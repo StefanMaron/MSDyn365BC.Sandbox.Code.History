@@ -4,15 +4,15 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.FinancialReports;
 
-page 8363 "Sheet Definition"
+page 8363 "Dimension Perspective"
 {
     ApplicationArea = Basic, Suite;
     AnalysisModeEnabled = false;
     AutoSplitKey = true;
-    Caption = 'Financial Report Sheet Definition';
+    Caption = 'Financial Report Dimension Perspective';
     MultipleNewLines = true;
     PageType = Worksheet;
-    SourceTable = "Sheet Definition Line";
+    SourceTable = "Dimension Perspective Line";
     UsageCategory = None;
 
     layout
@@ -22,60 +22,60 @@ page 8363 "Sheet Definition"
             field(Description; Description)
             {
                 Caption = 'Description';
-                ToolTip = 'Specifies the description of the sheet definition. The description is not shown on the final report but is used to provide more context when using the definition.';
+                ToolTip = 'Specifies the description of the dimension perspective. The description is not shown on the final report but is used to provide more context when using the definition.';
 
                 trigger OnValidate()
                 var
-                    SheetDefName: Record "Sheet Definition Name";
+                    DimPerspectiveName: Record "Dimension Perspective Name";
                 begin
-                    SheetDefName.Get(DefinitionName);
-                    SheetDefName.Validate(Description, Description);
-                    SheetDefName.Modify();
+                    DimPerspectiveName.Get(DefinitionName);
+                    DimPerspectiveName.Validate(Description, Description);
+                    DimPerspectiveName.Modify();
                 end;
             }
             field(InternalDescription; InternalDescription)
             {
                 Caption = 'Internal Description';
                 MultiLine = true;
-                ToolTip = 'Specifies the internal description of the sheet definition. The internal description is not shown on the final report but is used to provide more context when using the definition.';
+                ToolTip = 'Specifies the internal description of the dimension perspective. The internal description is not shown on the final report but is used to provide more context when using the definition.';
 
                 trigger OnValidate()
                 var
-                    SheetDefName: Record "Sheet Definition Name";
+                    DimPerspectiveName: Record "Dimension Perspective Name";
                 begin
-                    SheetDefName.Get(DefinitionName);
-                    SheetDefName.Validate("Internal Description", InternalDescription);
-                    SheetDefName.Modify();
+                    DimPerspectiveName.Get(DefinitionName);
+                    DimPerspectiveName.Validate("Internal Description", InternalDescription);
+                    DimPerspectiveName.Modify();
                 end;
             }
-            field(SheetType; SheetTypeText)
+            field(PerspectiveType; PerspectiveTypeText)
             {
-                Caption = 'Sheet Type';
-                ToolTip = 'Specifies how the financial report sheets will be totaled by. If you select Custom, then you can set up a combination of fields to total by on a sheet-by-sheet basis. Otherwise, sheets are automatically created and totaled by each dimension value or business unit.';
+                Caption = 'Perspective Type';
+                ToolTip = 'Specifies how the financial report dimension perspectives will be totaled by. If you select Custom, then you can set up a combination of fields to total by on a dimension-by-dimension basis. Otherwise, perspectives are automatically created and totaled by each dimension value or business unit.';
 
                 trigger OnLookup(var Text: Text): Boolean
                 var
-                    SheetDefName: Record "Sheet Definition Name";
+                    DimPerspectiveName: Record "Dimension Perspective Name";
                 begin
-                    SheetDefName.Get(DefinitionName);
-                    exit(SheetDefName.LookupSheetSheetType(Text));
+                    DimPerspectiveName.Get(DefinitionName);
+                    exit(DimPerspectiveName.LookupPerspectiveType(Text));
                 end;
 
                 trigger OnValidate()
                 var
-                    SheetDefName: Record "Sheet Definition Name";
+                    DimPerspectiveName: Record "Dimension Perspective Name";
                 begin
-                    SheetDefName.Get(DefinitionName);
-                    SheetDefName.Validate("Sheet Type", SheetDefName.TextToSheetType(SheetTypeText));
-                    SheetType := SheetDefName."Sheet Type";
-                    SheetDefName.Modify();
+                    DimPerspectiveName.Get(DefinitionName);
+                    DimPerspectiveName.Validate("Perspective Type", DimPerspectiveName.TextToPerspectiveType(PerspectiveTypeText));
+                    PerspectiveType := DimPerspectiveName."Perspective Type";
+                    DimPerspectiveName.Modify();
                     CurrPage.Update(false);
                 end;
             }
             repeater(Group)
             {
-                Enabled = SheetType = SheetType::Custom;
-                field("Sheet Header"; Rec."Sheet Header")
+                Enabled = PerspectiveType = PerspectiveType::Custom;
+                field("Perspective Header"; Rec."Perspective Header")
                 {
                     ShowMandatory = true;
                 }
@@ -121,16 +121,16 @@ page 8363 "Sheet Definition"
 
     trigger OnOpenPage()
     var
-        SheetDefName: Record "Sheet Definition Name";
+        DimPerspectiveName: Record "Dimension Perspective Name";
     begin
         if Rec.GetFilter(Name) <> '' then begin
             DefinitionName := Rec.GetRangeMin(Name);
             CurrPage.Caption(DefinitionName);
-            SheetDefName.Get(DefinitionName);
-            Description := SheetDefName.Description;
-            InternalDescription := SheetDefName."Internal Description";
-            SheetType := SheetDefName."Sheet Type";
-            SheetTypeText := SheetDefName.SheetTypeToText(SheetType);
+            DimPerspectiveName.Get(DefinitionName);
+            Description := DimPerspectiveName.Description;
+            InternalDescription := DimPerspectiveName."Internal Description";
+            PerspectiveType := DimPerspectiveName."Perspective Type";
+            PerspectiveTypeText := DimPerspectiveName.PerspectiveTypeToText(PerspectiveType);
         end;
     end;
 
@@ -138,6 +138,6 @@ page 8363 "Sheet Definition"
         DefinitionName: Code[10];
         Description: Text[100];
         InternalDescription: Text[250];
-        SheetType: Enum "Sheet Type";
-        SheetTypeText: Text;
+        PerspectiveType: Enum "Dimension Perspective Type";
+        PerspectiveTypeText: Text;
 }
