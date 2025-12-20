@@ -1246,6 +1246,90 @@ xmlport 1610 "Sales Invoice - PEPPOL BIS 3.0"
                         currXMLport.Skip();
                 end;
             }
+            tableelement(allowancechargepaymentdiscountloop; Integer)
+            {
+                NamespacePrefix = 'cac';
+                XmlName = 'AllowanceCharge';
+                SourceTableView = sorting(Number) where(Number = filter(1 ..));
+                textelement(ChargeIndicatorPaymentDiscount)
+                {
+                    XmlName = 'ChargeIndicator';
+                    NamespacePrefix = 'cbc';
+                }
+                textelement(AllowanceChargeReasonCodePaymentDiscount)
+                {
+                    XmlName = 'AllowanceChargeReasonCode';
+                    NamespacePrefix = 'cbc';
+                }
+                textelement(AllowanceChargeReasonPaymentDiscount)
+                {
+                    XmlName = 'AllowanceChargeReason';
+                    NamespacePrefix = 'cbc';
+                }
+                textelement(AmountPaymentDiscount)
+                {
+                    XmlName = 'Amount';
+                    NamespacePrefix = 'cbc';
+                    textattribute(allowancechargecurrencyidPaymentDiscount)
+                    {
+                        XmlName = 'currencyID';
+                    }
+                }
+                textelement(TaxCategoryPaymentDiscount)
+                {
+                    XmlName = 'TaxCategory';
+                    NamespacePrefix = 'cac';
+                    textelement(taxcategoryidPaymentDiscount)
+                    {
+                        NamespacePrefix = 'cbc';
+                        XmlName = 'ID';
+                    }
+                    textelement(PercentPaymentDiscount)
+                    {
+                        XmlName = 'Percent';
+                        NamespacePrefix = 'cbc';
+
+                        trigger OnBeforePassVariable()
+                        begin
+                            if PercentPaymentDiscount = '' then
+                                currXMLport.Skip();
+                        end;
+                    }
+                    textelement(TaxSchemePaymentDiscount)
+                    {
+                        XmlName = 'TaxScheme';
+                        NamespacePrefix = 'cac';
+                        textelement(allowancechargetaxschemeidPaymentDiscount)
+                        {
+                            NamespacePrefix = 'cbc';
+                            XmlName = 'ID';
+                        }
+                    }
+                }
+
+                trigger OnAfterGetRecord()
+                begin
+                    if not FindNextVATAmtRec(TempVATAmtLine, AllowanceChargePaymentDiscountLoop.Number) then
+                        currXMLport.Break();
+
+                    PEPPOLMgt.GetAllowanceChargeInfoPaymentDiscount(
+                      TempVATAmtLine,
+                      SalesHeader,
+                      ChargeIndicatorPaymentDiscount,
+                      AllowanceChargeReasonCodePaymentDiscount,
+                      DummyVar,
+                      AllowanceChargeReasonPaymentDiscount,
+                      AmountPaymentDiscount,
+                      AllowanceChargeCurrencyIDPaymentDiscount,
+                      TaxCategoryIDPaymentDiscount,
+                      DummyVar,
+                      PercentPaymentDiscount,
+                      AllowanceChargeTaxSchemeIDPaymentDiscount);
+
+                    if ChargeIndicatorPaymentDiscount = '' then
+                        currXMLport.Skip();
+                end;
+            }
             textelement(TaxTotal)
             {
                 NamespacePrefix = 'cac';
