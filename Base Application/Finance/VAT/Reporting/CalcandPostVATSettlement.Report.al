@@ -558,6 +558,9 @@ report 20 "Calc. and Post VAT Settlement"
                     GenJnlLine."Source Currency Amount" := VATAmountAddCurr;
                     GenJnlLine."Source Code" := SourceCodeSetup."VAT Settlement";
                     GenJnlLine."VAT Posting" := GenJnlLine."VAT Posting"::"Manual VAT Entry";
+
+                    OnVATPostingSetupOnPostDataItemOnBeforePostSettlement(GenJnlLine);
+
                     if PostSettlement then
                         PostGenJnlLine(GenJnlLine);
                     OnVATPostingSetupOnAfterOnPostDataItem(GenJnlLine, PostSettlement);
@@ -1186,6 +1189,16 @@ report 20 "Calc. and Post VAT Settlement"
     /// <param name="PostSettlement">Whether settlement entries are being posted to General Ledger</param>
     [IntegrationEvent(false, false)]
     local procedure OnVATPostingSetupOnAfterOnPostDataItem(GenJnlLine: Record "Gen. Journal Line"; PostSettlement: Boolean)
+    begin
+    end;
+
+    /// <summary>
+    /// Integration event raised before posting settlement entry during VAT posting setup processing.
+    /// Enables custom validation and modification of journal lines before settlement posting.
+    /// </summary>
+    /// <param name="GenJnlLine">General journal line being prepared for posting</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnVATPostingSetupOnPostDataItemOnBeforePostSettlement(var GenJnlLine: Record "Gen. Journal Line")
     begin
     end;
 }
