@@ -6,9 +6,9 @@ namespace Microsoft.Sales.Peppol;
 
 using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-using Microsoft.Foundation.Attachment;
 using System.Utilities;
 
 xmlport 1610 "Sales Invoice - PEPPOL BIS 3.0"

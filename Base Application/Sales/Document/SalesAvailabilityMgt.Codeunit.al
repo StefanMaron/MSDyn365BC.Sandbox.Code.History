@@ -4,13 +4,13 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Document;
 
+using Microsoft.Assembly.Document;
+using Microsoft.Foundation.Company;
 using Microsoft.Inventory.Availability;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Tracking;
-using Microsoft.Foundation.Company;
 using System.IO;
-using Microsoft.Assembly.Document;
 
 codeunit 99000872 "Sales Availability Mgt."
 {

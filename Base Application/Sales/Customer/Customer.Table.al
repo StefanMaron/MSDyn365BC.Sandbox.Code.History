@@ -57,8 +57,8 @@ using System.Email;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
-using System.Telemetry;
 using System.Security.User;
+using System.Telemetry;
 using System.Utilities;
 
 table 18 Customer

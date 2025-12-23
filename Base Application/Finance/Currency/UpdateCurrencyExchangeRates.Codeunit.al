@@ -7,8 +7,8 @@ namespace Microsoft.Finance.Currency;
 using Microsoft.Utilities;
 using System;
 using System.Environment.Configuration;
-using System.IO;
 using System.Integration;
+using System.IO;
 using System.Utilities;
 using System.Xml;
 

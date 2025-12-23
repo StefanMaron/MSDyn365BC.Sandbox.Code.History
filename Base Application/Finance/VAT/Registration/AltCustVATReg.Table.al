@@ -4,9 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.VAT.Registration;
 
-using Microsoft.Foundation.Address;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.Address;
 using Microsoft.Sales.Customer;
 using System.Telemetry;
 

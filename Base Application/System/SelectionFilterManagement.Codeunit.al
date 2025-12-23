@@ -1,5 +1,6 @@
 namespace System.Text;
 
+using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Payment;
 using Microsoft.CashFlow.Account;
 using Microsoft.CashFlow.Forecast;
@@ -18,7 +19,6 @@ using Microsoft.HumanResources.Employee;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Location;
-using Microsoft.Bank.BankAccount;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Inventory.Transfer;
 using Microsoft.Projects.Project.Job;

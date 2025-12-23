@@ -5,8 +5,8 @@
 namespace Microsoft.Service.Document;
 
 using Microsoft.Inventory.Item;
-using Microsoft.Service.Posting;
 using Microsoft.Service.Contract;
+using Microsoft.Service.Posting;
 
 codeunit 9065 "Check Service Document"
 {

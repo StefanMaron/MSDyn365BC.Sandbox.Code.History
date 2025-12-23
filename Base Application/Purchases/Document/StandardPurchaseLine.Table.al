@@ -4,9 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Purchases.Document;
 
+using Microsoft.Finance.AllocationAccount;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
-using Microsoft.Finance.AllocationAccount;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Item;

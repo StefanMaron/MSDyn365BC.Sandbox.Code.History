@@ -4,19 +4,19 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Service.Document;
 
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Inventory.Tracking;
+using Microsoft.Service.History;
 using Microsoft.Warehouse.Activity;
 using Microsoft.Warehouse.CrossDock;
 using Microsoft.Warehouse.Document;
-using Microsoft.Service.History;
+using Microsoft.Warehouse.History;
 using Microsoft.Warehouse.Journal;
 using Microsoft.Warehouse.Request;
 using Microsoft.Warehouse.Structure;
 using Microsoft.Warehouse.Worksheet;
 using System.Security.User;
-using Microsoft.Finance.ReceivablesPayables;
-using Microsoft.Foundation.AuditCodes;
-using Microsoft.Warehouse.History;
 
 codeunit 5995 "Service Warehouse Mgt."
 {

@@ -4,14 +4,14 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Projects.Project.Planning;
 
+using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Planning;
 using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Tracking;
-using Microsoft.Inventory.Ledger;
-using Microsoft.Foundation.Navigate;
-using Microsoft.Foundation.UOM;
 using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Project.Ledger;
 using Microsoft.Purchases.Document;

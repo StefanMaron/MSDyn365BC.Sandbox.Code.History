@@ -11,9 +11,9 @@ using Microsoft.Foundation.Company;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
 using System;
+using System.IO;
 using System.Utilities;
 using System.Xml;
-using System.IO;
 
 report 11309 "VAT Annual Listing - Disk"
 {
