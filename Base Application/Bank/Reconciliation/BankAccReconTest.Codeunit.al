@@ -5,8 +5,8 @@
 namespace Microsoft.Bank.Reconciliation;
 
 using Microsoft.Bank.BankAccount;
-using Microsoft.Bank.Statement;
 using Microsoft.Bank.Ledger;
+using Microsoft.Bank.Statement;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Ledger;

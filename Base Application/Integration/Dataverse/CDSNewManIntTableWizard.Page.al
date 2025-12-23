@@ -6,10 +6,10 @@
 
 namespace Microsoft.Integration.SyncEngine;
 
+using Microsoft.Integration.Dataverse;
+using System.Environment;
 using System.Reflection;
 using System.Utilities;
-using System.Environment;
-using Microsoft.Integration.Dataverse;
 
 page 5384 "CDS New Man. Int. Table Wizard"
 {

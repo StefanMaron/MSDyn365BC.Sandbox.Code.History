@@ -8,21 +8,21 @@ using Microsoft.Inventory.Journal;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Capacity;
+using Microsoft.Manufacturing.Family;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.Routing;
-using Microsoft.Manufacturing.Family;
 using Microsoft.Manufacturing.Setup;
 using Microsoft.Manufacturing.WorkCenter;
 using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.Activity.History;
+using Microsoft.Warehouse.Availability;
 using Microsoft.Warehouse.CrossDock;
 using Microsoft.Warehouse.Journal;
+using Microsoft.Warehouse.Ledger;
 using Microsoft.Warehouse.Request;
 using Microsoft.Warehouse.Structure;
 using Microsoft.Warehouse.Tracking;
 using Microsoft.Warehouse.Worksheet;
-using Microsoft.Warehouse.Availability;
-using Microsoft.Warehouse.Activity.History;
-using Microsoft.Warehouse.Ledger;
 
 codeunit 5996 "Prod. Order Warehouse Mgt."
 {

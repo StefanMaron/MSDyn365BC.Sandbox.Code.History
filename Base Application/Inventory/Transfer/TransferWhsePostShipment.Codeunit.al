@@ -4,11 +4,11 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Warehouse.Posting;
 
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Setup;
 using Microsoft.Inventory.Transfer;
 using Microsoft.Warehouse.Document;
-using Microsoft.Foundation.Navigate;
 using Microsoft.Warehouse.Setup;
-using Microsoft.Inventory.Setup;
 
 codeunit 5748 "Transfer Whse. Post Shipment"
 {
