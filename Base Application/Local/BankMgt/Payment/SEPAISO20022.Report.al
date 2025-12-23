@@ -5,16 +5,16 @@
 namespace Microsoft.Bank.Payment;
 
 using Microsoft.Finance.GeneralLedger.Setup;
-using Microsoft.Foundation.Company;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Company;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
 using System;
+using System.IO;
 using System.Text;
 using System.Xml;
-using System.IO;
 
 report 10883 "SEPA ISO20022"
 {

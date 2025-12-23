@@ -4,9 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Intercompany.DataExchange;
 
+using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Partner;
 using System.Telemetry;
-using Microsoft.Intercompany.GLAccount;
 
 /// <summary>
 /// Job queue runner for creating new intercompany notifications and managing outgoing notification queue.

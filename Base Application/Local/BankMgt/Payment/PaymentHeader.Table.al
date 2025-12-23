@@ -5,10 +5,10 @@
 namespace Microsoft.Bank.Payment;
 
 using Microsoft.Bank.BankAccount;
-using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.AuditCodes;

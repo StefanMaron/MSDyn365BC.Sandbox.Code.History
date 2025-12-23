@@ -2,8 +2,8 @@ namespace System.Security.AccessControl;
 
 using Microsoft.Bank.Payment;
 using Microsoft.Finance.FinancialReports;
-using Microsoft.Sales.Document;
 using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Sales.Document;
 
 permissionset 1002 "LOCAL READ"
 {

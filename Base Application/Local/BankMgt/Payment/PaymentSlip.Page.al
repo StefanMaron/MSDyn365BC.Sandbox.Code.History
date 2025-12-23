@@ -5,8 +5,8 @@
 namespace Microsoft.Bank.Payment;
 
 using Microsoft.Finance.Currency;
-using Microsoft.Sales.Customer;
 using Microsoft.Foundation.Navigate;
+using Microsoft.Sales.Customer;
 using System.Telemetry;
 
 page 10868 "Payment Slip"

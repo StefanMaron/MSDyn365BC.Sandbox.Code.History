@@ -5,21 +5,21 @@
 namespace Microsoft.Intercompany.DataExchange;
 
 using Microsoft.Bank.BankAccount;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Setup;
-using System.Globalization;
 using Microsoft.Foundation.Company;
+using Microsoft.Intercompany;
 using Microsoft.Intercompany.Comment;
 using Microsoft.Intercompany.Dimension;
 using Microsoft.Intercompany.GLAccount;
-using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Intercompany.Inbox;
+using Microsoft.Intercompany.Journal;
+using Microsoft.Intercompany.Outbox;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Intercompany.Setup;
-using Microsoft.Intercompany;
-using System.Threading;
-using Microsoft.Intercompany.Outbox;
+using System.Globalization;
 using System.Telemetry;
-using Microsoft.Intercompany.Journal;
+using System.Threading;
 
 /// <summary>
 /// Implements API-based intercompany data exchange for cross-system communication between partner companies.

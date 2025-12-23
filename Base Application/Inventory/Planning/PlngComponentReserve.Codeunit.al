@@ -4,10 +4,10 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Planning;
 
+using Microsoft.Assembly.Document;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
-using Microsoft.Assembly.Document;
 using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Tracking;
 

@@ -9,8 +9,8 @@ using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Purchases.Payables;
-using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
 
 report 10864 "Suggest Customer Payments"
 {

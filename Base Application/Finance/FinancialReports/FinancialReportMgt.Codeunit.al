@@ -6,8 +6,8 @@ namespace Microsoft.Finance.FinancialReports;
 
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Foundation.Period;
-using System.Environment.Configuration;
 using System.Environment;
+using System.Environment.Configuration;
 using System.IO;
 using System.Telemetry;
 

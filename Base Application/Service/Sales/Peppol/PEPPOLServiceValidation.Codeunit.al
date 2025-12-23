@@ -4,8 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Peppol;
 
-using Microsoft.Service.Document;
 using Microsoft.Sales.Document;
+using Microsoft.Service.Document;
 using Microsoft.Service.History;
 
 codeunit 1621 "PEPPOL Service Validation"

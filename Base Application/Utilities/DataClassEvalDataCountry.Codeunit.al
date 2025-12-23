@@ -4,16 +4,16 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Utilities;
 
+using Microsoft.Bank.Payment;
+using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Finance.VAT.Reporting;
 using Microsoft.HumanResources.Absence;
 using Microsoft.HumanResources.Employee;
 using Microsoft.HumanResources.Payables;
 using Microsoft.Sales.Archive;
-using System.Privacy;
-using Microsoft.Finance.FinancialReports;
 using Microsoft.Sales.Document;
-using Microsoft.Bank.Payment;
-using Microsoft.Finance.ReceivablesPayables;
+using System.Privacy;
 
 codeunit 1752 "Data Class. Eval. Data Country"
 {

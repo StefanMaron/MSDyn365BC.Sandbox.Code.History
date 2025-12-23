@@ -7,8 +7,8 @@ namespace Microsoft.Bank.Payment;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Company;
 using Microsoft.Sales.Customer;
-using System.Reflection;
 using System.IO;
+using System.Reflection;
 
 report 10880 "ETEBAC Files"
 {

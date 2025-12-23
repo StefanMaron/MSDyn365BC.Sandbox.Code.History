@@ -47,8 +47,8 @@ using System.Environment;
 using System.Environment.Configuration;
 using System.Privacy;
 using System.Security.User;
-using System.Utilities;
 using System.Threading;
+using System.Utilities;
 
 page 42 "Sales Order"
 {
