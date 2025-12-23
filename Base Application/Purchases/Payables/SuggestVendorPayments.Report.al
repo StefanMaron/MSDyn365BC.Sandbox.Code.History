@@ -5,6 +5,7 @@
 namespace Microsoft.Purchases.Payables;
 
 using Microsoft.Bank.BankAccount;
+using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
@@ -16,7 +17,6 @@ using Microsoft.Foundation.NoSeries;
 using Microsoft.Purchases.Vendor;
 using System.Environment;
 using System.Utilities;
-using Microsoft.EServices.EDocument;
 
 report 393 "Suggest Vendor Payments"
 {

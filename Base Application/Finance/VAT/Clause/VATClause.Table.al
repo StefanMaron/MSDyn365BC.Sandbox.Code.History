@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.VAT.Clause;
 
+using Microsoft.EServices.EDocument;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.ExtendedText;
 using Microsoft.Sales.Document;
@@ -11,7 +12,6 @@ using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Reminder;
 using System.Reflection;
-using Microsoft.EServices.EDocument;
 
 /// <summary>
 /// Stores VAT clause definitions for including explanatory text on VAT-related documents.

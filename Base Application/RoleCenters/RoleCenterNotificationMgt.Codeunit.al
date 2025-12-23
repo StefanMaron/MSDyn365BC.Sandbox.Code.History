@@ -7,12 +7,12 @@ namespace Microsoft.RoleCenters;
 using Microsoft;
 using Microsoft.Utilities;
 using System.DateTime;
-using System.Security.User;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;
-using System.Security.Authentication;
 using System.Reflection;
+using System.Security.Authentication;
+using System.Security.User;
 
 codeunit 1430 "Role Center Notification Mgt."
 {

@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.ReceivablesPayables;
 
+using Microsoft;
 using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.Team;
 using Microsoft.Finance.Currency;
@@ -19,7 +20,6 @@ using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
 using System.Security.AccessControl;
-using Microsoft;
 
 /// <summary>
 /// Buffer table for customer and vendor ledger entry data processing and reporting operations.

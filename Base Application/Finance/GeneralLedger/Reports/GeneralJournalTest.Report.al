@@ -12,6 +12,7 @@ using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
@@ -35,7 +36,6 @@ using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Setup;
 using System.Security.User;
 using System.Utilities;
-using Microsoft.Finance.ReceivablesPayables;
 
 /// <summary>
 /// Validates general journal entries for posting accuracy and completeness before final posting.

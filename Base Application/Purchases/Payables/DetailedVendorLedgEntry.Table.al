@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Purchases.Payables;
 
+using Microsoft;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Journal;
@@ -13,11 +14,10 @@ using Microsoft.Finance.SalesTax;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Receivables;
 using Microsoft.Utilities;
 using System.Security.AccessControl;
 using System.Security.User;
-using Microsoft.Sales.Receivables;
-using Microsoft;
 
 table 380 "Detailed Vendor Ledg. Entry"
 {

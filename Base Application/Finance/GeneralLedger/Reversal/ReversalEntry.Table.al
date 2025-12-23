@@ -13,6 +13,7 @@ using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Finance.VAT.Ledger;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
@@ -30,7 +31,6 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
 using System.Security.User;
 using System.Utilities;
-using Microsoft.Finance.ReceivablesPayables;
 
 /// <summary>
 /// Stores temporary information about ledger entries selected for reversal operations.

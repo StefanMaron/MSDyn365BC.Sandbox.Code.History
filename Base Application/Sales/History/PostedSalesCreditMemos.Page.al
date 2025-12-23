@@ -5,13 +5,13 @@
 namespace Microsoft.Sales.History;
 
 using Microsoft.CRM.Outlook;
+using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Foundation.Attachment;
-using Microsoft.Utilities;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
-using Microsoft.EServices.EDocument;
+using Microsoft.Utilities;
 
 page 144 "Posted Sales Credit Memos"
 {

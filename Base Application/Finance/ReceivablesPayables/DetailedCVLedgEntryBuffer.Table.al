@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.ReceivablesPayables;
 
+using Microsoft;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Setup;
@@ -14,7 +15,6 @@ using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
 using Microsoft.Sales.Receivables;
 using System.Security.AccessControl;
-using Microsoft;
 
 /// <summary>
 /// Buffer table for detailed customer and vendor ledger entry data including applications, payments, and adjustments.

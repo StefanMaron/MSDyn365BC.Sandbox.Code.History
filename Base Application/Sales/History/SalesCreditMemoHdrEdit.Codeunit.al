@@ -4,8 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.History;
 
-using Microsoft.Sales.Receivables;
 using Microsoft.EServices.EDocument;
+using Microsoft.Sales.Receivables;
 
 codeunit 1408 "Sales Credit Memo Hdr. - Edit"
 {

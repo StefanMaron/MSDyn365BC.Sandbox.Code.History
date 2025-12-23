@@ -11,6 +11,7 @@ using Microsoft.CRM.Duplicates;
 using Microsoft.CRM.Outlook;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Finance.VAT.Registration;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Attachment;
@@ -41,7 +42,6 @@ using System.Environment;
 using System.Environment.Configuration;
 using System.Integration.Word;
 using System.Privacy;
-using Microsoft.Finance.ReceivablesPayables;
 
 page 21 "Customer Card"
 {

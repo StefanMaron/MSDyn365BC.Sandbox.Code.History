@@ -4,20 +4,20 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Utilities;
 
+using Microsoft.EServices.EDocument;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Ledger;
 using Microsoft.Finance.VAT.Reporting;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.HumanResources.Absence;
 using Microsoft.HumanResources.Employee;
 using Microsoft.HumanResources.Payables;
-using Microsoft.Sales.Archive;
-using System.Privacy;
-using Microsoft.Finance.ReceivablesPayables;
-using Microsoft.EServices.EDocument;
-using Microsoft.Sales.Receivables;
-using Microsoft.Sales.History;
-using Microsoft.Purchases.Payables;
-using Microsoft.Foundation.AuditCodes;
 using Microsoft.Purchases.History;
-using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Archive;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
+using System.Privacy;
 
 codeunit 1752 "Data Class. Eval. Data Country"
 {

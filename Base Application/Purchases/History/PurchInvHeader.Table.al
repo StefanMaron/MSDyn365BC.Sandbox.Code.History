@@ -9,6 +9,7 @@ using Microsoft.Bank.Payment;
 using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Team;
+using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Deferral;
 using Microsoft.Finance.Dimension;
@@ -30,6 +31,7 @@ using Microsoft.Pricing.Calculation;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Remittance;
+using Microsoft.Purchases.Reports;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Utilities;
@@ -37,8 +39,6 @@ using System.Automation;
 using System.Globalization;
 using System.Security.AccessControl;
 using System.Security.User;
-using Microsoft.EServices.EDocument;
-using Microsoft.Purchases.Reports;
 
 table 122 "Purch. Inv. Header"
 {

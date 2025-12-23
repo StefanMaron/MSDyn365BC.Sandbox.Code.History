@@ -17,16 +17,16 @@ using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Reports;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Comment;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
 using Microsoft.Utilities;
 using System.Email;
 using System.Telemetry;
-using Microsoft.Finance.ReceivablesPayables;
-using Microsoft.Sales.Receivables;
-using Microsoft.Sales.History;
-using Microsoft.Purchases.Payables;
-using Microsoft.Purchases.History;
 
 /// <summary>
 /// Primary interface for managing bank account master data and configuration.

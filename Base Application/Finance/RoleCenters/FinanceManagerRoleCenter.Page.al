@@ -38,6 +38,7 @@ using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Reports;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Finance.VAT.Clause;
 using Microsoft.Finance.VAT.Ledger;
 using Microsoft.Finance.VAT.RateChange;
@@ -87,13 +88,12 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
-using Microsoft.Sales.Reports;
-using Microsoft.Sales.Setup;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
+using Microsoft.Sales.Reports;
+using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
 using System.Diagnostics;
-using Microsoft.Finance.ReceivablesPayables;
 
 page 8901 "Finance Manager Role Center"
 {

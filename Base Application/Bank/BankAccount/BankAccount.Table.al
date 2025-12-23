@@ -17,11 +17,17 @@ using Microsoft.EServices.OnlineMap;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Comment;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Inventory.Intrastat;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
 using Microsoft.Utilities;
 using System;
 using System.Email;
@@ -29,12 +35,6 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Threading;
-using Microsoft.Finance.ReceivablesPayables;
-using Microsoft.Foundation.AuditCodes;
-using Microsoft.Sales.History;
-using Microsoft.Sales.Receivables;
-using Microsoft.Purchases.History;
-using Microsoft.Purchases.Payables;
 
 /// <summary>
 /// Master data table for bank account information and configuration.

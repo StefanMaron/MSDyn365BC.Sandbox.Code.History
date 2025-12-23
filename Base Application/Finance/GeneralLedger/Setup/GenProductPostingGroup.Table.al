@@ -5,11 +5,11 @@
 namespace Microsoft.Finance.GeneralLedger.Setup;
 
 using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.VAT.Reporting;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Inventory.Item;
 using Microsoft.Projects.Resources.Resource;
 using System.Utilities;
-using Microsoft.Finance.VAT.Reporting;
 
 /// <summary>
 /// Defines general product posting groups and default VAT product group linkage.

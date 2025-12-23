@@ -5,11 +5,11 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Booking;
 
+using Microsoft.CRM.Outlook;
 using Microsoft.Inventory.Item;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Utilities;
-using Microsoft.CRM.Outlook;
 
 page 1638 "Booking Items"
 {

@@ -5,11 +5,12 @@
 namespace Microsoft.Sales.Document;
 
 using Microsoft.CRM.Contact;
+using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
-using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Reporting;
@@ -30,7 +31,6 @@ using Microsoft.Warehouse.InventoryDocument;
 using Microsoft.Warehouse.Request;
 using System.Automation;
 using System.Security.User;
-using Microsoft.EServices.EDocument;
 using System.Threading;
 
 page 6630 "Sales Return Order"

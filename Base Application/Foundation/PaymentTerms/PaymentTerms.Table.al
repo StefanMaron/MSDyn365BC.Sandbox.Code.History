@@ -4,9 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Foundation.PaymentTerms;
 
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Integration.Dataverse;
 using System.Globalization;
-using Microsoft.Finance.ReceivablesPayables;
 
 table 3 "Payment Terms"
 {

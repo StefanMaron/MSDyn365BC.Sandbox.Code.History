@@ -58,8 +58,8 @@ using Microsoft.Warehouse.Journal;
 using Microsoft.Warehouse.Request;
 using Microsoft.Warehouse.Setup;
 using Microsoft.Warehouse.Structure;
-using System.Utilities;
 using System.Environment.Configuration;
+using System.Utilities;
 
 table 39 "Purchase Line"
 {

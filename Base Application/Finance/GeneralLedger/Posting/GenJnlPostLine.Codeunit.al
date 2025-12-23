@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.GeneralLedger.Posting;
 
+using Microsoft;
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Check;
 using Microsoft.Bank.Ledger;
@@ -42,7 +43,6 @@ using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Setup;
 using System.Telemetry;
-using Microsoft;
 
 /// <summary>
 /// Core posting engine for individual general journal lines with comprehensive validation and ledger entry creation.

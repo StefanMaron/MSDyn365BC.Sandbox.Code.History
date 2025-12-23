@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Purchases.Payables;
 
+using Microsoft;
 using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.Team;
 using Microsoft.EServices.EDocument;
@@ -22,11 +23,10 @@ using Microsoft.Purchases.History;
 using Microsoft.Purchases.Remittance;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
+using Microsoft.Sales.Receivables;
 using Microsoft.Utilities;
 using System.Security.AccessControl;
 using System.Utilities;
-using Microsoft.Sales.Receivables;
-using Microsoft;
 
 table 25 "Vendor Ledger Entry"
 {

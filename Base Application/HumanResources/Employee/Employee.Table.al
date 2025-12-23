@@ -8,21 +8,21 @@ using Microsoft.Bank.Setup;
 using Microsoft.CostAccounting.Account;
 using Microsoft.CRM.Team;
 using Microsoft.EServices.OnlineMap;
+using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.Period;
 using Microsoft.HumanResources.Absence;
 using Microsoft.HumanResources.Comment;
 using Microsoft.HumanResources.Payables;
-using Microsoft.Foundation.Period;
 using Microsoft.HumanResources.Setup;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Projects.Resources.Setup;
 using System.Email;
-using Microsoft.Finance.Currency;
-using Microsoft.Finance.GeneralLedger.Setup;
 
 
 table 5200 Employee

@@ -9,6 +9,7 @@ using Microsoft.Bank.Reconciliation;
 using Microsoft.Finance.Dimension.Correction;
 using Microsoft.Finance.GeneralLedger.Reports;
 using Microsoft.Finance.GeneralLedger.Reversal;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Finance.VAT.Ledger;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Maintenance;
@@ -16,7 +17,6 @@ using Microsoft.Foundation.AuditCodes;
 using Microsoft.HumanResources.Payables;
 using Microsoft.Inventory.Ledger;
 using System.Security.User;
-using Microsoft.Finance.ReceivablesPayables;
 
 /// <summary>
 /// Displays G/L registers with navigation to related ledger entries and reporting capabilities.

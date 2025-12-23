@@ -14,12 +14,12 @@ using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Budget;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.Period;
 using System.IO;
 using System.Telemetry;
 using System.Text;
 using System.Utilities;
-using Microsoft.Foundation.Enums;
 
 /// <summary>
 /// Generates financial reports based on account schedules and column layouts with flexible filtering and formatting options.

@@ -30,6 +30,7 @@ using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Reports;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Finance.VAT.Registration;
 using Microsoft.Finance.VAT.Reporting;
 using Microsoft.FixedAssets.Depreciation;
@@ -37,8 +38,10 @@ using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Insurance;
 using Microsoft.FixedAssets.Journal;
 using Microsoft.FixedAssets.Setup;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.Period;
+using Microsoft.Foundation.Task;
 using Microsoft.Inventory.Costing;
 using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Document;
@@ -58,10 +61,7 @@ using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Reports;
 #endif
 using Microsoft.Sales.Setup;
-using Microsoft.Foundation.Navigate;
-using Microsoft.Foundation.Task;
 using System.Threading;
-using Microsoft.Finance.ReceivablesPayables;
 
 page 9001 "Accounting Manager Role Center"
 {

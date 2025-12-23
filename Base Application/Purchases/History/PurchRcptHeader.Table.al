@@ -28,13 +28,13 @@ using Microsoft.Inventory.Location;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Reports;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using System.Automation;
 using System.Globalization;
 using System.Security.AccessControl;
 using System.Security.User;
-using Microsoft.Purchases.Reports;
 
 table 120 "Purch. Rcpt. Header"
 {

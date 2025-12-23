@@ -13,8 +13,8 @@ using Microsoft.Sales.Document;
 using Microsoft.Warehouse.Document;
 using Microsoft.Warehouse.Journal;
 using Microsoft.Warehouse.Worksheet;
-using System.Text;
 using System.Reflection;
+using System.Text;
 
 codeunit 5752 "Get Source Doc. Outbound"
 {

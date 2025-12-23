@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Purchases.History;
 
+using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Deferral;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
@@ -35,7 +36,6 @@ using Microsoft.Purchases.Vendor;
 using Microsoft.Warehouse.Structure;
 using System.Reflection;
 using System.Security.User;
-using Microsoft.EServices.EDocument;
 
 table 123 "Purch. Inv. Line"
 {

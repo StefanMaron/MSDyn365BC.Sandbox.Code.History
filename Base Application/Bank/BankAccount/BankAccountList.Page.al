@@ -11,14 +11,14 @@ using Microsoft.Bank.Reports;
 using Microsoft.Bank.Statement;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Reports;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Foundation.Comment;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
 using System.Diagnostics;
 using System.Email;
-using Microsoft.Finance.ReceivablesPayables;
-using Microsoft.Sales.Receivables;
-using Microsoft.Sales.History;
-using Microsoft.Purchases.Payables;
-using Microsoft.Purchases.History;
 
 /// <summary>
 /// List interface for viewing and managing multiple bank accounts.

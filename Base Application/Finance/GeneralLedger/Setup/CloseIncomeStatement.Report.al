@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.GeneralLedger.Setup;
 
+using Microsoft;
 using Microsoft.Finance.Analysis;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
@@ -16,7 +17,6 @@ using Microsoft.Foundation.Period;
 using Microsoft.Inventory.Setup;
 using Microsoft.Utilities;
 using System.Globalization;
-using Microsoft;
 
 /// <summary>
 /// Year-end report that closes income statement accounts by transferring balances to retained earnings.

@@ -8,10 +8,10 @@ using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Check;
 using Microsoft.Bank.Ledger;
 using Microsoft.CostAccounting.Ledger;
-using Microsoft.Utilities;
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Finance.VAT.Ledger;
 using Microsoft.FixedAssets.Insurance;
 using Microsoft.FixedAssets.Ledger;
@@ -38,9 +38,9 @@ using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
+using Microsoft.Utilities;
 using System.IO;
 using System.Text;
-using Microsoft.Finance.ReceivablesPayables;
 
 page 344 Navigate
 {

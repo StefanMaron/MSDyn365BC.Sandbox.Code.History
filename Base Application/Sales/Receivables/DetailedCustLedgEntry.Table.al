@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Receivables;
 
+using Microsoft;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Journal;
@@ -16,7 +17,6 @@ using Microsoft.Sales.Customer;
 using Microsoft.Utilities;
 using System.Security.AccessControl;
 using System.Security.User;
-using Microsoft;
 
 table 379 "Detailed Cust. Ledg. Entry"
 {

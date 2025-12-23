@@ -5,12 +5,12 @@
 namespace Microsoft.Sales.Receivables;
 
 using Microsoft.Bank.BankAccount;
-using Microsoft.Foundation.Enums;
 using Microsoft.Bank.DirectDebit;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Sales.History;
 

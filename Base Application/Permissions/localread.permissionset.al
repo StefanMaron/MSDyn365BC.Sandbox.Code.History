@@ -1,15 +1,15 @@
 namespace System.Security.AccessControl;
 
-using Microsoft.Finance.VAT.Reporting;
 using Microsoft;
-using Microsoft.Finance.ReceivablesPayables;
-using Microsoft.Sales.Receivables;
-using Microsoft.Foundation.AuditCodes;
-using Microsoft.Purchases.Payables;
-using Microsoft.Finance.VAT.Ledger;
-using Microsoft.Sales.History;
-using Microsoft.Purchases.History;
 using Microsoft.EServices.EDocument;
+using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Finance.VAT.Reporting;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Receivables;
 
 permissionset 1002 "LOCAL READ"
 {

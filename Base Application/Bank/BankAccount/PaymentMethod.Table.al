@@ -7,9 +7,9 @@ namespace Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Payment;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Sales.Receivables;
 using System.Globalization;
 using System.IO;
-using Microsoft.Sales.Receivables;
 
 /// <summary>
 /// Defines payment methods and their processing characteristics for transactions.
