@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Document;
 
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Journal;
@@ -13,9 +14,8 @@ using Microsoft.Inventory.Planning;
 using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Purchases.Document;
-using Microsoft.Warehouse.Document;
 using Microsoft.Sales.History;
-using Microsoft.Foundation.Navigate;
+using Microsoft.Warehouse.Document;
 
 codeunit 99000832 "Sales Line-Reserve"
 {

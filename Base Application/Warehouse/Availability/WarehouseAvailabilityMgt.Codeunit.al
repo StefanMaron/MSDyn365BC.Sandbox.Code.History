@@ -5,6 +5,7 @@
 namespace Microsoft.Warehouse.Availability;
 
 using Microsoft.Assembly.Document;
+using Microsoft.Inventory.Availability;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
@@ -12,7 +13,6 @@ using Microsoft.Inventory.Tracking;
 using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Project.Planning;
 using Microsoft.Warehouse.Activity;
-using Microsoft.Inventory.Availability;
 using Microsoft.Warehouse.Document;
 using Microsoft.Warehouse.History;
 using Microsoft.Warehouse.Ledger;

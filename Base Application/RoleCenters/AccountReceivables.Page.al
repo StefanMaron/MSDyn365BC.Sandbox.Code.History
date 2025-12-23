@@ -4,25 +4,25 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.RoleCenters;
 
+using Microsoft.Bank.DirectDebit;
 using Microsoft.Bank.Payment;
-using Microsoft.Sales.Customer;
-using Microsoft.Foundation.Task;
-using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Bank.Reconciliation;
+using Microsoft.EServices.EDocument;
 using Microsoft.Finance.GeneralLedger.Journal;
-using Microsoft.Sales.Reports;
-using Microsoft.Sales.History;
-using Microsoft.Sales.Reminder;
+using Microsoft.Finance.GeneralLedger.Ledger;
+using Microsoft.Finance.GeneralLedger.Reports;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.Task;
+using Microsoft.RoleCenters;
+using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.FinanceCharge;
-using Microsoft.Bank.DirectDebit;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Reminder;
+using Microsoft.Sales.Reports;
 using Microsoft.Sales.Setup;
 using System.Visualization;
-using Microsoft.Finance.GeneralLedger.Ledger;
-using Microsoft.Bank.Reconciliation;
-using Microsoft.Foundation.Navigate;
-using Microsoft.Finance.GeneralLedger.Reports;
-using Microsoft.RoleCenters;
-using Microsoft.EServices.EDocument;
 
 page 9077 "Account Receivables"
 {

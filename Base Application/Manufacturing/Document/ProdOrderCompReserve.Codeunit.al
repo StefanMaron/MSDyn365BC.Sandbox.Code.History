@@ -4,15 +4,15 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Manufacturing.Document;
 
+using Microsoft.Foundation.Navigate;
+using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Journal;
 using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Planning;
 using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Tracking;
-using Microsoft.Foundation.Navigate;
 using Microsoft.Purchases.Document;
-using Microsoft.Inventory.Item;
 
 codeunit 99000838 "Prod. Order Comp.-Reserve"
 {
