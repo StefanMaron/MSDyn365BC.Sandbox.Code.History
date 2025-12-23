@@ -8,8 +8,8 @@ using Microsoft.CRM.Team;
 using Microsoft.Inventory.Location;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
-using System.Utilities;
 using System.Globalization;
+using System.Utilities;
 
 /// <summary>
 /// Validates dimension value posting rules and identifies conflicts between default dimension configurations.

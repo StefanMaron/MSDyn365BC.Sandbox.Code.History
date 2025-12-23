@@ -5,8 +5,8 @@
 namespace Microsoft.HumanResources.Employee;
 
 using Microsoft.Finance.GeneralLedger.Account;
-using Microsoft.HumanResources.Payables;
 using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.HumanResources.Payables;
 
 table 5221 "Employee Posting Group"
 {

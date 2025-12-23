@@ -26,6 +26,7 @@ using Microsoft.Sales.History;
 using Microsoft.Sales.Pricing;
 using Microsoft.Utilities;
 using System;
+using System.Apps;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Media;
@@ -33,7 +34,6 @@ using System.Reflection;
 using System.Telemetry;
 using System.Threading;
 using System.Utilities;
-using System.Apps;
 
 codeunit 5330 "CRM Integration Management"
 {
