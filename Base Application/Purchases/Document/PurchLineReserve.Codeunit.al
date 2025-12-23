@@ -4,15 +4,15 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Purchases.Document;
 
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Journal;
 using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Planning;
 using Microsoft.Inventory.Tracking;
-using Microsoft.Sales.Document;
 using Microsoft.Purchases.History;
-using Microsoft.Foundation.Navigate;
+using Microsoft.Sales.Document;
 
 codeunit 99000834 "Purch. Line-Reserve"
 {

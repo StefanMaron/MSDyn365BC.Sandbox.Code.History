@@ -5,11 +5,11 @@
 namespace Microsoft.Inventory.Location;
 
 using Microsoft.Finance.Dimension;
+using Microsoft.Finance.SalesTax;
 using Microsoft.Inventory.Reports;
 using Microsoft.Inventory.Transfer;
 using Microsoft.Warehouse.Structure;
 using System.Text;
-using Microsoft.Finance.SalesTax;
 
 page 15 "Location List"
 {

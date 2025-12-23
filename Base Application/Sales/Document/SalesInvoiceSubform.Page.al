@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Document;
 
+using Microsoft.eServices.EDocument;
 using Microsoft.Finance.AllocationAccount;
 using Microsoft.Finance.AllocationAccount.Sales;
 using Microsoft.Finance.Currency;
@@ -23,7 +24,6 @@ using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
 using System.Environment.Configuration;
 using System.Integration.Excel;
-using Microsoft.eServices.EDocument;
 
 page 47 "Sales Invoice Subform"
 {

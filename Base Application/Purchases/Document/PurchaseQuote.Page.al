@@ -15,6 +15,7 @@ using Microsoft.Foundation.Reporting;
 using Microsoft.Inventory.Reports;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Reports;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Utilities;
 using System.Automation;
@@ -22,7 +23,6 @@ using System.Environment;
 using System.Environment.Configuration;
 using System.Privacy;
 using System.Security.User;
-using Microsoft.Purchases.Reports;
 
 page 49 "Purchase Quote"
 {

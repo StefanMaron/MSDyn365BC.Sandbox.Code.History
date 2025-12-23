@@ -4,8 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.SalesTax;
 
-using Microsoft.Service.Document;
 using Microsoft.Finance.Currency;
+using Microsoft.Service.Document;
 using Microsoft.Service.History;
 
 codeunit 5968 "Serv. Sales Tax Calculate"

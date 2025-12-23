@@ -22,6 +22,7 @@ using Microsoft.Foundation.Reporting;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Reports;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
@@ -41,7 +42,6 @@ using System.Environment;
 using System.Integration.Word;
 using System.Privacy;
 using System.Utilities;
-using Microsoft.Inventory.Location;
 
 page 26 "Vendor Card"
 {

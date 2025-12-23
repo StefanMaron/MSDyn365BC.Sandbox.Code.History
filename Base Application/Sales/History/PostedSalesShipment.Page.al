@@ -5,6 +5,7 @@
 namespace Microsoft.Sales.History;
 
 using Microsoft.CRM.Contact;
+using Microsoft.eServices.EDocument;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
@@ -12,7 +13,6 @@ using Microsoft.Foundation.Attachment;
 using Microsoft.Sales.Comment;
 using Microsoft.Utilities;
 using System.Automation;
-using Microsoft.eServices.EDocument;
 
 page 130 "Posted Sales Shipment"
 {

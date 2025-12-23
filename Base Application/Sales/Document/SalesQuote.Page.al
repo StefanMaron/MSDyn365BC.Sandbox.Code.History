@@ -21,12 +21,12 @@ using Microsoft.Sales.Archive;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Pricing;
+using Microsoft.Sales.Reports;
 using Microsoft.Utilities;
 using System.Automation;
 using System.Environment;
 using System.Privacy;
 using System.Security.User;
-using Microsoft.Sales.Reports;
 
 page 41 "Sales Quote"
 {

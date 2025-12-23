@@ -6,8 +6,8 @@ namespace Microsoft.Finance.SalesTax;
 
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Setup;
-using System.Telemetry;
 using System.Globalization;
+using System.Telemetry;
 
 /// <summary>
 /// Stores tax jurisdiction definitions with account mappings and calculation rules.

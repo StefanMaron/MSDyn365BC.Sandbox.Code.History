@@ -5,8 +5,8 @@
 namespace Microsoft.Projects.TimeSheet;
 
 using Microsoft.Service.Document;
-using Microsoft.Service.Setup;
 using Microsoft.Service.History;
+using Microsoft.Service.Setup;
 
 codeunit 6451 "Serv. Time Sheet Mgt."
 {

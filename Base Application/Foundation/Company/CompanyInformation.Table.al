@@ -5,6 +5,7 @@
 namespace Microsoft.Foundation.Company;
 
 using Microsoft.Bank.Setup;
+using Microsoft.eServices.EDocument;
 using Microsoft.EServices.OnlineMap;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.SalesTax;
@@ -19,7 +20,6 @@ using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
-using Microsoft.eServices.EDocument;
 
 table 79 "Company Information"
 {

@@ -6,17 +6,17 @@ namespace Microsoft.Projects.RoleCenters;
 
 using Microsoft.EServices.EDocument;
 using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.Task;
 using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Reports;
 using Microsoft.Projects.Resources.Journal;
+using Microsoft.Projects.Resources.Reports;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Projects.TimeSheet;
 using Microsoft.RoleCenters;
 using Microsoft.Sales.Customer;
 using Microsoft.Utilities;
-using Microsoft.Foundation.Task;
 using System.Threading;
-using Microsoft.Projects.Resources.Reports;
-using Microsoft.Projects.Project.Reports;
 
 page 9014 "Job Resource Manager RC"
 {
