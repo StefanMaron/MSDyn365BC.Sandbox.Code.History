@@ -5,8 +5,8 @@
 namespace Microsoft.Finance.Currency;
 
 using Microsoft.Finance.GeneralLedger.Journal;
-using Microsoft.Purchases.Payables;
 using Microsoft.HumanResources.Payables;
+using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Receivables;
 
 /// <summary>

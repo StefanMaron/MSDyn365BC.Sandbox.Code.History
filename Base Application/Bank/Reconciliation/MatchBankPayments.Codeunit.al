@@ -7,6 +7,7 @@ namespace Microsoft.Bank.Reconciliation;
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.DirectDebit;
 using Microsoft.Bank.Ledger;
+using Microsoft.Bank.Payment;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.HumanResources.Employee;
@@ -19,7 +20,6 @@ using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Setup;
 using System.Environment.Configuration;
 using System.Telemetry;
-using Microsoft.Bank.Payment;
 
 /// <summary>
 /// Core engine for automatic matching of bank statement lines to customer, vendor, and general ledger entries.

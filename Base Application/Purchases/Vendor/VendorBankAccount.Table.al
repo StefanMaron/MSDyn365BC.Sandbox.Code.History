@@ -4,8 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Purchases.Vendor;
 
-using Microsoft.Bank.Setup;
+using Microsoft.Bank;
 using Microsoft.Bank.Payment;
+using Microsoft.Bank.Setup;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Foundation.Address;
@@ -13,7 +14,6 @@ using Microsoft.Foundation.Company;
 using Microsoft.Purchases.Payables;
 using System.Email;
 using System.Globalization;
-using Microsoft.Bank;
 
 table 288 "Vendor Bank Account"
 {

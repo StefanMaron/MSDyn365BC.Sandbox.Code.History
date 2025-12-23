@@ -9,6 +9,7 @@ using Microsoft.Foundation.BatchProcessing;
 using Microsoft.Foundation.Company;
 using Microsoft.Intercompany;
 using Microsoft.Intercompany.GLAccount;
+using Microsoft.Intercompany.Inbox;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Intercompany.Setup;
 using Microsoft.Purchases.Document;
@@ -18,7 +19,6 @@ using System.Environment;
 using System.IO;
 using System.Telemetry;
 using System.Utilities;
-using Microsoft.Intercompany.Inbox;
 
 /// <summary>
 /// Manages intercompany outbox transaction export and transmission operations.

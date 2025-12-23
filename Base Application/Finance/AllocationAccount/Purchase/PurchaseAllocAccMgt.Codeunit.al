@@ -7,11 +7,11 @@ namespace Microsoft.Finance.AllocationAccount.Purchase;
 using Microsoft.Finance.AllocationAccount;
 using Microsoft.Finance.Deferral;
 using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Inventory.Posting;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Posting;
 using System.Automation;
-using Microsoft.Finance.GeneralLedger.Account;
 
 /// <summary>
 /// Manages allocation account operations for purchase documents including line creation and validation.

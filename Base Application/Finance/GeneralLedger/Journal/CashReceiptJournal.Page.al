@@ -4,8 +4,10 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.GeneralLedger.Journal;
 
+using Microsoft.Bank.Payment;
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.Analysis;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Posting;
@@ -13,6 +15,7 @@ using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Environment;
 using System.Environment.Configuration;
@@ -20,9 +23,6 @@ using System.Integration;
 using System.Privacy;
 using System.Telemetry;
 using System.Threading;
-using Microsoft.Bank.Payment;
-using Microsoft.Finance.Analysis;
-using Microsoft.Utilities;
 
 /// <summary>
 /// Provides cash receipt journal functionality for recording customer payments and cash transactions.

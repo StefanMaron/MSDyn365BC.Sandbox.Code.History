@@ -5,18 +5,18 @@
 namespace Microsoft.Service.Document;
 
 using Microsoft.CRM.Contact;
+using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
-using Microsoft.Service.Setup;
 using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Reporting;
-using Microsoft.EServices.EDocument;
 using Microsoft.Sales.Customer;
 using Microsoft.Service.Comment;
 using Microsoft.Service.History;
 using Microsoft.Service.Posting;
+using Microsoft.Service.Setup;
 using Microsoft.Utilities;
 using System.Security.User;
 

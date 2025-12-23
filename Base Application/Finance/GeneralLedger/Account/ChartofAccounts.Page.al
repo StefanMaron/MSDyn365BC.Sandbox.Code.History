@@ -8,6 +8,7 @@ using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Analysis;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
+using Microsoft.Finance.Finance.GeneralLedger.Reports;
 using Microsoft.Finance.FinancialReports;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
@@ -15,7 +16,6 @@ using Microsoft.Finance.GeneralLedger.Reports;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Comment;
 using Microsoft.Foundation.ExtendedText;
-using Microsoft.Finance.Finance.GeneralLedger.Reports;
 
 /// <summary>
 /// Primary interface for managing the complete chart of accounts structure with hierarchical display and account operations.

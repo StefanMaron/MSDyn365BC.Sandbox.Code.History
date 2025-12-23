@@ -6,6 +6,7 @@ namespace Microsoft.Finance.GeneralLedger.Journal;
 
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.Analysis;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Posting;
@@ -20,7 +21,6 @@ using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;
 using System.Threading;
-using Microsoft.Finance.Analysis;
 
 /// <summary>
 /// Purchase journal page for entering purchase transactions and vendor-related general journal entries.

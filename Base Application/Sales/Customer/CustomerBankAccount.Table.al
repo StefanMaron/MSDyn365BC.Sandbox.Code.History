@@ -4,6 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Customer;
 
+using Microsoft.Bank;
+using Microsoft.Bank.Payment;
 using Microsoft.Bank.Setup;
 using Microsoft.Finance.Currency;
 using Microsoft.Foundation.Address;
@@ -11,8 +13,6 @@ using Microsoft.Foundation.Company;
 using Microsoft.Sales.Receivables;
 using System.Email;
 using System.Globalization;
-using Microsoft.Bank.Payment;
-using Microsoft.Bank;
 
 table 287 "Customer Bank Account"
 {

@@ -11,6 +11,7 @@ using Microsoft.Bank.PositivePay;
 using Microsoft.Bank.Setup;
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.Analysis;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Posting;
@@ -18,21 +19,20 @@ using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Foundation.Reporting;
 using Microsoft.HumanResources.Payables;
-using Microsoft.Sales.Receivables;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Remittance;
 using Microsoft.Purchases.Reports;
 using Microsoft.Purchases.Setup;
+using Microsoft.Sales.Receivables;
 using Microsoft.Utilities;
 using System.Automation;
 using System.Environment;
 using System.Environment.Configuration;
-using System.Telemetry;
 using System.Integration;
 using System.Privacy;
+using System.Telemetry;
 using System.Threading;
 using System.Utilities;
-using Microsoft.Finance.Analysis;
 
 /// <summary>
 /// Specialized journal interface for vendor payments, employee reimbursements, and outbound cash transactions.

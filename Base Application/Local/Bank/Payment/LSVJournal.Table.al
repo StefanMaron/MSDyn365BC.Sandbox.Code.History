@@ -5,9 +5,9 @@
 namespace Microsoft.Bank.Payment;
 
 using Microsoft.Bank.BankAccount;
-using Microsoft.Foundation.Enums;
 using Microsoft.Bank.DirectDebit;
 using Microsoft.Finance.Currency;
+using Microsoft.Foundation.Enums;
 using Microsoft.Sales.Receivables;
 using System.Security.AccessControl;
 

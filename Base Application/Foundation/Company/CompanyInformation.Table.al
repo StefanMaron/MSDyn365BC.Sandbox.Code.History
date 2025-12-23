@@ -10,6 +10,7 @@ using Microsoft.Finance.VAT.Registration;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.Enums;
+using Microsoft.Inventory.Intrastat;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Location;
 using Microsoft.Pricing.Calculation;
@@ -18,7 +19,6 @@ using System.Email;
 using System.Globalization;
 using System.Telemetry;
 using System.Utilities;
-using Microsoft.Inventory.Intrastat;
 
 table 79 "Company Information"
 {

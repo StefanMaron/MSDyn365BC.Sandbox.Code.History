@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Purchases.Posting;
 
+using Microsoft.Bank.Payment;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Deferral;
 using Microsoft.Finance.Dimension;
@@ -22,7 +23,6 @@ using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Setup;
-using Microsoft.Bank.Payment;
 
 codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
 {

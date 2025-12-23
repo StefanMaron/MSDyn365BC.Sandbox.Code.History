@@ -54,15 +54,15 @@ using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using Microsoft.Warehouse.Document;
 using Microsoft.Warehouse.Journal;
 using Microsoft.Warehouse.Request;
 using Microsoft.Warehouse.Setup;
 using Microsoft.Warehouse.Structure;
-using Microsoft.Utilities;
+using System.Environment.Configuration;
 using System.Security.AccessControl;
 using System.Utilities;
-using System.Environment.Configuration;
 
 table 37 "Sales Line"
 {

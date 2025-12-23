@@ -1,8 +1,9 @@
 #if not CLEAN26
 namespace System.Integration.PowerBI;
-using System.Telemetry;
+
 using System.Environment.Configuration;
 using System.Globalization;
+using System.Telemetry;
 
 page 6323 "Power BI Element Card"
 {
