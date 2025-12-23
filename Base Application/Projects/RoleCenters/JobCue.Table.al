@@ -4,10 +4,10 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Projects.RoleCenters;
 
-using Microsoft.Projects.Project.Job;
-using Microsoft.Projects.Resources.Resource;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
 
 table 9057 "Job Cue"
 {

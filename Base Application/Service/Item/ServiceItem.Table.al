@@ -9,6 +9,7 @@ using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.UOM;
+using Microsoft.Integration.Dataverse;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Projects.Resources.Resource;
@@ -25,7 +26,6 @@ using Microsoft.Service.Resources;
 using Microsoft.Service.Setup;
 using Microsoft.Utilities;
 using System.Utilities;
-using Microsoft.Integration.Dataverse;
 
 table 5940 "Service Item"
 {

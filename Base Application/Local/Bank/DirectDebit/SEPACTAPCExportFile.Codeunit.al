@@ -4,13 +4,13 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Bank.DirectDebit;
 
-using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Payment;
-using System.Utilities;
-using System.IO;
-using System.Xml;
+using Microsoft.Finance.GeneralLedger.Journal;
 using System;
+using System.IO;
+using System.Utilities;
+using System.Xml;
 
 codeunit 11100 "SEPA CT APC-Export File"
 {

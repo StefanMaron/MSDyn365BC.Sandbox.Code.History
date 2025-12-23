@@ -5,8 +5,8 @@
 namespace Microsoft.Finance.VAT.Calculation;
 
 using Microsoft.Finance.GeneralLedger.Journal;
-using Microsoft.Finance.VAT.Setup;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Setup;
 
 /// <summary>
 /// Temporary table storing VAT posting parameters for VAT entry creation during journal line posting.

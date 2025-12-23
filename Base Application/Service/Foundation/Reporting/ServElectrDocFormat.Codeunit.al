@@ -4,9 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Foundation.Reporting;
 
+using Microsoft.Sales.Peppol;
 using Microsoft.Service.Document;
 using Microsoft.Service.History;
-using Microsoft.Sales.Peppol;
 
 codeunit 6464 "Serv. Electr. Doc. Format"
 {

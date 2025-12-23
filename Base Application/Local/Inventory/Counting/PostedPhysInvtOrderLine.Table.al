@@ -7,12 +7,12 @@ namespace Microsoft.Inventory.Counting;
 
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Counting.Journal;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
 using Microsoft.Warehouse.Structure;
-using Microsoft.Foundation.UOM;
 
 table 5005355 "Posted Phys. Invt. Order Line"
 {

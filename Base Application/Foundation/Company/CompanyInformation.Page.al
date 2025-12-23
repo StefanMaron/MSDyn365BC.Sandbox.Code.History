@@ -22,11 +22,11 @@ using Microsoft.Projects.Project.Setup;
 using Microsoft.Purchases.Setup;
 using Microsoft.Sales.Setup;
 using System.Diagnostics;
-using System.Telemetry;
 using System.Environment.Configuration;
 using System.Globalization;
 using System.Security.AccessControl;
 using System.Security.User;
+using System.Telemetry;
 
 page 1 "Company Information"
 {

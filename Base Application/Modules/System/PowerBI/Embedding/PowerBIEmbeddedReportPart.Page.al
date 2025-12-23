@@ -1,11 +1,11 @@
 namespace System.Integration.PowerBI;
 
 using System.Environment;
+using System.Environment.Configuration;
+using System.Globalization;
+using System.Integration;
 using System.Telemetry;
 using System.Utilities;
-using System.Environment.Configuration;
-using System.Integration;
-using System.Globalization;
 
 page 6325 "Power BI Embedded Report Part"
 {
