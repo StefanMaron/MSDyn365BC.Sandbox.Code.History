@@ -6,11 +6,11 @@ namespace Microsoft.Finance.GeneralLedger.Setup;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Finance.Analysis;
-using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.Consolidation;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Preview;

@@ -4,13 +4,13 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Ledger;
 
+using Microsoft.Foundation.NoSeries;
 using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Setup;
 using Microsoft.Utilities;
+using System.Globalization;
 using System.Security.AccessControl;
 using System.Utilities;
-using System.Globalization;
-using Microsoft.Foundation.NoSeries;
-using Microsoft.Inventory.Setup;
 
 table 339 "Item Application Entry"
 {

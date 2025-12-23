@@ -2,8 +2,8 @@ namespace Microsoft.Sustainability.Sales;
 
 using Microsoft.Inventory.Item;
 using Microsoft.Projects.Resources.Resource;
-using Microsoft.Sustainability.Account;
 using Microsoft.Sales.Document;
+using Microsoft.Sustainability.Account;
 using Microsoft.Sustainability.Setup;
 
 tableextension 6235 "Sustainability Sales Line" extends "Sales Line"

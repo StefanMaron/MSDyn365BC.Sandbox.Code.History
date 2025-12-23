@@ -1,7 +1,7 @@
 namespace Microsoft.Finance.GeneralLedger.Review;
 
-using System.Upgrade;
 using Microsoft.Finance.GeneralLedger.Ledger;
+using System.Upgrade;
 codeunit 22201 "Upgrade"
 {
     Access = Internal;

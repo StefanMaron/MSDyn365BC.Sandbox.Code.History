@@ -4,12 +4,12 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Bank.Reconciliation;
 
+using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Check;
 using Microsoft.Bank.Ledger;
 using Microsoft.Finance.GeneralLedger.Journal;
 using System.Telemetry;
 using System.Utilities;
-using Microsoft.Bank.BankAccount;
 
 /// <summary>
 /// Provides automatic and manual matching capabilities for bank reconciliation statement lines.

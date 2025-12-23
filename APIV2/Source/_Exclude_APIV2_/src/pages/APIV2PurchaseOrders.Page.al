@@ -1,14 +1,14 @@
 namespace Microsoft.API.V2;
 
-using Microsoft.Integration.Entity;
-using Microsoft.Purchases.Document;
-using Microsoft.Purchases.Vendor;
 using Microsoft.Finance.Currency;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Shipping;
+using Microsoft.Integration.Entity;
 using Microsoft.Integration.Graph;
+using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Vendor;
 using Microsoft.Utilities;
 using System.Reflection;
 
