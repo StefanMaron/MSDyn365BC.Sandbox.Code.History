@@ -25,9 +25,9 @@ using Microsoft.Inventory.Location;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Payables;
 using Microsoft.Sales.FinanceCharge;
 using System.Globalization;
-using Microsoft.Purchases.Payables;
 
 table 1383 "Vendor Templ."
 {

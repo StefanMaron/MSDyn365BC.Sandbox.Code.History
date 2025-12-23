@@ -1,10 +1,10 @@
 ﻿namespace System.Environment.Configuration;
 
+using System;
 using System.Apps;
 using System.Security.AccessControl;
 using System.Security.User;
 using System.Utilities;
-using System;
 
 table 9012 "AAD Application"
 {
@@ -208,5 +208,4 @@ table 9012 "AAD Application"
         SuperPermissionSetTxt: Label 'SECURITY', Locked = true;
         UserNameCannotbeChangedQst: Label 'A user named %1 will be created. Do you want to continue?', Comment = '%1 a user name eq. xxx yyyyyy';
 }
-
 

@@ -6,8 +6,8 @@ namespace Microsoft.Finance.Consolidation;
 
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Setup;
-using System.Threading;
 using Microsoft.Foundation.Period;
+using System.Threading;
 using System.Utilities;
 
 /// <summary>

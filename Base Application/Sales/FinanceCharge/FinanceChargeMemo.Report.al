@@ -18,10 +18,10 @@ using Microsoft.Foundation.Company;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
 using System.Utilities;
-using Microsoft.Utilities;
 
 report 118 "Finance Charge Memo"
 {

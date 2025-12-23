@@ -6,6 +6,7 @@ namespace Microsoft.Finance.GeneralLedger.Account;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.CashFlow.Setup;
+using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Consolidation;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Journal;
@@ -16,14 +17,13 @@ using Microsoft.HumanResources.Employee;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Inventory.Item;
 using Microsoft.Projects.Project.Job;
+using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Setup;
 using System.Reflection;
 using System.Utilities;
-using Microsoft.Purchases.Payables;
-using Microsoft.EServices.EDocument;
 
 /// <summary>
 /// Calculates and displays all setup locations where a general ledger account is referenced or used.

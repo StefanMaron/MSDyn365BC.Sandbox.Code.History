@@ -41,6 +41,7 @@ using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Setup;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
+using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Archive;
 using Microsoft.Purchases.Comment;
@@ -62,7 +63,6 @@ using System.Reflection;
 using System.Security.User;
 using System.Threading;
 using System.Utilities;
-using Microsoft.Projects.Project.Job;
 
 table 38 "Purchase Header"
 {

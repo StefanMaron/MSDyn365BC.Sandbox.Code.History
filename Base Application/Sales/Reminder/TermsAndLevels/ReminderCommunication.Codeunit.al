@@ -4,19 +4,19 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Reminder;
 
-using Microsoft.Sales.Receivables;
-using Microsoft.Foundation.Company;
 using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Foundation.Company;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Customer;
-using System.Globalization;
-using System.Text;
 using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.Receivables;
+using System.EMail;
 #if not CLEAN26
 using System.Environment.Configuration;
 #endif
+using System.Globalization;
 using System.Reflection;
-using Microsoft.Foundation.Reporting;
-using System.EMail;
+using System.Text;
 using System.Utilities;
 
 codeunit 1890 "Reminder Communication"

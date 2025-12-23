@@ -5,8 +5,8 @@
 namespace Microsoft.Foundation.Period;
 
 using Microsoft.Finance.GeneralLedger.Reports;
-using Microsoft.Inventory.Setup;
 using Microsoft.Finance.VAT.Setup;
+using Microsoft.Inventory.Setup;
 
 page 100 "Accounting Periods"
 {

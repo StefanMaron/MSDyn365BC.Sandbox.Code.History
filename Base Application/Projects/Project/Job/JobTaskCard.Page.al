@@ -5,14 +5,14 @@
 namespace Microsoft.Projects.Project.Job;
 
 using Microsoft.Assembly.Document;
-using Microsoft.Inventory.BOM;
+using Microsoft.CRM.Contact;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.BOM;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Projects.Project.Planning;
-using Microsoft.Sales.Document;
 using Microsoft.Sales.Customer;
-using Microsoft.CRM.Contact;
+using Microsoft.Sales.Document;
 
 page 1003 "Job Task Card"
 {

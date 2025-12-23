@@ -5,16 +5,17 @@
 namespace Microsoft.Sales.Peppol;
 
 using Microsoft.CRM.Team;
+using Microsoft.EServices.EDocument;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Finance.VAT.Ledger;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Foundation.UOM;
-using Microsoft.Foundation.Attachment;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Location;
 using Microsoft.Sales.Customer;
@@ -22,12 +23,11 @@ using Microsoft.Sales.Document;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Reminder;
-using System.Text;
-using System.Utilities;
+using Microsoft.Utilities;
 using System.IO;
 using System.Telemetry;
-using Microsoft.Utilities;
-using Microsoft.EServices.EDocument;
+using System.Text;
+using System.Utilities;
 
 codeunit 1605 "PEPPOL Management"
 {

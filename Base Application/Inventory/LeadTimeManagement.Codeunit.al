@@ -8,8 +8,8 @@ using Microsoft.Foundation.Calendar;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Item.Catalog;
 using Microsoft.Inventory.Location;
-using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Planning;
+using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Setup;
 using Microsoft.Inventory.Transfer;
 

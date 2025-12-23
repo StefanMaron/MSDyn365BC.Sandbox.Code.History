@@ -4,9 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Reminder;
 
+using Microsoft.EServices.EDocument;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Reports;
-using Microsoft.EServices.EDocument;
 
 page 440 "Issued Reminder List"
 {

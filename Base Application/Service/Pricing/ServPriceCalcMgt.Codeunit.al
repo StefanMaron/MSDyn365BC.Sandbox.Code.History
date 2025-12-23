@@ -8,13 +8,13 @@ using Microsoft.CRM.Campaign;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.Enums;
 using Microsoft.Inventory.Item;
 using Microsoft.Projects.Resources.Journal;
 using Microsoft.Projects.Resources.Pricing;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Service.Document;
 using Microsoft.Service.Pricing;
-using Microsoft.Foundation.Enums;
 
 codeunit 6087 "Serv. Price Calc. Mgt."
 {

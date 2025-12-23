@@ -4,9 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.FinanceCharge;
 
+using Microsoft.EServices.EDocument;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Reports;
-using Microsoft.EServices.EDocument;
 
 page 452 "Issued Fin. Charge Memo List"
 {

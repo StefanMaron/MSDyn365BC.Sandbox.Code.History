@@ -5,6 +5,7 @@
 namespace Microsoft.Sales.FinanceCharge;
 
 using Microsoft.Bank.BankAccount;
+using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
@@ -23,7 +24,6 @@ using System.IO;
 using System.Security.User;
 using System.Text;
 using System.Utilities;
-using Microsoft.EServices.EDocument;
 
 table 302 "Finance Charge Memo Header"
 {

@@ -5,8 +5,8 @@
 namespace Microsoft.Finance.VAT.Setup;
 
 using Microsoft.Finance.GeneralLedger.Setup;
-using Microsoft.Finance.VAT.Registration;
 using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Registration;
 using System.Security.User;
 using System.Telemetry;
 using System.Utilities;

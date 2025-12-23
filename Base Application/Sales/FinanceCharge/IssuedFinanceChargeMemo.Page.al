@@ -5,12 +5,12 @@
 namespace Microsoft.Sales.FinanceCharge;
 
 using Microsoft.CRM.Contact;
+using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Reports;
-using Microsoft.EServices.EDocument;
 
 page 450 "Issued Finance Charge Memo"
 {
