@@ -5,6 +5,7 @@
 namespace Microsoft.Sales.Document;
 
 using Microsoft.Assembly.Document;
+using Microsoft.eServices.EDocument;
 using Microsoft.Finance.AllocationAccount;
 using Microsoft.Finance.AllocationAccount.Sales;
 using Microsoft.Finance.Currency;
@@ -30,7 +31,6 @@ using Microsoft.Utilities;
 using System.Environment.Configuration;
 using System.Integration.Excel;
 using System.Utilities;
-using Microsoft.eServices.EDocument;
 
 page 46 "Sales Order Subform"
 {

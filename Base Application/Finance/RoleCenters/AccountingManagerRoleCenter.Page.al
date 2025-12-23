@@ -39,13 +39,16 @@ using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Insurance;
 using Microsoft.FixedAssets.Journal;
 using Microsoft.FixedAssets.Setup;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.Period;
+using Microsoft.Foundation.Task;
 using Microsoft.Inventory.Costing;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Reports;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
+using Microsoft.Purchases.Reports;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Analysis;
@@ -54,12 +57,9 @@ using Microsoft.Sales.Document;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Reminder;
-using Microsoft.Sales.Setup;
-using Microsoft.Foundation.Navigate;
-using Microsoft.Foundation.Task;
-using System.Threading;
 using Microsoft.Sales.Reports;
-using Microsoft.Purchases.Reports;
+using Microsoft.Sales.Setup;
+using System.Threading;
 
 page 9001 "Accounting Manager Role Center"
 {

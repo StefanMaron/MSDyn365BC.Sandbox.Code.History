@@ -6,6 +6,7 @@ namespace Microsoft.Bank.Ledger;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Check;
+using Microsoft.Bank.Deposit;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Reversal;
@@ -13,7 +14,6 @@ using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Navigate;
 using System.Security.User;
-using Microsoft.Bank.Deposit;
 
 /// <summary>
 /// Displays bank account ledger entries in a list view with filtering and navigation capabilities.

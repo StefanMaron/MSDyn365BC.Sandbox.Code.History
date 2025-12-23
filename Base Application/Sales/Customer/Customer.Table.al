@@ -12,6 +12,7 @@ using Microsoft.CRM.Contact;
 using Microsoft.CRM.Outlook;
 using Microsoft.CRM.Setup;
 using Microsoft.CRM.Team;
+using Microsoft.eServices.EDocument;
 using Microsoft.EServices.OnlineMap;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
@@ -59,7 +60,6 @@ using System.IO;
 using System.Reflection;
 using System.Security.User;
 using System.Utilities;
-using Microsoft.eServices.EDocument;
 
 table 18 Customer
 {

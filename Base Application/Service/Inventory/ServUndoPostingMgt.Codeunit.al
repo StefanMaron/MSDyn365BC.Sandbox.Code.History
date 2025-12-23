@@ -4,10 +4,10 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory;
 
+using Microsoft.Inventory.Ledger;
+using Microsoft.Sales.Setup;
 using Microsoft.Service.Document;
 using Microsoft.Service.History;
-using Microsoft.Sales.Setup;
-using Microsoft.Inventory.Ledger;
 
 codeunit 6484 "Serv. Undo Posting Mgt."
 {

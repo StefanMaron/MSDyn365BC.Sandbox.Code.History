@@ -7,8 +7,8 @@ namespace Microsoft.Bank.Setup;
 using Microsoft.Bank.BankAccount;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
-using System.Reflection;
 using System.IO;
+using System.Reflection;
 
 /// <summary>
 /// Configures external payment service providers for online payment processing.

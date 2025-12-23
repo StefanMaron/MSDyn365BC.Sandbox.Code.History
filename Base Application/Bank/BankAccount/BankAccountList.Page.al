@@ -5,19 +5,19 @@
 namespace Microsoft.Bank.BankAccount;
 
 using Microsoft.Bank.Check;
+using Microsoft.Bank.Deposit;
 using Microsoft.Bank.Ledger;
 using Microsoft.Bank.PositivePay;
+using Microsoft.Bank.Reconciliation;
 using Microsoft.Bank.Reports;
 using Microsoft.Bank.Statement;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Reports;
 using Microsoft.Foundation.Comment;
+using Microsoft.Purchases.Reports;
+using Microsoft.Sales.Reports;
 using System.Diagnostics;
 using System.Email;
-using Microsoft.Bank.Reconciliation;
-using Microsoft.Bank.Deposit;
-using Microsoft.Sales.Reports;
-using Microsoft.Purchases.Reports;
 
 /// <summary>
 /// List interface for viewing and managing multiple bank accounts.

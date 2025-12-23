@@ -1,17 +1,17 @@
 namespace System.Security.AccessControl;
 
-using Microsoft.Finance.SalesTax;
-using Microsoft.Bank.ElectronicFundsTransfer;
 using Microsoft;
 using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Deposit;
+using Microsoft.Bank.ElectronicFundsTransfer;
+using Microsoft.Bank.Reconciliation;
 using Microsoft.EServices.EDocument;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.SalesTax;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Reports;
 using Microsoft.Sales.RoleCenters;
 using Microsoft.Utilities;
-using Microsoft.Finance.GeneralLedger.Account;
-using Microsoft.Inventory.Reports;
-using Microsoft.Bank.Reconciliation;
-using Microsoft.Bank.Deposit;
-using Microsoft.Inventory.Location;
 
 permissionset 1002 "LOCAL READ"
 {

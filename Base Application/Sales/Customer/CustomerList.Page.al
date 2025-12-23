@@ -10,6 +10,7 @@ using Microsoft.CRM.Contact;
 using Microsoft.CRM.Outlook;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.SalesTax;
 using Microsoft.Finance.VAT.Registration;
 using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Comment;
@@ -34,7 +35,6 @@ using System.Email;
 using System.Integration.PowerBI;
 using System.Integration.Word;
 using System.Text;
-using Microsoft.Finance.SalesTax;
 
 page 22 "Customer List"
 {

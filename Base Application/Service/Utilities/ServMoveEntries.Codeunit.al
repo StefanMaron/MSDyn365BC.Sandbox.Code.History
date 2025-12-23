@@ -8,13 +8,13 @@ using Microsoft.CashFlow.Account;
 using Microsoft.CashFlow.Setup;
 using Microsoft.Foundation.Period;
 using Microsoft.Inventory.Item;
-using Microsoft.Projects.Resources.Resource;
 using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Service.Contract;
-using Microsoft.Service.Ledger;
 using Microsoft.Service.Item;
+using Microsoft.Service.Ledger;
 using Microsoft.Service.Pricing;
 
 codeunit 6492 "Serv. Move Entries"

@@ -28,8 +28,8 @@ using Microsoft.Sales.History;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
-using System.Utilities;
 using System.Telemetry;
+using System.Utilities;
 
 codeunit 442 "Sales-Post Prepayments"
 {

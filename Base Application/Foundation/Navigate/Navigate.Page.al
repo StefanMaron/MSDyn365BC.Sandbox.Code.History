@@ -6,9 +6,9 @@ namespace Microsoft.Foundation.Navigate;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Check;
+using Microsoft.Bank.Deposit;
 using Microsoft.Bank.Ledger;
 using Microsoft.CostAccounting.Ledger;
-using Microsoft.Utilities;
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
@@ -38,9 +38,9 @@ using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
+using Microsoft.Utilities;
 using System.IO;
 using System.Text;
-using Microsoft.Bank.Deposit;
 
 page 344 Navigate
 {

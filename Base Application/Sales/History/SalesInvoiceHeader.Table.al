@@ -12,6 +12,7 @@ using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Opportunity;
 using Microsoft.CRM.Team;
+using Microsoft.eServices.EDocument;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Deferral;
 using Microsoft.Finance.Dimension;
@@ -39,14 +40,13 @@ using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
 using System.Automation;
+using System.Email;
 using System.Globalization;
+using System.IO;
 using System.Reflection;
 using System.Security.AccessControl;
 using System.Security.User;
 using System.Utilities;
-using System.IO;
-using Microsoft.eServices.EDocument;
-using System.Email;
 
 table 112 "Sales Invoice Header"
 {

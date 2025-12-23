@@ -16,8 +16,8 @@ using Microsoft.Pricing.PriceList;
 using Microsoft.Projects.Project.Analysis;
 using Microsoft.Projects.Resources.Analysis;
 using Microsoft.Projects.Resources.Ledger;
-using Microsoft.Projects.Resources.Reports;
 using Microsoft.Projects.Resources.Pricing;
+using Microsoft.Projects.Resources.Reports;
 using Microsoft.Utilities;
 
 page 76 "Resource Card"

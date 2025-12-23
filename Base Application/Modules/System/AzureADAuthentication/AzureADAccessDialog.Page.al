@@ -1,8 +1,8 @@
 namespace System.Azure.Identity;
 
 using Microsoft.Utilities;
-using System.Security.Authentication;
 using System.Environment;
+using System.Security.Authentication;
 
 page 6302 "Azure AD Access Dialog"
 {

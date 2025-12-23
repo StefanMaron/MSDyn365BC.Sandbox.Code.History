@@ -5,8 +5,8 @@
 namespace Microsoft.Bank.Reconciliation;
 
 using Microsoft.Bank.BankAccount;
-using Microsoft.Bank.Ledger;
 using Microsoft.Bank.Deposit;
+using Microsoft.Bank.Ledger;
 
 /// <summary>
 /// Tracks bank transactions that remain unmatched or outstanding during bank reconciliation processes.

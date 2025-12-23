@@ -9,11 +9,13 @@ using Microsoft.CRM.Contact;
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.SalesTax;
 using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Comment;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Reports;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
@@ -30,8 +32,6 @@ using System.Email;
 using System.Integration.PowerBI;
 using System.Integration.Word;
 using System.Text;
-using Microsoft.Inventory.Location;
-using Microsoft.Finance.SalesTax;
 
 page 27 "Vendor List"
 {

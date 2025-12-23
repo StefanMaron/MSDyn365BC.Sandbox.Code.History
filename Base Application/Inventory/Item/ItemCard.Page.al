@@ -34,8 +34,10 @@ using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Pricing;
+using Microsoft.Purchases.Reports;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Pricing;
+using Microsoft.Sales.Reports;
 using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
 using Microsoft.Warehouse.ADCS;
@@ -46,8 +48,6 @@ using System.Environment;
 using System.Environment.Configuration;
 using System.Privacy;
 using System.Text;
-using Microsoft.Sales.Reports;
-using Microsoft.Purchases.Reports;
 
 #pragma warning disable AS0106 // Protected variable ItemReferenceVisible was removed before AS0106 was introduced.
 page 30 "Item Card"

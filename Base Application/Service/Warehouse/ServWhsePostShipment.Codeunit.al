@@ -4,15 +4,15 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Warehouse.Posting;
 
+using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Navigate;
 using Microsoft.Service.Document;
 using Microsoft.Service.History;
 using Microsoft.Service.Posting;
 using Microsoft.Warehouse.Document;
-using Microsoft.Warehouse.Setup;
 using Microsoft.Warehouse.History;
 using Microsoft.Warehouse.Journal;
-using Microsoft.Foundation.AuditCodes;
+using Microsoft.Warehouse.Setup;
 
 codeunit 5749 "Serv. Whse Post-Shipment"
 {

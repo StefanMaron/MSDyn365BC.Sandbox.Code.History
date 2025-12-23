@@ -10,9 +10,9 @@ using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Foundation.Attachment;
 using Microsoft.Purchases.Comment;
-using Microsoft.Purchases.Vendor;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Reports;
+using Microsoft.Purchases.Vendor;
 
 page 147 "Posted Purchase Credit Memos"
 {

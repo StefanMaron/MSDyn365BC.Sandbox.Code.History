@@ -8,10 +8,10 @@ namespace Microsoft.Sales.Peppol;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
 using System.Utilities;
-using Microsoft.Foundation.Attachment;
 
 xmlport 1611 "Sales Cr.Memo - PEPPOL BIS 3.0"
 {

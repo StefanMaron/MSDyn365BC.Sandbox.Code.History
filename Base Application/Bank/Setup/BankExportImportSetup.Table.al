@@ -4,10 +4,10 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Bank.Setup;
 
+using Microsoft.Bank.ElectronicFundsTransfer;
 using Microsoft.Bank.PositivePay;
 using System.IO;
 using System.Reflection;
-using Microsoft.Bank.ElectronicFundsTransfer;
 
 /// <summary>
 /// Configures import/export settings for electronic banking file formats.

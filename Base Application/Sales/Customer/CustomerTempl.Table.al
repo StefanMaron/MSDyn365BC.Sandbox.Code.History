@@ -7,6 +7,7 @@ namespace Microsoft.Sales.Customer;
 using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Team;
+using Microsoft.eServices.EDocument;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
@@ -24,14 +25,13 @@ using Microsoft.Intercompany.Partner;
 using Microsoft.Inventory.Intrastat;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Tracking;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Reminder;
-using Microsoft.Pricing.Calculation;
-using Microsoft.Pricing.PriceList;
 using System.Globalization;
-using Microsoft.eServices.EDocument;
 
 table 1381 "Customer Templ."
 {
