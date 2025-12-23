@@ -5,7 +5,9 @@
 namespace Microsoft.Finance.Dimension;
 
 using Microsoft.Assembly.History;
+using Microsoft.Bank.Deposit;
 using Microsoft.Bank.Ledger;
+using Microsoft.Bank.Reconciliation;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Ledger;
@@ -32,8 +34,6 @@ using System.Automation;
 using System.Environment;
 using System.Reflection;
 using System.Utilities;
-using Microsoft.Bank.Reconciliation;
-using Microsoft.Bank.Deposit;
 
 /// <summary>
 /// Manages the process of changing global dimension assignments across all business data and ledger entries.

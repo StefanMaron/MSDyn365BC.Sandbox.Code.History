@@ -9,6 +9,7 @@ using Microsoft.CRM.Outlook;
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Attachment;
@@ -16,7 +17,6 @@ using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using System.Automation;
-using Microsoft.Finance.GeneralLedger.Setup;
 
 page 134 "Posted Sales Credit Memo"
 {

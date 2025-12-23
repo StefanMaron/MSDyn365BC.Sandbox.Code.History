@@ -13,6 +13,7 @@ using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.Enums;
@@ -42,7 +43,6 @@ using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Setup;
 using System.IO;
 using System.Utilities;
-using Microsoft.Finance.SalesTax;
 
 codeunit 6620 "Copy Document Mgt."
 {

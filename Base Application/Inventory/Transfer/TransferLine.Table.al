@@ -4,9 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Transfer;
 
+using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
-using Microsoft.EServices.EDocument;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.Shipping;

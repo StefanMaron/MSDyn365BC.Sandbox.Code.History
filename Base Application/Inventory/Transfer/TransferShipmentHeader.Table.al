@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Transfer;
 
+using Microsoft.eServices.EDocument;
 using Microsoft.Finance.Dimension;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.Address;
@@ -16,9 +17,8 @@ using Microsoft.Inventory.Intrastat;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Utilities;
-using System.Utilities;
 using System.IO;
-using Microsoft.eServices.EDocument;
+using System.Utilities;
 
 table 5744 "Transfer Shipment Header"
 {

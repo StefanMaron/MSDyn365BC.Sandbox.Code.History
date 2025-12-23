@@ -15,8 +15,8 @@ using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Finance.VAT.Reporting;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Period;
-using System.Telemetry;
 using System.Security.User;
+using System.Telemetry;
 using System.Utilities;
 
 /// <summary>

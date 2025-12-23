@@ -4,12 +4,12 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Foundation.Reporting;
 
+using Microsoft.Finance.SalesTax;
+using Microsoft.Sales.Setup;
 using Microsoft.Service.Contract;
 using Microsoft.Service.Document;
 using Microsoft.Service.History;
 using Microsoft.Service.Reports;
-using Microsoft.Sales.Setup;
-using Microsoft.Finance.SalesTax;
 
 codeunit 6461 "Serv. Document Print"
 {

@@ -27,6 +27,7 @@ using Microsoft.Purchases.History;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Posting;
 using Microsoft.Purchases.Remittance;
+using Microsoft.Purchases.Reports;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.History;
@@ -40,7 +41,6 @@ using System.Environment;
 using System.Environment.Configuration;
 using System.Privacy;
 using System.Security.User;
-using Microsoft.Purchases.Reports;
 using System.Threading;
 
 page 50 "Purchase Order"

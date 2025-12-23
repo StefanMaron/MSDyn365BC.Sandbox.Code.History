@@ -34,6 +34,7 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Pricing;
+using Microsoft.Sales.Reports;
 using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
 using Microsoft.Warehouse.Activity;
@@ -46,9 +47,8 @@ using System.Environment;
 using System.Environment.Configuration;
 using System.Privacy;
 using System.Security.User;
-using System.Utilities;
-using Microsoft.Sales.Reports;
 using System.Threading;
+using System.Utilities;
 
 page 42 "Sales Order"
 {

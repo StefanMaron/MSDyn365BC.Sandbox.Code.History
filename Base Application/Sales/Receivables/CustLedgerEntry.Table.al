@@ -13,9 +13,9 @@ using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.Attachment;
-using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Intercompany.Partner;
@@ -25,9 +25,9 @@ using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Reminder;
 using Microsoft.Utilities;
+using System.IO;
 using System.Security.AccessControl;
 using System.Utilities;
-using System.IO;
 
 table 21 "Cust. Ledger Entry"
 {

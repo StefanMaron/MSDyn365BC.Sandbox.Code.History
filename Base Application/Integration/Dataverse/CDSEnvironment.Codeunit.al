@@ -4,8 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Integration.Dataverse;
 
-using System.Security.Authentication;
 using System.Environment;
+using System.Security.Authentication;
 using System.Utilities;
 
 codeunit 7203 "CDS Environment"

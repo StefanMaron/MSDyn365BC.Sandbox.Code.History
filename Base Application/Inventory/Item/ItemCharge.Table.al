@@ -4,13 +4,13 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Item;
 
+using Microsoft.eServices.EDocument;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.SalesTax;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.eServices.EDocument;
 
 table 5800 "Item Charge"
 {

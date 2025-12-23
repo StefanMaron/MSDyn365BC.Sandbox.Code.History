@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Transfer;
 
+using Microsoft.eServices.EDocument;
 using Microsoft.Finance.Dimension;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.Address;
@@ -23,7 +24,6 @@ using Microsoft.Warehouse.Request;
 using System.Security.User;
 using System.Text;
 using System.Utilities;
-using Microsoft.eServices.EDocument;
 
 table 5740 "Transfer Header"
 {

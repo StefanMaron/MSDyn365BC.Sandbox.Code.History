@@ -10,6 +10,7 @@ using Microsoft.CRM.Outlook;
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Attachment;
@@ -18,9 +19,8 @@ using Microsoft.Inventory.Location;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
-using System.Telemetry;
 using System.Automation;
-using Microsoft.Finance.GeneralLedger.Setup;
+using System.Telemetry;
 
 page 132 "Posted Sales Invoice"
 {

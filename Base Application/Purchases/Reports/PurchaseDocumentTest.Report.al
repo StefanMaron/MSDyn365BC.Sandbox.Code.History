@@ -29,8 +29,8 @@ using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Document;
 using Microsoft.Utilities;
-using System.Utilities;
 using System.Security.User;
+using System.Utilities;
 
 report 402 "Purchase Document - Test"
 {

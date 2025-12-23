@@ -5,6 +5,7 @@
 namespace Microsoft.Inventory.Item;
 
 using Microsoft.Assembly.Setup;
+using Microsoft.eServices.EDocument;
 using Microsoft.Finance.Deferral;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
@@ -25,7 +26,6 @@ using Microsoft.Purchases.Vendor;
 using Microsoft.Warehouse.Activity;
 using Microsoft.Warehouse.Setup;
 using Microsoft.Warehouse.Structure;
-using Microsoft.eServices.EDocument;
 
 table 1382 "Item Templ."
 {

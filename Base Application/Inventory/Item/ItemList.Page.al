@@ -30,9 +30,11 @@ using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Reports;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Pricing;
+using Microsoft.Purchases.Reports;
 using Microsoft.RoleCenters;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Pricing;
+using Microsoft.Sales.Reports;
 using Microsoft.Warehouse.ADCS;
 using Microsoft.Warehouse.Ledger;
 using Microsoft.Warehouse.Setup;
@@ -43,8 +45,6 @@ using System.Environment.Configuration;
 using System.Integration.PowerBI;
 using System.Reflection;
 using System.Text;
-using Microsoft.Purchases.Reports;
-using Microsoft.Sales.Reports;
 
 #pragma warning disable AS0106 // Protected variable PowerBIVisible was removed before AS0106 was introduced.
 page 31 "Item List"

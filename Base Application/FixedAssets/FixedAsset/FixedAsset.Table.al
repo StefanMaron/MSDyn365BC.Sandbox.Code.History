@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.FixedAssets.FixedAsset;
 
+using Microsoft.eServices.EDocument;
 using Microsoft.Finance.Dimension;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.Insurance;
@@ -19,7 +20,6 @@ using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Document;
 using System.Environment.Configuration;
 using System.Telemetry;
-using Microsoft.eServices.EDocument;
 
 table 5600 "Fixed Asset"
 {

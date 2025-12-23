@@ -9,9 +9,9 @@ using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Company;
+using Microsoft.Utilities;
 using System.IO;
 using System.Utilities;
-using Microsoft.Utilities;
 
 /// <summary>
 /// Generates standard trial balance report displaying account balances and period movements.

@@ -16,8 +16,8 @@ using Microsoft.Pricing.Reports;
 using Microsoft.Projects.Resources.Analysis;
 using Microsoft.Projects.Resources.Ledger;
 using Microsoft.Projects.Resources.Pricing;
-using System.Text;
 using Microsoft.Projects.Resources.Reports;
+using System.Text;
 
 page 77 "Resource List"
 {

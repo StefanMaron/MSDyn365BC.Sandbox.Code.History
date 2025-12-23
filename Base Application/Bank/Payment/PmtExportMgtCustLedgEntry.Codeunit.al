@@ -7,9 +7,9 @@ namespace Microsoft.Bank.Payment;
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Setup;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
-using Microsoft.Foundation.Company;
 using System.IO;
 
 /// <summary>

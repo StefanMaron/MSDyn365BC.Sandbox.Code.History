@@ -4,12 +4,12 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Service.Document;
 
+using Microsoft.Foundation.Company;
 using Microsoft.Inventory.Availability;
 using Microsoft.Inventory.Item;
-using Microsoft.Foundation.Company;
 using Microsoft.Inventory.Requisition;
-using Microsoft.Service.History;
 using Microsoft.Inventory.Tracking;
+using Microsoft.Service.History;
 
 codeunit 6452 "Serv. Availability Mgt."
 {

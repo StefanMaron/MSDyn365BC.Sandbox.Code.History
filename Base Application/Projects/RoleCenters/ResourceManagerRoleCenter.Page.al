@@ -9,12 +9,12 @@ using Microsoft.Foundation.UOM;
 using Microsoft.Projects.Resources.Analysis;
 using Microsoft.Projects.Resources.Journal;
 using Microsoft.Projects.Resources.Ledger;
+using Microsoft.Projects.Resources.Reports;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Projects.Resources.Setup;
 using Microsoft.Projects.TimeSheet;
 using Microsoft.RoleCenters;
 using Microsoft.Utilities;
-using Microsoft.Projects.Resources.Reports;
 
 page 8906 "Resource Manager Role Center"
 {
