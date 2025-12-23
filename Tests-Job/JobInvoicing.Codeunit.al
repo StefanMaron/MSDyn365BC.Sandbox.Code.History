@@ -4195,6 +4195,69 @@
                     StrSubstNo(ExpectedValueErr, JobPlanningLine.FieldCaption("Unit Price (LCY)"), Format(SalesLine."Unit Price" / SalesHeader."Currency Factor")));
     end;
 
+    [Test]
+    [HandlerFunctions('TransferToInvoiceHandler,MessageHandler')]
+    [Scope('OnPrem')]
+    procedure SalesInvoiceWithTextLineAndPricesIncludingVAT()
+    var
+        Customer: Record Customer;
+        Job: Record Job;
+        JobTask: Record "Job Task";
+        JobPlanningLine: Record "Job Planning Line";
+        JobPlanningLineText: Record "Job Planning Line";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        JobPlanningLineInvoice: Record "Job Planning Line Invoice";
+        JobCreateInvoice: Codeunit "Job Create-Invoice";
+        PostedDocumentNo: Code[20];
+    begin
+        // [SCENARIO 612273] Sales Invoice with Text Line and "Prices Including VAT = TRUE" should populate Job Contract Entry No. for comment lines
+
+        Initialize();
+
+        // [GIVEN] Customer with "Prices Including VAT" = TRUE
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Prices Including VAT", true);
+        Customer.Modify(true);
+
+        // [GIVEN] Job for this customer
+        LibraryJob.CreateJob(Job, Customer."No.");
+
+        // [GIVEN] Job Task with "Job Task Type" = Posting
+        LibraryJob.CreateJobTask(Job, JobTask);
+
+        // [GIVEN] Job Planning Line with Type = Item and Line Type = Billable
+        LibraryJob.CreateJobPlanningLine(
+            JobPlanningLine."Line Type"::Billable, LibraryJob.ItemType(), JobTask, JobPlanningLine);
+
+        // [GIVEN] Job Planning Line with Type = Text and Line Type = Billable
+        CreateJobPlanningLineWithTypeText(JobPlanningLineText, JobPlanningLineText."Line Type"::Billable, JobTask);
+        Commit();
+
+        // [WHEN] Create Sales Invoice for job planning lines
+        JobCreateInvoice.CreateSalesInvoice(JobPlanningLine, false);
+
+        // [THEN] Sales Invoice is created with comment line (Type = " ") having "Job Contract Entry No." populated
+        GetSalesDocument(JobPlanningLine, SalesHeader."Document Type"::Invoice, SalesHeader);
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetRange(Type, SalesLine.Type::" ");
+        Assert.RecordIsNotEmpty(SalesLine);
+        SalesLine.FindFirst();
+        Assert.AreNotEqual(0, SalesLine."Job Contract Entry No.",
+            'Job Contract Entry No. must be populated for comment line when Prices Including VAT is TRUE');
+
+        // [WHEN] Post Sales Invoice
+        PostedDocumentNo := LibrarySales.PostSalesDocument(SalesHeader, true, true);
+
+        // [THEN] No residual Job Planning Line Invoice records remain for text line
+        JobPlanningLineInvoice.SetRange("Job No.", JobPlanningLineText."Job No.");
+        JobPlanningLineInvoice.SetRange("Job Task No.", JobPlanningLineText."Job Task No.");
+        JobPlanningLineInvoice.SetRange("Job Planning Line No.", JobPlanningLineText."Line No.");
+        JobPlanningLineInvoice.SetRange("Document Type", JobPlanningLineInvoice."Document Type"::Invoice);
+        Assert.RecordIsEmpty(JobPlanningLineInvoice);
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
