@@ -5,11 +5,11 @@
 namespace Microsoft.Intercompany.Outbox;
 
 using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Intercompany;
 using Microsoft.Intercompany.Journal;
 using Microsoft.Intercompany.Setup;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
-using Microsoft.Intercompany;
 
 /// <summary>
 /// Manages user feedback and messaging for intercompany transaction processing.

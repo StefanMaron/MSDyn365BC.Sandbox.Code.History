@@ -10,8 +10,8 @@ using Microsoft.Utilities;
 using System.Environment;
 using System.Privacy;
 using System.Security.Encryption;
-using System.Threading;
 using System.Telemetry;
+using System.Threading;
 
 table 7200 "CDS Connection Setup"
 {

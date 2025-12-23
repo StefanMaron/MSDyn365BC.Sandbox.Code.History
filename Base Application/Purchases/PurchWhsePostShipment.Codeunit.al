@@ -6,11 +6,11 @@ namespace Microsoft.Warehouse.Posting;
 
 using Microsoft.Foundation.Navigate;
 using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Posting;
+using Microsoft.Purchases.Setup;
 using Microsoft.Warehouse.Document;
 using Microsoft.Warehouse.Setup;
-using Microsoft.Purchases.Setup;
-using Microsoft.Purchases.Posting;
-using Microsoft.Purchases.History;
 
 codeunit 5747 "Purch. Whse. Post Shipment"
 {

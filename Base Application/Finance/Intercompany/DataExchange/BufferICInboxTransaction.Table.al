@@ -4,8 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Intercompany.DataExchange;
 
-using Microsoft.Intercompany.Journal;
 using Microsoft.Intercompany;
+using Microsoft.Intercompany.Journal;
 
 /// <summary>
 /// Temporary buffer table for staging intercompany inbox transaction data during API-based data exchange.

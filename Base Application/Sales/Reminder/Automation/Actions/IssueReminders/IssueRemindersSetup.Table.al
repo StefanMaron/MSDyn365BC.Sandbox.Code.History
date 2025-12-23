@@ -5,9 +5,9 @@
 namespace Microsoft.Sales.Reminder;
 
 using Microsoft.Finance.GeneralLedger.Journal;
-using System.Automation;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Sales.Setup;
+using System.Automation;
 using System.Utilities;
 
 table 6756 "Issue Reminders Setup"

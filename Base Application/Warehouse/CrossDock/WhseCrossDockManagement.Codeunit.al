@@ -4,8 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Warehouse.CrossDock;
 
-using Microsoft.Foundation.UOM;
 using Microsoft.Foundation.Calendar;
+using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Transfer;

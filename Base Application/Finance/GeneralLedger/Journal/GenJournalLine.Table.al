@@ -16,7 +16,6 @@ using Microsoft.EServices.EDocument;
 using Microsoft.Finance.AllocationAccount;
 using Microsoft.Finance.AutomaticAccounts;
 using Microsoft.Finance.Consolidation;
-using System.Threading;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Deferral;
 using Microsoft.Finance.Dimension;
@@ -68,9 +67,10 @@ using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Setup;
 using System.Automation;
-using System.IO;
 using System.DateTime;
 using System.Environment.Configuration;
+using System.IO;
+using System.Threading;
 using System.Utilities;
 
 /// <summary>
