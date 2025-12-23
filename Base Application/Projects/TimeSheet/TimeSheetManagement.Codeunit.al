@@ -6,13 +6,13 @@ namespace Microsoft.Projects.TimeSheet;
 
 using Microsoft.Assembly.Document;
 using Microsoft.Foundation.Period;
+using Microsoft.HumanResources.Absence;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Project.Journal;
 using Microsoft.Projects.Project.Planning;
 using Microsoft.Projects.Resources.Journal;
 using Microsoft.Projects.Resources.Resource;
-using Microsoft.HumanResources.Absence;
 using Microsoft.Projects.Resources.Setup;
 using System.Security.User;
 using System.Utilities;

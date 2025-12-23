@@ -20,9 +20,9 @@ using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
+using System.Globalization;
 using System.Reflection;
 using System.Text;
-using System.Globalization;
 
 /// <summary>
 /// Table Default Dimension (ID 352).

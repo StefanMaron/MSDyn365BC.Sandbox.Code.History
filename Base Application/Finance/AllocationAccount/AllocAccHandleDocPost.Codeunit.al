@@ -4,9 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.AllocationAccount;
 
-using Microsoft.Sales.Document;
-using Microsoft.Purchases.Document;
 using Microsoft.Finance.Deferral;
+using Microsoft.Purchases.Document;
+using Microsoft.Sales.Document;
 
 /// <summary>
 /// Manages VAT posting group handling during document posting operations for allocation accounts.

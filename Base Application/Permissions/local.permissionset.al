@@ -1,9 +1,9 @@
 namespace System.Security.AccessControl;
 
 using Microsoft.Finance.AuditFileExport;
-using Microsoft.Purchases.Document;
 using Microsoft.Finance.GeneralLedger.Reports;
 using Microsoft.Inventory.Intrastat;
+using Microsoft.Purchases.Document;
 
 permissionset 1001 "LOCAL"
 {

@@ -49,10 +49,10 @@ using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Posting;
 using Microsoft.Inventory.Setup;
 using Microsoft.Inventory.Tracking;
-using Microsoft.Projects.Project.Posting;
-using Microsoft.Projects.Project.Job;
-using Microsoft.Projects.Resources.Journal;
 using Microsoft.Projects.Project.Archive;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Posting;
+using Microsoft.Projects.Resources.Journal;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
@@ -69,14 +69,14 @@ using Microsoft.Utilities;
 using Microsoft.Warehouse.Activity;
 using Microsoft.Warehouse.Availability;
 using Microsoft.Warehouse.Document;
-using Microsoft.Warehouse.Journal;
 using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Journal;
 using Microsoft.Warehouse.Request;
 using Microsoft.Warehouse.Setup;
 using System.Automation;
-using System.Utilities;
-using System.Environment.Configuration;
 using System.Email;
+using System.Environment.Configuration;
+using System.Utilities;
 
 codeunit 80 "Sales-Post"
 {

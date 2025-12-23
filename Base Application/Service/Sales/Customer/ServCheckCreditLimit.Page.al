@@ -5,8 +5,8 @@
 namespace Microsoft.Sales.Customer;
 
 using Microsoft.Finance.Currency;
-using Microsoft.Sales.Setup;
 using Microsoft.Sales.Document;
+using Microsoft.Sales.Setup;
 using Microsoft.Service.Contract;
 using Microsoft.Service.Document;
 using Microsoft.Service.Setup;

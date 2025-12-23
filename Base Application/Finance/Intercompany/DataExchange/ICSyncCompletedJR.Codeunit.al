@@ -4,8 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Intercompany.DataExchange;
 
-using System.Telemetry;
 using Microsoft.Intercompany.GLAccount;
+using System.Telemetry;
 
 /// <summary>
 /// Job queue handler for cleaning up completed intercompany synchronization data.

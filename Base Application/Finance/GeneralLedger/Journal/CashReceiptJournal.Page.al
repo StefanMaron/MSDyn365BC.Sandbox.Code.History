@@ -13,13 +13,13 @@ using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Automation;
 using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;
 using System.Privacy;
 using System.Threading;
-using Microsoft.Utilities;
 
 /// <summary>
 /// Provides cash receipt journal functionality for recording customer payments and cash transactions.

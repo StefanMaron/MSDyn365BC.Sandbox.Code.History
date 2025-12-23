@@ -4,8 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Purchases.Document;
 
-using Microsoft.Purchases.Vendor;
 using Microsoft.Foundation.AuditCodes;
+using Microsoft.Purchases.Vendor;
 using Microsoft.Utilities;
 
 table 5005274 "Delivery Reminder Ledger Entry"
