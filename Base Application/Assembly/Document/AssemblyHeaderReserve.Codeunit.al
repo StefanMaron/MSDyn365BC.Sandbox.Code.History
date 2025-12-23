@@ -4,13 +4,13 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Assembly.Document;
 
+using Microsoft.Foundation.Navigate;
 using Microsoft.Inventory.Journal;
 using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Planning;
-using Microsoft.Inventory.Tracking;
-using Microsoft.Foundation.Navigate;
 using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Tracking;
 
 codeunit 925 "Assembly Header-Reserve"
 {

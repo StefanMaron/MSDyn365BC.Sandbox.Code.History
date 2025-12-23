@@ -18,12 +18,12 @@ using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using System.Globalization;
 using System.IO;
 using System.Security.User;
 using System.Text;
 using System.Utilities;
-using Microsoft.Utilities;
 
 table 302 "Finance Charge Memo Header"
 {

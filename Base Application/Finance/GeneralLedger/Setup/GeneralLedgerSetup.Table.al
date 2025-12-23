@@ -6,17 +6,18 @@ namespace Microsoft.Finance.GeneralLedger.Setup;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Finance.Analysis;
-using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.Consolidation;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.FinancialReports;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Preview;
 using Microsoft.Finance.SalesTax;
 using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Finance.VAT.Reporting;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Insurance;
 using Microsoft.FixedAssets.Ledger;
@@ -30,14 +31,13 @@ using Microsoft.Projects.Resources.Ledger;
 using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Receivables;
 using System.Environment;
+#if not CLEAN27
+using System.Environment.Configuration;
+#endif
 using System.IO;
 using System.Security.User;
 using System.Telemetry;
 using System.Threading;
-using Microsoft.Finance.VAT.Reporting;
-#if not CLEAN27
-using System.Environment.Configuration;
-#endif
 
 /// <summary>
 /// Core financial system configuration table controlling posting permissions, currency settings, VAT handling, and dimension management.

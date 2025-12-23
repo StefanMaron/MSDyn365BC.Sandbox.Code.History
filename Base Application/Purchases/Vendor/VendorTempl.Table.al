@@ -5,6 +5,7 @@
 namespace Microsoft.Purchases.Vendor;
 
 using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Payment;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Team;
 using Microsoft.Finance.Currency;
@@ -13,6 +14,7 @@ using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Finance.SalesTax;
 using Microsoft.Finance.VAT.Setup;
+using Microsoft.Finance.WithholdingTax;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.Enums;
@@ -27,8 +29,6 @@ using Microsoft.Pricing.PriceList;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.FinanceCharge;
 using System.Globalization;
-using Microsoft.Finance.WithholdingTax;
-using Microsoft.Bank.Payment;
 
 table 1383 "Vendor Templ."
 {

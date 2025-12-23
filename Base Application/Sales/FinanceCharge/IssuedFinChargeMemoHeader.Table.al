@@ -16,10 +16,10 @@ using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Customer;
+using Microsoft.Utilities;
 using System.Globalization;
 using System.Security.AccessControl;
 using System.Text;
-using Microsoft.Utilities;
 
 table 304 "Issued Fin. Charge Memo Header"
 {

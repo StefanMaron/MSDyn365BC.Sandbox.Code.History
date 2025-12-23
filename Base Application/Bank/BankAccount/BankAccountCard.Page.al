@@ -6,6 +6,7 @@ namespace Microsoft.Bank.BankAccount;
 
 using Microsoft.Bank.Check;
 using Microsoft.Bank.Ledger;
+using Microsoft.Bank.Payment;
 using Microsoft.Bank.PositivePay;
 using Microsoft.Bank.Reconciliation;
 using Microsoft.Bank.Reports;
@@ -21,7 +22,6 @@ using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Comment;
 using Microsoft.Utilities;
 using System.Email;
-using Microsoft.Bank.Payment;
 
 /// <summary>
 /// Primary interface for managing bank account master data and configuration.

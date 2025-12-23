@@ -6,11 +6,11 @@ namespace Microsoft.Service.Document;
 
 using Microsoft.CRM.Contact;
 using Microsoft.EServices.EDocument;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Shipping;
-using Microsoft.Finance.GeneralLedger.Account;
-using Microsoft.Finance.VAT.Setup;
 using Microsoft.Inventory.Intrastat;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;

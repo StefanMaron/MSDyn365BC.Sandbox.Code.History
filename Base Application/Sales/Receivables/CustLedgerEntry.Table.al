@@ -17,6 +17,7 @@ using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
@@ -26,7 +27,6 @@ using Microsoft.Sales.Reminder;
 using Microsoft.Utilities;
 using System.Security.AccessControl;
 using System.Utilities;
-using Microsoft.Foundation.PaymentTerms;
 
 table 21 "Cust. Ledger Entry"
 {

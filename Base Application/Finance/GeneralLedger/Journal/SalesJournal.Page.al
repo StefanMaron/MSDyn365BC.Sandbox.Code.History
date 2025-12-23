@@ -12,6 +12,7 @@ using Microsoft.Finance.GeneralLedger.Posting;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
@@ -20,7 +21,6 @@ using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;
 using System.Threading;
-using Microsoft.Foundation.PaymentTerms;
 
 /// <summary>
 /// Sales journal page for entering sales transactions and customer-related general journal entries.

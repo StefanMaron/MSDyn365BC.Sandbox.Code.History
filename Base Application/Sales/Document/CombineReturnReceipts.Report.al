@@ -11,8 +11,8 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
 using Microsoft.Sales.Setup;
-using System.Globalization;
 using Microsoft.Utilities;
+using System.Globalization;
 
 report 6653 "Combine Return Receipts"
 {

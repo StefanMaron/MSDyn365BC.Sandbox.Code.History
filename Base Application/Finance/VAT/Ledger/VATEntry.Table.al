@@ -6,6 +6,7 @@ namespace Microsoft.Finance.VAT.Ledger;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.CRM.Contact;
+using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Journal;
@@ -15,6 +16,7 @@ using Microsoft.Finance.SalesTax;
 using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Finance.VAT.Registration;
 using Microsoft.Finance.VAT.Setup;
+using Microsoft.Finance.VAT.TransactionNature;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
@@ -30,8 +32,6 @@ using Microsoft.Sales.Reminder;
 using Microsoft.Utilities;
 using System.Security.AccessControl;
 using System.Utilities;
-using Microsoft.Finance.VAT.TransactionNature;
-using Microsoft.EServices.EDocument;
 
 /// <summary>
 /// Central ledger table for recording VAT transactions with comprehensive support for multiple VAT calculation methods.

@@ -5,6 +5,7 @@
 namespace Microsoft.Sales.Posting;
 
 using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Payment;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
@@ -28,9 +29,8 @@ using Microsoft.Sales.History;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
-using System.Utilities;
-using Microsoft.Bank.Payment;
 using System.Telemetry;
+using System.Utilities;
 
 codeunit 442 "Sales-Post Prepayments"
 {

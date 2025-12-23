@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Receivables;
 
+using Microsoft.Bank.Payment;
 using Microsoft.Bank.Reconciliation;
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Dimension;
@@ -18,7 +19,6 @@ using Microsoft.Sales.Setup;
 using System.Diagnostics;
 using System.Security.User;
 using System.Utilities;
-using Microsoft.Bank.Payment;
 
 page 25 "Customer Ledger Entries"
 {

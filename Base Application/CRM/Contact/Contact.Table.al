@@ -33,6 +33,7 @@ using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
+using Microsoft.Utilities;
 using System;
 using System.DateTime;
 using System.Email;
@@ -41,7 +42,6 @@ using System.Globalization;
 using System.Reflection;
 using System.Security.User;
 using System.Utilities;
-using Microsoft.Utilities;
 
 table 5050 Contact
 {

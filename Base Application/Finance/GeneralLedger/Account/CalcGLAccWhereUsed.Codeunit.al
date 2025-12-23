@@ -5,12 +5,14 @@
 namespace Microsoft.Finance.GeneralLedger.Account;
 
 using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Payment;
 using Microsoft.CashFlow.Setup;
 using Microsoft.Finance.Consolidation;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Setup;
+using Microsoft.Finance.WithholdingTax;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Intercompany.Partner;
@@ -22,8 +24,6 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.Setup;
 using System.Reflection;
 using System.Utilities;
-using Microsoft.Finance.WithholdingTax;
-using Microsoft.Bank.Payment;
 
 /// <summary>
 /// Calculates and displays all setup locations where a general ledger account is referenced or used.

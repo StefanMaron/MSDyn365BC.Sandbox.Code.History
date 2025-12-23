@@ -15,11 +15,11 @@ using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
-using System.Utilities;
 using Microsoft.Utilities;
 #if not CLEAN27
 using System.Environment.Configuration;
 #endif
+using System.Utilities;
 
 /// <summary>
 /// Calculates VAT settlement amounts for a specified period and posts VAT settlement entries to General Ledger.

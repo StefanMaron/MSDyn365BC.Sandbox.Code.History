@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Purchases.Payables;
 
+using Microsoft.Bank.Payment;
 using Microsoft.Bank.Reconciliation;
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Dimension;
@@ -11,14 +12,13 @@ using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Reversal;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.WithholdingTax;
 using Microsoft.Foundation.Navigate;
 using Microsoft.Purchases.Remittance;
 using Microsoft.Purchases.Setup;
 using System.Diagnostics;
 using System.Security.User;
 using System.Utilities;
-using Microsoft.Bank.Payment;
-using Microsoft.Finance.WithholdingTax;
 
 page 29 "Vendor Ledger Entries"
 {

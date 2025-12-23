@@ -4,9 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Service.Document;
 
-using Microsoft.Inventory.Intrastat;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
+using Microsoft.Inventory.Intrastat;
 
 tableextension 12153 "Service Line IT" extends "Service Line"
 {

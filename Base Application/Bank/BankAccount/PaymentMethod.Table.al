@@ -5,11 +5,11 @@
 namespace Microsoft.Bank.BankAccount;
 
 using Microsoft.Bank.Payment;
+using Microsoft.EServices.EDocument;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Foundation.PaymentTerms;
 using System.Globalization;
 using System.IO;
-using Microsoft.EServices.EDocument;
 
 /// <summary>
 /// Defines payment methods and their processing characteristics for transactions.

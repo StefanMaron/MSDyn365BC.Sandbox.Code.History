@@ -13,6 +13,7 @@ using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Location;
@@ -26,7 +27,6 @@ using System.Automation;
 using System.Environment;
 using System.Privacy;
 using System.Security.User;
-using Microsoft.Foundation.PaymentTerms;
 
 page 41 "Sales Quote"
 {

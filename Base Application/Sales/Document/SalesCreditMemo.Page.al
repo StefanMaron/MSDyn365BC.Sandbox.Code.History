@@ -13,6 +13,7 @@ using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Comment;
@@ -26,7 +27,6 @@ using System.Automation;
 using System.Environment;
 using System.Privacy;
 using System.Security.User;
-using Microsoft.Foundation.PaymentTerms;
 using System.Threading;
 
 page 44 "Sales Credit Memo"

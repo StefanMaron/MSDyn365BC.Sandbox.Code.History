@@ -36,11 +36,11 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Pricing;
+using Microsoft.Utilities;
 using System.Globalization;
 using System.Reflection;
 using System.Security.AccessControl;
 using System.Security.User;
-using Microsoft.Utilities;
 
 table 5107 "Sales Header Archive"
 {

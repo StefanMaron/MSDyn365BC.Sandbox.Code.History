@@ -15,6 +15,7 @@ using Microsoft.Finance.GeneralLedger.Preview;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Finance.VAT.Setup;
+using Microsoft.Finance.WithholdingTax;
 using Microsoft.FixedAssets.Journal;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.Period;
@@ -25,7 +26,6 @@ using Microsoft.Utilities;
 using System.Environment.Configuration;
 using System.Reflection;
 using System.Utilities;
-using Microsoft.Finance.WithholdingTax;
 
 /// <summary>
 /// Core posting engine for general journal batches with comprehensive validation and posting functionality.

@@ -13,15 +13,20 @@ using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Finance.VAT.Registration;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.Inventory.Item.Catalog;
 using Microsoft.Inventory.Tracking;
+#if not CLEAN27
+using Microsoft.Manufacturing.Document;
+#endif
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
@@ -39,11 +44,6 @@ using System.Environment;
 using System.Integration.Word;
 using System.Privacy;
 using System.Utilities;
-using Microsoft.Foundation.PaymentTerms;
-using Microsoft.Finance.VAT.Setup;
-#if not CLEAN27
-using Microsoft.Manufacturing.Document;
-#endif
 
 page 26 "Vendor Card"
 {

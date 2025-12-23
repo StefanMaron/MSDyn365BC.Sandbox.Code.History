@@ -33,6 +33,7 @@ using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.BatchProcessing;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.ExtendedText;
+using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Foundation.Shipping;
@@ -70,14 +71,13 @@ using Microsoft.Warehouse.Document;
 using Microsoft.Warehouse.Request;
 using System;
 using System.Automation;
+using System.Email;
+using System.Environment.Configuration;
 using System.Globalization;
 using System.Reflection;
-using System.Utilities;
-using Microsoft.Foundation.NoSeries;
-using System.Threading;
-using System.Email;
 using System.Security.User;
-using System.Environment.Configuration;
+using System.Threading;
+using System.Utilities;
 
 table 36 "Sales Header"
 {

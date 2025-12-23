@@ -7,10 +7,10 @@ namespace Microsoft.Manufacturing.WorkCenter;
 using Microsoft.Finance.Dimension;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Comment;
-using Microsoft.Manufacturing.Reports;
 #if not CLEAN27
 using Microsoft.Manufacturing.Document;
 #endif
+using Microsoft.Manufacturing.Reports;
 
 page 99000755 "Work Center List"
 {

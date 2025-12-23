@@ -12,6 +12,7 @@ using Microsoft.Finance.GeneralLedger.Posting;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Purchases.Setup;
 using Microsoft.Utilities;
@@ -20,7 +21,6 @@ using System.Environment;
 using System.Environment.Configuration;
 using System.Integration;
 using System.Threading;
-using Microsoft.Foundation.PaymentTerms;
 
 /// <summary>
 /// Purchase journal page for entering purchase transactions and vendor-related general journal entries.

@@ -10,6 +10,7 @@ using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Opportunity;
 using Microsoft.CRM.Team;
+using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Deferral;
 using Microsoft.Finance.Dimension;
@@ -40,7 +41,6 @@ using System.Globalization;
 using System.Reflection;
 using System.Security.AccessControl;
 using System.Security.User;
-using Microsoft.EServices.EDocument;
 
 table 114 "Sales Cr.Memo Header"
 {

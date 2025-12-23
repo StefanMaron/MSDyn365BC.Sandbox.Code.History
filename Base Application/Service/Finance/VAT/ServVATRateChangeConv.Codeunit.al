@@ -4,13 +4,13 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.VAT.RateChange;
 
-using Microsoft.Service.Pricing;
-using Microsoft.Service.Document;
-using Microsoft.Inventory.Tracking;
-using Microsoft.Utilities;
-using Microsoft.Projects.Resources.Resource;
-using Microsoft.Inventory.Item;
 using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Tracking;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Service.Document;
+using Microsoft.Service.Pricing;
+using Microsoft.Utilities;
 
 codeunit 6471 "Serv. VAT Rate Change Conv."
 {

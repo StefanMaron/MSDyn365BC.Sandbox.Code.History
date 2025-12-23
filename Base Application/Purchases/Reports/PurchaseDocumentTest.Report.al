@@ -11,6 +11,7 @@ using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Reporting;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.Address;
@@ -32,7 +33,6 @@ using Microsoft.Utilities;
 using System.Environment.Configuration;
 using System.Security.User;
 using System.Utilities;
-using Microsoft.Finance.VAT.Reporting;
 
 report 402 "Purchase Document - Test"
 {

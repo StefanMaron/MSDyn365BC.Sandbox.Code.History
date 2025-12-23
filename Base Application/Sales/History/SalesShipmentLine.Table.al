@@ -17,6 +17,7 @@ using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.ExtendedText;
+using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Shipping;
 using Microsoft.Foundation.UOM;
 using Microsoft.Intercompany.Partner;
@@ -39,7 +40,6 @@ using Microsoft.Warehouse.Structure;
 using System.IO;
 using System.Reflection;
 using System.Security.User;
-using Microsoft.Foundation.PaymentTerms;
 
 table 111 "Sales Shipment Line"
 {

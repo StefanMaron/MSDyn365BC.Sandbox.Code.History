@@ -10,6 +10,7 @@ using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Sales.Comment;
@@ -18,7 +19,6 @@ using Microsoft.Sales.Pricing;
 using Microsoft.Utilities;
 using System.Automation;
 using System.Security.User;
-using Microsoft.Foundation.PaymentTerms;
 
 page 507 "Blanket Sales Order"
 {

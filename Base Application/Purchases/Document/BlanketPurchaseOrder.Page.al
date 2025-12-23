@@ -10,13 +10,13 @@ using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Utilities;
 using System.Automation;
 using System.Security.User;
-using Microsoft.Foundation.PaymentTerms;
 
 page 509 "Blanket Purchase Order"
 {

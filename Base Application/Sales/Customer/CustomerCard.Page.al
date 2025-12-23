@@ -12,10 +12,12 @@ using Microsoft.CRM.Outlook;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.VAT.Registration;
+using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.Comment;
+using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
@@ -41,8 +43,6 @@ using System.Environment;
 using System.Environment.Configuration;
 using System.Integration.Word;
 using System.Privacy;
-using Microsoft.Foundation.PaymentTerms;
-using Microsoft.Finance.VAT.Setup;
 
 page 21 "Customer Card"
 {

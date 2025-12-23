@@ -5,10 +5,10 @@
 namespace Microsoft.Finance.VAT.Reporting;
 
 using Microsoft.Foundation.Address;
-using System.Text;
 #if not CLEAN27
 using System.Environment.Configuration;
 #endif
+using System.Text;
 
 /// <summary>
 /// Interactive preview interface for VAT statement calculations with parameter adjustment capabilities.

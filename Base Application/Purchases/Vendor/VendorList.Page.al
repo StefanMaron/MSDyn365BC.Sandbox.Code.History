@@ -15,6 +15,9 @@ using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
 using Microsoft.Inventory.Item.Catalog;
 using Microsoft.Inventory.Tracking;
+#if not CLEAN27
+using Microsoft.Manufacturing.Document;
+#endif
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
@@ -29,9 +32,6 @@ using System.Email;
 using System.Integration.PowerBI;
 using System.Integration.Word;
 using System.Text;
-#if not CLEAN27
-using Microsoft.Manufacturing.Document;
-#endif
 
 page 27 "Vendor List"
 {

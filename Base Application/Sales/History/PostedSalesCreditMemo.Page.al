@@ -12,10 +12,10 @@ using Microsoft.Finance.Dimension;
 using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Attachment;
+using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using System.Automation;
-using Microsoft.Foundation.PaymentTerms;
 
 page 134 "Posted Sales Credit Memo"
 {

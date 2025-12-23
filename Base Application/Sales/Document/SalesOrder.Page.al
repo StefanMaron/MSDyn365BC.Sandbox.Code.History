@@ -16,6 +16,7 @@ using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
@@ -46,9 +47,8 @@ using System.Environment;
 using System.Environment.Configuration;
 using System.Privacy;
 using System.Security.User;
-using System.Utilities;
-using Microsoft.Foundation.PaymentTerms;
 using System.Threading;
+using System.Utilities;
 
 page 42 "Sales Order"
 {

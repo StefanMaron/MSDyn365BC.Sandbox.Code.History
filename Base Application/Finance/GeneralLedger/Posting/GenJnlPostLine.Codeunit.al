@@ -7,6 +7,7 @@ namespace Microsoft.Finance.GeneralLedger.Posting;
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Check;
 using Microsoft.Bank.Ledger;
+using Microsoft.Bank.Payment;
 using Microsoft.CostAccounting.Journal;
 using Microsoft.CostAccounting.Setup;
 using Microsoft.Finance.Currency;
@@ -20,7 +21,9 @@ using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Finance.SalesTax;
 using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Finance.VAT.Ledger;
+using Microsoft.Finance.VAT.Reporting;
 using Microsoft.Finance.VAT.Setup;
+using Microsoft.Finance.WithholdingTax;
 using Microsoft.FixedAssets.Journal;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Maintenance;
@@ -42,13 +45,10 @@ using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Setup;
-using System.Telemetry;
-using Microsoft.Finance.VAT.Reporting;
-using Microsoft.Finance.WithholdingTax;
-using Microsoft.Bank.Payment;
 #if not CLEAN27
 using System.Environment.Configuration;
 #endif
+using System.Telemetry;
 
 /// <summary>
 /// Core posting engine for individual general journal lines with comprehensive validation and ledger entry creation.

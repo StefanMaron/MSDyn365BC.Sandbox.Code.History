@@ -15,6 +15,7 @@ using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Enums;
+using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Intercompany;
 using Microsoft.Intercompany.Journal;
@@ -35,7 +36,6 @@ using System.Environment;
 using System.Environment.Configuration;
 using System.Privacy;
 using System.Security.User;
-using Microsoft.Foundation.PaymentTerms;
 using System.Threading;
 
 page 43 "Sales Invoice"

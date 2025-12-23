@@ -10,6 +10,7 @@ using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Opportunity;
 using Microsoft.CRM.Team;
+using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
@@ -40,7 +41,6 @@ using System.Globalization;
 using System.Reflection;
 using System.Security.AccessControl;
 using System.Security.User;
-using Microsoft.EServices.EDocument;
 
 table 110 "Sales Shipment Header"
 {

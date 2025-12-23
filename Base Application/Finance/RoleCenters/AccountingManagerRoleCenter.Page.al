@@ -6,6 +6,7 @@ namespace Microsoft.Finance.RoleCenters;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Deposit;
+using Microsoft.Bank.Payment;
 using Microsoft.Bank.Reconciliation;
 using Microsoft.Bank.Reports;
 using Microsoft.CashFlow.Account;
@@ -32,13 +33,16 @@ using Microsoft.Finance.GeneralLedger.Reports;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Registration;
 using Microsoft.Finance.VAT.Reporting;
+using Microsoft.Finance.WithholdingTax;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Insurance;
 using Microsoft.FixedAssets.Journal;
 using Microsoft.FixedAssets.Setup;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.Period;
+using Microsoft.Foundation.Task;
 using Microsoft.Inventory.Costing;
 using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Document;
@@ -58,11 +62,7 @@ using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Reports;
 #endif
 using Microsoft.Sales.Setup;
-using Microsoft.Foundation.Navigate;
-using Microsoft.Foundation.Task;
 using System.Threading;
-using Microsoft.Finance.WithholdingTax;
-using Microsoft.Bank.Payment;
 
 page 9001 "Accounting Manager Role Center"
 {

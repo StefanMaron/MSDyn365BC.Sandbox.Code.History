@@ -4,14 +4,14 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Manufacturing.Capacity;
 
+using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.Setup;
 using Microsoft.Manufacturing.WorkCenter;
-using Microsoft.Manufacturing.Document;
 #if not CLEAN27
-using Microsoft.Purchases.Vendor;
 using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Vendor;
 #endif
 
 tableextension 99000801 "Mfg. Capacity Ledger Entry" extends "Capacity Ledger Entry"

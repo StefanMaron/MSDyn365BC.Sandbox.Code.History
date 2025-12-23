@@ -22,6 +22,9 @@ using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Setup;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Inventory.Transfer;
+#if not CLEAN27
+using Microsoft.Manufacturing.Document;
+#endif
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
@@ -44,9 +47,6 @@ using Microsoft.Warehouse.Request;
 using Microsoft.Warehouse.Setup;
 using Microsoft.Warehouse.Structure;
 using Microsoft.Warehouse.Worksheet;
-#if not CLEAN27
-using Microsoft.Manufacturing.Document;
-#endif
 
 page 8909 "Warehouse Manager Role Center"
 {

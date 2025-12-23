@@ -4,9 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Receivables;
 
-using Microsoft.Sales.History;
-using Microsoft.Bank.Payment;
 using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Payment;
+using Microsoft.Sales.History;
 
 codeunit 103 "Cust. Entry-Edit"
 {

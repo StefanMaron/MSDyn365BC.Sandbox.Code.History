@@ -9,6 +9,7 @@ using Microsoft.Assembly.History;
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.Task;
 using Microsoft.Inventory.Analysis;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Item.Catalog;
@@ -16,18 +17,17 @@ using Microsoft.Inventory.Journal;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Reports;
 using Microsoft.Inventory.Requisition;
+#if not CLEAN27
+using Microsoft.Manufacturing.Document;
+#endif
 using Microsoft.Purchases.Analysis;
 using Microsoft.Purchases.Document;
-using Microsoft.Foundation.Task;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Reports;
 using Microsoft.Purchases.Vendor;
 using Microsoft.RoleCenters;
 using Microsoft.Sales.Document;
 using System.Threading;
-#if not CLEAN27
-using Microsoft.Manufacturing.Document;
-#endif
 
 page 9007 "Purchasing Agent Role Center"
 {

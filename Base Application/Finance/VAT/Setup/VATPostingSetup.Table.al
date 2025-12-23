@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.VAT.Setup;
 
+using Microsoft.EServices.EDocument;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Setup;
@@ -12,9 +13,8 @@ using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Finance.VAT.Clause;
 using Microsoft.Finance.VAT.Ledger;
 using Microsoft.Finance.VAT.Reporting;
-using Microsoft.Foundation.Enums;
 using Microsoft.Finance.VAT.TransactionNature;
-using Microsoft.EServices.EDocument;
+using Microsoft.Foundation.Enums;
 
 /// <summary>
 /// Defines VAT calculation rules and G/L account mappings for specific combinations of VAT business and product posting groups.
