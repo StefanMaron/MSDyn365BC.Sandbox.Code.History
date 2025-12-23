@@ -4867,28 +4867,28 @@ codeunit 137404 "SCM Manufacturing"
         // [GIVEN] Create Component 1 without item tracking.
         LibraryInventory.CreateItem(ItemComponent1);
 
-        // [GIVEN] Create Production BOM 1 with Component 1 and Quantity per as 10.
-        CreateProductionBOM(ProductionBOM1, ItemComponent1, 10);
+        // [GIVEN] Create Production BOM 1 with Component 1 and Quantity per.
+        CreateProductionBOM(ProductionBOM1, ItemComponent1, LibraryRandom.RandInt(10));
 
         // [GIVEN] Create Component 2 with item tracking, Make-to-Order and using BOM 1.
         CreateProdItemWithTracking(ItemComponent2, ItemTrackingCode.Code, ProductionBOM1."No.");
 
-        // [GIVEN] Create Production BOM 2 with Component 2 and Quantity per as 2.
-        CreateProductionBOM(ProductionBOM2, ItemComponent2, 2);
+        // [GIVEN] Create Production BOM 2 with Component 2 and Quantity per.
+        CreateProductionBOM(ProductionBOM2, ItemComponent2, LibraryRandom.RandInt(2));
 
         // [GIVEN] Create Main Item with item tracking, Make-to-Order and using BOM 2.
         CreateProdItemWithTracking(ItemMain, ItemTrackingCode.Code, ProductionBOM2."No.");
 
-        // [GIVEN] Create Positive adjustment for Component 1 with Quantity as 500.
-        CreateAndPostPositiveAdjustment(ItemComponent1."No.", 500);
+        // [GIVEN] Create Positive adjustment for Component 1 with Quantity.
+        CreateAndPostPositiveAdjustment(ItemComponent1."No.", LibraryRandom.RandInt(500));
 
-        // [GIVEN] Create Released Production Order for Main item and Quantity as 10.
+        // [GIVEN] Create Released Production Order for Main item and Quantity.
         LibraryManufacturing.CreateProductionOrder(
             ProductionOrder,
             ProductionOrder.Status::Released,
             ProductionOrder."Source Type"::Item,
             ItemMain."No.",
-            10);
+            LibraryRandom.RandInt(10));
         LibraryManufacturing.RefreshProdOrder(ProductionOrder, false, true, true, true, false);
 
         // [WHEN] Multiple production journals are posted with lot tracking.
@@ -7864,66 +7864,68 @@ codeunit 137404 "SCM Manufacturing"
         ItemJournalTemplate: Record "Item Journal Template";
         ProdOrderLine: Record "Prod. Order Line";
         LotNo: array[2] of Code[10];
+        Quantity: Decimal;
     begin
-        // [GIVEN] Generate Lot No.
+        // [GIVEN] Generate Lot No. and Output Qty.
         LotNo[1] := Format(LibraryRandom.RandText(4));
         LotNo[2] := Format(LibraryRandom.RandText(4));
+        Quantity := LibraryRandom.RandInt(10);
         LibraryInventory.SelectItemJournalTemplateName(ItemJournalTemplate, ItemJournalTemplate.Type::Output);
 
         // Post Production Journal for component 2 with lot tracking (first time).
         FindProdOrderLine(ProdOrderLine, ProductionOrder, Component2ItemNo);
         LibraryInventory.SelectItemJournalBatchName(ItemJournalBatch, ItemJournalTemplate.Type, ItemJournalTemplate.Name);
 
-        // [GIVEN] Create consumption line for Component 1 for 200 quantity.
-        CreateProductionJournalLine(ItemJournalLine, ItemJournalBatch, ItemJournalLine."Entry Type"::Consumption, Component1ItemNo, 200, ProdOrderLine);
+        // [GIVEN] Create consumption line for Component 1 with quantity.
+        CreateProductionJournalLine(ItemJournalLine, ItemJournalBatch, ItemJournalLine."Entry Type"::Consumption, Component1ItemNo, LibraryRandom.RandInt(200), ProdOrderLine);
 
-        // [GIVEN] Create output line for Component 2 with LotNo[1] and Output Quantity as 10.
-        CreateProductionJournalLine(ItemJournalLine, ItemJournalBatch, ItemJournalLine."Entry Type"::Output, Component2ItemNo, 10, ProdOrderLine);
-        ItemJournalLine.Validate("Output Quantity", 10);
+        // [GIVEN] Create output line for Component 2 with LotNo[1] and Output Quantity.
+        CreateProductionJournalLine(ItemJournalLine, ItemJournalBatch, ItemJournalLine."Entry Type"::Output, Component2ItemNo, Quantity, ProdOrderLine);
+        ItemJournalLine.Validate("Output Quantity", Quantity);
         ItemJournalLine.Modify(true);
 
         // [GIVEN] Assign LOTNo[1] to output via Item Tracking
         LibraryVariableStorage.Enqueue(LotNo[1]);
-        LibraryVariableStorage.Enqueue(10);
+        LibraryVariableStorage.Enqueue(Quantity);
         CreateItemTrackingForJournalLine(ItemJournalLine);
 
         // [GIVEN] Post Journal Line.
         LibraryInventory.PostItemJournalLine(ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name);
 
-        // [GIVEN] Create again consumption line for Component 1 with 200 quantity.
+        // [GIVEN] Create again consumption line for Component 1 with quantity.
         LibraryInventory.ClearItemJournal(ItemJournalTemplate, ItemJournalBatch);
-        CreateProductionJournalLine(ItemJournalLine, ItemJournalBatch, ItemJournalLine."Entry Type"::Consumption, Component1ItemNo, 200, ProdOrderLine);
+        CreateProductionJournalLine(ItemJournalLine, ItemJournalBatch, ItemJournalLine."Entry Type"::Consumption, Component1ItemNo, LibraryRandom.RandInt(200), ProdOrderLine);
 
-        // [GIVEN] Create output line for Component 2 with LOTNo[1] and Output Quantity as 10.
-        CreateProductionJournalLine(ItemJournalLine, ItemJournalBatch, ItemJournalLine."Entry Type"::Output, Component2ItemNo, 10, ProdOrderLine);
-        ItemJournalLine.Validate("Output Quantity", 10);
+        // [GIVEN] Create output line for Component 2 with LOTNo[1] and Output Quantity.
+        CreateProductionJournalLine(ItemJournalLine, ItemJournalBatch, ItemJournalLine."Entry Type"::Output, Component2ItemNo, Quantity, ProdOrderLine);
+        ItemJournalLine.Validate("Output Quantity", Quantity);
         ItemJournalLine.Modify(true);
 
         // [GIVEN] Assign LOTNo[1] to output via Item Tracking
         LibraryVariableStorage.Enqueue(LOTNo[1]);
-        LibraryVariableStorage.Enqueue(10);
+        LibraryVariableStorage.Enqueue(Quantity);
         CreateItemTrackingForJournalLine(ItemJournalLine);
 
         // [GIVEN] Post Journal Line.
         LibraryInventory.PostItemJournalLine(ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name);
 
-        // [GIVEN] Create Consumption of component 2 with Item Tracking with 20 quantity.
+        // [GIVEN] Create Consumption of component 2 with Item Tracking with quantity.
         FindProdOrderLine(ProdOrderLine, ProductionOrder, MainItemNo);
         LibraryInventory.ClearItemJournal(ItemJournalTemplate, ItemJournalBatch);
-        CreateProductionJournalLine(ItemJournalLine, ItemJournalBatch, ItemJournalLine."Entry Type"::Consumption, Component2ItemNo, 20, ProdOrderLine);
+        CreateProductionJournalLine(ItemJournalLine, ItemJournalBatch, ItemJournalLine."Entry Type"::Consumption, Component2ItemNo, Quantity * 2, ProdOrderLine);
 
         LibraryVariableStorage.Enqueue(LotNo[1]);
-        LibraryVariableStorage.Enqueue(20);
+        LibraryVariableStorage.Enqueue(Quantity * 2);
         CreateItemTrackingForJournalLine(ItemJournalLine);
 
-        // [GIVEN] Create output line for Main Component with LOTNo[2] and Output Quantity as 10.
-        CreateProductionJournalLine(ItemJournalLine, ItemJournalBatch, ItemJournalLine."Entry Type"::Output, MainItemNo, 10, ProdOrderLine);
-        ItemJournalLine.Validate("Output Quantity", 10);
+        // [GIVEN] Create output line for Main Component with LOTNo[2] and Output Quantity.
+        CreateProductionJournalLine(ItemJournalLine, ItemJournalBatch, ItemJournalLine."Entry Type"::Output, MainItemNo, Quantity, ProdOrderLine);
+        ItemJournalLine.Validate("Output Quantity", Quantity);
         ItemJournalLine.Modify(true);
 
         // [GIVEN] Assign LOTNo[2] to output via Item Tracking
         LibraryVariableStorage.Enqueue(LotNo[2]);
-        LibraryVariableStorage.Enqueue(10);
+        LibraryVariableStorage.Enqueue(Quantity);
         CreateItemTrackingForJournalLine(ItemJournalLine);
 
         // [WHEN] Post Item Journal Line.
