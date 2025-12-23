@@ -5,10 +5,13 @@
 namespace Microsoft.Finance.RoleCenters;
 
 using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Journal;
+using Microsoft.Bank.Payment;
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.Task;
 using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
@@ -16,10 +19,7 @@ using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Reports;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
-using Microsoft.Foundation.Task;
 using System.Threading;
-using Microsoft.Bank.Payment;
-using Microsoft.Bank.Journal;
 
 page 9002 "Acc. Payables Coordinator RC"
 {

@@ -12,9 +12,9 @@ using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Utilities;
-using Microsoft.Finance.VAT.Calculation;
 
 table 11400 "CBG Statement"
 {

@@ -7,11 +7,13 @@ namespace Microsoft.Finance.RoleCenters;
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Deposit;
 using Microsoft.Bank.DirectDebit;
+using Microsoft.Bank.Journal;
 using Microsoft.Bank.Payment;
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.Task;
 using Microsoft.Inventory.Item;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.Customer;
@@ -21,9 +23,7 @@ using Microsoft.Sales.History;
 using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Reports;
 using Microsoft.Sales.Setup;
-using Microsoft.Foundation.Task;
 using System.Threading;
-using Microsoft.Bank.Journal;
 
 page 9003 "Acc. Receivables Adm. RC"
 {

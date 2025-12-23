@@ -5,20 +5,20 @@
 namespace Microsoft.Finance.GeneralLedger.Journal;
 
 using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Journal;
+using Microsoft.Bank.Statement;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Reports;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Journal;
-using Microsoft.Intercompany.Partner;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Intercompany.Journal;
+using Microsoft.Intercompany.Partner;
 using Microsoft.Projects.Project.Journal;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using System.Reflection;
-using Microsoft.Bank.Statement;
-using Microsoft.Bank.Journal;
 
 /// <summary>
 /// Stores journal template definitions that control journal behavior, validation rules, and user interface features.

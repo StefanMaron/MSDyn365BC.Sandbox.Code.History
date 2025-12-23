@@ -4,8 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Bank.Reconciliation;
 
-using System.IO;
 using Microsoft.Bank.DirectDebit;
+using System.IO;
 
 /// <summary>
 /// Imports bank reconciliation lines from SEPA CAMT format files.

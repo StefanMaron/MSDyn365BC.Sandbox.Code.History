@@ -6,6 +6,7 @@ namespace Microsoft.Finance.RoleCenters;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Deposit;
+using Microsoft.Bank.Journal;
 using Microsoft.Bank.Payment;
 using Microsoft.Bank.Reconciliation;
 using Microsoft.Bank.Reports;
@@ -21,6 +22,7 @@ using Microsoft.Finance.VAT.Reporting;
 using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.Period;
+using Microsoft.Foundation.Task;
 using Microsoft.Inventory.Costing;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
@@ -38,9 +40,7 @@ using Microsoft.Sales.Reports;
 #endif
 using Microsoft.Sales.Setup;
 using System.Automation;
-using Microsoft.Foundation.Task;
 using System.Threading;
-using Microsoft.Bank.Journal;
 
 page 9004 "Bookkeeper Role Center"
 {

@@ -5,6 +5,7 @@
 namespace Microsoft.Finance.ReceivablesPayables;
 
 using Microsoft.Bank.Reconciliation;
+using Microsoft.Bank.Statement;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Preview;
@@ -14,7 +15,6 @@ using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
 using System.Utilities;
-using Microsoft.Bank.Statement;
 
 /// <summary>
 /// Manages payment tolerance processing for customer and vendor transactions.

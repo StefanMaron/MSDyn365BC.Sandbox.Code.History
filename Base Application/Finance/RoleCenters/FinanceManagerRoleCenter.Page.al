@@ -8,6 +8,7 @@ using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Check;
 using Microsoft.Bank.Deposit;
 using Microsoft.Bank.DirectDebit;
+using Microsoft.Bank.Journal;
 using Microsoft.Bank.Ledger;
 using Microsoft.Bank.Payment;
 using Microsoft.Bank.Reconciliation;
@@ -53,8 +54,8 @@ using Microsoft.FixedAssets.Maintenance;
 using Microsoft.FixedAssets.Reports;
 using Microsoft.FixedAssets.Setup;
 using Microsoft.Foundation.AuditCodes;
-using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Period;
 using Microsoft.HumanResources.Payables;
@@ -87,13 +88,12 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
-using Microsoft.Sales.Reports;
-using Microsoft.Sales.Setup;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
+using Microsoft.Sales.Reports;
+using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
 using System.Diagnostics;
-using Microsoft.Bank.Journal;
 
 page 8901 "Finance Manager Role Center"
 {

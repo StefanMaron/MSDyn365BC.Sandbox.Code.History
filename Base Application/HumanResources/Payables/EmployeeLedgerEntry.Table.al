@@ -5,6 +5,7 @@
 namespace Microsoft.HumanResources.Payables;
 
 using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Payment;
 using Microsoft.CRM.Team;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
@@ -19,7 +20,6 @@ using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using System.Security.AccessControl;
 using System.Utilities;
-using Microsoft.Bank.Payment;
 
 table 5222 "Employee Ledger Entry"
 {

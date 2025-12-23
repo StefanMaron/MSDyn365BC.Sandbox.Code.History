@@ -5,6 +5,7 @@
 namespace Microsoft.Purchases.Vendor;
 
 using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Payment;
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Outlook;
@@ -56,7 +57,6 @@ using System.Globalization;
 using System.Reflection;
 using System.Security.User;
 using System.Utilities;
-using Microsoft.Bank.Payment;
 
 table 23 Vendor
 {

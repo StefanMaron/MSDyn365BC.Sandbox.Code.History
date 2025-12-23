@@ -5,6 +5,7 @@
 namespace Microsoft.Sales.Customer;
 
 using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Payment;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Team;
 using Microsoft.Finance.Currency;
@@ -24,14 +25,13 @@ using Microsoft.Intercompany.Partner;
 using Microsoft.Inventory.Intrastat;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Tracking;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Reminder;
-using Microsoft.Pricing.Calculation;
-using Microsoft.Pricing.PriceList;
 using System.Globalization;
-using Microsoft.Bank.Payment;
 
 table 1381 "Customer Templ."
 {

@@ -10,9 +10,9 @@ using Microsoft.Finance.Currency;
 using Microsoft.Finance.VAT.Registration;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Utilities;
+using System.Automation;
 using System.DataAdministration;
 using System.Threading;
-using System.Automation;
 
 codeunit 8912 "Environment Cleanup Subs"
 {

@@ -6,8 +6,8 @@ namespace Microsoft.RoleCenters;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Deposit;
+using Microsoft.Bank.Journal;
 using Microsoft.Bank.Payment;
-using Microsoft.Foundation.Task;
 using Microsoft.Bank.Reconciliation;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Task;
@@ -29,6 +29,7 @@ using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.Period;
+using Microsoft.Foundation.Task;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Inventory.BOM;
@@ -59,7 +60,6 @@ using Microsoft.Sales.Setup;
 using System.IO;
 using System.Security.User;
 using System.Threading;
-using Microsoft.Bank.Journal;
 
 page 9020 "Small Business Owner RC"
 {

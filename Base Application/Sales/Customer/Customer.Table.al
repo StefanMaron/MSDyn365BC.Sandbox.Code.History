@@ -6,6 +6,7 @@ namespace Microsoft.Sales.Customer;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.DirectDebit;
+using Microsoft.Bank.Payment;
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
@@ -59,7 +60,6 @@ using System.IO;
 using System.Reflection;
 using System.Security.User;
 using System.Utilities;
-using Microsoft.Bank.Payment;
 
 table 18 Customer
 {

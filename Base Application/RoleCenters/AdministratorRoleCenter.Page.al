@@ -5,6 +5,8 @@
 namespace Microsoft.RoleCenters;
 
 using Microsoft.Bank.Ledger;
+using Microsoft.Bank.Payment;
+using Microsoft.Bank.Reconciliation;
 using Microsoft.Bank.Setup;
 using Microsoft.CashFlow.Setup;
 using Microsoft.CRM.Contact;
@@ -20,17 +22,18 @@ using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Ledger;
 using Microsoft.Finance.VAT.Registration;
+using Microsoft.Finance.VAT.Reporting;
 using Microsoft.FixedAssets.Insurance;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Maintenance;
 using Microsoft.FixedAssets.Setup;
-using Microsoft.Foundation.Task;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Calendar;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.Task;
 using Microsoft.HumanResources.Setup;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
@@ -50,11 +53,11 @@ using Microsoft.Sales.Analysis;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Setup;
+using Microsoft.Utilities;
 using Microsoft.Warehouse.ADCS;
 using Microsoft.Warehouse.Ledger;
 using Microsoft.Warehouse.Setup;
 using Microsoft.Warehouse.Structure;
-using Microsoft.Utilities;
 using System.Automation;
 using System.Diagnostics;
 using System.Email;
@@ -62,9 +65,6 @@ using System.IO;
 using System.Privacy;
 using System.Security.User;
 using System.Threading;
-using Microsoft.Bank.Payment;
-using Microsoft.Bank.Reconciliation;
-using Microsoft.Finance.VAT.Reporting;
 
 page 9018 "Administrator Role Center"
 {

@@ -5,6 +5,7 @@
 namespace Microsoft.Purchases.Vendor;
 
 using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Payment;
 using Microsoft.CRM.Contact;
 using Microsoft.CRM.Team;
 using Microsoft.Finance.Currency;
@@ -27,7 +28,6 @@ using Microsoft.Pricing.PriceList;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.FinanceCharge;
 using System.Globalization;
-using Microsoft.Bank.Payment;
 
 table 1383 "Vendor Templ."
 {

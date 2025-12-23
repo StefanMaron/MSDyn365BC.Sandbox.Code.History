@@ -5,8 +5,8 @@
 namespace Microsoft.Bank.Payment;
 
 using Microsoft.Bank.BankAccount;
-using Microsoft.CRM.Team;
 using Microsoft.Bank.DirectDebit;
+using Microsoft.CRM.Team;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Journal;

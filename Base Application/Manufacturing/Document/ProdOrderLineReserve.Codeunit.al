@@ -9,9 +9,9 @@ using Microsoft.Inventory.Journal;
 using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Planning;
-using Microsoft.Inventory.Tracking;
 using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Setup;
+using Microsoft.Inventory.Tracking;
 
 codeunit 99000837 "Prod. Order Line-Reserve"
 {

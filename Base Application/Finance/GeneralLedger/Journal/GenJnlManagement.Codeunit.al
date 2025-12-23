@@ -5,6 +5,8 @@
 namespace Microsoft.Finance.GeneralLedger.Journal;
 
 using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Journal;
+using Microsoft.Bank.Statement;
 using Microsoft.Finance.AllocationAccount;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Account;
@@ -13,8 +15,6 @@ using Microsoft.HumanResources.Employee;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
-using Microsoft.Bank.Statement;
-using Microsoft.Bank.Journal;
 using Microsoft.Utilities;
 
 /// <summary>

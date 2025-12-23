@@ -6,6 +6,7 @@ namespace Microsoft.Sales.Receivables;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.DirectDebit;
+using Microsoft.Bank.Payment;
 using Microsoft.CRM.Team;
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Currency;
@@ -26,7 +27,6 @@ using Microsoft.Sales.Reminder;
 using Microsoft.Utilities;
 using System.Security.AccessControl;
 using System.Utilities;
-using Microsoft.Bank.Payment;
 
 table 21 "Cust. Ledger Entry"
 {

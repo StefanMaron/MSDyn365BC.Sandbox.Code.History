@@ -5,8 +5,8 @@
 namespace Microsoft.Inventory.Availability;
 
 using Microsoft.Inventory.Item;
-using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Requisition;
 
 codeunit 5830 "Calc. Availability Overview"
 {

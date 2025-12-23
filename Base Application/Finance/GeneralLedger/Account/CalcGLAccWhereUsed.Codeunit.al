@@ -5,6 +5,7 @@
 namespace Microsoft.Finance.GeneralLedger.Account;
 
 using Microsoft.Bank.BankAccount;
+using Microsoft.Bank.Payment;
 using Microsoft.CashFlow.Setup;
 using Microsoft.Finance.Consolidation;
 using Microsoft.Finance.Currency;
@@ -22,7 +23,6 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.Setup;
 using System.Reflection;
 using System.Utilities;
-using Microsoft.Bank.Payment;
 
 /// <summary>
 /// Calculates and displays all setup locations where a general ledger account is referenced or used.

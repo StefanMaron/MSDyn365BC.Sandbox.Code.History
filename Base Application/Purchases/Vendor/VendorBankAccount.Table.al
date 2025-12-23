@@ -9,9 +9,9 @@ using Microsoft.Finance.Currency;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Purchases.Payables;
+using Microsoft.Utilities;
 using System.Email;
 using System.Globalization;
-using Microsoft.Utilities;
 
 table 288 "Vendor Bank Account"
 {
