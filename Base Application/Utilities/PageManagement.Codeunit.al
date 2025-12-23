@@ -13,6 +13,8 @@ using Microsoft.Foundation.Company;
 using Microsoft.HumanResources.Employee;
 using Microsoft.Intercompany.Journal;
 using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Counting.Journal;
+using Microsoft.Inventory.Journal;
 using Microsoft.Inventory.Requisition;
 using Microsoft.Projects.Project.Journal;
 using Microsoft.Projects.Resources.Journal;
@@ -212,6 +214,10 @@ codeunit 700 "Page Management"
                 exit(GetGenJournalBatchPageID(RecRef));
             Database::"Gen. Journal Line":
                 exit(GetGenJournalLinePageID(RecRef));
+            Database::"Item Journal Batch":
+                exit(GetItemJournalBatchPageID(RecRef));
+            Database::"Item Journal Line":
+                exit(GetItemJournalLinePageID(RecRef));
             Database::"Requisition Wksh. Name":
                 exit(GetRequisitionWkshBatchPageID(RecRef));
             Database::"Requisition Line":
@@ -588,6 +594,59 @@ codeunit 700 "Page Management"
         exit(PageMetadata.Caption);
     end;
 
+    local procedure GetItemJournalBatchPageID(RecRef: RecordRef): Integer
+    var
+        ItemJournalBatch: Record "Item Journal Batch";
+        ItemJournalLine: Record "Item Journal Line";
+    begin
+        RecRef.SetTable(ItemJournalBatch);
+
+        ItemJournalLine.SetRange("Journal Template Name", ItemJournalBatch."Journal Template Name");
+        ItemJournalLine.SetRange("Journal Batch Name", ItemJournalBatch.Name);
+        if not ItemJournalLine.FindFirst() then begin
+            ItemJournalLine."Journal Template Name" := ItemJournalBatch."Journal Template Name";
+            ItemJournalLine."Journal Batch Name" := ItemJournalBatch.Name;
+            RecRef.GetTable(ItemJournalLine);
+
+            exit(Page::"Item Journal");
+        end;
+
+        RecRef.GetTable(ItemJournalLine);
+        exit(GetItemJournalLinePageID(RecRef));
+    end;
+
+    local procedure GetItemJournalLinePageID(RecRef: RecordRef): Integer
+    var
+        ItemJournalLine: Record "Item Journal Line";
+        ItemJournalTemplate: Record "Item Journal Template";
+        CardPageID: Integer;
+    begin
+        RecRef.SetTable(ItemJournalLine);
+        ItemJournalTemplate.Get(ItemJournalLine."Journal Template Name");
+
+        if ItemJournalTemplate."Page ID" <> 0 then
+            exit(ItemJournalTemplate."Page ID");
+
+        if ItemJournalTemplate.Recurring then
+            exit(Page::"Recurring Item Jnl.");
+
+        case ItemJournalTemplate.Type of
+            ItemJournalTemplate.Type::Item:
+                exit(Page::"Item Journal");
+            ItemJournalTemplate.Type::"Phys. Inventory":
+                exit(Page::"Phys. Inventory Journal");
+            ItemJournalTemplate.Type::Revaluation:
+                exit(Page::"Revaluation Journal");
+            ItemJournalTemplate.Type::Transfer:
+                exit(Page::"Item Reclass. Journal")
+            else begin
+                OnGetItemJournalTemplatePageID(ItemJournalTemplate, RecRef, CardPageID);
+
+                exit(CardPageID);
+            end;
+        end;
+    end;
+
     local procedure GetRequisitionWkshBatchPageID(RecRef: RecordRef): Integer
     var
         RequisitionWkshName: Record "Requisition Wksh. Name";
@@ -688,6 +747,11 @@ codeunit 700 "Page Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeVerifyPageID(TableID: Integer; PageID: Integer; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetItemJournalTemplatePageID(ItemJournalTemplate: Record "Item Journal Template"; RecordRef: RecordRef; var CardPageID: Integer)
     begin
     end;
 
