@@ -13,9 +13,9 @@ using Microsoft.Finance.VAT.Ledger;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.Foundation.Enums;
+using Microsoft.Projects.Project.Journal;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
-using Microsoft.Projects.Project.Journal;
 
 /// <summary>
 /// Provides an interface of the Non-Deductible VAT functionality.

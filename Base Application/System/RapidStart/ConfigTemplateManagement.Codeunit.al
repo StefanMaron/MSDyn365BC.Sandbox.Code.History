@@ -1,8 +1,8 @@
 namespace System.IO;
 
-using System.Reflection;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
+using System.Reflection;
 
 codeunit 8612 "Config. Template Management"
 {

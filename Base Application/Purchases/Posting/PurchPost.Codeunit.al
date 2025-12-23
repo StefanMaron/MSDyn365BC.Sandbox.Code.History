@@ -66,11 +66,12 @@ using Microsoft.Warehouse.Journal;
 using Microsoft.Warehouse.Request;
 using Microsoft.Warehouse.Setup;
 using System.Automation;
-using System.Utilities;
 using System.Environment.Configuration;
 #if not CLEAN27
 using System.Telemetry;
 #endif
+using System.Utilities;
+
 
 codeunit 90 "Purch.-Post"
 {

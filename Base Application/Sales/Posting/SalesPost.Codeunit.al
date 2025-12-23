@@ -49,10 +49,10 @@ using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Posting;
 using Microsoft.Inventory.Setup;
 using Microsoft.Inventory.Tracking;
-using Microsoft.Projects.Project.Posting;
-using Microsoft.Projects.Project.Job;
-using Microsoft.Projects.Resources.Journal;
 using Microsoft.Projects.Project.Archive;
+using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Posting;
+using Microsoft.Projects.Resources.Journal;
 using Microsoft.Purchases.Comment;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
@@ -69,17 +69,17 @@ using Microsoft.Utilities;
 using Microsoft.Warehouse.Activity;
 using Microsoft.Warehouse.Availability;
 using Microsoft.Warehouse.Document;
-using Microsoft.Warehouse.Journal;
 using Microsoft.Warehouse.History;
+using Microsoft.Warehouse.Journal;
 using Microsoft.Warehouse.Request;
 using Microsoft.Warehouse.Setup;
 using System.Automation;
-using System.Utilities;
-using System.Environment.Configuration;
 using System.Email;
+using System.Environment.Configuration;
 #if not CLEAN27
 using System.Telemetry;
 #endif
+using System.Utilities;
 
 codeunit 80 "Sales-Post"
 {
@@ -933,7 +933,7 @@ codeunit 80 "Sales-Post"
             repeat
                 ErrorMessageMgt.PushContext(ErrorContextElement, TempSalesLineGlobal.RecordId(), 0, CheckSalesLineMsg);
                 TestSalesLine(SalesHeader, TempSalesLineGlobal);
-                if (SalesHeader.Ship or SalesHeader.Receive or SalesHeader.Invoice) and (TempSalesLineGlobal.Type = TempSalesLineGlobal.Type::Item) and (TempSalesLineGlobal."Qty. to Ship" <> 0) then 
+                if (SalesHeader.Ship or SalesHeader.Receive or SalesHeader.Invoice) and (TempSalesLineGlobal.Type = TempSalesLineGlobal.Type::Item) and (TempSalesLineGlobal."Qty. to Ship" <> 0) then
                     NoOfItemLines += 1;
             until TempSalesLineGlobal.Next() = 0;
         ErrorMessageMgt.PopContext(ErrorContextElement);
@@ -8909,7 +8909,7 @@ codeunit 80 "Sales-Post"
 
         exit(false);
     end;
-    
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforePostLines(var SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"; CommitIsSuppressed: Boolean; PreviewMode: Boolean; var TempWhseShptHeader: Record "Warehouse Shipment Header" temporary; var ItemJnlPostLine: Codeunit "Item Jnl.-Post Line")
     begin
@@ -9958,7 +9958,7 @@ codeunit 80 "Sales-Post"
         ReplacePostingDate: Boolean;
         ReplaceDocumentDate: Boolean;
         ReplaceVATDate: Boolean;
-        SkipTestPostingDate: Boolean;	
+        SkipTestPostingDate: Boolean;
         IsHandled: Boolean;
     begin
         IsHandled := false;

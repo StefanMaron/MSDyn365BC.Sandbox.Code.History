@@ -6,9 +6,9 @@
 namespace Microsoft.Finance.GeneralLedger.Setup;
 
 using Microsoft.Foundation.Period;
+using Microsoft.Inventory.Costing;
 using Microsoft.Inventory.Setup;
 using System.Utilities;
-using Microsoft.Inventory.Costing;
 
 table 10560 "Accounting Period GB"
 {

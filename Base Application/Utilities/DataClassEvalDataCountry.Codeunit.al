@@ -4,17 +4,19 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Utilities;
 
+#if not CLEAN28
+using Microsoft.Bank.Ledger;
+using Microsoft.Finance.GeneralLedger.Setup;
+#endif
 using Microsoft.Finance.VAT.Reporting;
 using Microsoft.HumanResources.Absence;
 using Microsoft.HumanResources.Employee;
 using Microsoft.HumanResources.Payables;
 using Microsoft.Sales.Archive;
-using System.Privacy;
 #if not CLEAN28
-using Microsoft.Bank.Ledger;
 using Microsoft.Sales.FinanceCharge;
-using Microsoft.Finance.GeneralLedger.Setup;
 #endif
+using System.Privacy;
 
 codeunit 1752 "Data Class. Eval. Data Country"
 {

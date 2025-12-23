@@ -40,9 +40,9 @@ using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
 using Microsoft.Utilities;
 using System.Environment.Configuration;
+using System.Globalization;
 using System.Reflection;
 using System.Utilities;
-using System.Globalization;
 
 /// <summary>
 /// Codeunit DimensionManagement (ID 408).

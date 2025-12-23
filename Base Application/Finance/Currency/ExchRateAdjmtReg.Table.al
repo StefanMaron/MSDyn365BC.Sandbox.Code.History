@@ -6,12 +6,12 @@ namespace Microsoft.Finance.Currency;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.HumanResources.Employee;
+using Microsoft.HumanResources.Payables;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
-using Microsoft.HumanResources.Employee;
-using Microsoft.HumanResources.Payables;
 
 /// <summary>
 /// Maintains a register of exchange rate adjustment runs for audit and tracking purposes.
