@@ -4,11 +4,11 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Foundation.ExtendedText;
 
-using Microsoft.Service.Document;
-using Microsoft.Service.Pricing;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Inventory.Item;
 using Microsoft.Projects.Resources.Resource;
+using Microsoft.Service.Document;
+using Microsoft.Service.Pricing;
 
 codeunit 6003 "Service Transfer Ext. Text"
 {

@@ -7,6 +7,7 @@ namespace Microsoft.Sales.Setup;
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Payment;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.VAT.Reporting;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Pricing.Calculation;
@@ -15,7 +16,6 @@ using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Reminder;
 using Microsoft.Utilities;
-using Microsoft.Finance.VAT.Reporting;
 
 page 459 "Sales & Receivables Setup"
 {

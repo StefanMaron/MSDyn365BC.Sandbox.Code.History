@@ -10,10 +10,10 @@ using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Intercompany.Partner;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using System.Automation;
-using Microsoft.Intercompany.Partner;
 
 /// <summary>
 /// Stores journal batch configurations that group journal lines for processing and provide default settings.

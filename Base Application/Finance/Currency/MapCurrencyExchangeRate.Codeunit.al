@@ -4,10 +4,10 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.Currency;
 
+using Microsoft.Utilities;
 using System.IO;
 using System.Reflection;
 using System.Utilities;
-using Microsoft.Utilities;
 
 /// <summary>
 /// Maps imported exchange rate data to currency exchange rate records.

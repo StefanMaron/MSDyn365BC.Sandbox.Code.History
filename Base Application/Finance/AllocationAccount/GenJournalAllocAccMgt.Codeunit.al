@@ -5,10 +5,10 @@
 namespace Microsoft.Finance.AllocationAccount;
 
 using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Posting;
-using Microsoft.Finance.GeneralLedger.Account;
 
 /// <summary>
 /// Manages allocation account operations for general journal entries including line creation and validation.
