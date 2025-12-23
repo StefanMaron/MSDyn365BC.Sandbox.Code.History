@@ -6,10 +6,10 @@ namespace Microsoft.Inventory.Transfer;
 
 using Microsoft.Foundation.Enums;
 using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Planning;
 using Microsoft.Inventory.Tracking;
-using Microsoft.Inventory.Ledger;
 using Microsoft.Warehouse.Document;
 using Microsoft.Warehouse.Ledger;
 

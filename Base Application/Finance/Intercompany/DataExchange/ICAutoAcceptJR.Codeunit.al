@@ -5,11 +5,11 @@
 namespace Microsoft.Intercompany.DataExchange;
 
 using Microsoft.Intercompany;
+using Microsoft.Intercompany.GLAccount;
 using Microsoft.Intercompany.Inbox;
 using Microsoft.Intercompany.Partner;
-using Microsoft.Intercompany.GLAccount;
-using System.Threading;
 using System.Telemetry;
+using System.Threading;
 
 /// <summary>
 /// Job queue handler for automatically accepting intercompany transactions based on partner configuration.

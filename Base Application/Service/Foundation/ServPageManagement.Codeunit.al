@@ -4,9 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Utilities;
 
-using Microsoft.Service.Document;
-using Microsoft.Service.Contract;
 using Microsoft.Service.Archive;
+using Microsoft.Service.Contract;
+using Microsoft.Service.Document;
 
 codeunit 6466 "Serv. Page Management"
 {

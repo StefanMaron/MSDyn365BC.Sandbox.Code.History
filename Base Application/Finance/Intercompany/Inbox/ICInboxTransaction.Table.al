@@ -4,10 +4,10 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Intercompany.Inbox;
 
+using Microsoft.Intercompany;
 using Microsoft.Intercompany.Journal;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Purchases.Document;
-using Microsoft.Intercompany;
 using Microsoft.Purchases.History;
 using System.Utilities;
 
