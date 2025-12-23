@@ -40,6 +40,7 @@ using Microsoft.Warehouse.Journal;
 using Microsoft.Warehouse.Reports;
 using Microsoft.Warehouse.Request;
 using Microsoft.Warehouse.Structure;
+using System.Automation;
 using System.Security.User;
 using System.Utilities;
 
@@ -1867,7 +1868,12 @@ table 83 "Item Journal Line"
     }
 
     trigger OnDelete()
+    var
+        ItemJournalBatch: Record "Item Journal Batch";
     begin
+        if ItemJournalBatch.Get(Rec."Journal Template Name", Rec."Journal Batch Name") then
+            ApprovalsMgmt.PreventDeletingRecordWithOpenApprovalEntry(ItemJournalBatch);
+
         ItemJnlLineReserve.DeleteLine(Rec);
 
         CalcFields("Reserved Qty. (Base)");
@@ -1883,6 +1889,8 @@ table 83 "Item Journal Line"
         if Rec."Posting No. Series" = '' then
             Rec."Posting No. Series" := ItemJnlTemplate."Posting No. Series";
 
+        ApprovalsMgmt.PreventInsertRecIfOpenApprovalEntryExist(ItemJnlBatch);
+
         Rec.ValidateShortcutDimCode(1, "Shortcut Dimension 1 Code");
         Rec.ValidateShortcutDimCode(2, "Shortcut Dimension 2 Code");
         Rec.ValidateNewShortcutDimCode(1, "New Shortcut Dimension 1 Code");
@@ -1893,6 +1901,7 @@ table 83 "Item Journal Line"
 
     trigger OnModify()
     begin
+        PreventModifyRecIfOpenApprovalEntryExist();
         OnBeforeVerifyReservedQty(Rec, xRec, 0);
         ItemJnlLineReserve.VerifyChange(Rec, xRec);
         CheckPlanningAssignment();
@@ -1925,6 +1934,7 @@ table 83 "Item Journal Line"
         WhseValidateSourceLine: Codeunit "Whse. Validate Source Line";
         WMSManagement: Codeunit "WMS Management";
         ItemReferenceManagement: Codeunit "Item Reference Management";
+        ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         GLSetupRead: Boolean;
 #pragma warning disable AA0074
         Text007: Label 'New ';
@@ -1947,6 +1957,7 @@ table 83 "Item Journal Line"
         RenumberDocNoQst: Label 'If you have many documents it can take time to sort them, and %1 might perform slowly during the process. In those cases we suggest that you sort them during non-working hours. Do you want to continue?', Comment = '%1= Business Central';
         IncorrectQtyForSNErr: Label 'Quantity must be -1, 0 or 1 when Serial No. is stated.';
         ItemTrackingExistsErr: Label 'You cannot change %1 because item tracking already exists for this journal line.', Comment = '%1 - Serial, Lot or Package No.';
+        RestrictBatchUsageDetailsTxt: Label 'The restriction was imposed because the journal batch requires approval.';
 
     protected var
         ItemJnlLine: Record "Item Journal Line";
@@ -3058,6 +3069,32 @@ table 83 "Item Journal Line"
         end;
     end;
 
+    internal procedure IsSourceProductionJournal() Result: Boolean
+    var
+        SourceCodeSetup: Record "Source Code Setup";
+    begin
+        if not (Rec."Entry Type" in [Rec."Entry Type"::Consumption, Rec."Entry Type"::Output]) then
+            exit;
+
+        SourceCodeSetup.SetLoadFields("Production Journal");
+        SourceCodeSetup.Get();
+
+        exit("Source Code" = SourceCodeSetup."Production Journal");
+    end;
+
+    internal procedure IsSourceCapacityJournal() Result: Boolean
+    var
+        SourceCodeSetup: Record "Source Code Setup";
+    begin
+        if not (Rec."Entry Type" = Rec."Entry Type"::Output) then
+            exit;
+
+        SourceCodeSetup.SetLoadFields("Capacity Journal");
+        SourceCodeSetup.Get();
+
+        exit("Source Code" = SourceCodeSetup."Capacity Journal");
+    end;
+
     /// <summary>
     /// Checks if reservation entry exists for the item journal line.
     /// </summary>
@@ -3887,6 +3924,9 @@ table 83 "Item Journal Line"
                 ItemJnlLine3.Get(ItemJnlLine2."Journal Template Name", ItemJnlLine2."Journal Batch Name", ItemJnlLine2."Line No.");
                 ItemJnlLine3."Document No." := DocNo;
                 ItemJnlLine3.Modify();
+
+                RestrictItemJournalBatch(ItemJnlLine3);
+
                 First := false;
                 LastItemJnlLine := ItemJnlLine2;
             until ItemJnlLine2.Next() = 0;
@@ -4062,6 +4102,27 @@ table 83 "Item Journal Line"
             exit;
         if not ("Quantity (Base)" in [-1, 0, 1]) then
             Error(IncorrectQtyForSNErr);
+    end;
+
+    local procedure PreventModifyRecIfOpenApprovalEntryExist()
+    var
+        ItemJournalBatch: Record "Item Journal Batch";
+    begin
+        if ItemJournalBatch.Get("Journal Template Name", "Journal Batch Name") then
+            ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExist(ItemJournalBatch);
+    end;
+
+    local procedure RestrictItemJournalBatch(var ItemJournalLine: Record "Item Journal Line")
+    var
+        ItemJournalBatch: Record "Item Journal Batch";
+        RecordRestrictionMgt: Codeunit "Record Restriction Mgt.";
+    begin
+        if ItemJournalLine.IsTemporary then
+            exit;
+
+        if ItemJournalBatch.Get(ItemJournalLine."Journal Template Name", ItemJournalLine."Journal Batch Name") then
+            if ApprovalsMgmt.IsItemJournalBatchApprovalsWorkflowEnabled(ItemJournalBatch) then
+                RecordRestrictionMgt.RestrictRecordUsage(ItemJournalBatch, RestrictBatchUsageDetailsTxt);
     end;
 
     /// <summary>
