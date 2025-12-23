@@ -4,8 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.FinancialReports;
 
-using Microsoft.Foundation.Enums;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Enums;
 
 /// <summary>
 /// Stores financial report definitions with configuration parameters and filter settings.

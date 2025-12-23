@@ -18,8 +18,8 @@ using Microsoft.Foundation.Period;
 using Microsoft.Purchases.Setup;
 using Microsoft.Sales.Setup;
 using System.Reflection;
-using System.Telemetry;
 using System.Security.User;
+using System.Telemetry;
 using System.Utilities;
 
 /// <summary>

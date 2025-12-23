@@ -4,9 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Item.Catalog;
 
+using Microsoft.Inventory.Item;
 using Microsoft.Service.Archive;
 using Microsoft.Service.Document;
-using Microsoft.Inventory.Item;
 
 codeunit 6479 "Serv. Catalog Item Mgt."
 {

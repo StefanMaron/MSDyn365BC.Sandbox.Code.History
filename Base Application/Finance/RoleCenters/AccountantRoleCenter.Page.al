@@ -37,6 +37,7 @@ using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.FixedAssets.Insurance;
 using Microsoft.FixedAssets.Journal;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Period;
@@ -66,7 +67,6 @@ using Microsoft.Sales.Reminder;
 #if not CLEAN28
 using Microsoft.Sales.Reports;
 #endif
-using Microsoft.Foundation.Navigate;
 using System.Automation;
 using System.Email;
 using System.Environment;

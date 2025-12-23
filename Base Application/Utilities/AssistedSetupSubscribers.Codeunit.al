@@ -7,7 +7,6 @@ namespace Microsoft.Utilities;
 using Microsoft.AccountantPortal;
 using Microsoft.Bank.Setup;
 using Microsoft.CashFlow.Forecast;
-using Microsoft.System.Threading;
 using Microsoft.CRM.Outlook;
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Currency;
@@ -17,7 +16,9 @@ using Microsoft.Foundation.Reporting;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Projects.Timesheet;
+using Microsoft.System.Threading;
 using System.AI;
+using System.Apps;
 using System.Automation;
 using System.Azure.Identity;
 using System.Email;
@@ -29,7 +30,6 @@ using System.Integration;
 using System.Integration.Excel;
 using System.Media;
 using System.Security.User;
-using System.Apps;
 
 codeunit 1814 "Assisted Setup Subscribers"
 {

@@ -67,8 +67,8 @@ using Microsoft.Warehouse.Journal;
 using Microsoft.Warehouse.Request;
 using Microsoft.Warehouse.Setup;
 using System.Automation;
-using System.Utilities;
 using System.Environment.Configuration;
+using System.Utilities;
 
 codeunit 90 "Purch.-Post"
 {

@@ -4,26 +4,26 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Assembly.Test;
 
-using Microsoft.Finance.GeneralLedger.Setup;
-using Microsoft.Utilities;
-using Microsoft.Assembly.Document;
-using Microsoft.Inventory.Item;
-using Microsoft.Inventory.Journal;
 using Microsoft.Assembly.Comment;
+using Microsoft.Assembly.Document;
 using Microsoft.Assembly.History;
-using Microsoft.Projects.Resources.Resource;
 using Microsoft.Assembly.Setup;
-using Microsoft.Foundation.NoSeries;
-using Microsoft.Inventory.Costing;
-using Microsoft.Inventory.Location;
 using Microsoft.Finance.Dimension;
-using Microsoft.Inventory.Ledger;
-using Microsoft.Projects.Resources.Ledger;
-using Microsoft.Manufacturing.Capacity;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Setup;
+using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.BOM;
-using Microsoft.Foundation.AuditCodes;
+using Microsoft.Inventory.Costing;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Journal;
+using Microsoft.Inventory.Ledger;
+using Microsoft.Inventory.Location;
+using Microsoft.Manufacturing.Capacity;
+using Microsoft.Projects.Resources.Ledger;
+using Microsoft.Projects.Resources.Resource;
+using Microsoft.Utilities;
 
 codeunit 137915 "SCM Assembly Posting"
 {

@@ -14,6 +14,7 @@ using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.WithholdingTax;
 using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.Task;
 using Microsoft.Inventory.Item;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.Customer;
@@ -23,7 +24,6 @@ using Microsoft.Sales.History;
 using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Reports;
 using Microsoft.Sales.Setup;
-using Microsoft.Foundation.Task;
 using System.Threading;
 
 page 9003 "Acc. Receivables Adm. RC"

@@ -5,12 +5,12 @@
 namespace Microsoft.Finance.AllocationAccount.Sales;
 
 using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.Deferral;
 using Microsoft.Finance.Dimension;
-using System.Automation;
+using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Posting;
-using Microsoft.Finance.Deferral;
-using Microsoft.Finance.GeneralLedger.Account;
+using System.Automation;
 
 /// <summary>
 /// Manages allocation account functionality for sales documents including line creation, dimension transfer, and distribution processing.

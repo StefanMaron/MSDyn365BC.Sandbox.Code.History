@@ -5,12 +5,12 @@
 namespace Microsoft.Finance.GeneralLedger.Preview;
 
 using Microsoft.Bank.Ledger;
+using Microsoft.Bank.Reconciliation;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Posting;
 using Microsoft.Finance.VAT.Ledger;
-using Microsoft.Bank.Reconciliation;
 using Microsoft.FixedAssets.Ledger;
 using Microsoft.FixedAssets.Maintenance;
 using Microsoft.Foundation.Navigate;
