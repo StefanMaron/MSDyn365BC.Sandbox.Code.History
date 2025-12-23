@@ -16,6 +16,7 @@ using Microsoft.Finance.SalesTax;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Reporting;
@@ -28,7 +29,6 @@ using Microsoft.Purchases.History;
 using Microsoft.Purchases.Setup;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
-using Microsoft.Foundation.Navigate;
 using System.Globalization;
 
 table 28075 "Purch. Tax Inv. Header"

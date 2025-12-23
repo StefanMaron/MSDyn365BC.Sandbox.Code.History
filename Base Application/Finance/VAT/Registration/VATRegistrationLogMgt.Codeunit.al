@@ -8,10 +8,10 @@ using Microsoft.CRM.Contact;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Purchases.Vendor;
-using System.Environment;
 using Microsoft.Sales.Customer;
 using Microsoft.Utilities;
 using System;
+using System.Environment;
 using System.Reflection;
 using System.Xml;
 

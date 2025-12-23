@@ -47,16 +47,16 @@ using Microsoft.Sales.History;
 using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
 using Microsoft.Warehouse.Activity;
+using Microsoft.Warehouse.ADCS;
 using Microsoft.Warehouse.Document;
 using Microsoft.Warehouse.InventoryDocument;
 using Microsoft.Warehouse.Ledger;
-using Microsoft.Warehouse.Structure;
-using Microsoft.Warehouse.ADCS;
 using Microsoft.Warehouse.Setup;
+using Microsoft.Warehouse.Structure;
 using System.Automation;
-using System.Text;
-using System.Reflection;
 using System.DateTime;
+using System.Reflection;
+using System.Text;
 using System.Utilities;
 
 table 27 Item

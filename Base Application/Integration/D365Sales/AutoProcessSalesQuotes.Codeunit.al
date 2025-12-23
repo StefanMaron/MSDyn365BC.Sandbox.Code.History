@@ -4,9 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Integration.D365Sales;
 
-using System.Threading;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Integration.SyncEngine;
+using System.Threading;
 
 codeunit 5354 "Auto Process Sales Quotes"
 {

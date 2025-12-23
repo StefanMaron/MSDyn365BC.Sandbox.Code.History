@@ -18,9 +18,9 @@ using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Pricing;
 using Microsoft.Purchases.Vendor;
-using Microsoft.Warehouse.Structure;
 using Microsoft.Upgrade;
 using Microsoft.Utilities;
+using Microsoft.Warehouse.Structure;
 using System.Environment;
 using System.Threading;
 

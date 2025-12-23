@@ -12,6 +12,7 @@ using Microsoft.CRM.Task;
 using Microsoft.CRM.Team;
 using Microsoft.EServices.EDocument;
 using Microsoft.Foundation.Navigate;
+using Microsoft.Foundation.Task;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Vendor;
@@ -21,7 +22,6 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Reports;
-using Microsoft.Foundation.Task;
 using System.Threading;
 
 page 9005 "Sales Manager Role Center"

@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.History;
 
+using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Journal;
@@ -25,7 +26,6 @@ using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
 using Microsoft.Warehouse.Request;
-using Microsoft.Finance.Currency;
 using System.Environment.Configuration;
 
 codeunit 1303 "Correct Posted Sales Invoice"

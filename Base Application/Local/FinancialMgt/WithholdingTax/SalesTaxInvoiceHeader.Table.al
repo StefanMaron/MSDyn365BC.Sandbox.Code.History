@@ -17,6 +17,7 @@ using Microsoft.Finance.SalesTax;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.AuditCodes;
+using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Foundation.Reporting;
@@ -28,7 +29,6 @@ using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
-using Microsoft.Foundation.Navigate;
 using System.Globalization;
 
 table 28071 "Sales Tax Invoice Header"

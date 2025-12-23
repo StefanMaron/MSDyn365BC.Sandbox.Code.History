@@ -12,7 +12,6 @@ using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Team;
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Consolidation;
-using System.Threading;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Deferral;
 using Microsoft.Finance.Dimension;
@@ -45,6 +44,7 @@ using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
 using System.IO;
+using System.Threading;
 
 /// <summary>
 /// Table storing historical records of posted general journal lines for audit trail and reference purposes.

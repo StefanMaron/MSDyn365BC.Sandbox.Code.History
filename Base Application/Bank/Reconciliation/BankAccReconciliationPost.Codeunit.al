@@ -8,19 +8,19 @@ using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Check;
 using Microsoft.Bank.Ledger;
 using Microsoft.Bank.Statement;
+using Microsoft.Finance.Analysis;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Journal;
-using Microsoft.Finance.Analysis;
 using Microsoft.Finance.GeneralLedger.Posting;
 using Microsoft.Finance.GeneralLedger.Setup;
-using System.Utilities;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.HumanResources.Payables;
 using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Receivables;
 using System.Reflection;
 using System.Telemetry;
+using System.Utilities;
 
 /// <summary>
 /// Handles the posting process for bank account reconciliation and payment application documents.

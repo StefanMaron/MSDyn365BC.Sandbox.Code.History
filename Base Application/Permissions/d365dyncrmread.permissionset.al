@@ -1,11 +1,11 @@
 namespace System.Security.AccessControl;
 
+using Microsoft.CRM.Interaction;
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
-using Microsoft.Sales.Customer;
 using Microsoft.Integration.SyncEngine;
-using Microsoft.CRM.Interaction;
 using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
 
 permissionset 618 "D365 DYN CRM READ"
 {

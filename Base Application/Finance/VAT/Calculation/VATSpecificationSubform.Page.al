@@ -7,9 +7,9 @@ namespace Microsoft.Finance.VAT.Calculation;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Setup;
 using Microsoft.Sales.Document;
 using System.Reflection;
-using Microsoft.Purchases.Setup;
 
 /// <summary>
 /// Subform displaying VAT specification lines with detailed VAT breakdown and calculation information.

@@ -20,12 +20,12 @@ using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.HumanResources.Employee;
+using Microsoft.HumanResources.Payables;
 using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
-using Microsoft.HumanResources.Payables;
-using Microsoft.HumanResources.Employee;
 
 /// <summary>
 /// Manages exchange rate adjustment processing for foreign currency transactions.

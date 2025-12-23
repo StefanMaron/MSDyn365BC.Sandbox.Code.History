@@ -25,8 +25,8 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
-using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Posting;
+using Microsoft.Sales.Reminder;
 
 codeunit 28000 "Post Code Check"
 {
