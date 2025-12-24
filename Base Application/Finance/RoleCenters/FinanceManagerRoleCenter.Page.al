@@ -2050,19 +2050,25 @@ page 8901 "Finance Manager Role Center"
                             ObsoleteReason = 'This report has been replaced by the report Fixed Asset Projected Value (Excel). This report will be removed in a future release.';
                             ObsoleteTag = '28.0';
                         }
-#endif
                         action("FA Projected Value (Derogatory)")
                         {
                             ApplicationArea = FixedAssets;
                             Caption = 'FA Projected Value (Derogatory)';
                             RunObject = report "FA - Proj. Value (Derogatory)";
+                            ObsoleteReason = 'This report is moved to FA Reports FR app.';
+                            ObsoleteState = Pending;
+                            ObsoleteTag = '28.0';
                         }
                         action("Professional Tax")
                         {
                             ApplicationArea = FixedAssets;
                             Caption = 'Professional Tax';
                             RunObject = report "Fixed Asset-Professional Tax";
+                            ObsoleteReason = 'This report is moved to FA Reports FR app.';
+                            ObsoleteState = Pending;
+                            ObsoleteTag = '28.0';
                         }
+#endif
                     }
                     group("Group46")
                     {

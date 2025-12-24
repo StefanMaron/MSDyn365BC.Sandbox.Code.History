@@ -677,7 +677,6 @@ page 5600 "Fixed Asset Card"
                 ObsoleteReason = 'This report has been replaced by the report Fixed Asset Projected Value (Excel). This report will be removed in a future release.';
                 ObsoleteTag = '28.0';
             }
-#endif
             action("Projected Value (Derogatory)")
             {
                 ApplicationArea = FixedAssets;
@@ -685,7 +684,11 @@ page 5600 "Fixed Asset Card"
                 Image = "Report";
                 RunObject = Report "FA - Proj. Value (Derogatory)";
                 ToolTip = 'View the calculated future derogatory depreciation and book value. You can view the report for one derogatory depreciation book at a time.';
+                ObsoleteReason = 'This report is moved to FA Reports FR app.';
+                ObsoleteState = Pending;
+                ObsoleteTag = '28.0';
             }
+#endif
             action("G/L Analysis")
             {
                 ApplicationArea = FixedAssets;
@@ -762,10 +765,13 @@ page 5600 "Fixed Asset Card"
                     ObsoleteReason = 'This report has been replaced by the report Fixed Asset Details (Excel). This report will be removed in a future release.';
                     ObsoleteTag = '28.0';
                 }
-#endif
                 actionref("Projected Value (Derogatory)_Promoted"; "Projected Value (Derogatory)")
                 {
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'This report has been moved to FA Reports FR app.';
+                    ObsoleteTag = '28.0';
                 }
+#endif
             }
         }
     }

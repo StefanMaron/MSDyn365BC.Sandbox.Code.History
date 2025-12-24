@@ -57,6 +57,7 @@ codeunit 144001 "Report Layout - Local"
         REPORT.Run(REPORT::"G/L Trial Balance");
     end;
 
+#if not CLEAN28
     [Test]
     [HandlerFunctions('RHFixedAssetProfessionalTax')]
     [Scope('OnPrem')]
@@ -65,6 +66,7 @@ codeunit 144001 "Report Layout - Local"
         Initialize();
         REPORT.Run(REPORT::"Fixed Asset-Professional Tax");
     end;
+#endif
 
     [Test]
     [HandlerFunctions('RHVendorJournal')]
@@ -170,6 +172,7 @@ codeunit 144001 "Report Layout - Local"
         GLTrialBalance.SaveAsPdf(FomatFileName(GLTrialBalance.Caption));
     end;
 
+#if not CLEAN28
     [RequestPageHandler]
     [Scope('OnPrem')]
     procedure RHFixedAssetProfessionalTax(var FixedAssetProfessionalTax: TestRequestPage "Fixed Asset-Professional Tax")
@@ -178,6 +181,7 @@ codeunit 144001 "Report Layout - Local"
         FixedAssetProfessionalTax.EndDate.SetValue(CalcDate('<+10Y>', WorkDate()));
         FixedAssetProfessionalTax.SaveAsPdf(FomatFileName(FixedAssetProfessionalTax.Caption));
     end;
+#endif
 
     [RequestPageHandler]
     [Scope('OnPrem')]

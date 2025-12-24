@@ -1,4 +1,5 @@
-﻿// ------------------------------------------------------------------------------------------------
+﻿#if not CLEAN28
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -16,6 +17,9 @@ report 10812 "Fixed Asset-Professional Tax"
     ApplicationArea = FixedAssets;
     Caption = 'Professional Tax';
     UsageCategory = ReportsAndAnalysis;
+    ObsoleteReason = 'Moved to FA Reports FR app';
+    ObsoleteState = Pending;
+    ObsoleteTag = '28.0';
 
     dataset
     {
@@ -552,4 +556,5 @@ report 10812 "Fixed Asset-Professional Tax"
             Error(Text008, PostingType);
     end;
 }
+#endif
 
