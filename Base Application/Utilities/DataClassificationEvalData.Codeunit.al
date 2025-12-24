@@ -3945,6 +3945,10 @@ codeunit 1751 "Data Classification Eval. Data"
         SetFieldToCompanyConfidential(2000000281, 6); // Description
         SetFieldToCompanyConfidential(2000000281, 8); // Page Caption
         SetFieldToCompanyConfidential(2000000281, 9); // Client Context
+
+        SetTableFieldsToNormal(2000000298); // Agent Troubleshoot Info Data table
+        SetFieldToCompanyConfidential(2000000298, 4); // Troubleshooting Info
+        SetFieldToPersonal(2000000298, 5); // Agent User Security Id
     end;
 
     local procedure ClasifyScheduledPerformanceProfiling()
