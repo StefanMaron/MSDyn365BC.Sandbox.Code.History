@@ -44,6 +44,7 @@ codeunit 134393 "ERM Sales Subform"
         LineNoPositiveAfterInsertNegativeLbl: Label 'Line No. should be positive after insert with negative';
         NewLineNoGreaterThanPreviousLbl: Label 'New Line No. should be greater than previous';
         PositiveLineNoRemainUnchangedLbl: Label 'Positive Line No. should remain unchanged';
+        SalesLineDescriptionMustMatchExtendedTextErr: Label 'Sales Line Description must match Extended Text';
 
 #if not CLEAN26
     [Obsolete('The statistics action will be replaced with the SalesStatistics action. The new action uses RunObject and does not run the action trigger', '26.0')]
@@ -6642,6 +6643,47 @@ codeunit 134393 "ERM Sales Subform"
         Assert.AreEqual(PreviousLineNo + 20000, SalesLine."Line No.", PositiveLineNoRemainUnchangedLbl);
     end;
 
+    [Test]
+    procedure VerifyExtendedTextSalesQuoteFromDescription()
+    var
+        customer: Record Customer;
+        ExtendedTextLine: array[2] of Record "Extended Text Line";
+        Item: Record Item;
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        SalesQuote: TestPage "Sales Quote";
+    begin
+        // [SCENARIO 616553] Extended Texts are being pulled into the sales document if there are more than just one Extended Text for an item.
+        Initialize();
+
+        // [GIVEN] Create Item with Extended Text.
+        LibraryInventory.CreateItem(Item);
+        Item.Validate("Automatic Ext. Texts", true);
+        Item.Modify(true);
+        CreateExtendedTextForItem(Item, ExtendedTextLine[1]);
+
+        // [WHEN] Create Customer.
+        LibrarySales.CreateCustomer(Customer);
+
+        // [GIVEN] Open New Sales quote page and set Sell-to Customer No.
+        SalesQuote.OpenNew();
+        SalesQuote."Sell-to Customer No.".SetValue(Customer."No.");
+        SalesHeader.SetRange("Document Type", SalesHeader."Document Type"::Quote);
+        SalesHeader.SetRange("Sell-to Customer No.", Customer."No.");
+        SalesHeader.FindFirst();
+
+        // [WHEN] Insert Sales Line with the Item created above.
+        SalesQuote.SalesLines.New();
+        SalesQuote.SalesLines.Type.SetValue(SalesLine.Type::Item);
+        SalesQuote.SalesLines.Description.SetValue(Item.Description);
+
+        // [THEN] Verify that Extended Text is pulled into Sales Line Description.
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.SetRange(Description, ExtendedTextLine[1].Text);
+        SalesLine.FindFirst();
+        Assert.AreEqual(1, SalesLine.Count(), SalesLineDescriptionMustMatchExtendedTextErr);
+    end;
+
     local procedure Initialize()
     var
         SalesHeader: Record "Sales Header";
@@ -7590,6 +7632,16 @@ codeunit 134393 "ERM Sales Subform"
           CustInvoiceDisc, Customer."No.", Customer."Currency Code", MinValue);
         CustInvoiceDisc.Validate("Discount %", DiscountPct);
         CustInvoiceDisc.Modify(true);
+    end;
+
+    local procedure CreateExtendedTextForItem(Item: Record Item; var ExtendedTextLine: Record "Extended Text Line")
+    var
+        ExtendedTextHeader: Record "Extended Text Header";
+    begin
+        LibraryInventory.CreateExtendedTextHeaderItem(ExtendedTextHeader, Item."No.");
+        LibraryInventory.CreateExtendedTextLineItem(ExtendedTextLine, ExtendedTextHeader);
+        LibraryUtility.FillFieldMaxText(ExtendedTextLine, ExtendedTextLine.FieldNo(Text));
+        ExtendedTextLine.Find();
     end;
 
     [ConfirmHandler]
