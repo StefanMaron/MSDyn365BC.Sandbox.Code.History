@@ -2844,6 +2844,8 @@ table 36 "Sales Header"
 
                 CreateDimFromDefaultDim(Rec.FieldNo("Responsibility Center"));
 
+                OnValidateResponsibilityCenterOnBeforeRecreateSalesLines(Rec, CurrFieldNo);
+
                 if xRec."Responsibility Center" <> "Responsibility Center" then begin
                     RecreateSalesLines(FieldCaption("Responsibility Center"));
                     "Assigned User ID" := '';
@@ -11008,6 +11010,11 @@ table 36 "Sales Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateBilltoCustomerTemplCodeOnBeforeRecreateSalesLines(var SalesHeader: Record "Sales Header"; CallingFieldNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateResponsibilityCenterOnBeforeRecreateSalesLines(var SalesHeader: Record "Sales Header"; CallingFieldNo: Integer)
     begin
     end;
 
