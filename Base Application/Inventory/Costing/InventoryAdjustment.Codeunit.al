@@ -1182,6 +1182,8 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         ItemJnlLine."Quantity (Base)" := 1;
         ItemJnlLine."Invoiced Qty. (Base)" := 1;
         ItemJnlLine."Source No." := OrigValueEntry."Source No.";
+
+        OnAfterInitRndgResidualItemJnlLine(ItemJnlLine, OrigValueEntry);
     end;
 
     local procedure AdjustItemAvgCost()
@@ -3561,6 +3563,11 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
 
     [IntegrationEvent(true, false)]
     local procedure OnCalcInbndEntryAdjustedCostOnBeforeCalcNewAdjustedCost(var CostElementBuffer: Record "Cost Element Buffer"; ItemApplicationEntry: Record "Item Application Entry"; ItemLedgerEntry: Record "Item Ledger Entry"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInitRndgResidualItemJnlLine(var ItemJournalLine: Record "Item Journal Line"; ValueEntry: Record "Value Entry")
     begin
     end;
 }
