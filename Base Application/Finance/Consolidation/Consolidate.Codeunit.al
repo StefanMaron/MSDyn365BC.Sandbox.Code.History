@@ -840,6 +840,7 @@ codeunit 432 Consolidate
 	                ConsolidGLEntry."Additional-Currency Amount" := 0;
 	                ConsolidGLEntry."Add.-Currency Debit Amount" := 0;
 	                ConsolidGLEntry."Add.-Currency Credit Amount" := 0;
+                    OnClearPreviousConsolidationOnBeforeModifyConsolidGLEntry(ConsolidGLEntry);
 	                ConsolidGLEntry.Modify();
 	                if ConsolidGLEntry."G/L Account No." <> TempGLAccount."No." then begin
 	                    Window.Update(3, ConsolidGLEntry."G/L Account No.");
@@ -2085,6 +2086,16 @@ codeunit 432 Consolidate
     /// <param name="TempSubsidGLAcc">Temporary subsidiary G/L Account records being tested for conflicts</param>
     [IntegrationEvent(true, false)]
     local procedure OnTestGLAccountsOnBeforeTestForConflicts(var TempSubsidGLAcc: Record "G/L Account" temporary)
+    begin
+    end;
+
+    /// <summary>
+    /// Integration event raised before modifying consolidated G/L entry during previous consolidation clearing.
+    /// Enables custom modification of consolidated G/L entry data before clearing amounts.
+    /// </summary>
+    /// <param name="ConsolidGLEntry">Consolidated G/L Entry record being modified</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnClearPreviousConsolidationOnBeforeModifyConsolidGLEntry(var ConsolidGLEntry: Record "G/L Entry")
     begin
     end;
 }
