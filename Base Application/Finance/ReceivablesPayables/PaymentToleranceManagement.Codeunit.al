@@ -62,6 +62,7 @@ codeunit 426 "Payment Tolerance Management"
         MaxPmtTolAmount: Decimal;
         CustEntryApplId: Code[50];
         ApplnRoundingPrecision: Decimal;
+        PaymentTolWarning: Boolean;
     begin
         MaxPmtTolAmount := 0;
         PmtDiscAmount := 0;
@@ -97,6 +98,10 @@ codeunit 426 "Payment Tolerance Management"
 
         if Abs(AmounttoApply) >= Abs(AppliedAmount - PmtDiscAmount - MaxPmtTolAmount) then begin
             AppliedAmount := AppliedAmount - PmtDiscAmount;
+
+            PaymentTolWarning := GLSetup."Payment Tolerance Warning";
+            OnPmtTolCustOnAfterSetPaymentTolWarning(GLSetup, PaymentTolWarning);
+
             if (Abs(AppliedAmount) > Abs(AmounttoApply)) and (AppliedAmount * PmtDiscAmount >= 0) then
                 AppliedAmount := AmounttoApply;
 
@@ -104,7 +109,7 @@ codeunit 426 "Payment Tolerance Management"
                (MaxPmtTolAmount <> 0) and ((Abs(AppliedAmount + ApplyingAmount) - ApplnRoundingPrecision) <> 0)
                and (Abs(AppliedAmount + ApplyingAmount) > ApplnRoundingPrecision)
             then
-                if GLSetup."Payment Tolerance Warning" then begin
+                if PaymentTolWarning then begin
                     if CallPmtTolWarning(
                          CustLedgEntry."Posting Date", CustLedgEntry."Customer No.", CustLedgEntry."Document No.",
                          CustLedgEntry."Currency Code", ApplyingAmount, OriginalAppliedAmount, "Payment Tolerance Account Type"::Customer)
@@ -139,6 +144,7 @@ codeunit 426 "Payment Tolerance Management"
         MaxPmtTolAmount: Decimal;
         VendEntryApplID: Code[50];
         ApplnRoundingPrecision: Decimal;
+        PaymentTolWarning: Boolean;
     begin
         MaxPmtTolAmount := 0;
         PmtDiscAmount := 0;
@@ -172,6 +178,8 @@ codeunit 426 "Payment Tolerance Management"
 
         if Abs(AmounttoApply) >= Abs(AppliedAmount - PmtDiscAmount - MaxPmtTolAmount) then begin
             AppliedAmount := AppliedAmount - PmtDiscAmount;
+            PaymentTolWarning := GLSetup."Payment Tolerance Warning";
+            OnPmtTolVendOnAfterSetPaymentTolWarning(GLSetup, PaymentTolWarning);
             if (Abs(AppliedAmount) > Abs(AmounttoApply)) and (AppliedAmount * PmtDiscAmount >= 0) then
                 AppliedAmount := AmounttoApply;
 
@@ -179,7 +187,7 @@ codeunit 426 "Payment Tolerance Management"
                (MaxPmtTolAmount <> 0) and ((Abs(AppliedAmount + ApplyingAmount) - ApplnRoundingPrecision) <> 0) and
                (Abs(AppliedAmount + ApplyingAmount) > ApplnRoundingPrecision)
             then
-                if GLSetup."Payment Tolerance Warning" then begin
+                if PaymentTolWarning then begin
                     if CallPmtTolWarning(
                          VendLedgEntry."Posting Date", VendLedgEntry."Vendor No.", VendLedgEntry."Document No.",
                          VendLedgEntry."Currency Code", ApplyingAmount, OriginalAppliedAmount, "Payment Tolerance Account Type"::Vendor)
@@ -370,6 +378,7 @@ codeunit 426 "Payment Tolerance Management"
         ApplnRoundingPrecision: Decimal;
         IsHandled: Boolean;
         Result: Boolean;
+        PaymentTolWarning: Boolean;
     begin
         GLSetup.Get();
         CalcCustApplnAmount(
@@ -391,6 +400,8 @@ codeunit 426 "Payment Tolerance Management"
 
         if Abs(AmounttoApply) >= Abs(AppliedAmount - PmtDiscAmount - MaxPmtTolAmount) then begin
             AppliedAmount := AppliedAmount - PmtDiscAmount;
+            PaymentTolWarning := GLSetup."Payment Tolerance Warning";
+            OnPmtTolCustLedgEntryOnAfterSetPaymentTolWarning(GLSetup, PaymentTolWarning);
             if (Abs(AppliedAmount) > Abs(AmounttoApply)) and (AppliedAmount * PmtDiscAmount > 0) then
                 AppliedAmount := AmounttoApply;
 
@@ -398,7 +409,7 @@ codeunit 426 "Payment Tolerance Management"
                (MaxPmtTolAmount <> 0) and ((Abs(AppliedAmount + ApplyingAmount) - ApplnRoundingPrecision) <> 0) and
                (Abs(AppliedAmount + ApplyingAmount) > ApplnRoundingPrecision)
             then
-                if GLSetup."Payment Tolerance Warning" then
+                if PaymentTolWarning then
                     if CallPmtTolWarning(
                          PostingDate, AccountNo, DocNo,
                          CurrencyCode, ApplyingAmount, OriginalAppliedAmount, "Payment Tolerance Account Type"::Customer)
@@ -429,6 +440,7 @@ codeunit 426 "Payment Tolerance Management"
         ApplnRoundingPrecision: Decimal;
         IsHandled: Boolean;
         Result: Boolean;
+        PaymentTolWarning: Boolean;
     begin
         GLSetup.Get();
         CalcVendApplnAmount(
@@ -450,6 +462,8 @@ codeunit 426 "Payment Tolerance Management"
 
         if Abs(AmounttoApply) >= Abs(AppliedAmount - PmtDiscAmount - MaxPmtTolAmount) then begin
             AppliedAmount := AppliedAmount - PmtDiscAmount;
+            PaymentTolWarning := GLSetup."Payment Tolerance Warning";
+            OnPmtTolVendLedgEntryOnAfterSetPaymentTolWarning(GLSetup, PaymentTolWarning);
             if (Abs(AppliedAmount) > Abs(AmounttoApply)) and (AppliedAmount * PmtDiscAmount > 0) then
                 AppliedAmount := AmounttoApply;
 
@@ -457,7 +471,7 @@ codeunit 426 "Payment Tolerance Management"
                (MaxPmtTolAmount <> 0) and ((Abs(AppliedAmount + ApplyingAmount) - ApplnRoundingPrecision) <> 0) and
                (Abs(AppliedAmount + ApplyingAmount) > ApplnRoundingPrecision)
             then
-                if GLSetup."Payment Tolerance Warning" then
+                if PaymentTolWarning then
                     if CallPmtTolWarning(
                          PostingDate, AccountNo, DocNo, CurrencyCode, ApplyingAmount, OriginalAppliedAmount, "Payment Tolerance Account Type"::Vendor)
                     then begin
@@ -1253,6 +1267,7 @@ codeunit 426 "Payment Tolerance Management"
             AppliedCustLedgEntry.SetRange(Open, true);
             AppliedCustLedgEntry.SetRange("Document No.", CustledgEntry."Applies-to Doc. No.");
             AppliedCustLedgEntry.ReadIsolation(IsolationLevel::UpdLock);
+            AppliedCustLedgEntry.SetLoadFields("Accepted Payment Tolerance", "Accepted Pmt. Disc. Tolerance");
             if AppliedCustLedgEntry.FindFirst() then begin
                 AppliedCustLedgEntry."Accepted Payment Tolerance" := 0;
                 AppliedCustLedgEntry."Accepted Pmt. Disc. Tolerance" := false;
@@ -1282,6 +1297,7 @@ codeunit 426 "Payment Tolerance Management"
             AppliedVendLedgEntry.SetRange(Open, true);
             AppliedVendLedgEntry.SetRange("Document No.", VendLedgEntry."Applies-to Doc. No.");
             AppliedVendLedgEntry.ReadIsolation(IsolationLevel::UpdLock);
+            AppliedVendLedgEntry.SetLoadFields("Accepted Payment Tolerance", "Accepted Pmt. Disc. Tolerance");
             if AppliedVendLedgEntry.FindFirst() then begin
                 AppliedVendLedgEntry."Accepted Payment Tolerance" := 0;
                 AppliedVendLedgEntry."Accepted Pmt. Disc. Tolerance" := false;
@@ -3101,6 +3117,51 @@ codeunit 426 "Payment Tolerance Management"
     /// <param name="CustLedgEntry">Customer ledger entry with grace period filters</param>
     [IntegrationEvent(false, false)]
     local procedure OnCalcGracePeriodCVLedgEntryOnAfterCustLedgEntrySetFilters(var CustLedgEntry: Record "Cust. Ledger Entry");
+    begin
+    end;
+
+    /// <summary>
+    /// Integration event raised after setting payment tolerance warning flag in customer scenarios.
+    /// Enables custom handling of payment tolerance warnings for customers.
+    /// </summary>
+    /// <param name="GLSetup">General Ledger Setup for tolerance parameters</param>
+    /// <param name="PaymentTolWarning">Payment tolerance warning flag</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnPmtTolCustOnAfterSetPaymentTolWarning(GLSetup: Record "General Ledger Setup"; var PaymentTolWarning: Boolean)
+    begin
+    end;
+
+    /// <summary>
+    /// Integration event raised after setting payment tolerance warning flag in vendor scenarios.
+    /// Enables custom handling of payment tolerance warnings for vendors.
+    /// </summary>
+    /// <param name="GLSetup">General Ledger Setup for tolerance parameters</param>
+    /// <param name="PaymentTolWarning">Payment tolerance warning flag</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnPmtTolVendOnAfterSetPaymentTolWarning(GLSetup: Record "General Ledger Setup"; var PaymentTolWarning: Boolean)
+    begin
+    end;
+
+
+    /// <summary>
+    /// Integration event raised after setting payment tolerance warning flag in customer ledger entry processing.
+    /// Enables custom handling of payment tolerance warnings for customer ledger entries.
+    /// </summary>
+    /// <param name="GLSetup">General Ledger Setup for tolerance parameters</param>
+    /// <param name="PaymentTolWarning">Payment tolerance warning flag</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnPmtTolCustLedgEntryOnAfterSetPaymentTolWarning(GLSetup: Record "General Ledger Setup"; var PaymentTolWarning: Boolean)
+    begin
+    end;
+
+    /// <summary>
+    /// Integration event raised after setting payment tolerance warning flag in vendor ledger entry processing.
+    /// Enables custom handling of payment tolerance warnings for vendor ledger entries.
+    /// </summary>
+    /// <param name="GLSetup">General Ledger Setup for tolerance parameters</param>
+    /// <param name="PaymentTolWarning">Payment tolerance warning flag</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnPmtTolVendLedgEntryOnAfterSetPaymentTolWarning(GLSetup: Record "General Ledger Setup"; var PaymentTolWarning: Boolean)
     begin
     end;
 }
