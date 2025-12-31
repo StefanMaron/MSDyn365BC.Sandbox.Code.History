@@ -1189,6 +1189,7 @@ codeunit 426 "Payment Tolerance Management"
             AppliedCustLedgEntry.SetRange(Open, true);
             AppliedCustLedgEntry.SetRange("Document No.", CustledgEntry."Applies-to Doc. No.");
             AppliedCustLedgEntry.ReadIsolation(IsolationLevel::UpdLock);
+            AppliedCustLedgEntry.SetLoadFields("Accepted Payment Tolerance", "Accepted Pmt. Disc. Tolerance");
             if AppliedCustLedgEntry.FindFirst() then begin
                 AppliedCustLedgEntry."Accepted Payment Tolerance" := 0;
                 AppliedCustLedgEntry."Accepted Pmt. Disc. Tolerance" := false;
@@ -1218,6 +1219,7 @@ codeunit 426 "Payment Tolerance Management"
             AppliedVendLedgEntry.SetRange(Open, true);
             AppliedVendLedgEntry.SetRange("Document No.", VendLedgEntry."Applies-to Doc. No.");
             AppliedVendLedgEntry.ReadIsolation(IsolationLevel::UpdLock);
+            AppliedVendLedgEntry.SetLoadFields("Accepted Payment Tolerance", "Accepted Pmt. Disc. Tolerance");
             if AppliedVendLedgEntry.FindFirst() then begin
                 AppliedVendLedgEntry."Accepted Payment Tolerance" := 0;
                 AppliedVendLedgEntry."Accepted Pmt. Disc. Tolerance" := false;
