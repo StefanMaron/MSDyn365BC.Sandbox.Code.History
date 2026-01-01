@@ -1,9 +1,9 @@
 {
   "settings": {
-    "al.enableCodeAnalysis": false,
     "search.exclude": {
       "**.xlf": true
     },
+    "al.enableCodeAnalysis": false,
     "allint.enabled": false,
     "al.enableCodeActions": false
   },
