@@ -357,7 +357,7 @@
     "search.exclude": {
       "**.xlf": true
     },
-    "al.enableCodeActions": false,
-    "al.enableCodeAnalysis": false
+    "al.enableCodeAnalysis": false,
+    "al.enableCodeActions": false
   }
 }
