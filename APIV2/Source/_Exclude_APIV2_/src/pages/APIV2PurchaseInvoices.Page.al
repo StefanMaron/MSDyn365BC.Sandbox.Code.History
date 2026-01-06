@@ -716,6 +716,7 @@ page 30042 "APIV2 - Purchase Invoices"
     end;
 
     [ServiceEnabled]
+    [Caption('Posts the draft purchase invoice to create a finalized posted invoice')]
     [Scope('Cloud')]
     procedure Post(var ActionContext: WebServiceActionContext)
     var

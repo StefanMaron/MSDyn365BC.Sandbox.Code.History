@@ -829,6 +829,7 @@ page 30028 "APIV2 - Sales Orders"
     end;
 
     [ServiceEnabled]
+    [Caption('Ships all items on the sales order and creates a posted sales invoice')]
     [Scope('Cloud')]
     procedure ShipAndInvoice(var ActionContext: WebServiceActionContext)
     var

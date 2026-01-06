@@ -874,6 +874,7 @@ page 30083 "APIV2 - Purchase Credit Memos"
     end;
 
     [ServiceEnabled]
+    [Caption('Posts the draft purchase credit memo to create a finalized posted credit memo')]
     [Scope('Cloud')]
     procedure Post(var ActionContext: WebServiceActionContext)
     var
@@ -886,6 +887,7 @@ page 30083 "APIV2 - Purchase Credit Memos"
     end;
 
     [ServiceEnabled]
+    [Caption('Cancels the posted purchase credit memo by creating a corrective invoice')]
     [Scope('Cloud')]
     procedure Cancel(var ActionContext: WebServiceActionContext)
     var

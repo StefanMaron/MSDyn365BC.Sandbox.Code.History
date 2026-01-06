@@ -771,6 +771,7 @@ page 30066 "APIV2 - Purchase Orders"
     end;
 
     [ServiceEnabled]
+    [Caption('Receives all items on the purchase order and creates a posted purchase invoice')]
     [Scope('Cloud')]
     procedure ReceiveAndInvoice(var ActionContext: WebServiceActionContext)
     var

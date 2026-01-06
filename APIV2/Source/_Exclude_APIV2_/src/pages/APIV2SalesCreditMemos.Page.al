@@ -886,6 +886,7 @@ page 30038 "APIV2 - Sales Credit Memos"
     end;
 
     [ServiceEnabled]
+    [Caption('Posts the draft sales credit memo to create a finalized posted credit memo')]
     [Scope('Cloud')]
     procedure Post(var ActionContext: WebServiceActionContext)
     var
@@ -898,6 +899,7 @@ page 30038 "APIV2 - Sales Credit Memos"
     end;
 
     [ServiceEnabled]
+    [Caption('Posts the sales credit memo and sends it to the customer via email')]
     [Scope('Cloud')]
     procedure PostAndSend(var ActionContext: WebServiceActionContext)
     var
@@ -913,6 +915,7 @@ page 30038 "APIV2 - Sales Credit Memos"
     end;
 
     [ServiceEnabled]
+    [Caption('Sends the posted sales credit memo document to the customer via email')]
     [Scope('Cloud')]
     procedure Send(var ActionContext: WebServiceActionContext)
     var
@@ -926,6 +929,7 @@ page 30038 "APIV2 - Sales Credit Memos"
     end;
 
     [ServiceEnabled]
+    [Caption('Cancels the posted sales credit memo by creating a corrective invoice')]
     [Scope('Cloud')]
     procedure Cancel(var ActionContext: WebServiceActionContext)
     var
@@ -937,6 +941,7 @@ page 30038 "APIV2 - Sales Credit Memos"
     end;
 
     [ServiceEnabled]
+    [Caption('Cancels the posted sales credit memo and sends the cancellation to the customer via email')]
     [Scope('Cloud')]
     procedure CancelAndSend(var ActionContext: WebServiceActionContext)
     var
