@@ -105,6 +105,7 @@ table 5991 "Service Shipment Line"
         }
         field(15; Quantity; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
         }
@@ -117,17 +118,20 @@ table 5991 "Service Shipment Line"
         }
         field(23; "Unit Cost (LCY)"; Decimal)
         {
+            AutoFormatExpression = '';
             AutoFormatType = 2;
             Caption = 'Unit Cost (LCY)';
         }
         field(25; "VAT %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'VAT %';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
         field(27; "Line Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Line Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -140,21 +144,25 @@ table 5991 "Service Shipment Line"
         }
         field(34; "Gross Weight"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Gross Weight';
             DecimalPlaces = 0 : 5;
         }
         field(35; "Net Weight"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Net Weight';
             DecimalPlaces = 0 : 5;
         }
         field(36; "Units per Parcel"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Units per Parcel';
             DecimalPlaces = 0 : 5;
         }
         field(37; "Unit Volume"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Unit Volume';
             DecimalPlaces = 0 : 5;
         }
@@ -202,12 +210,14 @@ table 5991 "Service Shipment Line"
         }
         field(58; "Qty. Shipped Not Invoiced"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Shipped Not Invoiced';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
         field(61; "Quantity Invoiced"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity Invoiced';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -358,6 +368,7 @@ table 5991 "Service Shipment Line"
         }
         field(5404; "Qty. per Unit of Measure"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. per Unit of Measure';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -372,11 +383,13 @@ table 5991 "Service Shipment Line"
         }
         field(5415; "Quantity (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity (Base)';
             DecimalPlaces = 0 : 5;
         }
         field(5458; "Qty. Shipped Not Invd. (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Shipped Not Invd. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -448,11 +461,13 @@ table 5991 "Service Shipment Line"
         }
         field(5918; "Quantity Consumed"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity Consumed';
             DecimalPlaces = 0 : 5;
         }
         field(5920; "Qty. Consumed (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Consumed (Base)';
             DecimalPlaces = 0 : 5;
         }
@@ -497,6 +512,7 @@ table 5991 "Service Shipment Line"
         }
         field(5938; "Contract Disc. %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Contract Disc. %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -504,6 +520,7 @@ table 5991 "Service Shipment Line"
         }
         field(5939; "Warranty Disc. %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Warranty Disc. %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
