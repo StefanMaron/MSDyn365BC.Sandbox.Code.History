@@ -62,6 +62,7 @@ codeunit 9800 User
         Field.SetRange(RelationTableNo, DATABASE::User);
         Field.SetRange(RelationFieldNo, User.FieldNo("User Name"));
         Field.SetFilter(Type, '%1|%2', Field.Type::Code, Field.Type::Text);
+        Field.SetRange(Enabled, true);
         if Field.FindSet() then
             repeat
                 Company.FindSet();
