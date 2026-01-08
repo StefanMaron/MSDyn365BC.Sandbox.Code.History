@@ -438,6 +438,11 @@ table 5404 "Item Unit of Measure"
         exit(CannotModifyUnitOfMeasureErr);
     end;
 
+    procedure CalcWeight(QtyPerUoM: Decimal; NetWeight: Decimal)
+    begin
+        Weight := QtyPerUoM * NetWeight;
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterCalcCubage(var ItemUnitOfMeasure: Record "Item Unit of Measure")
     begin
