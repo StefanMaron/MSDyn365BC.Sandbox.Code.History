@@ -1971,13 +1971,7 @@ page 30 "Item Card"
                     Caption = 'Item Statistics';
                     Image = Statistics;
                     RunObject = Page "Item Statistics 2";
-                    RunPageLink = "No." = field("No."),
-                                      "Date Filter" = field("Date Filter"),
-                                      "Global Dimension 1 Filter" = field("Global Dimension 1 Filter"),
-                                      "Global Dimension 2 Filter" = field("Global Dimension 2 Filter"),
-                                      "Location Filter" = field("Location Filter"),
-                                      "Drop Shipment Filter" = field("Drop Shipment Filter"),
-                                      "Variant Filter" = field("Variant Filter");
+                    RunPageLink = "Item No." = field("No.");
                     ToolTip = 'View item statistics. Summarised sales, inventory value, turnover and aging based on the selected filters, with drill-down to related ledger and value entries.';
                 }
                 action(Statistics)
