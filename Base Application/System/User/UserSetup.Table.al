@@ -1,7 +1,9 @@
 ﻿namespace System.Security.User;
 
 using Microsoft.CRM.Team;
+#if not CLEAN28
 using Microsoft.Finance.GeneralLedger.Setup;
+#endif
 using Microsoft.Inventory.Location;
 using System;
 using System.Automation;
@@ -42,7 +44,9 @@ table 91 "User Setup"
             trigger OnValidate()
             begin
                 CheckAllowedPostingDates(0);
+#if not CLEAN28
                 GLSetup.CheckPostingDateRange("Allow Posting From", FieldCaption("Allow Posting From"));
+#endif
             end;
         }
         field(3; "Allow Posting To"; Date)
@@ -52,7 +56,9 @@ table 91 "User Setup"
             trigger OnValidate()
             begin
                 CheckAllowedPostingDates(0);
+#if not CLEAN28
                 GLSetup.CheckPostingDateRange("Allow Posting From", FieldCaption("Allow Posting To"));
+#endif
             end;
         }
         field(4; "Register Time"; Boolean)
@@ -357,7 +363,9 @@ table 91 "User Setup"
     var
         SalesPersonPurchaser: Record "Salesperson/Purchaser";
         UserSetupManagement: Codeunit "User Setup Management";
+#if not CLEAN28
         GLSetup: Record "General Ledger Setup";
+#endif
 
 #pragma warning disable AA0470
         DuplicateSalesPersonErr: Label 'The %1 Salesperson/Purchaser code is already assigned to another User ID %2.';

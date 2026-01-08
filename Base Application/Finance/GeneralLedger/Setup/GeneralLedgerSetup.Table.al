@@ -70,7 +70,9 @@ table 98 "General Ledger Setup"
             trigger OnValidate()
             begin
                 CheckAllowedPostingDates(0);
+#if not CLEAN28
                 CheckPostingDateRange("Allow Posting From", FieldCaption("Allow Posting From"));
+#endif
             end;
         }
         /// <summary>
@@ -1286,12 +1288,22 @@ table 98 "General Ledger Setup"
             ToolTip = 'Specifies the name of the Net Change column on Financial Reports.';
             ValidateTableRelation = false;
         }
+#if not CLEANSCHEMA30
         field(10800; "Posting Allowed From"; Date)
         {
             CalcFormula = min("Accounting Period"."Starting Date" where("Fiscally Closed" = filter(false)));
             Caption = 'Posting Allowed From';
             Editable = false;
             FieldClass = FlowField;
+#if not CLEAN28
+            ObsoleteState = Pending;
+            ObsoleteReason = 'This field is obsolete and should not be used.';
+            ObsoleteTag = '28.0';
+#else
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field is obsolete and should not be used.';
+            ObsoleteTag = '30.0';
+#endif
         }
         field(10801; "Posting Allowed To"; Date)
         {
@@ -1300,7 +1312,17 @@ table 98 "General Ledger Setup"
             Caption = 'Posting Allowed To';
             Editable = false;
             FieldClass = FlowField;
+#if not CLEAN28
+            ObsoleteState = Pending;
+            ObsoleteReason = 'This field is obsolete and should not be used.';
+            ObsoleteTag = '28.0';
+#else
+            ObsoleteState = Removed;
+            ObsoleteReason = 'This field is obsolete and should not be used.';
+            ObsoleteTag = '30.0';
+#endif
         }
+#endif
         field(10805; "Local Currency"; Option)
         {
             Caption = 'Local Currency';
@@ -1391,7 +1413,9 @@ table 98 "General Ledger Setup"
         VATDateFeatureTok: Label 'VAT Date', Locked = true;
         VATPeriodControlUsageMsg: Label 'Control VAT Period is changed', Locked = true;
         VATDateFeatureUsageMsg: Label 'VAT Reporting Date Usage is changed', Locked = true;
+#if not CLEAN28
         PostingRangeErr: Label '%1 must be within the allowed posting range: %2..%3', Comment = '%1 is Field Caption,%2 is Posting Allowed From,%3 is Posting Allowed To';
+#endif
         PrivacyStatementAckErr: Label 'Enabling requires privacy statement acknowledgement.';
         CannotUpdateLCYCodeErr: Label 'You cannot update the local currency code because there are posted general ledger entries.';
 
@@ -1689,6 +1713,8 @@ table 98 "General Ledger Setup"
         exit(("Payment Tolerance %" > 0) or ("Max. Payment Tolerance Amount" <> 0));
     end;
 
+#if not CLEAN28
+    [Obsolete('The procedure will be removed in a future release.', '28.0')]
     procedure CheckPostingDateRange(DateToCheck: Date; FldCaption: Text[50])
     var
         AccountingPeriod: Record "Accounting Period";
@@ -1702,6 +1728,7 @@ table 98 "General Ledger Setup"
             Error(PostingRangeErr, FldCaption,
               "Posting Allowed From", CalcDate('<-1D>', "Posting Allowed To"));
     end;
+#endif
 
     /// <summary>
     /// Integration event raised before validating rounding error configuration.

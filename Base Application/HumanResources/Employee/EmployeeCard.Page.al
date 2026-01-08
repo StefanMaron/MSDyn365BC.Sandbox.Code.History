@@ -331,11 +331,16 @@ page 5200 "Employee Card"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the employee''s labor union membership number.';
                 }
+#if not CLEAN28
                 field("Marital Status"; Rec."Marital Status")
                 {
                     ApplicationArea = BasicHR;
                     ToolTip = 'Specifies the marital status of the employee.';
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'This field is obsolete and should not be used.';
+                    ObsoleteTag = '28.0';
                 }
+#endif
             }
             group(Payments)
             {
