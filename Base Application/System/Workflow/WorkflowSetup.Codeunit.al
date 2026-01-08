@@ -368,13 +368,13 @@ codeunit 1502 "Workflow Setup"
         DocSuccessEventID :=
           InsertEventStep(
             Workflow, WorkflowEventHandling.RunWorkflowOnAfterCreateDocFromIncomingDocSuccessCode(), CreateDocResponseID);
-        InsertEventArgument(DocSuccessEventID, BuildIncomingDocumentTypeConditions(IncomingDocument.Status::Created));
+        InsertEventArgument(DocSuccessEventID, BuildIncomingDocumentStatusConditions(IncomingDocument.Status::Created));
         InsertResponseStep(Workflow, WorkflowResponseHandling.DoNothingCode(), DocSuccessEventID);
 
         DocErrorEventID :=
           InsertEventStep(
             Workflow, WorkflowEventHandling.RunWorkflowOnAfterCreateDocFromIncomingDocFailCode(), CreateDocResponseID);
-        InsertEventArgument(DocErrorEventID, BuildIncomingDocumentTypeConditions(IncomingDocument.Status::Failed));
+        InsertEventArgument(DocErrorEventID, BuildIncomingDocumentStatusConditions(IncomingDocument.Status::Failed));
         NotifyResponseID := InsertResponseStep(Workflow, WorkflowResponseHandling.CreateNotificationEntryCode(), DocErrorEventID);
 
         InsertNotificationArgument(NotifyResponseID, false, '', PAGE::"Incoming Document", '');
@@ -443,23 +443,23 @@ codeunit 1502 "Workflow Setup"
     begin
         IncDocCreatedEventID :=
           InsertEntryPointEventStep(Workflow, WorkflowEventHandling.RunWorkflowOnAfterReceiveFromDocExchIncomingDocCode());
-        InsertEventArgument(IncDocCreatedEventID, BuildIncomingDocumentTypeConditions(IncomingDocument.Status::New));
+        InsertEventArgument(IncDocCreatedEventID, BuildIncomingDocumentStatusConditions(IncomingDocument.Status::New));
         ReleaseDocResponseID := InsertResponseStep(Workflow, WorkflowResponseHandling.ReleaseDocumentCode(), IncDocCreatedEventID);
 
         DocReleasedEventID :=
           InsertEventStep(Workflow, WorkflowEventHandling.RunWorkflowOnAfterReleaseIncomingDocCode(), ReleaseDocResponseID);
-        InsertEventArgument(DocReleasedEventID, BuildIncomingDocumentTypeConditions(IncomingDocument.Status::Released));
+        InsertEventArgument(DocReleasedEventID, BuildIncomingDocumentStatusConditions(IncomingDocument.Status::Released));
         CreateDocResponseID :=
           InsertResponseStep(Workflow, WorkflowResponseHandling.GetCreateDocFromIncomingDocCode(), DocReleasedEventID);
 
         DocSuccessEventID :=
           InsertEventStep(Workflow, WorkflowEventHandling.RunWorkflowOnAfterCreateDocFromIncomingDocSuccessCode(), CreateDocResponseID);
-        InsertEventArgument(DocSuccessEventID, BuildIncomingDocumentTypeConditions(IncomingDocument.Status::Created));
+        InsertEventArgument(DocSuccessEventID, BuildIncomingDocumentStatusConditions(IncomingDocument.Status::Created));
         InsertResponseStep(Workflow, WorkflowResponseHandling.DoNothingCode(), DocSuccessEventID);
 
         DocErrorEventID :=
           InsertEventStep(Workflow, WorkflowEventHandling.RunWorkflowOnAfterCreateDocFromIncomingDocFailCode(), CreateDocResponseID);
-        InsertEventArgument(DocErrorEventID, BuildIncomingDocumentTypeConditions(IncomingDocument.Status::Failed));
+        InsertEventArgument(DocErrorEventID, BuildIncomingDocumentStatusConditions(IncomingDocument.Status::Failed));
         NotifyResponseID := InsertResponseStep(Workflow, WorkflowResponseHandling.CreateNotificationEntryCode(), DocErrorEventID);
 
         InsertNotificationArgument(NotifyResponseID, false, '', PAGE::"Incoming Document", '');
@@ -534,9 +534,9 @@ codeunit 1502 "Workflow Setup"
 
         InsertDocApprovalWorkflowSteps(
           Workflow,
-          BuildIncomingDocumentTypeConditions(IncomingDocument.Status::New),
+          BuildIncomingDocumentStatusConditions(IncomingDocument.Status::New),
           WorkflowEventHandling.RunWorkflowOnSendIncomingDocForApprovalCode(),
-          BuildIncomingDocumentTypeConditions(IncomingDocument.Status::"Pending Approval"),
+          BuildIncomingDocumentStatusConditions(IncomingDocument.Status::"Pending Approval"),
           WorkflowEventHandling.RunWorkflowOnCancelIncomingDocApprovalRequestCode(),
           WorkflowStepArgument, true);
     end;
@@ -2441,7 +2441,15 @@ codeunit 1502 "Workflow Setup"
         exit(StrSubstNo(PendingApprovalsCondnTxt, Encode(ApprovalEntry.GetView(false))));
     end;
 
+#if not CLEAN28
+    [Obsolete('Replaced by procedure BuildIncomingDocumentStatusConditions()', '28.0')]
     procedure BuildIncomingDocumentTypeConditions(Status: Option): Text
+    begin
+        exit(BuildIncomingDocumentStatusConditions("Incoming Document Status".FromInteger(Status)));
+    end;
+#endif
+
+    procedure BuildIncomingDocumentStatusConditions(Status: Enum "Incoming Document Status"): Text
     var
         IncomingDocument: Record "Incoming Document";
         IncomingDocumentAttachment: Record "Incoming Document Attachment";

@@ -135,12 +135,10 @@ table 130 "Incoming Document"
             ClosingDates = true;
             Editable = false;
         }
-        field(18; Status; Option)
+        field(18; Status; Enum "Incoming Document Status")
         {
             Caption = 'Status';
             Editable = false;
-            OptionCaption = 'New,Released,Rejected,Posted,Created,Failed,Pending Approval';
-            OptionMembers = New,Released,Rejected,Posted,Created,Failed,"Pending Approval";
         }
         field(60; URL; Text[1024])
         {
@@ -511,7 +509,7 @@ table 130 "Incoming Document"
         ErrorMessage: Record "Error Message";
         ApprovalsMgmt: Codeunit "Approvals Mgmt.";
         ReleaseIncomingDocument: Codeunit "Release Incoming Document";
-        OldStatus: Option;
+        OldStatus: Enum "Incoming Document Status";
     begin
         Find();
 
@@ -1500,7 +1498,7 @@ table 130 "Incoming Document"
 
     procedure SetStatus(NewStatus: Option)
     begin
-        Status := NewStatus;
+        Status := "Incoming Document Status".FromInteger(NewStatus);
         Modify();
     end;
 
