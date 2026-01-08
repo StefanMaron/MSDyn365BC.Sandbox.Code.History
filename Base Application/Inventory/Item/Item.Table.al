@@ -533,6 +533,11 @@ table 27 Item
             DecimalPlaces = 0 : 5;
             MinValue = 0;
             AutoFormatType = 0;
+
+            trigger OnValidate()
+            begin
+                UpdateItemUnitOfMeasureWeight();
+            end;
         }
         field(43; "Units per Parcel"; Decimal)
         {
@@ -2665,6 +2670,7 @@ table 27 Item
         ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
         ItemVariant: Record "Item Variant";
         EntityText: Record "Entity Text";
+        ItemStatisticsCache: Record "Item Statistics Cache";
     begin
         ItemBudgetEntry.SetCurrentKey("Analysis Area", "Budget Name", "Item No.");
         ItemBudgetEntry.SetRange("Item No.", "No.");
@@ -2754,6 +2760,9 @@ table 27 Item
         EntityText.SetRange("Source Table Id", Database::Item);
         EntityText.SetRange("Source System Id", Rec.SystemId);
         EntityText.DeleteAll();
+
+        ItemStatisticsCache.SetRange("Item No.", "No.");
+        ItemStatisticsCache.DeleteAll();
 
         OnAfterDeleteRelatedData(Rec);
     end;
@@ -3887,6 +3896,24 @@ table 27 Item
     procedure CalcQtyOnServiceOrder() Result: Decimal
     begin
         OnCalcQtyOnServiceOrder(Rec, Result);
+    end;
+
+    local procedure UpdateItemUnitOfMeasureWeight()
+    var
+        ItemUOM: Record "Item Unit of Measure";
+    begin
+        if IsTemporary then
+            exit;
+
+        if "No." = '' then
+            exit;
+
+        ItemUOM.SetRange("Item No.", "No.");
+        if ItemUOM.FindSet(true) then
+            repeat
+                ItemUOM.CalcWeight(ItemUOM."Qty. per Unit of Measure", "Net Weight");
+                ItemUOM.Modify();
+            until ItemUOM.Next() = 0;
     end;
 
     [IntegrationEvent(false, false)]
