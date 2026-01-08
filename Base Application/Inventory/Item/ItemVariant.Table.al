@@ -83,6 +83,11 @@ table 5401 "Item Variant"
             Caption = 'Blocked';
             DataClassification = CustomerContent;
         }
+        field(92; Picture; MediaSet)
+        {
+            Caption = 'Picture';
+            DataClassification = CustomerContent;
+        }
         field(8003; "Sales Blocked"; Boolean)
         {
             Caption = 'Sales Blocked';
@@ -120,6 +125,9 @@ table 5401 "Item Variant"
     fieldgroups
     {
         fieldgroup(DropDown; "Item No.", "Code", Description)
+        {
+        }
+        fieldgroup(Brick; "Code", Description, Picture)
         {
         }
     }
@@ -326,6 +334,21 @@ table 5401 "Item Variant"
 
     [IntegrationEvent(false, false)]
     local procedure OnDeleteOnAfterCheck(var ItemVariant: Record "Item Variant")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterDeleteItemVariantPicture(var ItemVariant: Record "Item Variant")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnAfterTakeNewPicture(var ItemVariant: Record "Item Variant"; IsPictureAdded: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    internal procedure OnImportFromDeviceOnAfterModify(var ItemVariant: Record "Item Variant")
     begin
     end;
 }

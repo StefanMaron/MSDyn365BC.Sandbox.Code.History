@@ -6,6 +6,7 @@ namespace Microsoft.Inventory.Item;
 
 using Microsoft.Inventory.Item.Attribute;
 using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Item.Picture;
 
 page 5405 "Item Variant Card"
 {
@@ -72,6 +73,13 @@ page 5405 "Item Variant Card"
         }
         area(factboxes)
         {
+            part(ItemVariantPicture; "Item Variant Picture")
+            {
+                ApplicationArea = All;
+                Caption = 'Picture';
+                SubPageLink = "Item No." = field("Item No."),
+                              Code = field(Code);
+            }
             part(ItemAttributesFactbox; "Item Attributes Factbox")
             {
                 ApplicationArea = Basic, Suite;
