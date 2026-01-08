@@ -88,7 +88,7 @@ page 28165 "GST Sales Entries"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'GST %';
-                    DecimalPlaces = 2 : 5;
+                    DecimalPlaces = 2 : 2;
                     ToolTip = 'Specifies the relevant GST rate for the particular combination of GST business posting group and GST product posting group.';
                 }
                 field("GST Entry Type"; Rec."GST Entry Type")
