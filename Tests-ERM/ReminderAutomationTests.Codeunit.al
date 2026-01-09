@@ -1025,6 +1025,58 @@ codeunit 134979 "Reminder Automation Tests"
         ReminderAutomationCard.Close();
     end;
 
+    [HandlerFunctions('NewReminderActionModalPageHandler,CreateRemindersSetupModalPageHandler,IssueRemindersSetupModalPageHandler,SendRemindersSetupModalPageHandler,SelectRemTermsAutomationHandler')]
+    [Test]
+    procedure TestSendReminderAutomationWithInvoiceAttachmentsNoDuplicates()
+    var
+        Customer: Record Customer;
+        CustomerReminderTerms: Record "Reminder Terms";
+        ReminderActionGroup: Record "Reminder Action Group";
+        JobQueueEntry: Record "Job Queue Entry";
+        TempEmailItemSent: Record "Email Item" temporary;
+        ReminderAutomationJob: Codeunit "Reminders Automation Job";
+        SendEmailMock: Codeunit "Send Email Mock";
+        TempBlobList: Codeunit "Temp Blob List";
+        ReminderAutomationCard: TestPage "Reminder Automation Card";
+        NumberOfOverdueEntries: Integer;
+        TotalNumberOfSentEmails: Integer;
+        AttachmentNames: List of [Text];
+    begin
+        Initialize();
+
+        // [GIVEN] A customer with overdue entries
+        NumberOfOverdueEntries := Any.IntegerInRange(2, 5);
+        CreateReminderTermsWithLevels(CustomerReminderTerms, GetDefaultDueDatePeriodForReminderLevel(), Any.IntegerInRange(2, 5));
+        CreateCustomerWithOverdueEntries(Customer, CustomerReminderTerms, NumberOfOverdueEntries);
+
+        // [GIVEN] A reminder automation group with a create and issue action        
+        CreateReminderAutomationGroupViaUI(ReminderAutomationCard, CustomerReminderTerms);
+        CreateReminderAction(ReminderAutomationCard, Enum::"Reminder Action"::"Create Reminder");
+        CreateReminderAction(ReminderAutomationCard, Enum::"Reminder Action"::"Issue Reminder");
+        CreateReminderAction(ReminderAutomationCard, Enum::"Reminder Action"::"Send Reminder");
+
+        // [GIVEN] A reminder automation group with an issue action that applies to the customer
+        ReminderActionGroup.Get(ReminderAutomationCard.Code.Value());
+
+        // [GIVEN] User runs the issue reminder automation
+        BindSubscription(SendEmailMock);
+        SendEmailMock.AddSupportedScenario(Enum::"Email Scenario"::Reminder);
+        JobQueueEntry := CreateTestJobQueueEntry(ReminderActionGroup);
+        ReminderAutomationJob.Run(JobQueueEntry);
+        UnbindSubscription(SendEmailMock);
+
+        // [THEN] The reminder automation creates issued reminders
+        TotalNumberOfSentEmails := 1;
+        VerifyRemindersSentForCustomer(Customer, TotalNumberOfSentEmails, SendEmailMock);
+
+
+        // [THEN] The reminder automation sends the issued reminders with invoice attachments without duplicates
+        SendEmailMock.GetEmailsSent(TempEmailItemSent);
+        Assert.IsTrue(TempEmailItemSent.HasAttachments(), NoAttachmentsErr);
+        TempEmailItemSent.GetAttachments(TempBlobList, AttachmentNames);
+        Assert.AreEqual(1, TempBlobList.Count(), NoOfAttachmentsSameErr);
+    end;
+
     [ModalPageHandler()]
     procedure IssueRemindersSetupModalPageHandlerWithFilterSaveCheck(var IssueRemindersSetupPage: TestPage "Issue Reminders Setup")
     var
@@ -1677,4 +1729,6 @@ codeunit 134979 "Reminder Automation Tests"
         EmailRelatedRecordNotFoundErr: Label 'Email related record not found';
         ReminderLevelNotFoundErr: Label 'No Reminder Level found for the created Reminder Terms';
         LanguageDoesNotMatchErr: Label 'Attachment language does not match global language';
+        NoAttachmentsErr: Label 'The email has no attachments.';
+        NoOfAttachmentsSameErr: Label 'The number of attachments must be the same.';
 }
