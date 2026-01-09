@@ -1,23 +1,19 @@
-#if not CLEAN28
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License. See License.txt in the project root for license information.
+// Licensed under the MIT License. See License.txt in the project root for license information.\d "postcode"Postcode Configuration Page"
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Foundation.Address;
 
 using Microsoft.Utilities;
 using System.Security.Encryption;
 
-page 10501 "Postcode Configuration Page"
+page 9143 "Postcode Configuration Page W1"
 {
     ApplicationArea = Basic, Suite;
     Caption = 'Postcode provider configuration page';
     PageType = StandardDialog;
     SourceTable = "Postcode Service Config";
     UsageCategory = Administration;
-    ObsoleteReason = 'Page has been moved to W1 Base App.';
-    ObsoleteState = Pending;
-    ObsoleteTag = '28.0';
 
     layout
     {
@@ -40,7 +36,7 @@ page 10501 "Postcode Configuration Page"
                         var
                             TempNameValueBuffer: Record "Name/Value Buffer" temporary;
                         begin
-                            if PAGE.RunModal(PAGE::"Postcode Service Lookup", TempNameValueBuffer) = ACTION::LookupOK then
+                            if PAGE.RunModal(PAGE::"Postcode Service Lookup W1", TempNameValueBuffer) = ACTION::LookupOK then
                                 ServiceKeyText := TempNameValueBuffer.Name;
                         end;
 
@@ -48,7 +44,7 @@ page 10501 "Postcode Configuration Page"
                         var
                             TempNameValueBuffer: Record "Name/Value Buffer" temporary;
                         begin
-                            if PAGE.RunModal(PAGE::"Postcode Service Lookup", TempNameValueBuffer) = ACTION::LookupOK then
+                            if PAGE.RunModal(PAGE::"Postcode Service Lookup W1", TempNameValueBuffer) = ACTION::LookupOK then
                                 ServiceKeyText := TempNameValueBuffer.Name;
                         end;
 
@@ -110,4 +106,3 @@ page 10501 "Postcode Configuration Page"
         DisabledTok: Label 'Disabled';
         ServiceKeyText: Text;
 }
-#endif

@@ -18,7 +18,7 @@ page 10502 "Postcode Service Lookup"
     ShowFilter = false;
     SourceTable = "Name/Value Buffer";
     SourceTableTemporary = true;
-    ObsoleteReason = 'Page has been moved to the GetAddress.io UK Postcodes.';
+    ObsoleteReason = 'Page has been moved to W1 BaseApp.';
     ObsoleteState = Pending;
     ObsoleteTag = '28.0';
 
