@@ -441,10 +441,14 @@ permissionset 209 "D365 Basic - Read"
                   tabledata "Error Message Register" = R,
                   tabledata "Excel Buffer" = R,
                   tabledata "Excel Template Storage" = R,
+#if not CLEAN28
                   tabledata "Exchange Contact" = R,
+#endif
                   tabledata "Exchange Object" = R,
                   tabledata "Exchange Service Setup" = R,
+#if not CLEAN28
                   tabledata "Exchange Sync" = R,
+#endif
                   tabledata "Experience Tier Buffer" = R,
                   tabledata "Experience Tier Setup" = R,
                   tabledata "Extended Text Header" = R,
