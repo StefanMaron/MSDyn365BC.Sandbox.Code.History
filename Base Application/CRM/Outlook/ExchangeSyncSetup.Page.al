@@ -2,10 +2,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.CRM.Outlook;
+
 #if not CLEAN28
+namespace Microsoft.CRM.Outlook;
 using Microsoft.Booking;
-#endif
 using System.Azure.Identity;
 using System.Security.AccessControl;
 
@@ -17,6 +17,10 @@ page 6700 "Exchange Sync. Setup"
     LinksAllowed = false;
     PageType = Card;
     SourceTable = "Exchange Sync";
+    ObsoleteReason = 'Contact sync is now moved to assisted setup experience with new Graph based implementation.';
+    ObsoleteState = Pending;
+    ObsoleteTag = '28.0';
+
     UsageCategory = Administration;
 
     layout
@@ -93,7 +97,6 @@ page 6700 "Exchange Sync. Setup"
             group(Navigate)
             {
                 Caption = 'Navigate';
-#if not CLEAN28
                 action(SetupBookingSync)
                 {
                     ApplicationArea = Basic, Suite;
@@ -111,7 +114,6 @@ page 6700 "Exchange Sync. Setup"
                         PAGE.RunModal(PAGE::"Booking Sync. Setup");
                     end;
                 }
-#endif
                 action(SetupContactSync)
                 {
                     ApplicationArea = Basic, Suite;
@@ -146,14 +148,12 @@ page 6700 "Exchange Sync. Setup"
             group(Category_Category4)
             {
                 Caption = 'Navigate', Comment = 'Generated from the PromotedActionCategories property index 3.';
-#if not CLEAN28
                 actionref(SetupBookingSync_Promoted; SetupBookingSync)
                 {
                     ObsoleteState = Pending;
                     ObsoleteReason = 'Bookings is no longer part of Business Central 365.';
                     ObsoleteTag = '28.0';
                 }
-#endif
                 actionref(SetupContactSync_Promoted; SetupContactSync)
                 {
                 }
@@ -214,3 +214,4 @@ page 6700 "Exchange Sync. Setup"
     end;
 }
 
+#endif
