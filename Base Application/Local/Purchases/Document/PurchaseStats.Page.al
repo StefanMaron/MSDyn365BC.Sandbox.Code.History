@@ -179,8 +179,7 @@ page 10043 "Purchase Stats."
                     ApplicationArea = Basic, Suite;
                     AutoFormatType = 1;
                     Caption = 'Balance ($)';
-                    Editable = false;
-                    ToolTip = 'Specifies the balance on the vendor''s account.';
+                    ToolTip = 'Specifies the customer''s balance. ';
                 }
             }
         }
