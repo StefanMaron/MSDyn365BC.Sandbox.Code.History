@@ -419,9 +419,13 @@ permissionset 959 "D365 BUS FULL ACCESS"
                   tabledata "Error Message Register" = RIMD,
                   tabledata "Excel Buffer" = RIMD,
                   tabledata "Excel Template Storage" = RIMD,
+#if not CLEAN28
                   tabledata "Exchange Contact" = RIMD,
+#endif
                   tabledata "Exchange Object" = RIMD,
+#if not CLEAN28
                   tabledata "Exchange Sync" = RIMD,
+#endif
                   tabledata "Experience Tier Buffer" = RIMD,
                   tabledata "Experience Tier Setup" = RIMD,
                   tabledata "Extended Text Header" = RIMD,
