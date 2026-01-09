@@ -885,6 +885,58 @@ codeunit 134979 "Reminder Automation Tests"
         ReminderAutomationCard.Close();
     end;
 
+    [HandlerFunctions('NewReminderActionModalPageHandler,CreateRemindersSetupModalPageHandler,IssueRemindersSetupModalPageHandler,SendRemindersSetupModalPageHandler,SelectRemTermsAutomationHandler')]
+    [Test]
+    procedure TestSendReminderAutomationWithInvoiceAttachmentsNoDuplicates()
+    var
+        Customer: Record Customer;
+        CustomerReminderTerms: Record "Reminder Terms";
+        ReminderActionGroup: Record "Reminder Action Group";
+        JobQueueEntry: Record "Job Queue Entry";
+        TempEmailItemSent: Record "Email Item" temporary;
+        ReminderAutomationJob: Codeunit "Reminders Automation Job";
+        SendEmailMock: Codeunit "Send Email Mock";
+        TempBlobList: Codeunit "Temp Blob List";
+        ReminderAutomationCard: TestPage "Reminder Automation Card";
+        NumberOfOverdueEntries: Integer;
+        TotalNumberOfSentEmails: Integer;
+        AttachmentNames: List of [Text];
+    begin
+        Initialize();
+
+        // [GIVEN] A customer with overdue entries
+        NumberOfOverdueEntries := Any.IntegerInRange(2, 5);
+        CreateReminderTermsWithLevels(CustomerReminderTerms, GetDefaultDueDatePeriodForReminderLevel(), Any.IntegerInRange(2, 5));
+        CreateCustomerWithOverdueEntries(Customer, CustomerReminderTerms, NumberOfOverdueEntries);
+
+        // [GIVEN] A reminder automation group with a create and issue action        
+        CreateReminderAutomationGroupViaUI(ReminderAutomationCard, CustomerReminderTerms);
+        CreateReminderAction(ReminderAutomationCard, Enum::"Reminder Action"::"Create Reminder");
+        CreateReminderAction(ReminderAutomationCard, Enum::"Reminder Action"::"Issue Reminder");
+        CreateReminderAction(ReminderAutomationCard, Enum::"Reminder Action"::"Send Reminder");
+
+        // [GIVEN] A reminder automation group with an issue action that applies to the customer
+        ReminderActionGroup.Get(ReminderAutomationCard.Code.Value());
+
+        // [GIVEN] User runs the issue reminder automation
+        BindSubscription(SendEmailMock);
+        SendEmailMock.AddSupportedScenario(Enum::"Email Scenario"::Reminder);
+        JobQueueEntry := CreateTestJobQueueEntry(ReminderActionGroup);
+        ReminderAutomationJob.Run(JobQueueEntry);
+        UnbindSubscription(SendEmailMock);
+
+        // [THEN] The reminder automation creates issued reminders
+        TotalNumberOfSentEmails := 1;
+        VerifyRemindersSentForCustomer(Customer, TotalNumberOfSentEmails, SendEmailMock);
+
+
+        // [THEN] The reminder automation sends the issued reminders with invoice attachments without duplicates
+        SendEmailMock.GetEmailsSent(TempEmailItemSent);
+        Assert.IsTrue(TempEmailItemSent.HasAttachments(), NoAttachmentsErr);
+        TempEmailItemSent.GetAttachments(TempBlobList, AttachmentNames);
+        Assert.AreEqual(1, TempBlobList.Count(), NoOfAttachmentsSameErr);
+    end;
+
     [ModalPageHandler()]
     procedure IssueRemindersSetupModalPageHandlerWithFilterSaveCheck(var IssueRemindersSetupPage: TestPage "Issue Reminders Setup")
     var
@@ -1112,6 +1164,30 @@ codeunit 134979 "Reminder Automation Tests"
         Assert.AreEqual(ExpectedNumberOfLines, IssuedReminderLines.Count, 'Wrong number of issued reminder lines created');
         IssuedReminderLines.CalcSums(Amount, "Remaining Amount");
         Assert.AreNotEqual(0, IssuedReminderLines."Remaining Amount", 'The issues reminder lines were created with wrong Remaining Amount.');
+    end;
+
+    local procedure VerifyRemindersSentForCustomer(var Customer: Record Customer; TotalNumberOfRemindersSent: Integer; SendEmailMock: Codeunit "Send Email Mock")
+    var
+        IssuedReminderHeader: Record "Issued Reminder Header";
+        TempEmailItemSent: Record "Email Item" temporary;
+        BlankDate: Date;
+        IssuedReminderEmailCount: Integer;
+    begin
+        Clear(BlankDate);
+        IssuedReminderHeader.SetRange("Customer No.", Customer."No.");
+        Assert.IsFalse(IssuedReminderHeader.IsEmpty(), 'No issued reminders exist for the customer');
+        IssuedReminderHeader.FindFirst();
+        IssuedReminderEmailCount := 1;
+        Assert.AreNotEqual(IssuedReminderHeader."Last Email Sent Date Time", BlankDate, 'The email sent date was not updated');
+        Assert.AreEqual(true, IssuedReminderHeader."Sent For Current Level", 'The sent flag for current level was not updated');
+        Assert.AreEqual(IssuedReminderHeader."Reminder Level", IssuedReminderHeader."Email Sent Level", 'The email sent level was not updated');
+        Assert.AreEqual(IssuedReminderEmailCount, IssuedReminderHeader."Last Level Email Sent Count", 'The number of emails sent was not updated');
+        Assert.AreEqual(IssuedReminderEmailCount, IssuedReminderHeader."Total Email Sent Count", 'The total number of emails sent was not updated');
+        SendEmailMock.GetEmailsSent(TempEmailItemSent);
+        Assert.AreEqual(TempEmailItemSent.Count(), TotalNumberOfRemindersSent, 'The number of emails sent was not correct');
+        TempEmailItemSent.SetRange("Send to", Customer."E-Mail");
+        Assert.IsTrue(TempEmailItemSent.FindFirst(), 'The email was not sent to the customer');
+        Assert.IsTrue(TempEmailItemSent.HasAttachments(), 'The email has no attachments');
     end;
 
     local procedure VerifyReminderMailWithAttachmentSentForCustomer(var Customer: Record Customer; TotalNumberOfRemindersSent: Integer; SendEmailMock: Codeunit "Send Email Mock")
@@ -1511,4 +1587,6 @@ codeunit 134979 "Reminder Automation Tests"
         EmailRelatedRecordNotFoundErr: Label 'Email related record not found';
         ReminderLevelNotFoundErr: Label 'No Reminder Level found for the created Reminder Terms';
         LanguageDoesNotMatchErr: Label 'Attachment language does not match global language';
+        NoAttachmentsErr: Label 'The email has no attachments.';
+        NoOfAttachmentsSameErr: Label 'The number of attachments must be the same.';
 }
