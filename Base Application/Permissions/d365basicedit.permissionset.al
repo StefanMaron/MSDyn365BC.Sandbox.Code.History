@@ -345,9 +345,13 @@ permissionset 208 "D365 Basic - Edit"
                   tabledata "Error Message Register" = IMD,
                   tabledata "Excel Buffer" = IMD,
                   tabledata "Excel Template Storage" = IMD,
+#if not CLEAN28
                   tabledata "Exchange Contact" = IMD,
+#endif
                   tabledata "Exchange Object" = IMD,
+#if not CLEAN28
                   tabledata "Exchange Sync" = IMD,
+#endif
                   tabledata "Experience Tier Buffer" = IMD,
                   tabledata "Experience Tier Setup" = IMD,
                   tabledata "Extended Text Header" = IMD,
