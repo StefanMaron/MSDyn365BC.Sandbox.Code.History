@@ -918,12 +918,18 @@ page 8900 "Administrator Main Role Center"
                         Caption = 'Outlook Add-in Management';
                         RunObject = page "Office Add-in Management";
                     }
+#if not CLEAN28
                     action("Exchange Sync. Setup Action")
                     {
+                        ObsoleteReason = 'Exchange sync are no longer part of Business Central 365.  Contact Sync is implemented using the Microsoft Graph API.';
+                        ObsoleteState = Pending;
+                        Visible = false;
+                        ObsoleteTag = '28.0';
                         ApplicationArea = Basic, Suite;
                         Caption = 'Exchange Sync. Setup';
                         RunObject = page "Exchange Sync. Setup";
                     }
+#endif
                 }
                 group("GroupOneDrive")
                 {

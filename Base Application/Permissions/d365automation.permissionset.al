@@ -750,11 +750,15 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Excel Template Storage" = RIMD,
                   tabledata "Exch. Rate Adjmt. Reg." = Rimd,
                   tabledata "Exch. Rate Adjmt. Ledg. Entry" = Rimd,
+#if not CLEAN28
                   tabledata "Exchange Contact" = RIMD,
+#endif
                   tabledata "Exchange Folder" = RIMD,
                   tabledata "Exchange Object" = RIMD,
                   tabledata "Exchange Service Setup" = RIMD,
+#if not CLEAN28
                   tabledata "Exchange Sync" = RIMD,
+#endif
                   tabledata "Exp. Invt. Order Tracking" = RIMD,
                   tabledata "Experience Tier Buffer" = RIMD,
                   tabledata "Experience Tier Setup" = RIMD,
