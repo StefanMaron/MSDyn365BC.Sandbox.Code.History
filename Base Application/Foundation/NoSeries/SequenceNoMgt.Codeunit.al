@@ -83,11 +83,7 @@ codeunit 9500 "Sequence No. Mgt."
                 NoOfEntries := PendingAllocation.Get(SignedTableNo);
                 PendingAllocation.Remove(SignedTableNo);
                 ValidateSeqNo(TableNo);
-                if not TryGetRange(PreviewMode, TableNo, NoOfEntries, NewSeqNo) then begin
-                    ClearLastError();
-                    CreateNewTableSequence(PreviewMode, TableNo);
-                    TryGetRange(PreviewMode, TableNo, NoOfEntries, NewSeqNo);
-                end;
+                NewSeqNo := NumberSequence.Range(GetTableSequenceName(SignedTableNo < 0, TableNo), NoOfEntries);
                 if SeqNoBufferFrom.ContainsKey(SignedTableNo) then
                     SeqNoBufferFrom.Set(SignedTableNo, NewSeqNo)
                 else
@@ -173,12 +169,6 @@ codeunit 9500 "Sequence No. Mgt."
     local procedure TryGetNextNo(PreviewMode: Boolean; TableNo: Integer; var NewSeqNo: Integer)
     begin
         NewSeqNo := NumberSequence.Next(GetTableSequenceName(PreviewMode, TableNo));
-    end;
-
-    [TryFunction]
-    local procedure TryGetRange(PreviewMode: Boolean; TableNo: Integer; NoOfEntries: Integer; var NewSeqNo: Integer)
-    begin
-        NewSeqNo := NumberSequence.Range(GetTableSequenceName(PreviewMode, TableNo), NoOfEntries);
     end;
 
     [TryFunction]
