@@ -2580,38 +2580,36 @@ codeunit 137047 "SCM Warehouse I"
         LotNo: Code[20];
         Qty: Decimal;
     begin
-        // [FEATURE] [Item Tracking] [Reservation] [Warehouse] [Pick]
         // [SCENARIO 614876] Cannot reserve specific lot number that is already allocated to a registered warehouse pick
-
         Initialize();
         LibraryVariableStorage.Clear();
         LibraryInventory.ClearItemJournal(ItemJournalTemplate, ItemJournalBatch);
 
         // [GIVEN] Location with directed put-away and pick
-        CreateFullWMSLocation(Location, 2);
+        CreateFullWMSLocation(Location, LibraryRandom.RandIntInRange(2, 2));
 
         // [GIVEN] Item with lot warehouse tracking
         CreateItemWithLotWarehouseTracking(Item);
 
-        // [GIVEN] Post 100 pcs to location with lot no. "L1" via warehouse receipt and put-away
+        // [GIVEN] Post random pcs to location with lot no. "L1" via warehouse receipt and put-away
         LotNo := LibraryUtility.GenerateGUID();
-        Qty := 100;
+        Qty := LibraryRandom.RandIntInRange(100, 200);
         UpdateInventoryOnDirectedPutAwayPickLocationTrackedItem(Item."No.", Location.Code, Qty, LotNo);
 
-        // [GIVEN] Sales order "S1" for 100 pcs, create warehouse shipment and pick, register pick
+        // [GIVEN] Sales order for random pcs, create warehouse shipment and pick, register pick
         CreateSalesDocumentWithLine(SalesLine, Item."No.", Location.Code, Qty);
         SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.");
         CreateWhsePickFromSalesOrder(SalesHeader);
         FindWarehouseActivityLine(
-          WarehouseActivityLine, DATABASE::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.");
+          WarehouseActivityLine, Database::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.");
         WarehouseActivityLine.ModifyAll("Lot No.", LotNo);
         WarehouseActivityHeader.Get(WarehouseActivityLine."Activity Type", WarehouseActivityLine."No.");
         LibraryWarehouse.RegisterWhseActivity(WarehouseActivityHeader);
 
-        // [GIVEN] Sales order "S2" for 50 pcs
+        // [GIVEN] Create partial sales order
         CreateSalesDocumentWithLine(SalesLine2, Item."No.", Location.Code, Qty / 2);
 
-        // [WHEN] Try to auto-reserve sales order "S2"
+        // [WHEN] Try to auto-reserve sales order 
         LibrarySales.AutoReserveSalesLine(SalesLine2);
 
         // [THEN] No quantity is reserved (ConfirmHandler returns false for manual reservation prompt)
