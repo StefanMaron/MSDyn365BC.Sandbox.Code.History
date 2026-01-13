@@ -13802,6 +13802,15 @@
       <Cmt Name="Dev"><![CDATA[%1=Item No.]D;]A;(LookupHint=Codeunit SCM Warehouse Unit Tests - NamedType NotificationMsg)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3751593413 - NamedType 3072097358" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Put-away should not be created when template requires find same Item]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Warehouse Unit Tests - NamedType PutAwayErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3751593413 - NamedType 4088245546" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[%1 must not be changed]]></Val>
