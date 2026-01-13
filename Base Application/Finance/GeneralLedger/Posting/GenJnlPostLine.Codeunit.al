@@ -8442,6 +8442,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
                     end;
                 end;
         end;
+        OnAfterSendDocToCartera(GenJnlLine3, VendLedgEntry4, CustLedgEntry4, DocType, CVLedgEntryBuf4);
     end;
 
     procedure VendFindVATSetup(var VATSetup: Record "VAT Posting Setup"; VendLedgEntry4: Record "Vendor Ledger Entry"; IsFromJournal: Boolean): Boolean
@@ -12615,6 +12616,11 @@ codeunit 12 "Gen. Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnPostApplyOnAfterFindAmtForApplnOnBeforeCalcCurrencyUnrealizedGainLoss(var NewCVLedgEntryBuf: Record "CV Ledger Entry Buffer"; var OldCVLedgEntryBuf: Record "CV Ledger Entry Buffer"; var OldCVLedgEntryBuf2: Record "CV Ledger Entry Buffer"; var AppliedAmount: Decimal; var AppliedAmountLCY: Decimal; var OldAppliedAmount: Decimal; var ApplnRoundingPrecision: Decimal; var VATEntry: Record "VAT Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSendDocToCartera(var GenJnlLine: Record "Gen. Journal Line"; var VendLedgEntry: Record "Vendor Ledger Entry"; var CustLedgEntry: Record "Cust. Ledger Entry"; DocType: Option Sale,Purchase; var CVLedgEntryBuf: Record "CV Ledger Entry Buffer")
     begin
     end;
 }
