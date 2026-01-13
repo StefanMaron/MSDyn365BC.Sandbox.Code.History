@@ -942,7 +942,7 @@ codeunit 99000893 "Mfg. Create Put-away"
         repeat
             QtyToPutAwayBase := RemQtyToPutAwayBase;
 
-            if not IsTemplateLineEnableForFindBinFields() then
+            if IsTemplateLineEnableForFindBinFields() then
                 FindBinFromBinContentForProdOrderLine(ProdOrderLine, TempProdOrdLineTrackingBuff, BinContentQtyBase) // Calc Availability per Bin Content
             else
                 FindBinForProdOrderLine(ProdOrderLine, TempProdOrdLineTrackingBuff, BinContentQtyBase); // Calc Availability per Bin
