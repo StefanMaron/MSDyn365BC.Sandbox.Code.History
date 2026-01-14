@@ -2402,6 +2402,8 @@ codeunit 427 ICInboxOutboxMgt
         ICInboxTrans."IC Account No." := ICOutboxTrans."IC Account No.";
         ICInboxTrans."Source Line No." := ICOutboxTrans."Source Line No.";
 
+        OnOutboxTransToInboxOptimizedOnAfterTransferFields(ICOutboxTrans, ICInboxTrans);
+
         GetCompanyInfo();
         ICSetup.Get();
         if ICSetup."IC Partner Code" = ICInboxTrans."IC Partner Code" then
@@ -4870,6 +4872,16 @@ codeunit 427 ICInboxOutboxMgt
     /// <param name="SalesLine">Sales line record for loop processing</param>
     [IntegrationEvent(false, false)]
     local procedure OnCreateOutboxSalesDocTransOnBeforeLoop(var SalesLine: Record "Sales Line")
+    begin
+    end;
+
+    /// <summary>
+    /// Integration event raised after transferring fields from outbox transaction to inbox transaction during optimized transfer.
+    /// </summary>
+    /// <param name="ICOutboxTransaction">Source outbox transaction</param>
+    /// <param name="ICInboxTransaction">Target inbox transaction</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnOutboxTransToInboxOptimizedOnAfterTransferFields(var ICOutboxTransaction: Record "IC Outbox Transaction"; var ICInboxTransaction: Record "IC Inbox Transaction")
     begin
     end;
 }
