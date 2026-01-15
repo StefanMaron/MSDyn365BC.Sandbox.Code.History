@@ -175,6 +175,11 @@
       "id": "23b1772f-b823-4e87-2339-9ff7cbb2364b",
       "name": "Sales Order Agent Test",
       "publisher": "Microsoft"
+    },
+    {
+      "id": "c31ee575-3fc7-4388-98ee-d75aa2fc5f87",
+      "name": "Withholding Tax",
+      "publisher": "Microsoft"
     }
   ],
   "platform": "$(app_platformVersion)",

@@ -967,6 +967,7 @@ table 125 "Purch. Cr. Memo Line"
     internal procedure GetPurchaseInvoiceLine(var PurchInvLine: Record "Purch. Inv. Line")
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
+        PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.";
         ValueEntry: Record "Value Entry";
     begin
         CheckApplFromItemLedgEntry(ItemLedgerEntry);
@@ -980,6 +981,18 @@ table 125 "Purch. Cr. Memo Line"
         ValueEntry.SetRange("Document Type", ValueEntry."Document Type"::"Purchase Invoice");
         if ValueEntry.FindFirst() then
             PurchInvLine.Get(ValueEntry."Document No.", ValueEntry."Document Line No.");
+
+        if ItemLedgerEntry."Entry No." = 0 then begin
+            PurchCrMemoHdr.Get("Document No.");
+            if PurchCrMemoHdr."Applies-to Doc. Type" <> PurchCrMemoHdr."Applies-to Doc. Type"::Invoice then
+                exit;
+
+            PurchInvLine.Reset();
+            PurchInvLine.SetRange("Document No.", PurchCrMemoHdr."Applies-to Doc. No.");
+            PurchInvLine.SetRange(Type, Type);
+            PurchInvLine.SetRange("No.", "No.");
+            PurchInvLine.FindFirst();
+        end;
     end;
 
     local procedure CheckApplFromItemLedgEntry(var ItemLedgerEntry: Record "Item Ledger Entry")
