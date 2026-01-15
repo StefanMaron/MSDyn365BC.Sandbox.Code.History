@@ -9134,6 +9134,62 @@
                 ItemChargeCalculatedProportionallyErr, ItemChargeAssignmentPurch.FieldCaption("Amount to Handle")));
     end;
 
+    [Test]
+    [HandlerFunctions('ConfirmHandler')]
+    procedure VerifyQuantityToReceiveOnPurchOrderUpdatedWithGLAccountWithCorrectiveCreditMemo()
+    var
+        GLAccount: Record "G/L Account";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseHeader2: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        PurchInvHeader: Record "Purch. Inv. Header";
+        VATPostingSetup: Record "VAT Posting Setup";
+        Vendor: Record Vendor;
+        CorrectPostedPurchInvoice: Codeunit "Correct Posted Purch. Invoice";
+        PurchCreditMemo: TestPage "Purchase Credit Memo";
+        GLAccountCode: Code[20];
+        Quantity: Decimal;
+    begin
+        // [SCENARIO 615866] Verify Qty. to Receive and  Qty. to Invoice are updated for G/L Account lines
+        // after creating a Corrective Credit Memo from the Posted Purchase Invoice.
+        Initialize();
+        Quantity := LibraryRandom.RandIntInRange(10, 10);
+
+        // [GIVEN] Create a G/L Account.
+        FindVATPostingSetup(VATPostingSetup);
+        GLAccountCode := LibraryERM.CreateGLAccountWithVATPostingSetup(VATPostingSetup, GLAccount."Gen. Posting Type"::Purchase);
+
+        // [GIVEN] Create Vendor.
+        LibraryPurchase.CreateVendor(Vendor);
+
+        // [GIVEN] Create Purchase Header.
+        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Order, Vendor."No.");
+
+        // [GIVEN] Create Purchase Line with G/L Account and Quantity.
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::"G/L Account", GLAccountCode, Quantity);
+
+        // [GIVEN] Update Direct Unit Cost and Qty. to Receive in Purchase Line.
+        PurchaseLine.Validate("Direct Unit Cost", LibraryRandom.RandDec(100, 2));
+        PurchaseLine.Validate("Qty. to Receive", LibraryRandom.RandIntInRange(5, 5));
+        PurchaseLine.Modify(true);
+
+        // [GIVEN] Post partial Purchase order.
+        PurchInvHeader.Get(LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true));
+
+        // [GIVEN] Create Corrective Credit Memo.
+        CorrectPostedPurchInvoice.CreateCreditMemoCopyDocument(PurchInvHeader, PurchaseHeader2);
+        PurchaseHeader2.Validate("Vendor Cr. Memo No.", PurchaseHeader2."No.");
+        PurchaseHeader2.Modify(true);
+
+        // [WHEN] Post the Corrective Credit Memo.
+        PurchCreditMemo.OpenView();
+        PurchCreditMemo.GotoRecord(PurchaseHeader2);
+        PurchCreditMemo.Post.Invoke();
+
+        // [THEN] Verify Purchase Order Qty. to Receive and Qty. to Invoice are updated in Purchase line.
+        VerifyPurchaseOrderAfterPartialPostCorrectiveCreditMemo(PurchaseHeader."No.", Quantity);
+    end;
+
     local procedure Initialize()
     var
         PurchaseHeader: Record "Purchase Header";
