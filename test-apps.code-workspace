@@ -1,11 +1,11 @@
 {
   "settings": {
+    "al.enableCodeAnalysis": false,
     "search.exclude": {
       "**.xlf": true
     },
-    "al.enableCodeActions": false,
     "allint.enabled": false,
-    "al.enableCodeAnalysis": false
+    "al.enableCodeActions": false
   },
   "folders": [
     {
@@ -31,6 +31,9 @@
     },
     {
       "path": "./StatisticalAccounts/Test/Statistical Accounts Tests"
+    },
+    {
+      "path": "./Withholding Tax/Test/Withholding Tax Tests"
     },
     {
       "path": "./BankAccRecWithAI/Test/Bank Account Reconciliation With AI Tests"
