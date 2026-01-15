@@ -4929,7 +4929,8 @@ table 37 "Sales Line"
     var
         PriceCalculation: Interface "Price Calculation";
     begin
-        GetSalesHeader();
+        if Rec."Document No." <> '' then
+            SalesHeader.Get(Rec."Document Type", Rec."Document No.");
         GetPriceCalculationHandler(PriceType::Sale, SalesHeader, PriceCalculation);
         PriceCalculation.PickPrice();
         GetLineWithCalculatedPrice(PriceCalculation);
