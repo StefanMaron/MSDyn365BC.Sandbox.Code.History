@@ -735,6 +735,8 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
         GenJnlLine."Orig. Pmt. Disc. Possible(LCY)" :=
             CurrExchRate.ExchangeAmtFCYToLCY(
                 PurchHeader.GetUseDate(), PurchHeader."Currency Code", -TotalPurchLine."Pmt. Discount Amount", PurchHeader."Currency Factor");
+
+        PurchPostInvoiceEvents.RunOnAfterInitGenJnlLineAmountFieldsFromTotalLines(GenJnlLine, PurchHeader, TotalPurchLine, TotalPurchLineLCY);
     end;
 
     procedure PostBalancingEntry(PurchHeaderVar: Variant; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
