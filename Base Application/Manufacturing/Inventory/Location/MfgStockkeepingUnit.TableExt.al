@@ -166,6 +166,16 @@ tableextension 99000759 "Mfg. Stockkeeping Unit" extends "Stockkeeping Unit"
         }
     }
 
+    keys
+    {
+        key(Key8; "Production BOM No.")
+        {
+        }
+        key(Key9; "Routing No.")
+        {
+        }
+    }
+
     var
 #if not CLEAN27
         HideNonInventoryValidateOnStdCost: Boolean;
