@@ -819,11 +819,12 @@ table 39 "Purchase Line"
 
             trigger OnValidate()
             var
+                ThrowError: Boolean;
                 IsHandled: Boolean;
             begin
-                if ("Prepmt. Amt. Inv." <> 0) and
-                   ("Direct Unit Cost" <> xRec."Direct Unit Cost") and not IsServiceCharge()
-                then
+                ThrowError := ("Prepmt. Amt. Inv." <> 0) and ("Direct Unit Cost" <> xRec."Direct Unit Cost") and not IsServiceCharge();
+                OnValidateDirectUnitCostOnBeforeThrowErrorIfPrepaymentInvoicePosted(Rec, ThrowError);
+                if ThrowError then
                     FieldError("Direct Unit Cost", StrSubstNo(Text1020005, xRec."Direct Unit Cost"));
 
                 IsHandled := false;
@@ -12189,6 +12190,11 @@ table 39 "Purchase Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnCopyFromItemOnAfterGetItemTranslation(var PurchaseLine: Record "Purchase Line"; var Item: Record Item)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateDirectUnitCostOnBeforeThrowErrorIfPrepaymentInvoicePosted(var PurchaseLine: Record "Purchase Line"; var ThrowError: Boolean)
     begin
     end;
 
