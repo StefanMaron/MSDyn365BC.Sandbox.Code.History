@@ -329,6 +329,15 @@
       <Cmt Name="Dev"><![CDATA[%1 = Salesperson/Purchaser table caption, %2 = Salesperson/Purchaser code, %3 = Shopify Staff Member name]D;]A;(Namespace=Microsoft.Integration.Shopify.Test)(LookupHint=Codeunit Shpfy Staff Test - Method TestCannotAssignSameSalespersonToMultipleStaff - NamedType SalespersonPurchaserMappingErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 718136426 - NamedType 562056659" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[More than expected API calls to Shopify detected.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Integration.Shopify.Test)(LookupHint=Codeunit Shpfy Sync Variant Images Test - NamedType UnexpectedAPICallsErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2109467660 - Method 430562072 - NamedType 1603380026" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The Shop is missing the Shopify URL.]]></Val>
