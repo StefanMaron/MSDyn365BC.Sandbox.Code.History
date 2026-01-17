@@ -32,7 +32,7 @@
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "application": "27.2.0.0",
+  "application": "27.3.0.0",
   "target": "OnPrem",
   "features": [
     "NoImplicitWith",

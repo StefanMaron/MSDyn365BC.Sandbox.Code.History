@@ -2,23 +2,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.HumanResources.Employee;
+namespace Microsoft.eServices.EDocument.Processing.Import.Purchase;
 
-enum 5511 "Employee Working Type"
+enum 6111 "E-Doc PO Match Warning"
 {
-    Caption = 'Employee Working Type';
-    Extensible = true;
-
-    value(0; Week)
+    Extensible = false;
+    value(0; NotYetReceived)
     {
-        Caption = 'Week';
     }
-    value(1; Month)
+    value(1; QuantityMismatch)
     {
-        Caption = 'Month';
     }
-    value(2; Year)
+    value(2; MissingInformationForMatch)
     {
-        Caption = 'Year';
     }
 }
