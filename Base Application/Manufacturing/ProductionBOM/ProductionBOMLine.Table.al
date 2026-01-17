@@ -66,6 +66,7 @@ table 99000772 "Production BOM Line"
                         begin
                             Item.Get("No.");
                             Description := Item.Description;
+                            "Description 2" := Item."Description 2";
                             Item.TestField("Base Unit of Measure");
                             "Unit of Measure Code" := Item."Base Unit of Measure";
                             "Scrap %" := Item."Scrap %";
@@ -78,6 +79,7 @@ table 99000772 "Production BOM Line"
                             ProductionBOMHeader.Get("No.");
                             ProductionBOMHeader.TestField("Unit of Measure Code");
                             Description := ProductionBOMHeader.Description;
+                            "Description 2" := ProductionBOMHeader."Description 2";
                             "Unit of Measure Code" := ProductionBOMHeader."Unit of Measure Code";
                             OnValidateNoOnAfterAssignProdBOMFields(Rec, ProductionBOMHeader, xRec, CurrFieldNo);
                         end;
@@ -176,9 +178,10 @@ table 99000772 "Production BOM Line"
                     exit;
                 TestField(Type, Type::Item);
                 TestField("No.");
-                ItemVariant.SetLoadFields(Description);
+                ItemVariant.SetLoadFields(Description, "Description 2");
                 ItemVariant.Get("No.", "Variant Code");
                 Description := ItemVariant.Description;
+                "Description 2" := ItemVariant."Description 2";
             end;
         }
         field(22; Comment; Boolean)
@@ -189,6 +192,12 @@ table 99000772 "Production BOM Line"
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
+        }
+        field(23; "Description 2"; Text[50])
+        {
+            Caption = 'Description 2';
+            DataClassification = CustomerContent;
+            ToolTip = 'Specifies additional description text.';
         }
         field(28; "Starting Date"; Date)
         {

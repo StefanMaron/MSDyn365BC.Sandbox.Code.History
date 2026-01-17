@@ -584,10 +584,13 @@ table 32 "Item Ledger Entry"
         {
             IncludedFields = Quantity;
         }
-        key(Key6; "Item No.", Open, "Variant Code", Positive, "Location Code", "Posting Date", "SIFT Bucket No.")
+        key(Key6; "Item No.", Open, "Variant Code", Positive, "Location Code", "Posting Date")
+        {
+            IncludedFields = "Job No.", "Job Task No.", "Document Type", "Document No.", "Order Type", "Order No.", "Serial No.", "Lot No.", "Package No.", Quantity, "Remaining Quantity";
+        }
+        key(Key7; "Location Code", "Item No.", "Variant Code", Open, Positive, "SIFT Bucket No.")
         {
             SumIndexFields = Quantity, "Remaining Quantity";
-            IncludedFields = "Job No.", "Job Task No.", "Document Type", "Document No.", "Order Type", "Order No.", "Serial No.", "Lot No.", "Package No.";
         }
         key(Key8; "Country/Region Code", "Entry Type", "Posting Date")
         {
@@ -606,9 +609,7 @@ table 32 "Item Ledger Entry"
         key(Key14; "Item No.", Positive, "Location Code", "Variant Code")
         {
         }
-#pragma warning disable AS0009
         key(Key17; "Item No.", Open, "Variant Code", Positive, "Lot No.", "Serial No.", "Package No.")
-#pragma warning restore AS0009
         {
             IncludedFields = "Remaining Quantity";
         }
