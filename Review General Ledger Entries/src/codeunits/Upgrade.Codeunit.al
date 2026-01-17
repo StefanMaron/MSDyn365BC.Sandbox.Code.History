@@ -30,7 +30,8 @@ codeunit 22201 "Upgrade"
         UpgradeTag: Codeunit "Upgrade Tag";
         GLEntryReviewDataTransfer, GLEntryDataTransfer : DataTransfer;
     begin
-        if UpgradeTag.HasUpgradeTag(UpgradeReviewGLEntryTag()) then exit;
+        if UpgradeTag.HasUpgradeTag(UpgradeReviewGLEntryTag()) then
+            exit;
 
         GLEntryReviewDataTransfer.SetTables(Database::"G/L Entry Review Entry", Database::"G/L Entry Review Log");
         GLEntryReviewDataTransfer.AddFieldValue(GLEntryReviewEntry.FieldNo("G/L Entry No."), GLEntryReviewLog.FieldNo("G/L Entry No."));
