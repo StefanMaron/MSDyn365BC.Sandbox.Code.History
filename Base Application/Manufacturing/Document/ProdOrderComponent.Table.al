@@ -93,6 +93,7 @@ table 5407 "Prod. Order Component"
                         Validate("Quantity per");
                 end;
                 Description := Item.Description;
+                "Description 2" := Item."Description 2";
                 UpdateUOMFromItem(Item);
                 OnValidateItemNoOnAfterUpdateUOMFromItem(Rec, xRec, Item);
                 GetUpdateFromSKU();
@@ -401,6 +402,12 @@ table 5407 "Prod. Order Component"
                 if "Flushing Method" <> xRec."Flushing Method" then
                     UpdateBin(Rec, FieldNo("Flushing Method"), FieldCaption("Flushing Method"));
             end;
+        }
+        field(29; "Description 2"; Text[50])
+        {
+            Caption = 'Description 2';
+            DataClassification = CustomerContent;
+            ToolTip = 'Specifies additional description text.';
         }
         field(30; "Location Code"; Code[10])
         {
@@ -1224,6 +1231,7 @@ table 5407 "Prod. Order Component"
         "Line No." := PlanningComponent."Line No.";
         "Item No." := PlanningComponent."Item No.";
         Description := PlanningComponent.Description;
+        "Description 2" := PlanningComponent."Description 2";
         "Unit of Measure Code" := PlanningComponent."Unit of Measure Code";
         "Quantity per" := PlanningComponent."Quantity per";
         Quantity := PlanningComponent.Quantity;
@@ -1983,13 +1991,15 @@ table 5407 "Prod. Order Component"
     var
         ItemVariant: Record "Item Variant";
     begin
-        if Rec."Variant Code" = '' then
-            Description := Item.Description
-        else begin
-            ItemVariant.SetLoadFields(Description, Blocked);
+        if Rec."Variant Code" = '' then begin
+            Description := Item.Description;
+            "Description 2" := Item."Description 2";
+        end else begin
+            ItemVariant.SetLoadFields(Description, "Description 2", Blocked);
             ItemVariant.Get("Item No.", "Variant Code");
             ItemVariant.TestField(Blocked, false);
             Description := ItemVariant.Description;
+            "Description 2" := ItemVariant."Description 2";
         end;
         OnAfterAssignDecsriptionFromItemOrVariant(Rec, xRec, Item, ItemVariant);
     end;
