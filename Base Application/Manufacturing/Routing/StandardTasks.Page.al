@@ -4,6 +4,8 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Manufacturing.Routing;
 
+using System.Text;
+
 page 99000799 "Standard Tasks"
 {
     ApplicationArea = Manufacturing;
@@ -113,6 +115,17 @@ page 99000799 "Standard Tasks"
             }
         }
     }
+    
+    procedure GetCurrSelectionFilter(): Text
+    var
+        StandardTask: Record "Standard Task";
+        SelectionFilterManagement: Codeunit SelectionFilterManagement;
+        RecRef: RecordRef;
+    begin
+        CurrPage.SetSelectionFilter(StandardTask);
+        RecRef.GetTable(StandardTask);
+        exit(SelectionFilterManagement.GetSelectionFilter(RecRef, StandardTask.FieldNo(Code)));
+    end;    
 
 #if not CLEAN27
     [Scope('OnPrem')]
