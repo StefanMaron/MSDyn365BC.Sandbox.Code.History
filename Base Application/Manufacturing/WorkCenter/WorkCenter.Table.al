@@ -667,10 +667,10 @@ table 99000754 "Work Center"
         MfgSetup.Get();
         if "No." = '' then begin
             MfgSetup.TestField("Work Center Nos.");
-                "No. Series" := MfgSetup."Work Center Nos.";
-                if NoSeries.AreRelated("No. Series", xRec."No. Series") then
-                    "No. Series" := xRec."No. Series";
-                "No." := NoSeries.GetNextNo("No. Series");
+            "No. Series" := MfgSetup."Work Center Nos.";
+            if NoSeries.AreRelated("No. Series", xRec."No. Series") then
+                "No. Series" := xRec."No. Series";
+            "No." := NoSeries.GetNextNo("No. Series");
         end;
         DimMgt.UpdateDefaultDim(
           Database::"Work Center", "No.",
