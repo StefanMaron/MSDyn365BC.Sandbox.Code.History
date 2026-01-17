@@ -72,6 +72,12 @@ page 9288 "Prod. BOM Version Comparison"
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies a description of the entry.';
                 }
+                field("Description 2"; Rec."Description 2")
+                {
+                    ApplicationArea = Manufacturing;
+                    ToolTip = 'Specifies additional description text.';
+                    Visible = false;
+                }
                 field(BOMField1; BOMMatrix_CellData)
                 {
                     ApplicationArea = Manufacturing;
