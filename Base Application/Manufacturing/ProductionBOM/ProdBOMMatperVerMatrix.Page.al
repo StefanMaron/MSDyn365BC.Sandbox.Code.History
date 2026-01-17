@@ -42,6 +42,12 @@ page 9287 "Prod. BOM Mat. per Ver. Matrix"
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies a description of the entry.';
                 }
+                field("Description 2"; Rec."Description 2")
+                {
+                    ApplicationArea = Manufacturing;
+                    ToolTip = 'Specifies additional description text.';
+                    Visible = false;
+                }
                 field(Field1; MATRIX_CellData[1])
                 {
                     ApplicationArea = Manufacturing;
