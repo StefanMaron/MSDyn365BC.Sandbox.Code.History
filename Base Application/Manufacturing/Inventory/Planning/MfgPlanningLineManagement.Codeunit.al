@@ -353,6 +353,7 @@ codeunit 99000819 "Mfg. Planning Line Management"
         PlanningComponent."Variant Code" := ProdBOMLine."Variant Code";
         PlanningComponent."Location Code" := SKU."Components at Location";
         PlanningComponent.Description := ProdBOMLine.Description;
+        PlanningComponent."Description 2" := ProdBOMLine."Description 2";
         PlanningComponent."Planning Line Origin" := ReqLine."Planning Line Origin";
         PlanningComponent.Validate("Unit of Measure Code", ProdBOMLine."Unit of Measure Code");
         PlanningComponent."Quantity per" := ProdBOMLine."Quantity per" * LineQtyPerUOM / ItemQtyPerUOM;

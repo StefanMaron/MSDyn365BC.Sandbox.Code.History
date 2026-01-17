@@ -925,6 +925,7 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
         WarehouseActivityLine."Item No." := ProdOrderCompLine."Item No.";
         WarehouseActivityLine."Variant Code" := ProdOrderCompLine."Variant Code";
         WarehouseActivityLine.Description := ProdOrderCompLine.Description;
+        WarehouseActivityLine."Description 2" := ProdOrderCompLine."Description 2";
         WarehouseActivityLine."Due Date" := ProdOrderCompLine."Due Date";
         WarehouseActivityLine."Whse. Document Type" := WarehouseActivityLine."Whse. Document Type"::Production;
         WarehouseActivityLine."Whse. Document No." := ProdOrderCompLine."Prod. Order No.";
@@ -1313,6 +1314,7 @@ codeunit 5996 "Prod. Order Warehouse Mgt."
         WhseWkshLine."Unit of Measure Code" := ProdOrderCompLine."Unit of Measure Code";
         WhseWkshLine."Qty. per Unit of Measure" := ProdOrderCompLine."Qty. per Unit of Measure";
         WhseWkshLine.Description := ProdOrderCompLine.Description;
+        WhseWkshLine."Description 2" := ProdOrderCompLine."Description 2";
         WhseWkshLine."Due Date" := ProdOrderCompLine."Due Date";
         WhseWkshLine."Qty. Handled" := ProdOrderCompLine."Qty. Picked" + ProdOrderCompLine."Pick Qty.";
         WhseWkshLine."Qty. Handled (Base)" := ProdOrderCompLine."Qty. Picked (Base)" + ProdOrderCompLine."Pick Qty. (Base)";

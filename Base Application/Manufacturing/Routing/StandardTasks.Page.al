@@ -31,6 +31,12 @@ page 99000799 "Standard Tasks"
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the description of the standard task.';
                 }
+                field("Description 2"; Rec."Description 2")
+                {
+                    ApplicationArea = Manufacturing;
+                    ToolTip = 'Specifies additional description text.';
+                    Visible = false;
+                }
             }
         }
         area(factboxes)

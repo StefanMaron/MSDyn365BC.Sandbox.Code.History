@@ -296,6 +296,12 @@ table 5409 "Prod. Order Routing Line"
                 CalcStartingEndingDates(Direction::Forward);
             end;
         }
+        field(23; "Description 2"; Text[50])
+        {
+            Caption = 'Description 2';
+            DataClassification = CustomerContent;
+            ToolTip = 'Specifies additional description text.';
+        }
         field(27; "Minimum Process Time"; Decimal)
         {
             Caption = 'Minimum Process Time';
@@ -397,6 +403,7 @@ table 5409 "Prod. Order Routing Line"
 
                 StandardTask.Get("Standard Task Code");
                 Description := StandardTask.Description;
+                "Description 2" := StandardTask."Description 2";
 
                 DeleteRelations();
 
@@ -1045,6 +1052,7 @@ table 5409 "Prod. Order Routing Line"
         "Work Center No." := PlanningRoutingLine."Work Center No.";
         "Work Center Group Code" := PlanningRoutingLine."Work Center Group Code";
         Description := PlanningRoutingLine.Description;
+        "Description 2" := PlanningRoutingLine."Description 2";
         "Setup Time" := PlanningRoutingLine."Setup Time";
         "Run Time" := PlanningRoutingLine."Run Time";
         "Wait Time" := PlanningRoutingLine."Wait Time";
@@ -1099,6 +1107,7 @@ table 5409 "Prod. Order Routing Line"
         "Work Center No." := RoutingLine."Work Center No.";
         "Work Center Group Code" := RoutingLine."Work Center Group Code";
         Description := RoutingLine.Description;
+        "Description 2" := RoutingLine."Description 2";
         "Setup Time" := RoutingLine."Setup Time";
         "Run Time" := RoutingLine."Run Time";
         "Wait Time" := RoutingLine."Wait Time";
@@ -1188,8 +1197,10 @@ table 5409 "Prod. Order Routing Line"
             "Run Time Unit of Meas. Code" := WorkCenter."Unit of Measure Code";
             "Wait Time Unit of Meas. Code" := WorkCenter."Unit of Measure Code";
             "Move Time Unit of Meas. Code" := WorkCenter."Unit of Measure Code";
-            if (not SkipUpdateDescription) and ("Standard Task Code" = '') then
+            if (not SkipUpdateDescription) and ("Standard Task Code" = '') then begin
                 Description := WorkCenter.Name;
+                "Description 2" := WorkCenter."Name 2";
+            end;
             "Flushing Method" := WorkCenter."Flushing Method";
             "Unit Cost per" := WorkCenter."Unit Cost";
             "Direct Unit Cost" := WorkCenter."Direct Unit Cost";
@@ -1215,8 +1226,10 @@ table 5409 "Prod. Order Routing Line"
         SkipUpdateDescription := false;
         OnMachineCtrTransferFieldsOnAfterWorkCenterTransferFields(Rec, WorkCenter, MachineCenter, SkipUpdateDescription, xRec, IsHandled);
         if not IsHandled then begin
-            if not SkipUpdateDescription then
+            if not SkipUpdateDescription then begin
                 Description := MachineCenter.Name;
+                "Description 2" := MachineCenter."Name 2";
+            end;
             "Setup Time" := MachineCenter."Setup Time";
             "Wait Time" := MachineCenter."Wait Time";
             "Move Time" := MachineCenter."Move Time";

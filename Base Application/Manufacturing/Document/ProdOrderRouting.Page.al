@@ -82,6 +82,12 @@ page 99000817 "Prod. Order Routing"
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the routing link.';
                 }
+                field("Description 2"; Rec."Description 2")
+                {
+                    ApplicationArea = Manufacturing;
+                    ToolTip = 'Specifies additional description text.';
+                    Visible = false;
+                }
                 field("Flushing Method"; Rec."Flushing Method")
                 {
                     ApplicationArea = Manufacturing;

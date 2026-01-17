@@ -256,6 +256,12 @@ table 99000830 "Planning Routing Line"
                 CalcStartingEndingDates();
             end;
         }
+        field(23; "Description 2"; Text[50])
+        {
+            Caption = 'Description 2';
+            DataClassification = CustomerContent;
+            ToolTip = 'Specifies additional description text.';
+        }
         field(27; "Minimum Process Time"; Decimal)
         {
             Caption = 'Minimum Process Time';
@@ -310,6 +316,7 @@ table 99000830 "Planning Routing Line"
 
                 StandardTask.Get("Standard Task Code");
                 Description := StandardTask.Description;
+                "Description 2" := StandardTask."Description 2";
             end;
         }
         field(40; "Unit Cost per"; Decimal)
@@ -647,6 +654,7 @@ table 99000830 "Planning Routing Line"
             "Wait Time Unit of Meas. Code" := WorkCenter."Unit of Measure Code";
             "Move Time Unit of Meas. Code" := WorkCenter."Unit of Measure Code";
             Description := WorkCenter.Name;
+            "Description 2" := WorkCenter."Name 2";
             "Unit Cost per" := WorkCenter."Unit Cost";
             "Direct Unit Cost" := WorkCenter."Direct Unit Cost";
             "Indirect Cost %" := WorkCenter."Indirect Cost %";
@@ -666,6 +674,7 @@ table 99000830 "Planning Routing Line"
         OnMachineCtrTransferFieldsOnAfterWorkCenterTransferFields(Rec, xRec, WorkCenter, MachineCenter, IsHandled);
         if not IsHandled then begin
             Description := MachineCenter.Name;
+            "Description 2" := MachineCenter."Name 2";
             "Setup Time" := MachineCenter."Setup Time";
             "Wait Time" := MachineCenter."Wait Time";
             "Move Time" := MachineCenter."Move Time";
@@ -869,6 +878,7 @@ table 99000830 "Planning Routing Line"
         Type := ProdOrderRoutingLine.Type;
         "No." := ProdOrderRoutingLine."No.";
         Description := ProdOrderRoutingLine.Description;
+        "Description 2" := ProdOrderRoutingLine."Description 2";
         "Work Center No." := ProdOrderRoutingLine."Work Center No.";
         "Work Center Group Code" := ProdOrderRoutingLine."Work Center Group Code";
         "Setup Time" := ProdOrderRoutingLine."Setup Time";
@@ -934,6 +944,7 @@ table 99000830 "Planning Routing Line"
         "Work Center No." := RoutingLine."Work Center No.";
         "Work Center Group Code" := RoutingLine."Work Center Group Code";
         Description := RoutingLine.Description;
+        "Description 2" := RoutingLine."Description 2";
         "Setup Time" := RoutingLine."Setup Time";
         "Run Time" := RoutingLine."Run Time";
         "Wait Time" := RoutingLine."Wait Time";
