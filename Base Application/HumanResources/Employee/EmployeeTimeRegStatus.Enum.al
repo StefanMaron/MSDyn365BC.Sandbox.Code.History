@@ -2,27 +2,23 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.HumanResources.Employee;
+namespace Microsoft.eServices.EDocument.Processing.Import.Purchase;
 
-enum 5510 "Employee Time Reg. Status"
+enum 6112 "E-Doc. PO M. Config. Receipt"
 {
+    Access = Internal;
     Extensible = false;
-    AssignmentCompatibility = true;
 
-    value(0; Open)
+    value(0; "Always ask")
     {
-        Caption = 'Open';
+        Caption = 'Always ask';
     }
-    value(1; Submitted)
+    value(1; "Always receive at posting")
     {
-        Caption = 'Submitted';
+        Caption = 'Always receive at posting';
     }
-    value(2; Rejected)
+    value(2; "Never receive at posting")
     {
-        Caption = 'Rejected';
-    }
-    value(3; Approved)
-    {
-        Caption = 'Approved';
+        Caption = 'Never receive at posting';
     }
 }
