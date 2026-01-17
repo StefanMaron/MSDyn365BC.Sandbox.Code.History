@@ -67,6 +67,7 @@ table 99000829 "Planning Component"
                 GetItem();
                 Item.TestField(Blocked, false);
                 Description := Item.Description;
+                "Description 2" := Item."Description 2";
                 OnItemNoOnValidateOnAfterInitFromItem(Rec, Item);
                 Validate("Unit of Measure Code", Item."Base Unit of Measure");
                 GetUpdateFromSKU();
@@ -217,6 +218,12 @@ table 99000829 "Planning Component"
                     (("Direct Unit Cost" * "Indirect Cost %" / 100) + "Overhead Rate" * "Qty. per Unit of Measure"));
                 "Direct Cost Amount" := Round("Expected Quantity" * "Direct Unit Cost");
             end;
+        }
+        field(27; "Description 2"; Text[50])
+        {
+            Caption = 'Description 2';
+            DataClassification = CustomerContent;
+            ToolTip = 'Specifies additional description text.';
         }
         field(28; "Flushing Method"; Enum Microsoft.Manufacturing.Setup."Flushing Method")
         {
@@ -711,6 +718,7 @@ table 99000829 "Planning Component"
         "Line No." := AsmLine."Line No.";
         "Item No." := AsmLine."No.";
         Description := CopyStr(AsmLine.Description, 1, MaxStrLen(Description));
+        "Description 2" := CopyStr(AsmLine."Description 2", 1, MaxStrLen("Description 2"));
         "Unit of Measure Code" := AsmLine."Unit of Measure Code";
         "Quantity per" := AsmLine."Quantity per";
         Quantity := AsmLine."Quantity per";
