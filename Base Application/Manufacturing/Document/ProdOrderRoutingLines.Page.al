@@ -84,6 +84,12 @@ page 5408 "Prod. Order Routing Lines"
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the description of the operation.';
                 }
+                field("Description 2"; Rec."Description 2")
+                {
+                    ApplicationArea = Manufacturing;
+                    ToolTip = 'Specifies additional description text.';
+                    Visible = false;
+                }
                 field("Flushing Method"; Rec."Flushing Method")
                 {
                     ApplicationArea = Manufacturing;
