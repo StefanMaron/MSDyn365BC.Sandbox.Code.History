@@ -406,7 +406,7 @@ page 4511 "SMTP Account Wizard"
                 begin
                     // STEP 3 -> FINALIZE
                     if Step3Visible then begin
-                        if IsOAuthAuth() and CustomOAuth then
+                        if IsOAuthAuth() then
                             AuthenticateWithOAuth2CustomAppReg();
 
                         EnsureAccountCreated();
