@@ -1305,7 +1305,7 @@ codeunit 427 ICInboxOutboxMgt
                 PurchLine.Description := ICInboxPurchLine.Description;
                 PurchLine."Description 2" := ICInboxPurchLine."Description 2";
                 IsHandled := false;
-                OnCreatePurchLinesOnBeforeCalcPriceAndAmounts(PurchHeader, PurchLine, IsHandled);
+                OnCreatePurchLinesOnBeforeCalcPriceAndAmounts(PurchHeader, PurchLine, IsHandled, ICInboxPurchLine);
                 if not IsHandled then begin
                     if PurchHeader."Prices Including VAT" then begin
                         if ICInboxPurchLine.Quantity <> 0 then
@@ -3829,7 +3829,7 @@ codeunit 427 ICInboxOutboxMgt
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCreatePurchLinesOnBeforeCalcPriceAndAmounts(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
+    local procedure OnCreatePurchLinesOnBeforeCalcPriceAndAmounts(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean; var ICInboxPurchLine: Record "IC Inbox Purchase Line")
     begin
     end;
 
