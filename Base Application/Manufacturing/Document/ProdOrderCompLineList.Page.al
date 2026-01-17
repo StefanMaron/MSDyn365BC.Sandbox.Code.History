@@ -55,6 +55,12 @@ page 5407 "Prod. Order Comp. Line List"
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies a description of the item on the line.';
                 }
+                field("Description 2"; Rec."Description 2")
+                {
+                    ApplicationArea = Manufacturing;
+                    ToolTip = 'Specifies additional description text.';
+                    Visible = false;
+                }
                 field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                 {
                     ApplicationArea = Dimensions;
