@@ -783,11 +783,11 @@ table 339 "Item Application Entry"
         CalcQuantity := 0;
         if ItemApplicationEntry.FindSet() then
             repeat
-                ItemLedgerEntry.SetLoadFields("Entry Type", "Applies-to Entry");
+                ItemLedgerEntry.SetLoadFields("Entry Type", "Applies-to Entry", "Drop Shipment");
                 if ItemLedgerEntry.Get(ItemApplicationEntry."Outbound Item Entry No.") then
                     if SameType then begin
-                        if (ItemLedgerEntry."Entry Type" = OriginalItemLedgerEntry."Entry Type") or
-                           (ItemLedgerEntry."Applies-to Entry" <> 0)
+                        if ((ItemLedgerEntry."Entry Type" = OriginalItemLedgerEntry."Entry Type") or
+                           (ItemLedgerEntry."Applies-to Entry" <> 0)) and (not ItemLedgerEntry."Drop Shipment")
                         then
                             CalcQuantity := CalcQuantity + ItemApplicationEntry.Quantity
                     end else

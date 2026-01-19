@@ -273,7 +273,6 @@ codeunit 90 "Purch.-Post"
     end;
 
     var
-        DropShipmentErr: Label 'A drop shipment from a purchase order cannot be received and invoiced at the same time.';
 #pragma warning disable AA0470
         PostingLinesMsg: Label 'Posting lines              #2######\', Comment = 'Counter';
         PostingPurchasesAndVATMsg: Label 'Posting purchases and VAT  #3######\', Comment = 'Counter';
@@ -7606,14 +7605,11 @@ codeunit 90 "Purch.-Post"
         if PurchLine.FindSet() then
             repeat
                 AddAssociatedOrderLineToBuffer(PurchHeader, PurchLine, SalesOrderLine, TempSalesLine);
-                if PurchHeader.Invoice then begin
-                    CheckDropShipmentReceiveInvoice(PurchLine, PurchHeader.Receive);
-                    if Abs(PurchLine."Quantity Received" - PurchLine."Quantity Invoiced") < Abs(PurchLine."Qty. to Invoice")
-                    then begin
+                if PurchHeader.Invoice then
+                    if Abs(PurchLine."Quantity Received" - PurchLine."Quantity Invoiced") < Abs(PurchLine."Qty. to Invoice") then begin
                         PurchLine."Qty. to Invoice" := PurchLine."Quantity Received" - PurchLine."Quantity Invoiced";
                         PurchLine."Qty. to Invoice (Base)" := PurchLine."Qty. Received (Base)" - PurchLine."Qty. Invoiced (Base)";
                     end;
-                end;
 
                 TempSalesHeader."Document Type" := TempSalesHeader."Document Type"::Order;
                 TempSalesHeader."No." := PurchLine."Sales Order No.";
@@ -7644,18 +7640,6 @@ codeunit 90 "Purch.-Post"
         TempSalesLine.Insert();
     end;
 
-    local procedure CheckDropShipmentReceiveInvoice(PurchLine: Record "Purchase Line"; Receive: Boolean)
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeCheckDropShipmentReceiveInvoice(PurchLine, IsHandled);
-        if IsHandled then
-            exit;
-
-        if Receive and (PurchLine."Qty. to Invoice" <> 0) and (PurchLine."Qty. to Receive" <> 0) then
-            Error(DropShipmentErr);
-    end;
 
     local procedure RunItemJnlPostLine(var ItemJnlLineToPost: Record "Item Journal Line")
     begin
@@ -9633,10 +9617,13 @@ codeunit 90 "Purch.-Post"
     begin
     end;
 
+#if not CLEAN28
+    [Obsolete('This event is no longer used.', '28.0')]
     [IntegrationEvent(true, false)]
     local procedure OnBeforeCheckDropShipmentReceiveInvoice(PurchLine: Record "Purchase Line"; var IsHandled: Boolean)
     begin
     end;
+#endif
 
     [IntegrationEvent(true, false)]
     local procedure OnBeforeCheckDocumentTotalAmounts(PurchHeader: Record "Purchase Header"; PreviewMode: Boolean; var IsHandled: Boolean)
