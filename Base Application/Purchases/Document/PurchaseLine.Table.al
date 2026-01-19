@@ -1393,8 +1393,12 @@ table 39 "Purchase Line"
             TableRelation = "Gen. Business Posting Group";
 
             trigger OnValidate()
+            var
+                ValidateVATBusPostingGroup: Boolean;
             begin
-                if xRec."Gen. Bus. Posting Group" <> "Gen. Bus. Posting Group" then
+                ValidateVATBusPostingGroup := xRec."Gen. Bus. Posting Group" <> "Gen. Bus. Posting Group";
+                OnValidateGenBusPostingGroupOnBeforeValidateVATBusPostingGroup(Rec, ValidateVATBusPostingGroup);
+                if ValidateVATBusPostingGroup then
                     if GenBusPostingGrp.ValidateVatBusPostingGroup(GenBusPostingGrp, "Gen. Bus. Posting Group") then
                         Validate("VAT Bus. Posting Group", GenBusPostingGrp."Def. VAT Bus. Posting Group");
             end;
@@ -8400,13 +8404,16 @@ table 39 "Purchase Line"
     procedure IsServiceCharge(): Boolean
     var
         VendorPostingGroup: Record "Vendor Posting Group";
+        ServiceCharged: Boolean;
     begin
         if Type <> Type::"G/L Account" then
             exit(false);
 
         GetPurchHeader();
-        VendorPostingGroup.Get(PurchHeader."Vendor Posting Group");
-        exit(VendorPostingGroup."Service Charge Acc." = "No.");
+        ServiceCharged := VendorPostingGroup.Get(PurchHeader."Vendor Posting Group");
+        ServiceCharged := VendorPostingGroup."Service Charge Acc." = "No.";
+        OnAfterIsServiceCharge(Rec, ServiceCharged);
+        exit(ServiceCharged);
     end;
 
     /// <summary>
@@ -12047,6 +12054,16 @@ table 39 "Purchase Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcVATAmountLinesOnQtyTypeShippingOnBeforeCalcAmtToHandle(var PurchLine: Record "Purchase Line"; var PurchHeader: Record "Purchase Header"; var QtyToHandle: Decimal; var VATAmountLine: record "VAT Amount Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterIsServiceCharge(var PurchaseLine: Record "Purchase Line"; var ServiceCharged: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateGenBusPostingGroupOnBeforeValidateVATBusPostingGroup(var PurchaseLine: Record "Purchase Line"; var ValidateVATBusPostingGroup: Boolean)
     begin
     end;
 }
