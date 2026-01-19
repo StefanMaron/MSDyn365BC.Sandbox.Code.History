@@ -4303,7 +4303,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         end;
     end;
 
-    local procedure CustUnrealizedVAT(GenJnlLine: Record "Gen. Journal Line"; var CustLedgEntry2: Record "Cust. Ledger Entry"; SettledAmount: Decimal; GainLossLCY: Decimal; CurrencyFactor: Decimal; PostingDate: Date)
+    internal procedure CustUnrealizedVAT(GenJnlLine: Record "Gen. Journal Line"; var CustLedgEntry2: Record "Cust. Ledger Entry"; SettledAmount: Decimal; GainLossLCY: Decimal; CurrencyFactor: Decimal; PostingDate: Date)
     var
         IsHandled: Boolean;
         ShouldConsiderVATPostingGrouping: Boolean;
@@ -4342,7 +4342,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         InsertSummarizedVAT(GenJnlLine);
     end;
 
-    local procedure CustUnrealizedVAT(ShouldConsiderVATPostingGrouping: Boolean; TempVATPostingSetup: Record "VAT Posting Setup" temporary; GenJnlLine: Record "Gen. Journal Line"; var CustLedgEntry2: Record "Cust. Ledger Entry"; SettledAmount: Decimal; GainLossLCY: Decimal; CurrencyFactor: Decimal; PostingDate: Date)
+    internal procedure CustUnrealizedVAT(ShouldConsiderVATPostingGrouping: Boolean; TempVATPostingSetup: Record "VAT Posting Setup" temporary; GenJnlLine: Record "Gen. Journal Line"; var CustLedgEntry2: Record "Cust. Ledger Entry"; SettledAmount: Decimal; GainLossLCY: Decimal; CurrencyFactor: Decimal; PostingDate: Date)
     var
         VATEntry2: Record "VAT Entry";
         TaxJurisdiction: Record "Tax Jurisdiction";
@@ -5758,7 +5758,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         OnAfterPostDtldVendVATAdjustment(GenJnlLine, VATPostingSetup, DtldCVLedgEntryBuf, VATEntry);
     end;
 
-    local procedure VendUnrealizedVAT(GenJnlLine: Record "Gen. Journal Line"; var VendLedgEntry2: Record "Vendor Ledger Entry"; SettledAmount: Decimal; GainLossLCY: Decimal; CurrencyFactor: Decimal; PostingDate: Date)
+    internal procedure VendUnrealizedVAT(GenJnlLine: Record "Gen. Journal Line"; var VendLedgEntry2: Record "Vendor Ledger Entry"; SettledAmount: Decimal; GainLossLCY: Decimal; CurrencyFactor: Decimal; PostingDate: Date)
     var
         VATEntry2: Record "VAT Entry";
         VATPostingSetup: Record "VAT Posting Setup";
