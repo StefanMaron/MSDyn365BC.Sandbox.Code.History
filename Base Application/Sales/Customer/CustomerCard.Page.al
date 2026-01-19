@@ -553,10 +553,14 @@ page 21 "Customer Card"
                         CustLedgEntry.DrillDownOnEntries(DtldCustLedgEntry);
                     end;
                 }
+#if not CLEAN28
                 field("Payment in progress (LCY)"; Rec."Payment in progress (LCY)")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the customer''s payments in progress.';
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                    ObsoleteTag = '28.0';
                 }
                 field("""Balance (LCY)"" - ""Payment in progress (LCY)"""; Rec."Balance (LCY)" - Rec."Payment in progress (LCY)")
                 {
@@ -564,7 +568,11 @@ page 21 "Customer Card"
                     Caption = 'Net amount (LCY)';
                     Editable = false;
                     ToolTip = 'Specifies the net amount in local currency.';
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 field("Preferred Bank Account Code"; Rec."Preferred Bank Account Code")
                 {
                     ApplicationArea = Basic, Suite;
@@ -1093,6 +1101,7 @@ page 21 "Customer Card"
                         Rec.ShowContact();
                     end;
                 }
+#if not CLEAN28                
                 action("&Payment Addresses")
                 {
                     ApplicationArea = Basic, Suite;
@@ -1102,7 +1111,11 @@ page 21 "Customer Card"
                     RunPageLink = "Account Type" = const(Customer),
                                   "Account No." = field("No.");
                     ToolTip = 'View payment addresses for the customer.';
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                    ObsoleteTag = '28.0';
                 }
+#endif                
                 action("Item References")
                 {
                     AccessByPermission = TableData "Item Reference" = R;

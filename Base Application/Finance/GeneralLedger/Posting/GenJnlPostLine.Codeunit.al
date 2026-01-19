@@ -7,7 +7,9 @@ namespace Microsoft.Finance.GeneralLedger.Posting;
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Check;
 using Microsoft.Bank.Ledger;
+#if not CLEAN28
 using Microsoft.Bank.Payment;
+#endif
 using Microsoft.CostAccounting.Journal;
 using Microsoft.CostAccounting.Setup;
 using Microsoft.Finance.Currency;
@@ -174,7 +176,9 @@ codeunit 12 "Gen. Jnl.-Post Line"
         MultiplePostingGroups: Boolean;
         SourceCodeSetupRead: Boolean;
         IsGLRegInserted: Boolean;
+#if not CLEAN28
         OldTransactionNo: Integer;
+#endif
         IgnoreJournalTemplNameMandatoryCheck: Boolean;
 
         NeedsRoundingErr: Label '%1 needs to be rounded', Comment = '%1 - amount';
@@ -1178,7 +1182,9 @@ codeunit 12 "Gen. Jnl.-Post Line"
         OnBeforePostGLAcc(GenJnlLine, GLEntry, GLEntryNo, IsHandled, TempGLEntryBuf);
         if not IsHandled then begin
             GLAcc.Get(GenJnlLine."Account No.");
+#if not CLEAN28
             RealizeDelayedUnrealizedVAT(GenJnlLine);
+#endif
             OnBeforeInitGLEntryForGLAcc(GenJnlLine, GLAcc, GLEntry, TaxAmount, TaxAmountLCY, IsHandled);
             if not IsHandled then
                 InitGLEntry(
@@ -1541,7 +1547,9 @@ codeunit 12 "Gen. Jnl.-Post Line"
 
         BankAcc.Get(GenJnlLine."Account No.");
         BankAcc.TestField(Blocked, false);
+#if not CLEAN28
         RealizeDelayedUnrealizedVAT(GenJnlLine);
+#endif
         IsHandled := false;
         OnPostBankAccOnBeforeCheckCurrencyCode(GenJnlLine, BankAcc, IsHandled);
         if not IsHandled then
@@ -4200,7 +4208,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         end;
     end;
 
-    local procedure CustUnrealizedVAT(GenJnlLine: Record "Gen. Journal Line"; var CustLedgEntry2: Record "Cust. Ledger Entry"; SettledAmount: Decimal)
+    internal procedure CustUnrealizedVAT(GenJnlLine: Record "Gen. Journal Line"; var CustLedgEntry2: Record "Cust. Ledger Entry"; SettledAmount: Decimal)
     var
         VATEntry2: Record "VAT Entry";
         TaxJurisdiction: Record "Tax Jurisdiction";
@@ -5523,7 +5531,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         OnAfterPostDtldVendVATAdjustment(GenJnlLine, VATPostingSetup, DtldCVLedgEntryBuf, VATEntry);
     end;
 
-    local procedure VendUnrealizedVAT(GenJnlLine: Record "Gen. Journal Line"; var VendLedgEntry2: Record "Vendor Ledger Entry"; SettledAmount: Decimal)
+    internal procedure VendUnrealizedVAT(GenJnlLine: Record "Gen. Journal Line"; var VendLedgEntry2: Record "Vendor Ledger Entry"; SettledAmount: Decimal)
     var
         VATEntry2: Record "VAT Entry";
         VATPostingSetup: Record "VAT Posting Setup";
@@ -7592,12 +7600,14 @@ codeunit 12 "Gen. Jnl.-Post Line"
                            DtldCVLedgEntryBuf."Entry Type"::"Payment Discount Tolerance (VAT Excl.)"]);
     end;
 
+#if not CLEAN27
     local procedure RealizeDelayedUnrealizedVAT(GenJnlLine: Record "Gen. Journal Line")
     begin
         if GenJnlLine."Delayed Unrealized VAT" and GenJnlLine."Realize VAT" then
             if (GenJnlLine."Applies-to Doc. No." <> '') or (GenJnlLine."Applies-to ID" <> '') then
                 PostDelayedUnrealizedVAT(GenJnlLine);
     end;
+#endif
 
     local procedure MakeDerogFAJnlLine(var FAJnlLine: Record "FA Journal Line"; GenJnlLine: Record "Gen. Journal Line")
     var
@@ -7642,6 +7652,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         FAJnlLine."Index Entry" := GenJnlLine."Index Entry";
     end;
 
+#if not CLEAN28
     [Scope('OnPrem')]
     procedure PostDelayedUnrealizedVAT(GenJnlLine: Record "Gen. Journal Line")
     var
@@ -7783,6 +7794,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
                 end;
         end;
     end;
+#endif
 
     [Scope('OnPrem')]
     procedure UpdateUnrealCVLedgEntryBuffer(GenJnlLine: Record "Gen. Journal Line"; TransactionNo: Integer)
@@ -7830,6 +7842,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         exit(Abs(PaidAmount));
     end;
 
+#if not CLEAN28
     [Scope('OnPrem')]
     procedure CheckHeaderNo(DocNo: Code[20]): Boolean
     var
@@ -7841,6 +7854,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
 
         exit(false);
     end;
+#endif
 
     local procedure UpdateVATEntryTaxDetails(GenJnlLine: Record "Gen. Journal Line"; var VATEntry: Record "VAT Entry"; TaxDetail: Record "Tax Detail"; var TaxJurisdiction: Record "Tax Jurisdiction")
     begin

@@ -11,7 +11,9 @@ using Microsoft.Bank.Payment;
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
+#if not CLEAN28
 using Microsoft.Finance.GeneralLedger.Reports;
+#endif
 using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.Task;
 using Microsoft.Inventory.Item;
@@ -149,6 +151,7 @@ page 9003 "Acc. Receivables Adm. RC"
             separator(Action1120005)
             {
             }
+#if not CLEAN28
             action("Payments Lists")
             {
                 ApplicationArea = Basic, Suite;
@@ -156,6 +159,9 @@ page 9003 "Acc. Receivables Adm. RC"
                 Image = "Report";
                 RunObject = Report "Payment List";
                 ToolTip = 'View a list of payments.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                ObsoleteTag = '28.0';
             }
             action("GL/Cust. Ledger Reconciliation")
             {
@@ -164,7 +170,11 @@ page 9003 "Acc. Receivables Adm. RC"
                 Image = "Report";
                 RunObject = Report "GL/Cust. Ledger Reconciliation";
                 ToolTip = 'View or print a separate page for each customer that sums up amounts from general ledger transactions based on payments and posted invoices. This is useful when you want to reconcile general ledger entries with customer ledger entries.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                ObsoleteTag = '28.0';
             }
+#endif
         }
         area(embedding)
         {
@@ -267,13 +277,18 @@ page 9003 "Acc. Receivables Adm. RC"
                                     Recurring = const(false));
                 ToolTip = 'Register received payments by manually applying them to the related customer, vendor, or bank ledger entries. Then, post the payments to G/L accounts and thereby close the related ledger entries.';
             }
+#if not CLEAN28
             action("Payment Slips")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Payment Slips';
                 RunObject = Page "Payment Slip List";
                 ToolTip = 'View a list of payment slips.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                ObsoleteTag = '28.0';
             }
+#endif
             action(GeneralJournals)
             {
                 ApplicationArea = Basic, Suite;
@@ -368,13 +383,18 @@ page 9003 "Acc. Receivables Adm. RC"
                     RunObject = Page "G/L Registers";
                     ToolTip = 'View posted G/L entries.';
                 }
+#if not CLEAN28
                 action("Payment Slip List Archives")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Payment Slip List Archives';
                     RunObject = Page "Payment Slip List Archive";
                     ToolTip = 'View a list of payment slips that have been posted and archived.';
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 action("Posted Bank Deposits")
                 {
                     ApplicationArea = Basic, Suite;
@@ -472,12 +492,16 @@ page 9003 "Acc. Receivables Adm. RC"
                 RunObject = Page "Cash Receipt Journal";
                 ToolTip = 'Open the cash receipt journal to post incoming payments.';
             }
+#if not CLEAN28
             action("Payment Slip")
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Payment Slip';
                 RunObject = Page "Payment Slip";
                 ToolTip = 'Use payment slips to manage customer and vendor payments. ';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                ObsoleteTag = '28.0';
             }
             action("Look/Edit Payment Line")
             {
@@ -485,6 +509,9 @@ page 9003 "Acc. Receivables Adm. RC"
                 Caption = 'Look/Edit Payment Line';
                 RunObject = Page "View/Edit Payment Line";
                 ToolTip = 'View and edit all payment lines that belong to a payment class. The window shows a line for each payment status. ';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                ObsoleteTag = '28.0';
             }
             action("Payment Report")
             {
@@ -492,6 +519,9 @@ page 9003 "Acc. Receivables Adm. RC"
                 Caption = 'Payment Report';
                 RunObject = Page "Payment Report";
                 ToolTip = 'View all payment documents that belong to a payment class and have the same status.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                ObsoleteTag = '28.0';
             }
             action("Archive Payment Journals")
             {
@@ -500,6 +530,9 @@ page 9003 "Acc. Receivables Adm. RC"
                 Image = "Report";
                 RunObject = Report "Archive Payment Slips";
                 ToolTip = 'Archive payment journals to separate them from active journals. You can enter criteria to specify the journals to archive.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                ObsoleteTag = '28.0';
             }
             action("Create Payment Slip")
             {
@@ -507,7 +540,11 @@ page 9003 "Acc. Receivables Adm. RC"
                 Caption = 'Create Payment Slip';
                 RunObject = Codeunit "Payment Management";
                 ToolTip = 'Manage information about customer and vendor payments.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                ObsoleteTag = '28.0';
             }
+#endif
             action(Deposit)
             {
                 ApplicationArea = Basic, Suite;

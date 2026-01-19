@@ -6,7 +6,9 @@ namespace Microsoft.Sales.Customer;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.DirectDebit;
+#if not CLEAN28
 using Microsoft.Bank.Payment;
+#endif
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
@@ -1781,16 +1783,27 @@ table 18 Customer
         {
             Caption = 'SIREN No.';
         }
+#if not CLEANSCHEMA31        
         field(10860; "Payment in progress (LCY)"; Decimal)
         {
+#if CLEAN28
+            ObsoleteState = Removed;
+            ObsoleteTag = '31.0';
+            ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+#else
+            ObsoleteState = Pending;
+            ObsoleteTag = '28.0';
+            ObsoleteReason = 'Moved to the Payment Management FR first-party app';
             CalcFormula = - sum("Payment Line"."Amount (LCY)" where("Account Type" = const(Customer),
                                                                     "Account No." = field("No."),
                                                                     "Copied To Line" = const(0),
                                                                     "Payment in Progress" = const(true)));
+#endif
             Caption = 'Payment in progress (LCY)';
             Editable = false;
             FieldClass = FlowField;
         }
+#endif        
 #if not CLEANSCHEMA26
         field(10880; "Exclude from Payment Reporting"; Boolean)
         {

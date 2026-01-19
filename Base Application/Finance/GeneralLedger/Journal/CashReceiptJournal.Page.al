@@ -4,7 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.GeneralLedger.Journal;
 
+#if not CLEAN28
 using Microsoft.Bank.Payment;
+#endif
 using Microsoft.EServices.EDocument;
 using Microsoft.Finance.AllocationAccount;
 using Microsoft.Finance.Currency;
@@ -797,11 +799,18 @@ page 255 "Cash Receipt Journal"
                     RunObject = Codeunit "Adjust Gen. Journal Balance";
                     ToolTip = 'Insert a rounding correction line in the journal. This rounding correction line will balance in LCY when amounts in the foreign currency also balance. You can then post the journal.';
                 }
+#if not CLEAN28                
                 separator(Action1120000)
                 {
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                    ObsoleteTag = '28.0';
                 }
                 action(PrintCheckRemittanceReport)
                 {
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                    ObsoleteTag = '28.0';
                     ApplicationArea = Basic, Suite;
                     Caption = 'Print Check Remittance Report';
                     Image = PrintCheck;
@@ -816,6 +825,7 @@ page 255 "Cash Receipt Journal"
                         Clear(RecapitulationForm);
                     end;
                 }
+#endif                
             }
             group("P&osting")
             {

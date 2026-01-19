@@ -683,18 +683,26 @@ page 8901 "Finance Manager Role Center"
                             Caption = 'Bank Account Journal';
                             RunObject = report "Bank Account Journal";
                         }
+#if not CLEAN28
                         action("GL/Cust. Ledger Reconciliation")
                         {
                             ApplicationArea = Basic, Suite;
                             Caption = 'GL/Cust. Ledger Reconciliation';
                             RunObject = report "GL/Cust. Ledger Reconciliation";
+                            ObsoleteState = Pending;
+                            ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                            ObsoleteTag = '28.0';
                         }
                         action("GL/Vend. Ledger Reconciliation")
                         {
                             ApplicationArea = Basic, Suite;
                             Caption = 'GL/Vend. Ledger Reconciliation';
                             RunObject = report "GL/Vend. Ledger Reconciliation";
+                            ObsoleteState = Pending;
+                            ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                            ObsoleteTag = '28.0';
                         }
+#endif
                         action("G/L Account Statement")
                         {
                             ApplicationArea = Basic, Suite;
@@ -768,12 +776,17 @@ page 8901 "Finance Manager Role Center"
                     RunObject = page "Payment Registration";
                     Tooltip = 'Open the Payment Registration page.';
                 }
+#if not CLEAN28
                 action("Payment Slips")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Payment Slips';
                     RunObject = page "Payment Slip List";
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 action("Deposit")
                 {
                     ApplicationArea = Basic, Suite;
@@ -850,28 +863,42 @@ page 8901 "Finance Manager Role Center"
                         Tooltip = 'Open the Payment Reconciliation Journals page.';
                     }
                 }
+#if not CLEAN28
                 group("Group62")
                 {
                     Caption = 'Payment Slip';
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                    ObsoleteTag = '28.0';
                     action("View/Edit Payment Lines")
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'View/Edit Payment Lines';
                         RunObject = page "View/Edit Payment Line";
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                        ObsoleteTag = '28.0';
                     }
                     action("Payment Report")
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Payment Report';
                         RunObject = page "Payment Report";
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                        ObsoleteTag = '28.0';
                     }
                     action("Archive Payment Slips")
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Archive Payment Slips';
                         RunObject = report "Archive Payment Slips";
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                        ObsoleteTag = '28.0';
                     }
                 }
+#endif
                 group("Group16")
                 {
                     Caption = 'Journals';
@@ -920,12 +947,17 @@ page 8901 "Finance Manager Role Center"
                         Caption = 'Cash Flow Ledger Entries';
                         RunObject = page "Cash Flow Forecast Entries";
                     }
+#if not CLEAN28
                     action("Payment Slip Archive")
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Payment Slip Archive';
                         RunObject = page "Payment Slip List Archive";
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                        ObsoleteTag = '28.0';
                     }
+#endif
                 }
                 group("Group18")
                 {
@@ -1230,12 +1262,17 @@ page 8901 "Finance Manager Role Center"
                     RunObject = page "Direct Debit Collections";
                     Tooltip = 'Open the Direct Debit Collections page.';
                 }
+#if not CLEAN28
                 action("Payment Slips1")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Payment Slips';
                     RunObject = page "Payment Slip List";
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 action("Create Recurring Sales Invoice")
                 {
                     ApplicationArea = Basic, Suite;
@@ -1605,12 +1642,17 @@ page 8901 "Finance Manager Role Center"
                     Caption = 'Purchase Credit Memos';
                     RunObject = page "Purchase Credit Memos";
                 }
+#if not CLEAN28
                 action("Payment Slips2")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Payment Slips';
                     RunObject = page "Payment Slip List";
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Moved to the Payment Management FR first-party app';
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 action("Incoming Documents")
                 {
                     ApplicationArea = Basic, Suite;
