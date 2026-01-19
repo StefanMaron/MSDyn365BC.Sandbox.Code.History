@@ -1952,7 +1952,8 @@ table 210 "Job Journal Line"
             ApplyPrice(PriceType::Purchase, CalledByFieldNo);
             if Type = Type::Resource then begin
                 "Unit Cost (LCY)" := ConvertAmountToLCY("Unit Cost", UnitAmountRoundingPrecision);
-                "Direct Unit Cost (LCY)" := ConvertAmountToLCY("Direct Unit Cost (LCY)", UnitAmountRoundingPrecision);
+                if (xRec.Quantity = Quantity) or (Quantity = 0) then
+                    "Direct Unit Cost (LCY)" := ConvertAmountToLCY("Direct Unit Cost (LCY)", UnitAmountRoundingPrecision);
             end;
         end;
     end;
