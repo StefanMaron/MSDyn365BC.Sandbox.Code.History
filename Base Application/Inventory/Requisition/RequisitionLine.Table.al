@@ -1409,7 +1409,6 @@ table 246 "Requisition Line"
     trigger OnDelete()
     var
         RequisitionWkshName: Record "Requisition Wksh. Name";
-        RequisitionLine: Record "Requisition Line";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -1417,13 +1416,8 @@ table 246 "Requisition Line"
         if IsHandled then
             exit;
 
-        // Lines are deleted 1 by 1, this actually check if this is the last line in the Requisition Worksheet Name.
-        RequisitionLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
-        RequisitionLine.SetRange("Journal Batch Name", "Journal Batch Name");
-        RequisitionLine.SetFilter("Line No.", '<>%1', "Line No.");
-        if RequisitionLine.IsEmpty() then
-            if RequisitionWkshName.Get(Rec."Worksheet Template Name", Rec."Journal Batch Name") then
-                ApprovalsMgmt.PreventDeletingRecordWithOpenApprovalEntry(RequisitionWkshName);
+        if RequisitionWkshName.Get(Rec."Worksheet Template Name", Rec."Journal Batch Name") then
+            ApprovalsMgmt.PreventDeletingRecordWithOpenApprovalEntry(RequisitionWkshName);
 
         ReqLine.Reset();
         ReqLine.Get("Worksheet Template Name", "Journal Batch Name", "Line No.");
@@ -1465,13 +1459,12 @@ table 246 "Requisition Line"
 
     trigger OnModify()
     begin
-        CheckOpenApprovalEntryExistForCurrentUser();
+        PreventModifyRecIfOpenApprovalEntryExist();
         ReqLineReserve.VerifyChange(Rec, xRec);
     end;
 
     trigger OnRename()
     begin
-        ApprovalsMgmt.OnRenameRecordInApprovalRequest(xRec.RecordId(), RecordId());
         Error(Text004, TableCaption);
     end;
 
@@ -3419,7 +3412,7 @@ table 246 "Requisition Line"
         DoNotUpdateOrderReceiptDate := NewUpdateOrderReceiptDate;
     end;
 
-    local procedure CheckOpenApprovalEntryExistForCurrentUser()
+    local procedure PreventModifyRecIfOpenApprovalEntryExist()
     var
         RequisitionWkshName: Record "Requisition Wksh. Name";
     begin
