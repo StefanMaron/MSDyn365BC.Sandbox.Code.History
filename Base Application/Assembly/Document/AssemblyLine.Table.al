@@ -142,14 +142,14 @@ table 901 "Assembly Line"
                     GetItemResource();
                     Description := Item.Description;
                     "Description 2" := Item."Description 2";
-                    OnUpdateDescriptionsFromItem(Rec, Item);
+                    OnValidateVariantCodeOnUpdateDescriptionsFromItem(Rec, Item);
                 end else begin
                     ItemVariant.SetLoadFields(Description, "Description 2", Blocked);
                     ItemVariant.Get("No.", "Variant Code");
                     ItemVariant.TestField(Blocked, false);
                     Description := ItemVariant.Description;
                     "Description 2" := ItemVariant."Description 2";
-                    OnUpdateDescriptionsFromVariantCode(Rec, ItemVariant);
+                    OnValidateVariantCodeOnUpdateDescriptionsFromVariantCode(Rec, ItemVariant);
                 end;
 
                 GetDefaultBin();
@@ -2363,12 +2363,12 @@ table 901 "Assembly Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnUpdateDescriptionsFromItem(var AssemblyLine: Record "Assembly Line"; Item: Record Item)
+    local procedure OnValidateVariantCodeOnUpdateDescriptionsFromItem(var AssemblyLine: Record "Assembly Line"; Item: Record Item)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnUpdateDescriptionsFromVariantCode(var AssemblyLine: Record "Assembly Line"; ItemVariant: Record "Item Variant")
+    local procedure OnValidateVariantCodeOnUpdateDescriptionsFromVariantCode(var AssemblyLine: Record "Assembly Line"; ItemVariant: Record "Item Variant")
     begin
     end;
 }
