@@ -859,6 +859,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
         ReservEntry.SetRange("Variant Code", SKU."Variant Code");
         ReservEntry.SetRange("Location Code", SKU."Location Code");
         ReservEntry.SetFilter(ReservEntry."Reservation Status", '<>%1', ReservEntry."Reservation Status"::Prospect);
+        OnDeleteTrackingOnAfterSetReservEntryFilters(ReservEntry, SKU, ToDate);
         if ReservEntry.Find('-') then
             repeat
                 Item.SetLoadFields("Manufacturing Policy", "Replenishment System", "Reordering Policy", "Order Tracking Policy");
@@ -5966,6 +5967,11 @@ codeunit 99000854 "Inventory Profile Offsetting"
 
     [IntegrationEvent(false, false)]
     local procedure OnPlanItemCalcInitialInventoryOnBeforeChechkIncrementLastProjectedInventory(var SupplyInventoryProfile: Record "Inventory Profile"; var DemandInventoryProfile: Record "Inventory Profile"; var SupplyExists: Boolean; var DemandExists: Boolean; var IncrementLastProjectedInventory: Boolean; var LastProjectedInventory: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnDeleteTrackingOnAfterSetReservEntryFilters(var ReservationEntry: Record "Reservation Entry"; StockkeepingUnit: Record "Stockkeeping Unit"; ToDate: Date)
     begin
     end;
 }
