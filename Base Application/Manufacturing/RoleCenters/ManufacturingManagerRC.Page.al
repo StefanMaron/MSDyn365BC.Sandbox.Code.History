@@ -580,12 +580,6 @@ page 8903 "Manufacturing Manager RC"
                         Caption = 'Production Order Statistics';
                         RunObject = report "Production Order Statistics";
                     }
-                    action("Inventory Value (Help Report)")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        Caption = 'Inventory Value (Help Report)';
-                        RunObject = Report "Inventory Value (Help Report)";
-                    }
 #if not CLEAN27
                     action("Prod. Order - Precalc. Time1")
                     {
@@ -687,14 +681,12 @@ page 8903 "Manufacturing Manager RC"
                 ObsoleteState = Pending;
                 ObsoleteReason = 'This group will be removed in a future release.';
                 ObsoleteTag = '27.0';
-
                 group("Group19")
                 {
                     Caption = 'Reports';
                     ObsoleteState = Pending;
                     ObsoleteReason = 'This group will be removed in a future release.';
                     ObsoleteTag = '27.0';
-
                     action("BOM Cost Share Distribution")
                     {
                         ApplicationArea = Manufacturing;
