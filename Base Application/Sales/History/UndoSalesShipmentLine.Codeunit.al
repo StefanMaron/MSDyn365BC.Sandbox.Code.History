@@ -18,6 +18,7 @@ using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Posting;
 using Microsoft.Inventory.Setup;
 using Microsoft.Projects.Resources.Journal;
+using Microsoft.Purchases.History;
 using Microsoft.Sales.Document;
 using Microsoft.Utilities;
 using Microsoft.Warehouse.History;
@@ -190,6 +191,100 @@ codeunit 5815 "Undo Sales Shipment Line"
         OnAfterCode(SalesShipmentLine);
     end;
 
+    local procedure RemoveDropShipmentApplicationWithPurchase(SalesShptLine: Record "Sales Shipment Line"; NewSalesShptLine: Record "Sales Shipment Line")
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+        PurchItemLedgerEntryToUndo: Integer;
+    begin
+        if not SalesShptLine."Drop Shipment" then
+            exit;
+
+        if ItemLedgerEntry.Get(SalesShptLine."Item Shpt. Entry No.") then begin
+            PurchItemLedgerEntryToUndo := ItemLedgerEntry."Applies-to Entry";
+            UnApplyDropShipment(ItemLedgerEntry, NewSalesShptLine, SalesShptLine);
+        end else begin
+            ApplyFilterForItemTracking(ItemLedgerEntry, SalesShptLine);
+
+            if ItemLedgerEntry.FindSet() then
+                repeat
+                    if PurchItemLedgerEntryToUndo = 0 then
+                        PurchItemLedgerEntryToUndo := ItemLedgerEntry."Applies-to Entry";
+
+                    UnApplyDropShipment(ItemLedgerEntry, NewSalesShptLine, SalesShptLine);
+                until ItemLedgerEntry.Next() = 0;
+        end;
+
+        UndoPurchaseReceiptLineForDropShipment(PurchItemLedgerEntryToUndo);
+    end;
+
+    local procedure ApplyFilterForItemTracking(var ItemLedgerEntry: Record "Item Ledger Entry"; SalesShptLine: Record "Sales Shipment Line")
+    begin
+        ItemLedgerEntry.SetLoadFields("Entry No.", "Document Type", "Document No.", "Document Line No.", "Applies-to Entry", "Drop Shipment", "Lot No.", "Serial No.");
+        ItemLedgerEntry.SetRange("Document Type", ItemLedgerEntry."Document Type"::"Sales Shipment");
+        ItemLedgerEntry.SetRange("Document No.", SalesShptLine."Document No.");
+        ItemLedgerEntry.SetRange("Document Line No.", SalesShptLine."Line No.");
+        ItemLedgerEntry.SetRange("Drop Shipment", true);
+    end;
+
+    local procedure UnApplyDropShipment(ItemLedgerEntry: Record "Item Ledger Entry"; NewSalesShptLine: Record "Sales Shipment Line"; SalesShptLine: Record "Sales Shipment Line")
+    var
+        ItemApplicationEntry: Record "Item Application Entry";
+        RelevantUndoShipmentLedgerEntryNo: Integer;
+    begin
+        RelevantUndoShipmentLedgerEntryNo := FindRelevantNewSalesShptLedgerEntryNo(SalesShptLine, NewSalesShptLine, ItemLedgerEntry);
+
+        ItemApplicationEntry.SetBaseLoadFields();
+        ItemApplicationEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntry."Entry No.");
+        ItemApplicationEntry.SetRange("Cost Application", true);
+        ItemApplicationEntry.SetRange("Inbound Item Entry No.", ItemLedgerEntry."Applies-to Entry");
+        ItemApplicationEntry.SetRange("Outbound Item Entry No.", ItemLedgerEntry."Entry No.");
+        ItemApplicationEntry.FindFirst();
+
+        ItemJnlPostLine.UnApplyDropShipment(ItemApplicationEntry, RelevantUndoShipmentLedgerEntryNo);
+    end;
+
+    local procedure FindRelevantNewSalesShptLedgerEntryNo(SalesShptLine: Record "Sales Shipment Line"; NewSalesShptLine: Record "Sales Shipment Line"; ItemLedgerEntry: Record "Item Ledger Entry"): Integer
+    var
+        UndoReceiptLedgerEntry: Record "Item Ledger Entry";
+    begin
+        SalesShptLine := SalesShptLine;
+        if NewSalesShptLine."Item Shpt. Entry No." <> 0 then
+            exit(NewSalesShptLine."Item Shpt. Entry No.");
+
+        UndoReceiptLedgerEntry.SetLoadFields("Entry No.", "Document Type", "Lot No.", "Serial No.", "Drop Shipment", "Applies-to Entry");
+        if UndoReceiptLedgerEntry.Get(ItemLedgerEntry."Applies-to Entry") then begin
+            UndoReceiptLedgerEntry.TestField("Document Type", UndoReceiptLedgerEntry."Document Type"::"Purchase Receipt");
+            UndoReceiptLedgerEntry.TestField("Lot No.", ItemLedgerEntry."Lot No.");
+            UndoReceiptLedgerEntry.TestField("Serial No.", ItemLedgerEntry."Serial No.");
+            UndoReceiptLedgerEntry.TestField("Drop Shipment", true);
+
+            exit(UndoReceiptLedgerEntry."Entry No.");
+        end;
+
+        exit(0);
+    end;
+
+    local procedure UndoPurchaseReceiptLineForDropShipment(ReceiptItemLedgerEntryNo: Integer)
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+        PurchaseReceiptLine: Record "Purch. Rcpt. Line";
+        UndoPurchaseReceiptLine: Codeunit "Undo Purchase Receipt Line";
+    begin
+        ItemLedgerEntry.Get(ReceiptItemLedgerEntryNo);
+        ItemLedgerEntry.TestField("Drop Shipment", true);
+
+        PurchaseReceiptLine.SetRange("Document No.", ItemLedgerEntry."Document No.");
+        PurchaseReceiptLine.SetRange("Line No.", ItemLedgerEntry."Document Line No.");
+
+        if (ItemLedgerEntry."Lot No." = '') and (ItemLedgerEntry."Serial No." = '') then
+            PurchaseReceiptLine.SetRange("Item Rcpt. Entry No.", ItemLedgerEntry."Entry No.");
+
+        PurchaseReceiptLine.FindFirst();
+
+        UndoPurchaseReceiptLine.SetHideDialog(true);
+        UndoPurchaseReceiptLine.Run(PurchaseReceiptLine)
+    end;
+
     local procedure CheckSalesShptLine(SalesShipmentLine2: Record "Sales Shipment Line")
     var
         TempItemLedgerEntry: Record "Item Ledger Entry" temporary;
@@ -213,9 +308,6 @@ codeunit 5815 "Undo Sales Shipment Line"
                             Error(Text005);
             end;
             if SalesShipmentLine2.Type = SalesShipmentLine2.Type::Item then begin
-                if not SkipTestFields then
-                    SalesShipmentLine2.TestField("Drop Shipment", false);
-
                 if not SkipUndoPosting then begin
                     UndoPostingManagement.TestSalesShptLine(SalesShipmentLine2);
 
@@ -362,6 +454,7 @@ codeunit 5815 "Undo Sales Shipment Line"
         NewSalesShipmentLine.Insert();
         OnAfterNewSalesShptLineInsert(NewSalesShipmentLine, OldSalesShipmentLine);
 
+        RemoveDropShipmentApplicationWithPurchase(OldSalesShipmentLine, NewSalesShipmentLine);
         InsertItemEntryRelation(TempGlobalItemEntryRelation, NewSalesShipmentLine);
     end;
 
