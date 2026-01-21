@@ -488,9 +488,9 @@ table 5802 "Value Entry"
         {
             IncludedFields = "Invoiced Quantity", "Cost Amount (Expected)", "Cost Amount (Actual)", "Cost Amount (Expected) (ACY)", "Cost Amount (Actual) (ACY)", "Entry Type", "Expected Cost", "Item Charge No.";
         }
-        key(Key5; "Item No.", "Posting Date", "Item Ledger Entry Type", "Entry Type", "Variance Type", "Item Charge No.", "Location Code", "Variant Code", "Global Dimension 1 Code", "Global Dimension 2 Code", "Source Type", "Source No.", "SIFT Bucket No.")
+        key(Key5; "Item No.", "Posting Date", "Item Ledger Entry Type", "Entry Type", "Variance Type", "Item Charge No.", "Location Code", "Variant Code", "Global Dimension 1 Code", "Global Dimension 2 Code", "Source Type", "Source No.")
         {
-            SumIndexFields = "Invoiced Quantity", "Sales Amount (Expected)", "Sales Amount (Actual)", "Cost Amount (Expected)", "Cost Amount (Actual)", "Cost Amount (Non-Invtbl.)", "Purchase Amount (Actual)", "Expected Cost Posted to G/L", "Cost Posted to G/L", "Item Ledger Entry Quantity";
+            IncludedFields = "Invoiced Quantity", "Sales Amount (Expected)", "Sales Amount (Actual)", "Cost Amount (Expected)", "Cost Amount (Actual)", "Cost Amount (Non-Invtbl.)", "Purchase Amount (Actual)", "Expected Cost Posted to G/L", "Cost Posted to G/L", "Item Ledger Entry Quantity";
         }
         key(Key6; "Document No.")
         {
@@ -502,7 +502,7 @@ table 5802 "Value Entry"
         }
         key(Key8; "Source Type", "Source No.", "Item No.", "Posting Date", "Entry Type", Adjustment, "Item Ledger Entry Type")
         {
-            IncludedFields = "Discount Amount", "Cost Amount (Non-Invtbl.)", "Cost Amount (Actual)", "Cost Amount (Expected)", "Sales Amount (Actual)", "Sales Amount (Expected)", "Invoiced Quantity";
+            IncludedFields = "Discount Amount", "Cost Amount (Non-Invtbl.)", "Cost Amount (Actual)", "Cost Amount (Expected)", "Sales Amount (Actual)", "Sales Amount (Expected)", "Invoiced Quantity", "Global Dimension 1 Code", "Global Dimension 2 Code";
         }
         key(Key9; "Item Charge No.", "Inventory Posting Group", "Item No.")
         {
@@ -872,12 +872,12 @@ table 5802 "Value Entry"
         exit(false);
     end;
 
-/// <summary>
-/// Returns true if EntryNo parameter and Rec."Entry No." both are positive or negative.
-/// Used in scenarios where we posting preview entries are negative
-/// </summary>
-/// <param name="EntryNo">The entry no. of the entry we are comparing to</param>
-/// <returns>Boolean</returns>
+    /// <summary>
+    /// Returns true if EntryNo parameter and Rec."Entry No." both are positive or negative.
+    /// Used in scenarios where we posting preview entries are negative
+    /// </summary>
+    /// <param name="EntryNo">The entry no. of the entry we are comparing to</param>
+    /// <returns>Boolean</returns>
     internal procedure EntryNoHasSameSign(EntryNo: integer): Boolean
     begin
         if (Rec."Entry No." >= 0) and (EntryNo >= 0) then
