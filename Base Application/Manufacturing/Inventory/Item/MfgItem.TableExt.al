@@ -100,36 +100,6 @@ tableextension 99000750 "Mfg. Item" extends Item
             DataClassification = CustomerContent;
             ToolTip = 'Specifies which transactions with the item cannot be processed on production documents, except requisition worksheet, planning worksheet and journals.';
         }
-        field(10013; "Rel. Scheduled Receipt (Qty.)"; Decimal)
-        {
-            CalcFormula = sum("Prod. Order Line"."Remaining Qty. (Base)" where(Status = const(Released),
-                                                                                "Item No." = field("No."),
-                                                                                "Variant Code" = field("Variant Filter"),
-                                                                                "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
-                                                                                "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
-                                                                                "Location Code" = field("Location Filter"),
-                                                                                "Bin Code" = field("Bin Filter"),
-                                                                                "Due Date" = field("Date Filter")));
-            Caption = 'Rel. Scheduled Receipt (Qty.)';
-            DecimalPlaces = 0 : 5;
-            Editable = false;
-            FieldClass = FlowField;
-        }
-        field(10014; "Rel. Scheduled Need (Qty.)"; Decimal)
-        {
-            CalcFormula = sum("Prod. Order Component"."Remaining Qty. (Base)" where(Status = filter(Released),
-                                                                                     "Item No." = field("No."),
-                                                                                     "Variant Code" = field("Variant Filter"),
-                                                                                     "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
-                                                                                     "Shortcut Dimension 2 Code" = field("Global Dimension 2 Filter"),
-                                                                                     "Location Code" = field("Location Filter"),
-                                                                                     "Bin Code" = field("Bin Filter"),
-                                                                                     "Due Date" = field("Date Filter")));
-            Caption = 'Rel. Scheduled Need (Qty.)';
-            DecimalPlaces = 0 : 5;
-            Editable = false;
-            FieldClass = FlowField;
-        }
         field(99000750; "Routing No."; Code[20])
         {
             Caption = 'Routing No.';

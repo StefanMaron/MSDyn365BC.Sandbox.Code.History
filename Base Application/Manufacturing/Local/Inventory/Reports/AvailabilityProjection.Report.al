@@ -11,7 +11,7 @@ using Microsoft.Inventory.Ledger;
 report 10130 "Availability Projection"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/Inventory/Reports/AvailabilityProjection.rdlc';
+    RDLCLayout = './Manufacturing/Local/Inventory/Reports/AvailabilityProjection.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Availability Projection';
     UsageCategory = ReportsAndAnalysis;

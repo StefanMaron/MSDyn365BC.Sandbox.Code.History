@@ -10,7 +10,7 @@ using Microsoft.Inventory.Item;
 report 10131 "Availability Status"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/Inventory/Reports/AvailabilityStatus.rdlc';
+    RDLCLayout = './Manufacturing/Local/Inventory/Reports/AvailabilityStatus.rdlc';
     Caption = 'Availability Status';
     UsageCategory = ReportsAndAnalysis;
     DataAccessIntent = ReadOnly;
