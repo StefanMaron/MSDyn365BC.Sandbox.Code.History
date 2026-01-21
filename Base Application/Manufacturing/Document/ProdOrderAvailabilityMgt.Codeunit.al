@@ -1034,6 +1034,13 @@ codeunit 99000875 "Prod. Order Availability Mgt."
           "Scheduled Receipt (Qty.)",
           "Reserved Qty. on Prod. Order");
     end;
+
+    [EventSubscriber(ObjectType::Table, Database::Item, 'OnCalcReservedQtyOnProdOrder', '', false, false)]
+    local procedure OnCalcReservedQtyOnProdOrder(var Item: Record Item; var Result: Decimal)
+    begin
+        Item.CalcFields("Reserved Qty. on Prod. Order");
+        Result := Item."Reserved Qty. on Prod. Order";
+    end;
 #if not CLEAN27
     [EventSubscriber(ObjectType::Report, Report::"Planning Availability", 'OnRequisitionLineOnBeforeTempPlanningBufferInsert', '', false, false)]
     local procedure OnRequisitionLineOnBeforeTempPlanningBufferInsert(var TempPlanningBuffer: Record "Planning Buffer" temporary; RequisitionLine: Record "Requisition Line")
