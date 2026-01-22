@@ -254,8 +254,8 @@ codeunit 7324 "Whse.-Activity-Post"
             exit;
 
         Item.SetLoadFields("Order Tracking Policy", "Assembly BOM", "Assembly Policy");
+        Item.SetAutoCalcFields("Assembly BOM");
         Item.Get(WarehouseActivityLine."Item No.");
-        Item.CalcFields("Assembly BOM");
         if (Item."Order Tracking Policy" = Item."Order Tracking Policy"::None) then
             exit;
         if (Item."Assembly BOM") and (Item."Assembly Policy" = Item."Assembly Policy"::"Assemble-to-Order") then
