@@ -8609,6 +8609,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Reservation V - NamedType WrongQuantityErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1767918677 - NamedType 4249786749" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[%1 should be greater than 0.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Available Qty. to Reserve]D;]A;(LookupHint=Codeunit SCM Reservation Worksheet - NamedType AvailableQtyToReserveErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1767918677 - NamedType 917089156" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[You have changed Location Code on the sales header, but it has not been changed on the existing sales lines.]]></Val>
@@ -8643,6 +8652,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Reservation Worksheet - NamedType QtyCannotExceedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1767918677 - NamedType 2811028826" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[%1 should equal the quantity on the sales line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Remaining Qty. to Reserve]D;]A;(LookupHint=Codeunit SCM Reservation Worksheet - NamedType RemainingQtyToReserveErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3048149528 - NamedType 3030666451" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
