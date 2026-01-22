@@ -2290,8 +2290,7 @@ table 1003 "Job Planning Line"
             exit;
         end;
 
-        if (Amount <> xAmount) then
-            AmountLCY := ConvertAmountToLCY(Amount, UnitAmountRoundingPrecision);
+        AmountLCY := ConvertAmountToLCY(Amount, UnitAmountRoundingPrecision);
     end;
 
     local procedure ConvertAmountToFCY(AmountLCY: Decimal; Precision: Decimal) AmountFCY: Decimal;
