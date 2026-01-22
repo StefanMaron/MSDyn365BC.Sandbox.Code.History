@@ -623,6 +623,7 @@ codeunit 442 "Sales-Post Prepayments"
         PrepmtInvLineBuf2: Record "Prepayment Inv. Line Buffer";
         TotalPrepmtInvLineBuffer: Record "Prepayment Inv. Line Buffer";
         TotalPrepmtInvLineBufferDummy: Record "Prepayment Inv. Line Buffer";
+        HasInvoiceDiscount: Boolean;
     begin
         TempGlobalPrepmtInvLineBuf.Reset();
         TempGlobalPrepmtInvLineBuf.DeleteAll();
@@ -636,6 +637,9 @@ codeunit 442 "Sales-Post Prepayments"
                     if not CheckSystemCreatedInvoiceRoundEntry(SalesLine, SalesHeader."Customer Posting Group") then
                         CheckSalesLineIsNegative(SalesHeader, SalesLine);
 
+                    if SalesLine."Inv. Discount Amount" <> 0 then
+                        HasInvoiceDiscount := true;
+
                     OnBuildInvLineBufferOnBeforeFillInvLineBuffer(SalesHeader, SalesLine);
                     FillInvLineBuffer(SalesHeader, SalesLine, PrepmtInvLineBuf2);
                     if UpdateLines then
@@ -647,6 +651,8 @@ codeunit 442 "Sales-Post Prepayments"
                     TempSalesLine.Insert();
                 end;
             until SalesLine.Next() = 0;
+        UpdateDifferenceAmount(SalesHeader, TotalPrepmtInvLineBuffer, TempPrepmtInvLineBuf, HasInvoiceDiscount);
+        
         if SalesSetup."Invoice Rounding" then
             if InsertInvoiceRounding(
                  SalesHeader, PrepmtInvLineBuf2, TotalPrepmtInvLineBuffer, SalesLine."Line No.")
@@ -2331,6 +2337,30 @@ codeunit 442 "Sales-Post Prepayments"
     begin
         GLSetup.GetRecordOnce();
         exit(GLSetup.CheckFullGSTonPrepayment(PrepaymentInvLineBuffer."VAT Bus. Posting Group", PrepaymentInvLineBuffer."VAT Prod. Posting Group"));
+    end;
+
+    local procedure UpdateDifferenceAmount(SalesHeader: Record "Sales Header"; var TotalPrepmtInvLineBuffer: Record "Prepayment Inv. Line Buffer" temporary; var TempPrepmtInvLineBuf: Record "Prepayment Inv. Line Buffer"; HasInvoiceDiscount: Boolean)
+    var
+        Currency: Record Currency;
+        PrepmtAmt: Decimal;
+        DifferenceAmt: Decimal;
+    begin
+        if HasInvoiceDiscount and (SalesHeader."Prepayment %" <> 0) then begin
+            Currency.Initialize(SalesHeader."Currency Code");
+            SalesHeader.CalcFields(Amount);
+            PrepmtAmt := Round(SalesHeader.Amount * SalesHeader."Prepayment %" / 100, Currency."Amount Rounding Precision");
+            if TotalPrepmtInvLineBuffer.Amount > PrepmtAmt then begin
+                DifferenceAmt := TotalPrepmtInvLineBuffer.Amount - PrepmtAmt;
+
+                TempPrepmtInvLineBuf.Reset();
+                TempPrepmtInvLineBuf.SetCurrentKey(Adjustment);
+                if TempPrepmtInvLineBuf.FindLast() then begin
+                    TempPrepmtInvLineBuf.Amount := Round(TempPrepmtInvLineBuf.Amount - DifferenceAmt, Currency."Amount Rounding Precision");
+                    TempPrepmtInvLineBuf."Amount Incl. VAT" := Round(TempPrepmtInvLineBuf."Amount Incl. VAT" - DifferenceAmt, Currency."Amount Rounding Precision");
+                    TempPrepmtInvLineBuf.Modify();
+                end;
+            end;
+        end;
     end;
 
     [IntegrationEvent(false, false)]
