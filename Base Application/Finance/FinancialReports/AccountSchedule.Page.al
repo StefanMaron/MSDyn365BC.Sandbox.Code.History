@@ -287,6 +287,10 @@ page 104 "Account Schedule"
                     ToolTip = 'Specifies whether to hide currency symbols when a calculated result is not a currency.';
                     Visible = false;
                 }
+                field("Internal Description"; Rec."Internal Description")
+                {
+                    ApplicationArea = Basic, Suite;
+                }
             }
         }
         area(factboxes)

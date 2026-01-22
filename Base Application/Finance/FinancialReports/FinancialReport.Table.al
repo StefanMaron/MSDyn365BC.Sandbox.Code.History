@@ -230,7 +230,13 @@ table 88 "Financial Report"
         /// <summary>
         /// Internal description for administrative purposes and report management.
         /// </summary>
-        field(53; "Internal Description"; Text[250])
+#if not CLEAN28
+#pragma warning disable AS0086
+#endif
+        field(53; "Internal Description"; Text[500])
+#if not CLEAN28
+#pragma warning restore AS0086
+#endif
         {
             Caption = 'Internal Description';
             ToolTip = 'Specifies the internal description of this financial report.';
