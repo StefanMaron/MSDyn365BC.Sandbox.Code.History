@@ -2690,6 +2690,8 @@ codeunit 99000854 "Inventory Profile Offsetting"
                 if (SalesLine."Blanket Order No." = DocumentNo) and (SalesLine."Blanket Order Line No." = LineNo) then
                     RemQty += InventoryProfile."Remaining Quantity (Base)";
             until InventoryProfile.Next() = 0;
+
+        OnAfterCalcInventoryProfileRemainingQty(InventoryProfile, DocumentNo, LineNo, RemQty);
     end;
 
     procedure CalcReorderQty(NeededQty: Decimal; ProjectedInventory: Decimal; SupplyLineNo: Integer) QtyToOrder: Decimal
@@ -5972,6 +5974,11 @@ codeunit 99000854 "Inventory Profile Offsetting"
 
     [IntegrationEvent(false, false)]
     local procedure OnDeleteTrackingOnAfterSetReservEntryFilters(var ReservationEntry: Record "Reservation Entry"; StockkeepingUnit: Record "Stockkeeping Unit"; ToDate: Date)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCalcInventoryProfileRemainingQty(var InventoryProfile: Record "Inventory Profile"; DocumentNo: Code[20]; LineNo: Integer; var RemQty: Decimal)
     begin
     end;
 }
