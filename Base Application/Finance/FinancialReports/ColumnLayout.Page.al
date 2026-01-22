@@ -258,6 +258,10 @@ page 489 "Column Layout"
                 {
                     ApplicationArea = Basic, Suite;
                 }
+                field("Internal Description"; Rec."Internal Description")
+                {
+                    ApplicationArea = Basic, Suite;
+                }
             }
         }
         area(factboxes)
