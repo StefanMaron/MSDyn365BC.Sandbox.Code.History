@@ -3951,6 +3951,9 @@ codeunit 1751 "Data Classification Eval. Data"
         SetTableFieldsToNormal(2000000298); // Agent Troubleshoot Info Data table
         SetFieldToCompanyConfidential(2000000298, 4); // Troubleshooting Info
         SetFieldToPersonal(2000000298, 5); // Agent User Security Id
+
+        SetTableFieldsToNormal(2000000239); // Tenant Application Storage Data table
+        SetFieldToCompanyConfidential(2000000239, 11); // Blob
     end;
 
     local procedure ClasifyScheduledPerformanceProfiling()
