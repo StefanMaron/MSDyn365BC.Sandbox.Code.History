@@ -536,10 +536,14 @@ table 7317 "Warehouse Receipt Line"
     end;
 
     procedure CalcBaseQty(Qty: Decimal; FromFieldName: Text; ToFieldName: Text): Decimal
+    var
+        SuppressQtyPerUoMTestfield: Boolean;
     begin
-        OnBeforeCalcBaseQty(Rec, Qty, FromFieldName, ToFieldName);
+        OnBeforeCalcBaseQty(Rec, Qty, FromFieldName, ToFieldName, SuppressQtyPerUoMTestfield);
 
-        TestField("Qty. per Unit of Measure");
+        if not SuppressQtyPerUoMTestfield then
+            TestField("Qty. per Unit of Measure"); // For whse. receiving subcontracting PO, 'Qty. per Unit of Measure' can be zero.
+
         exit(UOMMgt.CalcBaseQty(
             "Item No.", "Variant Code", "Unit of Measure Code", Qty, "Qty. per Unit of Measure", "Qty. Rounding Precision (Base)", FieldCaption("Qty. Rounding Precision"), FromFieldName, ToFieldName));
     end;
@@ -668,6 +672,7 @@ table 7317 "Warehouse Receipt Line"
         SecondSourceQtyArray: array[3] of Decimal;
         Direction: Enum "Transfer Direction";
         IsHandled: Boolean;
+        SkipCallItemTracking: Boolean;
     begin
         IsHandled := false;
         OnBeforeOpenItemTrackingLines(Rec, IsHandled, CurrFieldNo);
@@ -686,8 +691,11 @@ table 7317 "Warehouse Receipt Line"
 
         case "Source Type" of
             Database::"Purchase Line":
-                if PurchaseLine.Get("Source Subtype", "Source No.", "Source Line No.") then
-                    PurchLineReserve.CallItemTracking(PurchaseLine, SecondSourceQtyArray);
+                if PurchaseLine.Get("Source Subtype", "Source No.", "Source Line No.") then begin
+                    OnBeforeOpenItemTrackingLineForPurchLine(PurchaseLine, SecondSourceQtyArray, SkipCallItemTracking);
+                    if not SkipCallItemTracking then
+                        PurchLineReserve.CallItemTracking(PurchaseLine, SecondSourceQtyArray);
+                end;
             Database::"Sales Line":
                 if SalesLine.Get("Source Subtype", "Source No.", "Source Line No.") then
                     SalesLineReserve.CallItemTracking(SalesLine, SecondSourceQtyArray);
@@ -912,7 +920,7 @@ table 7317 "Warehouse Receipt Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcBaseQty(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; var Qty: Decimal; FromFieldName: Text; ToFieldName: Text)
+    local procedure OnBeforeCalcBaseQty(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; var Qty: Decimal; FromFieldName: Text; ToFieldName: Text; var SuppressQtyPerUoMTestfield: Boolean)
     begin
     end;
 
@@ -923,6 +931,11 @@ table 7317 "Warehouse Receipt Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateQtyToCrossDockOnBeforeGetUseCrossDock(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; CallingFieldNo: Integer; var ShouldGetUseCrossDock: Boolean; var UseCrossDock: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOpenItemTrackingLineForPurchLine(PurchaseLine: Record "Purchase Line"; SecondSourceQtyArray: array[3] of Decimal; var SkipCallItemTracking: Boolean)
     begin
     end;
 }
