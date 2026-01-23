@@ -139,7 +139,7 @@
       "path": "./Quality Management/Source/Quality Management/src/Configuration/Template/Test"
     },
     {
-      "path": "./Quality Management/Test/Quality Management-Tests/DisabledTests"
+      "path": "./Quality Management/Test/Quality Management-Tests"
     },
     {
       "path": "./Quality Management/Test/Quality Management-Tests/src/TestLibraries"
