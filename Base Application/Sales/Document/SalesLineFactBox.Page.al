@@ -7,6 +7,9 @@ namespace Microsoft.Sales.Document;
 using Microsoft.Foundation.Attachment;
 using Microsoft.Inventory.Availability;
 
+/// <summary>
+/// Displays detailed information and availability data for the selected sales line in a factbox.
+/// </summary>
 page 9087 "Sales Line FactBox"
 {
     Caption = 'Sales Line Details';
