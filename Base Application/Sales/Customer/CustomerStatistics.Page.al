@@ -9,6 +9,9 @@ using Microsoft.Inventory.Costing;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Receivables;
 
+/// <summary>
+/// Displays comprehensive customer statistics including sales, costs, profit, and payment history.
+/// </summary>
 page 151 "Customer Statistics"
 {
     Caption = 'Customer Statistics';
@@ -891,6 +894,10 @@ page 151 "Customer Statistics"
                 Count += 1;
     end;
 
+    /// <summary>
+    /// Raises an event after setting the date filter on the customer record for statistics calculation.
+    /// </summary>
+    /// <param name="Customer">The customer record with the date filter applied.</param>
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetDateFilter(var Customer: Record Customer)
     begin

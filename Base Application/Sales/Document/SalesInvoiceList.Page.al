@@ -20,6 +20,9 @@ using System.Environment.Configuration;
 using System.Text;
 using System.Threading;
 
+/// <summary>
+/// Displays a list of sales invoices for managing customer billing documents.
+/// </summary>
 page 9301 "Sales Invoice List"
 {
     ApplicationArea = Basic, Suite;
@@ -873,6 +876,9 @@ page 9301 "Sales Invoice List"
     protected var
         JobQueueActive: Boolean;
 
+    /// <summary>
+    /// Shows a preview of the posting result for the selected invoice.
+    /// </summary>
     procedure ShowPreview()
     var
         SelectedSalesHeader: Record "Sales Header";
