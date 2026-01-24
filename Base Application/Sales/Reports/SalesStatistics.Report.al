@@ -4,6 +4,10 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Reports;
 
+/// <summary>
+/// Generates sales and profit statistics for customers showing amounts, costs, and profit percentages by period.
+/// </summary>
+
 using Microsoft.Inventory.Costing;
 using Microsoft.Sales.Customer;
 using Microsoft.Utilities;

@@ -9,6 +9,9 @@ using Microsoft.Inventory.Item.Catalog;
 using Microsoft.Sales.Document;
 using Microsoft.Utilities;
 
+/// <summary>
+/// Displays posted sales invoice lines as a subform for line selection during document retrieval.
+/// </summary>
 page 5852 "Get Post.Doc - S.InvLn Subform"
 {
     Caption = 'Lines';
@@ -489,6 +492,13 @@ page 5852 "Get Post.Doc - S.InvLn Subform"
         exit(0);
     end;
 
+    /// <summary>
+    /// Initializes the subform with target header, filter, and visibility settings.
+    /// </summary>
+    /// <param name="NewToSalesHeader">The target sales header for copying lines.</param>
+    /// <param name="NewRevQtyFilter">Specifies whether to filter for reversible quantities.</param>
+    /// <param name="NewFillExactCostReverse">Specifies whether to fill exact cost reverse.</param>
+    /// <param name="NewVisible">Specifies whether the subform is visible.</param>
     procedure Initialize(NewToSalesHeader: Record "Sales Header"; NewRevQtyFilter: Boolean; NewFillExactCostReverse: Boolean; NewVisible: Boolean)
     begin
         ToSalesHeader := NewToSalesHeader;
@@ -502,6 +512,10 @@ page 5852 "Get Post.Doc - S.InvLn Subform"
         end;
     end;
 
+    /// <summary>
+    /// Gets the currently selected invoice line with selection filter applied.
+    /// </summary>
+    /// <param name="FromSalesInvLine">Returns the selected sales invoice line.</param>
     procedure GetSelectedLine(var FromSalesInvLine: Record "Sales Invoice Line")
     begin
         FromSalesInvLine.Copy(Rec);
