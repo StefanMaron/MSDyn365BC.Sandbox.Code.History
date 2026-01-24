@@ -6,6 +6,9 @@ namespace Microsoft.Sales.Customer;
 
 using Microsoft.Sales.Receivables;
 
+/// <summary>
+/// Displays credit limit details in notifications when credit limits are exceeded.
+/// </summary>
 page 1871 "Credit Limit Details"
 {
     Caption = 'Details';
@@ -122,6 +125,10 @@ page 1871 "Credit Limit Details"
         ExtensionAmountsDic: Dictionary of [Guid, Decimal];
         OverdueAmountsTxt: Label 'Overdue Amounts (LCY)';
 
+    /// <summary>
+    /// Populates the credit limit notification with current customer and order amount data.
+    /// </summary>
+    /// <param name="CreditLimitNotification">The notification to populate with data.</param>
     procedure PopulateDataOnNotification(var CreditLimitNotification: Notification)
     begin
         CreditLimitNotification.SetData(Rec.FieldName("No."), Format(Rec."No."));
@@ -133,6 +140,10 @@ page 1871 "Credit Limit Details"
         OnAfterPopulateDataOnNotificationProcedure(CreditLimitNotification, ExtensionAmountsDic);
     end;
 
+    /// <summary>
+    /// Initializes the page with data from a credit limit notification.
+    /// </summary>
+    /// <param name="CreditLimitNotification">The notification containing the credit limit data.</param>
     procedure InitializeFromNotificationVar(CreditLimitNotification: Notification)
     var
         Customer: Record Customer;
@@ -152,46 +163,84 @@ page 1871 "Credit Limit Details"
         OnAfterInitializeFromNotificationVarProcedure(CreditLimitNotification, ExtensionAmountsDic);
     end;
 
+    /// <summary>
+    /// Sets the customer record by customer number.
+    /// </summary>
+    /// <param name="Value">The customer number to retrieve.</param>
     procedure SetCustomerNumber(Value: Code[20])
     begin
         Rec.Get(Value);
     end;
 
+    /// <summary>
+    /// Sets the total order amount in local currency.
+    /// </summary>
+    /// <param name="Value">The total order amount in LCY.</param>
     procedure SetOrderAmountTotalLCY(Value: Decimal)
     begin
         OrderAmountTotalLCY := Value;
     end;
 
+    /// <summary>
+    /// Sets the shipped or return received but not invoiced amount in local currency.
+    /// </summary>
+    /// <param name="Value">The shipped or return received not invoiced amount in LCY.</param>
     procedure SetShippedRetRcdNotIndLCY(Value: Decimal)
     begin
         ShippedRetRcdNotIndLCY := Value;
     end;
 
+    /// <summary>
+    /// Sets the order amount for the current order in local currency.
+    /// </summary>
+    /// <param name="Value">The order amount for the current order in LCY.</param>
     procedure SetOrderAmountThisOrderLCY(Value: Decimal)
     begin
         OrderAmountThisOrderLCY := Value;
     end;
 
+    /// <summary>
+    /// Sets the customer credit amount in local currency.
+    /// </summary>
+    /// <param name="Value">The customer credit amount in LCY.</param>
     procedure SetCustCreditAmountLCY(Value: Decimal)
     begin
         CustCreditAmountLCY := Value;
     end;
 
+    /// <summary>
+    /// Sets the extension amounts dictionary from an external source.
+    /// </summary>
+    /// <param name="FromExtensionAmounts">Dictionary of extension amounts keyed by GUID.</param>
     procedure SetExtensionAmounts(FromExtensionAmounts: Dictionary of [Guid, Decimal])
     begin
         ExtensionAmountsDic := FromExtensionAmounts;
     end;
 
+    /// <summary>
+    /// Gets the extension amounts dictionary.
+    /// </summary>
+    /// <param name="ToExtensionAmounts">Variable to receive the dictionary of extension amounts.</param>
     procedure GetExtensionAmounts(var ToExtensionAmounts: Dictionary of [Guid, Decimal])
     begin
         ToExtensionAmounts := ExtensionAmountsDic;
     end;
 
+    /// <summary>
+    /// Raised after populating data on the credit limit notification.
+    /// </summary>
+    /// <param name="CreditLimitNotification">The notification being populated.</param>
+    /// <param name="ExtensionAmountsDic">Dictionary of extension amounts by GUID.</param>
     [IntegrationEvent(false, false)]
     local procedure OnAfterPopulateDataOnNotificationProcedure(CreditLimitNotification: Notification; var ExtensionAmountsDic: Dictionary of [Guid, Decimal])
     begin
     end;
 
+    /// <summary>
+    /// Raised after initializing the credit limit details from a notification.
+    /// </summary>
+    /// <param name="CreditLimitNotification">The notification providing the data.</param>
+    /// <param name="ExtensionAmountsDic">Dictionary of extension amounts by GUID.</param>
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitializeFromNotificationVarProcedure(CreditLimitNotification: Notification; var ExtensionAmountsDic: Dictionary of [Guid, Decimal])
     begin

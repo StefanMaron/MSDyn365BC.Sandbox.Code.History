@@ -4,6 +4,10 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Reports;
 
+/// <summary>
+/// Lists customers with their basic information including name, address, phone number, and contact details.
+/// </summary>
+
 using Microsoft.Foundation.Address;
 using Microsoft.Sales.Customer;
 using Microsoft.Utilities;

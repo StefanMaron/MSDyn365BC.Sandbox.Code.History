@@ -9,6 +9,9 @@ using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Inventory.Costing;
 using Microsoft.Sales.Customer;
 
+/// <summary>
+/// Displays statistical and financial information for a posted sales credit memo including amounts, VAT, and costs.
+/// </summary>
 page 398 "Sales Credit Memo Statistics"
 {
     Caption = 'Sales Credit Memo Statistics';

@@ -24,6 +24,9 @@ using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Reports;
 using System.Threading;
 
+/// <summary>
+/// Provides the Role Center page for sales managers with access to sales analysis, budgets, pricing, and team management.
+/// </summary>
 page 9005 "Sales Manager Role Center"
 {
     Caption = 'Sales Manager';
