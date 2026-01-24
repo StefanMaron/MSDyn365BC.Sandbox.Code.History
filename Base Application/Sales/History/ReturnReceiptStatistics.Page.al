@@ -4,6 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.History;
 
+/// <summary>
+/// Displays statistical information for a posted sales return receipt including line counts and quantities.
+/// </summary>
 page 6665 "Return Receipt Statistics"
 {
     Caption = 'Return Receipt Statistics';
