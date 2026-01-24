@@ -10,6 +10,9 @@ using Microsoft.Inventory.Tracking;
 using Microsoft.Utilities;
 using System.Utilities;
 
+/// <summary>
+/// Displays sales lines that are available for reservation against the current demand source.
+/// </summary>
 page 499 "Available - Sales Lines"
 {
     Caption = 'Available - Sales Lines';
@@ -234,6 +237,11 @@ page 499 "Available - Sales Lines"
         QtyToReserveBase: Decimal;
         QtyReservedBase: Decimal;
 
+    /// <summary>
+    /// Sets the source record for reservation with outbound direction.
+    /// </summary>
+    /// <param name="CurrentSourceRecRef">The source record reference.</param>
+    /// <param name="CurrentReservEntry">The reservation entry to use.</param>
     procedure SetSource(CurrentSourceRecRef: RecordRef; CurrentReservEntry: Record "Reservation Entry")
     var
         TransferDirection: Enum "Transfer Direction";
@@ -241,6 +249,12 @@ page 499 "Available - Sales Lines"
         SetSource(CurrentSourceRecRef, CurrentReservEntry, TransferDirection::Outbound);
     end;
 
+    /// <summary>
+    /// Sets the source record for reservation with the specified transfer direction.
+    /// </summary>
+    /// <param name="CurrentSourceRecRef">The source record reference.</param>
+    /// <param name="CurrentReservEntry">The reservation entry to use.</param>
+    /// <param name="Direction">The transfer direction (Inbound or Outbound).</param>
     procedure SetSource(CurrentSourceRecRef: RecordRef; CurrentReservEntry: Record "Reservation Entry"; Direction: Enum "Transfer Direction")
     begin
         Clear(ReservMgt);
@@ -310,6 +324,10 @@ page 499 "Available - Sales Lines"
         exit(ReservMgt.MarkReservConnection(ReservEntry2, ReservEntry));
     end;
 
+    /// <summary>
+    /// Sets the current document subtype for filtering sales lines.
+    /// </summary>
+    /// <param name="SubType">The document subtype option value.</param>
     procedure SetCurrentSubType(SubType: Option)
     begin
         CurrentSubType := SubType;

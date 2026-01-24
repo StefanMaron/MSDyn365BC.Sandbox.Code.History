@@ -8,6 +8,9 @@ using Microsoft.Finance.Dimension;
 using Microsoft.Inventory.Item.Catalog;
 using Microsoft.Utilities;
 
+/// <summary>
+/// Displays posted sales shipment lines as a subform for line selection during document retrieval.
+/// </summary>
 page 5851 "Get Post.Doc - S.ShptLn Sbfrm"
 {
     Caption = 'Lines';
@@ -388,6 +391,12 @@ page 5851 "Get Post.Doc - S.ShptLn Sbfrm"
         exit(0);
     end;
 
+    /// <summary>
+    /// Initializes the subform with filter and visibility settings.
+    /// </summary>
+    /// <param name="NewRevQtyFilter">Specifies whether to filter for reversible quantities.</param>
+    /// <param name="NewFillExactCostReverse">Specifies whether to fill exact cost reverse.</param>
+    /// <param name="NewVisible">Specifies whether the subform is visible.</param>
     procedure Initialize(NewRevQtyFilter: Boolean; NewFillExactCostReverse: Boolean; NewVisible: Boolean)
     begin
         RevQtyFilter := NewRevQtyFilter;
@@ -400,6 +409,10 @@ page 5851 "Get Post.Doc - S.ShptLn Sbfrm"
         end;
     end;
 
+    /// <summary>
+    /// Gets the currently selected shipment line with selection filter applied.
+    /// </summary>
+    /// <param name="FromSalesShptLine">Returns the selected sales shipment line.</param>
     procedure GetSelectedLine(var FromSalesShptLine: Record "Sales Shipment Line")
     begin
         FromSalesShptLine.Copy(Rec);
