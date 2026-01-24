@@ -4,6 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Customer;
 
+/// <summary>
+/// Displays a list part of the current user's favorite customers for Role Center integration.
+/// </summary>
 page 9150 "My Customers"
 {
     Caption = 'My Customers';
