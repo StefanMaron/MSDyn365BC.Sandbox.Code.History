@@ -4,6 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.History;
 
+/// <summary>
+/// Displays statistical information for a posted sales shipment including line counts, quantities, and weights.
+/// </summary>
 page 396 "Sales Shipment Statistics"
 {
     Caption = 'Sales Shipment Statistics';

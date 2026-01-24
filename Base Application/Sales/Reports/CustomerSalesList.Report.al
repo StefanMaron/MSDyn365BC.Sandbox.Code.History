@@ -4,6 +4,10 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Reports;
 
+/// <summary>
+/// Lists customers with their sales amounts and VAT registration numbers for tax reporting purposes.
+/// </summary>
+
 using Microsoft.Foundation.Address;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
@@ -204,6 +208,11 @@ report 119 "Customer - Sales List"
         exit(Amt);
     end;
 
+    /// <summary>
+    /// Initializes the report request options for the Customer Sales List report.
+    /// </summary>
+    /// <param name="MinimumAmtLCY">The minimum sales amount in LCY to include customers.</param>
+    /// <param name="HideAddressDetails">True to hide customer address details.</param>
     procedure InitializeRequest(MinimumAmtLCY: Decimal; HideAddressDetails: Boolean)
     begin
         MinAmtLCY := MinimumAmtLCY;

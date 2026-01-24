@@ -42,6 +42,9 @@ using System.Environment.Configuration;
 using System.Integration.Word;
 using System.Privacy;
 
+/// <summary>
+/// Provides detailed view and management of an individual customer's master data.
+/// </summary>
 page 21 "Customer Card"
 {
     Caption = 'Customer Card';
@@ -2796,6 +2799,11 @@ page 21 "Customer Card"
             exit(CalendarMgmt.CustomizedChangesExist(Rec));
     end;
 
+    /// <summary>
+    /// Runs the specified report filtered to a single customer.
+    /// </summary>
+    /// <param name="ReportNumber">The ID of the report to run.</param>
+    /// <param name="CustomerNumber">The customer number to filter the report.</param>
     procedure RunReport(ReportNumber: Integer; CustomerNumber: Code[20])
     var
         Customer: Record Customer;
@@ -2869,42 +2877,77 @@ page 21 "Customer Card"
         CustomerMgt.CalculateStatistic(Rec, AdjmtCostLCY, AdjCustProfit, AdjProfitPct, CustInvDiscAmountLCY, CustPaymentsLCY, CustSalesLCY, CustProfit);
     end;
 
+    /// <summary>
+    /// Raised after activating the fields on the customer card.
+    /// </summary>
+    /// <param name="Customer">The customer record.</param>
     [IntegrationEvent(true, false)]
     local procedure OnAfterActivateFields(var Customer: Record Customer)
     begin
     end;
 
+    /// <summary>
+    /// Raised after opening the customer card page.
+    /// </summary>
+    /// <param name="Customer">The current customer record.</param>
+    /// <param name="xCustomer">The previous customer record.</param>
     [IntegrationEvent(true, false)]
     local procedure OnAfterOnOpenPage(var Customer: Record Customer; xCustomer: Record Customer)
     begin
     end;
 
+    /// <summary>
+    /// Raised to allow customization of the page caption.
+    /// </summary>
+    /// <param name="InText">The caption text to modify.</param>
     [IntegrationEvent(false, false)]
     [Scope('OnPrem')]
     procedure SetCaption(var InText: Text)
     begin
     end;
 
+    /// <summary>
+    /// Raised before creating a customer from a template.
+    /// </summary>
+    /// <param name="NewMode">Indicates whether the page is in new mode.</param>
+    /// <param name="Customer">The customer record to be created.</param>
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateCustomerFromTemplate(var NewMode: Boolean; var Customer: Record Customer)
     begin
     end;
 
+    /// <summary>
+    /// Raised before loading sales prices and line discounts.
+    /// </summary>
+    /// <param name="LoadOnDemand">Set to control whether prices load on demand.</param>
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetSalesPricesAndSalesLineDisc(var LoadOnDemand: Boolean)
     begin
     end;
 
+    /// <summary>
+    /// Raised before updating the current page after creating a customer from template.
+    /// </summary>
+    /// <param name="Customer">The newly created customer record.</param>
     [IntegrationEvent(false, false)]
     local procedure OnCreateCustomerFromTemplateOnBeforeCurrPageUpdate(var Customer: Record Customer)
     begin
     end;
 
+    /// <summary>
+    /// Raised before opening the customer card page.
+    /// </summary>
+    /// <param name="Customer">The customer record.</param>
     [IntegrationEvent(true, false)]
     local procedure OnBeforeOnOpenPage(var Customer: Record Customer)
     begin
     end;
 
+    /// <summary>
+    /// Raised before starting background calculations on the customer card.
+    /// </summary>
+    /// <param name="Customer">The customer record.</param>
+    /// <param name="IsHandled">Set to true to skip background calculations.</param>
     [IntegrationEvent(true, false)]
     local procedure OnBeforeStartBackgroundCalculations(var Customer: Record Customer; var IsHandled: Boolean)
     begin
