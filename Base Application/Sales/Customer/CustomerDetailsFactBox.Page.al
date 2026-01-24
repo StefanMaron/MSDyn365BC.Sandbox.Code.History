@@ -6,6 +6,9 @@ namespace Microsoft.Sales.Customer;
 
 using Microsoft.Foundation.Comment;
 
+/// <summary>
+/// Displays key customer information including contact details and credit status in a FactBox.
+/// </summary>
 page 9084 "Customer Details FactBox"
 {
     Caption = 'Customer Details';
@@ -122,6 +125,11 @@ page 9084 "Customer Details FactBox"
             PAGE.Run(PAGE::"Customer Card", Rec);
     end;
 
+    /// <summary>
+    /// Raised before showing the customer card details.
+    /// </summary>
+    /// <param name="Customer">The customer record to display.</param>
+    /// <param name="IsHandled">Set to true to skip the default show details behavior.</param>
     [IntegrationEvent(false, false)]
     local procedure OnBeforeShowDetails(var Customer: Record Customer; var IsHandled: Boolean)
     begin

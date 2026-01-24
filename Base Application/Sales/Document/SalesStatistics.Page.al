@@ -11,6 +11,9 @@ using Microsoft.Sales.Posting;
 using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
 
+/// <summary>
+/// Displays financial statistics and totals for a sales document including VAT calculations.
+/// </summary>
 #pragma warning disable AS0106 // Protected variables TempVATAmountLinePrep, TempVATAmountLineTot, TempTotVATAmountLinePrep, TempTotVATAmountLineTot were removed before AS0106 was introduced.
 page 160 "Sales Statistics"
 #pragma warning restore AS0106
@@ -461,6 +464,9 @@ page 160 "Sales Statistics"
         exit('2,0,' + FieldCaption);
     end;
 
+    /// <summary>
+    /// Updates VAT amounts on sales lines based on modifications made to the VAT amount lines.
+    /// </summary>
     procedure UpdateVATOnSalesLines()
     var
         SalesLine: Record "Sales Line";

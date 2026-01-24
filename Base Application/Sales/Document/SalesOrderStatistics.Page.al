@@ -12,6 +12,9 @@ using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
 using System.Utilities;
 
+/// <summary>
+/// Displays financial statistics and totals for a sales order including prepayment information.
+/// </summary>
 page 402 "Sales Order Statistics"
 {
     Caption = 'Sales Order Statistics';
@@ -1016,6 +1019,11 @@ page 402 "Sales Order Statistics"
         UpdateHeaderInfo(2, TempVATAmountLine2);
     end;
 
+    /// <summary>
+    /// Updates the header information for the statistics page based on VAT amount lines.
+    /// </summary>
+    /// <param name="IndexNo">The index number for the totals arrays (1-4 for different tabs).</param>
+    /// <param name="VATAmountLine">The VAT amount line record containing totals to display.</param>
     procedure UpdateHeaderInfo(IndexNo: Integer; var VATAmountLine: Record "VAT Amount Line")
     var
         CurrExchRate: Record "Currency Exchange Rate";
