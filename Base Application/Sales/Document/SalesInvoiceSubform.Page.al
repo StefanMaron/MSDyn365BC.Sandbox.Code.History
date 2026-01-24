@@ -24,6 +24,9 @@ using Microsoft.Utilities;
 using System.Environment.Configuration;
 using System.Integration.Excel;
 
+/// <summary>
+/// Displays the line items subform for a sales invoice document.
+/// </summary>
 page 47 "Sales Invoice Subform"
 {
     AutoSplitKey = true;
@@ -1445,6 +1448,9 @@ page 47 "Sales Invoice Subform"
         BackgroundErrorCheck := DocumentErrorsMgt.BackgroundValidationEnabled();
     end;
 
+    /// <summary>
+    /// Approves and calculates the invoice discount for the current line.
+    /// </summary>
     procedure ApproveCalcInvDisc()
     begin
         CODEUNIT.Run(CODEUNIT::"Sales-Disc. (Yes/No)", Rec);
@@ -1475,6 +1481,9 @@ page 47 "Sales Invoice Subform"
         OnAfterQuantityOnAfterValidate(Rec, xRec);
     end;
 
+    /// <summary>
+    /// Calculates the invoice discount for the current line.
+    /// </summary>
     procedure CalcInvDisc()
     var
         SalesCalcDiscount: Codeunit "Sales-Calc. Discount";
@@ -1483,12 +1492,18 @@ page 47 "Sales Invoice Subform"
         DocumentTotals.SalesDocTotalsNotUpToDate();
     end;
 
+    /// <summary>
+    /// Explodes the bill of materials for the current item line.
+    /// </summary>
     procedure ExplodeBOM()
     begin
         CODEUNIT.Run(CODEUNIT::"Sales-Explode BOM", Rec);
         DocumentTotals.SalesDocTotalsNotUpToDate();
     end;
 
+    /// <summary>
+    /// Gets shipment lines to create invoice lines from posted shipments.
+    /// </summary>
     procedure GetShipment()
     begin
         CODEUNIT.Run(CODEUNIT::"Sales-Get Shipment", Rec);
@@ -1499,6 +1514,10 @@ page 47 "Sales Invoice Subform"
         Codeunit.Run(Codeunit::"Job-Process Plan. Lines", Rec);
     end;
 
+    /// <summary>
+    /// Inserts extended text for the current line if available.
+    /// </summary>
+    /// <param name="Unconditionally">Whether to insert text without conditions.</param>
     procedure InsertExtendedText(Unconditionally: Boolean)
     begin
         OnBeforeInsertExtendedText(Rec);
@@ -1511,26 +1530,44 @@ page 47 "Sales Invoice Subform"
             UpdatePage(true);
     end;
 
+    /// <summary>
+    /// Updates the current page with optional record save.
+    /// </summary>
+    /// <param name="SetSaveRecord">Whether to save the record before updating.</param>
     procedure UpdatePage(SetSaveRecord: Boolean)
     begin
         CurrPage.Update(SetSaveRecord);
     end;
 
+    /// <summary>
+    /// Shows available prices for the current line item.
+    /// </summary>
     procedure ShowPrices()
     begin
         Rec.PickPrice();
     end;
 
+    /// <summary>
+    /// Shows available line discounts for the current line item.
+    /// </summary>
     procedure ShowLineDisc()
     begin
         Rec.PickDiscount();
     end;
 
+    /// <summary>
+    /// Sets whether updates are allowed on the page.
+    /// </summary>
+    /// <param name="UpdateAllowed">Whether updates should be allowed.</param>
     procedure SetUpdateAllowed(UpdateAllowed: Boolean)
     begin
         UpdateAllowedVar := UpdateAllowed;
     end;
 
+    /// <summary>
+    /// Returns whether updates are allowed on the page.
+    /// </summary>
+    /// <returns>True if updates are allowed.</returns>
     procedure UpdateAllowed(): Boolean
     begin
         if UpdateAllowedVar = false then begin
@@ -1540,6 +1577,9 @@ page 47 "Sales Invoice Subform"
         exit(true);
     end;
 
+    /// <summary>
+    /// Handles post-validation logic after the No. field is validated.
+    /// </summary>
     procedure NoOnAfterValidate()
     begin
         OnBeforeNoOnAfterValidate(Rec, xRec);
@@ -1552,6 +1592,9 @@ page 47 "Sales Invoice Subform"
         OnAfterNoOnAfterValidate(Rec, xRec);
     end;
 
+    /// <summary>
+    /// Updates the editable state of fields on the current row.
+    /// </summary>
     procedure UpdateEditableOnRow()
     begin
         IsCommentLine := not Rec.HasTypeToFillMandatoryFields();
@@ -1581,11 +1624,17 @@ page 47 "Sales Invoice Subform"
         DocumentTotals.GetTotalSalesHeaderAndCurrency(Rec, TotalSalesHeader, Currency);
     end;
 
+    /// <summary>
+    /// Clears the total sales header variable.
+    /// </summary>
     procedure ClearTotalSalesHeader();
     begin
         Clear(TotalSalesHeader);
     end;
 
+    /// <summary>
+    /// Calculates the document totals for all sales lines.
+    /// </summary>
     procedure CalculateTotals()
     begin
         OnBeforeCalculateTotals(TotalSalesLine, SuppressTotals);
@@ -1597,6 +1646,9 @@ page 47 "Sales Invoice Subform"
         DocumentTotals.RefreshSalesLine(Rec);
     end;
 
+    /// <summary>
+    /// Performs an incremental update of document totals based on line changes.
+    /// </summary>
     procedure DeltaUpdateTotals()
     var
         IsHandled: Boolean;
@@ -1614,6 +1666,9 @@ page 47 "Sales Invoice Subform"
             Rec.SendLineInvoiceDiscountResetNotification();
     end;
 
+    /// <summary>
+    /// Forces a recalculation of document totals on the next update.
+    /// </summary>
     procedure ForceTotalsCalculation()
     begin
         DocumentTotals.SalesDocTotalsNotUpToDate();
@@ -1634,6 +1689,9 @@ page 47 "Sales Invoice Subform"
             Rec."Line Amount" := Rec."Subtotal Net";
     end;
 
+    /// <summary>
+    /// Redistributes invoice discount amounts across lines after validation.
+    /// </summary>
     procedure RedistributeTotalsOnAfterValidate()
     var
         SalesHeader: Record "Sales Header";
@@ -1648,6 +1706,9 @@ page 47 "Sales Invoice Subform"
         CurrPage.Update(false);
     end;
 
+    /// <summary>
+    /// Updates the type text display based on the current line type.
+    /// </summary>
     procedure UpdateTypeText()
     var
         RecRef: RecordRef;

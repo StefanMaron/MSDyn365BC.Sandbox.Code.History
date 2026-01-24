@@ -16,6 +16,9 @@ using System.Feedback;
 #endif
 using System.Visualization;
 
+/// <summary>
+/// Displays sales order activity cues and key metrics for the Sales Order Processor Role Center.
+/// </summary>
 page 9060 "SO Processor Activities"
 {
     Caption = 'Activities';
@@ -326,6 +329,13 @@ page 9060 "SO Processor Activities"
         PartiallyShippedStyle: Text;
         DelayedOrdersStyle: Text;
 
+    /// <summary>
+    /// Raised before processing the results of a completed page background task.
+    /// </summary>
+    /// <param name="TaskId">The ID of the completed background task.</param>
+    /// <param name="CalcTaskId">The calculation task ID for comparison.</param>
+    /// <param name="Results">The results dictionary from the background task.</param>
+    /// <param name="IsHandled">Set to true to prevent default result processing.</param>
     [IntegrationEvent(true, false)]
     procedure OnBeforeOnPageBackgroundTaskCompleted(TaskId: Integer; CalcTaskId: Integer; var Results: Dictionary of [Text, Text]; var IsHandled: Boolean)
     begin
