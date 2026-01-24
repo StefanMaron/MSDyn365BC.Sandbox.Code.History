@@ -7,6 +7,9 @@ namespace Microsoft.Sales.Document;
 using Microsoft.Inventory.Item;
 using Microsoft.Sales.History;
 
+/// <summary>
+/// Displays and manages the allocation of item charges across sales shipment and return receipt lines.
+/// </summary>
 page 5814 "Item Charge Assignment (Sales)"
 {
     AutoSplitKey = true;
@@ -528,6 +531,11 @@ page 5814 "Item Charge Assignment (Sales)"
         OnAfterUpdateQty(Rec, QtyToShipBase, QtyShippedBase, QtyToRetReceiveBase, QtyRetReceivedBase, GrossWeight, UnitVolume);
     end;
 
+    /// <summary>
+    /// Initializes the page with the sales line and assignable amount.
+    /// </summary>
+    /// <param name="NewSalesLine">The sales line with the item charge.</param>
+    /// <param name="NewLineAmt">The line amount available for assignment.</param>
     procedure Initialize(NewSalesLine: Record "Sales Line"; NewLineAmt: Decimal)
     begin
         SalesLine2 := NewSalesLine;
