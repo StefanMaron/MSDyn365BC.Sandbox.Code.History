@@ -8,6 +8,9 @@ using Microsoft.EServices.EDocument;
 using Microsoft.Sales.Reports;
 using Microsoft.Utilities;
 
+/// <summary>
+/// Displays a lookup list of sales documents filtered by document type.
+/// </summary>
 page 45 "Sales List"
 {
     Caption = 'Sales List';

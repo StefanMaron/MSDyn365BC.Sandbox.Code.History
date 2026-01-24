@@ -7,6 +7,9 @@ namespace Microsoft.Sales.Customer;
 using Microsoft.Foundation.Period;
 using Microsoft.Sales.Receivables;
 
+/// <summary>
+/// Displays statistics on customer ledger entries grouped by document type and accounting period.
+/// </summary>
 page 302 "Customer Entry Statistics"
 {
     Caption = 'Customer Entry Statistics';
@@ -658,16 +661,28 @@ page 302 "Customer Entry Statistics"
         NoOfInv := NoOfInv + 1;
     end;
 
+    /// <summary>
+    /// Raised after setting filters on customer ledger entries for amount calculation.
+    /// </summary>
+    /// <param name="CustLedgerEntry">The customer ledger entry record with filters applied.</param>
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetRecordOnAfterCustLedgEntrySetFiltersCalcAmount(var CustLedgerEntry: Record "Cust. Ledger Entry")
     begin
     end;
 
+    /// <summary>
+    /// Raised after setting filters on customer ledger entries for remaining amount calculation.
+    /// </summary>
+    /// <param name="CustLedgerEntry">The customer ledger entry record with filters applied.</param>
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetRecordOnAfterCustLedgEntrySetFiltersCalcRemainingAmountLCY(var CustLedgerEntry: Record "Cust. Ledger Entry")
     begin
     end;
 
+    /// <summary>
+    /// Raised after setting filters on customer ledger entries for days to pay calculation.
+    /// </summary>
+    /// <param name="CustLedgerEntry">The customer ledger entry record with filters applied.</param>
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetRecordOnAfterCustLedgEntrySetFiltersCalcDaysToPay(var CustLedgerEntry: Record "Cust. Ledger Entry")
     begin
