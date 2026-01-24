@@ -6,6 +6,9 @@ namespace Microsoft.Sales.Customer;
 
 using Microsoft.Sales.Receivables;
 
+/// <summary>
+/// Displays customer credit details including balance, outstanding amounts, and available credit.
+/// </summary>
 page 7177 "Available Credit"
 {
     Caption = 'Available Credit';
