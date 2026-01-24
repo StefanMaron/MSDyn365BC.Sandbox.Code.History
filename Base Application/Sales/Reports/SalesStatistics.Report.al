@@ -9,6 +9,9 @@ using Microsoft.Inventory.Costing;
 using Microsoft.Sales.Customer;
 using Microsoft.Utilities;
 
+/// <summary>
+/// Generates sales and profit statistics for customers showing amounts, costs, and profit percentages by period.
+/// </summary>
 report 112 "Sales Statistics"
 {
     DefaultLayout = RDLC;

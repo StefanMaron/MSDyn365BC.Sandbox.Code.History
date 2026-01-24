@@ -9,6 +9,9 @@ using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Receivables;
 
+/// <summary>
+/// Displays customer statistics including balance, sales, and payment information in a FactBox.
+/// </summary>
 page 9082 "Customer Statistics FactBox"
 {
     Caption = 'Customer Statistics';
@@ -241,6 +244,10 @@ page 9082 "Customer Statistics FactBox"
         InvoicedPrepmtAmountLCY: Decimal;
         BalanceAsVendor: Decimal;
 
+    /// <summary>
+    /// Calculates the customer statistics using a background task.
+    /// </summary>
+    /// <param name="CustomerNo">The customer number to calculate statistics for.</param>
     procedure CalculateFieldValues(CustomerNo: Code[20])
     var
         CalculateCustomerStats: Codeunit "Calculate Customer Stats.";

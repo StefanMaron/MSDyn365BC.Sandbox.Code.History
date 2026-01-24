@@ -10,6 +10,9 @@ using Microsoft.Inventory.Costing;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
 
+/// <summary>
+/// Displays statistical and financial information for a posted sales invoice including amounts, VAT, costs, and payment status.
+/// </summary>
 page 397 "Sales Invoice Statistics"
 {
     Caption = 'Sales Invoice Statistics';

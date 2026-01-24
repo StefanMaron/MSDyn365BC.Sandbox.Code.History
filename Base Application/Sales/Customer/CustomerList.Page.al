@@ -36,6 +36,9 @@ using System.Integration.PowerBI;
 using System.Integration.Word;
 using System.Text;
 
+/// <summary>
+/// Lists all customers with filtering and navigation capabilities.
+/// </summary>
 page 22 "Customer List"
 {
     ApplicationArea = Basic, Suite, Service;
@@ -1698,6 +1701,10 @@ page 22 "Customer List"
         EventFilter: Text;
         CaptionTxt: Text;
 
+    /// <summary>
+    /// Gets a filter expression representing the currently selected customers.
+    /// </summary>
+    /// <returns>A filter expression for the selected customers.</returns>
     procedure GetSelectionFilter(): Text
     var
         Cust: Record Customer;
@@ -1712,6 +1719,10 @@ page 22 "Customer List"
         exit(SelectionFilterForCustomer);
     end;
 
+    /// <summary>
+    /// Sets the customer record variable to the current page selection.
+    /// </summary>
+    /// <param name="Cust">Variable to receive the selection filter.</param>
     procedure SetSelection(var Cust: Record Customer)
     begin
         CurrPage.SetSelectionFilter(Cust);
@@ -1748,12 +1759,21 @@ page 22 "Customer List"
         Page.Run(Page::"Sales Prices", SalesPrice);
     end;
 
+    /// <summary>
+    /// Raises an event to allow customization of the customer list page caption.
+    /// </summary>
+    /// <param name="InText">The caption text to be modified.</param>
     [IntegrationEvent(false, false)]
     [Scope('OnPrem')]
     procedure SetCaption(var InText: Text)
     begin
     end;
 
+    /// <summary>
+    /// Raises an event after getting the selection filter from the customer list.
+    /// </summary>
+    /// <param name="Customer">The customer records that are selected.</param>
+    /// <param name="SelectionFilterForCustomer">The selection filter text for the selected customers.</param>
     [IntegrationEvent(false, false)]
     procedure OnAfterGetSelectionFilter(var Customer: Record Customer; var SelectionFilterForCustomer: Text)
     begin
