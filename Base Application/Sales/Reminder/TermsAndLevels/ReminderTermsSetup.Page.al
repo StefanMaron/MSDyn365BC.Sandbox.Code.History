@@ -4,6 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Reminder;
 
+/// <summary>
+/// Provides a comprehensive setup interface for reminder terms including levels, fees, and communication settings.
+/// </summary>
 page 838 "Reminder Terms Setup"
 {
     Caption = 'Reminder Terms Setup';

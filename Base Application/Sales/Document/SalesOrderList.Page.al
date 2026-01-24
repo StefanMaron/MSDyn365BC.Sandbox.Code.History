@@ -32,6 +32,9 @@ using System.Integration.PowerBI;
 using System.Text;
 using System.Threading;
 
+/// <summary>
+/// Displays a list of sales orders for managing customer order processing and fulfillment.
+/// </summary>
 page 9305 "Sales Order List"
 {
     ApplicationArea = Basic, Suite, Assembly;
@@ -1296,6 +1299,9 @@ page 9305 "Sales Order List"
     protected var
         SalesTaxStatisticsVisible: Boolean;
 
+    /// <summary>
+    /// Shows a preview of the posting result for the selected order.
+    /// </summary>
     procedure ShowPreview()
     var
         SelectedSalesHeader: Record "Sales Header";
@@ -1329,6 +1335,9 @@ page 9305 "Sales Order List"
         CurrPage.Update(false);
     end;
 
+    /// <summary>
+    /// Sets a flag to only show orders with VAT lines.
+    /// </summary>
     procedure SkipShowingLinesWithoutVAT()
     begin
         OnlyShowHeadersWithVat := true;

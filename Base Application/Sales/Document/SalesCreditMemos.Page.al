@@ -20,6 +20,9 @@ using System.Environment.Configuration;
 using System.Text;
 using System.Threading;
 
+/// <summary>
+/// Displays a list of sales credit memos for managing customer refunds and corrections.
+/// </summary>
 page 9302 "Sales Credit Memos"
 {
     AdditionalSearchTerms = 'refund credit return refund correct cancel undo sale';

@@ -21,6 +21,9 @@ using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
 using System.Environment.Configuration;
 
+/// <summary>
+/// Displays the line items subform for a sales return order document.
+/// </summary>
 page 6631 "Sales Return Order Subform"
 {
     AutoSplitKey = true;
@@ -1337,6 +1340,9 @@ page 6631 "Sales Return Order Subform"
         AttachToInvtItemEnabled: Boolean;
         VATAmount: Decimal;
 
+    /// <summary>
+    /// Approves and calculates the invoice discount for the current sales return order line.
+    /// </summary>
     procedure ApproveCalcInvDisc()
     begin
         CODEUNIT.Run(CODEUNIT::"Sales-Disc. (Yes/No)", Rec);
@@ -1366,6 +1372,9 @@ page 6631 "Sales Return Order Subform"
         CurrPage.Update(false);
     end;
 
+    /// <summary>
+    /// Calculates the invoice discount for the current sales return order line.
+    /// </summary>
     procedure CalcInvDisc()
     begin
         CODEUNIT.Run(CODEUNIT::"Sales-Calc. Discount", Rec);
@@ -1378,11 +1387,18 @@ page 6631 "Sales Return Order Subform"
         DocumentTotals.SalesDocTotalsNotUpToDate();
     end;
 
+    /// <summary>
+    /// Marks the sales document totals as not up to date, triggering recalculation.
+    /// </summary>
     procedure SalesDocTotalsNotUpToDate()
     begin
         DocumentTotals.SalesDocTotalsNotUpToDate();
     end;
 
+    /// <summary>
+    /// Inserts extended text for the current sales return order line if applicable.
+    /// </summary>
+    /// <param name="Unconditionally">If true, inserts extended text without checking conditions.</param>
     procedure InsertExtendedText(Unconditionally: Boolean)
     var
         IsHandled: Boolean;
@@ -1412,11 +1428,18 @@ page 6631 "Sales Return Order Subform"
         Rec.ShowItemChargeAssgnt();
     end;
 
+    /// <summary>
+    /// Updates the sales return order subform page.
+    /// </summary>
+    /// <param name="SetSaveRecord">If true, saves the current record before updating.</param>
     procedure UpdateForm(SetSaveRecord: Boolean)
     begin
         CurrPage.Update(SetSaveRecord);
     end;
 
+    /// <summary>
+    /// Shows the document line tracking page for the current sales return order line.
+    /// </summary>
     procedure ShowDocumentLineTracking()
     var
         DocumentLineTrackingPage: Page "Document Line Tracking";
@@ -1427,6 +1450,9 @@ page 6631 "Sales Return Order Subform"
         DocumentLineTrackingpage.RunModal();
     end;
 
+    /// <summary>
+    /// Handles post-validation logic after the No. field is validated, including inserting extended text.
+    /// </summary>
     procedure NoOnAfterValidate()
     begin
         OnBeforeNoOnAfterValidate(Rec, xRec);
@@ -1502,6 +1528,9 @@ page 6631 "Sales Return Order Subform"
         LocationCodeMandatory := InventorySetup."Location Mandatory" and (Rec.Type = Rec.Type::Item);
     end;
 
+    /// <summary>
+    /// Redistributes invoice discount amounts across lines after a field validation.
+    /// </summary>
     procedure RedistributeTotalsOnAfterValidate()
     begin
         CurrPage.SaveRecord();
@@ -1515,11 +1544,17 @@ page 6631 "Sales Return Order Subform"
         DocumentTotals.GetTotalSalesHeaderAndCurrency(Rec, TotalSalesHeader, Currency);
     end;
 
+    /// <summary>
+    /// Clears the cached total sales header record.
+    /// </summary>
     procedure ClearTotalSalesHeader();
     begin
         Clear(TotalSalesHeader);
     end;
 
+    /// <summary>
+    /// Calculates and updates the document totals for the sales return order.
+    /// </summary>
     procedure CalculateTotals()
     begin
         DocumentTotals.SalesCheckIfDocumentChanged(Rec, xRec);
@@ -1527,6 +1562,9 @@ page 6631 "Sales Return Order Subform"
         DocumentTotals.RefreshSalesLine(Rec);
     end;
 
+    /// <summary>
+    /// Performs an incremental update of document totals based on the change in the current line.
+    /// </summary>
     procedure DeltaUpdateTotals()
     begin
         OnBeforeDeltaUpdateTotals(Rec, xRec);
@@ -1535,6 +1573,9 @@ page 6631 "Sales Return Order Subform"
             Rec.SendLineInvoiceDiscountResetNotification();
     end;
 
+    /// <summary>
+    /// Forces a recalculation of the document totals by marking them as not up to date.
+    /// </summary>
     procedure ForceTotalsCalculation()
     begin
         DocumentTotals.SalesDocTotalsNotUpToDate();
@@ -1546,6 +1587,9 @@ page 6631 "Sales Return Order Subform"
         exit(-Rec."Reserved Quantity");
     end;
 
+    /// <summary>
+    /// Updates the editable state of fields on the current row based on line type and settings.
+    /// </summary>
     procedure UpdateEditableOnRow()
     begin
         IsCommentLine := not Rec.HasTypeToFillMandatoryFields();
@@ -1562,6 +1606,9 @@ page 6631 "Sales Return Order Subform"
         OnAfterUpdateEditableOnRow(Rec, IsCommentLine, IsBlankNumber, UnitofMeasureCodeIsChangeable);
     end;
 
+    /// <summary>
+    /// Updates the display text for the Type field based on the current record.
+    /// </summary>
     procedure UpdateTypeText()
     var
         RecRef: RecordRef;
