@@ -8,6 +8,9 @@ using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Sales.Customer;
 
+/// <summary>
+/// Displays statistical information for an issued reminder including amounts, fees, and VAT breakdowns.
+/// </summary>
 page 441 "Issued Reminder Statistics"
 {
     Caption = 'Issued Reminder Statistics';

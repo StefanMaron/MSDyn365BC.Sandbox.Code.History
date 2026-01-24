@@ -8,6 +8,9 @@ using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Sales.Customer;
 
+/// <summary>
+/// Displays statistical information for finance charge memos including interest amounts, VAT, and customer credit status.
+/// </summary>
 page 449 "Finance Charge Memo Statistics"
 {
     Caption = 'Finance Charge Memo Statistics';
