@@ -4,6 +4,10 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Reports;
 
+/// <summary>
+/// Displays inventory reservation availability for sales order lines showing reserved quantities and shortages.
+/// </summary>
+
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
@@ -376,6 +380,12 @@ report 209 "Sales Reservation Avail."
         LineStatusCaptionLbl: Label 'Shipment Status';
         LineQuantityOnHandCaptionLbl: Label 'Quantity on Hand (Base)';
 
+    /// <summary>
+    /// Initializes the report request options for the Sales Reservation Availability report.
+    /// </summary>
+    /// <param name="NewShowSalesLines">True to show sales lines.</param>
+    /// <param name="NewShowReservationEntries">True to show reservation entries.</param>
+    /// <param name="NewModifyQtyToShip">True to allow modification of quantity to ship.</param>
     procedure InitializeRequest(NewShowSalesLines: Boolean; NewShowReservationEntries: Boolean; NewModifyQtyToShip: Boolean)
     begin
         ShowSalesLines := NewShowSalesLines;
