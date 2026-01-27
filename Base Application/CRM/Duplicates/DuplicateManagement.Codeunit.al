@@ -120,7 +120,7 @@ codeunit 5060 DuplicateManagement
         DuplContSearchString."Field No." := DuplSearchStringSetup."Field No.";
         DuplContSearchString."Part of Field" := DuplSearchStringSetup."Part of Field";
         DuplContSearchString."Search String" :=
-          ComposeSearchString(
+          ComposeIndexString(
             ContactRecRef, DuplContSearchString."Field No.",
             DuplSearchStringSetup."Part of Field", DuplSearchStringSetup.Length);
 
@@ -178,14 +178,9 @@ codeunit 5060 DuplicateManagement
     end;
 
     procedure ComposeIndexString(var RecRef: RecordRef; FieldNo: Integer; "Part": Option First,Last; ChrToCopy: Integer): Text[10]
-    begin
-        exit(ComposeSearchString(RecRef, FieldNo, "Duplicate Search String Part".FromInteger("Part"), ChrToCopy));
-    end;
-
-    procedure ComposeSearchString(var RecRef: RecordRef; FieldNo: Integer; StringPart: Enum "Duplicate Search String Part"; ChrToCopy: Integer): Text[10]
     var
         FieldRef: FieldRef;
-        InString: Text;
+        InString: Text[260];
     begin
         FieldRef := RecRef.Field(FieldNo);
         InString := Format(FieldRef.Value);
@@ -195,12 +190,12 @@ codeunit 5060 DuplicateManagement
             ChrToCopy := StrLen(InString);
 
         if ChrToCopy > 0 then
-            if StringPart = StringPart::First then
+            if Part = Part::First then
                 InString := CopyStr(InString, 1, ChrToCopy)
             else
                 InString := CopyStr(InString, StrLen(InString) - ChrToCopy + 1, ChrToCopy);
 
-        exit(CopyStr(UpperCase(InString), 1, 10));
+        exit(UpperCase(InString));
     end;
 
     procedure Notify()
