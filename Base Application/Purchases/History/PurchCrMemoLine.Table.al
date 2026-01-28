@@ -973,8 +973,10 @@ table 125 "Purch. Cr. Memo Line"
         ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntry."Entry No.");
         ValueEntry.SetRange("Item Ledger Entry Type", ItemLedgerEntry."Entry Type");
         ValueEntry.SetRange("Document Type", ValueEntry."Document Type"::"Purchase Invoice");
-        if ValueEntry.FindFirst() then
+        if ValueEntry.FindFirst() then begin
             PurchInvLine.Get(ValueEntry."Document No.", ValueEntry."Document Line No.");
+            exit;
+        end;
 
         if ItemLedgerEntry."Entry No." = 0 then begin
             PurchCrMemoHdr.Get("Document No.");
@@ -985,7 +987,7 @@ table 125 "Purch. Cr. Memo Line"
             PurchInvLine.SetRange("Document No.", PurchCrMemoHdr."Applies-to Doc. No.");
             PurchInvLine.SetRange(Type, Type);
             PurchInvLine.SetRange("No.", "No.");
-            PurchInvLine.FindFirst();
+            if PurchInvLine.FindFirst() then;
         end;
     end;
 
