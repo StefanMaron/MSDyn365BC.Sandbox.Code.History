@@ -5,16 +5,12 @@
 
 namespace System.MCP;
 
-permissionset 8350 "MCP - Objects"
+interface "MCP Config Warning"
 {
     Access = Internal;
-    Assignable = false;
-    Caption = 'MCP - Objects';
 
-    Permissions = table "MCP API Publisher Group" = X,
-                  table "MCP Configuration" = X,
-                  table "MCP Configuration Tool" = X,
-                  table "MCP Config Warning" = X,
-                  table "MCP Entra Application" = X,
-                  table "MCP System Tool" = X;
+    procedure CheckForWarnings(ConfigId: Guid; var MCPConfigWarning: Record "MCP Config Warning"; var EntryNo: Integer);
+    procedure WarningMessage(MCPConfigWarning: Record "MCP Config Warning"): Text;
+    procedure RecommendedAction(MCPConfigWarning: Record "MCP Config Warning"): Text;
+    procedure ApplyRecommendedAction(var MCPConfigWarning: Record "MCP Config Warning");
 }
