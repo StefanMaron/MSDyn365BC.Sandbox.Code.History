@@ -410,24 +410,6 @@
       <Cmt Name="Dev"><![CDATA[%1 = The serial number]D;]A;(Namespace=Microsoft.Test.QualityManagement)(LookupHint=Codeunit Qlty. Tests - Item Tracking - NamedType SNAlreadyEnteredErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 2107338336 - NamedType 1606046099" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[You have altered inspection %1, would you like to assign it to yourself?]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1=the inspection number]D;]A;(Namespace=Microsoft.Test.QualityManagement)(LookupHint=Codeunit Qlty. Tests - Misc. - NamedType AssignToSelfExpectedMessageLbl)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 2107338336 - NamedType 999535272" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Assign to myself]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.QualityManagement)(LookupHint=Codeunit Qlty. Tests - Misc. - NamedType AssignToSelfLbl)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 2107338336 - NamedType 145732464" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Bin1]]></Val>
@@ -462,15 +444,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[%1=quality inspection, %2=result, %3=entry type being blocked, %4=item, %5=lot, %6=serial]D;]A;(Namespace=Microsoft.Test.QualityManagement)(LookupHint=Codeunit Qlty. Tests - Misc. - NamedType EntryTypeBlockedErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 2107338336 - NamedType 1634208510" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Ignore]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.QualityManagement)(LookupHint=Codeunit Qlty. Tests - Misc. - NamedType IgnoreLbl)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2107338336 - NamedType 30100135" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">

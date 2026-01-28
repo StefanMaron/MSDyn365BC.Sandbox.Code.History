@@ -95,6 +95,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.eServices.EDocument.Test)(LookupHint=Codeunit E-Doc E2E Test - NamedType SendingErrStateErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1612271362 - Method 858222956 - NamedType 2382580892" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Cannot link e-document to existing purchase document because vendor number is missing in e-document purchase header.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.eServices.EDocument.Test)(LookupHint=Codeunit E-Doc Link To Existing Test - Method LinkToExisting_ErrorWhenVendorNoIsMissing - NamedType NoVendorErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3338114009 - NamedType 2996603465" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Incorrect number of E-Document returned.]]></Val>

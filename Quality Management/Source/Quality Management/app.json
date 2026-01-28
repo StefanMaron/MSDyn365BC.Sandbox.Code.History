@@ -4,7 +4,7 @@
   "publisher": "Microsoft",
   "brief": "Quality Management helps ensure products meet defined standards by enabling systematic quality control.",
   "description": "Quality Management helps ensure products meet defined standards by integrating inspection routines, test plans, and quality specifications directly into production, inventory, and purchasing workflows.",
-  "version": "28.0.45173.0",
+  "version": "28.0.45184.0",
   "contextSensitiveHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2338953",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
   "EULA": "https://go.microsoft.com/fwlink/?linkid=2182906",
@@ -26,17 +26,14 @@
     "includeSourceInSymbolFile": true,
     "allowDownloadingSource": true
   },
-  "resourceFolders": [
-    "Resources"
-  ],
   "features": [
     "NoImplicitWith",
     "TranslationFile"
   ],
   "internalsVisibleTo": [
     {
-      "id": "aa5fc5d3-ef4e-4b03-8512-9c584cdc1ceb",
-      "name": "Quality Management-Tests",
+      "id": "9c32d4af-77d5-4fba-a3de-361805163a00",
+      "name": "Quality Management Test Library",
       "publisher": "Microsoft"
     }
   ]

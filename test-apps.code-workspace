@@ -139,10 +139,10 @@
       "path": "./Quality Management/Source/Quality Management/src/Configuration/Template/Test"
     },
     {
-      "path": "./Quality Management/Test/Quality Management-Tests"
+      "path": "./Quality Management/Test Library/Quality Management Test Library"
     },
     {
-      "path": "./Quality Management/Test/Quality Management-Tests/src/TestLibraries"
+      "path": "./Quality Management/Test/Quality Management-Tests"
     },
     {
       "path": "./SalesAndInventoryForecast/Test/Sales and Inventory Forecast Tests"
