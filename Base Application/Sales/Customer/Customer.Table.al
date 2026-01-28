@@ -2278,14 +2278,9 @@ table 18 Customer
         {
             Caption = 'SIREN No.';
         }
-#if not CLEANSCHEMA31        
+#if not CLEAN28        
         field(10860; "Payment in progress (LCY)"; Decimal)
         {
-#if CLEAN28
-            ObsoleteState = Removed;
-            ObsoleteTag = '31.0';
-            ObsoleteReason = 'Moved to the Payment Management FR first-party app';
-#else
             ObsoleteState = Pending;
             ObsoleteTag = '28.0';
             ObsoleteReason = 'Moved to the Payment Management FR first-party app';
@@ -2293,7 +2288,6 @@ table 18 Customer
                                                                     "Account No." = field("No."),
                                                                     "Copied To Line" = const(0),
                                                                     "Payment in Progress" = const(true)));
-#endif
             Caption = 'Payment in progress (LCY)';
             Editable = false;
             FieldClass = FlowField;
