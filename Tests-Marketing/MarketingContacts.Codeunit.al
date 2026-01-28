@@ -6205,6 +6205,36 @@ codeunit 136201 "Marketing Contacts"
         PurchaseOrder."Quote No.".AssertEquals(QuoteNo);
     end;
 
+    [Test]
+    [HandlerFunctions('CustomerLinkPageHandler')]
+    [Scope('OnPrem')]
+    procedure TestPersonCustomerContactLookupShowsPersonContacts()
+    var
+        Contact: Record Contact;
+        Customer: Record Customer;
+        ContactList: TestPage "Contact List";
+        CurrMasterFields: Option Contact,Customer;
+    begin
+        // [SCENARIO 617692] When customer type is Person, contact lookup should show Person contacts related to customer
+
+        Initialize();
+
+        // [GIVEN] Create Customer with Person Business Relation and related Contact.
+        CreateCustomerWithSetupBusinessRelation(Customer);
+        LibraryVariableStorage.Enqueue(Customer."No.");
+        LibraryVariableStorage.Enqueue(CurrMasterFields::Customer);
+        LibraryMarketing.CreatePersonContact(Contact);
+        Contact.CreateCustomerLink();
+
+        //[WHEN] Open Contact List Page for Customer.
+        ContactList.Trap();
+        Customer.ShowContact();
+
+        // [THEN] Contact No. and Name in Contact List Page.
+        ContactList."No.".AssertEquals(Contact."No.");
+        ContactList.Name.AssertEquals(Customer.Name);
+    end;
+
     local procedure Initialize()
     var
         MarketingSetup: Record "Marketing Setup";
