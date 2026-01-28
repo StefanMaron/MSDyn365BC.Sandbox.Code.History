@@ -1153,8 +1153,10 @@ table 115 "Sales Cr.Memo Line"
         ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntry."Entry No.");
         ValueEntry.SetRange("Item Ledger Entry Type", ItemLedgerEntry."Entry Type");
         ValueEntry.SetRange("Document Type", ValueEntry."Document Type"::"Sales Invoice");
-        if ValueEntry.FindFirst() then
+        if ValueEntry.FindFirst() then begin
             SalesInvoiceLine.Get(ValueEntry."Document No.", ValueEntry."Document Line No.");
+            exit;
+        end;
 
         if ItemLedgerEntry."Entry No." = 0 then begin
             SalesCreditMemoHeader.Get("Document No.");
@@ -1165,7 +1167,7 @@ table 115 "Sales Cr.Memo Line"
             SalesInvoiceLine.SetRange("Document No.", SalesCreditMemoHeader."Applies-to Doc. No.");
             SalesInvoiceLine.SetRange(Type, Type);
             SalesInvoiceLine.SetRange("No.", "No.");
-            SalesInvoiceLine.FindFirst();
+            if SalesInvoiceLine.FindFirst() then;
         end;
     end;
 
