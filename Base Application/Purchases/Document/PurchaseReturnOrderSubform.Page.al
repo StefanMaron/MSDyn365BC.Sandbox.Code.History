@@ -267,6 +267,7 @@ page 6641 "Purchase Return Order Subform"
                 field("Reserved Quantity"; ReverseReservedQtySign())
                 {
                     ApplicationArea = Reservation;
+                    AutoFormatType = 0;
                     BlankZero = true;
                     CaptionClass = Rec.FieldCaption("Reserved Quantity");
                     DecimalPlaces = 0 : 5;
@@ -833,6 +834,7 @@ page 6641 "Purchase Return Order Subform"
                     field("Invoice Disc. Pct."; InvoiceDiscountPct)
                     {
                         ApplicationArea = PurchReturnOrder;
+                        AutoFormatType = 0;
                         Caption = 'Invoice Discount %';
                         DecimalPlaces = 0 : 3;
                         Editable = InvDiscAmountEditable;

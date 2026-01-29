@@ -12,6 +12,7 @@ tableextension 10027 "Mfg. Item NA" extends Item
     {
         field(10013; "Rel. Scheduled Receipt (Qty.)"; Decimal)
         {
+            AutoFormatType = 0;
             CalcFormula = sum("Prod. Order Line"."Remaining Qty. (Base)" where(Status = const(Released),
                                                                                 "Item No." = field("No."),
                                                                                 "Variant Code" = field("Variant Filter"),
@@ -27,6 +28,7 @@ tableextension 10027 "Mfg. Item NA" extends Item
         }
         field(10014; "Rel. Scheduled Need (Qty.)"; Decimal)
         {
+            AutoFormatType = 0;
             CalcFormula = sum("Prod. Order Component"."Remaining Qty. (Base)" where(Status = filter(Released),
                                                                                      "Item No." = field("No."),
                                                                                      "Variant Code" = field("Variant Filter"),

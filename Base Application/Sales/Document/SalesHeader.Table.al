@@ -3575,10 +3575,14 @@ table 36 "Sales Header"
         }
         field(10000; "Sales Tax Amount Rounding"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Sales Tax Amount Rounding';
         }
         field(10001; "Prepmt. Sales Tax Rounding Amt"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Prepayment Sales Tax Rounding Amount';
         }
         field(10005; "Ship-to UPS Zone"; Code[2])
@@ -3587,6 +3591,8 @@ table 36 "Sales Header"
         }
         field(10009; "Outstanding Amount ($)"; Decimal)
         {
+            AutoFormatType = 0;
+            AutoFormatExpression = '';
             CalcFormula = sum("Sales Line"."Outstanding Amount (LCY)" where("Document Type" = field("Document Type"),
                                                                              "Document No." = field("No.")));
             Caption = 'Outstanding Amount ($)';
@@ -3622,6 +3628,7 @@ table 36 "Sales Header"
         }
         field(10047; "Transit Distance"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Transit Distance';
         }
         field(10048; "Insurer Name"; Text[50])
@@ -3681,6 +3688,7 @@ table 36 "Sales Header"
         }
         field(10060; "Exchange Rate USD"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Exchange Rate USD';
             DecimalPlaces = 0 : 6;
         }
@@ -5911,7 +5919,7 @@ table 36 "Sales Header"
     local procedure CheckCustomerContactRelation(Cont: Record Contact; CustomerNo: Code[20]; ContBusinessRelationNo: Code[20])
     var
         ContactBusinessRelationLinkType: Enum "Contact Business Relation Link To Table";
-                                             IsHandled: Boolean;
+        IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeCheckCustomerContactRelation(Rec, Cont, IsHandled, CustomerNo, ContBusinessRelationNo);
@@ -6490,7 +6498,7 @@ table 36 "Sales Header"
     procedure GetPstdDocLinesToReverse()
     var
         SalesPostedDocLines: Page "Posted Sales Document Lines";
-                                 IsHandled: Boolean;
+        IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeGetPstdDocLinesToReverse(Rec, IsHandled);
@@ -6955,9 +6963,9 @@ table 36 "Sales Header"
     local procedure UpdateOpportunityLink(Opportunity: Record Opportunity; SalesDocumentType: Enum "Opportunity Document Type"; SalesHeaderNo: Code[20])
     begin
         Opportunity."Sales Document Type" := SalesDocumentType;
-                                                                                                  Opportunity."Sales Document No." := SalesHeaderNo;
-                                                                                                  OnUpdateOpportunityLinkOnBeforeModify(Opportunity, Rec, SalesDocumentType.AsInteger(), SalesHeaderNo);
-                                                                                                  Opportunity.Modify();
+        Opportunity."Sales Document No." := SalesHeaderNo;
+        OnUpdateOpportunityLinkOnBeforeModify(Opportunity, Rec, SalesDocumentType.AsInteger(), SalesHeaderNo);
+        Opportunity.Modify();
     end;
 
     local procedure IsPrepmtInvoicePosted(): Boolean
@@ -8900,8 +8908,8 @@ table 36 "Sales Header"
         MyNotifications: Record "My Notifications";
         NotificationLifecycleMgt: Codeunit "Notification Lifecycle Mgt.";
         PageMyNotifications: Page "My Notifications";
-                                 ModifyCustomerAddressNotification: Notification;
-                                 IsHandled: Boolean;
+        ModifyCustomerAddressNotification: Notification;
+        IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeShowModifyAddressNotification(IsHandled, Rec, CustomerNumber);
@@ -9525,7 +9533,7 @@ table 36 "Sales Header"
     procedure CopyDocument()
     var
         CopySalesDocument: Report "Copy Sales Document";
-                               IsHandled: Boolean;
+        IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeCopyDocument(Rec, IsHandled);
@@ -10035,7 +10043,7 @@ table 36 "Sales Header"
     internal procedure CalculateReservableOutstandingQuantityBase() OutstandingQtyBase: Decimal
     var
         RemQtyBaseInvtItemSalesLine: Query RemQtyBaseInvtItemSalesLine;
-                                         IsHandled: Boolean;
+        IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeCalculateReservableOutstandingQuantityBase(Rec, IsHandled, OutstandingQtyBase);
