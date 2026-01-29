@@ -78,6 +78,7 @@ table 7190 "Sales Shipment Buffer"
         /// </summary>
         field(7; Quantity; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity';
             DataClassification = SystemMetadata;
         }

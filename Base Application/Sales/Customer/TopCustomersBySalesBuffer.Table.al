@@ -36,6 +36,8 @@ table 1328 "Top Customers By Sales Buffer"
         /// </summary>
         field(3; SalesLCY; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'SalesLCY';
             DataClassification = OrganizationIdentifiableInformation;
         }
