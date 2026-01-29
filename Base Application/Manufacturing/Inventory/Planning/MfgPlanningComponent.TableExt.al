@@ -98,6 +98,7 @@ tableextension 99000829 "Mfg. Planning Component" extends "Planning Component"
         }
         field(20; "Scrap %"; Decimal)
         {
+            AutoFormatType = 0;
             BlankNumbers = BlankNeg;
             Caption = 'Scrap %';
             DataClassification = CustomerContent;

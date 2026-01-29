@@ -290,6 +290,7 @@ page 99000817 "Prod. Order Routing"
                 field("Expected Capacity Need"; Rec."Expected Capacity Need" / ExpCapacityNeed())
                 {
                     ApplicationArea = Manufacturing;
+                    AutoFormatType = 0;
                     Caption = 'Expected Capacity Need';
                     DecimalPlaces = 0 : 5;
                     ToolTip = 'Specifies the expected capacity need for the production order.';

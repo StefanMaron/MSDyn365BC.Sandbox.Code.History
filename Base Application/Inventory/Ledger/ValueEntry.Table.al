@@ -99,27 +99,32 @@ table 5802 "Value Entry"
         }
         field(12; "Valued Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Valued Quantity';
             DecimalPlaces = 0 : 5;
         }
         field(13; "Item Ledger Entry Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Item Ledger Entry Quantity';
             DecimalPlaces = 0 : 5;
         }
         field(14; "Invoiced Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Invoiced Quantity';
             DecimalPlaces = 0 : 5;
         }
         field(15; "Cost per Unit"; Decimal)
         {
             AutoFormatType = 2;
+            AutoFormatExpression = '';
             Caption = 'Cost per Unit';
         }
         field(17; "Sales Amount (Actual)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Sales Amount (Actual)';
         }
         field(20; "Item Register No."; Integer)
@@ -142,6 +147,7 @@ table 5802 "Value Entry"
         field(23; "Discount Amount"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Discount Amount';
         }
         field(24; "User ID"; Code[50])
@@ -178,11 +184,13 @@ table 5802 "Value Entry"
         field(43; "Cost Amount (Actual)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Cost Amount (Actual)';
         }
         field(45; "Cost Posted to G/L"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Cost Posted to G/L';
         }
         field(46; "Reason Code"; Code[10])
@@ -302,29 +310,34 @@ table 5802 "Value Entry"
         field(148; "Purchase Amount (Actual)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Purchase Amount (Actual)';
         }
         field(149; "Purchase Amount (Expected)"; Decimal)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Purchase Amount (Expected)';
         }
         field(150; "Sales Amount (Expected)"; Decimal)
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Sales Amount (Expected)';
         }
         field(151; "Cost Amount (Expected)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Cost Amount (Expected)';
         }
         field(152; "Cost Amount (Non-Invtbl.)"; Decimal)
         {
             AccessByPermission = TableData "Item Charge" = R;
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Cost Amount (Non-Invtbl.)';
         }
         field(156; "Cost Amount (Expected) (ACY)"; Decimal)
@@ -343,6 +356,7 @@ table 5802 "Value Entry"
         field(158; "Expected Cost Posted to G/L"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Expected Cost Posted to G/L';
         }
         field(159; "Exp. Cost Posted to G/L (ACY)"; Decimal)

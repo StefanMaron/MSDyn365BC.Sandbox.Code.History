@@ -1054,6 +1054,7 @@ table 39 "Purchase Line"
                         "Inv. Discount Amount" := 0;
                         "Inv. Disc. Amount to Invoice" := 0;
                     end;
+                    "Recalculate Invoice Disc." := true;
                     UpdateAmounts();
                     UpdateUnitCost();
                 end;
@@ -2235,6 +2236,8 @@ table 39 "Purchase Line"
         }
         field(1003; "Job Unit Price"; Decimal)
         {
+            AutoFormatType = 2;
+            AutoFormatExpression = "Job Currency Code";
             AccessByPermission = TableData Job = R;
             BlankZero = true;
             Caption = 'Project Unit Price';
@@ -2262,6 +2265,8 @@ table 39 "Purchase Line"
         field(1004; "Job Total Price"; Decimal)
         {
             AccessByPermission = TableData Job = R;
+            AutoFormatExpression = "Job Currency Code";
+            AutoFormatType = 1;
             BlankZero = true;
             Caption = 'Project Total Price';
             Editable = false;
@@ -3765,6 +3770,7 @@ table 39 "Purchase Line"
         }
         field(12101; "Deductible %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Deductible %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -3777,6 +3783,7 @@ table 39 "Purchase Line"
         }
         field(12102; "Prepayment Deductible %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Prepayment Deductible %';
             DecimalPlaces = 0 : 5;
             InitValue = 100;
@@ -3871,6 +3878,7 @@ table 39 "Purchase Line"
 #if not CLEAN27
         field(12182; "WIP Qty at Subc.Loc. (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             CalcFormula = sum(Microsoft.Manufacturing.Capacity."Capacity Ledger Entry"."WIP Item Qty." where("Subcontr. Purch. Order No." = field("Document No."),
                                                                              "Subcontr. Purch. Order Line" = field("Line No.")));
             Caption = 'WIP Qty at Subc.Loc. (Base)';
@@ -3884,6 +3892,7 @@ table 39 "Purchase Line"
 #endif
         field(12183; "Not Proc. WIP Qty to Receive"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Not Proc. WIP Qty to Receive';
             DecimalPlaces = 0 : 5;
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
@@ -3906,6 +3915,7 @@ table 39 "Purchase Line"
         }
         field(12184; "Base UM Qty/Pricelist UM Qty"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Base UM Qty/Pricelist UM Qty';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -3935,6 +3945,7 @@ table 39 "Purchase Line"
         }
         field(12186; "Pricelist UM Qty/Base UM Qty"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Pricelist UM Qty/Base UM Qty';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -5598,7 +5609,7 @@ table 39 "Purchase Line"
 
         VATBaseAmount := "VAT Base Amount";
         NonDeductAmount := NonDeductibleVAT.GetNonDeductibleVATAmount(Rec);
-        "Recalculate Invoice Disc." := "Allow Invoice Disc.";
+        "Recalculate Invoice Disc." := "Recalculate Invoice Disc." or "Allow Invoice Disc.";
 
         UpdateLineAmount(LineAmountChanged);
 

@@ -120,30 +120,35 @@ table 99000764 "Routing Line"
         }
         field(12; "Setup Time"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Setup Time';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
         }
         field(13; "Run Time"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Run Time';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
         }
         field(14; "Wait Time"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Wait Time';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
         }
         field(15; "Move Time"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Move Time';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
         }
         field(16; "Fixed Scrap Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Fixed Scrap Quantity';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
@@ -155,11 +160,13 @@ table 99000764 "Routing Line"
         }
         field(17; "Lot Size"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Lot Size';
             DecimalPlaces = 0 : 5;
         }
         field(18; "Scrap Factor %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Scrap Factor %';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
@@ -197,18 +204,21 @@ table 99000764 "Routing Line"
         }
         field(27; "Minimum Process Time"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Minimum Process Time';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
         }
         field(28; "Maximum Process Time"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Maximum Process Time';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
         }
         field(30; "Concurrent Capacities"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Concurrent Capacities';
             DecimalPlaces = 0 : 5;
             InitValue = 1;
@@ -216,6 +226,7 @@ table 99000764 "Routing Line"
         }
         field(31; "Send-Ahead Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Send-Ahead Quantity';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
@@ -313,6 +324,7 @@ table 99000764 "Routing Line"
         field(40; "Unit Cost per"; Decimal)
         {
             AutoFormatType = 2;
+            AutoFormatExpression = '';
             Caption = 'Unit Cost per';
             MinValue = 0;
         }
@@ -342,12 +354,14 @@ table 99000764 "Routing Line"
         }
         field(52; "Fixed Scrap Qty. (Accum.)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Fixed Scrap Qty. (Accum.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
         field(53; "Scrap Factor % (Accumulated)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Scrap Factor % (Accumulated)';
             DecimalPlaces = 0 : 5;
             Editable = false;

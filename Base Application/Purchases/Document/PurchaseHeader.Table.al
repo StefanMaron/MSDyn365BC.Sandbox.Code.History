@@ -3046,6 +3046,7 @@ table 38 "Purchase Header"
         }
         field(12170; "Payment %"; Decimal)
         {
+            AutoFormatType = 0;
             CalcFormula = sum("Payment Lines"."Payment %" where("Sales/Purchase" = const(Purchase),
                                                                  Type = field("Document Type"),
                                                                  Code = field("No.")));
