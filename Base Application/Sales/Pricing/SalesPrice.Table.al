@@ -179,6 +179,7 @@ table 7002 "Sales Price"
         /// </summary>
         field(14; "Minimum Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Minimum Quantity';
             DecimalPlaces = 0 : 5;
             MinValue = 0;

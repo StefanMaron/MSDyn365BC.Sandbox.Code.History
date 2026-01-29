@@ -68,6 +68,7 @@ page 499 "Available - Sales Lines"
                 field(QtyToReserveBase; QtyToReserveBase)
                 {
                     ApplicationArea = Reservation;
+                    AutoFormatType = 0;
                     Caption = 'Available Quantity';
                     DecimalPlaces = 0 : 5;
                     Editable = false;
@@ -76,6 +77,7 @@ page 499 "Available - Sales Lines"
                 field(ReservedQuantity; GetReservedQtyInLine())
                 {
                     ApplicationArea = Reservation;
+                    AutoFormatType = 0;
                     Caption = 'Current Reserved Quantity';
                     DecimalPlaces = 0 : 5;
                     ToolTip = 'Specifies the quantity of the item that is reserved from the sales line for the current line or entry.';
