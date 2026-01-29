@@ -107,6 +107,8 @@ page 126 "Cust. Ledg. Entries Preview"
                 field(OriginalAmountLCY; OriginalAmountLCY)
                 {
                     ApplicationArea = Basic, Suite;
+                    AutoFormatType = 1;
+                    AutoFormatExpression = '';
                     Caption = 'Original Amount LCY';
                     Editable = false;
                     ToolTip = 'Specifies the original amount linked to the customer ledger entry, in local currency.';
@@ -135,6 +137,8 @@ page 126 "Cust. Ledg. Entries Preview"
                 field(AmountLCY; AmountLCY)
                 {
                     ApplicationArea = Basic, Suite;
+                    AutoFormatType = 1;
+                    AutoFormatExpression = '';
                     Caption = 'Amount LCY';
                     DrillDown = true;
                     Editable = false;
@@ -154,6 +158,8 @@ page 126 "Cust. Ledg. Entries Preview"
                 field("Debit Amount (LCY)"; Rec."Debit Amount (LCY)")
                 {
                     ApplicationArea = Basic, Suite;
+                    AutoFormatType = 1;
+                    AutoFormatExpression = '';
                     Visible = false;
                 }
                 field("Credit Amount"; Rec."Credit Amount")
@@ -164,6 +170,8 @@ page 126 "Cust. Ledg. Entries Preview"
                 field("Credit Amount (LCY)"; Rec."Credit Amount (LCY)")
                 {
                     ApplicationArea = Basic, Suite;
+                    AutoFormatType = 1;
+                    AutoFormatExpression = '';
                     Visible = false;
                 }
                 field(RemainingAmountFCY; RemainingAmountFCY)
@@ -183,6 +191,8 @@ page 126 "Cust. Ledg. Entries Preview"
                 field(RemainingAmountLCY; RemainingAmountLCY)
                 {
                     ApplicationArea = Basic, Suite;
+                    AutoFormatType = 1;
+                    AutoFormatExpression = '';
                     Caption = 'Remaining Amount LCY';
                     Editable = false;
                     ToolTip = 'Specifies the remaining amount linked to the customer ledger entry on the line, in local currency.';

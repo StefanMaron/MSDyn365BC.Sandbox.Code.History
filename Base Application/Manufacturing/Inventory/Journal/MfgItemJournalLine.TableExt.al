@@ -57,6 +57,7 @@ tableextension 99000758 "Mfg. Item Journal Line" extends "Item Journal Line"
         }
         field(5849; "Concurrent Capacity"; Decimal)
         {
+            AutoFormatType = 0;
             AccessByPermission = TableData "Machine Center" = R;
             Caption = 'Concurrent Capacity';
             DataClassification = CustomerContent;
@@ -102,6 +103,7 @@ tableextension 99000758 "Mfg. Item Journal Line" extends "Item Journal Line"
         }
         field(5841; "Setup Time"; Decimal)
         {
+            AutoFormatType = 0;
             AccessByPermission = TableData "Machine Center" = R;
             Caption = 'Setup Time';
             DataClassification = CustomerContent;
@@ -116,6 +118,7 @@ tableextension 99000758 "Mfg. Item Journal Line" extends "Item Journal Line"
         }
         field(5842; "Run Time"; Decimal)
         {
+            AutoFormatType = 0;
             AccessByPermission = TableData "Machine Center" = R;
             Caption = 'Run Time';
             DataClassification = CustomerContent;
@@ -131,6 +134,7 @@ tableextension 99000758 "Mfg. Item Journal Line" extends "Item Journal Line"
         }
         field(5843; "Stop Time"; Decimal)
         {
+            AutoFormatType = 0;
             AccessByPermission = TableData "Machine Center" = R;
             Caption = 'Stop Time';
             DataClassification = CustomerContent;
@@ -143,6 +147,7 @@ tableextension 99000758 "Mfg. Item Journal Line" extends "Item Journal Line"
         }
         field(5846; "Output Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             AccessByPermission = TableData "Machine Center" = R;
             Caption = 'Output Quantity';
             DataClassification = CustomerContent;
@@ -173,6 +178,7 @@ tableextension 99000758 "Mfg. Item Journal Line" extends "Item Journal Line"
         }
         field(5847; "Scrap Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             AccessByPermission = TableData "Machine Center" = R;
             Caption = 'Scrap Quantity';
             DataClassification = CustomerContent;
@@ -186,6 +192,7 @@ tableextension 99000758 "Mfg. Item Journal Line" extends "Item Journal Line"
         }
         field(5851; "Setup Time (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Setup Time (Base)';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
@@ -198,6 +205,7 @@ tableextension 99000758 "Mfg. Item Journal Line" extends "Item Journal Line"
         }
         field(5852; "Run Time (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Run Time (Base)';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
@@ -210,6 +218,7 @@ tableextension 99000758 "Mfg. Item Journal Line" extends "Item Journal Line"
         }
         field(5853; "Stop Time (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Stop Time (Base)';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
@@ -222,6 +231,7 @@ tableextension 99000758 "Mfg. Item Journal Line" extends "Item Journal Line"
         }
         field(5856; "Output Quantity (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Output Quantity (Base)';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
@@ -241,6 +251,7 @@ tableextension 99000758 "Mfg. Item Journal Line" extends "Item Journal Line"
         }
         field(5857; "Scrap Quantity (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Scrap Quantity (Base)';
             DataClassification = CustomerContent;
             DecimalPlaces = 0 : 5;
