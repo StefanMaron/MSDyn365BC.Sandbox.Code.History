@@ -1169,6 +1169,7 @@ table 37 "Sales Line"
                         "Inv. Discount Amount" := 0;
                         "Inv. Disc. Amount to Invoice" := 0;
                     end;
+                    "Recalculate Invoice Disc." := true;
                     UpdateAmounts();
                 end;
             end;
@@ -2634,6 +2635,7 @@ table 37 "Sales Line"
         /// </summary>
         field(903; "ATO Whse. Outstd. Qty. (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             AccessByPermission = TableData "BOM Component" = R;
             BlankZero = true;
             CalcFormula = sum("Warehouse Shipment Line"."Qty. Outstanding (Base)" where("Source Type" = const(37),
@@ -2920,6 +2922,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5404; "Qty. per Unit of Measure"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. per Unit of Measure';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -2938,6 +2941,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5406; "Qty. Rounding Precision"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Rounding Precision';
             InitValue = 0;
             DecimalPlaces = 0 : 5;
@@ -2950,6 +2954,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5408; "Qty. Rounding Precision (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Rounding Precision (Base)';
             InitValue = 0;
             DecimalPlaces = 0 : 5;
@@ -3057,6 +3062,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5415; "Quantity (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity (Base)';
             DecimalPlaces = 0 : 5;
 
@@ -3082,6 +3088,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5416; "Outstanding Qty. (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Outstanding Qty. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -3091,6 +3098,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5417; "Qty. to Invoice (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. to Invoice (Base)';
             DecimalPlaces = 0 : 5;
 
@@ -3112,6 +3120,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5418; "Qty. to Ship (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. to Ship (Base)';
             DecimalPlaces = 0 : 5;
 
@@ -3133,6 +3142,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5458; "Qty. Shipped Not Invd. (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Shipped Not Invd. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -3142,6 +3152,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5460; "Qty. Shipped (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Shipped (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -3151,6 +3162,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5461; "Qty. Invoiced (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Invoiced (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -3160,6 +3172,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5495; "Reserved Qty. (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             AccessByPermission = TableData "Sales Shipment Header" = R;
             CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Source ID" = field("Document No."),
                                                                             "Source Ref. No." = field("Line No."),
@@ -3451,6 +3464,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5749; "Whse. Outstanding Qty."; Decimal)
         {
+            AutoFormatType = 0;
             AccessByPermission = TableData Location = R;
             BlankZero = true;
             CalcFormula = sum("Warehouse Shipment Line"."Qty. Outstanding" where("Source Type" = const(37),
@@ -3469,6 +3483,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5750; "Whse. Outstanding Qty. (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             AccessByPermission = TableData Location = R;
             BlankZero = true;
             CalcFormula = sum("Warehouse Shipment Line"."Qty. Outstanding (Base)" where("Source Type" = const(37),
@@ -3689,6 +3704,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5801; "Qty. to Assign"; Decimal)
         {
+            AutoFormatType = 0;
             CalcFormula = sum("Item Charge Assignment (Sales)"."Qty. to Assign" where("Document Type" = field("Document Type"),
                                                                                        "Document No." = field("Document No."),
                                                                                        "Document Line No." = field("Line No.")));
@@ -3702,6 +3718,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5802; "Qty. Assigned"; Decimal)
         {
+            AutoFormatType = 0;
             CalcFormula = sum("Item Charge Assignment (Sales)"."Qty. Assigned" where("Document Type" = field("Document Type"),
                                                                                       "Document No." = field("Document No."),
                                                                                       "Document Line No." = field("Line No.")));
@@ -3717,6 +3734,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "Return Receipt Header" = R;
             Caption = 'Return Qty. to Receive';
+            AutoFormatType = 0;
             DecimalPlaces = 0 : 5;
 
             trigger OnValidate()
@@ -3769,6 +3787,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5804; "Return Qty. to Receive (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Return Qty. to Receive (Base)';
             DecimalPlaces = 0 : 5;
 
@@ -3790,6 +3809,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5805; "Return Qty. Rcd. Not Invd."; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Return Qty. Rcd. Not Invd.';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -3799,6 +3819,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5806; "Ret. Qty. Rcd. Not Invd.(Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Ret. Qty. Rcd. Not Invd.(Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -3846,6 +3867,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5809; "Return Qty. Received"; Decimal)
         {
+            AutoFormatType = 0;
             AccessByPermission = TableData "Return Receipt Header" = R;
             Caption = 'Return Qty. Received';
             DecimalPlaces = 0 : 5;
@@ -3856,6 +3878,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5810; "Return Qty. Received (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Return Qty. Received (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -3889,6 +3912,7 @@ table 37 "Sales Line"
         /// </summary>
         field(5812; "Item Charge Qty. to Handle"; Decimal)
         {
+            AutoFormatType = 0;
             CalcFormula = sum("Item Charge Assignment (Sales)"."Qty. to Handle" where("Document Type" = field("Document Type"),
                                                                                        "Document No." = field("Document No."),
                                                                                        "Document Line No." = field("Line No.")));
@@ -4044,6 +4068,7 @@ table 37 "Sales Line"
         }
         field(10501; "Reverse Charge"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Reverse Charge';
             ObsoleteReason = 'Moved to Reverse Charge VAT GB app';
 #if CLEAN27
@@ -5801,7 +5826,7 @@ table 37 "Sales Line"
 
         GetSalesHeader();
         VATBaseAmount := "VAT Base Amount";
-        "Recalculate Invoice Disc." := "Allow Invoice Disc.";
+        "Recalculate Invoice Disc." := "Recalculate Invoice Disc." or "Allow Invoice Disc.";
 
         IsHandled := false;
         OnUpdateAmountsOnBeforeCheckLineAmount(IsHandled, Rec, xRec);

@@ -108,6 +108,7 @@ table 99000772 "Production BOM Line"
         }
         field(14; Quantity; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -155,6 +156,7 @@ table 99000772 "Production BOM Line"
         }
         field(20; "Scrap %"; Decimal)
         {
+            AutoFormatType = 0;
             BlankNumbers = BlankNeg;
             Caption = 'Scrap %';
             DecimalPlaces = 0 : 5;
@@ -231,6 +233,7 @@ table 99000772 "Production BOM Line"
         }
         field(40; Length; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Length';
             DecimalPlaces = 0 : 5;
 
@@ -241,6 +244,7 @@ table 99000772 "Production BOM Line"
         }
         field(41; Width; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Width';
             DecimalPlaces = 0 : 5;
 
@@ -251,6 +255,7 @@ table 99000772 "Production BOM Line"
         }
         field(42; Weight; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Weight';
             DecimalPlaces = 0 : 5;
 
@@ -261,6 +266,7 @@ table 99000772 "Production BOM Line"
         }
         field(43; Depth; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Depth';
             DecimalPlaces = 0 : 5;
 
@@ -302,6 +308,7 @@ table 99000772 "Production BOM Line"
         }
         field(45; "Quantity per"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity per';
             DecimalPlaces = 0 : 5;
 

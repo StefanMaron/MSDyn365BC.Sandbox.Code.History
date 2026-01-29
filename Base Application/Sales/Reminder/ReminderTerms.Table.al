@@ -61,6 +61,7 @@ table 292 "Reminder Terms"
         field(6; "Minimum Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Minimum Amount (LCY)';
             MinValue = 0;
         }

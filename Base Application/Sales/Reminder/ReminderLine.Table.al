@@ -343,6 +343,7 @@ table 296 "Reminder Line"
         /// </summary>
         field(17; "Interest Rate"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Interest Rate';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -375,6 +376,7 @@ table 296 "Reminder Line"
         /// </summary>
         field(19; "VAT %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'VAT %';
             DecimalPlaces = 0 : 5;
             Editable = false;

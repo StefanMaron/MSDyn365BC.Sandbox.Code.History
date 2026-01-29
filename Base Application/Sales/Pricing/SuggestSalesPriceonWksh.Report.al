@@ -318,6 +318,7 @@ report 7052 "Suggest Sales Price on Wksh."
                     field(OnlyPricesAbove; PriceLowerLimit)
                     {
                         ApplicationArea = Basic, Suite;
+                        AutoFormatType = 0;
                         Caption = 'Only Prices Above';
                         DecimalPlaces = 2 : 5;
                         ToolTip = 'Specifies the code for the sales type that the sales prices will be copied to. To see the existing sales codes, click the field.';
@@ -325,6 +326,7 @@ report 7052 "Suggest Sales Price on Wksh."
                     field(AdjustmentFactor; UnitPriceFactor)
                     {
                         ApplicationArea = Basic, Suite;
+                        AutoFormatType = 0;
                         Caption = 'Adjustment Factor';
                         DecimalPlaces = 0 : 5;
                         MinValue = 0;
