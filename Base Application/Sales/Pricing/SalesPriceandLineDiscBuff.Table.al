@@ -148,7 +148,7 @@ table 1304 "Sales Price and Line Disc Buff"
         /// </summary>
         field(5; "Line Discount %"; Decimal)
         {
-            AutoFormatType = 2;
+            AutoFormatType = 0;
             Caption = 'Line Discount %';
             DataClassification = SystemMetadata;
             MaxValue = 100;
@@ -234,6 +234,7 @@ table 1304 "Sales Price and Line Disc Buff"
         /// </summary>
         field(14; "Minimum Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Minimum Quantity';
             DataClassification = SystemMetadata;
             MinValue = 0;

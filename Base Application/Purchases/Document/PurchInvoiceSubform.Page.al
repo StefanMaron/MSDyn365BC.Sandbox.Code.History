@@ -408,6 +408,7 @@ page 55 "Purch. Invoice Subform"
                 }
                 field("Non Deductible VAT %"; Rec."Non Deductible VAT %")
                 {
+                    AutoFormatType = 0;
                     ApplicationArea = VAT;
                     ToolTip = 'Specifies the percentage of VAT that cannot be deducted for this purchase line.';
 
@@ -874,6 +875,7 @@ page 55 "Purch. Invoice Subform"
                     field("Invoice Disc. Pct."; InvoiceDiscountPct)
                     {
                         ApplicationArea = Basic, Suite;
+                        AutoFormatType = 0;
                         Caption = 'Invoice Discount %';
                         DecimalPlaces = 0 : 3;
                         Editable = InvDiscAmountEditable;

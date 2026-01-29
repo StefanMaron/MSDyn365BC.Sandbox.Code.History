@@ -34,6 +34,8 @@ page 437 "Reminder Statistics"
                 }
                 field(Interest; Interest)
                 {
+                    AutoFormatType = 2;
+                    AutoFormatExpression = Rec."Currency Code";
                     ApplicationArea = Basic, Suite;
                     Caption = 'Interest Amount';
                     DrillDown = false;
@@ -47,6 +49,8 @@ page 437 "Reminder Statistics"
                 }
                 field(VatAmount; VatAmount)
                 {
+                    AutoFormatType = 2;
+                    AutoFormatExpression = Rec."Currency Code";
                     ApplicationArea = Basic, Suite;
                     Caption = 'VAT Amount';
                     DrillDown = false;
@@ -54,6 +58,8 @@ page 437 "Reminder Statistics"
                 }
                 field("Add. Fee per Line"; Rec."Add. Fee per Line")
                 {
+                    AutoFormatType = 2;
+                    AutoFormatExpression = Rec."Currency Code";
                     ApplicationArea = Basic, Suite;
                     DrillDown = false;
                     ToolTip = 'Specifies that the fee is distributed on individual reminder lines.';
@@ -68,6 +74,8 @@ page 437 "Reminder Statistics"
                 }
                 field(InvoiceRoundingAmount; InvoiceRoundingAmount)
                 {
+                    AutoFormatType = 2;
+                    AutoFormatExpression = Rec."Currency Code";
                     ApplicationArea = Basic, Suite;
                     Caption = 'Invoice Rounding Amount';
                     ToolTip = 'Specifies the amount that must be added to the reminder when it is posted according to invoice rounding setup.';
@@ -96,6 +104,8 @@ page 437 "Reminder Statistics"
                 }
                 field(CreditLimitLCYExpendedPct; CreditLimitLCYExpendedPct)
                 {
+                    AutoFormatType = 2;
+                    AutoFormatExpression = '';
                     ApplicationArea = Basic, Suite;
                     Caption = 'Expended % of Credit Limit (LCY)';
                     ExtendedDatatype = Ratio;

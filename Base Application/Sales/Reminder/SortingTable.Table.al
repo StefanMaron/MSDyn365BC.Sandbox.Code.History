@@ -29,6 +29,7 @@ table 1051 "Sorting Table"
         /// </summary>
         field(2; Decimal; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Decimal';
         }
         /// <summary>
