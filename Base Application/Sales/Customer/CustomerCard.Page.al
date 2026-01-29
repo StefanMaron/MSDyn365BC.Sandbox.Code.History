@@ -113,6 +113,8 @@ page 21 "Customer Card"
                 field(BalanceAsVendor; BalanceAsVendor)
                 {
                     ApplicationArea = Basic, Suite;
+                    AutoFormatType = 1;
+                    AutoFormatExpression = '';
                     Caption = 'Balance (LCY) As Vendor';
                     Editable = false;
                     Enabled = BalanceAsVendorEnabled;
@@ -176,6 +178,8 @@ page 21 "Customer Card"
                 field(TotalSales2; CustSalesLCY)
                 {
                     ApplicationArea = Basic, Suite;
+                    AutoFormatType = 1;
+                    AutoFormatExpression = '';
                     Caption = 'Total Sales - Fiscal Year';
                     Style = Strong;
                     StyleExpr = true;
@@ -191,6 +195,7 @@ page 21 "Customer Card"
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatType = 1;
+                    AutoFormatExpression = '';
                     Caption = 'Costs (LCY)';
                     ToolTip = 'Specifies how much cost you have incurred from the customer in the current fiscal year.';
                 }
@@ -198,6 +203,7 @@ page 21 "Customer Card"
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatType = 1;
+                    AutoFormatExpression = '';
                     Caption = 'Profit (LCY)';
                     Editable = false;
                     Importance = Additional;
@@ -206,6 +212,7 @@ page 21 "Customer Card"
                 field(AdjProfitPct; AdjProfitPct)
                 {
                     ApplicationArea = Basic, Suite;
+                    AutoFormatType = 0;
                     Caption = 'Profit %';
                     DecimalPlaces = 1 : 1;
                     Editable = false;
@@ -673,6 +680,8 @@ page 21 "Customer Card"
                     field(ExpectedCustMoneyOwed; ExpectedMoneyOwed)
                     {
                         ApplicationArea = Basic, Suite;
+                        AutoFormatType = 1;
+                        AutoFormatExpression = Rec."Currency Code";
                         Caption = 'Money Owed - Expected';
                         Editable = false;
                         Importance = Additional;
@@ -686,6 +695,8 @@ page 21 "Customer Card"
                     field(TotalMoneyOwed; TotalMoneyOwed)
                     {
                         ApplicationArea = Basic, Suite;
+                        AutoFormatType = 1;
+                        AutoFormatExpression = Rec."Currency Code";
                         Caption = 'Money Owed - Total';
                         Style = Strong;
                         StyleExpr = true;
@@ -699,6 +710,7 @@ page 21 "Customer Card"
                     field(CalcCreditLimitLCYExpendedPct; Rec.CalcCreditLimitLCYExpendedPct())
                     {
                         ApplicationArea = Basic, Suite;
+                        AutoFormatType = 0;
                         Caption = 'Usage Of Credit Limit';
                         ExtendedDatatype = Ratio;
                         Style = Attention;
@@ -712,6 +724,8 @@ page 21 "Customer Card"
                     field("Balance Due"; OverdueBalance)
                     {
                         ApplicationArea = Basic, Suite;
+                        AutoFormatType = 1;
+                        AutoFormatExpression = Rec."Currency Code";
                         CaptionClass = OverduePaymentsMsg;
                         ToolTip = 'Specifies the sum of outstanding payments from the customer.';
 
@@ -730,6 +744,8 @@ page 21 "Customer Card"
                     field("Payments (LCY)"; CustPaymentsLCY)
                     {
                         ApplicationArea = Basic, Suite;
+                        AutoFormatType = 1;
+                        AutoFormatExpression = '';
                         CaptionClass = Format(StrSubstNo(PaymentsThisYearTxt, Format(CustomerMgt.GetCurrentYearFilter())));
                         ToolTip = 'Specifies the sum of payments received from the customer in the current fiscal year. Current fiscal year is determined by the system date. The value shown here is calculated asynchronously so there might be a delay in updating this field.';
 
@@ -743,6 +759,7 @@ page 21 "Customer Card"
 #pragma warning restore AA0100
                     {
                         ApplicationArea = Basic, Suite;
+                        AutoFormatType = 0;
                         Caption = 'Average Collection Period (Days)';
                         DecimalPlaces = 0 : 1;
                         Importance = Additional;
@@ -751,6 +768,7 @@ page 21 "Customer Card"
                     field(DaysPaidPastDueDate; DaysPastDueDate)
                     {
                         ApplicationArea = Basic, Suite;
+                        AutoFormatType = 0;
                         Caption = 'Average Late Payments (Days)';
                         DecimalPlaces = 0 : 1;
                         Importance = Additional;
@@ -777,6 +795,7 @@ page 21 "Customer Card"
                     field(PercentPaidLate; PercentPaidLate)
                     {
                         ApplicationArea = Basic, Suite;
+                        AutoFormatType = 0;
                         Caption = 'Percent Paid Late';
                         ToolTip = 'Specifies the percentage of invoices that were paid late by the customer in the current fiscal year.';
                         Importance = Additional;
@@ -822,6 +841,8 @@ page 21 "Customer Card"
                     field(AmountOnPostedInvoices; AmountOnPostedInvoices)
                     {
                         ApplicationArea = Basic, Suite;
+                        AutoFormatType = 1;
+                        AutoFormatExpression = '';
                         CaptionClass = StrSubstNo(PostedInvoicesMsg, Format(NoPostedInvoices));
                         ToolTip = 'Specifies your sales to the customer in the current fiscal year based on posted sales invoices. The figure in parenthesis Specifies the number of posted sales invoices.';
 
@@ -833,6 +854,8 @@ page 21 "Customer Card"
                     field(AmountOnCrMemo; AmountOnPostedCrMemos)
                     {
                         ApplicationArea = Basic, Suite;
+                        AutoFormatType = 1;
+                        AutoFormatExpression = '';
                         CaptionClass = StrSubstNo(CreditMemosMsg, Format(NoPostedCrMemos));
                         ToolTip = 'Specifies your expected refunds to the customer in the current fiscal year based on posted sales credit memos. The figure in parenthesis shows the number of posted sales credit memos.';
 
@@ -844,6 +867,8 @@ page 21 "Customer Card"
                     field(AmountOnOutstandingInvoices; AmountOnOutstandingInvoices)
                     {
                         ApplicationArea = Basic, Suite;
+                        AutoFormatType = 1;
+                        AutoFormatExpression = '';
                         CaptionClass = StrSubstNo(OutstandingInvoicesMsg, Format(NoOutstandingInvoices));
                         ToolTip = 'Specifies your expected sales to the customer in the current fiscal year based on ongoing sales invoices. The figure in parenthesis shows the number of ongoing sales invoices.';
 
@@ -855,6 +880,8 @@ page 21 "Customer Card"
                     field(AmountOnOutstandingCrMemos; AmountOnOutstandingCrMemos)
                     {
                         ApplicationArea = Basic, Suite;
+                        AutoFormatType = 1;
+                        AutoFormatExpression = '';
                         CaptionClass = StrSubstNo(OutstandingCrMemosMsg, Format(NoOutstandingCrMemos));
                         ToolTip = 'Specifies your refunds to the customer in the current fiscal year based on ongoing sales credit memos. The figure in parenthesis shows the number of ongoing sales credit memos.';
 
@@ -866,6 +893,8 @@ page 21 "Customer Card"
                     field(Totals; Totals)
                     {
                         ApplicationArea = Basic, Suite;
+                        AutoFormatType = 1;
+                        AutoFormatExpression = '';
                         Caption = 'Total Sales';
                         Style = Strong;
                         StyleExpr = true;
@@ -874,6 +903,8 @@ page 21 "Customer Card"
                     field(CustInvDiscAmountLCY; CustInvDiscAmountLCY)
                     {
                         ApplicationArea = Basic, Suite;
+                        AutoFormatType = 1;
+                        AutoFormatExpression = '';
                         Caption = 'Invoice Discounts';
                         ToolTip = 'Specifies the total of all invoice discounts that you have granted to the customer in the current fiscal year.';
                     }

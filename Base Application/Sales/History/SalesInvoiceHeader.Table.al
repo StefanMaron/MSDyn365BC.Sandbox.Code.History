@@ -238,6 +238,7 @@ table 112 "Sales Invoice Header"
         /// </summary>
         field(25; "Payment Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Payment Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -307,6 +308,7 @@ table 112 "Sales Invoice Header"
         /// </summary>
         field(33; "Currency Factor"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Currency Factor';
             DecimalPlaces = 0 : 15;
             MinValue = 0;
@@ -800,6 +802,7 @@ table 112 "Sales Invoice Header"
         /// </summary>
         field(119; "VAT Base Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'VAT Base Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -820,6 +823,7 @@ table 112 "Sales Invoice Header"
         field(122; "Invoice Discount Value"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Invoice Discount Value';
         }
         /// <summary>
@@ -1054,6 +1058,7 @@ table 112 "Sales Invoice Header"
         field(1305; "Invoice Discount Amount"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             CalcFormula = sum("Sales Invoice Line"."Inv. Discount Amount" where("Document No." = field("No.")));
             Caption = 'Invoice Discount Amount';
             Editable = false;

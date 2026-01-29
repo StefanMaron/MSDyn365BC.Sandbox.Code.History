@@ -117,6 +117,7 @@ table 7317 "Warehouse Receipt Line"
         }
         field(15; Quantity; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -130,12 +131,14 @@ table 7317 "Warehouse Receipt Line"
         }
         field(16; "Qty. (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
         field(19; "Qty. Outstanding"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Outstanding';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -149,12 +152,14 @@ table 7317 "Warehouse Receipt Line"
         }
         field(20; "Qty. Outstanding (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Outstanding (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
         field(21; "Qty. to Receive"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. to Receive';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
@@ -202,6 +207,7 @@ table 7317 "Warehouse Receipt Line"
         }
         field(22; "Qty. to Receive (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. to Receive (Base)';
             DecimalPlaces = 0 : 5;
 
@@ -220,6 +226,7 @@ table 7317 "Warehouse Receipt Line"
         }
         field(23; "Qty. Received"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Received';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -232,6 +239,7 @@ table 7317 "Warehouse Receipt Line"
         }
         field(24; "Qty. Received (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Received (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -244,6 +252,7 @@ table 7317 "Warehouse Receipt Line"
         }
         field(30; "Qty. per Unit of Measure"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. per Unit of Measure';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -287,11 +296,13 @@ table 7317 "Warehouse Receipt Line"
         }
         field(38; Cubage; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Cubage';
             DecimalPlaces = 0 : 5;
         }
         field(39; Weight; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Weight';
             DecimalPlaces = 0 : 5;
         }
@@ -307,6 +318,7 @@ table 7317 "Warehouse Receipt Line"
         }
         field(50; "Qty. to Cross-Dock"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. to Cross-Dock';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
@@ -333,6 +345,7 @@ table 7317 "Warehouse Receipt Line"
         }
         field(51; "Qty. to Cross-Dock (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. to Cross-Dock (Base)';
             DecimalPlaces = 0 : 5;
 
@@ -360,6 +373,7 @@ table 7317 "Warehouse Receipt Line"
         }
         field(55; "Qty. Rounding Precision"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Rounding Precision';
             InitValue = 0;
             DecimalPlaces = 0 : 5;
@@ -369,6 +383,7 @@ table 7317 "Warehouse Receipt Line"
         }
         field(56; "Qty. Rounding Precision (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Rounding Precision (Base)';
             InitValue = 0;
             DecimalPlaces = 0 : 5;
@@ -378,6 +393,7 @@ table 7317 "Warehouse Receipt Line"
         }
         field(8509; "Over-Receipt Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Over-Receipt Quantity';
             DecimalPlaces = 0 : 5;
             BlankZero = false;

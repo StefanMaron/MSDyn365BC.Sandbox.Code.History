@@ -48,6 +48,9 @@ page 9150 "My Customers"
                 field("Balance (LCY)"; Rec."Balance (LCY)")
                 {
                     ApplicationArea = Basic, Suite;
+                    AutoFormatExpression = '';
+                    AutoFormatType = 1;
+
                     trigger OnDrillDown()
                     begin
                         Customer.OpenCustomerLedgerEntries(false);

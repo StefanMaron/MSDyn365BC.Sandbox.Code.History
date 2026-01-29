@@ -34,6 +34,8 @@ page 441 "Issued Reminder Statistics"
                 }
                 field(Interest; Interest)
                 {
+                    AutoFormatExpression = Rec."Currency Code";
+                    AutoFormatType = 1;
                     ApplicationArea = Basic, Suite;
                     Caption = 'Interest Amount';
                     DrillDown = false;
@@ -47,6 +49,8 @@ page 441 "Issued Reminder Statistics"
                 }
                 field(VatAmount; VatAmount)
                 {
+                    AutoFormatExpression = Rec."Currency Code";
+                    AutoFormatType = 1;
                     ApplicationArea = Basic, Suite;
                     Caption = 'VAT Amount';
                     DrillDown = false;
@@ -54,6 +58,8 @@ page 441 "Issued Reminder Statistics"
                 }
                 field("Add. Fee per Line"; Rec."Add. Fee per Line")
                 {
+                    AutoFormatExpression = Rec."Currency Code";
+                    AutoFormatType = 1;
                     ApplicationArea = Basic, Suite;
                     DrillDown = false;
                     ToolTip = 'Specifies that the fee is distributed on individual reminder lines.';
@@ -90,6 +96,8 @@ page 441 "Issued Reminder Statistics"
                 }
                 field(CreditLimitLCYExpendedPct; CreditLimitLCYExpendedPct)
                 {
+                    AutoFormatExpression = '';
+                    AutoFormatType = 1;
                     ApplicationArea = Basic, Suite;
                     Caption = 'Expended % of Credit Limit (LCY)';
                     ExtendedDatatype = Ratio;

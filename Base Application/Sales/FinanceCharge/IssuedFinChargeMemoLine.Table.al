@@ -172,6 +172,7 @@ table 305 "Issued Fin. Charge Memo Line"
         /// </summary>
         field(17; "Interest Rate"; Decimal)
         {
+            AutoFormatType = 0;
             BlankZero = true;
             Caption = 'Interest Rate';
             DecimalPlaces = 0 : 5;
@@ -189,6 +190,7 @@ table 305 "Issued Fin. Charge Memo Line"
         /// </summary>
         field(19; "VAT %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'VAT %';
             DecimalPlaces = 0 : 5;
         }
