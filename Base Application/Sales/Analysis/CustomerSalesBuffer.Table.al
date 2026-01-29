@@ -54,6 +54,7 @@ table 923 "Customer Sales Buffer"
             Caption = 'Balance Due (LCY)';
             DataClassification = SystemMetadata;
             AutoFormatType = 1;
+            AutoFormatExpression = '';
         }
         /// <summary>
         /// Stores the total sales amount in local currency for the period.
@@ -63,6 +64,7 @@ table 923 "Customer Sales Buffer"
             Caption = 'Sales (LCY)';
             DataClassification = SystemMetadata;
             AutoFormatType = 1;
+            AutoFormatExpression = '';
         }
         /// <summary>
         /// Stores the profit amount in local currency for the period, calculated as sales minus cost.
@@ -72,6 +74,7 @@ table 923 "Customer Sales Buffer"
             Caption = 'Profit (LCY)';
             DataClassification = SystemMetadata;
             AutoFormatType = 1;
+            AutoFormatExpression = '';
         }
     }
 

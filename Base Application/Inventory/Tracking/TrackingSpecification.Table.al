@@ -40,6 +40,7 @@ table 336 "Tracking Specification"
         }
         field(4; "Quantity (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity (Base)';
             DecimalPlaces = 0 : 5;
 
@@ -132,6 +133,7 @@ table 336 "Tracking Specification"
         }
         field(29; "Qty. per Unit of Measure"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. per Unit of Measure';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -139,6 +141,7 @@ table 336 "Tracking Specification"
         }
         field(31; "Qty. Rounding Precision (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Rounding Precision (Base)';
             InitValue = 0;
             DecimalPlaces = 0 : 5;
@@ -214,6 +217,7 @@ table 336 "Tracking Specification"
         }
         field(50; "Qty. to Handle (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. to Handle (Base)';
             DecimalPlaces = 0 : 5;
 
@@ -237,6 +241,7 @@ table 336 "Tracking Specification"
         }
         field(51; "Qty. to Invoice (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. to Invoice (Base)';
             DecimalPlaces = 0 : 5;
 
@@ -258,23 +263,27 @@ table 336 "Tracking Specification"
         }
         field(52; "Quantity Handled (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity Handled (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
         field(53; "Quantity Invoiced (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity Invoiced (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
         field(60; "Qty. to Handle"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. to Handle';
             DecimalPlaces = 0 : 5;
         }
         field(61; "Qty. to Invoice"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. to Invoice';
             DecimalPlaces = 0 : 5;
         }
@@ -294,26 +303,31 @@ table 336 "Tracking Specification"
         }
         field(72; "Buffer Value1"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Buffer Value1';
             Editable = false;
         }
         field(73; "Buffer Value2"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Buffer Value2';
             Editable = false;
         }
         field(74; "Buffer Value3"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Buffer Value3';
             Editable = false;
         }
         field(75; "Buffer Value4"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Buffer Value4';
             Editable = false;
         }
         field(76; "Buffer Value5"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Buffer Value5';
             Editable = false;
         }
@@ -457,6 +471,7 @@ table 336 "Tracking Specification"
         }
         field(7300; "Quantity actual Handled (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity actual Handled (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;

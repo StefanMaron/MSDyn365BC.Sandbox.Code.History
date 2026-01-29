@@ -348,6 +348,7 @@ table 18 Customer
         field(20; "Credit Limit (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Credit Limit (LCY)';
             Tooltip = 'Specifies the maximum amount of credit that you extend to the customer for their purchases before you issue warnings. The value 0 represents unlimited credit.';
         }
@@ -739,6 +740,7 @@ table 18 Customer
         field(59; "Balance (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Customer No." = field("No."),
                                                                                  "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
                                                                                  "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
@@ -770,6 +772,7 @@ table 18 Customer
         field(61; "Net Change (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Customer No." = field("No."),
                                                                                  "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
                                                                                  "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
@@ -785,6 +788,7 @@ table 18 Customer
         field(62; "Sales (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Cust. Ledger Entry"."Sales (LCY)" where("Customer No." = field("No."),
                                                                         "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
                                                                         "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
@@ -801,6 +805,7 @@ table 18 Customer
         field(63; "Profit (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Cust. Ledger Entry"."Profit (LCY)" where("Customer No." = field("No."),
                                                                          "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
                                                                          "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
@@ -816,6 +821,7 @@ table 18 Customer
         field(64; "Inv. Discounts (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Cust. Ledger Entry"."Inv. Discount (LCY)" where("Customer No." = field("No."),
                                                                                 "Global Dimension 1 Code" = field("Global Dimension 1 Filter"),
                                                                                 "Global Dimension 2 Code" = field("Global Dimension 2 Filter"),
@@ -831,6 +837,7 @@ table 18 Customer
         field(65; "Pmt. Discounts (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = - sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Customer No." = field("No."),
                                                                                   "Entry Type" = filter("Payment Discount" .. "Payment Discount (VAT Adjustment)"),
                                                                                   "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
@@ -863,6 +870,7 @@ table 18 Customer
         field(67; "Balance Due (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Customer No." = field("No."),
                                                                                  "Initial Entry Due Date" = field(upperlimit("Date Filter")),
                                                                                  "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
@@ -951,6 +959,7 @@ table 18 Customer
         field(74; "Payments (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = - sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Initial Document Type" = const(Payment),
                                                                                   "Entry Type" = const("Initial Entry"),
                                                                                   "Customer No." = field("No."),
@@ -969,6 +978,7 @@ table 18 Customer
         field(75; "Inv. Amounts (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Initial Document Type" = const(Invoice),
                                                                                  "Entry Type" = const("Initial Entry"),
                                                                                  "Customer No." = field("No."),
@@ -986,6 +996,7 @@ table 18 Customer
         field(76; "Cr. Memo Amounts (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = - sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Initial Document Type" = const("Credit Memo"),
                                                                                   "Entry Type" = const("Initial Entry"),
                                                                                   "Customer No." = field("No."),
@@ -1003,6 +1014,7 @@ table 18 Customer
         field(77; "Fin. Charge Memo Amounts (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Initial Document Type" = const("Finance Charge Memo"),
                                                                                  "Entry Type" = const("Initial Entry"),
                                                                                  "Customer No." = field("No."),
@@ -1259,6 +1271,7 @@ table 18 Customer
         field(99; "Debit Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             BlankZero = true;
             CalcFormula = sum("Detailed Cust. Ledg. Entry"."Debit Amount (LCY)" where("Customer No." = field("No."),
                                                                                        "Entry Type" = filter(<> Application),
@@ -1276,6 +1289,7 @@ table 18 Customer
         field(100; "Credit Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             BlankZero = true;
             CalcFormula = sum("Detailed Cust. Ledg. Entry"."Credit Amount (LCY)" where("Customer No." = field("No."),
                                                                                         "Entry Type" = filter(<> Application),
@@ -1352,6 +1366,7 @@ table 18 Customer
         field(106; "Reminder Amounts (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Initial Document Type" = const(Reminder),
                                                                                  "Entry Type" = const("Initial Entry"),
                                                                                  "Customer No." = field("No."),
@@ -1424,6 +1439,7 @@ table 18 Customer
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Sales Line"."Outstanding Amount (LCY)" where("Document Type" = const(Order),
                                                                              "Bill-to Customer No." = field("No."),
                                                                              "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
@@ -1441,6 +1457,7 @@ table 18 Customer
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Sales Line"."Shipped Not Invoiced (LCY)" where("Document Type" = const(Order),
                                                                                "Bill-to Customer No." = field("No."),
                                                                                "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
@@ -1480,6 +1497,7 @@ table 18 Customer
         field(117; "Pmt. Disc. Tolerance (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = - sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Customer No." = field("No."),
                                                                                   "Entry Type" = filter("Payment Discount Tolerance" | "Payment Discount Tolerance (VAT Adjustment)" | "Payment Discount Tolerance (VAT Excl.)"),
                                                                                   "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
@@ -1496,6 +1514,7 @@ table 18 Customer
         field(118; "Pmt. Tolerance (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = - sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Customer No." = field("No."),
                                                                                   "Entry Type" = filter("Payment Tolerance" | "Payment Tolerance (VAT Adjustment)" | "Payment Tolerance (VAT Excl.)"),
                                                                                   "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
@@ -1561,6 +1580,8 @@ table 18 Customer
         /// </summary>
         field(120; Refunds; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             CalcFormula = sum("Detailed Cust. Ledg. Entry".Amount where("Initial Document Type" = const(Refund),
                                                                          "Entry Type" = const("Initial Entry"),
                                                                          "Customer No." = field("No."),
@@ -1587,6 +1608,7 @@ table 18 Customer
             FieldClass = FlowField;
             ToolTip = 'Specifies the sum of refunds received from the customer.';
             AutoFormatType = 1;
+            AutoFormatExpression = '';
         }
         /// <summary>
         /// Contains other miscellaneous amounts for this customer within the date filter.
@@ -1602,6 +1624,7 @@ table 18 Customer
                                                                          "Currency Code" = field("Currency Filter")));
             Caption = 'Other Amounts';
             FieldClass = FlowField;
+            AutoFormatType = 0;
         }
         /// <summary>
         /// Contains other miscellaneous amounts in local currency for this customer.
@@ -1618,12 +1641,14 @@ table 18 Customer
             Caption = 'Other Amounts (LCY)';
             FieldClass = FlowField;
             AutoFormatType = 1;
+            AutoFormatExpression = '';
         }
         /// <summary>
         /// Specifies the default prepayment percentage required for sales orders.
         /// </summary>
         field(124; "Prepayment %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Prepayment %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -1637,6 +1662,7 @@ table 18 Customer
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Sales Line"."Outstanding Amount (LCY)" where("Document Type" = const(Invoice),
                                                                              "Bill-to Customer No." = field("No."),
                                                                              "Shortcut Dimension 1 Code" = field("Global Dimension 1 Filter"),
@@ -2315,6 +2341,7 @@ table 18 Customer
         field(10022; "Balance on Date (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Customer No." = field("No."),
                                                                                  "Posting Date" = field(upperlimit("Date Filter")),
                                                                                  "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),

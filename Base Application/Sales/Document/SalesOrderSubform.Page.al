@@ -1023,6 +1023,7 @@ page 46 "Sales Order Subform"
                 }
                 field("Retention VAT %"; Rec."Retention VAT %")
                 {
+                    AutoFormatType = 0;
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the retention VAT percentage that is used in the line.';
                     Visible = IsPACEnabled;
@@ -1088,6 +1089,7 @@ page 46 "Sales Order Subform"
                     }
                     field("Invoice Disc. Pct."; InvoiceDiscountPct)
                     {
+                        AutoFormatType = 0;
                         ApplicationArea = Basic, Suite;
                         Caption = 'Invoice Discount %';
                         DecimalPlaces = 0 : 3;

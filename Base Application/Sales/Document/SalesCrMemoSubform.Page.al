@@ -742,6 +742,7 @@ page 96 "Sales Cr. Memo Subform"
                     }
                     field("Invoice Disc. Pct."; InvoiceDiscountPct)
                     {
+                        AutoFormatType = 0;
                         ApplicationArea = Basic, Suite;
                         Caption = 'Invoice Discount %';
                         DecimalPlaces = 0 : 3;

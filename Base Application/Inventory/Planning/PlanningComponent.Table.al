@@ -120,6 +120,7 @@ table 99000829 "Planning Component"
         }
         field(14; Quantity; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -160,6 +161,7 @@ table 99000829 "Planning Component"
         }
         field(22; "Qty. Rounding Precision"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Rounding Precision';
             InitValue = 0;
             DecimalPlaces = 0 : 5;
@@ -169,6 +171,7 @@ table 99000829 "Planning Component"
         }
         field(23; "Qty. Rounding Precision (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Rounding Precision (Base)';
             InitValue = 0;
             DecimalPlaces = 0 : 5;
@@ -178,6 +181,7 @@ table 99000829 "Planning Component"
         }
         field(25; "Expected Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Expected Quantity';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -304,6 +308,7 @@ table 99000829 "Planning Component"
         }
         field(40; Length; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Length';
             DecimalPlaces = 0 : 5;
 
@@ -314,6 +319,7 @@ table 99000829 "Planning Component"
         }
         field(41; Width; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Width';
             DecimalPlaces = 0 : 5;
 
@@ -324,6 +330,7 @@ table 99000829 "Planning Component"
         }
         field(42; Weight; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Weight';
             DecimalPlaces = 0 : 5;
 
@@ -334,6 +341,7 @@ table 99000829 "Planning Component"
         }
         field(43; Depth; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Depth';
             DecimalPlaces = 0 : 5;
 
@@ -382,6 +390,7 @@ table 99000829 "Planning Component"
         }
         field(45; "Quantity per"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity per';
             DecimalPlaces = 0 : 5;
 
@@ -398,6 +407,7 @@ table 99000829 "Planning Component"
         field(50; "Unit Cost"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Unit Cost';
 
             trigger OnValidate()
@@ -429,6 +439,7 @@ table 99000829 "Planning Component"
         field(51; "Cost Amount"; Decimal)
         {
             AutoFormatType = 2;
+            AutoFormatExpression = '';
             Caption = 'Cost Amount';
         }
         field(52; "Due Date"; Date)
@@ -454,11 +465,14 @@ table 99000829 "Planning Component"
         }
         field(55; "Direct Unit Cost"; Decimal)
         {
+            AutoFormatType = 2;
+            AutoFormatExpression = '';
             Caption = 'Direct Unit Cost';
             DecimalPlaces = 2 : 5;
         }
         field(56; "Indirect Cost %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Indirect Cost %';
             DecimalPlaces = 0 : 5;
 
@@ -470,6 +484,7 @@ table 99000829 "Planning Component"
         }
         field(57; "Overhead Rate"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Overhead Rate';
             DecimalPlaces = 0 : 5;
 
@@ -480,22 +495,28 @@ table 99000829 "Planning Component"
         }
         field(58; "Direct Cost Amount"; Decimal)
         {
+            AutoFormatType = 2;
+            AutoFormatExpression = '';
             Caption = 'Direct Cost Amount';
             DecimalPlaces = 2 : 2;
         }
         field(59; "Overhead Amount"; Decimal)
         {
+            AutoFormatType = 2;
+            AutoFormatExpression = '';
             Caption = 'Overhead Amount';
             DecimalPlaces = 2 : 2;
         }
         field(60; "Qty. per Unit of Measure"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. per Unit of Measure';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
         field(62; "Quantity (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity (Base)';
             DecimalPlaces = 0 : 5;
         }
@@ -503,6 +524,7 @@ table 99000829 "Planning Component"
         field(63; "Reserved Qty. (Base)"; Decimal)
 #pragma warning restore AA0232
         {
+            AutoFormatType = 0;
             CalcFormula = - sum("Reservation Entry"."Quantity (Base)" where("Source ID" = field("Worksheet Template Name"),
                                                                             "Source Ref. No." = field("Line No."),
                                                                             "Source Type" = const(99000829),
@@ -517,6 +539,7 @@ table 99000829 "Planning Component"
         }
         field(71; "Reserved Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             CalcFormula = - sum("Reservation Entry".Quantity where("Source ID" = field("Worksheet Template Name"),
                                                                    "Source Ref. No." = field("Line No."),
                                                                    "Source Type" = const(99000829),
@@ -531,12 +554,14 @@ table 99000829 "Planning Component"
         }
         field(73; "Expected Quantity (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Expected Quantity (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
         field(74; "Original Expected Qty. (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             BlankZero = true;
             Caption = 'Original Expected Qty. (Base)';
             DecimalPlaces = 0 : 5;
@@ -544,6 +569,7 @@ table 99000829 "Planning Component"
         }
         field(75; "Net Quantity (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Net Quantity (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;

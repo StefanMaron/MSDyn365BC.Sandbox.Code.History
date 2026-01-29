@@ -243,6 +243,7 @@ table 110 "Sales Shipment Header"
         /// </summary>
         field(25; "Payment Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Payment Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -312,6 +313,7 @@ table 110 "Sales Shipment Header"
         /// </summary>
         field(33; "Currency Factor"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Currency Factor';
             DecimalPlaces = 0 : 15;
             MinValue = 0;
@@ -763,6 +765,7 @@ table 110 "Sales Shipment Header"
         /// </summary>
         field(119; "VAT Base Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'VAT Base Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -1057,6 +1060,7 @@ table 110 "Sales Shipment Header"
         }
         field(10047; "Transit Distance"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Transit Distance';
         }
         field(10048; "Insurer Name"; Text[50])
@@ -1116,6 +1120,7 @@ table 110 "Sales Shipment Header"
         }
         field(10060; "Exchange Rate USD"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Exchange Rate USD';
             DecimalPlaces = 0 : 6;
         }
