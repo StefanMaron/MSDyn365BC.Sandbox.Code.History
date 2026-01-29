@@ -158,6 +158,7 @@ table 5409 "Prod. Order Routing Line"
         }
         field(12; "Setup Time"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Setup Time';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
@@ -169,6 +170,7 @@ table 5409 "Prod. Order Routing Line"
         }
         field(13; "Run Time"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Run Time';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
@@ -180,6 +182,7 @@ table 5409 "Prod. Order Routing Line"
         }
         field(14; "Wait Time"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Wait Time';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
@@ -191,6 +194,7 @@ table 5409 "Prod. Order Routing Line"
         }
         field(15; "Move Time"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Move Time';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
@@ -202,6 +206,7 @@ table 5409 "Prod. Order Routing Line"
         }
         field(16; "Fixed Scrap Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Fixed Scrap Quantity';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
@@ -213,6 +218,7 @@ table 5409 "Prod. Order Routing Line"
         }
         field(17; "Lot Size"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Lot Size';
             DecimalPlaces = 0 : 5;
 
@@ -223,6 +229,7 @@ table 5409 "Prod. Order Routing Line"
         }
         field(18; "Scrap Factor %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Scrap Factor %';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
@@ -280,18 +287,21 @@ table 5409 "Prod. Order Routing Line"
         }
         field(27; "Minimum Process Time"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Minimum Process Time';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
         }
         field(28; "Maximum Process Time"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Maximum Process Time';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
         }
         field(30; "Concurrent Capacities"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Concurrent Capacities';
             DecimalPlaces = 0 : 5;
             InitValue = 1;
@@ -304,6 +314,7 @@ table 5409 "Prod. Order Routing Line"
         }
         field(31; "Send-Ahead Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Send-Ahead Quantity';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
@@ -426,6 +437,7 @@ table 5409 "Prod. Order Routing Line"
         field(40; "Unit Cost per"; Decimal)
         {
             AutoFormatType = 2;
+            AutoFormatExpression = '';
             Caption = 'Unit Cost per';
             MinValue = 0;
 
@@ -457,12 +469,14 @@ table 5409 "Prod. Order Routing Line"
         }
         field(52; "Fixed Scrap Qty. (Accum.)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Fixed Scrap Qty. (Accum.)';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
         field(53; "Scrap Factor % (Accumulated)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Scrap Factor % (Accumulated)';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -474,6 +488,8 @@ table 5409 "Prod. Order Routing Line"
         }
         field(56; "Direct Unit Cost"; Decimal)
         {
+            AutoFormatType = 2;
+            AutoFormatExpression = '';
             Caption = 'Direct Unit Cost';
             DecimalPlaces = 2 : 5;
 
@@ -484,6 +500,7 @@ table 5409 "Prod. Order Routing Line"
         }
         field(57; "Indirect Cost %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Indirect Cost %';
             DecimalPlaces = 0 : 5;
 
@@ -498,6 +515,7 @@ table 5409 "Prod. Order Routing Line"
         }
         field(58; "Overhead Rate"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Overhead Rate';
             DecimalPlaces = 0 : 5;
 
@@ -559,6 +577,7 @@ table 5409 "Prod. Order Routing Line"
         }
         field(77; "Input Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Input Quantity';
             DecimalPlaces = 0 : 5;
         }
@@ -609,11 +628,13 @@ table 5409 "Prod. Order Routing Line"
         field(90; "Expected Operation Cost Amt."; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Expected Operation Cost Amt.';
             Editable = false;
         }
         field(91; "Expected Capacity Need"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Expected Capacity Need';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -622,6 +643,7 @@ table 5409 "Prod. Order Routing Line"
         field(96; "Expected Capacity Ovhd. Cost"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Expected Capacity Ovhd. Cost';
             Editable = false;
         }
@@ -677,6 +699,7 @@ table 5409 "Prod. Order Routing Line"
         }
         field(7304; "Posted Output Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Posted Output Quantity';
             ToolTip = 'Specifies the total output quantity that has been posted to the capacity ledger. Value expressed in base unit of measure.';
             FieldClass = FlowField;
@@ -689,6 +712,7 @@ table 5409 "Prod. Order Routing Line"
         }
         field(7305; "Posted Scrap Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Posted Scrap Quantity';
             ToolTip = 'Specifies the total scrap quantity that has been posted to the capacity ledger. Value expressed in base unit of measure.';
             FieldClass = FlowField;
@@ -701,6 +725,7 @@ table 5409 "Prod. Order Routing Line"
         }
         field(7306; "Posted Run Time"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Posted Run Time';
             ToolTip = 'Specifies the total run time that has been posted to the capacity ledger.';
             FieldClass = FlowField;
@@ -713,6 +738,7 @@ table 5409 "Prod. Order Routing Line"
         }
         field(7307; "Posted Setup Time"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Posted Setup Time';
             ToolTip = 'Specifies the total set up time that has been posted to the capacity ledger.';
             FieldClass = FlowField;
