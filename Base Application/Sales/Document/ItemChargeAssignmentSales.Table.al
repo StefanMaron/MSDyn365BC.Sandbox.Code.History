@@ -206,6 +206,7 @@ table 5809 "Item Charge Assignment (Sales)"
         /// </summary>
         field(16; "Qty. to Handle"; Decimal)
         {
+            AutoFormatType = 0;
             BlankZero = true;
             Caption = 'Qty. to Handle';
             DecimalPlaces = 0 : 5;

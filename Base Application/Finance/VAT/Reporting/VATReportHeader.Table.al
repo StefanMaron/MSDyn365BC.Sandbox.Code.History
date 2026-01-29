@@ -332,6 +332,8 @@ table 740 "VAT Report Header"
         }
         field(31; "Total Base"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("VAT Report Line".Base where("VAT Report No." = field("No."),
                                                             "Line Type" = filter(New | Correction)));
             Caption = 'Total Base';
@@ -340,6 +342,8 @@ table 740 "VAT Report Header"
         }
         field(32; "Total Amount"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("VAT Report Line".Amount where("VAT Report No." = field("No."),
                                                               "Line Type" = filter(New | Correction)));
             Caption = 'Total Amount';
@@ -348,6 +352,8 @@ table 740 "VAT Report Header"
         }
         field(33; "Total Number of Supplies"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("VAT Report Line"."Number of Supplies" where("VAT Report No." = field("No."),
                                                                             "Line Type" = filter(New | Correction)));
             Caption = 'Total Number of Supplies';
