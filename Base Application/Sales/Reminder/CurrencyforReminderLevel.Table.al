@@ -61,6 +61,8 @@ table 329 "Currency for Reminder Level"
         /// </summary>
         field(5; "Add. Fee per Line"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Add. Fee per Line';
             MinValue = 0;
         }

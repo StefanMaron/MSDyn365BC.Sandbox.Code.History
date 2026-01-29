@@ -34,6 +34,7 @@ page 9087 "Sales Line FactBox"
             }
             field("Required Quantity"; Rec."Outstanding Quantity" - Rec."Reserved Quantity")
             {
+                AutoFormatType = 0;
                 ApplicationArea = Reservation;
                 Caption = 'Required Quantity';
                 DecimalPlaces = 0 : 5;
@@ -70,6 +71,7 @@ page 9087 "Sales Line FactBox"
                 }
                 field("Item Availability"; SalesInfoPaneMgt.CalcAvailability(Rec))
                 {
+                    AutoFormatType = 0;
                     ApplicationArea = Basic, Suite;
                     Caption = 'Item Availability';
                     DecimalPlaces = 0 : 5;
@@ -84,6 +86,7 @@ page 9087 "Sales Line FactBox"
                 }
                 field("Available Inventory"; SalesInfoPaneMgt.CalcAvailableInventory(Rec))
                 {
+                    AutoFormatType = 0;
                     ApplicationArea = Basic, Suite;
                     Caption = 'Available Inventory';
                     DecimalPlaces = 0 : 5;
@@ -91,6 +94,7 @@ page 9087 "Sales Line FactBox"
                 }
                 field("Scheduled Receipt"; SalesInfoPaneMgt.CalcScheduledReceipt(Rec))
                 {
+                    AutoFormatType = 0;
                     ApplicationArea = Basic, Suite;
                     Caption = 'Scheduled Receipt';
                     DecimalPlaces = 0 : 5;
@@ -98,6 +102,7 @@ page 9087 "Sales Line FactBox"
                 }
                 field("Reserved Receipt"; SalesInfoPaneMgt.CalcReservedRequirements(Rec))
                 {
+                    AutoFormatType = 0;
                     ApplicationArea = Reservation;
                     Caption = 'Reserved Receipt';
                     DecimalPlaces = 0 : 5;
@@ -105,6 +110,7 @@ page 9087 "Sales Line FactBox"
                 }
                 field("Gross Requirements"; SalesInfoPaneMgt.CalcGrossRequirements(Rec))
                 {
+                    AutoFormatType = 0;
                     ApplicationArea = Service;
                     Caption = 'Gross Requirements';
                     DecimalPlaces = 0 : 5;
@@ -112,6 +118,7 @@ page 9087 "Sales Line FactBox"
                 }
                 field("Reserved Requirements"; SalesInfoPaneMgt.CalcReservedDemand(Rec))
                 {
+                    AutoFormatType = 0;
                     ApplicationArea = Reservation;
                     Caption = 'Reserved Requirements';
                     DecimalPlaces = 0 : 5;
