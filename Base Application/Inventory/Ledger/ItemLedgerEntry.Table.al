@@ -77,16 +77,19 @@ table 32 "Item Ledger Entry"
         }
         field(12; Quantity; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
         }
         field(13; "Remaining Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Remaining Quantity';
             DecimalPlaces = 0 : 5;
         }
         field(14; "Invoiced Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Invoiced Quantity';
             DecimalPlaces = 0 : 5;
         }
@@ -186,6 +189,7 @@ table 32 "Item Ledger Entry"
         field(70; "Reserved Quantity"; Decimal)
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
+            AutoFormatType = 0;
             CalcFormula = sum("Reservation Entry"."Quantity (Base)" where("Source ID" = const(''),
                                                                            "Source Ref. No." = field("Entry No."),
                                                                            "Source Type" = const(32),
@@ -312,6 +316,7 @@ table 32 "Item Ledger Entry"
         }
         field(5404; "Qty. per Unit of Measure"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. per Unit of Measure';
             DecimalPlaces = 0 : 5;
         }
@@ -373,6 +378,7 @@ table 32 "Item Ledger Entry"
         field(5803; "Cost Amount (Expected)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Value Entry"."Cost Amount (Expected)" where("Item Ledger Entry No." = field("Entry No.")));
             Caption = 'Cost Amount (Expected)';
             Editable = false;
@@ -381,6 +387,7 @@ table 32 "Item Ledger Entry"
         field(5804; "Cost Amount (Actual)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Value Entry"."Cost Amount (Actual)" where("Item Ledger Entry No." = field("Entry No.")));
             Caption = 'Cost Amount (Actual)';
             Editable = false;
@@ -389,6 +396,7 @@ table 32 "Item Ledger Entry"
         field(5805; "Cost Amount (Non-Invtbl.)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Value Entry"."Cost Amount (Non-Invtbl.)" where("Item Ledger Entry No." = field("Entry No.")));
             Caption = 'Cost Amount (Non-Invtbl.)';
             Editable = false;
@@ -424,6 +432,7 @@ table 32 "Item Ledger Entry"
         field(5813; "Purchase Amount (Expected)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Value Entry"."Purchase Amount (Expected)" where("Item Ledger Entry No." = field("Entry No.")));
             Caption = 'Purchase Amount (Expected)';
             Editable = false;
@@ -432,6 +441,7 @@ table 32 "Item Ledger Entry"
         field(5814; "Purchase Amount (Actual)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Value Entry"."Purchase Amount (Actual)" where("Item Ledger Entry No." = field("Entry No.")));
             Caption = 'Purchase Amount (Actual)';
             Editable = false;
@@ -440,6 +450,7 @@ table 32 "Item Ledger Entry"
         field(5815; "Sales Amount (Expected)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Value Entry"."Sales Amount (Expected)" where("Item Ledger Entry No." = field("Entry No.")));
             Caption = 'Sales Amount (Expected)';
             Editable = false;
@@ -448,6 +459,7 @@ table 32 "Item Ledger Entry"
         field(5816; "Sales Amount (Actual)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Value Entry"."Sales Amount (Actual)" where("Item Ledger Entry No." = field("Entry No.")));
             Caption = 'Sales Amount (Actual)';
             Editable = false;
@@ -459,12 +471,14 @@ table 32 "Item Ledger Entry"
         }
         field(5818; "Shipped Qty. Not Returned"; Decimal)
         {
+            AutoFormatType = 0;
             AccessByPermission = TableData "Sales Header" = R;
             Caption = 'Shipped Qty. Not Returned';
             DecimalPlaces = 0 : 5;
         }
         field(5819; "Item Ledger Entry Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             CalcFormula = sum("Value Entry"."Item Ledger Entry Quantity" where("Item Ledger Entry No." = field("Entry No.")));
             Caption = 'Item Ledger Entry Quantity on Value Entry';
             DecimalPlaces = 0 : 5;
@@ -473,6 +487,7 @@ table 32 "Item Ledger Entry"
         }
         field(5820; "Remaining Qty. by Date"; Decimal)
         {
+            AutoFormatType = 0;
             CalcFormula = sum("Item Application Entry".Quantity where("Inbound Item Entry No." = field("Entry No."), "Posting Date" = field("Date Filter")));
             Caption = 'Remaining Quantity by Date';
             DecimalPlaces = 0 : 5;

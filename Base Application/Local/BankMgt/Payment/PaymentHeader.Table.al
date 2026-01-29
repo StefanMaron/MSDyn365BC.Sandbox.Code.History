@@ -94,6 +94,7 @@ table 10865 "Payment Header"
         }
         field(3; "Currency Factor"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Currency Factor';
             DecimalPlaces = 0 : 15;
 
@@ -302,6 +303,8 @@ table 10865 "Payment Header"
         }
         field(16; "Amount (LCY)"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Payment Line"."Amount (LCY)" where("No." = field("No.")));
             Caption = 'Amount (LCY)';
             Editable = false;
@@ -309,6 +312,8 @@ table 10865 "Payment Header"
         }
         field(17; Amount; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = "Currency Code";
             CalcFormula = sum("Payment Line".Amount where("No." = field("No.")));
             Caption = 'Amount';
             Editable = false;

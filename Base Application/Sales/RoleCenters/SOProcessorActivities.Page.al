@@ -120,6 +120,7 @@ page 9060 "SO Processor Activities"
                 }
                 field("Average Days Delayed"; AverageDaysDelayed)
                 {
+                    AutoFormatType = 0;
                     ApplicationArea = Basic, Suite;
                     Caption = 'Average Days Delayed';
                     DecimalPlaces = 0 : 1;

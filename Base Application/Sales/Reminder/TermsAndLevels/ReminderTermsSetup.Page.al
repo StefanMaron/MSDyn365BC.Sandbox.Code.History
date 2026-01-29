@@ -63,6 +63,8 @@ page 838 "Reminder Terms Setup"
                 }
                 field("Minimum Amount (LCY)"; Rec."Minimum Amount (LCY)")
                 {
+                    AutoFormatType = 1;
+                    AutoFormatExpression = '';
                     Caption = 'Minimum Amount (LCY)';
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the minimum amount for which a reminder will be created.';

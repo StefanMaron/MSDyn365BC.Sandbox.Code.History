@@ -122,6 +122,8 @@ page 26 "Vendor Card"
                 }
                 field(BalanceAsCustomer; BalanceAsCustomer)
                 {
+                    AutoFormatType = 2;
+                    AutoFormatExpression = '';
                     ApplicationArea = Basic, Suite;
                     Caption = 'Balance (LCY) As Customer';
                     Editable = false;
@@ -539,6 +541,8 @@ page 26 "Vendor Card"
                 }
                 field("""Balance (LCY)"" - ""Payment in progress (LCY)"""; Rec."Balance (LCY)" - Rec."Payment in progress (LCY)")
                 {
+                    AutoFormatType = 1;
+                    AutoFormatExpression = '';
                     ApplicationArea = Basic, Suite;
                     Caption = 'Net amount (LCY)';
                     Editable = false;

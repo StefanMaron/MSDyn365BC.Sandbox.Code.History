@@ -168,6 +168,8 @@ report 10862 "Suggest Vendor Payments FR"
                     }
                     field(AvailableAmountLCY; AmountAvailable)
                     {
+                        AutoFormatType = 1;
+                        AutoFormatExpression = '';
                         ApplicationArea = Basic, Suite;
                         Caption = 'Available Amount (LCY)';
                         ToolTip = 'Specifies a maximum amount available in local currency for payments. ';

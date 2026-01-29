@@ -45,6 +45,8 @@ table 10868 "Payment Line Archive"
         }
         field(3; Amount; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = "Currency Code";
             Caption = 'Amount';
         }
         field(4; "Account Type"; enum "Gen. Journal Account Type")
@@ -241,6 +243,7 @@ table 10868 "Payment Line Archive"
         }
         field(36; "Currency Factor"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Currency Factor';
             DecimalPlaces = 0 : 15;
         }
@@ -280,6 +283,8 @@ table 10868 "Payment Line Archive"
         }
         field(44; "Amount (LCY)"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Amount (LCY)';
         }
         field(45; "Drawee Reference"; Text[10])
