@@ -2364,6 +2364,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         GLEntry: Record "G/L Entry";
     begin
         OnBeforeCreateGLEntryBalAcc(GenJnlLine, AccNo, Amount, AmountAddCurr, BalAccType, BalAccNo);
+        AmountAddCurr := AmountAddCurr - GenJnlLine."VAT Amount";
         InitGLEntry(
             GenJnlLine, GLEntry, AccNo, Amount, AmountAddCurr, true, true,
             CalcAmountSrcCurr(GenJnlLine, Amount));
