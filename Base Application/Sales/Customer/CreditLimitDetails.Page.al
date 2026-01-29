@@ -45,6 +45,7 @@ page 1871 "Credit Limit Details"
             {
                 ApplicationArea = Basic, Suite;
                 AutoFormatType = 1;
+                AutoFormatExpression = '';
                 Caption = 'Outstanding Amt. (LCY)';
                 Editable = false;
                 ToolTip = 'Specifies the amount on sales to the customer that remains to be shipped. The amount is calculated as Amount x Outstanding Quantity / Quantity.';
@@ -52,6 +53,8 @@ page 1871 "Credit Limit Details"
             field(ShippedRetRcdNotIndLCY; ShippedRetRcdNotIndLCY)
             {
                 ApplicationArea = Basic, Suite;
+                AutoFormatType = 1;
+                AutoFormatExpression = '';
                 Caption = 'Shipped/Ret. Rcd. Not Invd. (LCY)';
                 Editable = false;
                 ToolTip = 'Specifies the amount on sales returns from the customer that are not yet refunded';
@@ -60,6 +63,7 @@ page 1871 "Credit Limit Details"
             {
                 ApplicationArea = Basic, Suite;
                 AutoFormatType = 1;
+                AutoFormatExpression = '';
                 Caption = 'Current Amount (LCY)';
                 Editable = false;
                 ToolTip = 'Specifies the total amount the whole sales document.';
@@ -68,6 +72,7 @@ page 1871 "Credit Limit Details"
             {
                 ApplicationArea = Basic, Suite;
                 AutoFormatType = 1;
+                AutoFormatExpression = '';
                 Caption = 'Total Amount (LCY)';
                 Editable = false;
                 ToolTip = 'Specifies the sum of the amounts in all of the preceding fields in the window.';
@@ -80,6 +85,8 @@ page 1871 "Credit Limit Details"
             field(OverdueBalance; Rec.CalcOverdueBalance())
             {
                 ApplicationArea = Basic, Suite;
+                AutoFormatType = 1;
+                AutoFormatExpression = '';
                 CaptionClass = OverdueAmountsTxt;
                 Editable = false;
                 ToolTip = 'Specifies payments from the customer that are overdue per today''s date.';
@@ -99,6 +106,8 @@ page 1871 "Credit Limit Details"
             field(GetInvoicedPrepmtAmountLCY; Rec.GetInvoicedPrepmtAmountLCY())
             {
                 ApplicationArea = Prepayments;
+                AutoFormatType = 1;
+                AutoFormatExpression = '';
                 Caption = 'Invoiced Prepayment Amount (LCY)';
                 Editable = false;
                 ToolTip = 'Specifies your sales income from the customer based on invoiced prepayments.';

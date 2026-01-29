@@ -51,6 +51,8 @@ page 1051 "Additional Fee Chart"
                 }
                 field("Max. Remaining Amount"; MaxRemAmount)
                 {
+                    AutoFormatType = 2;
+                    AutoFormatExpression = Currency;
                     ApplicationArea = Suite;
                     Caption = 'Max. Remaining Amount';
                     MinValue = 0;

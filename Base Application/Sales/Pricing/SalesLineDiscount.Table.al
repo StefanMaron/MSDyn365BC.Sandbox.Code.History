@@ -127,6 +127,7 @@ table 7004 "Sales Line Discount"
         /// </summary>
         field(14; "Minimum Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Minimum Quantity';
             MinValue = 0;
         }
