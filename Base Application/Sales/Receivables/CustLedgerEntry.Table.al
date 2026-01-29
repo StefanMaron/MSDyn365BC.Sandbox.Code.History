@@ -157,6 +157,7 @@ table 21 "Cust. Ledger Entry"
         field(15; "Original Amt. (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Cust. Ledger Entry No." = field("Entry No."),
                                                                                  "Entry Type" = filter("Initial Entry"),
                                                                                  "Posting Date" = field("Date Filter")));
@@ -171,6 +172,7 @@ table 21 "Cust. Ledger Entry"
         field(16; "Remaining Amt. (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Cust. Ledger Entry No." = field("Entry No."),
                                                                                  "Posting Date" = field("Date Filter")));
             Caption = 'Remaining Amt. (LCY)';
@@ -184,6 +186,7 @@ table 21 "Cust. Ledger Entry"
         field(17; "Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             CalcFormula = sum("Detailed Cust. Ledg. Entry"."Amount (LCY)" where("Ledger Entry Amount" = const(true),
                                                                                  "Cust. Ledger Entry No." = field("Entry No."),
                                                                                  "Posting Date" = field("Date Filter")));
@@ -198,6 +201,7 @@ table 21 "Cust. Ledger Entry"
         field(18; "Sales (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Sales (LCY)';
             ToolTip = 'Specifies the total sales amount excl. VAT to the customer in LCY.';
         }
@@ -207,6 +211,7 @@ table 21 "Cust. Ledger Entry"
         field(19; "Profit (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Profit (LCY)';
         }
         /// <summary>
@@ -215,6 +220,7 @@ table 21 "Cust. Ledger Entry"
         field(20; "Inv. Discount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Inv. Discount (LCY)';
         }
         /// <summary>
@@ -389,6 +395,7 @@ table 21 "Cust. Ledger Entry"
         field(40; "Pmt. Disc. Given (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Pmt. Disc. Given (LCY)';
         }
         /// <summary>
@@ -397,6 +404,7 @@ table 21 "Cust. Ledger Entry"
         field(42; "Orig. Pmt. Disc. Possible(LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Orig. Pmt. Disc. Possible (LCY)';
             Editable = false;
         }
@@ -508,6 +516,7 @@ table 21 "Cust. Ledger Entry"
         field(54; "Closed by Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Closed by Amount (LCY)';
         }
         /// <summary>
@@ -548,6 +557,7 @@ table 21 "Cust. Ledger Entry"
         field(60; "Debit Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             BlankZero = true;
             CalcFormula = sum("Detailed Cust. Ledg. Entry"."Debit Amount (LCY)" where("Ledger Entry Amount" = const(true),
                                                                                        "Cust. Ledger Entry No." = field("Entry No."),
@@ -563,6 +573,7 @@ table 21 "Cust. Ledger Entry"
         field(61; "Credit Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             BlankZero = true;
             CalcFormula = sum("Detailed Cust. Ledg. Entry"."Credit Amount (LCY)" where("Ledger Entry Amount" = const(true),
                                                                                         "Cust. Ledger Entry No." = field("Entry No."),
@@ -635,6 +646,7 @@ table 21 "Cust. Ledger Entry"
         /// </summary>
         field(73; "Adjusted Currency Factor"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Adjusted Currency Factor';
             DecimalPlaces = 0 : 15;
         }
@@ -643,6 +655,7 @@ table 21 "Cust. Ledger Entry"
         /// </summary>
         field(74; "Original Currency Factor"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Original Currency Factor';
             DecimalPlaces = 0 : 15;
         }
@@ -756,6 +769,7 @@ table 21 "Cust. Ledger Entry"
         field(83; "Pmt. Tolerance (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Pmt. Tolerance (LCY)';
         }
         /// <summary>

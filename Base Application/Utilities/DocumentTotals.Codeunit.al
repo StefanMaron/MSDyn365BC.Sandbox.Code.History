@@ -74,7 +74,6 @@ codeunit 57 "Document Totals"
         IsHandled: Boolean;
         OldInvoiceDiscountPct: Decimal;
         RoundingDiffDiscountPer: Decimal;
-        RecalculateInvoiceDisc: Boolean;
     begin
         IsHandled := false;
         OnBeforeCalculateSalesSubPageTotals(TotalSalesHeader, TotalSalesLine, VATAmount, InvoiceDiscountAmount, InvoiceDiscountPct, IsHandled, TotalsUpToDate, NeedRefreshSalesLine);
@@ -97,10 +96,7 @@ codeunit 57 "Document Totals"
            (TotalSalesHeader."Customer Posting Group" <> '')
         then begin
             TotalSalesHeader.CalcFields("Recalculate Invoice Disc.");
-            RecalculateInvoiceDisc := TotalSalesHeader."Recalculate Invoice Disc.";
-            if not RecalculateInvoiceDisc then
-                RecalculateInvoiceDisc := InvoiceHasRelatedShipments(TotalSalesLine2, TotalSalesHeader);
-            if RecalculateInvoiceDisc then
+            if TotalSalesHeader."Recalculate Invoice Disc." then
                 if TotalSalesLine2.FindFirst() then begin
                     SalesCalcDiscount.CalculateInvoiceDiscountOnLine(TotalSalesLine2);
                     NeedRefreshSalesLine := true;
@@ -144,34 +140,6 @@ codeunit 57 "Document Totals"
           TotalSalesHeader, TotalSalesLine, VATAmount, InvoiceDiscountAmount, InvoiceDiscountPct, TotalSalesLine2);
 
         TotalSalesLine := TotalSalesLine2;
-    end;
-
-    local procedure InvoiceHasRelatedShipments(CurrSalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"): Boolean
-    var
-        SalesLine: Record "Sales Line";
-    begin
-        if not (SalesHeader."Document Type" in [SalesHeader."Document Type"::Invoice]) then
-            exit(false);
-
-        SalesLine.CopyFilters(CurrSalesLine);
-        SalesLine.SetRange("Allow Invoice Disc.", true);
-        SalesLine.SetRange("Shipment No.", '');
-        SalesLine.SetRange("Shipment Line No.", 0);
-        exit(not SalesLine.IsEmpty());
-    end;
-
-    local procedure InvoiceHasRelatedReceipts(CurrPurchaseLine: Record "Purchase Line"; PurchaseHeader: Record "Purchase Header"): Boolean
-    var
-        PurchaseLine: Record "Purchase Line";
-    begin
-        if not (PurchaseHeader."Document Type" in [PurchaseHeader."Document Type"::Invoice]) then
-            exit(false);
-
-        PurchaseLine.CopyFilters(CurrPurchaseLine);
-        PurchaseLine.SetRange("Allow Invoice Disc.", true);
-        PurchaseLine.SetRange("Receipt No.", '');
-        PurchaseLine.SetRange("Receipt Line No.", 0);
-        exit(not PurchaseLine.IsEmpty());
     end;
 
     procedure CalculatePostedSalesInvoiceTotals(var SalesInvoiceHeader: Record "Sales Invoice Header"; var VATAmount: Decimal; SalesInvoiceLine: Record "Sales Invoice Line")
@@ -683,7 +651,6 @@ codeunit 57 "Document Totals"
         PurchaseLine2: Record "Purchase Line";
         TotalPurchaseLine2: Record "Purchase Line";
         IsHandled: Boolean;
-        RecalculateInvoiceDisc: Boolean;
     begin
         IsHandled := false;
         OnBeforeCalculatePurchaseSubPageTotals(TotalPurchaseHeader, TotalPurchaseLine, VATAmount, InvoiceDiscountAmount, InvoiceDiscountPct, IsHandled);
@@ -705,10 +672,7 @@ codeunit 57 "Document Totals"
            (TotalPurchaseHeader."Vendor Posting Group" <> '')
         then begin
             TotalPurchaseHeader.CalcFields("Recalculate Invoice Disc.");
-            RecalculateInvoiceDisc := TotalPurchaseHeader."Recalculate Invoice Disc.";
-            if not RecalculateInvoiceDisc then
-                RecalculateInvoiceDisc := InvoiceHasRelatedReceipts(TotalPurchaseLine2, TotalPurchaseHeader);
-            if RecalculateInvoiceDisc then
+            if TotalPurchaseHeader."Recalculate Invoice Disc." then
                 if TotalPurchaseLine2.FindFirst() then begin
                     PurchCalcDiscount.CalculateInvoiceDiscountOnLine(TotalPurchaseLine2);
                     NeedRefreshPurchaseLine := true;

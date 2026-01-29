@@ -401,6 +401,7 @@ table 297 "Issued Reminder Header"
         /// </summary>
         field(44; "Add. Fee per Line"; Decimal)
         {
+            AutoFormatType = 2;
             AutoFormatExpression = Rec."Currency Code";
             CalcFormula = sum("Issued Reminder Line".Amount where("Reminder No." = field("No."),
                                                                    Type = const("Line Fee")));
