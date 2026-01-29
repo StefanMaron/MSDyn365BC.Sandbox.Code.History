@@ -2721,6 +2721,87 @@ codeunit 137047 "SCM Warehouse I"
         SalesLine2.TestField("Reserved Quantity", 0);
     end;
 
+    [Test]
+    [HandlerFunctions('ItemTrackingLinesPageHandler')]
+    procedure GetBinContentWithLotAndSerialTrackingAfterReclassification()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        ItemTrackingCode: Record "Item Tracking Code";
+        ItemJournalLine: Record "Item Journal Line";
+        Location: Record Location;
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        WarehouseActivityHeader: Record "Warehouse Activity Header";
+        WarehouseActivityLine: Record "Warehouse Activity Line";
+        WarehouseEmployee: Record "Warehouse Employee";
+        WarehouseShipmentHeader: Record "Warehouse Shipment Header";
+        Quantity: Decimal;
+        LotNo: Code[20];
+    begin
+        // [SCENARIO 616739] Get Bin Content in Item Reclass Journal with Lot Specific and  Serial Number (Outbound) Tracking
+        // after item was reclassed from Shipment bin back to Storage bin
+        Initialize();
+
+        // [GIVEN] Create location with Inventory Posting Setup
+        LibraryWarehouse.CreateLocationWMS(Location, true, true, true, true, true);
+
+        // [GIVEN] Assign Bins to "Receipt Bin Code", "Shipment Bin Code" fields on Location.
+        Location.Validate("Receipt Bin Code", AddBin(Location.Code));
+        Location.Validate("Shipment Bin Code", AddBin(Location.Code));
+        Location.Modify(true);
+
+        // [GIVEN] Create Warehouse Employee for Location.
+        LibraryWarehouse.CreateWarehouseEmployee(WarehouseEmployee, Location.Code, true);
+
+        // [GIVEN] Create an Item with Lot Specific Tracking and Serial tracking for Outbound only.
+        CreateItemWithLotAndOutboundSerialTracking(Item, ItemTrackingCode);
+
+        // [GIVEN] Set Lot No and Quantity.
+        LotNo := LibraryUtility.GenerateGUID();
+        Quantity := LibraryRandom.RandIntInRange(3, 3);
+
+        // [GIVEN] Create and Post Item Journal Line With Lot No.
+        CreateItemJournalLine(ItemJournalLine, Item."No.", Location.Code, Quantity);
+        ItemJournalLine.Validate("Bin Code", AddBin(Location.Code));
+        ItemJournalLine.Modify(true);
+
+        AssignLotNoToItemJournalLine(ItemJournalLine, LotNo, Quantity);
+        LibraryInventory.PostItemJournalLine(ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name);
+
+        // [GIVEN] Create Sales Document and release it.
+        LibrarySales.CreateCustomer(Customer);
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.");
+        SalesHeader.Validate("Location Code", Location.Code);
+        SalesHeader.Modify(true);
+
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", Quantity);
+
+        LibrarySales.ReleaseSalesDocument(SalesHeader);
+
+        //[GIVEN] Create Warehouse Shipment from Sales Order.
+        LibraryWarehouse.CreateWhseShipmentFromSO(SalesHeader);
+
+        // [GIVEN] Create Warehouse Pick.
+        WarehouseShipmentHeader.SetRange("Location Code", Location.Code);
+        WarehouseShipmentHeader.FindLast();
+        LibraryWarehouse.CreatePick(WarehouseShipmentHeader);
+        FindWarehouseActivityLine(
+                WarehouseActivityLine, DATABASE::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.");
+        WarehouseActivityHeader.Get(WarehouseActivityLine."Activity Type", WarehouseActivityLine."No.");
+
+        //  [GIVEN] Split Pick lines into quantity of 1 and assign serial numbers and lot number. 
+        SplitPickLinesAndAssignSerialNumbers(WarehouseActivityHeader, LotNo);
+
+        // [GIVEN] Register the pick.
+        LibraryWarehouse.RegisterWhseActivity(WarehouseActivityHeader);
+
+        // [WHEN] Reclassify Items from Shipment bin back to Storage bin.
+        ReclassifyItemsFromShipmentToStorage(Item, Location);
+
+        // [THEN] Get Bin Content in Item Reclass Journal should work without any error.
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -3791,6 +3872,104 @@ codeunit 137047 "SCM Warehouse I"
         WarehouseShipmentLine.SetRange("Item No.", ItemNo);
         WarehouseShipmentLine.FindFirst();
         WarehouseShipmentLine.TestField("Qty. Picked", WarehouseShipmentLine.Quantity);
+    end;
+
+    local procedure SplitPickLinesAndAssignSerialNumbers(var WarehouseActivityHeader: Record "Warehouse Activity Header"; LotNo: Code[20])
+    var
+        WarehouseActivityLine: Record "Warehouse Activity Line";
+        SerialNo: Code[20];
+        SerialNoList: List of [Code[20]];
+        CountOfTakeLines: Integer;
+        i: Integer;
+    begin
+        WarehouseActivityLine.SetRange("Activity Type", WarehouseActivityHeader.Type);
+        WarehouseActivityLine.SetRange("No.", WarehouseActivityHeader."No.");
+        if WarehouseActivityLine.FindSet() then
+            repeat
+                while WarehouseActivityLine."Qty. to Handle" > 1 do begin
+                    WarehouseActivityLine.Validate("Qty. to Handle", 1);
+                    WarehouseActivityLine.Modify(true);
+                    WarehouseActivityLine.SplitLine(WarehouseActivityLine);
+                    WarehouseActivityLine.Next();
+                end;
+            until WarehouseActivityLine.Next() = 0;
+
+        WarehouseActivityLine.Reset();
+        WarehouseActivityLine.SetRange("Activity Type", WarehouseActivityHeader.Type);
+        WarehouseActivityLine.SetRange("Action Type", WarehouseActivityLine."Action Type"::Take);
+        WarehouseActivityLine.SetRange("No.", WarehouseActivityHeader."No.");
+        CountOfTakeLines := WarehouseActivityLine.Count;
+
+        for i := 1 to CountOfTakeLines do
+            SerialNoList.Add(LibraryUtility.GenerateGUID());
+
+        foreach SerialNo in SerialNoList do begin
+            AssignTrackingToActivityLine(WarehouseActivityHeader, WarehouseActivityLine."Action Type"::Take, SerialNo, LotNo);
+            AssignTrackingToActivityLine(WarehouseActivityHeader, WarehouseActivityLine."Action Type"::Place, SerialNo, LotNo);
+        end;
+    end;
+
+    local procedure AssignTrackingToActivityLine(WarehouseActivityHeader: Record "Warehouse Activity Header"; ActionType: Enum "Warehouse Action Type"; SerialNo: Code[20]; LotNo: Code[20])
+    var
+        WarehouseActivityLine: Record "Warehouse Activity Line";
+    begin
+        WarehouseActivityLine.SetRange("Activity Type", WarehouseActivityHeader.Type);
+        WarehouseActivityLine.SetRange("Action Type", ActionType);
+        WarehouseActivityLine.SetRange("No.", WarehouseActivityHeader."No.");
+        WarehouseActivityLine.SetFilter("Qty. to Handle", '>0');
+        WarehouseActivityLine.SetFilter("Serial No.", '%1', '');
+        if WarehouseActivityLine.FindFirst() then begin
+            WarehouseActivityLine.Validate("Serial No.", SerialNo);
+            WarehouseActivityLine.Validate("Lot No.", LotNo);
+            WarehouseActivityLine.Modify(true);
+        end;
+    end;
+
+    local procedure CreateItemWithLotAndOutboundSerialTracking(var Item: Record Item; var ItemTrackingCode: Record "Item Tracking Code")
+    begin
+        LibraryItemTracking.CreateItemTrackingCode(ItemTrackingCode, false, false);
+        ItemTrackingCode.Validate("Lot Specific Tracking", true);
+        ItemTrackingCode.Validate("Lot Warehouse Tracking", true);
+        ItemTrackingCode.Validate("SN Sales Outbound Tracking", true);
+        ItemTrackingCode.Modify(true);
+
+        LibraryInventory.CreateTrackedItem(Item, '', '', ItemTrackingCode.Code);
+    end;
+
+    local procedure ReclassifyItemsFromShipmentToStorage(Item: Record Item; Location: Record Location)
+    var
+        ItemJnlBatch: Record "Item Journal Batch";
+        ItemJnlTemplate: Record "Item Journal Template";
+    begin
+        LibraryInventory.SelectItemJournalTemplateName(ItemJnlTemplate, ItemJnlTemplate.Type::Transfer);
+        LibraryInventory.SelectItemJournalBatchName(ItemJnlBatch, ItemJnlBatch."Template Type"::Item, ItemJnlTemplate.Name);
+        LibraryInventory.ClearItemJournal(ItemJnlTemplate, ItemJnlBatch);
+
+        ReclassifyBinContent(ItemJnlBatch, Location.Code, Location."Shipment Bin Code", Location."Receipt Bin Code", Item."No.");
+        ReclassifyBinContent(ItemJnlBatch, Location.Code, Location."Receipt Bin Code", Location."Shipment Bin Code", Item."No.");
+    end;
+
+    local procedure ReclassifyBinContent(ItemJnlBatch: Record "Item Journal Batch"; LocationCode: Code[10]; FromBinCode: Code[20]; ToBinCode: Code[20]; ItemNo: Code[20])
+    var
+        ItemJnlTemplate: Record "Item Journal Template";
+        ItemJournalLine: Record "Item Journal Line";
+    begin
+        GetBinContentFromItemJournalLine(ItemJnlBatch, LocationCode, FromBinCode, ItemNo);
+        FindItemJournalLine(ItemJournalLine, ItemJnlBatch, ItemNo);
+        ItemJournalLine.Validate("New Bin Code", ToBinCode);
+        if ItemJournalLine."Document No." = '' then
+            ItemJournalLine.Validate("Document No.", LibraryUtility.GenerateRandomCode(ItemJournalLine.FieldNo("Document No."), DATABASE::"Item Journal Line"));
+        ItemJournalLine.Modify(true);
+        LibraryInventory.SelectItemJournalTemplateName(ItemJnlTemplate, ItemJnlTemplate.Type::Transfer);
+        LibraryInventory.PostItemJournalLine(ItemJnlTemplate.Name, ItemJnlBatch.Name);
+    end;
+
+    local procedure FindItemJournalLine(var ItemJournalLine: Record "Item Journal Line"; ItemJournalBatch: Record "Item Journal Batch"; ItemNo: Code[20])
+    begin
+        ItemJournalLine.SetRange("Journal Template Name", ItemJournalBatch."Journal Template Name");
+        ItemJournalLine.SetRange("Journal Batch Name", ItemJournalBatch.Name);
+        ItemJournalLine.SetRange("Item No.", ItemNo);
+        ItemJournalLine.FindFirst();
     end;
 
     [StrMenuHandler]
