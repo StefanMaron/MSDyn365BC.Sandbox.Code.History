@@ -1035,6 +1035,7 @@ table 39 "Purchase Line"
                         "Inv. Discount Amount" := 0;
                         "Inv. Disc. Amount to Invoice" := 0;
                     end;
+                    "Recalculate Invoice Disc." := true;
                     UpdateAmounts();
                     UpdateUnitCost();
                 end;
@@ -2209,6 +2210,8 @@ table 39 "Purchase Line"
         }
         field(1003; "Job Unit Price"; Decimal)
         {
+            AutoFormatType = 2;
+            AutoFormatExpression = "Job Currency Code";
             AccessByPermission = TableData Job = R;
             BlankZero = true;
             Caption = 'Project Unit Price';
@@ -2236,6 +2239,8 @@ table 39 "Purchase Line"
         field(1004; "Job Total Price"; Decimal)
         {
             AccessByPermission = TableData Job = R;
+            AutoFormatExpression = "Job Currency Code";
+            AutoFormatType = 1;
             BlankZero = true;
             Caption = 'Project Total Price';
             Editable = false;
@@ -3739,11 +3744,15 @@ table 39 "Purchase Line"
         }
         field(28006; "Prepmt. VAT Amount Deducted"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Prepmt. VAT Amount Deducted';
             Editable = false;
         }
         field(28007; "Prepmt. VAT Base Deducted"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Prepmt. VAT Base Deducted';
             Editable = false;
         }
@@ -3759,34 +3768,41 @@ table 39 "Purchase Line"
         }
         field(28042; "WHT Absorb Base"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'WHT Absorb Base';
         }
         field(28081; "VAT Base (ACY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = GetAdditionalCurrencyCode();
             Caption = 'VAT Base (ACY)';
             Editable = false;
         }
         field(28082; "VAT Amount (ACY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = GetAdditionalCurrencyCode();
             Caption = 'VAT Amount (ACY)';
         }
         field(28083; "Amount Including VAT (ACY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = GetAdditionalCurrencyCode();
             Caption = 'Amount Including VAT (ACY)';
             Editable = false;
         }
         field(28084; "Amount (ACY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = GetAdditionalCurrencyCode();
             Caption = 'Amount (ACY)';
             Editable = false;
         }
         field(28085; "VAT Difference (ACY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = GetAdditionalCurrencyCode();
             Caption = 'VAT Difference (ACY)';
             Editable = false;
         }
@@ -5506,7 +5522,7 @@ table 39 "Purchase Line"
 
         VATBaseAmount := "VAT Base Amount";
         NonDeductAmount := NonDeductibleVAT.GetNonDeductibleVATAmount(Rec);
-        "Recalculate Invoice Disc." := "Allow Invoice Disc.";
+        "Recalculate Invoice Disc." := "Recalculate Invoice Disc." or "Allow Invoice Disc.";
 
         UpdateLineAmount(LineAmountChanged);
 
@@ -10826,6 +10842,12 @@ table 39 "Purchase Line"
         if IsHandled then
             exit;
         TestField("FA Posting Type", "FA Posting Type"::"Acquisition Cost");
+    end;
+
+    local procedure GetAdditionalCurrencyCode(): Code[10]
+    begin
+        GetGLSetup();
+        exit(GLSetup."Additional Reporting Currency");
     end;
 
     [IntegrationEvent(false, false)]

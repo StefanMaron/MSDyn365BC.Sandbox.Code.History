@@ -2814,6 +2814,8 @@ table 38 "Purchase Header"
         }
         field(28050; "WHT Amount"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'WHT Amount';
             Editable = false;
         }
@@ -2834,6 +2836,7 @@ table 38 "Purchase Header"
         }
         field(28087; "Vendor Exchange Rate (ACY)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Vendor Exchange Rate (ACY)';
             DecimalPlaces = 0 : 15;
 

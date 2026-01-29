@@ -152,6 +152,7 @@ table 113 "Sales Invoice Line"
         /// </summary>
         field(15; Quantity; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
         }
@@ -171,6 +172,7 @@ table 113 "Sales Invoice Line"
         field(23; "Unit Cost (LCY)"; Decimal)
         {
             AutoFormatType = 2;
+            AutoFormatExpression = '';
             Caption = 'Unit Cost (LCY)';
         }
         /// <summary>
@@ -178,6 +180,7 @@ table 113 "Sales Invoice Line"
         /// </summary>
         field(25; "VAT %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'VAT %';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -187,6 +190,7 @@ table 113 "Sales Invoice Line"
         /// </summary>
         field(27; "Line Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Line Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -232,6 +236,7 @@ table 113 "Sales Invoice Line"
         /// </summary>
         field(34; "Gross Weight"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Gross Weight';
             DecimalPlaces = 0 : 5;
         }
@@ -240,6 +245,7 @@ table 113 "Sales Invoice Line"
         /// </summary>
         field(35; "Net Weight"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Net Weight';
             DecimalPlaces = 0 : 5;
         }
@@ -248,6 +254,7 @@ table 113 "Sales Invoice Line"
         /// </summary>
         field(36; "Units per Parcel"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Units per Parcel';
             DecimalPlaces = 0 : 5;
         }
@@ -256,6 +263,7 @@ table 113 "Sales Invoice Line"
         /// </summary>
         field(37; "Unit Volume"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Unit Volume';
             DecimalPlaces = 0 : 5;
         }
@@ -703,6 +711,7 @@ table 113 "Sales Invoice Line"
         /// </summary>
         field(5404; "Qty. per Unit of Measure"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. per Unit of Measure';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -722,6 +731,7 @@ table 113 "Sales Invoice Line"
         /// </summary>
         field(5415; "Quantity (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity (Base)';
             DecimalPlaces = 0 : 5;
         }
@@ -896,39 +906,47 @@ table 113 "Sales Invoice Line"
         }
         field(28042; "WHT Absorb Base"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = GetCurrencyCode();
             Caption = 'WHT Absorb Base';
         }
         field(28081; "VAT Base (ACY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = GetCurrencyCode();
             Caption = 'VAT Base (ACY)';
             Editable = false;
         }
         field(28082; "VAT Amount (ACY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = GetCurrencyCode();
             Caption = 'VAT Amount (ACY)';
         }
         field(28083; "Amount Including VAT (ACY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = GetCurrencyCode();
             Caption = 'Amount Including VAT (ACY)';
             Editable = false;
         }
         field(28084; "Amount (ACY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = GetAdditionalCurrencyCode();
             Caption = 'Amount (ACY)';
             Editable = false;
         }
         field(28085; "VAT Difference (ACY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = GetCurrencyCode();
             Caption = 'VAT Difference (ACY)';
             Editable = false;
         }
         field(28090; "Prepayment %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Prepayment %';
         }
     }
@@ -1014,6 +1032,18 @@ table 113 "Sales Invoice Line"
     begin
         GetHeader();
         exit(SalesInvoiceHeader."Currency Code");
+    end;
+
+    /// <summary>
+    /// Retrieves the additional reporting currency code from the general ledger setup.
+    /// </summary>
+    /// <returns>The additional currency code.</returns>
+    local procedure GetAdditionalCurrencyCode(): Code[10]
+    var
+        GLSetup: Record "General Ledger Setup";
+    begin
+        GLSetup.Get();
+        exit(GLSetup."Additional Reporting Currency");
     end;
 
     /// <summary>

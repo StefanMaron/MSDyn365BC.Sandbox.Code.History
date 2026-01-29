@@ -96,6 +96,7 @@ table 379 "Detailed Cust. Ledg. Entry"
         field(8; "Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Amount (LCY)';
             ToolTip = 'Specifies the amount of the entry in LCY.';
         }
@@ -194,6 +195,7 @@ table 379 "Detailed Cust. Ledg. Entry"
         field(18; "Debit Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             BlankZero = true;
             Caption = 'Debit Amount (LCY)';
             ToolTip = 'Specifies the total of the ledger entries that represent debits, expressed in LCY.';
@@ -204,6 +206,7 @@ table 379 "Detailed Cust. Ledg. Entry"
         field(19; "Credit Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             BlankZero = true;
             Caption = 'Credit Amount (LCY)';
             ToolTip = 'Specifies the total of the ledger entries that represent credits, expressed in LCY.';

@@ -185,6 +185,7 @@ table 7002 "Sales Price"
         /// </summary>
         field(14; "Minimum Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Minimum Quantity';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
@@ -259,6 +260,7 @@ table 7002 "Sales Price"
         }
         field(28060; "Published Price"; Decimal)
         {
+            AutoFormatType = 0;
             CalcFormula = lookup(Item."Unit Price" where("No." = field("Item No.")));
             Caption = 'Published Price';
             Editable = false;
@@ -266,6 +268,7 @@ table 7002 "Sales Price"
         }
         field(28061; Cost; Decimal)
         {
+            AutoFormatType = 0;
             CalcFormula = lookup(Item."Unit Cost" where("No." = field("Item No.")));
             Caption = 'Cost';
             Editable = false;
@@ -273,6 +276,7 @@ table 7002 "Sales Price"
         }
         field(28062; "Cost-plus %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Cost-plus %';
             DecimalPlaces = 0 : 1;
             MinValue = 0;
