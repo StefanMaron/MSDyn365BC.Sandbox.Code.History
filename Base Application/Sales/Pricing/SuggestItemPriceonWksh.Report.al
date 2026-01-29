@@ -205,6 +205,7 @@ report 7051 "Suggest Item Price on Wksh."
                     }
                     field(PriceLowerLimit; PriceLowerLimit)
                     {
+                        AutoFormatType = 0;
                         ApplicationArea = Basic, Suite;
                         Caption = 'Only Amounts Above';
                         DecimalPlaces = 2 : 5;
@@ -212,6 +213,7 @@ report 7051 "Suggest Item Price on Wksh."
                     }
                     field(UnitPriceFactor; UnitPriceFactor)
                     {
+                        AutoFormatType = 0;
                         ApplicationArea = Basic, Suite;
                         Caption = 'Adjustment Factor';
                         DecimalPlaces = 0 : 5;

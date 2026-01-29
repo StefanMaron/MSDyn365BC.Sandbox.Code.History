@@ -2807,6 +2807,7 @@ table 38 "Purchase Header"
         }
         field(3010545; "ESR Amount"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'ESR Amount';
             DecimalPlaces = 2 : 2;
 

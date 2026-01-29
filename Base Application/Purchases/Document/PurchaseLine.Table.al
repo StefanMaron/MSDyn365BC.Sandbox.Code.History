@@ -1030,6 +1030,7 @@ table 39 "Purchase Line"
                         "Inv. Discount Amount" := 0;
                         "Inv. Disc. Amount to Invoice" := 0;
                     end;
+                    "Recalculate Invoice Disc." := true;
                     UpdateAmounts();
                     UpdateUnitCost();
                 end;
@@ -2187,6 +2188,8 @@ table 39 "Purchase Line"
         }
         field(1003; "Job Unit Price"; Decimal)
         {
+            AutoFormatType = 2;
+            AutoFormatExpression = "Job Currency Code";
             AccessByPermission = TableData Job = R;
             BlankZero = true;
             Caption = 'Project Unit Price';
@@ -2214,6 +2217,8 @@ table 39 "Purchase Line"
         field(1004; "Job Total Price"; Decimal)
         {
             AccessByPermission = TableData Job = R;
+            AutoFormatExpression = "Job Currency Code";
+            AutoFormatType = 1;
             BlankZero = true;
             Caption = 'Project Total Price';
             Editable = false;
@@ -5361,7 +5366,7 @@ table 39 "Purchase Line"
 
         VATBaseAmount := "VAT Base Amount";
         NonDeductAmount := NonDeductibleVAT.GetNonDeductibleVATAmount(Rec);
-        "Recalculate Invoice Disc." := "Allow Invoice Disc.";
+        "Recalculate Invoice Disc." := "Recalculate Invoice Disc." or "Allow Invoice Disc.";
 
         UpdateLineAmount(LineAmountChanged);
 

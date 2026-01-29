@@ -257,6 +257,7 @@ table 5107 "Sales Header Archive"
         /// </summary>
         field(25; "Payment Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Payment Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -331,6 +332,7 @@ table 5107 "Sales Header Archive"
         /// </summary>
         field(33; "Currency Factor"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Currency Factor';
             DecimalPlaces = 0 : 15;
             MinValue = 0;
@@ -914,6 +916,7 @@ table 5107 "Sales Header Archive"
         /// </summary>
         field(119; "VAT Base Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'VAT Base Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -942,6 +945,7 @@ table 5107 "Sales Header Archive"
         field(122; "Invoice Discount Value"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = "Currency Code";
             Caption = 'Invoice Discount Value';
         }
         /// <summary>
@@ -996,6 +1000,7 @@ table 5107 "Sales Header Archive"
         /// </summary>
         field(130; "Prepayment %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Prepayment %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -1059,6 +1064,7 @@ table 5107 "Sales Header Archive"
         /// </summary>
         field(140; "Prepmt. Payment Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Prepmt. Payment Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -1518,6 +1524,7 @@ table 5107 "Sales Header Archive"
         }
         field(3010802; "Probability %"; Decimal)
         {
+            AutoFormatType = 0;
             BlankZero = true;
             Caption = 'Probability %';
             DecimalPlaces = 0 : 0;
@@ -1542,6 +1549,8 @@ table 5107 "Sales Header Archive"
         }
         field(3010807; "Competitor Price"; Decimal)
         {
+            AutoFormatType = 2;
+            AutoFormatExpression = "Currency Code";
             Caption = 'Competitor Price';
         }
         field(3010808; "Filed Date"; Date)

@@ -28,6 +28,7 @@ table 47 "Aging Band Buffer"
         /// </summary>
         field(2; "Column 1 Amt."; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Column 1 Amt.';
             DataClassification = SystemMetadata;
         }
@@ -36,6 +37,7 @@ table 47 "Aging Band Buffer"
         /// </summary>
         field(3; "Column 2 Amt."; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Column 2 Amt.';
             DataClassification = SystemMetadata;
         }
@@ -44,6 +46,7 @@ table 47 "Aging Band Buffer"
         /// </summary>
         field(4; "Column 3 Amt."; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Column 3 Amt.';
             DataClassification = SystemMetadata;
         }
@@ -52,6 +55,7 @@ table 47 "Aging Band Buffer"
         /// </summary>
         field(5; "Column 4 Amt."; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Column 4 Amt.';
             DataClassification = SystemMetadata;
         }
@@ -60,6 +64,7 @@ table 47 "Aging Band Buffer"
         /// </summary>
         field(6; "Column 5 Amt."; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Column 5 Amt.';
             DataClassification = SystemMetadata;
         }
