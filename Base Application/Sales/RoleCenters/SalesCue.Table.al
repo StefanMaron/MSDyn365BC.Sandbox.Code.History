@@ -134,6 +134,7 @@ table 9053 "Sales Cue"
         /// </summary>
         field(9; "Average Days Delayed"; Decimal)
         {
+            AutoFormatType = 0;
             AccessByPermission = TableData "Sales Shipment Header" = R;
             Caption = 'Average Days Delayed';
             DecimalPlaces = 1 : 1;

@@ -31,6 +31,7 @@ table 5 "Finance Charge Terms"
         /// </summary>
         field(2; "Interest Rate"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Interest Rate';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -50,6 +51,7 @@ table 5 "Finance Charge Terms"
         field(3; "Minimum Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Minimum Amount (LCY)';
             MinValue = 0;
         }
@@ -59,6 +61,7 @@ table 5 "Finance Charge Terms"
         field(5; "Additional Fee (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Additional Fee (LCY)';
             MinValue = 0;
         }

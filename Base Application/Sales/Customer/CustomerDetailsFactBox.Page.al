@@ -53,6 +53,8 @@ page 9084 "Customer Details FactBox"
             field(AvailableCreditLCY; Rec.CalcAvailableCreditUI())
             {
                 ApplicationArea = Basic, Suite;
+                AutoFormatType = 1;
+                AutoFormatExpression = '';
                 Caption = 'Available Credit (LCY)';
                 ToolTip = 'Specifies a customer''s available credit. If the available credit is 0 and the customer''s credit limit is also 0, then the customer has unlimited credit because no credit limit has been defined.';
 

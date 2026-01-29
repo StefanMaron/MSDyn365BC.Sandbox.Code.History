@@ -173,6 +173,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(15; Quantity; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
             ToolTip = 'Specifies how many units are being sold.';
@@ -182,6 +183,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(16; "Outstanding Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Outstanding Quantity';
             DecimalPlaces = 0 : 5;
         }
@@ -190,6 +192,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(17; "Qty. to Invoice"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. to Invoice';
             DecimalPlaces = 0 : 5;
             ToolTip = 'Specifies the quantity that remains to be invoiced. It is calculated as Quantity - Qty. Invoiced.';
@@ -199,6 +202,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(18; "Qty. to Ship"; Decimal)
         {
+            AutoFormatType = 0;
             AccessByPermission = TableData "Sales Shipment Header" = R;
             Caption = 'Qty. to Ship';
             DecimalPlaces = 0 : 5;
@@ -221,6 +225,7 @@ table 5108 "Sales Line Archive"
         field(23; "Unit Cost (LCY)"; Decimal)
         {
             AutoFormatType = 2;
+            AutoFormatExpression = '';
             Caption = 'Unit Cost (LCY)';
             ToolTip = 'Specifies the cost, in LCY, of one unit of the item or resource on the line.';
         }
@@ -229,6 +234,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(25; "VAT %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'VAT %';
             DecimalPlaces = 0 : 5;
         }
@@ -237,6 +243,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(26; "Quantity Disc. %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity Disc. %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -247,6 +254,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(27; "Line Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Line Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -297,6 +305,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(34; "Gross Weight"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Gross Weight';
             DecimalPlaces = 0 : 5;
             ToolTip = 'Specifies the gross weight of one unit of the item. In the sales statistics window, the gross weight on the line is included in the total gross weight of all the lines for the particular sales document.';
@@ -306,6 +315,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(35; "Net Weight"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Net Weight';
             DecimalPlaces = 0 : 5;
             ToolTip = 'Specifies the net weight of one unit of the item. In the sales statistics window, the net weight on the line is included in the total net weight of all the lines for the particular sales document.';
@@ -315,6 +325,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(36; "Units per Parcel"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Units per Parcel';
             DecimalPlaces = 0 : 5;
             ToolTip = 'Specifies the number of units per parcel of the item. In the sales statistics window, the number of units per parcel on the line helps to determine the total number of units for all the lines for the particular sales document.';
@@ -324,6 +335,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(37; "Unit Volume"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Unit Volume';
             DecimalPlaces = 0 : 5;
             ToolTip = 'Specifies the volume of one unit of the item. In the sales statistics window, the volume of one unit of the item on the line is included in the total volume of all the lines for the particular sales document.';
@@ -395,6 +407,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(55; "Cust./Item Disc. %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Cust./Item Disc. %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -415,6 +428,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(58; "Qty. Shipped Not Invoiced"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Shipped Not Invoiced';
             DecimalPlaces = 0 : 5;
         }
@@ -432,6 +446,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(60; "Quantity Shipped"; Decimal)
         {
+            AutoFormatType = 0;
             AccessByPermission = TableData "Sales Shipment Header" = R;
             Caption = 'Quantity Shipped';
             DecimalPlaces = 0 : 5;
@@ -442,6 +457,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(61; "Quantity Invoiced"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity Invoiced';
             DecimalPlaces = 0 : 5;
             ToolTip = 'Specifies how many units of the item on the line have been posted as invoiced.';
@@ -465,6 +481,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(67; "Profit %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Profit %';
             DecimalPlaces = 0 : 5;
         }
@@ -654,6 +671,7 @@ table 5108 "Sales Line Archive"
         field(92; "Outstanding Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Outstanding Amount (LCY)';
         }
         /// <summary>
@@ -662,6 +680,7 @@ table 5108 "Sales Line Archive"
         field(93; "Shipped Not Invoiced (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Shipped Not Invoiced (LCY)';
         }
         /// <summary>
@@ -772,6 +791,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(109; "Prepayment %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Prepayment %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -834,6 +854,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(115; "Prepayment VAT %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Prepayment VAT %';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -1029,6 +1050,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(5404; "Qty. per Unit of Measure"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. per Unit of Measure';
             DecimalPlaces = 0 : 5;
             InitValue = 1;
@@ -1056,6 +1078,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(5415; "Quantity (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity (Base)';
             DecimalPlaces = 0 : 5;
         }
@@ -1064,6 +1087,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(5416; "Outstanding Qty. (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Outstanding Qty. (Base)';
             DecimalPlaces = 0 : 5;
         }
@@ -1072,6 +1096,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(5417; "Qty. to Invoice (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. to Invoice (Base)';
             DecimalPlaces = 0 : 5;
         }
@@ -1080,6 +1105,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(5418; "Qty. to Ship (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. to Ship (Base)';
             DecimalPlaces = 0 : 5;
         }
@@ -1088,6 +1114,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(5458; "Qty. Shipped Not Invd. (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Shipped Not Invd. (Base)';
             DecimalPlaces = 0 : 5;
         }
@@ -1096,6 +1123,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(5460; "Qty. Shipped (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Shipped (Base)';
             DecimalPlaces = 0 : 5;
         }
@@ -1104,6 +1132,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(5461; "Qty. Invoiced (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Invoiced (Base)';
             DecimalPlaces = 0 : 5;
         }
@@ -1364,6 +1393,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(5803; "Return Qty. to Receive"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Return Qty. to Receive';
             DecimalPlaces = 0 : 5;
         }
@@ -1372,6 +1402,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(5804; "Return Qty. to Receive (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Return Qty. to Receive (Base)';
             DecimalPlaces = 0 : 5;
         }
@@ -1380,6 +1411,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(5805; "Return Qty. Rcd. Not Invd."; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Return Qty. Rcd. Not Invd.';
             DecimalPlaces = 0 : 5;
         }
@@ -1388,6 +1420,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(5806; "Ret. Qty. Rcd. Not Invd.(Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Ret. Qty. Rcd. Not Invd.(Base)';
             DecimalPlaces = 0 : 5;
         }
@@ -1406,6 +1439,7 @@ table 5108 "Sales Line Archive"
         field(5808; "Ret. Amt. Rcd. Not Invd. (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Ret. Amt. Rcd. Not Invd. (LCY)';
         }
         /// <summary>
@@ -1413,6 +1447,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(5809; "Return Qty. Received"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Return Qty. Received';
             DecimalPlaces = 0 : 5;
         }
@@ -1421,6 +1456,7 @@ table 5108 "Sales Line Archive"
         /// </summary>
         field(5810; "Return Qty. Received (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Return Qty. Received (Base)';
             DecimalPlaces = 0 : 5;
         }
@@ -1490,18 +1526,24 @@ table 5108 "Sales Line Archive"
         }
         field(10700; "Pmt. Disc. Given Amount (Old)"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Pmt. Disc. Given Amount (Old)';
         }
         field(10701; "EC %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'EC %';
         }
         field(10702; "EC Difference"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'EC Difference';
         }
         field(10703; "Prepayment EC %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Prepayment EC %';
         }
     }

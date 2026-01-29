@@ -38,6 +38,7 @@ table 572 "Finance Charge Interest Rate"
         /// </summary>
         field(3; "Interest Rate"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Interest Rate';
             MaxValue = 100;
             DecimalPlaces = 0 : 5;

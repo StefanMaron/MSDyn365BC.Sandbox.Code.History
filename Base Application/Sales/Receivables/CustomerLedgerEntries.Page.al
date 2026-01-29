@@ -180,9 +180,10 @@ page 25 "Customer Ledger Entries"
                 field(RunningBalanceLCY; CalcRunningCustBalance.GetCustomerBalanceLCY(Rec))
                 {
                     ApplicationArea = Basic, Suite;
+                    AutoFormatType = 1;
+                    AutoFormatExpression = '';
                     Caption = 'Running Balance (LCY)';
                     ToolTip = 'Specifies the running balance in LCY.';
-                    AutoFormatType = 1;
                     Visible = false;
                 }
                 field("Remaining Amount"; Rec."Remaining Amount")
