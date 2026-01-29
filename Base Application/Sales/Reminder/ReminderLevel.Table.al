@@ -50,6 +50,7 @@ table 293 "Reminder Level"
         field(4; "Additional Fee (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Additional Fee (LCY)';
             MinValue = 0;
         }
@@ -72,6 +73,8 @@ table 293 "Reminder Level"
         /// </summary>
         field(7; "Add. Fee per Line Amount (LCY)"; Decimal)
         {
+            AutoFormatType = 2;
+            AutoFormatExpression = '';
             Caption = 'Add. Fee per Line Amount (LCY)';
             MinValue = 0;
         }

@@ -56,6 +56,8 @@ table 1050 "Additional Fee Setup"
         /// </summary>
         field(5; "Threshold Remaining Amount"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Threshold Remaining Amount';
             MinValue = 0;
         }
@@ -64,6 +66,8 @@ table 1050 "Additional Fee Setup"
         /// </summary>
         field(6; "Additional Fee Amount"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Additional Fee Amount';
             MinValue = 0;
 
@@ -86,6 +90,7 @@ table 1050 "Additional Fee Setup"
         /// </summary>
         field(7; "Additional Fee %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Additional Fee %';
             MaxValue = 100;
             MinValue = 0;
@@ -95,6 +100,8 @@ table 1050 "Additional Fee Setup"
         /// </summary>
         field(8; "Min. Additional Fee Amount"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Min. Additional Fee Amount';
             MinValue = 0;
 
@@ -109,6 +116,8 @@ table 1050 "Additional Fee Setup"
         /// </summary>
         field(9; "Max. Additional Fee Amount"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Max. Additional Fee Amount';
             MinValue = 0;
 

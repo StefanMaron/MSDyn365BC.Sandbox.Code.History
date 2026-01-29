@@ -189,6 +189,7 @@ table 7023 "Sales Price Worksheet"
         /// </summary>
         field(14; "Minimum Quantity"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Minimum Quantity';
             MinValue = 0;
 

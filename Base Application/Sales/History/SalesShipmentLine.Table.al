@@ -159,6 +159,7 @@ table 111 "Sales Shipment Line"
         /// </summary>
         field(15; Quantity; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
         }
@@ -177,6 +178,7 @@ table 111 "Sales Shipment Line"
         field(23; "Unit Cost (LCY)"; Decimal)
         {
             AutoFormatType = 2;
+            AutoFormatExpression = '';
             Caption = 'Unit Cost (LCY)';
         }
         /// <summary>
@@ -184,6 +186,7 @@ table 111 "Sales Shipment Line"
         /// </summary>
         field(25; "VAT %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'VAT %';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -193,6 +196,7 @@ table 111 "Sales Shipment Line"
         /// </summary>
         field(27; "Line Discount %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Line Discount %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -211,6 +215,7 @@ table 111 "Sales Shipment Line"
         /// </summary>
         field(34; "Gross Weight"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Gross Weight';
             DecimalPlaces = 0 : 5;
         }
@@ -219,6 +224,7 @@ table 111 "Sales Shipment Line"
         /// </summary>
         field(35; "Net Weight"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Net Weight';
             DecimalPlaces = 0 : 5;
         }
@@ -227,6 +233,7 @@ table 111 "Sales Shipment Line"
         /// </summary>
         field(36; "Units per Parcel"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Units per Parcel';
             DecimalPlaces = 0 : 5;
         }
@@ -235,6 +242,7 @@ table 111 "Sales Shipment Line"
         /// </summary>
         field(37; "Unit Volume"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Unit Volume';
             DecimalPlaces = 0 : 5;
         }
@@ -300,6 +308,7 @@ table 111 "Sales Shipment Line"
         /// </summary>
         field(58; "Qty. Shipped Not Invoiced"; Decimal)
         {
+            AutoFormatType = 0;
             AccessByPermission = TableData "Sales Shipment Header" = R;
             Caption = 'Qty. Shipped Not Invoiced';
             DecimalPlaces = 0 : 5;
@@ -310,6 +319,7 @@ table 111 "Sales Shipment Line"
         /// </summary>
         field(61; "Quantity Invoiced"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity Invoiced';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -608,6 +618,7 @@ table 111 "Sales Shipment Line"
         /// </summary>
         field(5404; "Qty. per Unit of Measure"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. per Unit of Measure';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -627,6 +638,7 @@ table 111 "Sales Shipment Line"
         /// </summary>
         field(5415; "Quantity (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity (Base)';
             DecimalPlaces = 0 : 5;
         }
@@ -635,6 +647,7 @@ table 111 "Sales Shipment Line"
         /// </summary>
         field(5461; "Qty. Invoiced (Base)"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Qty. Invoiced (Base)';
             DecimalPlaces = 0 : 5;
             Editable = false;
