@@ -144,6 +144,7 @@ page 5852 "Get Post.Doc - S.InvLn Subform"
                 field(QtyNotReturned; QtyNotReturned)
                 {
                     ApplicationArea = Basic, Suite;
+                    AutoFormatType = 0;
                     Caption = 'Qty. Not Returned';
                     DecimalPlaces = 0 : 5;
                     ToolTip = 'Specifies the quantity from the posted document line that has been shipped to the customer and not returned by the customer.';
@@ -151,6 +152,7 @@ page 5852 "Get Post.Doc - S.InvLn Subform"
                 field(QtyReturned; GetQtyReturned())
                 {
                     ApplicationArea = Basic, Suite;
+                    AutoFormatType = 0;
                     Caption = 'Qty. Returned';
                     DecimalPlaces = 0 : 5;
                     ToolTip = 'Specifies the quantity that was returned.';
@@ -171,6 +173,7 @@ page 5852 "Get Post.Doc - S.InvLn Subform"
                 {
                     ApplicationArea = Basic, Suite;
                     AutoFormatType = 2;
+                    AutoFormatExpression = '';
                     Caption = 'Reverse Unit Cost (LCY)';
                     ToolTip = 'Specifies the unit cost that will appear on the new document lines.';
                     Visible = false;

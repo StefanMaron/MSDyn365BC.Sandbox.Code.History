@@ -108,6 +108,7 @@ page 5814 "Item Charge Assignment (Sales)"
                 field(GrossWeight; GrossWeight)
                 {
                     ApplicationArea = ItemCharges;
+                    AutoFormatType = 0;
                     BlankZero = true;
                     Caption = 'Gross Weight';
                     DecimalPlaces = 0 : 4;
@@ -117,6 +118,7 @@ page 5814 "Item Charge Assignment (Sales)"
                 field(UnitVolume; UnitVolume)
                 {
                     ApplicationArea = ItemCharges;
+                    AutoFormatType = 0;
                     BlankZero = true;
                     Caption = 'Unit Volume';
                     DecimalPlaces = 0 : 4;
@@ -126,6 +128,7 @@ page 5814 "Item Charge Assignment (Sales)"
                 field(QtyToShipBase; QtyToShipBase)
                 {
                     ApplicationArea = ItemCharges;
+                    AutoFormatType = 0;
                     BlankZero = true;
                     Caption = 'Qty. to Ship (Base)';
                     DecimalPlaces = 0 : 5;
@@ -135,6 +138,7 @@ page 5814 "Item Charge Assignment (Sales)"
                 field(QtyShippedBase; QtyShippedBase)
                 {
                     ApplicationArea = ItemCharges;
+                    AutoFormatType = 0;
                     BlankZero = true;
                     Caption = 'Qty. Shipped (Base)';
                     DecimalPlaces = 0 : 5;
@@ -144,6 +148,7 @@ page 5814 "Item Charge Assignment (Sales)"
                 field(QtyToRetReceiveBase; QtyToRetReceiveBase)
                 {
                     ApplicationArea = ItemCharges;
+                    AutoFormatType = 0;
                     BlankZero = true;
                     Caption = 'Return Qty. to Receive (Base)';
                     DecimalPlaces = 0 : 5;
@@ -153,6 +158,7 @@ page 5814 "Item Charge Assignment (Sales)"
                 field(QtyRetReceivedBase; QtyRetReceivedBase)
                 {
                     ApplicationArea = ItemCharges;
+                    AutoFormatType = 0;
                     BlankZero = true;
                     Caption = 'Return Qty. Received (Base)';
                     DecimalPlaces = 0 : 5;
@@ -172,6 +178,7 @@ page 5814 "Item Charge Assignment (Sales)"
                         field(AssignableQty; AssignableQty)
                         {
                             ApplicationArea = ItemCharges;
+                            AutoFormatType = 0;
                             Caption = 'Total (Qty.)';
                             DecimalPlaces = 0 : 5;
                             Editable = false;
@@ -180,6 +187,7 @@ page 5814 "Item Charge Assignment (Sales)"
                         field(AssignableAmount; AssignableAmount)
                         {
                             ApplicationArea = ItemCharges;
+                            AutoFormatType = 0;
                             Caption = 'Total (Amount)';
                             DecimalPlaces = 2 : 5;
                             Editable = false;
@@ -192,6 +200,7 @@ page 5814 "Item Charge Assignment (Sales)"
                         field(TotalQtyToAssign; TotalQtyToAssign)
                         {
                             ApplicationArea = ItemCharges;
+                            AutoFormatType = 0;
                             Caption = 'Qty. to Assign';
                             DecimalPlaces = 0 : 5;
                             Editable = false;
@@ -200,6 +209,8 @@ page 5814 "Item Charge Assignment (Sales)"
                         field(TotalAmountToAssign; TotalAmountToAssign)
                         {
                             ApplicationArea = ItemCharges;
+                            AutoFormatType = 1;
+                            AutoFormatExpression = '';
                             Caption = 'Amount to Assign';
                             DecimalPlaces = 2 : 5;
                             Editable = false;
@@ -212,6 +223,7 @@ page 5814 "Item Charge Assignment (Sales)"
                         field(RemQtyToAssign; RemQtyToAssign)
                         {
                             ApplicationArea = ItemCharges;
+                            AutoFormatType = 0;
                             Caption = 'Rem. Qty. to Assign';
                             DecimalPlaces = 0 : 5;
                             Editable = false;
@@ -222,6 +234,8 @@ page 5814 "Item Charge Assignment (Sales)"
                         field(RemAmountToAssign; RemAmountToAssign)
                         {
                             ApplicationArea = ItemCharges;
+                            AutoFormatType = 1;
+                            AutoFormatExpression = '';
                             Caption = 'Rem. Amount to Assign';
                             DecimalPlaces = 2 : 5;
                             Editable = false;
@@ -236,6 +250,7 @@ page 5814 "Item Charge Assignment (Sales)"
                         field(TotalQtyToHandle; TotalQtyToHandle)
                         {
                             ApplicationArea = ItemCharges;
+                            AutoFormatType = 0;
                             Caption = 'Qty. to Handle';
                             DecimalPlaces = 0 : 5;
                             Editable = false;
@@ -244,6 +259,8 @@ page 5814 "Item Charge Assignment (Sales)"
                         field(TotalAmountToHandle; TotalAmountToHandle)
                         {
                             ApplicationArea = ItemCharges;
+                            AutoFormatType = 1;
+                            AutoFormatExpression = '';
                             Caption = 'Amount to Handle';
                             DecimalPlaces = 2 : 5;
                             Editable = false;
@@ -256,6 +273,7 @@ page 5814 "Item Charge Assignment (Sales)"
                         field(RemQtyToHandle; RemQtyToHandle)
                         {
                             ApplicationArea = ItemCharges;
+                            AutoFormatType = 0;
                             Caption = 'Rem. Qty. to Handle';
                             DecimalPlaces = 0 : 5;
                             Editable = false;
@@ -266,6 +284,8 @@ page 5814 "Item Charge Assignment (Sales)"
                         field(RemAmountToHandle; RemAmountToHandle)
                         {
                             ApplicationArea = ItemCharges;
+                            AutoFormatType = 1;
+                            AutoFormatExpression = '';
                             Caption = 'Rem. Amount to Handle';
                             DecimalPlaces = 2 : 5;
                             Editable = false;
