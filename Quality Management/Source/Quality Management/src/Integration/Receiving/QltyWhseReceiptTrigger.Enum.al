@@ -5,23 +5,23 @@
 namespace Microsoft.QualityManagement.Integration.Receiving;
 
 /// <summary>
-/// Helps determine how receiving behaviors should occur.
+/// The warehouse receipt behavior to create an inspection.
 /// </summary>
-enum 20452 "Qlty. Purchase Trigger"
+enum 20450 "Qlty. Whse. Receipt Trigger"
 {
     Extensible = true;
-    Caption = 'Quality Purchase Trigger';
+    Caption = 'Quality Warehouse Receipt Trigger';
 
     value(0; NoTrigger)
     {
         Caption = 'Never';
     }
-    value(1; OnPurchaseOrderPostReceive)
+    value(1; OnWarehouseReceiptCreate)
     {
-        Caption = 'When Purchase Order is received';
+        Caption = 'When Warehouse Receipt is created';
     }
-    value(2; OnPurchaseOrderRelease)
+    value(2; OnWarehouseReceiptPost)
     {
-        Caption = 'When Purchase Order is released';
+        Caption = 'When Warehouse Receipt is posted';
     }
 }

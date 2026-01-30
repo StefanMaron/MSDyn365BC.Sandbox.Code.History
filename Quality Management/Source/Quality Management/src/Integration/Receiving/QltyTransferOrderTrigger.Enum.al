@@ -7,10 +7,10 @@ namespace Microsoft.QualityManagement.Integration.Receiving;
 /// <summary>
 /// Helps determine the trigger for transfer specific reactions.
 /// </summary>
-enum 20454 "Qlty. Transfer Trigger"
+enum 20454 "Qlty. Transfer Order Trigger"
 {
     Extensible = true;
-    Caption = 'Quality Transfer Trigger';
+    Caption = 'Quality Transfer Order Trigger';
 
     value(0; NoTrigger)
     {

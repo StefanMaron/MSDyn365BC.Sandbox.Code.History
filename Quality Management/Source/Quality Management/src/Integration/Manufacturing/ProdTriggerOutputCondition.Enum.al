@@ -5,26 +5,26 @@
 namespace Microsoft.QualityManagement.Integration.Manufacturing;
 
 /// <summary>
-/// The trigger for when to create inspections for production orders.
+/// Helps determine the behavior of when to create inspections with production output.
 /// </summary>
-enum 20406 "Qlty. Production Trigger"
+enum 20442 "Prod. Trigger Output Condition"
 {
-    Caption = 'Quality Production Trigger';
+    Caption = 'Production Trigger Output Condition';
 
-    value(0; NoTrigger)
+    value(0; OnAnyOutput)
     {
-        Caption = 'Never';
+        Caption = 'Any Output Entry (time or quantity)';
     }
-    value(1; OnProductionOutputPost)
+    value(1; OnAnyQuantity)
     {
-        Caption = 'When Production Output is posted';
+        Caption = 'Any Quantity Output';
     }
-    value(2; OnProductionOrderRelease)
+    value(2; OnlyWithQuantity)
     {
-        Caption = 'When Production Order is released';
+        Caption = 'Only with Quantity';
     }
-    value(3; OnReleasedProductionOrderRefresh)
+    value(3; OnlyWithScrap)
     {
-        Caption = 'When a Released Production Order is refreshed';
+        Caption = 'Only with Scrap';
     }
 }
