@@ -406,6 +406,9 @@ codeunit 80 "Sales-Post"
           CustLedgEntry, WhseShip, WhseReceive, PreviewMode);
 
         OnAfterPostSalesDocDropShipment(PurchRcptHeader."No.", SuppressCommit);
+
+        if SalesHeader."Document Type" = SalesHeader."Document Type"::"Return Order" then
+            UpdateSalesOrderLineIfExist(SalesHeader."No.");
     end;
 
     /// <summary>
@@ -9052,6 +9055,17 @@ codeunit 80 "Sales-Post"
             exit(true);
 
         exit(false);
+    end;
+
+    local procedure UpdateSalesOrderLineIfExist(DocumentNo: Code[20])
+    var
+        SalesCreditMemoHeader: Record "Sales Cr.Memo Header";
+        CorrectPostedSalesInvoice: Codeunit "Correct Posted Sales Invoice";
+    begin
+        SalesCreditMemoHeader.SetLoadFields("Return Order No.", "No.");
+        SalesCreditMemoHeader.SetRange("Return Order No.", DocumentNo);
+        if SalesCreditMemoHeader.FindFirst() then
+            CorrectPostedSalesInvoice.UpdateSalesOrderLineIfExist(SalesCreditMemoHeader."No.");
     end;
 
     /// <summary>
