@@ -49,6 +49,8 @@ page 9082 "Customer Statistics FactBox"
             field(BalanceAsVendor; BalanceAsVendor)
             {
                 ApplicationArea = Basic, Suite;
+                AutoFormatType = 1;
+                AutoFormatExpression = '';
                 Caption = 'Balance (LCY) As Vendor';
                 Editable = false;
                 Enabled = BalanceAsVendorEnabled;
@@ -145,6 +147,7 @@ page 9082 "Customer Statistics FactBox"
                 AccessByPermission = TableData "Sales Line" = R;
                 ApplicationArea = Basic, Suite;
                 AutoFormatType = 1;
+                AutoFormatExpression = '';
                 Caption = 'Total (LCY)';
                 Importance = Promoted;
                 Style = Strong;
@@ -158,6 +161,8 @@ page 9082 "Customer Statistics FactBox"
             field("Balance Due (LCY)"; OverdueBalance)
             {
                 ApplicationArea = Basic, Suite;
+                AutoFormatType = 1;
+                AutoFormatExpression = '';
                 CaptionClass = Text000;
                 Caption = 'Balance Due (LCY)';
 
@@ -176,6 +181,8 @@ page 9082 "Customer Statistics FactBox"
             field("Sales (LCY)"; SalesLCY)
             {
                 ApplicationArea = Basic, Suite;
+                AutoFormatType = 1;
+                AutoFormatExpression = '';
                 Caption = 'Total Sales (LCY)';
                 ToolTip = 'Specifies your total sales turnover with the customer in the current fiscal year. It is calculated from amounts excluding VAT on all completed and open sales invoices and credit memos.';
 
@@ -197,6 +204,8 @@ page 9082 "Customer Statistics FactBox"
             {
                 AccessByPermission = TableData "Sales Line" = R;
                 ApplicationArea = Prepayments;
+                AutoFormatType = 1;
+                AutoFormatExpression = '';
                 Caption = 'Invoiced Prepayment Amount (LCY)';
                 ToolTip = 'Specifies your sales income from the customer, based on invoiced prepayments.';
             }
