@@ -368,7 +368,7 @@ page 489 "Column Layout"
         CurrentColumnName: Code[10];
         DimCaptionsInitialized: Boolean;
         CurrentDescription: Text[80];
-        InternalDescription: Text[250];
+        InternalDescription: Text[500];
 #if not CLEAN27
     local procedure CurrentColumnNameOnAfterValida()
     begin
