@@ -163,7 +163,7 @@ codeunit 99000819 "Mfg. Planning Line Management"
         PlanningRoutingLine.Insert();
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Planning Line Management", 'OnCalculateOnTransferBOM', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Planning Line Management", 'OnCalculateOnTransferBOM', '', true, true)]
     local procedure OnCalculateOnTransferBOM(
         var RequisitionLine: Record "Requisition Line"; Item: Record Item; var PlanningComponent: Record "Planning Component";
         var TempPlanningErrorLog: Record "Planning Error Log" temporary; var TempPlanningComponent: Record "Planning Component" temporary;
