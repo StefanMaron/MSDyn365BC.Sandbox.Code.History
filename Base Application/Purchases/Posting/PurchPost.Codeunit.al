@@ -1685,7 +1685,9 @@ codeunit 90 "Purch.-Post"
             TotalSalesTaxToExpense := PurchaseLine."Tax To Be Expensed"
         else
             TotalSalesTaxToExpense := 0;
-        ItemJnlLine.Amount := (PurchaseLine.Amount + TotalSalesTaxToExpense + NonDeductibleVAT.GetNonDeductibleVATAmountForItemCost(PurchaseLine)) * Factor + RemAmt;
+        ItemJnlLine.Amount := (PurchaseLine.Amount + TotalSalesTaxToExpense) * Factor + RemAmt;
+        if not PurchaseLine."Item Charge Has Non.Ded. VAT" then
+            ItemJnlLine.Amount += NonDeductibleVAT.GetNonDeductibleVATAmountForItemCost(PurchaseLine) * Factor;
         if PurchaseHeader."Prices Including VAT" then
             ItemJnlLine."Discount Amount" :=
                 (PurchaseLine."Line Discount Amount" + PurchaseLine."Inv. Discount Amount") /
