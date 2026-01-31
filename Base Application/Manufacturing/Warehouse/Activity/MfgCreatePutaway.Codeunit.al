@@ -747,6 +747,7 @@ codeunit 99000893 "Mfg. Create Put-away"
         BreakPackage: Boolean;
         Breakbulk: Boolean;
     begin
+        OnBeforeCreateWhsPutAwayForProdOutput(ProdOrderLine, TempProdOrdLineTrackingBuff);
         InitializeGlobalsWhsePutAwayForProdOutput();
 
         GetLocation(ProdOrderLine."Location Code");
@@ -801,6 +802,8 @@ codeunit 99000893 "Mfg. Create Put-away"
             Breakbulk);
 
         OldLineNo := LineNo;
+
+        OnAfterCreateWhsePutAwayForProdOutput(ProdOrderLine, TempProdOrdLineTrackingBuff, CurrWarehouseActivityHeader, CurrWarehouseActivityLine, QtyToPickBase);
     end;
 
     local procedure FindBinForProdOrderLine(ProdOrderLine: Record "Prod. Order Line"; var TempProdOrdLineTrackingBuff: Record "Prod. Ord. Line Tracking Buff." temporary; var BinContentQtyBase: Decimal)
@@ -1168,6 +1171,7 @@ codeunit 99000893 "Mfg. Create Put-away"
         WarehouseActivityLine."Warranty Date" := TempProdOrdLineTrackingBuff."Warranty Date";
         WarehouseActivityLine."Expiration Date" := TempProdOrdLineTrackingBuff."Expiration Date";
 
+        OnCreateNewWhseActivityForProdOrderLineOnBeforeWarehouseActivityLineInsert(WarehouseActivityLine, ProdOrderLine, TempProdOrdLineTrackingBuff);
         WarehouseActivityLine.Insert();
     end;
 
@@ -1338,6 +1342,21 @@ codeunit 99000893 "Mfg. Create Put-away"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateNewWhseActivityForProdOrderLineOnAfterSetQtyToHandle(var WarehouseActivityLine: Record "Warehouse Activity Line"; ProdOrderLine: Record "Prod. Order Line"; var TempProdOrdLineTrackingBuff: Record "Prod. Ord. Line Tracking Buff." temporary; DoNotFillQtytoHandle: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateNewWhseActivityForProdOrderLineOnBeforeWarehouseActivityLineInsert(var WarehouseActivityLine: Record "Warehouse Activity Line"; ProdOrderLine: Record "Prod. Order Line"; var TempProdOrdLineTrackingBuff: Record "Prod. Ord. Line Tracking Buff." temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateWhsPutAwayForProdOutput(ProdOrderLine: Record "Prod. Order Line"; var TempProdOrdLineTrackingBuff: Record "Prod. Ord. Line Tracking Buff." temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCreateWhsePutAwayForProdOutput(ProdOrderLine: Record "Prod. Order Line"; var TempProdOrdLineTrackingBuff: Record "Prod. Ord. Line Tracking Buff." temporary; var WarehouseActivityHeader: Record "Warehouse Activity Header"; var WarehouseActivityLine: Record "Warehouse Activity Line"; QtyToPickBase: Decimal)
     begin
     end;
 }
