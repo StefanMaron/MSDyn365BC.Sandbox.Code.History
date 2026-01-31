@@ -182,12 +182,14 @@ table 88 "Financial Report"
             Caption = 'Period Type';
             DataClassification = SystemMetadata;
             ToolTip = 'Specifies by which period amounts are displayed.';
+            InitValue = Default;
         }
         field(19; NegativeAmountFormatDefault; Enum "Fin. Report Negative Format")
         {
             Caption = 'Negative Amount Format';
             DataClassification = SystemMetadata;
             ToolTip = 'Specifies the default negative amount format for this financial report.';
+            InitValue = Default;
         }
         // Fields not in "FinancialReportUserFilters"
         /// <summary>
@@ -294,6 +296,7 @@ table 88 "Financial Report"
         {
             Caption = 'Logo Position';
             ToolTip = 'Specifies how your company logo is displayed on the financial report.';
+            InitValue = Default;
         }
         field(61; DimPerspective; Code[10])
         {
