@@ -35,11 +35,9 @@ table 300 "Reminder/Fin. Charge Entry"
         /// <summary>
         /// Specifies whether this entry is for a reminder or a finance charge memo.
         /// </summary>
-        field(2; Type; Option)
+        field(2; Type; Enum "Reminder/Fin.ChargeEntry Type")
         {
             Caption = 'Type';
-            OptionCaption = 'Reminder,Finance Charge Memo';
-            OptionMembers = Reminder,"Finance Charge Memo";
         }
         /// <summary>
         /// Specifies the document number of the issued reminder or finance charge memo.
