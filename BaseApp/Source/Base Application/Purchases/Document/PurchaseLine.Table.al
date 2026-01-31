@@ -5678,7 +5678,7 @@ table 39 "Purchase Line"
         OnAfterUpdateSalesCost(Rec, SalesOrderLine);
     end;
 
-    local procedure GetFAPostingGroup()
+    procedure GetFAPostingGroup()
     var
         LocalGLAcc: Record "G/L Account";
         FAPostingGr: Record "FA Posting Group";
