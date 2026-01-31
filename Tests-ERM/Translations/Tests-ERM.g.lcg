@@ -808,7 +808,7 @@
   </Item>
   <Item ItemId=";Codeunit 2859947066 - NamedType 2448474427" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Row no %1 with property Show = No is visible in Account Schedule Overview.]]></Val>
+      <Val><![CDATA[Row description %1 with property Show = No is visible in Account Schedule Overview.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -943,7 +943,7 @@
   </Item>
   <Item ItemId=";Codeunit 583230938 - NamedType 2006647528" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[This account schedule may be automatically updated by the system, so any changes you make may be lost. Do you want to make a copy?]]></Val>
+      <Val><![CDATA[This report definition may be automatically updated by the system, so any changes you make may be lost. Do you want to make a copy?]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
