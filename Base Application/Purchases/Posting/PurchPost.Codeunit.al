@@ -1590,8 +1590,9 @@ codeunit 90 "Purch.-Post"
         else
             Factor := QtyToBeInvoiced / PurchaseLine."Qty. to Invoice";
         OnPostItemJnlLineOnAfterSetFactor(PurchaseLine, Factor, GenJnlLineExtDocNo, ItemJnlLine);
-        ItemJnlLine.Amount :=
-            (PurchaseLine.Amount + NonDeductibleVAT.GetNonDeductibleVATAmountForItemCost(PurchaseLine)) * Factor + RemAmt;
+        ItemJnlLine.Amount := PurchaseLine.Amount * Factor + RemAmt;
+        if not PurchaseLine."Item Charge Has Non.Ded. VAT" then
+            ItemJnlLine.Amount += NonDeductibleVAT.GetNonDeductibleVATAmountForItemCost(PurchaseLine) * Factor;
         if PurchaseHeader."Prices Including VAT" then
             ItemJnlLine."Discount Amount" :=
                 (PurchaseLine."Line Discount Amount" + PurchaseLine."Inv. Discount Amount") /
