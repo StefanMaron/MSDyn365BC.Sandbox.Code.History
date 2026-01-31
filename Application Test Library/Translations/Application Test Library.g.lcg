@@ -527,6 +527,24 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Library - Costing - NamedType WrongRecordTypeErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3077960804 - Method 3097212941 - NamedType 1555179857" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[I_ASSEMBLY]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[{MaxLength=20}]D;]A;(LookupHint=Codeunit Library - ERM Country Data - Method UpdateDirectCostAppliedAccount - NamedType IAssemblyTok)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3077960804 - Method 3097212941 - NamedType 898554560" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[MISC]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[{MaxLength=20}]D;]A;(LookupHint=Codeunit Library - ERM Country Data - Method UpdateDirectCostAppliedAccount - NamedType MiscTok)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1134074846 - NamedType 2130242343" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Posting Date must be %9.]]></Val>
