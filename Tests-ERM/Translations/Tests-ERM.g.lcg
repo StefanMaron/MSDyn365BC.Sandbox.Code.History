@@ -3587,6 +3587,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Intercompany III - NamedType AcceptAgainQst)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 689671132 - NamedType 200415287" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Direct Unit Cost should be %1 but is %2]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Intercompany III - NamedType DirectUnitCostErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 689671132 - NamedType 1342389712" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[You have insufficient quantity of Item]]></Val>
@@ -3594,6 +3603,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Intercompany III - NamedType InsufficientQtyErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 689671132 - NamedType 952973569" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Line Amount should be %1 but is %2]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Intercompany III - NamedType LineAmountErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 689671132 - NamedType 3013900158" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
