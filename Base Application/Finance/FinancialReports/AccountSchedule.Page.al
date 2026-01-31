@@ -469,7 +469,7 @@ page 104 "Account Schedule"
         DimCaptionsInitialized: Boolean;
         IsSaaSExcelAddinEnabled: Boolean;
         CurrentDescription: Text[80];
-        InternalDescription: Text[250];
+        InternalDescription: Text[500];
         TotalingDisplayed: Text[250];
         ExcelFileNameTxt: Label 'Row Definition - ScheduleName %1', Comment = '%1 = Schedule Name';
 
