@@ -3376,7 +3376,6 @@ table 38 "Purchase Header"
 #pragma warning restore AA0470
 #pragma warning restore AA0074
         ReplaceDocumentDate: Boolean;
-        UpdateDocumentDate: Boolean;
 #pragma warning disable AA0470
         PrepaymentInvoicesNotPaidErr: Label 'You cannot post the document of type %1 with the number %2 before all related prepayment invoices are posted.', Comment = 'You cannot post the document of type Order with the number 1001 before all related prepayment invoices are posted.';
 #pragma warning restore AA0470
@@ -3440,6 +3439,7 @@ table 38 "Purchase Header"
         SkipBuyFromContact: Boolean;
         SkipPayToContact: Boolean;
         SkipTaxCalculation: Boolean;
+        UpdateDocumentDate: Boolean;
 
     /// <summary>
     /// Initializes a new purchase header with a new document number from the number series.

@@ -251,6 +251,8 @@ page 729 "Copy Item"
         SpecifyTargetItemNoErr: Label 'You must specify the target item number.';
         TargetItemNoTxt: Label 'Target Item No.';
         UnincrementableStringErr: Label 'The value in the %1 field must have a number so that we can assign the next number in the series.', Comment = '%1 = New Field Name';
+
+    protected var
         ShouldCopyAllInformation: Boolean;
 
     procedure GetParameters(var CopyItemBuffer: Record "Copy Item Buffer")
