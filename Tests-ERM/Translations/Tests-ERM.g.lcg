@@ -799,7 +799,7 @@
   </Item>
   <Item ItemId=";Codeunit 2859947066 - NamedType 2448474427" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Row no %1 with property Show = No is visible in Account Schedule Overview.]]></Val>
+      <Val><![CDATA[Row description %1 with property Show = No is visible in Account Schedule Overview.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>

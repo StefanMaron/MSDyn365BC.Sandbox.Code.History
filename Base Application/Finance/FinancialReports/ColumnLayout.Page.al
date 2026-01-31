@@ -151,7 +151,6 @@ page 489 "Column Layout"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a period formula that specifies the accounting periods you want to use to calculate the amount in this column.';
-                    Visible = false;
                 }
                 field(Show; Rec.Show)
                 {
