@@ -349,6 +349,9 @@
       "path": "./DataArchive/Test/Data Archive Tests"
     },
     {
+      "path": "./ExciseTaxes/Test/Excise Taxes Tests"
+    },
+    {
       "path": "./DataSearch/Test/Data Search Tests"
     },
     {
