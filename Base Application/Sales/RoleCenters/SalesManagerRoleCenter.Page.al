@@ -111,6 +111,7 @@ page 9005 "Sales Manager Role Center"
             separator(Action17)
             {
             }
+#if not CLEAN28
             action("S&ales Statistics")
             {
                 ApplicationArea = Suite;
@@ -118,7 +119,11 @@ page 9005 "Sales Manager Role Center"
                 Image = "Report";
                 RunObject = Report "Sales Statistics";
                 ToolTip = 'View detailed information about sales to your customers.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This report is obsolete and will be removed in a future version.';
+                ObsoleteTag = '28.0';
             }
+#endif
             action("Salesperson - Sales &Statistics")
             {
                 ApplicationArea = Suite;
