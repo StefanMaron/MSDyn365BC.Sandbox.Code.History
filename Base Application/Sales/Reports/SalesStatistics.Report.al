@@ -2,6 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
+#if not CLEAN28
 namespace Microsoft.Sales.Reports;
 
 using Microsoft.Foundation.Reporting;
@@ -14,6 +15,9 @@ using Microsoft.Utilities;
 /// </summary>
 report 112 "Sales Statistics"
 {
+    ObsoleteState = Pending;
+    ObsoleteReason = 'This report is obsolete and will be removed in a future version.';
+    ObsoleteTag = '28.0';
     DefaultLayout = RDLC;
     RDLCLayout = './Sales/Reports/SalesStatistics.rdlc';
     ApplicationArea = Basic, Suite;
@@ -515,4 +519,5 @@ report 112 "Sales Statistics"
         AdjmtCostLCY1CaptionLbl: Label 'Cost Adjmt. Amounts (LCY)';
         TotalCaptionLbl: Label 'Total';
 }
+#endif
 
