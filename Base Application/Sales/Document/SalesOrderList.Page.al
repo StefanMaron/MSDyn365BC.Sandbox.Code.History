@@ -20,7 +20,9 @@ using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Posting;
+#if not CLEAN28
 using Microsoft.Sales.Reports;
+#endif
 using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
 using Microsoft.Warehouse.Activity;
@@ -1044,6 +1046,7 @@ page 9305 "Sales Order List"
                 RunObject = Query "Sales Order Analysis";
                 ToolTip = 'Analyze (group, summarize, pivot) your Sales Order performance against customers and goods/services sold, including outstanding vs. posted quantities and amounts.';
             }
+#if not CLEAN28
             action("Sales Reservation Avail.")
             {
                 ApplicationArea = Reservation;
@@ -1051,7 +1054,11 @@ page 9305 "Sales Order List"
                 Image = "Report";
                 RunObject = Report "Sales Reservation Avail.";
                 ToolTip = 'View, print, or save an overview of availability of items for shipment on sales documents, filtered on shipment status.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This report is obsolete and will be removed in a future version.';
+                ObsoleteTag = '28.0';
             }
+#endif
         }
         area(Promoted)
         {
