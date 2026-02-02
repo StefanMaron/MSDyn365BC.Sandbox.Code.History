@@ -732,12 +732,15 @@ table 121 "Purch. Rcpt. Line"
     trigger OnDelete()
     var
         PurchDocLineComments: Record "Purch. Comment Line";
+        MatchedOrderLineMgmt: Codeunit "Matched Order Line Mgmt.";
     begin
         PurchDocLineComments.SetRange("Document Type", PurchDocLineComments."Document Type"::Receipt);
         PurchDocLineComments.SetRange("No.", "Document No.");
         PurchDocLineComments.SetRange("Document Line No.", "Line No.");
         if not PurchDocLineComments.IsEmpty() then
             PurchDocLineComments.DeleteAll();
+
+        MatchedOrderLineMgmt.DeleteMatchedLinesForPurchReceipt(Rec);
     end;
 
     trigger OnInsert()
@@ -859,6 +862,7 @@ table 121 "Purch. Rcpt. Line"
                     PurchOrderHeader.Get(PurchOrderLine."Document Type"::Order, "Order No.");
 
                 PrepaymentMgt.TestPurchaseOrderLineForGetRcptLines(PurchOrderLine);
+                CalcFields("Currency Code");
                 InitCurrency("Currency Code");
 
                 if PurchInvHeader."Prices Including VAT" then begin
