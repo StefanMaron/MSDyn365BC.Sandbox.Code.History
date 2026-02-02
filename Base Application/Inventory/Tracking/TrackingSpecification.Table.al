@@ -110,6 +110,10 @@ table 336 "Tracking Specification"
             Caption = 'Transfer Item Entry No.';
             TableRelation = "Item Ledger Entry";
         }
+        field(18; "Receipt/Shipment No."; Code[20])
+        {
+            Caption = 'Receipt/Shipment No.';
+        }
         field(24; "Serial No."; Code[50])
         {
             Caption = 'Serial No.';
