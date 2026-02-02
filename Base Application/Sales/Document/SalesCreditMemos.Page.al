@@ -616,6 +616,7 @@ page 9302 "Sales Credit Memos"
                         ObsoleteTag = '28.0';
                     }
 #endif
+#if not CLEAN28
                     action("Customer - Sales List")
                     {
                         ApplicationArea = Basic, Suite;
@@ -623,7 +624,12 @@ page 9302 "Sales Credit Memos"
                         Image = "Report";
                         RunObject = Report "Customer - Sales List";
                         ToolTip = 'View customer sales for a period, for example, to report sales activity to customs and tax authorities. You can choose to include only customers with total sales that exceed a minimum amount. You can also specify whether you want the report to show address details for each customer.';
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'This report is obsolete and will be removed in a future version.';
+                        ObsoleteTag = '28.0';
                     }
+#endif
+#if not CLEAN28
                     action("Sales Statistics")
                     {
                         ApplicationArea = Basic, Suite;
@@ -631,7 +637,11 @@ page 9302 "Sales Credit Memos"
                         Image = "Report";
                         RunObject = Report "Sales Statistics";
                         ToolTip = 'View the customer''s total cost, sale, and profit over time, for example, to analyze earnings trends. The report shows amounts for original and adjusted cost, sales, profit, invoice discount, payment discount, and profit percentage in three adjustable periods.';
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'This report is obsolete and will be removed in a future version.';
+                        ObsoleteTag = '28.0';
                     }
+#endif
                 }
                 group(FinanceReports)
                 {
