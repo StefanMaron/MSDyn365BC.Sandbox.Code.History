@@ -98,6 +98,7 @@ using Microsoft.Intercompany.Outbox;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Intercompany.Setup;
 using Microsoft.Inventory.Analysis;
+using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
@@ -993,6 +994,9 @@ codeunit 1751 "Data Classification Eval. Data"
         SetTableFieldsToNormal(Database::"IC Incoming Notification");
         SetTableFieldsToNormal(Database::"IC Outgoing Notification");
         SetTableFieldsToNormal(Database::"Item Statistics Cache");
+        SetTableFieldsToNormal(Database::"Matched Order Line");
+        SetTableFieldsToNormal(Database::"Detailed Matched Order Line");
+        SetTableFieldsToNormal(Database::"Posted Matched Order Line");
     end;
 
     procedure SetTableFieldsToNormal(TableNo: Integer)

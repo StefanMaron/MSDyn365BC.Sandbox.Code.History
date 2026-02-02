@@ -2657,6 +2657,21 @@ table 38 "Purchase Header"
             Editable = false;
             TableRelation = "Return Shipment Header";
         }
+        field(5850; "Receipt on Invoice"; Boolean)
+        {
+            Caption = 'Receipt on Invoice';
+            ToolTip = 'Specifies whether the receipt is posted with the invoice.';
+
+            trigger OnValidate()
+            var
+                MatchedOrderLineMgmt: Codeunit "Matched Order Line Mgmt.";
+            begin
+                if "Receipt on Invoice" then
+                    MatchedOrderLineMgmt.CheckReceiptOnInvoiceAllowed(Rec);
+
+                MatchedOrderLineMgmt.RefreshMatchedOrderLineReceipt(Rec);
+            end;
+        }
         field(7000; "Price Calculation Method"; Enum "Price Calculation Method")
         {
             Caption = 'Price Calculation Method';
@@ -2939,6 +2954,7 @@ table 38 "Purchase Header"
         UpdateLinesOrderDateAutomaticallyQst: Label 'Do you want to update the order date for existing lines?';
         DifferentDatesQst: Label 'Posting Date %1 is different from Work Date %2.\\Do you want to continue?', Comment = '%1 - Posting Date, %2 - work date';
         DifferentDatesErr: Label 'Posting Date %1 is different from Work Date %2.\\Batch posting cannot be used.', Comment = '%1 - Posting Date, %2 - work date';
+        PurchLineMatchedToOrderLineErr: Label 'You cannot change the field because line %1 is matched to order line.', Comment = '%1 - Line No.';
         GLSetup: Record "General Ledger Setup";
         GLAcc: Record "G/L Account";
         xPurchLine: Record "Purchase Line";
@@ -4509,6 +4525,14 @@ table 38 "Purchase Header"
         PurchLine.SetRange("Quantity Received");
         if not PayTo then
             PurchLine.SetRange("Buy-from Vendor No.");
+
+        // Check if there are matched order lines and use testfield to raise error
+        if "Document Type" = "Document Type"::Invoice then begin
+            PurchLine.SetFilter("Matched Order Lines", '>0');
+            if PurchLine.FindFirst() then
+                Error(PurchLineMatchedToOrderLineErr, PurchLine."Line No.");
+            PurchLine.SetRange("Matched Order Lines");
+        end;
     end;
 
     local procedure CheckPrepmtInfo(var PurchLine: Record "Purchase Line")
@@ -7519,6 +7543,7 @@ table 38 "Purchase Header"
     local procedure TestPurchLineFieldsBeforeRecreate()
     var
         SalesHeader: Record "Sales Header";
+        MatchedOrderLineMgmt: Codeunit "Matched Order Line Mgmt.";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -7532,6 +7557,8 @@ table 38 "Purchase Header"
         PurchLine.CalcFields("Reserved Qty. (Base)");
         PurchLine.TestField("Reserved Qty. (Base)", 0);
         PurchLine.TestField("Receipt No.", '');
+        MatchedOrderLineMgmt.IsLineMatched(PurchLine, true);
+
         PurchLine.TestField("Return Shipment No.", '');
         PurchLine.TestField("Blanket Order No.", '');
         IsHandled := false;
