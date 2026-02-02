@@ -2,6 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
+#if not CLEAN28
 namespace Microsoft.Sales.Reports;
 
 /// <summary>
@@ -16,6 +17,9 @@ using Microsoft.Sales.Document;
 
 report 209 "Sales Reservation Avail."
 {
+    ObsoleteState = Pending;
+    ObsoleteReason = 'This report is obsolete and will be removed in a future version.';
+    ObsoleteTag = '28.0';
     DefaultLayout = RDLC;
     RDLCLayout = './Sales/Reports/SalesReservationAvail.rdlc';
     ApplicationArea = Reservation;
@@ -398,4 +402,5 @@ report 209 "Sales Reservation Avail."
     begin
     end;
 }
+#endif
 
