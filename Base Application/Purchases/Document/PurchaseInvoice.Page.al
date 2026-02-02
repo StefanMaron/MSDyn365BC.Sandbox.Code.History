@@ -1533,6 +1533,21 @@ page 51 "Purchase Invoice"
                         MoveNegPurchLines.ShowDocument();
                     end;
                 }
+                action(MatchedOrderLines)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Matched Order Lines';
+                    Image = TransferToLines;
+                    ToolTip = 'View and match order lines related to this purchase invoice.';
+
+                    trigger OnAction()
+                    var
+                        MatchedOrderLines: Page "Matched Order Lines";
+                    begin
+                        MatchedOrderLines.InitializePage("Matched Order Line Source"::"Purchase Invoice", true, Rec.SystemId);
+                        MatchedOrderLines.RunModal();
+                    end;
+                }
             }
             group("Request Approval")
             {
@@ -1780,6 +1795,9 @@ page 51 "Purchase Invoice"
                 {
                 }
                 actionref(MoveNegativeLines_Promoted; MoveNegativeLines)
+                {
+                }
+                actionref(MatchedOrderLines_Promoted; MatchedOrderLines)
                 {
                 }
             }

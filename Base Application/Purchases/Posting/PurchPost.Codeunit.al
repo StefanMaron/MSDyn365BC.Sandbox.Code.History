@@ -176,6 +176,8 @@ codeunit 90 "Purch.-Post"
         ErrorMessageMgt.PushContext(ErrorContextElementProcessLines, ZeroPurchLineRecID, 0, PostDocumentLinesMsg);
         OnBeforePostLines(TempPurchLineGlobal, PurchHeader, PreviewMode, SuppressCommit, TempPurchLineGlobal);
 
+        MatchedOrderLineMgmt.ProcessMatchedReceiptOnInvoice(TempPurchLineGlobal);
+
         LineCount := 0;
         RoundingLineInserted := false;
         AdjustFinalInvWith100PctPrepmt(TempPurchLineGlobal);
@@ -368,6 +370,7 @@ codeunit 90 "Purch.-Post"
         ApplicationAreaMgmt: Codeunit "Application Area Mgmt.";
         NonDeductibleVAT: Codeunit "Non-Deductible VAT";
         WHTManagement: Codeunit WHTManagement;
+        MatchedOrderLineMgmt: Codeunit "Matched Order Line Mgmt.";	
         InvoicePostingInterface: Interface "Invoice Posting";
         IsInterfaceInitialized: Boolean;
         Window: Dialog;
@@ -1052,6 +1055,7 @@ codeunit 90 "Purch.-Post"
         RemQtyToBeInvoicedBase := PurchLine."Qty. to Invoice (Base)";
 
         InvoicePostingInterface.CheckCreditLine(PurchHeader, PurchLine);
+        MatchedOrderLineMgmt.CheckMatchedOrderLine(PurchHeader, PurchLine);
 
         PostItemTrackingLine(PurchHeader, PurchLine);
 
@@ -1080,7 +1084,7 @@ codeunit 90 "Purch.-Post"
         OnPostPurchLineOnBeforeInsertReceiptLine(
             PurchHeader, PurchLine, IsHandled, PurchRcptHeader, RoundingLineInserted, CostBaseAmount, xPurchLine, ReturnShptHeader, TempTrackingSpecification, ItemLedgShptEntryNo, SrcCode, PreviewMode, WhseRcptHeader, WhseReceive, WhseShip, GenJnlPostLine, GenJnlLineDocNo);
         if not IsHandled then
-            if (PurchRcptHeader."No." <> '') and (PurchLine."Receipt No." = '') and
+            if (PurchRcptHeader."No." <> '') and not PurchLine.IsMatchedToReceiptOrOrder() and
                not RoundingLineInserted and not PurchLine."Prepayment Line"
             then
                 InsertReceiptLine(PurchRcptHeader, PurchLine, CostBaseAmount);
@@ -1123,6 +1127,9 @@ codeunit 90 "Purch.-Post"
                         PurchInvLine.Insert(true);
                         Session.LogMessage('0000DDA', EmptyIdFoundLbl, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', PurchLinePostCategoryTok);
                     end;
+
+                    MatchedOrderLineMgmt.InsertPostedMatchedOrderLines(PurchInvLine, PurchLine);
+
                     OnAfterPurchInvLineInsert(
                         PurchInvLine, PurchInvHeader, PurchLine, ItemLedgShptEntryNo, WhseShip, WhseReceive, SuppressCommit,
                         PurchHeader, PurchRcptHeader, TempWhseRcptHeader, ItemJnlPostLine);
@@ -2574,7 +2581,7 @@ codeunit 90 "Purch.-Post"
                         IsHandled := false;
                         OnTestPurchLineOnBeforeTestFieldQtyToReceive(PurchaseLine, IsHandled);
                         if not IsHandled then
-                            if PurchaseLine."Receipt No." = '' then
+                            if not PurchaseLine.IsMatchedToReceiptOrOrder() then
                                 PurchaseLine.TestField("Qty. to Receive", PurchaseLine.Quantity, ErrorInfo.Create());
                         PurchaseLine.TestField("Return Qty. to Ship", 0, ErrorInfo.Create());
                         PurchaseLine.TestField("Qty. to Invoice", PurchaseLine.Quantity, ErrorInfo.Create());
@@ -3039,7 +3046,7 @@ codeunit 90 "Purch.-Post"
             PurchLine."Return Qty. to Ship (Base)" := 0;
         end;
 
-        if (PurchHeader."Document Type" = PurchHeader."Document Type"::Invoice) and (PurchLine."Receipt No." <> '') then begin
+        if (PurchHeader."Document Type" = PurchHeader."Document Type"::Invoice) and PurchLine.IsMatchedToReceiptOrOrder() then begin
             PurchLine."Quantity Received" := PurchLine.Quantity;
             PurchLine."Qty. Received (Base)" := PurchLine."Quantity (Base)";
             PurchLine."Qty. to Receive" := 0;
@@ -3110,6 +3117,8 @@ codeunit 90 "Purch.-Post"
                 if TempPurchLine.HasLinks then
                     TempPurchLine.DeleteLinks();
             until TempPurchLine.Next() = 0;
+
+        MatchedOrderLineMgmt.DeleteAllMatchedOrderLines(PurchHeader);
 
         PurchLine.SetRange("Document Type", PurchHeader."Document Type");
         PurchLine.SetRange("Document No.", PurchHeader."No.");
@@ -3928,7 +3937,7 @@ codeunit 90 "Purch.-Post"
                     else
                         OnUpdateBlanketOrderLineOnTypeCaseElse(PurchLine, Sign);
                 end;
-                if Receive and (PurchLine."Receipt No." = '') then begin
+                if Receive and not PurchLine.IsMatchedToReceiptOrOrder() then begin
                     if BlanketOrderPurchLine."Qty. per Unit of Measure" =
                        PurchLine."Qty. per Unit of Measure"
                     then
@@ -6498,10 +6507,13 @@ codeunit 90 "Purch.-Post"
         if TrackingSpecificationExists then begin
             QtyToBeInvoiced := InvoicingTrackingSpecification."Qty. to Invoice";
             QtyToBeInvoicedBase := InvoicingTrackingSpecification."Qty. to Invoice (Base)";
-        end else begin
-            QtyToBeInvoiced := RemQtyToBeInvoiced - PurchLine."Qty. to Receive";
-            QtyToBeInvoicedBase := RemQtyToBeInvoicedBase - PurchLine."Qty. to Receive (Base)";
-        end;
+        end else
+            if MatchedOrderLineMgmt.IsLineMatchedToReceiptShipment(PurchLine) then
+                MatchedOrderLineMgmt.SetQtyToBeInvoiced(QtyToBeInvoiced, QtyToBeInvoicedBase, PurchLine, PurchRcptLine)
+            else begin
+                QtyToBeInvoiced := RemQtyToBeInvoiced - PurchLine."Qty. to Receive";
+                QtyToBeInvoicedBase := RemQtyToBeInvoicedBase - PurchLine."Qty. to Receive (Base)";
+            end;
         if Abs(QtyToBeInvoiced) > Abs(PurchRcptLine.Quantity - PurchRcptLine."Quantity Invoiced") then begin
             QtyToBeInvoiced := PurchRcptLine.Quantity - PurchRcptLine."Quantity Invoiced";
             QtyToBeInvoicedBase := PurchRcptLine."Quantity (Base)" - PurchRcptLine."Qty. Invoiced (Base)";
@@ -7468,6 +7480,7 @@ codeunit 90 "Purch.-Post"
         if PurchHeader."Document Type" = PurchHeader."Document Type"::Order then
             TempPurchLine.SetFilter("Qty. to Receive", '<>0');
         TempPurchLine.SetRange("Receipt No.", '');
+        TempPurchLine.SetRange("Matched Order Lines", 0);
         OnCheckTrackingAndWarehouseForReceiveOnAfterTempPurchLineSetFilters(PurchHeader, TempPurchLine);
         Receive := TempPurchLine.FindFirst();
         WhseReceive := TempWhseRcptHeader.FindFirst();
@@ -7525,6 +7538,7 @@ codeunit 90 "Purch.-Post"
         if PurchaseHeader."Document Type" = PurchaseHeader."Document Type"::Order then
             TempPurchLine.SetFilter("Qty. to Receive", '<>0');
         TempPurchLine.SetRange("Receipt No.", '');
+        TempPurchLine.SetRange("Matched Order Lines", 0);
         if TempPurchLine.IsEmpty() then
             exit(false);
         TempPurchLine.FindSet();
@@ -8042,7 +8056,9 @@ codeunit 90 "Purch.-Post"
                     PurchRcptLine.SetRange("Order Line No.", PurchLine."Line No.");
                 end;
             PurchHeader."Document Type"::Invoice:
-                begin
+                if MatchedOrderLineMgmt.IsLineMatchedToReceiptShipment(PurchLine) then
+                    MatchedOrderLineMgmt.SetMatchedReceiptLinesFilter(PurchRcptLine, PurchLine)
+                else begin
                     PurchRcptLine.SetRange("Document No.", PurchLine."Receipt No.");
                     PurchRcptLine.SetRange("Line No.", PurchLine."Receipt Line No.");
                 end;
@@ -8427,6 +8443,8 @@ codeunit 90 "Purch.-Post"
         OnBeforePostUpdateInvoiceLine(TempPurchLine, IsHandled, PurchaseHeader);
         if IsHandled then
             exit;
+
+        MatchedOrderLineMgmt.UpdateMatchedOrderLines(TempPurchLine, PurchaseHeader);
 
         TempPurchLine.SetFilter("Receipt No.", '<>%1', '');
         TempPurchLine.SetFilter(Type, '<>%1', TempPurchLine.Type::" ");
@@ -8837,6 +8855,7 @@ codeunit 90 "Purch.-Post"
             exit;
 
         PurchRcptLine.Insert(true);
+        MatchedOrderLineMgmt.InsertMatchedOrderLineReceipt(PurchLine, PurchRcptLine);
 
         OnAfterPurchRcptLineInsert(PurchLine, PurchRcptLine, ItemLedgShptEntryNo, WhseShip, WhseReceive, SuppressCommit, PurchInvHeader, TempTrackingSpecification, PurchRcptHeader, TempWhseRcptHeader, xPurchLine, TempPurchLineGlobal);
     end;
