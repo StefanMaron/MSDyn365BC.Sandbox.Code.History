@@ -528,6 +528,14 @@ table 123 "Purch. Inv. Line"
             Caption = 'Allocation Purchase Line SystemId';
             DataClassification = SystemMetadata;
         }
+        field(2701; "Matched Order Lines"; Integer)
+        {
+            BlankZero = true;
+            CalcFormula = count("Posted Matched Order Line" where("Document Line SystemId" = field(SystemId), "Matched Rcpt./Shpt. Line SysId" = const('00000000-0000-0000-0000-000000000000')));
+            Caption = 'Matched Order Lines';
+            Editable = false;
+            FieldClass = FlowField;
+        }
         field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
@@ -796,6 +804,7 @@ table 123 "Purch. Inv. Line"
     var
         PurchDocLineComments: Record "Purch. Comment Line";
         PostedDeferralHeader: Record "Posted Deferral Header";
+        MatchedOrderLineMgmt: Codeunit "Matched Order Line Mgmt.";
     begin
         PurchDocLineComments.SetRange("Document Type", PurchDocLineComments."Document Type"::"Posted Invoice");
         PurchDocLineComments.SetRange("No.", "Document No.");
@@ -806,6 +815,8 @@ table 123 "Purch. Inv. Line"
         PostedDeferralHeader.DeleteHeader(
             "Deferral Document Type"::Purchase.AsInteger(), '', '',
             PurchDocLineComments."Document Type"::"Posted Invoice".AsInteger(), "Document No.", "Line No.");
+
+        MatchedOrderLineMgmt.DeleteMatchedLinesFromPostedPurchaseInvoice(Rec);
     end;
 
     var
