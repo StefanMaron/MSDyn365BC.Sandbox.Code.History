@@ -31,6 +31,9 @@ table 7413 "Excise Tax Item/FA Rate"
         field(3; "Source No."; Code[20])
         {
             Caption = 'Source No.';
+            TableRelation = if ("Source Type" = const(Item)) Item
+            else
+            if ("Source Type" = const("Fixed Asset")) "Fixed Asset";
 
             trigger OnLookup()
             begin
@@ -137,9 +140,6 @@ table 7413 "Excise Tax Item/FA Rate"
 
         if FindTaxRate(TaxTypeCode, SourceType, '', EffectiveDate, TaxRate) then
             exit(true);
-
-        TaxRate := 0;
-        exit(false);
     end;
 
     local procedure FindTaxRate(TaxTypeCode: Code[20]; SourceType: Enum "Excise Source Type"; SourceNo: Code[20]; EffectiveDate: Date; var TaxRate: Decimal): Boolean

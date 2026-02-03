@@ -18,7 +18,7 @@ codeunit 148350 "Library - Excise Tax"
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryERM: Codeunit "Library - ERM";
         LibraryFixedAsset: Codeunit "Library - Fixed Asset";
-        SourceSpecificRateMismatchLbl: Label 'Expected source-specific rate %1, but got %2';
+        SourceSpecificRateMismatchLbl: Label 'Expected source-specific rate %1, but got %2', Comment = '%1 = Expected Rate, %2 = Actual Rate';
 
     procedure CreateExciseTaxType(TaxCode: Code[20]; TaxBasis: Enum "Excise Tax Basis"; IsEnabled: Boolean): Record "Excise Tax Type"
     var
@@ -29,10 +29,10 @@ codeunit 148350 "Library - Excise Tax"
 
         ExciseTaxType.Init();
         ExciseTaxType.Code := TaxCode;
-        ExciseTaxType.Description := LibraryUtility.GenerateRandomText(100);
+        ExciseTaxType.Description := CopyStr(LibraryUtility.GenerateRandomText(100), 1, 100);
         ExciseTaxType."Tax Basis" := TaxBasis;
         ExciseTaxType.Enabled := IsEnabled;
-        ExciseTaxType."Report Caption" := LibraryUtility.GenerateRandomText(50);
+        ExciseTaxType."Report Caption" := CopyStr(LibraryUtility.GenerateRandomText(50), 1, 50);
         ExciseTaxType.Insert(true);
         exit(ExciseTaxType);
     end;
@@ -42,7 +42,7 @@ codeunit 148350 "Library - Excise Tax"
         ExciseTaxEntryPermission: Record "Excise Tax Entry Permission";
     begin
         if TaxTypeCode = '' then
-            TaxTypeCode := LibraryRandom.RandText(20);
+            TaxTypeCode := CopyStr(LibraryRandom.RandText(20), 1, 20);
         ExciseTaxEntryPermission.Init();
         ExciseTaxEntryPermission."Excise Tax Type Code" := TaxTypeCode;
         ExciseTaxEntryPermission."Excise Entry Type" := EntryType;
@@ -102,8 +102,8 @@ codeunit 148350 "Library - Excise Tax"
         LibraryInventory.CreateItem(Item);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
         Item.Validate("Excise Tax Type", TaxTypeCode);
-        Item.Validate("Qty for Excise Tax", LibraryRandom.RandDec(1, 3));
-        Item.Validate("Excise Tax UOM", UnitOfMeasure.Code);
+        Item.Validate("Quantity for Excise Tax", LibraryRandom.RandDec(1, 3));
+        Item.Validate("Excise Unit of Measure Code", UnitOfMeasure.Code);
         Item.Modify(true);
     end;
 
@@ -114,8 +114,8 @@ codeunit 148350 "Library - Excise Tax"
         LibraryFixedAsset.CreateFAWithPostingGroup(FixedAsset);
         LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
         FixedAsset.Validate("Excise Tax Type", TaxTypeCode);
-        FixedAsset.Validate("Qty for Excise Tax", LibraryRandom.RandDec(1, 3));
-        FixedAsset.Validate("Excise Tax UOM", UnitOfMeasure.Code);
+        FixedAsset.Validate("Quantity for Excise Tax", LibraryRandom.RandDec(1, 3));
+        FixedAsset.Validate("Excise Unit of Measure Code", UnitOfMeasure.Code);
         FixedAsset.Modify(true);
     end;
 

@@ -8,11 +8,10 @@ using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Inventory.Item;
 using Microsoft.Sustainability.ExciseTax;
 
-report 7412 "Excise Tax Report"
+report 7412 "Create Excise Tax Jnl. Entries"
 {
     ProcessingOnly = true;
     Caption = 'Generate Excise Tax Journal Entries';
-    UsageCategory = Tasks;
     ApplicationArea = Basic, Suite;
 
     dataset
@@ -20,25 +19,27 @@ report 7412 "Excise Tax Report"
         dataitem("Excise Tax Type"; "Excise Tax Type")
         {
             RequestFilterFields = Code;
+            DataItemTableView = where(Enabled = const(true));
+
             trigger OnAfterGetRecord()
             var
                 ExciseJournalBatch: Record "Sust. Excise Journal Batch";
                 ExciseTaxCalculation: Codeunit "Excise Tax Calculation";
             begin
-                ExciseTaxCalculation.GetExciseBatchForTaxType(ExciseJournalBatch, "Excise Tax Type".Code, false);
-                if ExciseJournalBatch.IsEmpty() then
-                    exit;
+                ExciseJournalBatch.Get(ExciseJournalLine."Journal Template Name", ExciseJournalLine."Journal Batch Name");
+                ExciseJournalBatch.TestField(Type, ExciseJournalBatch.Type::Excises);
+                if ExciseJournalBatch."Excise Tax Type Filter" <> '' then
+                    if ExciseJournalBatch."Excise Tax Type Filter" <> "Excise Tax Type".Code then
+                        exit;
 
-                ExciseTaxCalculation.ProcessTaxTypeItemsWithFilter("Excise Tax Type".Code, StartingDate, EndingDate, ItemFilter, PostingDate);
-                ExciseTaxCalculation.ProcessFATaxTypeItemsWithFilter("Excise Tax Type".Code, StartingDate, EndingDate, FixedAssetFilter, PostingDate);
+                ExciseTaxCalculation.SetExciseJournalBatch(ExciseJournalBatch);
+                ExciseTaxCalculation.CreateExciseJournalLineForItem("Excise Tax Type".Code, StartingDate, EndingDate, ItemFilter, PostingDate);
+                ExciseTaxCalculation.CreateExciseJournalLineForFixedAsset("Excise Tax Type".Code, StartingDate, EndingDate, FixedAssetFilter, PostingDate);
                 ProcessedTaxTypes += 1;
             end;
 
             trigger OnPreDataItem()
             begin
-                SetRange(Enabled, true);
-                ProcessedTaxTypes := 0;
-                TotalJournalLines := 0;
                 LinesCountBefore := GetCurrentJournalLineCount();
             end;
 
@@ -61,7 +62,7 @@ report 7412 "Excise Tax Report"
                 {
                     Caption = 'Posting Information';
 
-                    field(PostingDate; PostingDate)
+                    field("Posting Date"; PostingDate)
                     {
                         ApplicationArea = All;
                         Caption = 'Posting Date';
@@ -78,7 +79,7 @@ report 7412 "Excise Tax Report"
                 {
                     Caption = 'Date Filters';
 
-                    field(StartingDate; StartingDate)
+                    field("Starting Date"; StartingDate)
                     {
                         ApplicationArea = All;
                         Caption = 'Starting Date';
@@ -89,7 +90,7 @@ report 7412 "Excise Tax Report"
                             ValidateDateRange();
                         end;
                     }
-                    field(EndingDate; EndingDate)
+                    field("Ending Date"; EndingDate)
                     {
                         ApplicationArea = All;
                         Caption = 'Ending Date';
@@ -105,14 +106,14 @@ report 7412 "Excise Tax Report"
                 {
                     Caption = 'Source Filters';
 
-                    field(ItemFilter; ItemFilter)
+                    field("Item Filter"; ItemFilter)
                     {
                         ApplicationArea = All;
                         Caption = 'Item Filter';
                         ToolTip = 'Specifies the item filter. Leave blank to include all items.';
                         TableRelation = Item;
                     }
-                    field(FixedAssetFilter; FixedAssetFilter)
+                    field("Fixed Asset Filter"; FixedAssetFilter)
                     {
                         ApplicationArea = All;
                         Caption = 'Fixed Asset Filter';
@@ -128,8 +129,10 @@ report 7412 "Excise Tax Report"
     begin
         if PostingDate = 0D then
             Error(PostingDateRequiredErr);
+
         if StartingDate = 0D then
             Error(StartingDateRequiredErr);
+
         if EndingDate = 0D then
             Error(EndingDateRequiredErr);
 
@@ -143,6 +146,7 @@ report 7412 "Excise Tax Report"
     end;
 
     var
+        ExciseJournalLine: Record "Sust. Excise Jnl. Line";
         StartingDate: Date;
         EndingDate: Date;
         PostingDate: Date;
@@ -156,15 +160,11 @@ report 7412 "Excise Tax Report"
         PostingDateRequiredErr: Label 'Posting Date is required. Please specify a posting date.';
         StartingDateRequiredErr: Label 'Starting Date is required. Please specify a starting date.';
         EndingDateRequiredErr: Label 'Ending Date is required. Please specify an ending date.';
-        ProcessingCompletedMsg: Label 'Processing completed successfully:\Tax Types Processed: %1\Journal Lines Created: %2\Date Range: %3 to %4';
+        ProcessingCompletedMsg: Label 'Processing completed successfully:\Tax Types Processed: %1\Journal Lines Created: %2\Date Range: %3 to %4', Comment = '%1 = Number of tax types processed, %2 = Number of journal lines created, %3 = Starting Date, %4 = Ending Date';
 
-    procedure SetRequestPageParameters(NewPostingDate: Date; NewStartingDate: Date; NewEndingDate: Date; NewItemFilter: Text[250]; NewFixedAssetFilter: Text[250])
+    procedure SetExciseJournalLine(var NewExciseJournalLine: Record "Sust. Excise Jnl. Line")
     begin
-        PostingDate := NewPostingDate;
-        StartingDate := NewStartingDate;
-        EndingDate := NewEndingDate;
-        ItemFilter := NewItemFilter;
-        FixedAssetFilter := NewFixedAssetFilter;
+        ExciseJournalLine := NewExciseJournalLine;
     end;
 
     local procedure CountCreatedJournalLines()
@@ -178,18 +178,13 @@ report 7412 "Excise Tax Report"
     local procedure GetCurrentJournalLineCount(): Integer
     var
         ExciseJnlLine: Record "Sust. Excise Jnl. Line";
-        ExciseJnlBatch: Record "Sust. Excise Journal Batch";
         TotalCount: Integer;
     begin
         TotalCount := 0;
 
-        ExciseJnlBatch.SetRange(Type, ExciseJnlBatch.Type::Excises);
-        if ExciseJnlBatch.FindSet() then
-            repeat
-                ExciseJnlLine.SetRange("Journal Template Name", ExciseJnlBatch."Journal Template Name");
-                ExciseJnlLine.SetRange("Journal Batch Name", ExciseJnlBatch.Name);
-                TotalCount += ExciseJnlLine.Count;
-            until ExciseJnlBatch.Next() = 0;
+        ExciseJnlLine.SetRange("Journal Template Name", ExciseJournalLine."Journal Template Name");
+        ExciseJnlLine.SetRange("Journal Batch Name", ExciseJournalLine."Journal Batch Name");
+        TotalCount += ExciseJnlLine.Count;
 
         exit(TotalCount);
     end;

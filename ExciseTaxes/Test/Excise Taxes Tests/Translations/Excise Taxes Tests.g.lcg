@@ -65,7 +65,7 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.ExciseTaxes)(LookupHint=Codeunit Library - Excise Tax - NamedType SourceSpecificRateMismatchLbl)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1 = Expected Rate, %2 = Actual Rate]D;]A;(Namespace=Microsoft.Test.ExciseTaxes)(LookupHint=Codeunit Library - Excise Tax - NamedType SourceSpecificRateMismatchLbl)]]></Cmt>
     </Cmts>
   </Item>
 </LCX>

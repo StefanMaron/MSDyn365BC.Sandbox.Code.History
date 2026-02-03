@@ -257,6 +257,8 @@ table 6240 "Sust. Excise Jnl. Line"
                             SustainabilityExciseJnlBatch.Get("Journal Template Name", "Journal Batch Name");
                             if SustainabilityExciseJnlBatch.Type = SustainabilityExciseJnlBatch.Type::EPR then
                                 Rec.Validate("Material Breakdown No.", Item."Material Composition No.");
+
+                            OnAfterCopyFromItem(Rec, Item);
                         end;
                     Rec."Source Type"::"G/L Account":
                         begin
@@ -269,6 +271,8 @@ table 6240 "Sust. Excise Jnl. Line"
                             FixedAsset.Get(Rec."Source No.");
 
                             Rec.Validate("Source Description", FixedAsset.Description);
+
+                            OnAfterCopyFromFixedAsset(Rec, FixedAsset);
                         end;
                     Rec."Source Type"::"Charge (Item)":
                         begin
@@ -926,6 +930,16 @@ table 6240 "Sust. Excise Jnl. Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateSourceNoBeforeTestFieldPartnerNo(var SustainabilityExciseJnlLine: Record "Sust. Excise Jnl. Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCopyFromItem(var ExciseJournalLine: Record "Sust. Excise Jnl. Line"; Item: Record Item)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCopyFromFixedAsset(var ExciseJournalLine: Record "Sust. Excise Jnl. Line"; FixedAsset: Record "Fixed Asset")
     begin
     end;
 }

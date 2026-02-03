@@ -10,89 +10,92 @@ pageextension 7414 "Excise Journal Line Ext" extends "Sustainability Excise Jour
 {
     layout
     {
+        modify("Entry Type")
+        {
+            Visible = not EnableExciseTax;
+        }
+        modify("Total Emission Cost")
+        {
+            Visible = not EnableExciseTax;
+        }
         addafter("Posting Date")
         {
             field("Excise Tax Type"; Rec."Excise Tax Type")
             {
                 ApplicationArea = All;
+                Visible = EnableExciseTax;
                 ToolTip = 'Specifies the excise tax type for this journal line.';
             }
-            field(Quantity; Rec.Quantity)
+            field("Excise Entry Type"; Rec."Excise Entry Type")
             {
                 ApplicationArea = All;
+                Visible = EnableExciseTax;
+                ToolTip = 'Specifies which entry type was used to calculate the quantity from Item Ledger Entries for this journal line.';
+            }
+        }
+        addafter("Source Unit of Measure Code")
+        {
+            field("Excise Unit of Measure Code"; Rec."Excise Unit of Measure Code")
+            {
+                ApplicationArea = All;
+                Visible = EnableExciseTax;
+                Editable = false;
+                ToolTip = 'Specifies the unit of measure for the excise tax quantity.';
+            }
+        }
+        addafter("Source Qty.")
+        {
+            field("Quantity for Excise Tax"; Rec."Quantity for Excise Tax")
+            {
+                ApplicationArea = All;
+                Visible = EnableExciseTax;
+                Editable = false;
                 ToolTip = 'Specifies the quantity for excise tax calculation.';
             }
             field("Tax Rate %"; Rec."Tax Rate %")
             {
                 ApplicationArea = All;
+                Visible = EnableExciseTax;
                 ToolTip = 'Specifies the tax rate percentage applied to this journal line.';
-                Editable = false;
             }
             field("Tax Amount"; Rec."Tax Amount")
             {
                 ApplicationArea = All;
+                Visible = EnableExciseTax;
                 ToolTip = 'Specifies the calculated excise tax amount for this journal line.';
-                Editable = false;
-            }
-            field("Excise Tax UOM"; Rec."Excise Tax UOM")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies the unit of measure for the excise tax quantity.';
-            }
-            field("Excise Entry Type"; Rec."Excise Entry Type")
-            {
-                ApplicationArea = All;
-                ToolTip = 'Specifies which entry type was used to calculate the quantity from Item Ledger Entries for this journal line.';
             }
         }
     }
-
     actions
     {
         addlast(processing)
         {
-            action(GenerateExciseTaxEntries)
+            action("Generate Excise Tax Entries")
             {
                 ApplicationArea = All;
                 Caption = 'Generate Excise Tax Entries';
                 ToolTip = 'Generate excise tax journal entries based on Item Ledger Entry quantities for the specified date range.';
                 Image = CreateDocuments;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedOnly = true;
-                Enabled = IsBatchExciseType;
+                Enabled = EnableExciseTax;
 
                 trigger OnAction()
                 var
-                    ExciseTaxReport: Report "Excise Tax Report";
+                    CreateExciseTaxJnlEntries: Report "Create Excise Tax Jnl. Entries";
                 begin
-                    ExciseTaxReport.RunModal();
+                    CreateExciseTaxJnlEntries.SetExciseJournalLine(Rec);
+                    CreateExciseTaxJnlEntries.RunModal();
                 end;
             }
         }
         modify(Calculate)
         {
-            Enabled = not IsBatchExciseType;
+            Enabled = not EnableExciseTax;
+        }
+        addafter(Calculate_Promoted)
+        {
+            actionref("Generate Excise Tax Entries_Promoted"; "Generate Excise Tax Entries")
+            {
+            }
         }
     }
-
-    var
-        IsBatchExciseType: Boolean;
-
-
-    trigger OnAfterGetCurrRecord()
-    begin
-        UpdateBatchTypeEnabled();
-    end;
-
-    local procedure UpdateBatchTypeEnabled()
-    var
-        ExciseTaxCalculation: Codeunit "Excise Tax Calculation";
-    begin
-        IsBatchExciseType := false;
-        if Rec."Journal Batch Name" = '' then
-            exit;
-
-        IsBatchExciseType := ExciseTaxCalculation.IsExciseTaxEntry(Rec);
-    end;
 }

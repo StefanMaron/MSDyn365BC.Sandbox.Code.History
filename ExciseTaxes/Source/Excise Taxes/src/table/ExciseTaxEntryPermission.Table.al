@@ -27,7 +27,6 @@ table 7414 "Excise Tax Entry Permission"
         field(3; Allowed; Boolean)
         {
             Caption = 'Allowed';
-            InitValue = false;
         }
     }
 
