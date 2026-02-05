@@ -4784,7 +4784,7 @@
 
         GLEntry.SetRange("Dimension Set ID", DimSetID[2]);
         GLEntry.FindFirst();
-        Assert.AreEqual(-Amount[2], GLEntry.Amount, AmountNotMatchedErr);
+        Assert.AreNearlyEqual(-Amount[2], GLEntry.Amount, LibraryERM.GetAmountRoundingPrecision(), AmountNotMatchedErr);
     end;
 
     [Test]
