@@ -386,9 +386,6 @@ codeunit 80 "Sales-Post"
           CustLedgEntry, WhseShip, WhseReceive, PreviewMode);
 
         OnAfterPostSalesDocDropShipment(PurchRcptHeader."No.", SuppressCommit);
-
-        if SalesHeader."Document Type" = SalesHeader."Document Type"::"Return Order" then
-            UpdateSalesOrderLineIfExist(SalesHeader."No.");
     end;
 
     /// <summary>
@@ -3325,6 +3322,9 @@ codeunit 80 "Sales-Post"
           GenJnlPostLine, SuppressCommit, PreviewMode);
 
         ClearPostBuffers();
+
+        if SalesHeader."Document Type" = SalesHeader."Document Type"::"Return Order" then
+            UpdateSalesOrderLineIfExist(SalesHeader."No.");
     end;
 
     local procedure DeleteApprovalEntries(var SalesHeader: Record "Sales Header")

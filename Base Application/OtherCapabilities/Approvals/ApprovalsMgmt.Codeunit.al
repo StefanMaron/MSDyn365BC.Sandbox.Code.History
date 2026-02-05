@@ -1667,14 +1667,15 @@ codeunit 1535 "Approvals Mgmt."
         exit(true);
     end;
 
-    procedure CheckItemApprovalsWorkflowEnabled(var Item: Record Item): Boolean
+    procedure CheckItemApprovalsWorkflowEnabled(var Item: Record Item) Result: Boolean
     begin
         if not WorkflowManagement.CanExecuteWorkflow(Item, WorkflowEventHandling.RunWorkflowOnSendItemForApprovalCode()) then begin
             if WorkflowManagement.EnabledWorkflowExist(DATABASE::Item, WorkflowEventHandling.RunWorkflowOnItemChangedCode()) then
                 exit(false);
             Error(NoWorkflowEnabledErr);
         end;
-        exit(true);
+        Result := true;
+        OnAfterCheckItemApprovalsWorkflowEnabled(Item, Result);
     end;
 
     procedure CheckGeneralJournalBatchApprovalsWorkflowEnabled(var GenJournalBatch: Record "Gen. Journal Batch"): Boolean
@@ -3126,6 +3127,11 @@ codeunit 1535 "Approvals Mgmt."
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCheckCustomerApprovalsWorkflowEnabled(var Customer: Record Customer; var Result: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCheckItemApprovalsWorkflowEnabled(var Item: Record Item; var Result: Boolean)
     begin
     end;
 
