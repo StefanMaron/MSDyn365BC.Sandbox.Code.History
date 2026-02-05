@@ -4074,6 +4074,9 @@ table 39 "Purchase Line"
         PurchaseLine: Record "Purchase Line";
         MaxLineNo: Integer;
     begin
+        if SkipEnsurePositiveLineNo then
+            exit;
+
         if "Line No." < 0 then begin
             PurchaseLine.SetRange("Document Type", "Document Type");
             PurchaseLine.SetRange("Document No.", "Document No.");
@@ -4081,6 +4084,11 @@ table 39 "Purchase Line"
                 MaxLineNo := PurchaseLine."Line No.";
             "Line No." := MaxLineNo + 10000;
         end;
+    end;
+
+    procedure SetSkipEnsurePositiveLineNo(NewSkipEnsurePositiveLineNo: Boolean)
+    begin
+        SkipEnsurePositiveLineNo := NewSkipEnsurePositiveLineNo;
     end;
 
     var
@@ -4123,6 +4131,7 @@ table 39 "Purchase Line"
         PrePaymentLineAmountEntered: Boolean;
         PurchSetupRead: Boolean;
         HasPurchHeader: Boolean;
+        SkipEnsurePositiveLineNo: Boolean;
 #pragma warning disable AA0074
 #pragma warning disable AA0470
         Text000: Label 'You cannot rename a %1.';
