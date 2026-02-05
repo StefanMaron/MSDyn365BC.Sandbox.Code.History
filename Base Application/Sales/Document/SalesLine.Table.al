@@ -4275,6 +4275,9 @@ table 37 "Sales Line"
         SalesLine: Record "Sales Line";
         MaxLineNo: Integer;
     begin
+        if SkipEnsurePositiveLineNo then
+            exit;
+
         if "Line No." < 0 then begin
             SalesLine.SetRange("Document Type", "Document Type");
             SalesLine.SetRange("Document No.", "Document No.");
@@ -4282,6 +4285,11 @@ table 37 "Sales Line"
                 MaxLineNo := SalesLine."Line No.";
             "Line No." := MaxLineNo + 10000;
         end;
+    end;
+
+    procedure SetSkipEnsurePositiveLineNo(NewSkipEnsurePositiveLineNo: Boolean)
+    begin
+        SkipEnsurePositiveLineNo := NewSkipEnsurePositiveLineNo;
     end;
 
     var
@@ -4331,6 +4339,7 @@ table 37 "Sales Line"
         PlannedDeliveryDateCalculated: Boolean;
         HasSalesHeader: Boolean;
         SkipDefaultItemQuantity: Boolean;
+        SkipEnsurePositiveLineNo: Boolean;
 #pragma warning disable AA0074
 #pragma warning disable AA0470
         Text000: Label 'You cannot delete the order line because it is associated with purchase order %1 line %2.';
