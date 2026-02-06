@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -34,12 +34,10 @@ page 15 "Location List"
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = Location;
-                    ToolTip = 'Specifies a location code for the warehouse or distribution center where your items are handled and stored before being sold.';
                 }
                 field(Name; Rec.Name)
                 {
                     ApplicationArea = Location;
-                    ToolTip = 'Specifies the name or address of the location.';
                 }
             }
         }
