@@ -30,6 +30,7 @@ codeunit 10500 "Postcode Business Logic"
         DontShowAgainTok: Label 'Don''t show again';
         NotificationIdTok: Label '3c379efc-509e-4f20-8c0e-e65f9d535a04', Locked = true;
         DisabledTok: Label 'Disabled', Locked = true;
+        ServiceNameTxt: Label 'GetAddress.io', Locked = true;
 
     procedure ShowLookupWindow(var TempEnteredAutocompleteAddress: Record "Autocomplete Address" temporary; ShowInputPage: Boolean; var TempAutocompleteAddress: Record "Autocomplete Address" temporary): Boolean
     var
@@ -48,6 +49,11 @@ codeunit 10500 "Postcode Business Logic"
         // -- Address selection window opened with a list of possible addresses
         // -  - Address selection is canceled => EXIT(FALSE), do not show postcode input page
         // -  - Address selection is confirmed => set the address and EXIT(TRUE)
+        if not IsConfigured() then
+            exit;
+
+        if PostcodeServiceManager.GetActiveService() <> ServiceNameTxt then
+            exit;
 
         if not ShowInputPage then
             TempEnteredAutocompleteAddress.Address := '';
@@ -126,8 +132,11 @@ codeunit 10500 "Postcode Business Logic"
     end;
 
     procedure IsConfigured(): Boolean
+    var
+        Configured: Boolean;
     begin
-        exit(PostcodeServiceManager.IsConfigured());
+        PostcodeServiceManager.IsServiceConfigured(ServiceNameTxt, Configured);
+        exit(Configured);
     end;
 
     procedure SetSavePostcode(NewValue: Boolean)
@@ -222,8 +231,10 @@ codeunit 10500 "Postcode Business Logic"
     local procedure RegisterServiceOnRegisterServiceConnection(var ServiceConnection: Record "Service Connection")
     var
         PostcodeServiceConfig: Record "Postcode Service Config";
+        Configured: Boolean;
     begin
-        if PostcodeServiceManager.IsConfigured() then
+        PostcodeServiceManager.IsServiceConfigured(ServiceNameTxt, Configured);
+        if Configured then
             ServiceConnection.Status := ServiceConnection.Status::Enabled
         else
             ServiceConnection.Status := ServiceConnection.Status::Disabled;

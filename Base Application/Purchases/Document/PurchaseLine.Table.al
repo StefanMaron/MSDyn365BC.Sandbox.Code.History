@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -523,6 +523,7 @@ table 39 "Purchase Line"
         field(13; "Unit of Measure"; Text[50])
         {
             Caption = 'Unit of Measure';
+            ToolTip = 'Specifies the unit of measure.';
 
             trigger OnValidate()
             begin
@@ -723,6 +724,7 @@ table 39 "Purchase Line"
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
             AutoFormatType = 0;
             Caption = 'Qty. to Receive';
+            ToolTip = 'Specifies the quantity of items that remains to be received.';
             DecimalPlaces = 0 : 5;
 
             trigger OnValidate()
@@ -857,6 +859,7 @@ table 39 "Purchase Line"
         {
             AutoFormatType = 0;
             Caption = 'Line Discount %';
+            ToolTip = 'Specifies the discount percentage that is granted for the item on the line.';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
             MinValue = 0;
@@ -902,6 +905,7 @@ table 39 "Purchase Line"
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
+            ToolTip = 'Specifies the net amount, excluding any invoice discount amount, that must be paid for products on the line.';
             Editable = false;
 
             trigger OnValidate()
@@ -1019,6 +1023,7 @@ table 39 "Purchase Line"
         field(32; "Allow Invoice Disc."; Boolean)
         {
             Caption = 'Allow Invoice Disc.';
+            ToolTip = 'Specifies if the invoice line is included when the invoice discount is calculated.';
             InitValue = true;
 
             trigger OnValidate()
@@ -1042,30 +1047,35 @@ table 39 "Purchase Line"
         {
             AutoFormatType = 0;
             Caption = 'Gross Weight';
+            ToolTip = 'Specifies the gross weight of one unit of the item. In the purchase statistics window, the gross weight on the line is included in the total gross weight of all the lines for the particular purchase document.';
             DecimalPlaces = 0 : 5;
         }
         field(35; "Net Weight"; Decimal)
         {
             AutoFormatType = 0;
             Caption = 'Net Weight';
+            ToolTip = 'Specifies the net weight of one unit of the item. In the purchase statistics window, the net weight on the line is included in the total net weight of all the lines for the particular purchase document.';
             DecimalPlaces = 0 : 5;
         }
         field(36; "Units per Parcel"; Decimal)
         {
             AutoFormatType = 0;
             Caption = 'Units per Parcel';
+            ToolTip = 'Specifies the number of units per parcel of the item. In the purchase statistics window, the number of units per parcel on the line helps to determine the total number of units for all the lines for the particular purchase document.';
             DecimalPlaces = 0 : 5;
         }
         field(37; "Unit Volume"; Decimal)
         {
             AutoFormatType = 0;
             Caption = 'Unit Volume';
+            ToolTip = 'Specifies the volume of one unit of the item. In the purchase statistics window, the volume of one unit of the item on the line is included in the total volume of all the lines for the particular purchase document.';
             DecimalPlaces = 0 : 5;
         }
         field(38; "Appl.-to Item Entry"; Integer)
         {
             AccessByPermission = TableData Item = R;
             Caption = 'Appl.-to Item Entry';
+            ToolTip = 'Specifies the number of the item ledger entry that the document or journal line is applied -to.';
 
             trigger OnLookup()
             begin
@@ -1278,6 +1288,7 @@ table 39 "Purchase Line"
         {
             AutoFormatType = 0;
             Caption = 'Quantity Invoiced';
+            ToolTip = 'Specifies how many units of the item on the line have been posted as invoiced.';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
@@ -1373,6 +1384,7 @@ table 39 "Purchase Line"
         {
             AccessByPermission = TableData "Drop Shpt. Post. Buffer" = R;
             Caption = 'Drop Shipment';
+            ToolTip = 'Specifies if your vendor ships the items directly to your customer.';
             Editable = false;
 
             trigger OnValidate()
@@ -1395,6 +1407,7 @@ table 39 "Purchase Line"
         field(74; "Gen. Bus. Posting Group"; Code[20])
         {
             Caption = 'Gen. Bus. Posting Group';
+            ToolTip = 'Specifies the vendor''s or customer''s trade type to link transactions made for this business partner with the appropriate general ledger account according to the general posting setup.';
             TableRelation = "Gen. Business Posting Group";
 
             trigger OnValidate()
@@ -1411,6 +1424,7 @@ table 39 "Purchase Line"
         field(75; "Gen. Prod. Posting Group"; Code[20])
         {
             Caption = 'Gen. Prod. Posting Group';
+            ToolTip = 'Specifies the item''s product type to link transactions made for this item with the appropriate general ledger account according to the general posting setup.';
             TableRelation = "Gen. Product Posting Group";
 
             trigger OnValidate()
@@ -1446,6 +1460,7 @@ table 39 "Purchase Line"
         field(80; "Attached to Line No."; Integer)
         {
             Caption = 'Attached to Line No.';
+            ToolTip = 'Specifies the line number to which this purchase line is attached.';
             Editable = false;
             TableRelation = "Purchase Line"."Line No." where("Document Type" = field("Document Type"),
                                                               "Document No." = field("Document No."));
@@ -1468,6 +1483,7 @@ table 39 "Purchase Line"
         field(85; "Tax Area Code"; Code[20])
         {
             Caption = 'Tax Area Code';
+            ToolTip = 'Specifies the tax area that is used to calculate and post sales tax.';
             TableRelation = "Tax Area";
 
             trigger OnValidate()
@@ -1478,6 +1494,7 @@ table 39 "Purchase Line"
         field(86; "Tax Liable"; Boolean)
         {
             Caption = 'Tax Liable';
+            ToolTip = 'Specifies if this vendor charges you sales tax for purchases.';
 
             trigger OnValidate()
             begin
@@ -1487,6 +1504,7 @@ table 39 "Purchase Line"
         field(87; "Tax Group Code"; Code[20])
         {
             Caption = 'Tax Group Code';
+            ToolTip = 'Specifies the tax group that is used to calculate and post sales tax.';
             TableRelation = "Tax Group";
 
             trigger OnValidate()
@@ -1498,6 +1516,7 @@ table 39 "Purchase Line"
         field(88; "Use Tax"; Boolean)
         {
             Caption = 'Use Tax';
+            ToolTip = 'Specifies a U.S. sales tax that is paid on items purchased by a company that are used by the company, instead of being sold to a customer.';
 
             trigger OnValidate()
             begin
@@ -1507,6 +1526,7 @@ table 39 "Purchase Line"
         field(89; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
+            ToolTip = 'Specifies the vendor''s VAT specification to link transactions made for this vendor with the appropriate general ledger account according to the VAT posting setup.';
             TableRelation = "VAT Business Posting Group";
 
             trigger OnValidate()
@@ -1517,6 +1537,7 @@ table 39 "Purchase Line"
         field(90; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
+            ToolTip = 'Specifies the VAT product posting group. Links business transactions made for the item, resource, or G/L account with the general ledger, to account for VAT amounts resulting from trade with that record.';
             TableRelation = "VAT Product Posting Group";
 
             trigger OnValidate()
@@ -1582,6 +1603,7 @@ table 39 "Purchase Line"
         field(91; "Currency Code"; Code[10])
         {
             Caption = 'Currency Code';
+            ToolTip = 'Specifies the currency that is used on the entry.';
             Editable = false;
             TableRelation = Currency;
         }
@@ -1614,6 +1636,7 @@ table 39 "Purchase Line"
 #pragma warning restore
                                                                   "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Quantity';
+            ToolTip = 'Specifies how many item units on this line have been reserved.';
             DecimalPlaces = 0 : 5;
             Editable = false;
             FieldClass = FlowField;
@@ -1622,6 +1645,7 @@ table 39 "Purchase Line"
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
             Caption = 'Blanket Order No.';
+            ToolTip = 'Specifies the number of the blanket order that the record originates from.';
             TableRelation = "Purchase Header"."No." where("Document Type" = const("Blanket Order"));
 
             trigger OnLookup()
@@ -1658,6 +1682,7 @@ table 39 "Purchase Line"
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
             Caption = 'Blanket Order Line No.';
+            ToolTip = 'Specifies the number of the blanket order line that the record originates from.';
             TableRelation = "Purchase Line"."Line No." where("Document Type" = const("Blanket Order"),
                                                               "Document No." = field("Blanket Order No."));
 
@@ -1763,6 +1788,7 @@ table 39 "Purchase Line"
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Inv. Disc. Amount to Invoice';
+            ToolTip = 'Specifies the actual invoice discount amount that will be posted for the line on the invoice.';
             Editable = false;
         }
         field(106; "VAT Identifier"; Code[20])
@@ -1774,6 +1800,7 @@ table 39 "Purchase Line"
         {
             AccessByPermission = TableData "IC G/L Account" = R;
             Caption = 'IC Partner Ref. Type';
+            ToolTip = 'Specifies the item or account in your IC partner''s company that corresponds to the item or account on the line.';
 
             trigger OnValidate()
             var
@@ -1794,6 +1821,7 @@ table 39 "Purchase Line"
         {
             AccessByPermission = TableData "IC G/L Account" = R;
             Caption = 'IC Partner Reference';
+            ToolTip = 'Specifies the IC partner. If the line is being sent to one of your intercompany partners, this field is used together with the IC Partner Ref. Type field to indicate the item or account in your partner''s company that corresponds to the line.';
 
             trigger OnLookup()
             var
@@ -1830,6 +1858,7 @@ table 39 "Purchase Line"
         {
             AutoFormatType = 0;
             Caption = 'Prepayment %';
+            ToolTip = 'Specifies the prepayment percentage to use to calculate the prepayment for purchases.';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
             MinValue = 0;
@@ -1850,6 +1879,7 @@ table 39 "Purchase Line"
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Prepmt. Line Amount"));
             Caption = 'Prepmt. Line Amount';
+            ToolTip = 'Specifies the prepayment amount of the line in the currency of the purchase document if a prepayment percentage is specified for the purchase line.';
             MinValue = 0;
 
             trigger OnValidate()
@@ -1877,6 +1907,7 @@ table 39 "Purchase Line"
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Prepmt. Amt. Inv."));
             Caption = 'Prepmt. Amt. Inv.';
+            ToolTip = 'Specifies the prepayment amount that has already been invoiced to the customer for this purchase line.';
             Editable = false;
         }
         field(112; "Prepmt. Amt. Incl. VAT"; Decimal)
@@ -1954,6 +1985,7 @@ table 39 "Purchase Line"
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Prepmt Amt to Deduct"));
             Caption = 'Prepmt Amt to Deduct';
+            ToolTip = 'Specifies the prepayment amount that has already been deducted from ordinary invoices posted for this purchase order line.';
             MinValue = 0;
 
             trigger OnValidate()
@@ -1983,6 +2015,7 @@ table 39 "Purchase Line"
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Prepmt Amt Deducted"));
             Caption = 'Prepmt Amt Deducted';
+            ToolTip = 'Specifies the prepayment amount that has already been deducted from ordinary invoices posted for this purchase order line.';
             Editable = false;
         }
         field(123; "Prepayment Line"; Boolean)
@@ -2007,6 +2040,7 @@ table 39 "Purchase Line"
         field(130; "IC Partner Code"; Code[20])
         {
             Caption = 'IC Partner Code';
+            ToolTip = 'Specifies the code of the intercompany partner that the transaction is related to if the entry was created from an intercompany transaction.';
             TableRelation = "IC Partner";
 
             trigger OnValidate()
@@ -2214,6 +2248,7 @@ table 39 "Purchase Line"
             AccessByPermission = TableData Job = R;
             BlankZero = true;
             Caption = 'Project Unit Price';
+            ToolTip = 'Specifies the sales price per unit that applies to the item or general ledger expense that will be posted.';
 
             trigger OnValidate()
             var
@@ -2244,6 +2279,7 @@ table 39 "Purchase Line"
             AutoFormatType = 1;
             BlankZero = true;
             Caption = 'Project Total Price';
+            ToolTip = 'Specifies the gross amount of the line that the purchase line applies to.';
             Editable = false;
         }
         field(1005; "Job Line Amount"; Decimal)
@@ -2253,6 +2289,7 @@ table 39 "Purchase Line"
             AutoFormatType = 1;
             BlankZero = true;
             Caption = 'Project Line Amount';
+            ToolTip = 'Specifies the line amount of the project ledger entry that is related to the purchase line.';
 
             trigger OnValidate()
             var
@@ -2282,6 +2319,7 @@ table 39 "Purchase Line"
             AutoFormatType = 1;
             BlankZero = true;
             Caption = 'Project Line Discount Amount';
+            ToolTip = 'Specifies the line discount amount of the project ledger entry that is related to the purchase line.';
 
             trigger OnValidate()
             var
@@ -2311,6 +2349,7 @@ table 39 "Purchase Line"
             AutoFormatType = 0;
             BlankZero = true;
             Caption = 'Project Line Discount %';
+            ToolTip = 'Specifies the line discount percentage of the project ledger entry that is related to the purchase line.';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
             MinValue = 0;
@@ -2454,6 +2493,7 @@ table 39 "Purchase Line"
             AccessByPermission = TableData Job = R;
             BlankZero = true;
             Caption = 'Project Planning Line No.';
+            ToolTip = 'Specifies the project planning line number that the usage should be linked to when the project journal is posted. You can only link to project planning lines that have the Apply Usage Link option enabled.';
 
             trigger OnLookup()
             var
@@ -2522,6 +2562,7 @@ table 39 "Purchase Line"
             AccessByPermission = TableData Job = R;
             AutoFormatType = 0;
             Caption = 'Project Remaining Qty.';
+            ToolTip = 'Specifies the quantity that remains to complete a project.';
             DecimalPlaces = 0 : 5;
 
             trigger OnValidate()
@@ -2553,6 +2594,7 @@ table 39 "Purchase Line"
         field(1700; "Deferral Code"; Code[10])
         {
             Caption = 'Deferral Code';
+            ToolTip = 'Specifies the deferral template that governs how expenses paid with this purchase document are deferred to the different accounting periods when the expenses were incurred.';
             TableRelation = "Deferral Template"."Deferral Code";
 
             trigger OnValidate()
@@ -2578,6 +2620,7 @@ table 39 "Purchase Line"
         field(1702; "Returns Deferral Start Date"; Date)
         {
             Caption = 'Returns Deferral Start Date';
+            ToolTip = 'Specifies the starting date of the returns deferral period.';
 
             trigger OnValidate()
             var
@@ -2646,6 +2689,7 @@ table 39 "Purchase Line"
         field(5402; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
+            ToolTip = 'Specifies the variant of the item on the line.';
             TableRelation = if (Type = const(Item), "Document Type" = filter(<> "Credit Memo" & <> "Return Order")) "Item Variant".Code where("Item No." = field("No."), Blocked = const(false), "Purchasing Blocked" = const(false))
             else
             if (Type = const(Item), "Document Type" = filter("Credit Memo" | "Return Order")) "Item Variant".Code where("Item No." = field("No."), Blocked = const(false));
@@ -2717,6 +2761,7 @@ table 39 "Purchase Line"
         field(5403; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
+            ToolTip = 'Specifies the bin where the items are picked or put away.';
             TableRelation = if ("Document Type" = filter(Order | Invoice),
                                 Quantity = filter(< 0)) "Bin Content"."Bin Code" where("Location Code" = field("Location Code"),
                                                                                      "Item No." = field("No."),
@@ -2992,11 +3037,13 @@ table 39 "Purchase Line"
         field(5600; "FA Posting Date"; Date)
         {
             Caption = 'FA Posting Date';
+            ToolTip = 'Specifies the FA posting date if you have selected Fixed Asset in the Type field for this line.';
         }
         field(5601; "FA Posting Type"; Enum "Purchase FA Posting Type")
         {
             AccessByPermission = TableData "Fixed Asset" = R;
             Caption = 'FA Posting Type';
+            ToolTip = 'Specifies the FA posting type if you have selected Fixed Asset in the Type field for this line.';
 
             trigger OnValidate()
             begin
@@ -3022,6 +3069,7 @@ table 39 "Purchase Line"
         field(5602; "Depreciation Book Code"; Code[10])
         {
             Caption = 'Depreciation Book Code';
+            ToolTip = 'Specifies the code for the depreciation book to which the line will be posted if you have selected Fixed Asset in the Type field for this line.';
             TableRelation = "Depreciation Book";
 
             trigger OnValidate()
@@ -3039,11 +3087,13 @@ table 39 "Purchase Line"
         {
             AccessByPermission = TableData "Fixed Asset" = R;
             Caption = 'Depr. until FA Posting Date';
+            ToolTip = 'Specifies if depreciation was calculated until the FA posting date of the line.';
         }
         field(5606; "Depr. Acquisition Cost"; Boolean)
         {
             AccessByPermission = TableData "Fixed Asset" = R;
             Caption = 'Depr. Acquisition Cost';
+            ToolTip = 'Specifies if, when this line was posted, the additional acquisition cost posted on the line was depreciated in proportion to the amount by which the fixed asset had already been depreciated.';
         }
         field(5609; "Maintenance Code"; Code[10])
         {
@@ -3053,11 +3103,13 @@ table 39 "Purchase Line"
         field(5610; "Insurance No."; Code[20])
         {
             Caption = 'Insurance No.';
+            ToolTip = 'Specifies an insurance number if you have selected the Acquisition Cost option in the FA Posting Type field.';
             TableRelation = Insurance;
         }
         field(5611; "Budgeted FA No."; Code[20])
         {
             Caption = 'Budgeted FA No.';
+            ToolTip = 'Specifies the number of a fixed asset with the Budgeted Asset check box selected. When you post the journal or document line, an additional entry is created for the budgeted fixed asset where the amount has the opposite sign.';
             TableRelation = "Fixed Asset";
 
             trigger OnValidate()
@@ -3073,6 +3125,7 @@ table 39 "Purchase Line"
         field(5612; "Duplicate in Depreciation Book"; Code[10])
         {
             Caption = 'Duplicate in Depreciation Book';
+            ToolTip = 'Specifies a depreciation book code if you want the journal line to be posted to that depreciation book, as well as to the depreciation book in the Depreciation Book Code field.';
             TableRelation = "Depreciation Book";
 
             trigger OnValidate()
@@ -3084,6 +3137,7 @@ table 39 "Purchase Line"
         {
             AccessByPermission = TableData "Fixed Asset" = R;
             Caption = 'Use Duplication List';
+            ToolTip = 'Specifies, if the type is Fixed Asset, that information on the line is to be posted to all the assets defined depreciation books.';
 
             trigger OnValidate()
             begin
@@ -3110,6 +3164,7 @@ table 39 "Purchase Line"
         {
             AccessByPermission = TableData "Nonstock Item" = R;
             Caption = 'Catalog';
+            ToolTip = 'Specifies that this item is a catalog item.';
         }
         field(5711; "Purchasing Code"; Code[10])
         {
@@ -3176,6 +3231,7 @@ table 39 "Purchase Line"
         {
             AccessByPermission = TableData "Item Reference" = R;
             Caption = 'Item Reference No.';
+            ToolTip = 'Specifies the referenced item number.';
             ExtendedDatatype = Barcode;
 
             trigger OnLookup()
@@ -3288,6 +3344,7 @@ table 39 "Purchase Line"
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
             Caption = 'Lead Time Calculation';
+            ToolTip = 'Specifies a date formula for the amount of time it takes to replenish the item.';
 
             trigger OnValidate()
             var
@@ -3310,6 +3367,7 @@ table 39 "Purchase Line"
         {
             AccessByPermission = TableData Location = R;
             Caption = 'Inbound Whse. Handling Time';
+            ToolTip = 'Specifies the time it takes to make items part of available inventory, after the items have been posted as received.';
 
             trigger OnValidate()
             begin
@@ -3325,6 +3383,7 @@ table 39 "Purchase Line"
         {
             AccessByPermission = TableData "Order Promising Line" = R;
             Caption = 'Planned Receipt Date';
+            ToolTip = 'Specifies the date when the item is planned to arrive in inventory. Forward calculation: planned receipt date = order date + vendor lead time (per the vendor calendar and rounded to the next working day in first the vendor calendar and then the location calendar). If no vendor calendar exists, then: planned receipt date = order date + vendor lead time (per the location calendar). Backward calculation: order date = planned receipt date - vendor lead time (per the vendor calendar and rounded to the previous working day in first the vendor calendar and then the location calendar). If no vendor calendar exists, then: order date = planned receipt date - vendor lead time (per the location calendar).';
 
             trigger OnValidate()
             var
@@ -3365,6 +3424,7 @@ table 39 "Purchase Line"
         {
             AccessByPermission = TableData "Purch. Rcpt. Header" = R;
             Caption = 'Order Date';
+            ToolTip = 'Specifies the date when the order was created.';
 
             trigger OnValidate()
             var
@@ -3411,6 +3471,7 @@ table 39 "Purchase Line"
         {
             AccessByPermission = TableData "Item Charge" = R;
             Caption = 'Allow Item Charge Assignment';
+            ToolTip = 'Specifies that you can assign item charges to this line.';
             InitValue = true;
 
             trigger OnValidate()
@@ -3425,6 +3486,7 @@ table 39 "Purchase Line"
                                                                                        "Document No." = field("Document No."),
                                                                                        "Document Line No." = field("Line No.")));
             Caption = 'Qty. to Assign';
+            ToolTip = 'Specifies how many units of the item charge will be assigned to the line.';
             DecimalPlaces = 0 : 5;
             Editable = false;
             FieldClass = FlowField;
@@ -3436,6 +3498,7 @@ table 39 "Purchase Line"
                                                                                       "Document No." = field("Document No."),
                                                                                       "Document Line No." = field("Line No.")));
             Caption = 'Qty. Assigned';
+            ToolTip = 'Specifies how much of the item charge that has been assigned.';
             DecimalPlaces = 0 : 5;
             Editable = false;
             FieldClass = FlowField;
@@ -3445,6 +3508,7 @@ table 39 "Purchase Line"
             AccessByPermission = TableData "Return Shipment Header" = R;
             AutoFormatType = 0;
             Caption = 'Return Qty. to Ship';
+            ToolTip = 'Specifies the quantity of items that remains to be shipped.';
             DecimalPlaces = 0 : 5;
 
             trigger OnValidate()
@@ -3560,6 +3624,7 @@ table 39 "Purchase Line"
             AccessByPermission = TableData "Return Shipment Header" = R;
             AutoFormatType = 0;
             Caption = 'Return Qty. Shipped';
+            ToolTip = 'Specifies how many units of the item on the line have been posted as shipped.';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
@@ -3577,6 +3642,7 @@ table 39 "Purchase Line"
                                                                                        "Document No." = field("Document No."),
                                                                                        "Document Line No." = field("Line No.")));
             Caption = 'Item Charge Qty. to Handle';
+            ToolTip = 'Specifies how many items the item charge will be assigned to on the line. It can be either equal to Qty. to Assign or to zero. If it is zero, the item charge will not be assigned to the line.';
             DecimalPlaces = 0 : 5;
             Editable = false;
             FieldClass = FlowField;
@@ -3599,6 +3665,7 @@ table 39 "Purchase Line"
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Non-Deductible VAT Base';
+            ToolTip = 'Specifies the amount of VAT that is not deducted due to the type of goods or services purchased.';
             Editable = false;
         }
         field(6202; "Non-Deductible VAT Amount"; Decimal)
@@ -3606,6 +3673,7 @@ table 39 "Purchase Line"
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Non-Deductible VAT Amount';
+            ToolTip = 'Specifies the amount of the transaction for which VAT is not applied, due to the type of goods or services purchased.';
             Editable = false;
         }
         field(6203; "Non-Deductible VAT Diff."; Decimal)
@@ -3647,6 +3715,7 @@ table 39 "Purchase Line"
         field(6608; "Return Reason Code"; Code[10])
         {
             Caption = 'Return Reason Code';
+            ToolTip = 'Specifies the code explaining why the item was returned.';
             TableRelation = "Return Reason";
 
             trigger OnValidate()
@@ -3676,6 +3745,7 @@ table 39 "Purchase Line"
                                                              "Document Type" = field("Document Type"),
                                                              "Line No." = field("Line No.")));
             Caption = 'Attached Doc Count';
+            ToolTip = 'Specifies the number of attachments.';
             FieldClass = FlowField;
             InitValue = 0;
         }
@@ -3686,6 +3756,7 @@ table 39 "Purchase Line"
                                                        "Attached to Line No." = field("Line No."),
                                                        Quantity = filter(<> 0)));
             Caption = 'Attached Lines Count';
+            ToolTip = 'Specifies the number of non-inventory product lines attached to the purchase line.';
             Editable = false;
             FieldClass = FlowField;
             BlankZero = true;
@@ -3694,6 +3765,7 @@ table 39 "Purchase Line"
         {
             AutoFormatType = 0;
             Caption = 'Over-Receipt Quantity';
+            ToolTip = 'Specifies over-receipt quantity.';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
 
@@ -3748,6 +3820,7 @@ table 39 "Purchase Line"
         field(8510; "Over-Receipt Code"; Code[20])
         {
             Caption = 'Over-Receipt Code';
+            ToolTip = 'Specifies over-receipt code.';
             TableRelation = "Over-Receipt Code";
 
             trigger OnValidate()
@@ -3817,6 +3890,7 @@ table 39 "Purchase Line"
         field(99000757; "Planning Flexibility"; Enum "Reservation Planning Flexibility")
         {
             Caption = 'Planning Flexibility';
+            ToolTip = 'Specifies whether the supply represented by this line is considered by the planning system when calculating action messages.';
 
             trigger OnValidate()
             begin
