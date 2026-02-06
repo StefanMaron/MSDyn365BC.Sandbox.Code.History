@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -40,56 +40,46 @@ page 5701 "Stockkeeping Unit List"
                 field("Item No."; Rec."Item No.")
                 {
                     ApplicationArea = Planning;
-                    ToolTip = 'Specifies the item number to which the SKU applies.';
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = Planning;
-                    ToolTip = 'Specifies the variant of the item on the line.';
                 }
                 field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = Planning;
-                    ToolTip = 'Specifies the location code (for example, the warehouse or distribution center) to which the SKU applies.';
                 }
                 field("Replenishment System"; Rec."Replenishment System")
                 {
                     ApplicationArea = Planning;
-                    ToolTip = 'Specifies the type of supply order that is created by the planning system when the SKU needs to be replenished.';
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = Planning;
-                    ToolTip = 'Specifies the description from the Item Card.';
                 }
                 field(Inventory; Rec.Inventory)
                 {
                     ApplicationArea = Planning;
                     HideValue = IsNonInventoriable;
-                    ToolTip = 'Specifies for the SKU, the same as the field does on the item card.';
                 }
                 field("Reorder Point"; Rec."Reorder Point")
                 {
                     ApplicationArea = Planning;
-                    ToolTip = 'Specifies for the SKU, the same as the field does on the item card.';
                     Visible = false;
                 }
                 field("Reorder Quantity"; Rec."Reorder Quantity")
                 {
                     ApplicationArea = Planning;
-                    ToolTip = 'Specifies for the SKU, the same as the field does on the item card.';
                     Visible = false;
                 }
                 field("Maximum Inventory"; Rec."Maximum Inventory")
                 {
                     ApplicationArea = Planning;
-                    ToolTip = 'Specifies for the SKU, the same as the field does on the item card.';
                     Visible = false;
                 }
                 field("Assembly Policy"; Rec."Assembly Policy")
                 {
                     ApplicationArea = Assembly;
-                    ToolTip = 'Specifies which default order flow is used to supply this SKU by assembly.';
                     Visible = false;
                 }
             }
