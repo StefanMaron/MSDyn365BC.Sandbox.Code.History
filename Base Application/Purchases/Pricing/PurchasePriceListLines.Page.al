@@ -258,7 +258,6 @@ page 7011 "Purchase Price List Lines"
                 {
                     ApplicationArea = All;
                     Visible = AllowUpdatingDefaults;
-                    ToolTip = 'Specifies the if prices include VAT.';
                 }
                 field(VATBusPostingGrPrice; Rec."VAT Bus. Posting Gr. (Price)")
                 {
