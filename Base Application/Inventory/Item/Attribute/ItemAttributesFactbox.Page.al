@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -43,14 +43,12 @@ page 9110 "Item Attributes Factbox"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Attribute';
-                    ToolTip = 'Specifies the name of the item attribute.';
                     Visible = not TranslatedValuesVisible;
                 }
                 field(RawValue; Rec.Value)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Value';
-                    ToolTip = 'Specifies the value of the item attribute.';
                     Visible = not TranslatedValuesVisible;
                 }
             }
