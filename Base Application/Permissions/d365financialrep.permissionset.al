@@ -57,6 +57,7 @@ permissionset 7576 "D365 FINANCIAL REP."
                   tabledata "Financial Report Schedule" = RIMD,
                   tabledata "Financial Report User Filters" = RIMD,
                   tabledata "Fin. Report Excel Template" = RIMD,
+                  tabledata "Financial Report Category" = RIMD,
                   tabledata "Accounting Period" = RIMD,
                   tabledata "Analysis Column" = RIMD,
                   tabledata "Analysis Column Template" = RIMD,
