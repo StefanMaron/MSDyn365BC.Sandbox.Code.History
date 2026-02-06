@@ -365,9 +365,13 @@ codeunit 7307 "Whse.-Activity-Register"
                     WhseJnlLine."Reference Document" := WhseJnlLine."Reference Document"::Movement;
                 end;
             WhseActivLine."Activity Type"::"Invt. Put-away",
-          WhseActivLine."Activity Type"::"Invt. Pick",
-          WhseActivLine."Activity Type"::"Invt. Movement":
+          WhseActivLine."Activity Type"::"Invt. Pick":
                 WhseJnlLine."Whse. Document Type" := WhseJnlLine."Whse. Document Type"::" ";
+            WhseActivLine."Activity Type"::"Invt. Movement":
+                begin
+                    WhseJnlLine."Reference No." := RegisteredInvtMovementHdr."No.";
+                    WhseJnlLine."Whse. Document Type" := WhseJnlLine."Whse. Document Type"::" ";
+                end;
         end;
         WhseActivLine.ValidateQtyWhenSNDefined();
         WhseJnlLine.CopyTrackingFromWhseActivityLine(WhseActivLine);
