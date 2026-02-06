@@ -558,7 +558,7 @@ codeunit 9510 "Document Service Management"
         HttpStatusCode: DotNet HttpStatusCode;
         ResponseHeaders: DotNet NameValueCollection;
     begin
-        InitializeGraphWebRequest(FolderUrl, HttpWebRequestMgt, 'application/json', 'GET');
+        InitializeWebRequest(FolderUrl, 'GET', 'application/json', HttpWebRequestMgt);
 
         if not HttpWebRequestMgt.SendRequestAndReadTextResponse(ResponseBody, ErrorMessage, ErrorDetails, HttpStatusCode, ResponseHeaders) then begin
             Session.LogMessage('0000FML', StrSubstNo(SharepointStatusCodeTelemetryMsg, HttpStatusCode), Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', SharePointTelemetryCategoryTxt);
@@ -586,7 +586,8 @@ codeunit 9510 "Document Service Management"
     begin
         ResolveItemId(DocumentSharing);
         GetFileDownloadUrl(DocumentSharing, FileUrl);
-        InitializeOneDriveWebRequest(FileUrl, HttpWebRequestMgt, '');
+
+        InitializeWebRequest(FileUrl, 'GET', '', HttpWebRequestMgt);
 
         if not HttpWebRequestMgt.SendRequestAndReadResponse(TempBlob, ErrorMessage, ErrorDetails, HttpStatusCode, ResponseHeaders) then begin
             Session.LogMessage('0000IN8', StrSubstNo(SharepointStatusCodeTelemetryMsg, HttpStatusCode), Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', SharePointTelemetryCategoryTxt);
@@ -619,9 +620,8 @@ codeunit 9510 "Document Service Management"
         JsonToken: JsonToken;
     begin
         MetadataUrl := GetGraphFileByIdUrl(DocumentSharing."Item Id");
-        // Add Prefer header to get the new downloadurl for the onedrive content while hitting the GetFileContent function
-        InitializeGraphWebRequest(MetadataUrl, HttpWebRequestMgt, 'application/json', 'GET');
-        HttpWebRequestMgt.AddHeader('Prefer', 'pacToken=N');
+
+        InitializeWebRequest(MetadataUrl, 'GET', 'application/json', HttpWebRequestMgt);
 
         if not HttpWebRequestMgt.SendRequestAndReadTextResponse(ResponseBody, ErrorMessage, ErrorDetails, HttpStatusCode, ResponseHeaders) then begin
             Session.LogMessage('0000IN8', StrSubstNo(SharepointStatusCodeTelemetryMsg, HttpStatusCode), Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', SharePointTelemetryCategoryTxt);
@@ -637,6 +637,7 @@ codeunit 9510 "Document Service Management"
             Error(DownloadUrlDoesNotExistErr, ResponseBody);
 
         FileUrl := JsonToken.AsValue().AsText();
+
         if FileUrl = '' then
             Session.LogMessage('0000JWY', SharepointUnableToGetDownloadUrlMsg, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', SharePointTelemetryCategoryTxt);
     end;
@@ -654,7 +655,8 @@ codeunit 9510 "Document Service Management"
     begin
         ResolveItemId(DocumentSharing);
         FileUrl := GetGraphFileByIdUrl(DocumentSharing."Item Id");
-        InitializeGraphWebRequest(FileUrl, HttpWebRequestMgt, 'application/json', 'DELETE');
+
+        InitializeWebRequest(FileUrl, 'DELETE', 'application/json', HttpWebRequestMgt);
 
         if not HttpWebRequestMgt.SendRequestAndReadTextResponse(ResponseBody, ErrorMessage, ErrorDetails, HttpStatusCode, ResponseHeaders) then begin
             Session.LogMessage('0000J18', StrSubstNo(SharepointStatusCodeTelemetryMsg, HttpStatusCode), Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', SharePointTelemetryCategoryTxt);
@@ -681,7 +683,7 @@ codeunit 9510 "Document Service Management"
             exit;
 
         FileUrl := GetGraphItemIdUrl(DocumentSharing);
-        InitializeGraphWebRequest(FileUrl, HttpWebRequestMgt, 'application/json', 'GET');
+        InitializeWebRequest(FileUrl, 'GET', 'application/json', HttpWebRequestMgt);
 
         if not HttpWebRequestMgt.SendRequestAndReadTextResponse(ResponseBody, ErrorMessage, ErrorDetails, HttpStatusCode, ResponseHeaders) then begin
             Session.LogMessage('0000J19', StrSubstNo(SharepointStatusCodeTelemetryMsg, HttpStatusCode), Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', SharePointTelemetryCategoryTxt);
@@ -705,35 +707,17 @@ codeunit 9510 "Document Service Management"
         Session.LogMessage('0000JB5', StrSubstNo(SharepointItemIdMsg, DocumentSharing."Item Id"), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', SharePointTelemetryCategoryTxt);
     end;
 
-    local procedure InitializeGraphWebRequest(FileUrl: Text; var HttpWebRequestMgt: Codeunit "Http Web Request Mgt."; ReturnType: Text; RequestMethod: Text)
+    local procedure InitializeWebRequest(Url: Text; Method: Text; ReturnType: Text; var HttpWebRequestMgt: Codeunit "Http Web Request Mgt.")
     var
         AzureADMgt: Codeunit "Azure AD Mgt.";
         Token: SecretText;
     begin
         Token := AzureADMgt.GetAccessTokenAsSecretText(GetGraphDomain(), AzureADMgt.GetO365ResourceName(), false);
-        InitializeWebRequest(FileUrl, RequestMethod, ReturnType, HttpWebRequestMgt, Token);
-    end;
-
-    local procedure InitializeOneDriveWebRequest(FileUrl: Text; var HttpWebRequestMgt: Codeunit "Http Web Request Mgt."; ReturnType: Text)
-    var
-        AzureADMgt: Codeunit "Azure AD Mgt.";
-        Token: SecretText;
-    begin
-        Token := AzureADMgt.GetOnBehalfAccessTokenAsSecretText(GetResourceUrl(FileUrl));
-        InitializeWebRequest(FileUrl, 'GET', ReturnType, HttpWebRequestMgt, Token);
-    end;
-
-    local procedure InitializeWebRequest(
-            Url: Text;
-            Method: Text;
-            ReturnType: Text;
-            var HttpWebRequestMgt: Codeunit "Http Web Request Mgt.";
-            Token: SecretText)
-    begin
         if Token.IsEmpty() then begin
             Session.LogMessage('0000FMK', EmptyTokenTelemetryMsg, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', SharePointTelemetryCategoryTxt);
             LicenseError();
         end;
+
         HttpWebRequestMgt.Initialize(Url);
         HttpWebRequestMgt.DisableUI();
         HttpWebRequestMgt.SetMethod(Method);
