@@ -83,15 +83,7 @@ page 490 "Acc. Schedule Overview"
                     Editable = not ViewOnlyMode;
                     ToolTip = 'Specifies a title of the financial report. The text is shown as a title on the final report when you run it to get a PDF or to print it.';
                 }
-                field(CategoryCode; TempFinancialReport.CategoryCode)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Category';
-                    Editable = not ViewOnlyMode;
-                    Importance = Additional;
-                    TableRelation = "Financial Report Category";
-                    ToolTip = 'Specifies the category code for the financial report.';
-                }
+
                 field(CurrentSchedName; TempFinancialReport."Financial Report Row Group")
                 {
                     ApplicationArea = Basic, Suite;
@@ -1096,20 +1088,6 @@ page 490 "Acc. Schedule Overview"
                     end;
                 end;
             }
-            action(EditCategory)
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Edit Category';
-                Image = Edit;
-                ToolTip = 'Edit the category of the current financial report.';
-                trigger OnAction()
-                var
-                    FinancialReportCategory: Record "Financial Report Category";
-                begin
-                    if FinancialReportCategory.Get(TempFinancialReport.CategoryCode) then
-                        Page.Run(Page::"Financial Report Category", FinancialReportCategory);
-                end;
-            }
 
             group(DisplayOptions)
             {
@@ -1270,31 +1248,49 @@ page 490 "Acc. Schedule Overview"
             {
                 Caption = 'Process', Comment = 'Generated from the PromotedActionCategories property index 1.';
 
-                actionref(Recalculate_Promoted; Recalculate) { }
-                actionref(RestoreFinRepFilters_Promoted; RestoreFinRepFilters) { }
+                actionref(Recalculate_Promoted; Recalculate)
+                {
+                }
+                actionref(RestoreFinRepFilters_Promoted; RestoreFinRepFilters)
+                {
+                }
             }
             group(DisplayPromoted)
             {
                 Caption = 'Show';
                 ShowAs = SplitButton;
-                actionref(ShowNone_Promoted; DisplayNone) { }
-                actionref(ShowFiltersOnly_Promoted; DisplayFiltersOnly) { }
-                actionref(ShowAll_Promoted; DisplayAll) { }
+                actionref(ShowNone_Promoted; DisplayNone)
+                {
+                }
+                actionref(ShowFiltersOnly_Promoted; DisplayFiltersOnly)
+                {
+                }
+                actionref(ShowAll_Promoted; DisplayAll)
+                {
+                }
             }
 
             group(Category_Category4)
             {
                 Caption = 'Column', Comment = 'Generated from the PromotedActionCategories property index 3.';
 
-                actionref(PreviousColumn_Promoted; PreviousColumn) { }
-                actionref(NextColumn_Promoted; NextColumn) { }
+                actionref(PreviousColumn_Promoted; PreviousColumn)
+                {
+                }
+                actionref(NextColumn_Promoted; NextColumn)
+                {
+                }
             }
             group(Category_Category5)
             {
                 Caption = 'Period', Comment = 'Generated from the PromotedActionCategories property index 4.';
 
-                actionref(PreviousPeriod_Promoted; PreviousPeriod) { }
-                actionref(NextPeriod_Promoted; NextPeriod) { }
+                actionref(PreviousPeriod_Promoted; PreviousPeriod)
+                {
+                }
+                actionref(NextPeriod_Promoted; NextPeriod)
+                {
+                }
             }
             group("Category_Export to Excel")
             {
@@ -1326,14 +1322,27 @@ page 490 "Acc. Schedule Overview"
             group(Category_Definitions)
             {
                 Caption = 'Definitions';
-                actionref(EditDefinition_Promoted; EditDefinition) { }
-                actionref(EditRowDefinition_Promoted; EditRowDefinition) { }
-                actionref(EditColumnDefinition_Promoted; EditColumnDefinition) { }
-                actionref(EditDimPerspective_Promoted; EditDimPerspective) { }
-                actionref(EditCategory_Promoted; EditCategory) { }
-                actionref(EditIntroductoryClosingParagraph_Promoted; EditIntroductoryClosingParagraph) { }
-                actionref(ExcelTemplates_Promoted; ExcelTemplates) { }
-                actionref(Schedules_Promoted; Schedules) { }
+                actionref(EditDefinition_Promoted; EditDefinition)
+                {
+                }
+                actionref(EditRowDefinition_Promoted; EditRowDefinition)
+                {
+                }
+                actionref(EditColumnDefinition_Promoted; EditColumnDefinition)
+                {
+                }
+                actionref(EditDimPerspective_Promoted; EditDimPerspective)
+                {
+                }
+                actionref(EditIntroductoryClosingParagraph_Promoted; EditIntroductoryClosingParagraph)
+                {
+                }
+                actionref(ExcelTemplates_Promoted; ExcelTemplates)
+                {
+                }
+                actionref(Schedules_Promoted; Schedules)
+                {
+                }
             }
             group(Category_Report)
             {
