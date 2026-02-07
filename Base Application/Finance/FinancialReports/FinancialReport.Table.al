@@ -309,13 +309,6 @@ table 88 "Financial Report"
                     AccSchedManagement.CheckPerspectiveAnalysisView(Rec."Financial Report Row Group", Rec.DimPerspective);
             end;
         }
-        field(63; CategoryCode; Code[20])
-        {
-            Caption = 'Category';
-            TableRelation = "Financial Report Category";
-            ToolTip = 'Specifies the category code for the financial report.';
-            DataClassification = CustomerContent;
-        }
     }
     keys
     {
