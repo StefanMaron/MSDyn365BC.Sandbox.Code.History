@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -40,7 +40,6 @@ table 5901 "Service Item Line"
         field(1; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            ToolTip = 'Specifies the number of the service order linked to this service item line.';
             Editable = false;
             TableRelation = "Service Header"."No." where("Document Type" = field("Document Type"));
 
@@ -52,12 +51,10 @@ table 5901 "Service Item Line"
         field(2; "Line No."; Integer)
         {
             Caption = 'Line No.';
-            ToolTip = 'Specifies the number of the line.';
         }
         field(3; "Service Item No."; Code[20])
         {
             Caption = 'Service Item No.';
-            ToolTip = 'Specifies the service item number registered in the Service Item table.';
             TableRelation = if ("Document Type" = filter(<> "Credit Memo")) "Service Item"."No." where(Blocked = filter(<> All))
             else
             if ("Document Type" = filter("Credit Memo")) "Service Item"."No.";
@@ -216,7 +213,6 @@ table 5901 "Service Item Line"
         field(4; "Service Item Group Code"; Code[10])
         {
             Caption = 'Service Item Group Code';
-            ToolTip = 'Specifies the code of the service item group for this item.';
             TableRelation = "Service Item Group".Code;
 
             trigger OnValidate()
@@ -242,7 +238,6 @@ table 5901 "Service Item Line"
         field(5; "Item No."; Code[20])
         {
             Caption = 'Item No.';
-            ToolTip = 'Specifies the item number linked to this service item.';
             TableRelation = if ("Document Type" = filter(<> "Credit Memo")) Item."No." where(Blocked = const(false), "Service Blocked" = const(false))
             else
             if ("Document Type" = filter("Credit Memo")) Item."No." where(Blocked = const(false));
@@ -275,7 +270,6 @@ table 5901 "Service Item Line"
         field(6; "Serial No."; Code[50])
         {
             Caption = 'Serial No.';
-            ToolTip = 'Specifies the serial number of this item.';
 
             trigger OnValidate()
             var
@@ -319,7 +313,6 @@ table 5901 "Service Item Line"
         field(7; Description; Text[100])
         {
             Caption = 'Description';
-            ToolTip = 'Specifies a description of this service item.';
 
             trigger OnValidate()
             begin
@@ -330,7 +323,6 @@ table 5901 "Service Item Line"
         field(8; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
-            ToolTip = 'Specifies an additional description of this item.';
 
             trigger OnValidate()
             begin
@@ -340,7 +332,6 @@ table 5901 "Service Item Line"
         field(9; "Repair Status Code"; Code[10])
         {
             Caption = 'Repair Status Code';
-            ToolTip = 'Specifies the repair status of this service item.';
             TableRelation = "Repair Status";
 
             trigger OnValidate()
@@ -487,7 +478,6 @@ table 5901 "Service Item Line"
         field(10; Priority; Enum "Service Priority")
         {
             Caption = 'Priority';
-            ToolTip = 'Specifies the service priority for this item.';
         }
         field(11; "Response Time (Hours)"; Decimal)
         {
@@ -508,7 +498,6 @@ table 5901 "Service Item Line"
         field(12; "Response Date"; Date)
         {
             Caption = 'Response Date';
-            ToolTip = 'Specifies the estimated date when service should start on this service item line.';
 
             trigger OnValidate()
             var
@@ -541,7 +530,6 @@ table 5901 "Service Item Line"
         field(13; "Response Time"; Time)
         {
             Caption = 'Response Time';
-            ToolTip = 'Specifies the estimated time when service should start on this service item.';
 
             trigger OnValidate()
             var
@@ -566,7 +554,6 @@ table 5901 "Service Item Line"
         field(14; "Starting Date"; Date)
         {
             Caption = 'Starting Date';
-            ToolTip = 'Specifies the date when service on this item began and when the repair status changed to In process.';
 
             trigger OnValidate()
             var
@@ -614,7 +601,6 @@ table 5901 "Service Item Line"
         field(15; "Starting Time"; Time)
         {
             Caption = 'Starting Time';
-            ToolTip = 'Specifies the time when service on this item began and when the repair status changed to In process.';
 
             trigger OnValidate()
             begin
@@ -637,7 +623,6 @@ table 5901 "Service Item Line"
         field(16; "Finishing Date"; Date)
         {
             Caption = 'Finishing Date';
-            ToolTip = 'Specifies the finishing date of the service and when the repair status of this item changes to Finished.';
 
             trigger OnValidate()
             var
@@ -679,7 +664,6 @@ table 5901 "Service Item Line"
         field(17; "Finishing Time"; Time)
         {
             Caption = 'Finishing Time';
-            ToolTip = 'Specifies the finishing time of the service and when the repair status of this item changes to Finished.';
 
             trigger OnValidate()
             var
@@ -702,7 +686,6 @@ table 5901 "Service Item Line"
         field(18; "Service Shelf No."; Code[10])
         {
             Caption = 'Service Shelf No.';
-            ToolTip = 'Specifies the number of the service shelf this item is stored on.';
             TableRelation = "Service Shelf";
         }
         field(19; "Warranty Starting Date (Parts)"; Date)
@@ -757,7 +740,6 @@ table 5901 "Service Item Line"
         field(21; Warranty; Boolean)
         {
             Caption = 'Warranty';
-            ToolTip = 'Specifies that warranty on either parts or labor exists for this item.';
 
             trigger OnValidate()
             var
@@ -915,7 +897,6 @@ table 5901 "Service Item Line"
         field(26; "Contract No."; Code[20])
         {
             Caption = 'Contract No.';
-            ToolTip = 'Specifies the number of the service contract associated with the item or service on the line.';
             TableRelation = "Service Contract Header"."Contract No." where("Contract Type" = const(Contract));
 
             trigger OnLookup()
@@ -1012,14 +993,12 @@ table 5901 "Service Item Line"
         {
             CalcFormula = lookup("Service Item"."Location of Service Item" where("No." = field("Service Item No.")));
             Caption = 'Location of Service Item';
-            ToolTip = 'Specifies the code of the location of this item.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(28; "Loaner No."; Code[20])
         {
             Caption = 'Loaner No.';
-            ToolTip = 'Specifies the number of the loaner that has been lent to the customer in the service order to replace this item.';
             TableRelation = Loaner."No.";
 
             trigger OnValidate()
@@ -1061,18 +1040,15 @@ table 5901 "Service Item Line"
         field(29; "Vendor No."; Code[20])
         {
             Caption = 'Vendor No.';
-            ToolTip = 'Specifies the number of the vendor of this item.';
             TableRelation = Vendor;
         }
         field(30; "Vendor Item No."; Text[50])
         {
             Caption = 'Vendor Item No.';
-            ToolTip = 'Specifies the number that the vendor uses for this item.';
         }
         field(31; "Fault Reason Code"; Code[10])
         {
             Caption = 'Fault Reason Code';
-            ToolTip = 'Specifies the fault reason code for the item.';
             TableRelation = "Fault Reason Code";
 
             trigger OnValidate()
@@ -1094,7 +1070,6 @@ table 5901 "Service Item Line"
         field(32; "Service Price Group Code"; Code[10])
         {
             Caption = 'Service Price Group Code';
-            ToolTip = 'Specifies the code of the service price group associated with the item.';
             TableRelation = "Service Price Group";
 
             trigger OnValidate()
@@ -1162,7 +1137,6 @@ table 5901 "Service Item Line"
         field(33; "Fault Area Code"; Code[10])
         {
             Caption = 'Fault Area Code';
-            ToolTip = 'Specifies the fault area code for this item.';
             TableRelation = "Fault Area";
 
             trigger OnValidate()
@@ -1196,7 +1170,6 @@ table 5901 "Service Item Line"
         field(34; "Symptom Code"; Code[10])
         {
             Caption = 'Symptom Code';
-            ToolTip = 'Specifies the symptom code for this item.';
             TableRelation = "Symptom Code";
 
             trigger OnValidate()
@@ -1208,14 +1181,12 @@ table 5901 "Service Item Line"
         field(35; "Fault Code"; Code[10])
         {
             Caption = 'Fault Code';
-            ToolTip = 'Specifies the fault code for this item.';
             TableRelation = "Fault Code".Code where("Fault Area Code" = field("Fault Area Code"),
                                                      "Symptom Code" = field("Symptom Code"));
         }
         field(36; "Resolution Code"; Code[10])
         {
             Caption = 'Resolution Code';
-            ToolTip = 'Specifies the resolution code for this item.';
             TableRelation = "Resolution Code";
         }
         field(37; "Fault Comment"; Boolean)
@@ -1243,7 +1214,6 @@ table 5901 "Service Item Line"
         field(40; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            ToolTip = 'Specifies the variant of the item on the line.';
             TableRelation = if ("Document Type" = filter(<> "Credit Memo")) "Item Variant".Code where("Item No." = field("Item No."), Blocked = const(false), "Service Blocked" = const(false))
             else
             if ("Document Type" = filter("Credit Memo")) "Item Variant".Code where("Item No." = field("Item No."), Blocked = const(false));
@@ -1288,7 +1258,6 @@ table 5901 "Service Item Line"
         field(43; "Document Type"; Enum "Service Document Type")
         {
             Caption = 'Document Type';
-            ToolTip = 'Specifies whether the service document is a service order or service quote.';
             Editable = false;
         }
         field(44; "Serv. Price Adjmt. Gr. Code"; Code[10])
@@ -1300,7 +1269,6 @@ table 5901 "Service Item Line"
         field(45; "Adjustment Type"; Option)
         {
             Caption = 'Adjustment Type';
-            ToolTip = 'Specifies the adjustment type for the line.';
             Editable = false;
             OptionCaption = 'Fixed,Maximum,Minimum';
             OptionMembers = "Fixed",Maximum,Minimum;
@@ -1310,7 +1278,6 @@ table 5901 "Service Item Line"
             AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
             Caption = 'Base Amount to Adjust';
-            ToolTip = 'Specifies the amount that the service line, linked to this service item line, will be adjusted to.';
             Editable = false;
         }
         field(60; "No. of Active/Finished Allocs"; Integer)
@@ -1335,7 +1302,6 @@ table 5901 "Service Item Line"
                                                                   "Document No." = field("Document No."),
                                                                   "Service Item Line No." = field("Line No.")));
             Caption = 'No. of Allocations';
-            ToolTip = 'Specifies the number of resource allocations with the allocation status specified in the Allocation Status Filter field.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -1344,7 +1310,6 @@ table 5901 "Service Item Line"
             CalcFormula = count("Service Shipment Item Line" where("Item No." = field("Item No."),
                                                                     "Serial No." = field("Serial No.")));
             Caption = 'No. of Previous Services';
-            ToolTip = 'Specifies the number of services performed on service items with the same item and serial number as this service item.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -1357,14 +1322,12 @@ table 5901 "Service Item Line"
         field(64; "Ship-to Code"; Code[10])
         {
             Caption = 'Ship-to Code';
-            ToolTip = 'Specifies a code for an alternate shipment address if you want to ship to another address than the one that has been entered automatically. This field is also used in case of drop shipment.';
             Editable = false;
             TableRelation = "Ship-to Address".Code where("Customer No." = field("Customer No."));
         }
         field(65; "Customer No."; Code[20])
         {
             Caption = 'Customer No.';
-            ToolTip = 'Specifies the customer number associated with the service contract.';
             Editable = false;
             TableRelation = Customer."No.";
         }
