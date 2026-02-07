@@ -288,7 +288,6 @@ permissionset 1044 "D365 READ"
                   tabledata "Financial Report Schedule" = R,
                   tabledata "Financial Report User Filters" = R,
                   tabledata "Fin. Report Excel Template" = R,
-                  tabledata "Financial Report Category" = R,
                   tabledata "Account Schedules Chart Setup" = R,
                   tabledata "Account Use Buffer" = R,
                   tabledata "Accounting Period" = R,
