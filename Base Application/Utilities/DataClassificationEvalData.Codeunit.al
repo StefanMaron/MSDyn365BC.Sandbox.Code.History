@@ -400,7 +400,6 @@ codeunit 1751 "Data Classification Eval. Data"
         SetTableFieldsToNormal(Database::"Fin. Report Excel Template");
         SetTableFieldsToNormal(Database::"Dimension Perspective Name");
         SetTableFieldsToNormal(Database::"Dimension Perspective Line");
-        SetTableFieldsToNormal(Database::"Financial Report Category");
         SetFieldToPersonal(Database::"Financial Report User Filters", FinancialReportUserFilters.FieldNo("User ID"));
     end;
 
