@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -20,7 +20,6 @@ table 5945 "Troubleshooting Setup"
         field(1; Type; Enum "Troubleshooting Item Type")
         {
             Caption = 'Type';
-            ToolTip = 'Specifies the type of troubleshooting issue.';
 
             trigger OnValidate()
             begin
@@ -31,7 +30,6 @@ table 5945 "Troubleshooting Setup"
         field(2; "No."; Code[20])
         {
             Caption = 'No.';
-            ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
             TableRelation = if (Type = const("Service Item Group")) "Service Item Group"
             else
             if (Type = const(Item)) Item
@@ -41,7 +39,6 @@ table 5945 "Troubleshooting Setup"
         field(3; "Troubleshooting No."; Code[20])
         {
             Caption = 'Troubleshooting No.';
-            ToolTip = 'Specifies the number of the troubleshooting issue.';
             NotBlank = true;
             TableRelation = "Troubleshooting Header";
 
@@ -54,7 +51,6 @@ table 5945 "Troubleshooting Setup"
         {
             CalcFormula = lookup("Troubleshooting Header".Description where("No." = field("Troubleshooting No.")));
             Caption = 'Troubleshooting Description';
-            ToolTip = 'Specifies a description of the troubleshooting issue.';
             Editable = false;
             FieldClass = FlowField;
         }
