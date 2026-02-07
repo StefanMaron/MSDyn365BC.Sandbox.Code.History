@@ -223,7 +223,6 @@ permissionset 209 "D365 Basic - Read"
                   tabledata "Financial Report Schedule" = R,
                   tabledata "Financial Report User Filters" = R,
                   tabledata "Fin. Report Excel Template" = R,
-                  tabledata "Financial Report Category" = R,
                   tabledata "Account Schedules Chart Setup" = R,
                   tabledata "Account Use Buffer" = R,
                   tabledata "Accounting Period" = R,
