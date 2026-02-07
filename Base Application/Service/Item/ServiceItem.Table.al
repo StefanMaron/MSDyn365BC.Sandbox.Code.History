@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -40,7 +40,6 @@ table 5940 "Service Item"
         field(1; "No."; Code[20])
         {
             Caption = 'No.';
-            ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
             OptimizeForTextSearch = true;
 
             trigger OnValidate()
@@ -55,7 +54,6 @@ table 5940 "Service Item"
         field(2; "Serial No."; Code[50])
         {
             Caption = 'Serial No.';
-            ToolTip = 'Specifies the serial number of this item.';
 
             trigger OnValidate()
             var
@@ -93,7 +91,6 @@ table 5940 "Service Item"
         field(3; "Service Item Group Code"; Code[10])
         {
             Caption = 'Service Item Group Code';
-            ToolTip = 'Specifies the code of the service item group associated with this item.';
             TableRelation = "Service Item Group";
 
             trigger OnValidate()
@@ -144,7 +141,6 @@ table 5940 "Service Item"
         field(4; Description; Text[100])
         {
             Caption = 'Description';
-            ToolTip = 'Specifies a description of this item.';
             OptimizeForTextSearch = true;
 
             trigger OnValidate()
@@ -161,7 +157,6 @@ table 5940 "Service Item"
         field(6; Status; Enum "Service Item Status")
         {
             Caption = 'Status';
-            ToolTip = 'Specifies the status of the service item.';
 
             trigger OnValidate()
             begin
@@ -175,12 +170,10 @@ table 5940 "Service Item"
         field(7; Priority; Enum "Service Priority")
         {
             Caption = 'Priority';
-            ToolTip = 'Specifies the service priority for this item.';
         }
         field(8; "Customer No."; Code[20])
         {
             Caption = 'Customer No.';
-            ToolTip = 'Specifies the number of the customer who owns this item.';
             TableRelation = Customer;
             ValidateTableRelation = true;
 
@@ -221,7 +214,6 @@ table 5940 "Service Item"
         field(9; "Ship-to Code"; Code[10])
         {
             Caption = 'Ship-to Code';
-            ToolTip = 'Specifies a code for an alternate shipment address if you want to ship to another address than the one that has been entered automatically. This field is also used in case of drop shipment.';
             TableRelation = "Ship-to Address".Code where("Customer No." = field("Customer No."));
 
             trigger OnValidate()
@@ -257,7 +249,6 @@ table 5940 "Service Item"
         field(10; "Item No."; Code[20])
         {
             Caption = 'Item No.';
-            ToolTip = 'Specifies the item number linked to the service item.';
             TableRelation = Item."No." where(Blocked = const(false), "Service Blocked" = const(false));
 
             trigger OnValidate()
@@ -343,7 +334,6 @@ table 5940 "Service Item"
         field(11; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
-            ToolTip = 'Specifies how each unit of the item or resource is measured, such as in pieces or hours. By default, the value in the Base Unit of Measure field on the item or resource card is inserted.';
             TableRelation = if ("Item No." = filter(<> '')) "Item Unit of Measure".Code where("Item No." = field("Item No."))
             else
             "Unit of Measure";
@@ -351,7 +341,6 @@ table 5940 "Service Item"
         field(12; "Location of Service Item"; Text[30])
         {
             Caption = 'Location of Service Item';
-            ToolTip = 'Specifies the code of the location of this item.';
             OptimizeForTextSearch = true;
         }
         field(13; "Sales Unit Price"; Decimal)
@@ -360,7 +349,6 @@ table 5940 "Service Item"
             AutoFormatType = 2;
             BlankZero = true;
             Caption = 'Sales Unit Price';
-            ToolTip = 'Specifies the unit price of this item when it was sold.';
 
             trigger OnValidate()
             begin
@@ -381,7 +369,6 @@ table 5940 "Service Item"
             AutoFormatType = 2;
             BlankZero = true;
             Caption = 'Sales Unit Cost';
-            ToolTip = 'Specifies the unit cost of this item when it was sold.';
 
             trigger OnValidate()
             begin
@@ -562,12 +549,10 @@ table 5940 "Service Item"
         field(22; "Installation Date"; Date)
         {
             Caption = 'Installation Date';
-            ToolTip = 'Specifies the date when this item was installed at the customer''s site.';
         }
         field(23; "Sales Date"; Date)
         {
             Caption = 'Sales Date';
-            ToolTip = 'Specifies the date when this item was sold.';
 
             trigger OnValidate()
             begin
@@ -582,7 +567,6 @@ table 5940 "Service Item"
         field(24; "Last Service Date"; Date)
         {
             Caption = 'Last Service Date';
-            ToolTip = 'Specifies the date of the last service on this item.';
         }
         field(25; "Default Contract Value"; Decimal)
         {
@@ -590,14 +574,12 @@ table 5940 "Service Item"
             AutoFormatExpression = '';
             BlankZero = true;
             Caption = 'Default Contract Value';
-            ToolTip = 'Specifies the default contract value of an item that later will be included in a service contract or contract quote.';
         }
         field(26; "Default Contract Discount %"; Decimal)
         {
             AutoFormatType = 0;
             BlankZero = true;
             Caption = 'Default Contract Discount %';
-            ToolTip = 'Specifies a default contract discount percentage for an item, if this item will be part of a service contract.';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
             MinValue = 0;
@@ -612,18 +594,15 @@ table 5940 "Service Item"
         field(33; "Vendor No."; Code[20])
         {
             Caption = 'Vendor No.';
-            ToolTip = 'Specifies the number of the vendor for this item.';
             TableRelation = Vendor;
         }
         field(34; "Vendor Item No."; Code[50])
         {
             Caption = 'Vendor Item No.';
-            ToolTip = 'Specifies the number that the vendor uses for this item.';
         }
         field(40; Blocked; Enum "Service Item Blocked")
         {
             Caption = 'Blocked';
-            ToolTip = 'Specifies that the service item is blocked from being used in service contracts or used and posted in transactions via service documents, except credit memos.';
             DataClassification = CustomerContent;
 
             trigger OnValidate()
@@ -641,7 +620,6 @@ table 5940 "Service Item"
         {
             CalcFormula = lookup(Item.Description where("No." = field("Item No.")));
             Caption = 'Item Description';
-            ToolTip = 'Specifies the description of the item that the service item is linked to.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -649,7 +627,6 @@ table 5940 "Service Item"
         {
             CalcFormula = lookup(Customer.Name where("No." = field("Customer No.")));
             Caption = 'Name';
-            ToolTip = 'Specifies the name of the customer who owns this item.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -657,7 +634,6 @@ table 5940 "Service Item"
         {
             CalcFormula = lookup(Customer.Address where("No." = field("Customer No.")));
             Caption = 'Address';
-            ToolTip = 'Specifies the address of the customer who owns this item.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -665,7 +641,6 @@ table 5940 "Service Item"
         {
             CalcFormula = lookup(Customer."Address 2" where("No." = field("Customer No.")));
             Caption = 'Address 2';
-            ToolTip = 'Specifies additional address information.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -673,7 +648,6 @@ table 5940 "Service Item"
         {
             CalcFormula = lookup(Customer."Post Code" where("No." = field("Customer No.")));
             Caption = 'Post Code';
-            ToolTip = 'Specifies the postal code.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -681,7 +655,6 @@ table 5940 "Service Item"
         {
             CalcFormula = lookup(Customer.City where("No." = field("Customer No.")));
             Caption = 'City';
-            ToolTip = 'Specifies the city of the customer address.';
             Editable = false;
             FieldClass = FlowField;
             TableRelation = "Post Code".City;
@@ -691,7 +664,6 @@ table 5940 "Service Item"
         {
             CalcFormula = lookup(Customer.Contact where("No." = field("Customer No.")));
             Caption = 'Contact';
-            ToolTip = 'Specifies the name of the person you regularly contact when you do business with the customer who owns this item.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -699,7 +671,6 @@ table 5940 "Service Item"
         {
             CalcFormula = lookup(Customer."Phone No." where("No." = field("Customer No.")));
             Caption = 'Phone No.';
-            ToolTip = 'Specifies the customer phone number.';
             Editable = false;
             ExtendedDatatype = PhoneNo;
             FieldClass = FlowField;
@@ -709,7 +680,6 @@ table 5940 "Service Item"
             CalcFormula = lookup("Ship-to Address".Name where("Customer No." = field("Customer No."),
                                                                Code = field("Ship-to Code")));
             Caption = 'Ship-to Name';
-            ToolTip = 'Specifies the name of the customer at the address that the items are shipped to.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -718,7 +688,6 @@ table 5940 "Service Item"
             CalcFormula = lookup("Ship-to Address".Address where("Customer No." = field("Customer No."),
                                                                   Code = field("Ship-to Code")));
             Caption = 'Ship-to Address';
-            ToolTip = 'Specifies the address that the items are shipped to.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -727,7 +696,6 @@ table 5940 "Service Item"
             CalcFormula = lookup("Ship-to Address"."Address 2" where("Customer No." = field("Customer No."),
                                                                       Code = field("Ship-to Code")));
             Caption = 'Ship-to Address 2';
-            ToolTip = 'Specifies an additional part of the ship-to address, in case it is a long address.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -736,7 +704,6 @@ table 5940 "Service Item"
             CalcFormula = lookup("Ship-to Address"."Post Code" where("Customer No." = field("Customer No."),
                                                                       Code = field("Ship-to Code")));
             Caption = 'Ship-to Post Code';
-            ToolTip = 'Specifies the postal code of the address that the items are shipped to.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -745,7 +712,6 @@ table 5940 "Service Item"
             CalcFormula = lookup("Ship-to Address".City where("Customer No." = field("Customer No."),
                                                                Code = field("Ship-to Code")));
             Caption = 'Ship-to City';
-            ToolTip = 'Specifies the city of the address that the items are shipped to.';
             Editable = false;
             FieldClass = FlowField;
             TableRelation = "Post Code".City;
@@ -756,7 +722,6 @@ table 5940 "Service Item"
             CalcFormula = lookup("Ship-to Address".Contact where("Customer No." = field("Customer No."),
                                                                   Code = field("Ship-to Code")));
             Caption = 'Ship-to Contact';
-            ToolTip = 'Specifies the name of the contact person at the address that the items are shipped to.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -765,7 +730,6 @@ table 5940 "Service Item"
             CalcFormula = lookup("Ship-to Address"."Phone No." where("Customer No." = field("Customer No."),
                                                                       Code = field("Ship-to Code")));
             Caption = 'Ship-to Phone No.';
-            ToolTip = 'Specifies the phone number at address that the items are shipped to.';
             Editable = false;
             ExtendedDatatype = PhoneNo;
             FieldClass = FlowField;
@@ -882,14 +846,12 @@ table 5940 "Service Item"
         {
             CalcFormula = lookup(Vendor.Name where("No." = field("Vendor No.")));
             Caption = 'Vendor Name';
-            ToolTip = 'Specifies the vendor name for this item.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(72; "Vendor Item Name"; Text[100])
         {
             Caption = 'Vendor Item Name';
-            ToolTip = 'Specifies the name assigned to this item by the vendor.';
             OptimizeForTextSearch = true;
         }
         field(73; Comment; Boolean)
@@ -906,14 +868,12 @@ table 5940 "Service Item"
             CalcFormula = exist("Service Item Component" where("Parent Service Item No." = field("No."),
                                                                 Active = const(true)));
             Caption = 'Service Item Components';
-            ToolTip = 'Specifies that there is a component for this service item.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(75; "Preferred Resource"; Code[20])
         {
             Caption = 'Preferred Resource';
-            ToolTip = 'Specifies the number of the resource that the customer prefers for servicing of the item.';
             TableRelation = Resource."No.";
 
             trigger OnLookup()
@@ -940,7 +900,6 @@ table 5940 "Service Item"
         field(76; "Variant Code"; Code[10])
         {
             Caption = 'Variant Code';
-            ToolTip = 'Specifies the variant of the item on the line.';
             TableRelation = "Item Variant".Code where("Item No." = field("Item No."), Blocked = const(false), "Service Blocked" = const(false));
 
             trigger OnValidate()
@@ -954,7 +913,6 @@ table 5940 "Service Item"
             CalcFormula = lookup(Customer.County where("No." = field("Customer No.")));
             CaptionClass = '5,1,' + "Country/Region Code";
             Caption = 'County';
-            ToolTip = 'Specifies the state, province or county as a part of the address.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -984,7 +942,6 @@ table 5940 "Service Item"
         {
             CalcFormula = lookup(Customer."Country/Region Code" where("No." = field("Customer No.")));
             Caption = 'Country/Region Code';
-            ToolTip = 'Specifies the country/region of the address.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -1008,14 +965,12 @@ table 5940 "Service Item"
             CalcFormula = lookup("Ship-to Address"."Name 2" where("Customer No." = field("Customer No."),
                                                                    Code = field("Ship-to Code")));
             Caption = 'Ship-to Name 2';
-            ToolTip = 'Specifies an additional part of the name of the customer at the address that the items are shipped to.';
             Editable = false;
             FieldClass = FlowField;
         }
         field(85; "Service Price Group Code"; Code[10])
         {
             Caption = 'Service Price Group Code';
-            ToolTip = 'Specifies the code of the Service Price Group associated with this item.';
             TableRelation = "Service Price Group";
         }
         field(86; "Default Contract Cost"; Decimal)
@@ -1024,7 +979,6 @@ table 5940 "Service Item"
             AutoFormatType = 2;
             BlankZero = true;
             Caption = 'Default Contract Cost';
-            ToolTip = 'Specifies the default contract cost of a service item that later will be included in a service contract or contract quote.';
         }
         field(87; "Prepaid Amount"; Decimal)
         {
@@ -1045,14 +999,12 @@ table 5940 "Service Item"
         field(88; "Search Description"; Code[100])
         {
             Caption = 'Search Description';
-            ToolTip = 'Specifies an alternate description to search for the service item.';
             OptimizeForTextSearch = true;
         }
         field(89; "Service Contracts"; Boolean)
         {
             CalcFormula = exist("Service Contract Line" where("Service Item No." = field("No.")));
             Caption = 'Service Contracts';
-            ToolTip = 'Specifies that this service item is associated with one or more service contracts/quotes.';
             Editable = false;
             FieldClass = FlowField;
         }
