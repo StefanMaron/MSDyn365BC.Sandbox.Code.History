@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -26,7 +26,6 @@ table 9052 "Service Cue"
                                                         Status = filter("In Process"),
                                                         "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'Service Orders - in Process';
-            ToolTip = 'Specifies the number of in process service orders that are displayed in the Service Cue on the Role Center. The documents are filtered by today''s date.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -36,7 +35,6 @@ table 9052 "Service Cue"
                                                         Status = filter(Finished),
                                                         "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'Service Orders - Finished';
-            ToolTip = 'Specifies the finished service orders that are displayed in the Service Cue on the Role Center. The documents are filtered by today''s date.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -46,7 +44,6 @@ table 9052 "Service Cue"
                                                         Status = filter(Pending | "On Hold"),
                                                         "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'Service Orders - Inactive';
-            ToolTip = 'Specifies the number of inactive service orders that are displayed in the Service Cue on the Role Center. The documents are filtered by today''s date.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -56,7 +53,6 @@ table 9052 "Service Cue"
                                                         Status = filter(Pending | "On Hold"),
                                                         "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'Open Service Quotes';
-            ToolTip = 'Specifies the number of open service quotes that are displayed in the Service Cue on the Role Center. The documents are filtered by today''s date.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -66,7 +62,6 @@ table 9052 "Service Cue"
                                                                  Status = filter(" "),
                                                                  "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'Open Service Contract Quotes';
-            ToolTip = 'Specifies the number of open service contract quotes that are displayed in the Service Cue on the Role Center. The documents are filtered by today''s date.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -76,7 +71,6 @@ table 9052 "Service Cue"
                                                                  "Expiration Date" = field("Date Filter"),
                                                                  "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'Service Contracts to Expire';
-            ToolTip = 'Specifies the number of service contracts set to expire that are displayed in the Service Cue on the Role Center. The documents are filtered by today''s date.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -86,7 +80,6 @@ table 9052 "Service Cue"
                                                         "Response Date" = field("Date Filter"),
                                                         "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'Service Orders - Today';
-            ToolTip = 'Specifies the number of in-service orders that are displayed in the Service Cue on the Role Center. The documents are filtered by today''s date.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -96,7 +89,6 @@ table 9052 "Service Cue"
                                                         Status = filter("In Process"),
                                                         "Responsibility Center" = field("Responsibility Center Filter")));
             Caption = 'Service Orders - to Follow-up';
-            ToolTip = 'Specifies the number of service orders that have been marked for follow up that are displayed in the Service Cue on the Role Center. The documents are filtered by today''s date.';
             Editable = false;
             FieldClass = FlowField;
         }
