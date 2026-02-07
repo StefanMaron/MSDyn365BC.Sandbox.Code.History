@@ -170,6 +170,7 @@ permissionset 191 "D365 SETUP"
                   tabledata "Financial Report Schedule" = RIMD,
                   tabledata "Financial Report User Filters" = RIMD,
                   tabledata "Fin. Report Excel Template" = RIMD,
+                  tabledata "Financial Report Category" = RIMD,
                   tabledata "Accounting Period" = IMD,
                   tabledata "Action Message Entry" = D,
                   tabledata Activity = D,
