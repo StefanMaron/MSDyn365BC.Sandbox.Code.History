@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -20,6 +20,7 @@ page 5990 Troubleshooting
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = Service;
+                    ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
 
                     trigger OnAssistEdit()
                     begin
@@ -30,6 +31,7 @@ page 5990 Troubleshooting
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = Service;
+                    ToolTip = 'Specifies a description of the troubleshooting issue.';
                 }
             }
             part(Control7; "Troubleshooting Subform")
