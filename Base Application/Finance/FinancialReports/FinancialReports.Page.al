@@ -49,6 +49,10 @@ page 108 "Financial Reports"
                 {
                     ApplicationArea = Basic, Suite;
                 }
+                field(CategoryCode; Rec.CategoryCode)
+                {
+                    ApplicationArea = Basic, Suite;
+                }
                 field("Financial Report Row Group"; Rec."Financial Report Row Group")
                 {
                     Caption = 'Row Definition';
@@ -287,6 +291,28 @@ page 108 "Financial Reports"
                     FinancialReportMgt.XMLExchangeExport(Rec);
                 end;
             }
+            action(ShowAllCategories)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Show All Categories';
+                Image = List;
+                RunObject = page "Financial Report Categories";
+                ToolTip = 'View or edit financial report categories.';
+            }
+            action(EditCategory)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Edit Category';
+                Image = Edit;
+                ToolTip = 'Edit the category of the selected financial report.';
+                trigger OnAction()
+                var
+                    FinancialReportCategory: Record "Financial Report Category";
+                begin
+                    if FinancialReportCategory.Get(Rec.CategoryCode) then
+                        Page.Run(Page::"Financial Report Category", FinancialReportCategory);
+                end;
+            }
         }
         area(navigation)
         {
@@ -355,8 +381,10 @@ page 108 "Financial Reports"
                 actionref(EditRowGroup_Promoted; EditRowGroup) { }
                 actionref(EditColumnGroup_Promoted; EditColumnGroup) { }
                 actionref(EditDimPerspective_Promoted; EditDimPerspective) { }
+                actionref(EditCategory_Promoted; EditCategory) { }
                 actionref(ShowAllRowDefinitions_Promoted; ShowAllRowDefinitions) { }
                 actionref(ShowAllColumnDefinitions_Promoted; ShowAllColumnDefinitions) { }
+                actionref(ShowAllCategories_Promoted; ShowAllCategories) { }
                 actionref(Schedules_Promoted; Schedules) { }
             }
             group(CopyExportImport)
