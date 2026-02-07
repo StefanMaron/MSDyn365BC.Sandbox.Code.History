@@ -333,7 +333,6 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Financial Report Recipient" = RIMD,
                   tabledata "Financial Report Schedule" = RIMD,
                   tabledata "Financial Report User Filters" = RIMD,
-                  tabledata "Financial Report Category" = RIMD,
                   tabledata "Account Schedules Chart Setup" = RIMD,
                   tabledata "Account Use Buffer" = RIMD,
                   tabledata "Account Payable Cue" = RIMD,
