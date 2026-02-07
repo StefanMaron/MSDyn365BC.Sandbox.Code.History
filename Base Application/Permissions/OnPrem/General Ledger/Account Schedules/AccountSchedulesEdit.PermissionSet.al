@@ -22,7 +22,6 @@ permissionset 3632 "Account Schedules - Edit"
                   tabledata "Financial Report Schedule" = RIMD,
                   tabledata "Financial Report User Filters" = RIMD,
                   tabledata "Fin. Report Excel Template" = RIMD,
-                  tabledata "Financial Report Category" = RIMD,
                   tabledata "Account Schedules Chart Setup" = RIMD,
                   tabledata "Analysis View" = R,
                   tabledata "Analysis View Budget Entry" = R,

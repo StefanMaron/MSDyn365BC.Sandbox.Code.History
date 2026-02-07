@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -20,12 +20,10 @@ table 5956 "Resource Skill"
         field(1; Type; Enum "Resource Skill Type")
         {
             Caption = 'Type';
-            ToolTip = 'Specifies the skill type associated with the entry.';
         }
         field(2; "No."; Code[20])
         {
             Caption = 'No.';
-            ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
             NotBlank = true;
             TableRelation = if (Type = const(Resource)) Resource."No."
             else
@@ -38,7 +36,6 @@ table 5956 "Resource Skill"
         field(3; "Skill Code"; Code[10])
         {
             Caption = 'Skill Code';
-            ToolTip = 'Specifies the code of the skill you want to assign.';
             NotBlank = true;
             TableRelation = "Skill Code";
 
@@ -58,7 +55,6 @@ table 5956 "Resource Skill"
         field(4; "Assigned From"; Enum "Resource Skill Assigned From")
         {
             Caption = 'Assigned From';
-            ToolTip = 'Specifies the object, such as item or service item group, from which the skill code was assigned.';
         }
         field(5; "Source Type"; Enum "Resource Skill Source Type")
         {
