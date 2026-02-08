@@ -44,6 +44,7 @@ using Microsoft.Integration.SyncEngine;
 using Microsoft.Intercompany.Inbox;
 using Microsoft.Intercompany.Journal;
 using Microsoft.Intercompany.Outbox;
+using Microsoft.Inventory.Analysis;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Requisition;
@@ -90,7 +91,8 @@ codeunit 104000 "Upgrade - BaseApp"
     Subtype = Upgrade;
     Permissions =
         TableData "User Group Plan" = rimd,
-        TableData "Cust. Ledger Entry" = rm;
+        TableData "Cust. Ledger Entry" = rm,
+        Tabledata "ABC Analysis Setup" = ri;
 
     var
         HybridDeployment: Codeunit "Hybrid Deployment";
@@ -232,6 +234,7 @@ codeunit 104000 "Upgrade - BaseApp"
         UpgradeIntegrationTableMappingTemplates();
         UpgradeICOutboxTransactionSourceType();
         UpgradeICTransactionSourceType();
+        UpgradeABCAnalysisSetup();
     end;
 
     local procedure ClearTemporaryTables()
@@ -305,7 +308,7 @@ codeunit 104000 "Upgrade - BaseApp"
               CODEUNIT::"SEPA DD-Export File", XMLPORT::"SEPA DD pain.008.001.08", CODEUNIT::"SEPA DD-Check Line");
 
         ExportProtocolDescription := CopyStr(XGenericSEPADesc09Txt, 1, MaxStrLen(ExportProtocolDescription));
-	if not ExportProtocol.Get(XGenericSEPA09Txt) then
+        if not ExportProtocol.Get(XGenericSEPA09Txt) then
             CreateExportProtocol(XGenericSEPA09Txt, ExportProtocolDescription, Codeunit::"Check BTL91", Report::Docket, Report::"SEPA ISO20022 Pain 01.01.09", '');
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetBankExportImportSetupSEPACT09UpgradeTag());
@@ -3852,5 +3855,23 @@ codeunit 104000 "Upgrade - BaseApp"
     local procedure SEPACAMT05300108NL(): Code[20]
     begin
         exit('SEPA CAMT 053-08-NL');
+    end;
+
+    local procedure UpgradeABCAnalysisSetup()
+    var
+        ABCAnalysisSetup: Record "ABC Analysis Setup";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetInitializeABCAnalysisSetupUpgradeTag()) then
+            exit;
+
+        if not ABCAnalysisSetup.Get() then begin
+            ABCAnalysisSetup.Init();
+            ABCAnalysisSetup.InitializeValues();
+            ABCAnalysisSetup.Insert();
+        end;
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetInitializeABCAnalysisSetupUpgradeTag());
     end;
 }
