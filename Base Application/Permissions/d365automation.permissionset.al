@@ -320,6 +320,7 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Web Service" = RIMD,
                   tabledata "Windows Language" = imd,
                   tabledata "AAD Application" = RIMD,
+                  tabledata "ABC Analysis Setup" = RIMD,
                   tabledata "Acc. Sched. Cell Value" = RIMD,
                   tabledata "Acc. Sched. Chart Setup Line" = RIMD,
                   tabledata "Acc. Sched. KPI Buffer" = RIMD,
