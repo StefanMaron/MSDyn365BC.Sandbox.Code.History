@@ -274,6 +274,7 @@ permissionset 1044 "D365 READ"
                   tabledata User = R,
                   tabledata "User Property" = R,
                   tabledata "AAD Application" = R,
+                  tabledata "ABC Analysis Setup" = R,
                   tabledata "Acc. Sched. Cell Value" = R,
                   tabledata "Acc. Sched. Chart Setup Line" = R,
                   tabledata "Acc. Sched. KPI Buffer" = R,

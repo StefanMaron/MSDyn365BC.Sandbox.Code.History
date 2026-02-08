@@ -319,6 +319,7 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "User Property" = Rimd,
                   tabledata "Windows Language" = m,
                   tabledata "AAD Application" = RM,
+                  tabledata "ABC Analysis Setup" = RM,
                   tabledata "Acc. Sched. Cell Value" = RM,
                   tabledata "Acc. Sched. Chart Setup Line" = RM,
                   tabledata "Acc. Sched. KPI Buffer" = RM,
