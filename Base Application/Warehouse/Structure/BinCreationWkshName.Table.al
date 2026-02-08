@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -24,15 +24,18 @@ table 7337 "Bin Creation Wksh. Name"
         field(2; Name; Code[10])
         {
             Caption = 'Name';
+            ToolTip = 'Specifies a name for the worksheet.';
             NotBlank = true;
         }
         field(3; Description; Text[100])
         {
             Caption = 'Description';
+            ToolTip = 'Specifies a description for the worksheet.';
         }
         field(7; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
+            ToolTip = 'Specifies the location code for which the worksheet should be used.';
             NotBlank = true;
             TableRelation = Location;
 

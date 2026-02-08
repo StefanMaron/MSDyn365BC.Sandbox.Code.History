@@ -154,6 +154,7 @@ permissionset 191 "D365 SETUP"
     Permissions = tabledata "Data Sensitivity" = RIMD,
                   tabledata "NAV App Installed App" = Rimd,
                   tabledata "Object Options" = IMD,
+                  tabledata "ABC Analysis Setup" = RIMD,
                   tabledata "Acc. Sched. Cell Value" = D,
                   tabledata "Acc. Sched. KPI Web Srv. Line" = RIMD,
                   tabledata "Acc. Sched. KPI Web Srv. Setup" = RIMD,
