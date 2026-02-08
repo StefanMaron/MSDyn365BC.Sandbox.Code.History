@@ -527,6 +527,18 @@ page 5703 "Location Card"
                 }
             }
         }
+        area(processing)
+        {
+            action(CopyLocation)
+            {
+                AccessByPermission = TableData Location = I;
+                ApplicationArea = Location;
+                Caption = 'Copy Location';
+                Image = Copy;
+                ToolTip = 'Create a copy of the current location with all related information.';
+                RunObject = Codeunit "Copy Location";
+            }
+        }
         area(Promoted)
         {
             group(Category_Process)
@@ -549,6 +561,9 @@ page 5703 "Location Card"
                 {
                 }
                 actionref(Dimensions_Promoted; Dimensions)
+                {
+                }
+                actionref(CopyLocation_Promoted; CopyLocation)
                 {
                 }
             }
