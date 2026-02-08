@@ -138,6 +138,8 @@ codeunit 137072 "SCM Production Orders II"
         ProdOrderLineErr: Label 'Production Order should have two lines for variant-based BOM structure.';
         NoOfRecordsMustBeSameErr: Label 'The number of records in table %1 must be the same.', Comment = '%1- TableCaption';
         UnitCostMustBeEqualErr: Label '%1 must be correct in %2', Comment = '%1 =Field Name %2 = Table Name';
+        PostingReverseEntriesQst: Label 'To reverse these entries, correcting entries will be posted.\Do you want to reverse the entries?';
+        QtyMustBeEqualErr: Label 'Quantity must be equal after reverse production entry';
 
     [Test]
     [Scope('OnPrem')]
@@ -7522,6 +7524,90 @@ codeunit 137072 "SCM Production Orders II"
             StrSubstNo(UnitCostMustBeEqualErr, ProdOrderLine.FieldCaption("Unit Cost"), ProdOrderLine.TableCaption()));
     end;
 
+    [Test]
+    [HandlerFunctions('ProductionJnlPageHandler5,ConfirmHandlerTrue,MessageHandler')]
+    procedure VerifySuccessfulReverseProductionEntryFromILE()
+    var
+        CompItem: Record Item;
+        FGItem: Record Item;
+        ItemJournalLine: Record "Item Journal Line";
+        ItemLedgerEntry: Record "Item Ledger Entry";
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        ProdOrderLine: Record "Prod. Order Line";
+        ProductionBOMHeader: Record "Production BOM Header";
+        ProductionBOMLine: Record "Production BOM Line";
+        ProductionOrder: Record "Production Order";
+        UnitOfMeasure: Record "Unit of Measure";
+        UnitOfMeasure2: Record "Unit of Measure";
+        UnitOfMeasure3: Record "Unit of Measure";
+        UndoProdPostingMgmt: Codeunit "Undo Prod. Posting Mgmt.";
+    begin
+        // [SCENARIO 563091] Error when attempting to reverse production entries in their system.  
+        // "Qty. Rounding Precision on Item-xxx causes the Quantity and Quantity (Base) to be out of balance. Rounding of the field Quantity (Base) results to 0."
+        Initialize();
+
+        // [GIVEN] Create Unit of Measure Codes.
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure2);
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure3);
+
+        // [GIVEN] Create Component Item and FG Item.
+        LibraryInventory.CreateItem(CompItem);
+        LibraryInventory.CreateItem(FGItem);
+
+        // [GIVEN] Create Item Unit of Measure for Component Item and Validate Base Unit of Measure and Replenishment System.
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, CompItem."No.", UnitOfMeasure.Code, 1);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, CompItem."No.", UnitOfMeasure2.Code, 0.001);
+        CompItem.Validate("Base Unit of Measure", UnitOfMeasure.Code);
+        CompItem.Validate("Replenishment System", CompItem."Replenishment System"::Purchase);
+        CompItem.Modify(true);
+
+        // [GIVEN] Create an Item Journal Line.
+        CreateItemJournalLine(ItemJournalLine, CompItem."No.", LibraryRandom.RandIntInRange(5, 10), '', '');
+
+        // [GIVEN] Post Item Journal Line.
+        LibraryInventory.PostItemJournalLine(ItemJournalLine."Journal Template Name", ItemJournalLine."Journal Batch Name");
+
+        // [GIVEN] Create Production BOM for FG Item with Component Item and Validate Unit of Measure Code.
+        LibraryManufacturing.CreateProductionBOMHeader(ProductionBOMHeader, UnitOfMeasure3.Code);
+        LibraryManufacturing.CreateProductionBOMLine(ProductionBOMHeader, ProductionBOMLine, '', ProductionBOMLine.Type::Item, CompItem."No.", 1);
+        ProductionBOMLine.Validate("Unit of Measure Code", UnitOfMeasure2.Code);
+        ProductionBOMLine.Modify(true);
+        ProductionBOMHeader.Validate(Status, ProductionBOMHeader.Status::Certified);
+        ProductionBOMHeader.Modify(true);
+        FGItem.Validate("Base Unit of Measure", UnitOfMeasure3.Code);
+        FGItem.Validate("Replenishment System", FGItem."Replenishment System"::"Prod. Order");
+        FGItem.Validate("Production BOM No.", ProductionBOMHeader."No.");
+        FGItem.Modify(true);
+
+        // [GIVEN] Create and Refresh Production Order.
+        CreateAndRefreshProductionOrder(ProductionOrder, ProductionOrder.Status::Released, FGItem."No.", 1, '', '');
+
+        // [GIVEN] Find Prod. Order Line.
+        ProdOrderLine.SetRange(Status, ProductionOrder.Status::Released);
+        ProdOrderLine.SetRange("Prod. Order No.", ProductionOrder."No.");
+        ProdOrderLine.FindFirst();
+
+        // [GIVEN] Create and Post Production Journal.
+        LibraryVariableStorage.Enqueue(PostingProductionJournalQst);
+        LibraryVariableStorage.Enqueue(PostingProductionJournalTxt);
+        LibraryVariableStorage.Enqueue(PostingReverseEntriesQst);
+        LibraryVariableStorage.Enqueue(ProductionJournalPostedTxt);
+        CreateAndPostProductionJournal(ProductionOrder, ProdOrderLine."Line No.");
+
+        // [GIVEN] Find Item Ledger Entry.
+        ItemLedgerEntry.SetRange("Item No.", CompItem."No.");
+        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Consumption);
+        ItemLedgerEntry.FindFirst();
+
+        // [WHEN] Reverse Production Item Ledger Entry.
+        ItemLedgerEntry.SetRange("Entry No.", ItemLedgerEntry."Entry No.");
+        UndoProdPostingMgmt.ReverseProdItemLedgerEntry(ItemLedgerEntry);
+
+        // [THEN] Verify Reverse Item Ledger Entry is created.
+        VerifyReverseItemLedgerEntry(CompItem."No.", UnitOfMeasure.Code);
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -9785,6 +9871,18 @@ codeunit 137072 "SCM Production Orders II"
         Item.Modify(true);
     end;
 
+    local procedure VerifyReverseItemLedgerEntry(CompItemNo: Code[20]; UnitOfMeasureCode: Code[10])
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        ItemLedgerEntry.SetRange("Item No.", CompItemNo);
+        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Consumption);
+        ItemLedgerEntry.SetRange("Unit of Measure Code", UnitOfMeasureCode);
+        ItemLedgerEntry.FindFirst();
+
+        Assert.AreEqual(0.001, ItemLedgerEntry.Quantity, QtyMustBeEqualErr);
+    end;
+
     [ModalPageHandler]
     procedure ProductionJournalModalPageHandler(var ProductionJournal: TestPage "Production Journal")
     begin
@@ -10181,6 +10279,13 @@ codeunit 137072 "SCM Production Orders II"
         ProductionJournal.Next();
         OutputQuantity := ProductionJournal."Output Quantity".AsDecimal();
         ProductionJournal."Output Quantity".SetValue(OutputQuantity + 1);
+        ProductionJournal.Post.Invoke();
+    end;
+
+    [ModalPageHandler]
+    procedure ProductionJnlPageHandler5(var ProductionJournal: TestPage "Production Journal")
+    begin
+        ProductionJournal.Filter.SetFilter("Entry Type", Format("Item Ledger Entry Type"::Consumption));
         ProductionJournal.Post.Invoke();
     end;
 }
