@@ -139,6 +139,16 @@ page 15 "Location List"
                 RunObject = Report "Create Warehouse Location";
                 ToolTip = 'Enable the inventory location to use zones and bins to operate as a warehouse location. The batch job creates initial warehouse entries for the warehouse adjustment bin for all items that have inventory in the location. It is necessary to perform a physical inventory after this batch job is finished so that these initial entries can be balanced by posting warehouse physical inventory entries.';
             }
+            action(CopyLocation)
+            {
+                AccessByPermission = TableData Location = I;
+                ApplicationArea = Location;
+                Caption = 'Copy Location';
+                Image = Copy;
+                ToolTip = 'Create a copy of the current location with all related information.';
+                RunObject = Codeunit "Copy Location";
+            }
+
         }
         area(reporting)
         {
@@ -208,6 +218,10 @@ page 15 "Location List"
                 actionref("Create Warehouse location_Promoted"; "Create Warehouse location")
                 {
                 }
+                actionref(CopyLocation_Promoted; CopyLocation)
+                {
+                }
+
             }
             group(Category_Location)
             {
