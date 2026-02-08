@@ -148,6 +148,15 @@ page 15 "Location List"
                 RunObject = Report "Assign Tax Area to Location";
                 ToolTip = 'Assign a tax area to the location.';
             }
+            action(CopyLocation)
+            {
+                AccessByPermission = TableData Location = I;
+                ApplicationArea = Location;
+                Caption = 'Copy Location';
+                Image = Copy;
+                ToolTip = 'Create a copy of the current location with all related information.';
+                RunObject = Codeunit "Copy Location";
+            }
         }
         area(reporting)
         {
@@ -218,6 +227,9 @@ page 15 "Location List"
                 {
                 }
                 actionref(AssignTaxArea_Promoted; AssignTaxArea)
+                {
+                }
+                actionref(CopyLocation_Promoted; CopyLocation)
                 {
                 }
             }

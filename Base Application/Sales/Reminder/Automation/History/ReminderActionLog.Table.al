@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -37,6 +37,7 @@ table 6752 "Reminder Action Log"
         /// </summary>
         field(4; "Reminder Action ID"; Code[50])
         {
+            ToolTip = 'Specifies the reminder action that was performed.';
         }
         /// <summary>
         /// Specifies the total number of records processed by this action.
@@ -50,6 +51,7 @@ table 6752 "Reminder Action Log"
         /// </summary>
         field(6; "Total Errors"; Integer)
         {
+            ToolTip = 'Specifies the total number of errors that occurred during the action job.';
 #if not CLEAN26
             ObsoleteState = Pending;
             ObsoleteReason = 'This field is obsolete and should not be used.';
@@ -74,12 +76,14 @@ table 6752 "Reminder Action Log"
         /// </summary>
         field(10; Status; Enum "Reminder Log Status")
         {
+            ToolTip = 'Specifies the status of the action.';
         }
         /// <summary>
         /// Contains a summary description of the action status and results.
         /// </summary>
         field(11; "Status summary"; Text[1024])
         {
+            ToolTip = 'Specifies the details of the last action job.';
         }
         /// <summary>
         /// Contains detailed information about the action execution.
