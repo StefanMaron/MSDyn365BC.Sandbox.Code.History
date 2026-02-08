@@ -187,6 +187,7 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetInventoryPlanningSetupUpgradeTag());
         PerCompanyUpgradeTags.Add(GetICTransactionSourceTypeUpgradeTag());
         PerCompanyUpgradeTags.Add(GetFinancialReportDefaultsUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetInitializeABCAnalysisSetupUpgradeTag());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Upgrade Tag", 'OnGetPerDatabaseUpgradeTags', '', false, false)]
@@ -1313,5 +1314,10 @@ codeunit 9998 "Upgrade Tag Definitions"
     internal procedure GetCreateExpenseAgentAADApplicationsTag(): Code[250]
     begin
         exit('MS-580734-CreateExpenseAgentAADApplication-20260115');
+    end;
+
+    internal procedure GetInitializeABCAnalysisSetupUpgradeTag(): Code[250]
+    begin
+        exit('MS-619893-ABCAnalysisSetup-20260129');
     end;
 }

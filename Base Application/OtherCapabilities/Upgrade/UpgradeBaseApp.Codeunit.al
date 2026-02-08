@@ -44,6 +44,7 @@ using Microsoft.Integration.SyncEngine;
 using Microsoft.Intercompany.Inbox;
 using Microsoft.Intercompany.Journal;
 using Microsoft.Intercompany.Outbox;
+using Microsoft.Inventory.Analysis;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Requisition;
@@ -91,7 +92,8 @@ codeunit 104000 "Upgrade - BaseApp"
     Permissions =
         TableData "User Group Plan" = rimd,
         TableData "Cust. Ledger Entry" = rm,
-        TableData "Employee Ledger Entry" = rm;
+        TableData "Employee Ledger Entry" = rm,
+        Tabledata "ABC Analysis Setup" = ri;
 
     var
         EnvironmentInformation: Codeunit "Environment Information";
@@ -237,6 +239,7 @@ codeunit 104000 "Upgrade - BaseApp"
         UpgradeIntegrationTableMappingTemplates();
         UpgradeICOutboxTransactionSourceType();
         UpgradeICTransactionSourceType();
+        UpgradeABCAnalysisSetup();
     end;
 
     local procedure ClearTemporaryTables()
@@ -3911,5 +3914,23 @@ codeunit 104000 "Upgrade - BaseApp"
     local procedure SEPACAMT05300108(): Code[20]
     begin
         exit('SEPA CAMT 053-08');
+    end;
+
+    local procedure UpgradeABCAnalysisSetup()
+    var
+        ABCAnalysisSetup: Record "ABC Analysis Setup";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetInitializeABCAnalysisSetupUpgradeTag()) then
+            exit;
+
+        if not ABCAnalysisSetup.Get() then begin
+            ABCAnalysisSetup.Init();
+            ABCAnalysisSetup.InitializeValues();
+            ABCAnalysisSetup.Insert();
+        end;
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetInitializeABCAnalysisSetupUpgradeTag());
     end;
 }
