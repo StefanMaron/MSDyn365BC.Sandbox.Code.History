@@ -310,6 +310,7 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   table "Power BI Report Labels" = X,
 
                   tabledata "AAD Application" = R,
+                  tabledata "ABC Analysis Setup" = R,
                   tabledata "Acc. Sched. Cell Value" = R,
                   tabledata "Acc. Sched. Chart Setup Line" = R,
                   tabledata "Acc. Sched. KPI Buffer" = R,

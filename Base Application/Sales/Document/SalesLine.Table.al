@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -660,6 +660,7 @@ table 37 "Sales Line"
         field(13; "Unit of Measure"; Text[50])
         {
             Caption = 'Unit of Measure';
+            ToolTip = 'Specifies the unit of measure for the item or resource on the sales line.';
             TableRelation = if (Type = filter(<> " ")) "Unit of Measure".Description;
             ValidateTableRelation = false;
 
@@ -836,6 +837,7 @@ table 37 "Sales Line"
         {
             AutoFormatType = 0;
             Caption = 'Qty. to Invoice';
+            ToolTip = 'Specifies the quantity that remains to be invoiced. It is calculated as Quantity - Qty. Invoiced.';
             DecimalPlaces = 0 : 5;
 
             trigger OnValidate()
@@ -927,6 +929,7 @@ table 37 "Sales Line"
             AutoFormatType = 2;
             CaptionClass = GetCaptionClass(FieldNo("Unit Price"));
             Caption = 'Unit Price';
+            ToolTip = 'Specifies the price for one unit on the sales line.';
 
             trigger OnValidate()
             var
@@ -1010,6 +1013,7 @@ table 37 "Sales Line"
         {
             AutoFormatType = 0;
             Caption = 'Line Discount %';
+            ToolTip = 'Specifies the discount percentage that is granted for the item on the line.';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
             MinValue = 0;
@@ -1033,6 +1037,7 @@ table 37 "Sales Line"
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Discount Amount';
+            ToolTip = 'Specifies the discount amount that is granted for the item on the line.';
 
             trigger OnValidate()
             begin
@@ -1058,6 +1063,7 @@ table 37 "Sales Line"
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
+            ToolTip = 'Specifies the sum of amounts in the Line Amount field on the sales return order lines.';
             Editable = false;
 
             trigger OnValidate()
@@ -1158,6 +1164,7 @@ table 37 "Sales Line"
         field(32; "Allow Invoice Disc."; Boolean)
         {
             Caption = 'Allow Invoice Disc.';
+            ToolTip = 'Specifies if the invoice line is included when the invoice discount is calculated.';
             InitValue = true;
 
             trigger OnValidate()
@@ -1184,6 +1191,7 @@ table 37 "Sales Line"
         {
             AutoFormatType = 0;
             Caption = 'Gross Weight';
+            ToolTip = 'Specifies the gross weight of one unit of the item. In the sales statistics window, the gross weight on the line is included in the total gross weight of all the lines for the particular sales document.';
             DecimalPlaces = 0 : 5;
         }
         /// <summary>
@@ -1193,6 +1201,7 @@ table 37 "Sales Line"
         {
             AutoFormatType = 0;
             Caption = 'Net Weight';
+            ToolTip = 'Specifies the net weight of one unit of the item. In the sales statistics window, the net weight on the line is included in the total net weight of all the lines for the particular sales document.';
             DecimalPlaces = 0 : 5;
         }
         /// <summary>
@@ -1202,6 +1211,7 @@ table 37 "Sales Line"
         {
             AutoFormatType = 0;
             Caption = 'Units per Parcel';
+            ToolTip = 'Specifies the number of units per parcel of the item. In the sales statistics window, the number of units per parcel on the line helps to determine the total number of units for all the lines for the particular sales document.';
             DecimalPlaces = 0 : 5;
         }
         /// <summary>
@@ -1211,6 +1221,7 @@ table 37 "Sales Line"
         {
             AutoFormatType = 0;
             Caption = 'Unit Volume';
+            ToolTip = 'Specifies the volume of one unit of the item. In the sales statistics window, the volume of one unit of the item on the line is included in the total volume of all the lines for the particular sales document.';
             DecimalPlaces = 0 : 5;
         }
         /// <summary>
@@ -1220,6 +1231,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData Item = R;
             Caption = 'Appl.-to Item Entry';
+            ToolTip = 'Specifies the number of the item ledger entry that the document or journal line is applied -to.';
 
             trigger OnLookup()
             begin
@@ -1431,6 +1443,7 @@ table 37 "Sales Line"
             AccessByPermission = TableData "Sales Shipment Header" = R;
             AutoFormatType = 0;
             Caption = 'Quantity Shipped';
+            ToolTip = 'Specifies how many units of the item on the line have been posted as shipped.';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
@@ -1441,6 +1454,7 @@ table 37 "Sales Line"
         {
             AutoFormatType = 0;
             Caption = 'Quantity Invoiced';
+            ToolTip = 'Specifies how many units of the item on the line have been posted as invoiced.';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
@@ -1488,6 +1502,7 @@ table 37 "Sales Line"
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Inv. Discount Amount"));
             Caption = 'Inv. Discount Amount';
+            ToolTip = 'Specifies the invoice discount amount for the line.';
             Editable = false;
 
             trigger OnValidate()
@@ -1540,6 +1555,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "Drop Shpt. Post. Buffer" = R;
             Caption = 'Drop Shipment';
+            ToolTip = 'Specifies if your vendor ships the items directly to your customer.';
             Editable = true;
 
             trigger OnValidate()
@@ -1601,6 +1617,7 @@ table 37 "Sales Line"
         field(74; "Gen. Bus. Posting Group"; Code[20])
         {
             Caption = 'Gen. Bus. Posting Group';
+            ToolTip = 'Specifies the vendor''s or customer''s trade type to link transactions made for this business partner with the appropriate general ledger account according to the general posting setup.';
             TableRelation = "Gen. Business Posting Group";
 
             trigger OnValidate()
@@ -1616,6 +1633,7 @@ table 37 "Sales Line"
         field(75; "Gen. Prod. Posting Group"; Code[20])
         {
             Caption = 'Gen. Prod. Posting Group';
+            ToolTip = 'Specifies the item''s product type to link transactions made for this item with the appropriate general ledger account according to the general posting setup.';
             TableRelation = "Gen. Product Posting Group";
 
             trigger OnValidate()
@@ -1663,6 +1681,7 @@ table 37 "Sales Line"
         field(80; "Attached to Line No."; Integer)
         {
             Caption = 'Attached to Line No.';
+            ToolTip = 'Specifies the line number to which this sales line is attached.';
             Editable = false;
             TableRelation = "Sales Line"."Line No." where("Document Type" = field("Document Type"),
                                                            "Document No." = field("Document No."));
@@ -1697,6 +1716,7 @@ table 37 "Sales Line"
         field(84; "Tax Category"; Code[10])
         {
             Caption = 'Tax Category';
+            ToolTip = 'Specifies the VAT category in connection with electronic document sending. For example, when you send sales documents through the PEPPOL service, the value in this field is used to populate several fields, such as the ClassifiedTaxCategory element in the Item group. It is also used to populate the TaxCategory element in both the TaxSubtotal and AllowanceCharge group. The number is based on the UNCL5305 standard.';
         }
         /// <summary>
         /// Specifies the tax area that applies for sales tax calculation on this line.
@@ -1704,6 +1724,7 @@ table 37 "Sales Line"
         field(85; "Tax Area Code"; Code[20])
         {
             Caption = 'Tax Area Code';
+            ToolTip = 'Specifies the tax area that is used to calculate and post sales tax.';
             TableRelation = "Tax Area";
 
             trigger OnValidate()
@@ -1717,6 +1738,7 @@ table 37 "Sales Line"
         field(86; "Tax Liable"; Boolean)
         {
             Caption = 'Tax Liable';
+            ToolTip = 'Specifies if the customer or vendor is liable for sales tax.';
 
             trigger OnValidate()
             begin
@@ -1729,6 +1751,7 @@ table 37 "Sales Line"
         field(87; "Tax Group Code"; Code[20])
         {
             Caption = 'Tax Group Code';
+            ToolTip = 'Specifies the tax group that is used to calculate and post sales tax.';
             TableRelation = "Tax Group";
 
             trigger OnValidate()
@@ -1752,6 +1775,7 @@ table 37 "Sales Line"
         field(89; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
+            ToolTip = 'Specifies the vendor''s VAT specification to link transactions made for this vendor with the appropriate general ledger account according to the VAT posting setup.';
             TableRelation = "VAT Business Posting Group";
 
             trigger OnValidate()
@@ -1765,6 +1789,7 @@ table 37 "Sales Line"
         field(90; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
+            ToolTip = 'Specifies the VAT product posting group. Links business transactions made for the item, resource, or G/L account with the general ledger, to account for VAT amounts resulting from trade with that record.';
             TableRelation = "VAT Product Posting Group";
 
             trigger OnValidate()
@@ -1823,6 +1848,7 @@ table 37 "Sales Line"
         field(91; "Currency Code"; Code[10])
         {
             Caption = 'Currency Code';
+            ToolTip = 'Specifies the currency that is used on the entry.';
             Editable = false;
             TableRelation = Currency;
         }
@@ -1872,6 +1898,7 @@ table 37 "Sales Line"
 #pragma warning restore
                                                                    "Reservation Status" = const(Reservation)));
             Caption = 'Reserved Quantity';
+            ToolTip = 'Specifies how many units of the item on the line have been reserved.';
             DecimalPlaces = 0 : 5;
             Editable = false;
             FieldClass = FlowField;
@@ -1917,6 +1944,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
             Caption = 'Blanket Order No.';
+            ToolTip = 'Specifies the number of the blanket order that the record originates from.';
             TableRelation = "Sales Header"."No." where("Document Type" = const("Blanket Order"));
 
             trigger OnLookup()
@@ -1947,6 +1975,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "Sales Shipment Header" = R;
             Caption = 'Blanket Order Line No.';
+            ToolTip = 'Specifies the number of the blanket order line that the record originates from.';
             TableRelation = "Sales Line"."Line No." where("Document Type" = const("Blanket Order"),
                                                            "Document No." = field("Blanket Order No."));
 
@@ -2070,6 +2099,7 @@ table 37 "Sales Line"
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Inv. Disc. Amount to Invoice';
+            ToolTip = 'Specifies the actual invoice discount amount that will be posted for the line in next invoice.';
             Editable = false;
         }
         /// <summary>
@@ -2087,6 +2117,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "IC G/L Account" = R;
             Caption = 'IC Partner Ref. Type';
+            ToolTip = 'Specifies the item or account in your IC partner''s company that corresponds to the item or account on the line.';
 
             trigger OnValidate()
             var
@@ -2110,6 +2141,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "IC G/L Account" = R;
             Caption = 'IC Partner Reference';
+            ToolTip = 'Specifies the IC partner. If the line is being sent to one of your intercompany partners, this field is used together with the IC Partner Ref. Type field to indicate the item or account in your partner''s company that corresponds to the line.';
 
             trigger OnLookup()
             var
@@ -2142,6 +2174,7 @@ table 37 "Sales Line"
         {
             AutoFormatType = 0;
             Caption = 'Prepayment %';
+            ToolTip = 'Specifies the prepayment percentage to use to calculate the prepayment for sales.';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
             MinValue = 0;
@@ -2174,6 +2207,7 @@ table 37 "Sales Line"
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Prepmt. Line Amount"));
             Caption = 'Prepmt. Line Amount';
+            ToolTip = 'Specifies the prepayment amount of the line in the currency of the sales document if a prepayment percentage is specified for the sales line.';
             MinValue = 0;
 
             trigger OnValidate()
@@ -2206,6 +2240,7 @@ table 37 "Sales Line"
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Prepmt. Amt. Inv."));
             Caption = 'Prepmt. Amt. Inv.';
+            ToolTip = 'Specifies the prepayment amount that has already been invoiced to the customer for this sales line.';
             Editable = false;
         }
         /// <summary>
@@ -2313,6 +2348,7 @@ table 37 "Sales Line"
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Prepmt Amt to Deduct"));
             Caption = 'Prepmt Amt to Deduct';
+            ToolTip = 'Specifies the prepayment amount that has already been deducted from ordinary invoices posted for this sales order line.';
             MinValue = 0;
 
             trigger OnValidate()
@@ -2352,6 +2388,7 @@ table 37 "Sales Line"
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Prepmt Amt Deducted"));
             Caption = 'Prepmt Amt Deducted';
+            ToolTip = 'Specifies the prepayment amount that has already been deducted from ordinary invoices posted for this sales order line.';
             Editable = false;
         }
         /// <summary>
@@ -2388,6 +2425,7 @@ table 37 "Sales Line"
         field(130; "IC Partner Code"; Code[20])
         {
             Caption = 'IC Partner Code';
+            ToolTip = 'Specifies the code of the intercompany partner that the transaction is related to if the entry was created from an intercompany transaction.';
             TableRelation = "IC Partner";
 
             trigger OnValidate()
@@ -2448,6 +2486,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "Item Reference" = R;
             Caption = 'IC Item Reference No.';
+            ToolTip = 'Specifies the IC item reference. If the line is being sent to one of your intercompany partners, this field is used together with the IC Partner Ref. Type field to indicate the item or account in your partner''s company that corresponds to the line.';
 
             trigger OnLookup()
             var
@@ -2528,6 +2567,7 @@ table 37 "Sales Line"
             AccessByPermission = TableData "BOM Component" = R;
             AutoFormatType = 0;
             Caption = 'Qty. to Assemble to Order';
+            ToolTip = 'Specifies how many units of the sales line quantity that you want to supply by assembly.';
             DecimalPlaces = 0 : 5;
 
             trigger OnValidate()
@@ -2616,6 +2656,7 @@ table 37 "Sales Line"
                                                                                   "Source Line No." = field("Line No."),
                                                                                   "Assemble to Order" = filter(true)));
             Caption = 'ATO Whse. Outstanding Qty.';
+            ToolTip = 'Specifies how many assemble-to-order units on the sales order line need to be assembled and handled in warehouse documents.';
             DecimalPlaces = 0 : 5;
             Editable = false;
             FieldClass = FlowField;
@@ -2646,6 +2687,7 @@ table 37 "Sales Line"
         field(1001; "Job Task No."; Code[20])
         {
             Caption = 'Project Task No.';
+            ToolTip = 'Specifies the number of the related project task.';
             Editable = false;
             TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
@@ -2656,6 +2698,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData Job = R;
             Caption = 'Project Contract Entry No.';
+            ToolTip = 'Specifies the entry number of the project planning line that the sales line is linked to.';
             Editable = false;
 
             trigger OnValidate()
@@ -2692,6 +2735,7 @@ table 37 "Sales Line"
         field(1700; "Deferral Code"; Code[10])
         {
             Caption = 'Deferral Code';
+            ToolTip = 'Specifies the deferral template that governs how revenue earned with this sales document is deferred to the different accounting periods when the good or service was delivered.';
             TableRelation = "Deferral Template"."Deferral Code";
 
             trigger OnValidate()
@@ -2722,6 +2766,7 @@ table 37 "Sales Line"
         field(1702; "Returns Deferral Start Date"; Date)
         {
             Caption = 'Returns Deferral Start Date';
+            ToolTip = 'Specifies the starting date of the returns deferral period.';
 
             trigger OnValidate()
             var
@@ -2849,6 +2894,7 @@ table 37 "Sales Line"
         field(5403; "Bin Code"; Code[20])
         {
             Caption = 'Bin Code';
+            ToolTip = 'Specifies the bin where the items are picked or put away.';
             TableRelation = if ("Document Type" = filter(Order | Invoice),
                                 Quantity = filter(>= 0),
                                 "Qty. to Asm. to Order (Base)" = const(0)) "Bin Content"."Bin Code" where("Location Code" = field("Location Code"),
@@ -2914,6 +2960,7 @@ table 37 "Sales Line"
         {
             AutoFormatType = 0;
             Caption = 'Qty. per Unit of Measure';
+            ToolTip = 'Specifies an auto-filled number if you have included Sales Unit of Measure on the item card and a quantity in the Qty. per Unit of Measure field.';
             DecimalPlaces = 0 : 5;
             Editable = false;
             InitValue = 1;
@@ -3184,6 +3231,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "Fixed Asset" = R;
             Caption = 'FA Posting Date';
+            ToolTip = 'Specifies the date that will be used on related fixed asset ledger entries.';
         }
         /// <summary>
         /// Specifies the depreciation book code for fixed asset accounting.
@@ -3191,6 +3239,7 @@ table 37 "Sales Line"
         field(5602; "Depreciation Book Code"; Code[10])
         {
             Caption = 'Depreciation Book Code';
+            ToolTip = 'Specifies the code for the depreciation book to which the line will be posted if you have selected Fixed Asset in the Type field for this line.';
             TableRelation = "Depreciation Book";
 
             trigger OnValidate()
@@ -3205,6 +3254,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "Fixed Asset" = R;
             Caption = 'Depr. until FA Posting Date';
+            ToolTip = 'Specifies if depreciation was calculated until the FA posting date of the line.';
         }
         /// <summary>
         /// Specifies the depreciation book to duplicate the fixed asset transaction into.
@@ -3212,6 +3262,7 @@ table 37 "Sales Line"
         field(5612; "Duplicate in Depreciation Book"; Code[10])
         {
             Caption = 'Duplicate in Depreciation Book';
+            ToolTip = 'Specifies a depreciation book code if you want the journal line to be posted to that depreciation book, as well as to the depreciation book in the Depreciation Book Code field.';
             TableRelation = "Depreciation Book";
 
             trigger OnValidate()
@@ -3226,6 +3277,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "Fixed Asset" = R;
             Caption = 'Use Duplication List';
+            ToolTip = 'Specifies, if the type is Fixed Asset, that information on the line is to be posted to all the assets defined depreciation books.';
 
             trigger OnValidate()
             begin
@@ -3263,6 +3315,7 @@ table 37 "Sales Line"
                                                            "No." = field("No."),
                                                            "Substitute Type" = const(Item)));
             Caption = 'Substitution Available';
+            ToolTip = 'Specifies that a substitute is available for the item on the sales line.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -3299,6 +3352,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "Nonstock Item" = R;
             Caption = 'Catalog';
+            ToolTip = 'Specifies that this item is a catalog item.';
             Editable = false;
         }
         /// <summary>
@@ -3308,6 +3362,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "Drop Shpt. Post. Buffer" = R;
             Caption = 'Purchasing Code';
+            ToolTip = 'Specifies the code for a special procurement method, such as drop shipment.';
             TableRelation = Purchasing;
 
             trigger OnValidate()
@@ -3381,6 +3436,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "Drop Shpt. Post. Buffer" = R;
             Caption = 'Special Order';
+            ToolTip = 'Specifies that the item on the sales line is a special-order item.';
             Editable = false;
         }
         /// <summary>
@@ -3409,6 +3465,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "Item Reference" = R;
             Caption = 'Item Reference No.';
+            ToolTip = 'Specifies the referenced item number.';
             ExtendedDatatype = Barcode;
 
             trigger OnLookup()
@@ -3464,6 +3521,7 @@ table 37 "Sales Line"
                                                                                   "Source No." = field("Document No."),
                                                                                   "Source Line No." = field("Line No.")));
             Caption = 'Whse. Outstanding Qty.';
+            ToolTip = 'Specifies how many units on the sales order line remain to be handled in warehouse documents.';
             DecimalPlaces = 0 : 5;
             Editable = false;
             FieldClass = FlowField;
@@ -3501,6 +3559,7 @@ table 37 "Sales Line"
         field(5790; "Requested Delivery Date"; Date)
         {
             Caption = 'Requested Delivery Date';
+            ToolTip = 'Specifies the date that the customer has asked for the order to be delivered.';
 
             trigger OnValidate()
             var
@@ -3530,6 +3589,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "Order Promising Line" = R;
             Caption = 'Promised Delivery Date';
+            ToolTip = 'Specifies the date that you have promised to deliver the order, as a result of the Order Promising function.';
 
             trigger OnValidate()
             var
@@ -3555,6 +3615,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "Order Promising Line" = R;
             Caption = 'Shipping Time';
+            ToolTip = 'Specifies how long it takes from when the items are shipped from the warehouse to when they are delivered.';
 
             trigger OnValidate()
             begin
@@ -3571,6 +3632,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData Location = R;
             Caption = 'Outbound Whse. Handling Time';
+            ToolTip = 'Specifies a date formula for the time it takes to get items ready to ship from this location. The time element is used in the calculation of the delivery date as follows: Shipment Date + Outbound Warehouse Handling Time = Planned Shipment Date + Shipping Time = Planned Delivery Date.';
 
             trigger OnValidate()
             begin
@@ -3588,6 +3650,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "Order Promising Line" = R;
             Caption = 'Planned Delivery Date';
+            ToolTip = 'Specifies the planned date that the shipment will be delivered at the customer''s address. If the customer requests a delivery date, the program calculates whether the items will be available for delivery on this date. If the items are available, the planned delivery date will be the same as the requested delivery date. If not, the program calculates the date that the items are available for delivery and enters this date in the Planned Delivery Date field.';
 
             trigger OnValidate()
             var
@@ -3616,6 +3679,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "Order Promising Line" = R;
             Caption = 'Planned Shipment Date';
+            ToolTip = 'Specifies the date that the shipment should ship from the warehouse. If the customer requests a delivery date, the program calculates the planned shipment date by subtracting the shipping time from the requested delivery date. If the customer does not request a delivery date or the requested delivery date cannot be met, the program calculates the content of this field by adding the shipment time to the shipping date.';
 
             trigger OnValidate()
             var
@@ -3641,6 +3705,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "Shipping Agent Services" = R;
             Caption = 'Shipping Agent Code';
+            ToolTip = 'Specifies the code for the shipping agent who is transporting the items.';
             TableRelation = "Shipping Agent";
 
             trigger OnValidate()
@@ -3657,6 +3722,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "Shipping Agent Services" = R;
             Caption = 'Shipping Agent Service Code';
+            ToolTip = 'Specifies the code for the service, such as a one-day delivery, that is offered by the shipping agent.';
             TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
 
             trigger OnValidate()
@@ -3682,6 +3748,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData "Item Charge" = R;
             Caption = 'Allow Item Charge Assignment';
+            ToolTip = 'Specifies that you can assign item charges to this line.';
             InitValue = true;
 
             trigger OnValidate()
@@ -3699,6 +3766,7 @@ table 37 "Sales Line"
                                                                                        "Document No." = field("Document No."),
                                                                                        "Document Line No." = field("Line No.")));
             Caption = 'Qty. to Assign';
+            ToolTip = 'Specifies how many units of the item charge will be assigned to the line.';
             DecimalPlaces = 0 : 5;
             Editable = false;
             FieldClass = FlowField;
@@ -3713,6 +3781,7 @@ table 37 "Sales Line"
                                                                                       "Document No." = field("Document No."),
                                                                                       "Document Line No." = field("Line No.")));
             Caption = 'Qty. Assigned';
+            ToolTip = 'Specifies the quantity of the item charge that was assigned to a specified item when you posted this sales line.';
             DecimalPlaces = 0 : 5;
             Editable = false;
             FieldClass = FlowField;
@@ -3725,6 +3794,7 @@ table 37 "Sales Line"
             AccessByPermission = TableData "Return Receipt Header" = R;
             Caption = 'Return Qty. to Receive';
             AutoFormatType = 0;
+            ToolTip = 'Specifies the quantity of items that remain to be shipped.';
             DecimalPlaces = 0 : 5;
 
             trigger OnValidate()
@@ -3860,6 +3930,7 @@ table 37 "Sales Line"
             AutoFormatType = 0;
             AccessByPermission = TableData "Return Receipt Header" = R;
             Caption = 'Return Qty. Received';
+            ToolTip = 'Specifies how many units of the item on the line have been posted as shipped.';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
@@ -3880,6 +3951,7 @@ table 37 "Sales Line"
         {
             AccessByPermission = TableData Item = R;
             Caption = 'Appl.-from Item Entry';
+            ToolTip = 'Specifies the number of the item ledger entry that the document or journal line is applied from.';
             MinValue = 0;
 
             trigger OnLookup()
@@ -3907,6 +3979,7 @@ table 37 "Sales Line"
                                                                                        "Document No." = field("Document No."),
                                                                                        "Document Line No." = field("Line No.")));
             Caption = 'Item Charge Qty. to Handle';
+            ToolTip = 'Specifies how many items the item charge will be assigned to on the line. It can be either equal to Qty. to Assign or to zero. If it is zero, the item charge will not be assigned to the line.';
             DecimalPlaces = 0 : 5;
             Editable = false;
             FieldClass = FlowField;
@@ -3941,6 +4014,7 @@ table 37 "Sales Line"
         field(6608; "Return Reason Code"; Code[10])
         {
             Caption = 'Return Reason Code';
+            ToolTip = 'Specifies the code explaining why the item was returned.';
             TableRelation = "Return Reason";
 
             trigger OnValidate()
@@ -4015,6 +4089,7 @@ table 37 "Sales Line"
                                                              "Document Type" = field("Document Type"),
                                                              "Line No." = field("Line No.")));
             Caption = 'Attached Doc Count';
+            ToolTip = 'Specifies the number of attachments.';
             FieldClass = FlowField;
             InitValue = 0;
         }
@@ -4028,6 +4103,7 @@ table 37 "Sales Line"
                                                     "Attached to Line No." = field("Line No."),
                                                     Quantity = filter(<> 0)));
             Caption = 'Attached Lines Count';
+            ToolTip = 'Specifies the number of non-inventory product lines attached to the sales line.';
             Editable = false;
             FieldClass = FlowField;
             BlankZero = true;
@@ -4039,6 +4115,7 @@ table 37 "Sales Line"
         {
             CalcFormula = lookup(Customer.Name where("No." = field("Sell-to Customer No.")));
             Caption = 'Sell-to Customer Name';
+            ToolTip = 'Specifies the name of the customer.';
             Editable = false;
             FieldClass = FlowField;
         }
