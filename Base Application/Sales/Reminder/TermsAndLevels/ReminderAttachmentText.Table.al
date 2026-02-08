@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -31,6 +31,7 @@ table 502 "Reminder Attachment Text"
         field(2; "Language Code"; Code[10])
         {
             Caption = 'Language Code';
+            ToolTip = 'Specifies the language code of the beginning and ending lines.';
             NotBlank = true;
             TableRelation = Language;
             DataClassification = SystemMetadata;
@@ -49,6 +50,7 @@ table 502 "Reminder Attachment Text"
         field(4; "File Name"; Text[100])
         {
             Caption = 'File Name';
+            ToolTip = 'Specifies the file name of the attachment.';
             DataClassification = CustomerContent;
         }
 #if not CLEANSCHEMA28
@@ -78,6 +80,7 @@ table 502 "Reminder Attachment Text"
         field(6; "Inline Fee Description"; Text[100])
         {
             Caption = 'Inline Fee Description';
+            ToolTip = 'Specifies the description line that will appear in the attachment along side the fee.';
             DataClassification = CustomerContent;
         }
 #if not CLEANSCHEMA28
@@ -111,6 +114,7 @@ table 502 "Reminder Attachment Text"
                                       "Language Code" = field("Language Code"),
                                       Position = const("Beginning Line")));
             Caption = 'Beginning Line';
+            ToolTip = 'Shows if there are beginning lines for the current language.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -124,6 +128,7 @@ table 502 "Reminder Attachment Text"
                                       "Language Code" = field("Language Code"),
                                       Position = const("Ending Line")));
             Caption = 'Ending Line';
+            ToolTip = 'Shows if there are ending lines for the current language.';
             Editable = false;
             FieldClass = FlowField;
         }
