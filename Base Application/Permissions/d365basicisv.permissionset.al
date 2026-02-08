@@ -206,6 +206,7 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Tenant Web Service" = R,
                   tabledata "Upgrade Blob Storage" = Rimd,
                   tabledata User = RMD,
+                  tabledata "ABC Analysis Setup" = RIMD,
                   tabledata "Acc. Sched. Cell Value" = RIMD,
                   tabledata "Acc. Sched. Chart Setup Line" = RIMD,
                   tabledata "Acc. Sched. KPI Buffer" = RIMD,
