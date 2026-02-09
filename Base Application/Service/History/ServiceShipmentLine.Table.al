@@ -440,6 +440,14 @@ table 5991 "Service Shipment Line"
             Caption = 'Catalog';
             ToolTip = 'Specifies that the item on the shipment line is a catalog item.';
         }
+        field(5798; "External Document No."; Code[35])
+        {
+            Caption = 'External Document No.';
+        }
+        field(5799; "Your Reference"; Text[35])
+        {
+            Caption = 'Your Reference';
+        }
         field(5817; Correction; Boolean)
         {
             Caption = 'Correction';
