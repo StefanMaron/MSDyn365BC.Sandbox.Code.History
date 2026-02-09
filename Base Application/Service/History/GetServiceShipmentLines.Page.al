@@ -110,6 +110,27 @@ page 5994 "Get Service Shipment Lines"
                     ApplicationArea = Service;
                     Visible = false;
                 }
+                field("Order No."; Rec."Order No.")
+                {
+                    Caption = 'Order No.';
+                    ApplicationArea = Service;
+                    ToolTip = 'Specifies the number of the service order that this shipment was posted from.';
+                    Visible = false;
+                }
+                field("External Document No."; Rec."External Document No.")
+                {
+                    Caption = 'External Document No.';
+                    ApplicationArea = Service;
+                    ToolTip = 'Specifies the number that the customer uses in their own system to refer to this service document.';
+                    Visible = false;
+                }
+                field("Your Reference"; Rec."Your Reference")
+                {
+                    Caption = 'Your Reference';
+                    ApplicationArea = Service;
+                    ToolTip = 'Specifies the reference information that the customer uses in their own system to refer to this service document.';
+                    Visible = false;
+                }
             }
         }
         area(factboxes)
