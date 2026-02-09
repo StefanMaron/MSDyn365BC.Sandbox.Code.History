@@ -910,6 +910,8 @@ codeunit 5988 "Serv-Documents Mgt."
             if PassedServLine."Document Type" = PassedServLine."Document Type"::Order then begin
                 ServShptLine."Order No." := PassedServLine."Document No.";
                 ServShptLine."Order Line No." := PassedServLine."Line No.";
+                ServShptLine."External Document No." := ServShptHeader."External Document No.";
+                ServShptLine."Your Reference" := ServShptHeader."Your Reference";
             end;
 
             if (PassedServLine.Type = PassedServLine.Type::Item) and (PassedServLine."Qty. to Ship" <> 0) then

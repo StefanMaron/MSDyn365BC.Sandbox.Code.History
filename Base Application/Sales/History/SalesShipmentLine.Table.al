@@ -836,6 +836,20 @@ table 111 "Sales Shipment Line"
             Editable = false;
         }
         /// <summary>
+        /// Specifies the external document number from the customer's system for reference.
+        /// </summary>
+        field(5798; "External Document No."; Code[35])
+        {
+            Caption = 'External Document No.';
+        }
+        /// <summary>
+        /// Specifies the reference number provided by the customer for this shipment line.
+        /// </summary>
+        field(5799; "Your Reference"; Text[35])
+        {
+            Caption = 'Your Reference';
+        }
+        /// <summary>
         /// Specifies the item ledger entry to apply from for cost tracking.
         /// </summary>
         field(5811; "Appl.-from Item Entry"; Integer)
@@ -1427,6 +1441,8 @@ table 111 "Sales Shipment Line"
         if SalesLine."Document Type" = SalesLine."Document Type"::Order then begin
             "Order No." := SalesLine."Document No.";
             "Order Line No." := SalesLine."Line No.";
+            "External Document No." := SalesShptHeader."External Document No.";
+            "Your Reference" := SalesShptHeader."Your Reference";
         end;
 
         OnAfterInitFromSalesLine(SalesShptHeader, SalesLine, Rec);
