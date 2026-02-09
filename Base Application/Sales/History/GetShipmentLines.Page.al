@@ -125,21 +125,21 @@ page 5708 "Get Shipment Lines"
                 {
                     ApplicationArea = Suite;
                 }
-                field(OrderNo; OrderNo)
+                field(OrderNo; Rec."Order No.")
                 {
                     Caption = 'Order No.';
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the number of the sales order that this shipment was posted from.';
                     Visible = false;
                 }
-                field(ExternalDocumentNo; ExternalDocumentNo)
+                field(ExternalDocumentNo; Rec."External Document No.")
                 {
                     Caption = 'External Document No.';
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the number that the customer uses in their own system to refer to this sales document.';
                     Visible = false;
                 }
-                field(YourReference; YourReference)
+                field(YourReference; Rec."Your Reference")
                 {
                     Caption = 'Your Reference';
                     ApplicationArea = Suite;
@@ -239,12 +239,6 @@ page 5708 "Get Shipment Lines"
     begin
         DocumentNoHideValue := false;
         DocumentNoOnFormat();
-        GetDataFromShipmentHeader();
-    end;
-
-    trigger OnAfterGetCurrRecord()
-    begin
-        GetDataFromShipmentHeader();
     end;
 
     trigger OnQueryClosePage(CloseAction: Action) Result: Boolean
@@ -266,9 +260,6 @@ page 5708 "Get Shipment Lines"
         TempSalesShptLine: Record "Sales Shipment Line" temporary;
         SalesGetShpt: Codeunit "Sales-Get Shipment";
         DocumentNoHideValue: Boolean;
-        OrderNo: Code[20];
-        YourReference: Text[35];
-        ExternalDocumentNo: Text[35];
 
     /// <summary>
     /// Sets the sales header for filtering shipment lines.
@@ -328,17 +319,6 @@ page 5708 "Get Shipment Lines"
     begin
         if not IsFirstDocLine() then
             DocumentNoHideValue := true;
-    end;
-
-    local procedure GetDataFromShipmentHeader()
-    var
-        SalesShipmentHeader: Record "Sales Shipment Header";
-    begin
-        SalesShipmentHeader.Get(Rec."Document No.");
-
-        OrderNo := SalesShipmentHeader."Order No.";
-        YourReference := SalesShipmentHeader."Your Reference";
-        ExternalDocumentNo := SalesShipmentHeader."External Document No.";
     end;
 
     [IntegrationEvent(true, false)]

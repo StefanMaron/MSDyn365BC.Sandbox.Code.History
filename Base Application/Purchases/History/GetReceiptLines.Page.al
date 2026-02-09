@@ -114,19 +114,19 @@ page 5709 "Get Receipt Lines"
                 {
                     ApplicationArea = Suite;
                 }
-                field(OrderNo; OrderNo)
+                field(OrderNo; Rec."Order No.")
                 {
                     Caption = 'Order No.';
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the line number of the order that created the entry.';
                 }
-                field(VendorOrderNo; VendorOrderNo)
+                field(VendorOrderNo; Rec."Vendor Order No.")
                 {
                     Caption = 'Vendor Order No.';
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the vendor''s order number.';
                 }
-                field(VendorShptNo; VendorShptNo)
+                field(VendorShptNo; Rec."Vendor Shipment No.")
                 {
                     Caption = 'Vendor Shipment No.';
                     ApplicationArea = Suite;
@@ -137,11 +137,17 @@ page 5709 "Get Receipt Lines"
                     Caption = 'Vendor Item No.';
                     ApplicationArea = Suite;
                 }
-                field(ItemReferenceNo; ItemReferenceNo)
+                field(ItemReferenceNo; Rec."Item Reference No.")
                 {
                     Caption = 'Item Reference No.';
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the referenced item number.';
+                }
+                field("Your Reference"; Rec."Your Reference")
+                {
+                    Caption = 'Your Reference';
+                    ApplicationArea = Suite;
+                    ToolTip = 'Specifies the vendor''s reference.';
                 }
                 field("Pay-to Vendor No."; Rec."Pay-to Vendor No.")
                 {
@@ -247,12 +253,6 @@ page 5709 "Get Receipt Lines"
     begin
         DocumentNoHideValue := false;
         DocumentNoOnFormat();
-        GetDataFromRcptHeader();
-    end;
-
-    trigger OnAfterGetCurrRecord()
-    begin
-        GetDataFromRcptHeader();
     end;
 
     trigger OnQueryClosePage(CloseAction: Action) Result: Boolean
@@ -272,10 +272,6 @@ page 5709 "Get Receipt Lines"
         PurchRcptHeader: Record "Purch. Rcpt. Header";
         TempPurchRcptLine: Record "Purch. Rcpt. Line" temporary;
         GetReceipts: Codeunit "Purch.-Get Receipt";
-        VendorOrderNo: Code[35];
-        VendorShptNo: Code[35];
-        OrderNo: Code[20];
-        ItemReferenceNo: Code[50];
         SelectionOnly: Boolean;
 
     protected var
@@ -335,18 +331,6 @@ page 5709 "Get Receipt Lines"
             DocumentNoHideValue := true;
     end;
 
-    local procedure GetDataFromRcptHeader()
-    var
-        SrcPurchRcptHeader: Record "Purch. Rcpt. Header";
-    begin
-        SrcPurchRcptHeader.Get(Rec."Document No.");
-        VendorOrderNo := SrcPurchRcptHeader."Vendor Order No.";
-        VendorShptNo := SrcPurchRcptHeader."Vendor Shipment No.";
-        OrderNo := SrcPurchRcptHeader."Order No.";
-
-        ItemReferenceNo := Rec."Item Reference No.";
-    end;
-
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSetPurchHeader(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean; var PurchHeader: Record "Purchase Header")
     begin
@@ -362,4 +346,3 @@ page 5709 "Get Receipt Lines"
     begin
     end;
 }
-
