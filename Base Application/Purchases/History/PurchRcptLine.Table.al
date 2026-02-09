@@ -687,6 +687,18 @@ table 121 "Purch. Rcpt. Line"
             Caption = 'Order Date';
             ToolTip = 'Specifies the date when the related order was created.';
         }
+        field(5796; "Vendor Order No."; Code[35])
+        {
+            Caption = 'Vendor Order No.';
+        }
+        field(5797; "Vendor Shipment No."; Code[35])
+        {
+            Caption = 'Vendor Shipment No.';
+        }
+        field(5798; "Your Reference"; Text[35])
+        {
+            Caption = 'Your Reference';
+        }
         field(5811; "Item Charge Base Amount"; Decimal)
         {
             AutoFormatExpression = GetCurrencyCodeFromHeader();
@@ -1182,6 +1194,9 @@ table 121 "Purch. Rcpt. Line"
         if PurchLine."Document Type" = PurchLine."Document Type"::Order then begin
             "Order No." := PurchLine."Document No.";
             "Order Line No." := PurchLine."Line No.";
+            "Vendor Order No." := PurchRcptHeader."Vendor Order No.";
+            "Vendor Shipment No." := PurchRcptHeader."Vendor Shipment No.";
+            "Your Reference" := PurchRcptHeader."Your Reference";
         end;
         if (PurchLine.Quantity <> 0) and ("Job No." <> '') then begin
             Factor := PurchLine."Qty. to Receive" / PurchLine.Quantity;
