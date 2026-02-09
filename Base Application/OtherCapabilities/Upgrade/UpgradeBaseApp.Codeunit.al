@@ -67,6 +67,7 @@ using Microsoft.Sales.History;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Reminder;
 using Microsoft.Sales.Setup;
+using Microsoft.Service.History;
 using Microsoft.Utilities;
 using Microsoft.Warehouse.Activity;
 using Microsoft.Warehouse.Structure;
@@ -120,6 +121,9 @@ codeunit 104000 "Upgrade - BaseApp"
         XNonEuroPaymentDescTxt: Label 'Parties share fees.';
         XEuroPaymentDescTxt: Label 'Sender pays fees.';
         JobConsumpWhseHandlingUnexpectedValueLbl: Label 'UpgradeJobConsumpWhseHandlingForDirectedPutAwayAndPickLocation skipped. %1 set to different value than %2 for at least one record in table %3 with %4 enabled.', Comment = '%1 = "Job Consump. Whse. Handling" field caption, %2 = "Job Consump. Whse. Handling" expected value, %3 = "Location" table caption, %4 = "Directed Put-away and Pick" field caption', Locked = true;
+        PurchRcptLineFieldsAlreadyPopulatedLbl: Label 'UpgradePurchRcptLineFields skipped. Purch. Rcpt. Line records already have values populated.', Locked = true;
+        SalesShptLineFieldsAlreadyPopulatedLbl: Label 'UpgradeSalesShptLineFields skipped. Sales Shipment Line records already have values populated.', Locked = true;
+        ServiceShptLineFieldsAlreadyPopulatedLbl: Label 'UpgradeServiceShptLineFields skipped. Service Shipment Line records already have values populated.', Locked = true;
         SEPACAMTMappingBankAccRecLineLbl: Label 'SEPA CAMT to Bank Acc. Reconciliation Line', Comment = 'SEPA CAMT is ISO standard name, should not be translated. Bank Acc. Reconciliation Line is the name of table 274 - use its translated caption here.', MaxLength = 250;
         SEPACAMTMappingGenJnlLineLbl: Label 'SEPA CAMT to Gen. Journal Line', Comment = 'SEPA CAMT is ISO standard name, should not be translated. Gen. Journal Line is the name of table 81 - use its translated caption here.', MaxLength = 250;
         DataExchangeDefinitionsFolderLbl: Label 'DataExchangeDefinitions', Locked = true;
@@ -240,6 +244,9 @@ codeunit 104000 "Upgrade - BaseApp"
         UpgradeICOutboxTransactionSourceType();
         UpgradeICTransactionSourceType();
         UpgradeABCAnalysisSetup();
+        UpgradePurchRcptLineFields();
+        UpgradeSalesShptLineFields();
+        UpgradeServiceShptLineFields();
     end;
 
     local procedure ClearTemporaryTables()
@@ -3909,6 +3916,98 @@ codeunit 104000 "Upgrade - BaseApp"
         Clear(ICTransactionDataTransfer);
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetICTransactionSourceTypeUpgradeTag());
+    end;
+
+    local procedure UpgradePurchRcptLineFields()
+    var
+        PurchRcptHeader: Record "Purch. Rcpt. Header";
+        PurchRcptLine: Record "Purch. Rcpt. Line";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+        PurchRcptLineDataTransfer: DataTransfer;
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetPurchRcptLineFieldsUpgradeTag()) then
+            exit;
+
+        PurchRcptLine.FilterGroup(-1);
+        PurchRcptLine.SetFilter("Your Reference", '<>%1', '');
+        PurchRcptLine.SetFilter("Vendor Shipment No.", '<>%1', '');
+        PurchRcptLine.SetFilter("Vendor Order No.", '<>%1', '');
+        PurchRcptLine.FilterGroup(0);
+        if not PurchRcptLine.IsEmpty() then begin
+            Session.LogMessage('0000RIS', PurchRcptLineFieldsAlreadyPopulatedLbl, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', 'AL SaaS Upgrade');
+            exit;
+        end;
+
+        PurchRcptLineDataTransfer.SetTables(Database::"Purch. Rcpt. Header", Database::"Purch. Rcpt. Line");
+        PurchRcptLineDataTransfer.AddJoin(PurchRcptHeader.FieldNo("No."), PurchRcptLine.FieldNo("Document No."));
+        PurchRcptLineDataTransfer.AddFieldValue(PurchRcptHeader.FieldNo("Vendor Order No."), PurchRcptLine.FieldNo("Vendor Order No."));
+        PurchRcptLineDataTransfer.AddFieldValue(PurchRcptHeader.FieldNo("Vendor Shipment No."), PurchRcptLine.FieldNo("Vendor Shipment No."));
+        PurchRcptLineDataTransfer.AddFieldValue(PurchRcptHeader.FieldNo("Your Reference"), PurchRcptLine.FieldNo("Your Reference"));
+        PurchRcptLineDataTransfer.UpdateAuditFields := false;
+        PurchRcptLineDataTransfer.CopyFields();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetPurchRcptLineFieldsUpgradeTag());
+    end;
+
+    local procedure UpgradeSalesShptLineFields()
+    var
+        SalesShipmentHeader: Record "Sales Shipment Header";
+        SalesShipmentLine: Record "Sales Shipment Line";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+        SalesShptLineDataTransfer: DataTransfer;
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetSalesShptLineFieldsUpgradeTag()) then
+            exit;
+
+        SalesShipmentLine.FilterGroup(-1);
+        SalesShipmentLine.SetFilter("Your Reference", '<>%1', '');
+        SalesShipmentLine.SetFilter("External Document No.", '<>%1', '');
+        SalesShipmentLine.FilterGroup(0);
+        if not SalesShipmentLine.IsEmpty() then begin
+            Session.LogMessage('0000RIT', SalesShptLineFieldsAlreadyPopulatedLbl, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', 'AL SaaS Upgrade');
+            exit;
+        end;
+
+        SalesShptLineDataTransfer.SetTables(Database::"Sales Shipment Header", Database::"Sales Shipment Line");
+        SalesShptLineDataTransfer.AddJoin(SalesShipmentHeader.FieldNo("No."), SalesShipmentLine.FieldNo("Document No."));
+        SalesShptLineDataTransfer.AddFieldValue(SalesShipmentHeader.FieldNo("External Document No."), SalesShipmentLine.FieldNo("External Document No."));
+        SalesShptLineDataTransfer.AddFieldValue(SalesShipmentHeader.FieldNo("Your Reference"), SalesShipmentLine.FieldNo("Your Reference"));
+        SalesShptLineDataTransfer.UpdateAuditFields := false;
+        SalesShptLineDataTransfer.CopyFields();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetSalesShptLineFieldsUpgradeTag());
+    end;
+
+    local procedure UpgradeServiceShptLineFields()
+    var
+        ServiceShipmentHeader: Record "Service Shipment Header";
+        ServiceShipmentLine: Record "Service Shipment Line";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+        ServiceShptLineDataTransfer: DataTransfer;
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetServiceShptLineFieldsUpgradeTag()) then
+            exit;
+
+        ServiceShipmentLine.FilterGroup(-1);
+        ServiceShipmentLine.SetFilter("Your Reference", '<>%1', '');
+        ServiceShipmentLine.SetFilter("External Document No.", '<>%1', '');
+        ServiceShipmentLine.FilterGroup(0);
+        if not ServiceShipmentLine.IsEmpty() then begin
+            Session.LogMessage('0000RIU', ServiceShptLineFieldsAlreadyPopulatedLbl, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', 'AL SaaS Upgrade');
+            exit;
+        end;
+
+        ServiceShptLineDataTransfer.SetTables(Database::"Service Shipment Header", Database::"Service Shipment Line");
+        ServiceShptLineDataTransfer.AddJoin(ServiceShipmentHeader.FieldNo("No."), ServiceShipmentLine.FieldNo("Document No."));
+        ServiceShptLineDataTransfer.AddFieldValue(ServiceShipmentHeader.FieldNo("External Document No."), ServiceShipmentLine.FieldNo("External Document No."));
+        ServiceShptLineDataTransfer.AddFieldValue(ServiceShipmentHeader.FieldNo("Your Reference"), ServiceShipmentLine.FieldNo("Your Reference"));
+        ServiceShptLineDataTransfer.UpdateAuditFields := false;
+        ServiceShptLineDataTransfer.CopyFields();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetServiceShptLineFieldsUpgradeTag());
     end;
 
     local procedure SEPACAMT05300108(): Code[20]
