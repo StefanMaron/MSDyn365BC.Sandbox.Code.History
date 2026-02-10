@@ -890,7 +890,13 @@ table 5406 "Prod. Order Line"
             trigger OnValidate()
             var
                 ProdBOMVersion: Record "Production BOM Version";
+                IsHandled: Boolean;
             begin
+                IsHandled := false;
+                OnBeforeValidateProductionBOMVersionCode(Rec, xRec, IsHandled);
+                if IsHandled then
+                    exit;
+
                 if "Production BOM Version Code" = '' then
                     exit;
 
@@ -2068,6 +2074,11 @@ table 5406 "Prod. Order Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnShowRoutingOnBeforeFindAndSetProdOrderLineBinCodeFromProdRoutingLines(var ProdOrderLine: Record "Prod. Order Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateProductionBOMVersionCode(var ProdOrderLine: Record "Prod. Order Line"; xProdOrderLine: Record "Prod. Order Line"; var IsHandled: Boolean)
     begin
     end;
 }
