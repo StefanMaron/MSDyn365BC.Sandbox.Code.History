@@ -58,35 +58,39 @@ table 99000772 "Production BOM Line"
             trigger OnValidate()
             var
                 Item: Record Item;
+                IsHandled: Boolean;
             begin
-                TestField(Type);
+                IsHandled := false;
+                OnBeforeValidateNo(Rec, xRec, CurrFieldNo, IsHandled);
+                if not IsHandled then begin
+                    TestField(Type);
 
-                TestStatus();
+                    TestStatus();
 
-                case Type of
-                    Type::Item:
-                        begin
-                            Item.Get("No.");
-                            Description := Item.Description;
-                            "Description 2" := Item."Description 2";
-                            Item.TestField("Base Unit of Measure");
-                            "Unit of Measure Code" := Item."Base Unit of Measure";
-                            "Scrap %" := Item."Scrap %";
-                            if "No." <> xRec."No." then
-                                "Variant Code" := '';
-                            OnValidateNoOnAfterAssignItemFields(Rec, Item, xRec, CurrFieldNo);
-                        end;
-                    Type::"Production BOM":
-                        begin
-                            ProductionBOMHeader.Get("No.");
-                            ProductionBOMHeader.TestField("Unit of Measure Code");
-                            Description := ProductionBOMHeader.Description;
-                            "Description 2" := ProductionBOMHeader."Description 2";
-                            "Unit of Measure Code" := ProductionBOMHeader."Unit of Measure Code";
-                            OnValidateNoOnAfterAssignProdBOMFields(Rec, ProductionBOMHeader, xRec, CurrFieldNo);
-                        end;
+                    case Type of
+                        Type::Item:
+                            begin
+                                Item.Get("No.");
+                                Description := Item.Description;
+                                "Description 2" := Item."Description 2";
+                                Item.TestField("Base Unit of Measure");
+                                "Unit of Measure Code" := Item."Base Unit of Measure";
+                                "Scrap %" := Item."Scrap %";
+                                if "No." <> xRec."No." then
+                                    "Variant Code" := '';
+                                OnValidateNoOnAfterAssignItemFields(Rec, Item, xRec, CurrFieldNo);
+                            end;
+                        Type::"Production BOM":
+                            begin
+                                ProductionBOMHeader.Get("No.");
+                                ProductionBOMHeader.TestField("Unit of Measure Code");
+                                Description := ProductionBOMHeader.Description;
+                                "Description 2" := ProductionBOMHeader."Description 2";
+                                "Unit of Measure Code" := ProductionBOMHeader."Unit of Measure Code";
+                                OnValidateNoOnAfterAssignProdBOMFields(Rec, ProductionBOMHeader, xRec, CurrFieldNo);
+                            end;
+                    end;
                 end;
-
                 OnAfterValidateNo(Rec);
             end;
         }
@@ -605,6 +609,11 @@ table 99000772 "Production BOM Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateNoOnAfterAssignItemFields(var ProductionBOMLine: Record "Production BOM Line"; Item: Record Item; var xProductionBOMLine: Record "Production BOM Line"; CallingFieldNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateNo(var ProductionBOMLine: Record "Production BOM Line"; xProductionBOMLine: Record "Production BOM Line"; CallingFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 
