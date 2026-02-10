@@ -3809,6 +3809,7 @@ codeunit 1751 "Data Classification Eval. Data"
         SetTableFieldsToNormal(6910); // ExpReportItemizationLine
         SetTableFieldsToNormal(6911); // ExpReportLineItemization
         SetTableFieldsToNormal(6912); // ExpenseLedgerEntry
+        SetTableFieldsToNormal(6913); // ExpensePaymentMethod
         SetTableFieldsToNormal(6915); // PostedExpenseReportHeader
         SetTableFieldsToNormal(6916); // PostedExpenseReportLine
         SetTableFieldsToNormal(6917); // PostedExpReportLinePcpt
