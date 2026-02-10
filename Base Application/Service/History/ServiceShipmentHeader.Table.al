@@ -182,7 +182,13 @@ table 5990 "Service Shipment Header"
         {
             Caption = 'Pmt. Discount Date';
         }
+#if not CLEAN28
+#pragma warning disable AS0136
+#endif
         field(27; "Shipment Method Code"; Code[10])
+#if not CLEAN28
+#pragma warning restore AS0136
+#endif
         {
             Caption = 'Shipment Method Code';
             ToolTip = 'Specifies the code for the shipment method that is associated with the posted service shipment.';
@@ -466,7 +472,9 @@ table 5990 "Service Shipment Header"
             Caption = 'Payment Method Code';
             TableRelation = "Payment Method";
         }
+#pragma warning disable AS0136
         field(105; "Shipping Agent Code"; Code[10])
+#pragma warning restore AS0136
         {
             Caption = 'Shipping Agent Code';
             ToolTip = 'Specifies the code of the shipping agent for the posted service shipment.';
