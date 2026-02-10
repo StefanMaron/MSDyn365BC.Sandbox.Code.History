@@ -12,7 +12,9 @@ using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Company;
+#if not CLEAN28
 using Microsoft.Foundation.Reporting;
+#endif
 using Microsoft.Integration.D365Sales;
 using Microsoft.Integration.Dataverse;
 using Microsoft.Projects.Timesheet;
@@ -75,10 +77,12 @@ codeunit 1814 "Assisted Setup Subscribers"
         SetupExchangeRatesHelpTxt: Label 'https://go.microsoft.com/fwlink/?linkid=2115182', Locked = true;
         SetupExchangeRatesVideoTxt: Label 'https://go.microsoft.com/fwlink/?linkid=2117931', Locked = true;
         SetupExchangeRatesDescriptionTxt: Label 'View or update currencies and exchange rates if you buy or sell in currencies other than your local currency or record G/L transactions in different currencies.';
+#if not CLEAN28
         CustomizeDocumentLayoutsTitleTxt: Label 'Customize document layouts';
         CustomizeDocumentLayoutsShortTitleTxt: Label 'Customize document layouts', MaxLength = 50;
         CustomizeDocumentLayoutsHelpTxt: Label 'https://go.microsoft.com/fwlink/?linkid=2115464', Locked = true;
         CustomizeDocumentLayoutsDescTxt: Label 'Make invoices and other documents look right for your business.';
+#endif
         CustomerAppWorkflowTitleTxt: Label 'Set up a customer approval workflow';
         CustomerAppWorkflowShortTitleTxt: Label 'Set up customer approval workflow', MaxLength = 50;
         CustomerAppWorkflowDescriptionTxt: Label 'Create approval workflows that automatically notify an approver when a user tries to create or change a customer.';
@@ -427,13 +431,18 @@ codeunit 1814 "Assisted Setup Subscribers"
         GuidedExperience.AddTranslationForSetupObjectTitle(GuidedExperienceType::"Assisted Setup", ObjectType::Page,
             Page::"Time Sheet Setup Wizard", Language.GetDefaultApplicationLanguageId(), SetupTimeSheetsTitleTxt);
         GlobalLanguage(CurrentGlobalLanguage);
-
+#if not CLEAN28
+#pragma warning disable AL0432
         GuidedExperience.InsertAssistedSetup(CustomizeDocumentLayoutsTitleTxt, CustomizeDocumentLayoutsShortTitleTxt, CustomizeDocumentLayoutsDescTxt, 10, ObjectType::Page,
             Page::"Custom Report Layouts", AssistedSetupGroup::FirstInvoice, '', VideoCategory::FirstInvoice, CustomizeDocumentLayoutsHelpTxt);
+#pragma warning restore AL0432
         GlobalLanguage(Language.GetDefaultApplicationLanguageId());
+#pragma warning disable AL0432
         GuidedExperience.AddTranslationForSetupObjectTitle(GuidedExperienceType::"Assisted Setup", ObjectType::Page,
             Page::"Custom Report Layouts", Language.GetDefaultApplicationLanguageId(), CustomizeDocumentLayoutsTitleTxt);
+#pragma warning restore AL0432
         GlobalLanguage(CurrentGlobalLanguage);
+#endif
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Guided Experience", 'OnReRunOfCompletedAssistedSetup', '', false, false)]
