@@ -119,14 +119,18 @@ table 77 "Report Selections"
             FieldClass = Flowfield;
             ToolTip = 'Specifies a description of the custom email body layout that is used.';
 
+#if not CLEAN28
             trigger OnLookup()
             var
                 CustomReportLayout: Record "Custom Report Layout";
             begin
                 if "Email Body Layout Type" = "Email Body Layout Type"::"Custom Report Layout" then
+#pragma warning disable AL0432
                     if CustomReportLayout.LookupLayoutOK("Report ID") then
+#pragma warning restore AL0432
                         Validate("Email Body Layout Code", CustomReportLayout.Code);
             end;
+#endif
         }
         field(25; "Email Body Layout Type"; Enum "Email Body Layout Type")
         {
