@@ -800,7 +800,8 @@ page 190 "Incoming Documents"
         UpdateOCRSetupVisibility();
 
         Rec.FilterGroup(0);
-        SetProcessedDocumentsVisibility(Rec.GetFilter(Processed) = Format(true));
+        if Rec.GetFilter(Processed) <> '' then
+            SetProcessedDocumentsVisibility(Rec.GetFilter(Processed) = Format(true));
     end;
 
     var
