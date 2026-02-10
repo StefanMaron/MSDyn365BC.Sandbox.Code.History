@@ -1384,7 +1384,13 @@ table 5900 "Service Header"
                 Validate("Payment Terms Code");
             end;
         }
+#if not CLEAN28
+#pragma warning disable AS0136
+#endif
         field(100; "External Document No."; Code[35])
+#if not CLEAN28
+#pragma warning restore AS0136
+#endif
         {
             Caption = 'External Document No.';
             ToolTip = 'Specifies a document number that refers to the customer''s or vendor''s numbering system.';
