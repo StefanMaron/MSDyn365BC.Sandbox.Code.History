@@ -458,7 +458,13 @@ table 5994 "Service Cr.Memo Header"
             Caption = 'Document Date';
             ToolTip = 'Specifies the date when the related document was created.';
         }
+#if not CLEAN28
+#pragma warning disable AS0136
+#endif
         field(100; "External Document No."; Code[35])
+#if not CLEAN28
+#pragma warning restore AS0136
+#endif
         {
             Caption = 'External Document No.';
             ToolTip = 'Specifies the external document number that is entered on the service header that this line was posted from.';
