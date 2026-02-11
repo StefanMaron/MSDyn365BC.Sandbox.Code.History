@@ -7,7 +7,7 @@
   </OwnedComments>
   <Item ItemId=";Codeunit 207529790 - NamedType 4220619603" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Cannot find a Quality Inspection Template or Quality Inspection Generation Rule to match  %1. Ensure there is a Quality Inspection Generation Rule that will match this record.]]></Val>
+      <Val><![CDATA[Cannot find a Quality Inspection Template or Quality Inspection Generation Rule to match %1. Ensure there is a Quality Inspection Generation Rule that will match this record.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
