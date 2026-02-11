@@ -486,6 +486,9 @@ table 304 "Issued Fin. Charge Memo Header"
         key(Key2; "Customer No.", "Posting Date")
         {
         }
+        key(Key3; "Posting Date")
+        {
+        }
     }
 
     fieldgroups
@@ -622,4 +625,3 @@ table 304 "Issued Fin. Charge Memo Header"
     begin
     end;
 }
-
