@@ -23,6 +23,8 @@ page 440 "Issued Reminder List"
     AboutTitle = 'About Issued Reminders';
     AboutText = 'View and manage reminders issued to customers for overdue payments, including the ability to review details and cancel reminders individually or in batches before they are sent.';
     SourceTable = "Issued Reminder Header";
+    SourceTableView = sorting("Posting Date")
+                      order(descending);
     UsageCategory = Lists;
 
     layout
@@ -35,6 +37,12 @@ page 440 "Issued Reminder List"
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = Basic, Suite;
+                }
+                field("Posting Date"; Rec."Posting Date")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the posting date that the reminder was issued on.';
+                    Visible = false;
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
@@ -358,4 +366,3 @@ page 440 "Issued Reminder List"
     end;
 
 }
-

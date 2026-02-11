@@ -21,6 +21,8 @@ page 452 "Issued Fin. Charge Memo List"
     ModifyAllowed = false;
     PageType = List;
     SourceTable = "Issued Fin. Charge Memo Header";
+    SourceTableView = sorting("Posting Date")
+                      order(descending);
     UsageCategory = Lists;
 
     layout
@@ -33,6 +35,12 @@ page 452 "Issued Fin. Charge Memo List"
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = Basic, Suite;
+                }
+                field("Posting Date"; Rec."Posting Date")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Visible = false;
+                    ToolTip = 'Specifies the posting date that the finance charge memo was issued on.';
                 }
                 field("Customer No."; Rec."Customer No.")
                 {
