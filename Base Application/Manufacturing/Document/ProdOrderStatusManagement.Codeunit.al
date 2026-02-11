@@ -113,9 +113,11 @@ codeunit 5407 "Prod. Order Status Management"
 
     procedure ChangeProdOrderStatus(ProdOrder: Record "Production Order"; NewStatus: Enum "Production Order Status"; NewPostingDate: Date; NewUpdateUnitCost: Boolean)
     var
+        xProductionOrder: Record "Production Order";
         SuppressCommit: Boolean;
         IsHandled: Boolean;
     begin
+        xProductionOrder := ProdOrder;
         SetPostingInfo(NewStatus, NewPostingDate, NewUpdateUnitCost);
         IsHandled := false;
         OnBeforeChangeStatusOnProdOrder(ProdOrder, NewStatus.AsInteger(), IsHandled, NewPostingDate, NewUpdateUnitCost);
@@ -147,7 +149,7 @@ codeunit 5407 "Prod. Order Status Management"
             WhseProdRelease.Release(ProdOrder);
         end;
         SuppressCommit := false;
-        OnAfterChangeStatusOnProdOrder(ProdOrder, ToProdOrder, NewStatus, NewPostingDate, NewUpdateUnitCost, SuppressCommit);
+        OnAfterChangeStatusOnProdOrder(ProdOrder, ToProdOrder, NewStatus, NewPostingDate, NewUpdateUnitCost, SuppressCommit, xProductionOrder);
 
         if not SuppressCommit then
             Commit();
@@ -1691,7 +1693,7 @@ codeunit 5407 "Prod. Order Status Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterChangeStatusOnProdOrder(var ProdOrder: Record "Production Order"; var ToProdOrder: Record "Production Order"; NewStatus: Enum "Production Order Status"; NewPostingDate: Date; NewUpdateUnitCost: Boolean; var SuppressCommit: Boolean)
+    local procedure OnAfterChangeStatusOnProdOrder(var ProdOrder: Record "Production Order"; var ToProdOrder: Record "Production Order"; NewStatus: Enum "Production Order Status"; NewPostingDate: Date; NewUpdateUnitCost: Boolean; var SuppressCommit: Boolean; xProductionOrder: Record "Production Order")
     begin
     end;
 
