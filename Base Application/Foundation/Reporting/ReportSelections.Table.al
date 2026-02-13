@@ -1524,6 +1524,7 @@ table 77 "Report Selections"
                                 SourceIDs.Add(SalesInvoice.SystemId);
                                 SourceRelationTypes.Add(Enum::"Email Relation Type"::"Related Entity".AsInteger());
                             end;
+                        OnSendEmailDirectlyOnAfterAddRelatedReminderInvoiceSource(SourceTableIDs, SourceRelationTypes, SourceIDs, ReminderLines);
                     until ReminderLines.Next() = 0;
             end;
 
@@ -2750,6 +2751,11 @@ table 77 "Report Selections"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCopyReportSelectionToReportSelection(ReportSelections: Record "Report Selections"; var TempToReportSelections: Record "Report Selections" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSendEmailDirectlyOnAfterAddRelatedReminderInvoiceSource(var SourceTableIDs: List of [Integer]; var SourceRelationTypes: List of [Integer]; var SourceIDs: List of [Guid]; ReminderLines: Record "Issued Reminder Line")
     begin
     end;
 }

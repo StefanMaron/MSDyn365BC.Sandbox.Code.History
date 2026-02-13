@@ -816,10 +816,14 @@ table 130 "Incoming Document"
         if not GetUnpostedRecord(RelatedRecordVariant) then
             exit;
         RelatedRecordRecordRef.GetTable(RelatedRecordVariant);
-        DataTypeManagement.FindFieldByName(
-          RelatedRecordRecordRef, RelatedRecordFieldRef, SalesHeader.FieldName("Incoming Document Entry No."));
-        RelatedRecordFieldRef.Value := 0;
-        RelatedRecordRecordRef.Modify(true);
+        if DataTypeManagement.FindFieldByName(
+          RelatedRecordRecordRef, RelatedRecordFieldRef, SalesHeader.FieldName("Incoming Document Entry No."))
+        then begin
+            RelatedRecordFieldRef.Value := 0;
+            RelatedRecordRecordRef.Modify(true);
+        end;
+
+        OnAfterRemoveIncomingDocumentEntryNoFromUnpostedDocument(Rec, RelatedRecordVariant);
     end;
 
     procedure CreateIncomingDocument(NewDescription: Text; NewURL: Text): Integer
@@ -2429,6 +2433,11 @@ table 130 "Incoming Document"
 
     [IntegrationEvent(false, false)]
     local procedure OnFindByDocumentNoAndPostingDateOnSetFilters(var IncomingDocument: Record "Incoming Document"; MainRecordRef: RecordRef)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterRemoveIncomingDocumentEntryNoFromUnpostedDocument(var IncomingDocument: Record "Incoming Document"; RelatedRecord: Variant)
     begin
     end;
 }
