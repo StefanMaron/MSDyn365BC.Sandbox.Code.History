@@ -3026,6 +3026,22 @@ table 23 Vendor
         end;
     end;
 
+    procedure FormatVATRegistrationNo(VATRegistrationNo: Text; CountryCode: Code[10]): Text
+    var
+        CountryRegion: Record "Country/Region";
+    begin
+        if VATRegistrationNo = '' then
+            exit;
+
+        VATRegistrationNo := DelChr(VATRegistrationNo);
+
+        if CountryRegion.Get(CountryCode) and (CountryRegion."ISO Code" <> '') then
+            if StrPos(VATRegistrationNo, CountryRegion."ISO Code") <> 1 then
+                VATRegistrationNo := CountryRegion."ISO Code" + VATRegistrationNo;
+
+        exit(VATRegistrationNo);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterHasAddress(Vendor: Record Vendor; var Result: Boolean)
     begin
@@ -3256,4 +3272,5 @@ table 23 Vendor
     local procedure OnOpenVendorLedgerEntriesOnBeforeDrillDownEntries(var DetailedVendorLedgEntry: Record "Detailed Vendor Ledg. Entry"; FilterOnDueEntries: Boolean; var IsHandled: Boolean)
     begin
     end;
+
 }
