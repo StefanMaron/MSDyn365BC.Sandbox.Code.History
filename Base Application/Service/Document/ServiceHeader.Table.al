@@ -3274,7 +3274,10 @@ table 5900 "Service Header"
                 ServiceHeader.Validate("Payment Discount %", 0);
             end else begin
                 ServiceHeader."Due Date" := CalcDate(PaymentTerms."Due Date Calculation", ServiceHeader."Document Date");
-                ServiceHeader."Pmt. Discount Date" := CalcDate(PaymentTerms."Discount Date Calculation", ServiceHeader."Document Date");
+                IsHandled := false;
+                OnValidatePaymentTermsCodeOnBeforeCalcPmtDiscDate(ServiceHeader, IsHandled);
+                if not IsHandled then
+                    ServiceHeader."Pmt. Discount Date" := CalcDate(PaymentTerms."Discount Date Calculation", ServiceHeader."Document Date");
                 ServiceHeader.Validate("Payment Discount %", PaymentTerms."Discount %")
             end;
         end else begin
@@ -5989,6 +5992,11 @@ table 5900 "Service Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidatePaymentTermsCodeOnBeforeValidateDueDate(var ServiceHeader: Record "Service Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidatePaymentTermsCodeOnBeforeCalcPmtDiscDate(var ServiceHeader: Record "Service Header"; var IsHandled: Boolean)
     begin
     end;
 
