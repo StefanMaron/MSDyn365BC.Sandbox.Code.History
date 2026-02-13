@@ -3279,7 +3279,10 @@ table 5900 "Service Header"
             end else begin
                 ServiceHeader."Due Date" := ServiceHeader."Document Date";
                 AdjustDueDate.SalesAdjustDueDate(ServiceHeader."Due Date", ServiceHeader."Document Date", 99991231D, ServiceHeader."Bill-to Customer No.");
-                ServiceHeader."Pmt. Discount Date" := ServiceHeader."Document Date";
+                IsHandled := false;
+                OnValidatePaymentTermsCodeOnBeforeCalcPmtDiscDate(ServiceHeader, IsHandled);
+                if not IsHandled then
+                    ServiceHeader."Pmt. Discount Date" := ServiceHeader."Document Date";
                 ServiceHeader.Validate("Payment Discount %", 0);
             end
         else
@@ -6030,6 +6033,11 @@ table 5900 "Service Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidatePaymentTermsCodeOnBeforeValidateDueDate(var ServiceHeader: Record "Service Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidatePaymentTermsCodeOnBeforeCalcPmtDiscDate(var ServiceHeader: Record "Service Header"; var IsHandled: Boolean)
     begin
     end;
 

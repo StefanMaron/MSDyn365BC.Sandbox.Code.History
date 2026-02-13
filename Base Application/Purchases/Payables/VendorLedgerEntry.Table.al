@@ -832,13 +832,13 @@ table 25 "Vendor Ledger Entry"
         {
             Clustered = true;
         }
-        key(Key2; "Vendor No.", "Posting Date", "Currency Code")
+        key(Key2; "Vendor No.", "Currency Code")
         {
             SumIndexFields = "Purchase (LCY)", "Inv. Discount (LCY)";
         }
         key(Key3; "Vendor No.", "Currency Code", "Posting Date")
         {
-            Enabled = false;
+            IncludedFields = "Purchase (LCY)", "Inv. Discount (LCY)";
         }
         key(Key4; "Document No.")
         {
@@ -852,12 +852,6 @@ table 25 "Vendor Ledger Entry"
         key(Key7; Open, "Due Date")
         {
         }
-        key(Key8; "Document Type", "Vendor No.", "Posting Date", "Currency Code")
-        {
-            MaintainSIFTIndex = false;
-            MaintainSQLIndex = false;
-            SumIndexFields = "Purchase (LCY)", "Inv. Discount (LCY)";
-        }
         key(Key9; "Closed by Entry No.")
         {
         }
@@ -866,44 +860,18 @@ table 25 "Vendor Ledger Entry"
         }
         key(Key11; "Vendor No.", "Global Dimension 1 Code", "Global Dimension 2 Code", "Posting Date", "Currency Code")
         {
-            SumIndexFields = "Purchase (LCY)", "Inv. Discount (LCY)", "Pmt. Disc. Rcd.(LCY)";
+            IncludedFields = "Purchase (LCY)", "Inv. Discount (LCY)";
         }
-        key(Key12; "Vendor No.", Open, "Global Dimension 1 Code", "Global Dimension 2 Code", Positive, "Due Date", "Currency Code")
-        {
-            Enabled = false;
-        }
-        key(Key13; Open, "Global Dimension 1 Code", "Global Dimension 2 Code", "Due Date")
-        {
-            Enabled = false;
-        }
-        key(Key14; "Document Type", "Vendor No.", "Global Dimension 1 Code", "Global Dimension 2 Code", "Posting Date", "Currency Code")
-        {
-            MaintainSIFTIndex = false;
-            MaintainSQLIndex = false;
-        }
-        key(Key15; "Vendor No.", "Applies-to ID", Open, Positive, "Due Date", "Document Type")
+        key(Key15; "Vendor No.", "Applies-to ID", Open, Positive, "Due Date")
         {
         }
-        key(Key16; "Vendor No.", "Document Type", "Document Situation", "Document Status")
-        {
-            SumIndexFields = "Remaining Amount (LCY) stats.", "Amount (LCY) stats.";
-        }
-        key(Key17; "Document No.", "Document Type", "Vendor No.")
+        key(Key16; "Vendor Posting Group")
         {
         }
-        key(Key18; "Applies-to ID", "Document Type")
+        key(Key17; "Pmt. Discount Date")
         {
         }
-        key(Key19; "Document Type", "Vendor No.", "Document Date", "Currency Code")
-        {
-        }
-        key(Key20; "Vendor Posting Group")
-        {
-        }
-        key(Key21; "Pmt. Discount Date")
-        {
-        }
-        key(Key22; "Document Type", "Due Date", Open)
+        key(Key18; "Document Type", "Due Date", Open)
         {
         }
         key(Key25; "Vendor No.", "Posting Date", "Applies-to ID")

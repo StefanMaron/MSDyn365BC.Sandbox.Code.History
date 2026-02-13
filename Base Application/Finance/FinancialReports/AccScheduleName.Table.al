@@ -131,6 +131,36 @@ table 84 "Acc. Schedule Name"
     {
     }
 
+    trigger OnRename()
+    var
+        GLSetup: Record "General Ledger Setup";
+        FinancialReportUserFilters: Record "Financial Report User Filters";
+        GLSetupModified: Boolean;
+    begin
+        if GLSetup.Get() then begin
+            if GLSetup."Fin. Rep. Bal. Sheet Row" = xRec.Name then begin
+                GLSetup."Fin. Rep. Bal. Sheet Row" := Rec.Name;
+                GLSetupModified := true;
+            end;
+            if GLSetup."Fin. Rep. Income Stmt. Row" = xRec.Name then begin
+                GLSetup."Fin. Rep. Income Stmt. Row" := Rec.Name;
+                GLSetupModified := true;
+            end;
+            if GLSetup."Fin. Rep. Cash Flow Stmt. Row" = xRec.Name then begin
+                GLSetup."Fin. Rep. Cash Flow Stmt. Row" := Rec.Name;
+                GLSetupModified := true;
+            end;
+            if GLSetup."Fin. Rep. Retained Earn. Row" = xRec.Name then begin
+                GLSetup."Fin. Rep. Retained Earn. Row" := Rec.Name;
+                GLSetupModified := true;
+            end;
+            if GLSetupModified then
+                GLSetup.Modify();
+        end;
+        FinancialReportUserFilters.SetRange("Row Definition", xRec.Name);
+        FinancialReportUserFilters.ModifyAll("Row Definition", Rec.Name);
+    end;
+
     trigger OnDelete()
     begin
         AccSchedLine.SetRange("Schedule Name", Name);

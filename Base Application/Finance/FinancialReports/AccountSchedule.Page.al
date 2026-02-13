@@ -8,6 +8,7 @@ using Microsoft.CostAccounting.Account;
 using System.Environment.Configuration;
 using System.Integration;
 using System.Integration.Excel;
+using System.Utilities;
 
 /// <summary>
 /// Account schedule line definition page for creating and managing financial report row structures.
@@ -36,61 +37,76 @@ page 104 "Account Schedule"
     {
         area(content)
         {
-#if not CLEAN27
-            field(CurrentSchedName; CurrentSchedName)
+            group(General)
             {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Name';
-                Lookup = true;
-                ToolTip = 'Specifies the unique name (code) of the financial report row definition.';
-                Visible = false;
-                ObsoleteState = Pending;
-                ObsoleteReason = 'This field is no longer required and will be removed in a future release.';
-                ObsoleteTag = '27.0';
+                ShowCaption = false;
+                Visible = not HeaderHidden;
+                field(CurrentSchedName; CurrentSchedName)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Name';
+                    ToolTip = 'Specifies the unique name (code) of the financial report row definition.';
 
-                trigger OnLookup(var Text: Text): Boolean
-                begin
-                    exit(AccSchedManagement.LookupName(CurrentSchedName, Text));
-                end;
+                    trigger OnValidate()
+                    var
+                        AccScheduleName: Record "Acc. Schedule Name";
+                        ConfirmMgt: Codeunit "Confirm Management";
+                        OldName: Code[10];
+                        RenameQst: Label 'Your change might update related records, which can take a while. Do you want to continue?';
+                    begin
+                        Rec.FilterGroup(2);
+                        if Rec.GetFilter("Schedule Name") <> '' then
+                            OldName := Rec.GetRangeMin("Schedule Name");
+                        Rec.FilterGroup(0);
+                        if (OldName = CurrentSchedName) or (OldName = '') then
+                            Error('');
+                        if not AccScheduleName.Get(OldName) then
+                            Error('');
+                        if not ConfirmMgt.GetResponse(RenameQst) then
+                            Error('');
+                        CurrPage.SaveRecord();
+                        AccScheduleName.Rename(CurrentSchedName);
+                        CurrentSchedName := AccScheduleName.Name;
+                        AccSchedManagement.SetName(CurrentSchedName, Rec);
+                        if Rec.FindFirst() then
+                            CurrPage.Update(false)
+                        else begin
+                            Clear(Rec);
+                            Rec.Init();
+                        end;
+                    end;
+                }
+                field(CurrentDescription; CurrentDescription)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Description';
+                    ToolTip = 'Specifies the description of row definition. The description is not shown on the final report but is used to provide more context when using the definition.';
 
-                trigger OnValidate()
-                begin
-                    AccSchedManagement.CheckName(CurrentSchedName);
-                    CurrentSchedNameOnAfterValidate();
-                    GetDescriptions();
-                end;
-            }
-#endif
-            field(CurrentDescription; CurrentDescription)
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Description';
-                ToolTip = 'Specifies the description of row definition. The description is not shown on the final report but is used to provide more context when using the definition.';
+                    trigger OnValidate()
+                    var
+                        AccScheduleName: Record "Acc. Schedule Name";
+                    begin
+                        AccScheduleName.Get(CurrentSchedName);
+                        AccScheduleName.Description := CurrentDescription;
+                        AccScheduleName.Modify();
+                    end;
+                }
+                field(InternalDescription; InternalDescription)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Internal Description';
+                    MultiLine = true;
+                    ToolTip = 'Specifies the internal description of row definition. The internal description is not shown on the final report but is used to provide more context when using the definition.';
 
-                trigger OnValidate()
-                var
-                    AccScheduleName: Record "Acc. Schedule Name";
-                begin
-                    AccScheduleName.Get(CurrentSchedName);
-                    AccScheduleName.Description := CurrentDescription;
-                    AccScheduleName.Modify();
-                end;
-            }
-            field(InternalDescription; InternalDescription)
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Internal Description';
-                MultiLine = true;
-                ToolTip = 'Specifies the internal description of row definition. The internal description is not shown on the final report but is used to provide more context when using the definition.';
-
-                trigger OnValidate()
-                var
-                    AccScheduleName: Record "Acc. Schedule Name";
-                begin
-                    AccScheduleName.Get(CurrentSchedName);
-                    AccScheduleName."Internal Description" := InternalDescription;
-                    AccScheduleName.Modify();
-                end;
+                    trigger OnValidate()
+                    var
+                        AccScheduleName: Record "Acc. Schedule Name";
+                    begin
+                        AccScheduleName.Get(CurrentSchedName);
+                        AccScheduleName."Internal Description" := InternalDescription;
+                        AccScheduleName.Modify();
+                    end;
+                }
             }
             repeater(Control1)
             {
@@ -369,6 +385,34 @@ page 104 "Account Schedule"
                     Page.Run(0, FinancialReport);
                 end;
             }
+            action(HideHeader)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Hide Header';
+                Image = ListPage;
+                ToolTip = 'Show the page header.';
+                Visible = not HeaderHidden;
+
+                trigger OnAction()
+                begin
+                    HeaderHidden := true;
+                    CurrPage.Update(false);
+                end;
+            }
+            action(ShowHeader)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Show Header';
+                Image = TaskPage;
+                ToolTip = 'Hide the page header.';
+                Visible = HeaderHidden;
+
+                trigger OnAction()
+                begin
+                    HeaderHidden := false;
+                    CurrPage.Update(false);
+                end;
+            }
             group("F&unctions")
             {
                 Caption = 'F&unctions';
@@ -466,29 +510,19 @@ page 104 "Account Schedule"
             {
                 Caption = 'Process', Comment = 'Generated from the PromotedActionCategories property index 1.';
 
-                actionref(Outdent_Promoted; Outdent)
-                {
-                }
-                actionref(Indent_Promoted; Indent)
-                {
-                }
-                actionref(WhereUsed_Promoted; WhereUsed)
-                {
-                }
+                actionref(Outdent_Promoted; Outdent) { }
+                actionref(Indent_Promoted; Indent) { }
+                actionref(WhereUsed_Promoted; WhereUsed) { }
+                actionref(HideHeader_Promoted; HideHeader) { }
+                actionref(ShowHeader_Promoted; ShowHeader) { }
             }
             group(Category_Category4)
             {
                 Caption = 'Insert', Comment = 'Generated from the PromotedActionCategories property index 3.';
 
-                actionref(InsertGLAccounts_Promoted; InsertGLAccounts)
-                {
-                }
-                actionref(InsertCostTypes_Promoted; InsertCostTypes)
-                {
-                }
-                actionref(InsertCFAccounts_Promoted; InsertCFAccounts)
-                {
-                }
+                actionref(InsertGLAccounts_Promoted; InsertGLAccounts) { }
+                actionref(InsertCostTypes_Promoted; InsertCostTypes) { }
+                actionref(InsertCFAccounts_Promoted; InsertCFAccounts) { }
             }
             group(Category_Report)
             {
@@ -539,6 +573,7 @@ page 104 "Account Schedule"
         CurrentDescription: Text[80];
         InternalDescription: Text[500];
         TotalingDisplayed: Text[250];
+        HeaderHidden: Boolean;
         ExcelFileNameTxt: Label 'Row Definition - ScheduleName %1', Comment = '%1 = Schedule Name';
 
     /// <summary>

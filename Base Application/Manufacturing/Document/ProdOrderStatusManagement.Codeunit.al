@@ -117,12 +117,13 @@ codeunit 5407 "Prod. Order Status Management"
         SuppressCommit: Boolean;
         IsHandled: Boolean;
     begin
-        xProductionOrder := ProdOrder;
         SetPostingInfo(NewStatus, NewPostingDate, NewUpdateUnitCost);
         IsHandled := false;
         OnBeforeChangeStatusOnProdOrder(ProdOrder, NewStatus.AsInteger(), IsHandled, NewPostingDate, NewUpdateUnitCost);
         if IsHandled then
             exit;
+
+        xProductionOrder := ProdOrder;
         if (NewStatus = Enum::"Production Order Status"::Released) and (ProdOrder."Source Type" = ProdOrder."Source Type"::Item) then
             Item.CheckItemAndVariantForProdBlocked(ProdOrder."Source No.", '', Enum::"Item Production Blocked"::Output);
         if NewStatus = NewStatus::Finished then begin
