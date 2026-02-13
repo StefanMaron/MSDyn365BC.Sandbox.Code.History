@@ -340,6 +340,33 @@ table 88 "Financial Report"
         AccSchedManagement.CheckAnalysisView(Rec."Financial Report Row Group", Rec."Financial Report Column Group", true);
     end;
 
+    trigger OnRename()
+    var
+        GLSetup: Record "General Ledger Setup";
+        GLSetupModified: Boolean;
+    begin
+        if GLSetup.Get() then begin
+            if GLSetup."Fin. Rep. for Balance Sheet" = xRec.Name then begin
+                GLSetup."Fin. Rep. for Balance Sheet" := Rec.Name;
+                GLSetupModified := true;
+            end;
+            if GLSetup."Fin. Rep. for Income Stmt." = xRec.Name then begin
+                GLSetup."Fin. Rep. for Income Stmt." := Rec.Name;
+                GLSetupModified := true;
+            end;
+            if GLSetup."Fin. Rep. for Cash Flow Stmt" = xRec.Name then begin
+                GLSetup."Fin. Rep. for Cash Flow Stmt" := Rec.Name;
+                GLSetupModified := true;
+            end;
+            if GLSetup."Fin. Rep. for Retained Earn." = xRec.Name then begin
+                GLSetup."Fin. Rep. for Retained Earn." := Rec.Name;
+                GLSetupModified := true;
+            end;
+            if GLSetupModified then
+                GLSetup.Modify();
+        end;
+    end;
+
     trigger OnDelete()
     var
         FinancialReportSchedule: Record "Financial Report Schedule";
