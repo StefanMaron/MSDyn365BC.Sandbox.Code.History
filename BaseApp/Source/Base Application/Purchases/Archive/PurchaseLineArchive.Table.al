@@ -1134,8 +1134,7 @@ table 5110 "Purchase Line Archive"
         }
         key(Key5; "Document No.", "Document Type", "Doc. No. Occurrence", "Version No.")
         {
-            MaintainSqlIndex = false;
-            SumIndexFields = Amount, "Amount Including VAT";
+            IncludedFields = Amount, "Amount Including VAT";
         }
     }
 

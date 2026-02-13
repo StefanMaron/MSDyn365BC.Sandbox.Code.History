@@ -470,6 +470,7 @@ page 6050 "Service Contract"
                 field("Allow Unbalanced Amounts"; Rec."Allow Unbalanced Amounts")
                 {
                     ApplicationArea = Service;
+                    Importance = Additional;
 
                     trigger OnValidate()
                     begin
@@ -479,6 +480,21 @@ page 6050 "Service Contract"
                 field("Calcd. Annual Amount"; Rec."Calcd. Annual Amount")
                 {
                     ApplicationArea = Service;
+                    Importance = Additional;
+                }
+                field(ActiveAnnualAmount; Rec.GetActiveAnnualAmount())
+                {
+                    ApplicationArea = Service;
+                    Importance = Promoted;
+                    Caption = 'Active Annual Amount';
+                    ToolTip = 'Specifies the sum of the Line Amount field values on all contract lines associated with the service contract or contract quote, respecting the contract expiration date.';
+                    AutoFormatExpression = Rec."Currency Code";
+                    AutoFormatType = 1;
+
+                    trigger OnDrillDown()
+                    begin
+                        Rec.ShowActiveServiceContractLines();
+                    end;
                 }
                 field(InvoicePeriod; Rec."Invoice Period")
                 {
