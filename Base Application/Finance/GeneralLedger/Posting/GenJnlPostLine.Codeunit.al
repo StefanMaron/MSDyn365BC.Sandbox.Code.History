@@ -6419,6 +6419,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
                 VATPostingSetup.Get(VATEntry."VAT Bus. Posting Group", VATEntry."VAT Prod. Posting Group");
                 OnPostUnapplyOnBeforeUnapplyVATEntry(VATEntry, UnapplyVATEntries);
                 if UnapplyVATEntries or (VATEntry."Unrealized VAT Entry No." <> 0) then begin
+                    OnPostUnapplyOnBeforeInsertTempVATEntry(VATEntry, UnapplyVATEntries);
                     InsertTempVATEntry(GenJnlLine, VATEntry, TempVATEntryNo, TempVATEntry);
                     if VATEntry."Unrealized VAT Entry No." <> 0 then begin
                         VATPostingSetup.Get(VATEntry."VAT Bus. Posting Group", VATEntry."VAT Prod. Posting Group");
@@ -10915,4 +10916,8 @@ codeunit 12 "Gen. Jnl.-Post Line"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnPostUnapplyOnBeforeInsertTempVATEntry(var VATEntry: Record "VAT Entry"; var UnapplyVATEntries: Boolean)
+    begin
+    end;
 }
