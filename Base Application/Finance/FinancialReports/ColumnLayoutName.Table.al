@@ -5,6 +5,7 @@
 namespace Microsoft.Finance.FinancialReports;
 
 using Microsoft.Finance.Analysis;
+using Microsoft.Finance.GeneralLedger.Setup;
 using System.Environment;
 using System.IO;
 using System.Telemetry;
@@ -83,6 +84,29 @@ table 333 "Column Layout Name"
         {
         }
     }
+
+    trigger OnRename()
+    var
+        GLSetup: Record "General Ledger Setup";
+        FinancialReportUserFilters: Record "Financial Report User Filters";
+        GLSetupModified: Boolean;
+    begin
+        if GLSetup.Get() then begin
+            if GLSetup."Fin. Rep. Bal. Sheet Column" = xRec.Name then begin
+                GLSetup."Fin. Rep. Bal. Sheet Column" := Rec.Name;
+                GLSetupModified := true;
+            end;
+            if GLSetup."Fin. Rep. Net Change Column" = xRec.Name then begin
+                GLSetup."Fin. Rep. Net Change Column" := Rec.Name;
+                GLSetupModified := true;
+            end;
+            if GLSetupModified then
+                GLSetup.Modify();
+        end;
+
+        FinancialReportUserFilters.SetRange("Column Definition", xRec.Name);
+        FinancialReportUserFilters.ModifyAll("Column Definition", Rec.Name);
+    end;
 
     trigger OnDelete()
     begin
