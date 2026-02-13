@@ -683,9 +683,9 @@ table 32 "Item Ledger Entry"
         {
             IncludedFields = "Job No.", "Job Task No.", "Document Type", "Document No.", "Order Type", "Order No.", "Serial No.", "Lot No.", "Package No.", Quantity, "Remaining Quantity";
         }
-        key(Key7; "Location Code", "Item No.", "Variant Code", Open, Positive, "SIFT Bucket No.")
+        key(Key7; "Location Code", "Item No.", "Variant Code", Open, Positive)
         {
-            SumIndexFields = Quantity, "Remaining Quantity";
+            IncludedFields = Quantity, "Remaining Quantity";
         }
         key(Key8; "Country/Region Code", "Entry Type", "Posting Date")
         {

@@ -267,25 +267,25 @@ table 380 "Detailed Vendor Ledg. Entry"
         {
             Clustered = true;
         }
-        key(Key2; "Vendor Ledger Entry No.", "Posting Date")
+        key(Key2; "Vendor No.", "Currency Code")
         {
-            IncludedFields = Amount, "Amount (LCY)";
+            SumIndexFields = Amount, "Amount (LCY)";
         }
         key(Key3; "Vendor Ledger Entry No.", "Entry Type", "Posting Date")
         {
             IncludedFields = Amount, "Amount (LCY)";
         }
-        key(Key4; "Ledger Entry Amount", "Vendor Ledger Entry No.", "Posting Date")
+        key(Key4; "Vendor Ledger Entry No.", "Ledger Entry Amount", "Posting Date")
         {
-            IncludedFields = Amount, "Amount (LCY)", "Debit Amount", "Credit Amount", "Debit Amount (LCY)", "Credit Amount (LCY)";
+            IncludedFields = "Currency Code", Amount, "Amount (LCY)", "Debit Amount", "Credit Amount", "Debit Amount (LCY)", "Credit Amount (LCY)";
         }
         key(Key5; "Initial Document Type", "Entry Type", "Vendor No.", "Currency Code", "Initial Entry Global Dim. 1", "Initial Entry Global Dim. 2", "Posting Date")
         {
-            SumIndexFields = Amount, "Amount (LCY)";
+            IncludedFields = Amount, "Amount (LCY)";
         }
         key(Key6; "Vendor No.", "Currency Code", "Initial Entry Global Dim. 1", "Initial Entry Global Dim. 2", "Initial Entry Due Date", "Posting Date")
         {
-            SumIndexFields = Amount, "Amount (LCY)";
+            IncludedFields = Amount, "Amount (LCY)";
         }
         key(Key7; "Document No.", "Document Type", "Posting Date")
         {
@@ -303,9 +303,9 @@ table 380 "Detailed Vendor Ledg. Entry"
         {
             SumIndexFields = "Amount (LCY)";
         }
-        key(Key12; "Entry Type", "Vendor No.", "Posting Date")
+        key(Key12; "Vendor No.", "Entry Type", "Posting Date")
         {
-            SumIndexFields = "Debit Amount", "Credit Amount", "Debit Amount (LCY)", "Credit Amount (LCY)";
+            IncludedFields = Amount, "Amount (LCY)", "Debit Amount", "Credit Amount", "Debit Amount (LCY)", "Credit Amount (LCY)";
         }
     }
 

@@ -772,7 +772,6 @@ table 125 "Purch. Cr. Memo Line"
         key(Key1; "Document No.", "Line No.")
         {
             Clustered = true;
-            MaintainSIFTIndex = false;
         }
         key(Key2; "Blanket Order No.", "Blanket Order Line No.")
         {
@@ -785,8 +784,7 @@ table 125 "Purch. Cr. Memo Line"
         }
         key(Key5; "Document No.", "Location Code")
         {
-            MaintainSQLIndex = false;
-            SumIndexFields = Amount, "Amount Including VAT";
+            IncludedFields = Amount, "Amount Including VAT";
         }
     }
 
