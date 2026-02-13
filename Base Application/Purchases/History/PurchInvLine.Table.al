@@ -848,8 +848,7 @@ table 123 "Purch. Inv. Line"
         }
         key(Key7; "Document No.", "Location Code")
         {
-            MaintainSQLIndex = false;
-            SumIndexFields = Amount, "Amount Including VAT", "Inv. Discount Amount";
+            IncludedFields = Amount, "Amount Including VAT", "Inv. Discount Amount";
         }
     }
 

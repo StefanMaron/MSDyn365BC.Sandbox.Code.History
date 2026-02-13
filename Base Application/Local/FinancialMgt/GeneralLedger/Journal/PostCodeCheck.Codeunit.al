@@ -103,6 +103,7 @@ codeunit 28000 "Post Code Check"
                 begin
                     PostCodeRec.Reset();
                     PostCodeRec.SetFilter(Code, PostCode);
+                    OnVerifyPostCodeOnAfterFilterPostCode(PostCodeRec, CountryCode);
                     PostCodeRec.FindFirst();
                     RecCount := PostCodeRec.Count();
                     case true of
@@ -2637,6 +2638,11 @@ codeunit 28000 "Post Code Check"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterVerifyPostCode(var PostCodeRec: Record "Post Code"; var CityTxt: Text[30]; var PostCode: Code[20]; var CountyTxt: Text[30]; var CountryCode: Code[10])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnVerifyPostCodeOnAfterFilterPostCode(var PostCodeRec: Record "Post Code"; CountryCode: Code[10])
     begin
     end;
 }
