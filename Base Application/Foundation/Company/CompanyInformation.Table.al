@@ -797,6 +797,37 @@ table 79 "Company Information"
             "Brand Color Value" := '';
     end;
 
+    procedure FormatVATRegistrationNo(VATRegistrationNo: Text; CountryCode: Code[10]): Text
+    var
+        CountryRegion: Record "Country/Region";
+    begin
+        if VATRegistrationNo = '' then
+            exit;
+
+        VATRegistrationNo := DelChr(VATRegistrationNo);
+
+        if CountryRegion.DetermineCountry(CountryCode) then
+            VATRegistrationNo := FormatEnterpriseNo(VATRegistrationNo, CountryCode)
+        else
+            if CountryRegion.Get(CountryCode) and (CountryRegion."ISO Code" <> '') then
+                if StrPos(VATRegistrationNo, CountryRegion."ISO Code") <> 1 then
+                    VATRegistrationNo := CountryRegion."ISO Code" + VATRegistrationNo;
+
+        exit(VATRegistrationNo);
+    end;
+
+    local procedure FormatEnterpriseNo(EnterpriseNo: Text; CountryCode: Code[10]): Text
+    var
+        CountryRegion: Record "Country/Region";
+    begin
+        EnterpriseNo := DelChr(EnterpriseNo);
+        if DelChr(EnterpriseNo, '=', DelChr(UpperCase(EnterpriseNo), '=', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')) <> '' then
+            exit(EnterpriseNo);
+        if CountryRegion.Get(CountryCode) and (CountryRegion."ISO Code" <> '') then
+            EnterpriseNo := CountryRegion."ISO Code" + EnterpriseNo;
+        exit(EnterpriseNo);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetSystemIndicator(var Text: Text[250]; var Style: Option Standard,Accent1,Accent2,Accent3,Accent4,Accent5,Accent6,Accent7,Accent8,Accent9)
     begin

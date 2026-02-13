@@ -4433,6 +4433,37 @@ table 18 Customer
         end;
     end;
 
+    procedure FormatVATRegistrationNo(VATRegistrationNo: Text; CountryCode: Code[10]): Text
+    var
+        CountryRegion: Record "Country/Region";
+    begin
+        if VATRegistrationNo = '' then
+            exit;
+
+        VATRegistrationNo := DelChr(VATRegistrationNo);
+
+        if CountryRegion.DetermineCountry(CountryCode) then
+            VATRegistrationNo := FormatEnterpriseNo(VATRegistrationNo, CountryCode)
+        else
+            if CountryRegion.Get(CountryCode) and (CountryRegion."ISO Code" <> '') then
+                if StrPos(VATRegistrationNo, CountryRegion."ISO Code") <> 1 then
+                    VATRegistrationNo := CountryRegion."ISO Code" + VATRegistrationNo;
+
+        exit(VATRegistrationNo);
+    end;
+
+    local procedure FormatEnterpriseNo(EnterpriseNo: Text; CountryCode: Code[10]): Text
+    var
+        CountryRegion: Record "Country/Region";
+    begin
+        EnterpriseNo := DelChr(EnterpriseNo);
+        if DelChr(EnterpriseNo, '=', DelChr(UpperCase(EnterpriseNo), '=', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')) <> '' then
+            exit(EnterpriseNo);
+        if CountryRegion.Get(CountryCode) and (CountryRegion."ISO Code" <> '') then
+            EnterpriseNo := CountryRegion."ISO Code" + EnterpriseNo;
+        exit(EnterpriseNo);
+    end;
+
     /// <summary>
     /// Raised before determining if the associated contact needs to be updated.
     /// </summary>

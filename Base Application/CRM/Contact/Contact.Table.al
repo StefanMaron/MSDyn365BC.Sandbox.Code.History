@@ -1590,11 +1590,16 @@ table 5050 Contact
         end;
     end;
 
-    procedure CreateCustomer(): Code[20];
+    procedure CreateCustomer() CustomerNo: Code[20];
     var
         CustomerTempl: Record "Customer Templ.";
         CustomerTemplMgt: Codeunit "Customer Templ. Mgt.";
+        IsHandled: Boolean;
     begin
+        OnBeforeCreateCustomer(Rec, CustomerNo, IsHandled);
+        if IsHandled then
+            exit(CustomerNo);
+
         if CustomerTemplMgt.SelectCustomerTemplateFromContact(CustomerTempl, Rec) then
             exit(CreateCustomerFromTemplate(CustomerTempl.Code))
         else
@@ -4211,6 +4216,11 @@ table 5050 Contact
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateEmployeeLink(var Contact: Record Contact)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateCustomer(var Contact: Record Contact; var CustomerNo: Code[20]; var IsHandled: Boolean)
     begin
     end;
 }

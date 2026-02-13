@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -2863,6 +2863,37 @@ table 23 Vendor
                         MyVendor.ModifyAll("Phone No.", "Phone No.");
                 end;
         end;
+    end;
+
+    procedure FormatVATRegistrationNo(VATRegistrationNo: Text; CountryCode: Code[10]): Text
+    var
+        CountryRegion: Record "Country/Region";
+    begin
+        if VATRegistrationNo = '' then
+            exit;
+
+        VATRegistrationNo := DelChr(VATRegistrationNo);
+
+        if CountryRegion.DetermineCountry(CountryCode) then
+            VATRegistrationNo := FormatEnterpriseNo(VATRegistrationNo, CountryCode)
+        else
+            if CountryRegion.Get(CountryCode) and (CountryRegion."ISO Code" <> '') then
+                if StrPos(VATRegistrationNo, CountryRegion."ISO Code") <> 1 then
+                    VATRegistrationNo := CountryRegion."ISO Code" + VATRegistrationNo;
+
+        exit(VATRegistrationNo);
+    end;
+
+    local procedure FormatEnterpriseNo(EnterpriseNo: Text; CountryCode: Code[10]): Text
+    var
+        CountryRegion: Record "Country/Region";
+    begin
+        EnterpriseNo := DelChr(EnterpriseNo);
+        if DelChr(EnterpriseNo, '=', DelChr(UpperCase(EnterpriseNo), '=', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')) <> '' then
+            exit(EnterpriseNo);
+        if CountryRegion.Get(CountryCode) and (CountryRegion."ISO Code" <> '') then
+            EnterpriseNo := CountryRegion."ISO Code" + EnterpriseNo;
+        exit(EnterpriseNo);
     end;
 
     [IntegrationEvent(false, false)]
