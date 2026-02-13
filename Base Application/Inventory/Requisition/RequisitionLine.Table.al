@@ -228,6 +228,7 @@ table 246 "Requisition Line"
                 ItemVend: Record "Item Vendor";
                 TempSKU: Record "Stockkeeping Unit" temporary;
                 IsHandled: Boolean;
+                UpdateVendorItemInfo: Boolean;
             begin
                 CheckActionMessageNew();
                 if "Vendor No." <> '' then
@@ -274,7 +275,10 @@ table 246 "Requisition Line"
 
                 "Order Address Code" := '';
 
-                if (Type = Type::Item) and ("No." <> '') and (not IsProdOrder()) then begin
+                UpdateVendorItemInfo := (Type = Type::Item) and ("No." <> '') and (not IsProdOrder());
+                OnValidateVendorNoOnBeforeUpdateVendorItemInfo(Rec, UpdateVendorItemInfo);
+
+                if UpdateVendorItemInfo then begin
                     if ItemVend.Get("Vendor No.", "No.", "Variant Code") then begin
                         IsHandled := false;
                         OnValidateVendorNoOnBeforeSetVendorItemNoFromItemVend(Rec, IsHandled);
@@ -4191,6 +4195,11 @@ table 246 "Requisition Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateVendorNoOnAfterGetDefaultBinCode(var RequisitionLine: Record "Requisition Line");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateVendorNoOnBeforeUpdateVendorItemInfo(var RequisitionLine: Record "Requisition Line"; var UpdateVendorItemInfo: Boolean)
     begin
     end;
 }

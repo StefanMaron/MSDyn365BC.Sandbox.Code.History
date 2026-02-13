@@ -509,7 +509,7 @@ table 37 "Sales Line"
                         Validate("VAT Prod. Posting Group");
 
                 DoCheckReceiptOrderStatus := CurrFieldNo <> 0;
-                OnValidateShipmentDateOnAfterSalesLineVerifyChange(Rec, CurrFieldNo, DoCheckReceiptOrderStatus);
+                OnValidateShipmentDateOnAfterSalesLineVerifyChange(Rec, CurrFieldNo, DoCheckReceiptOrderStatus, HasBeenShown);
                 if DoCheckReceiptOrderStatus then
                     CheckReceiptOrderStatus();
 
@@ -7762,7 +7762,14 @@ table 37 "Sales Line"
     end;
 
     local procedure SumVATAmountLine(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var VATAmountLine: Record "VAT Amount Line"; QtyType: Option General,Invoicing,Shipping; AmtToHandle: Decimal; QtyToHandle: Decimal)
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeSumVATAmountLine(SalesHeader, SalesLine, VATAmountLine, QtyType, AmtToHandle, QtyToHandle, IsHandled);
+        if IsHandled then
+            exit;
+
         case QtyType of
             QtyType::General:
                 begin
@@ -13498,8 +13505,9 @@ table 37 "Sales Line"
     /// <param name="SalesLine">The sales line being processed.</param>
     /// <param name="CurrentFieldNo">The current field number.</param>
     /// <param name="DoCheckReceiptOrderStatus">Specifies whether to check the receipt order status.</param>
+    /// <param name="HasBeenShown">Specifies whether the validation dialog has been shown.</param>
     [IntegrationEvent(false, false)]
-    local procedure OnValidateShipmentDateOnAfterSalesLineVerifyChange(var SalesLine: Record "Sales Line"; CurrentFieldNo: Integer; var DoCheckReceiptOrderStatus: Boolean)
+    local procedure OnValidateShipmentDateOnAfterSalesLineVerifyChange(var SalesLine: Record "Sales Line"; CurrentFieldNo: Integer; var DoCheckReceiptOrderStatus: Boolean; var HasBeenShown: Boolean)
     begin
     end;
 
@@ -15523,6 +15531,21 @@ table 37 "Sales Line"
     /// <param name="Currency">The currency record used for calculations.</param>
     [IntegrationEvent(false, false)]
     local procedure OnUpdateVATOnLinesOnAfterUpdateBaseAmounts(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var TempVATAmountLine: Record "VAT Amount Line" temporary; var VATAmountLine: Record "VAT Amount Line"; Currency: Record Currency)
+    begin
+    end;
+
+    /// <summary>
+    /// Raised before summing the VAT amount line.
+    /// </summary>
+    /// <param name="SalesHeader">The sales header being processed.</param>
+    /// <param name="SalesLine">The sales line being processed.</param>
+    /// <param name="VATAmountLine">The VAT amount line record.</param>
+    /// <param name="QtyType">The quantity type (General, Invoicing, or Shipping).</param>
+    /// <param name="AmtToHandle">The amount to handle.</param>
+    /// <param name="QtyToHandle">The quantity to handle.</param>
+    /// <param name="IsHandled">Specifies whether the sum operation is handled.</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSumVATAmountLine(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var VATAmountLine: Record "VAT Amount Line"; QtyType: Option General,Invoicing,Shipping; AmtToHandle: Decimal; QtyToHandle: Decimal; var IsHandled: Boolean)
     begin
     end;
 

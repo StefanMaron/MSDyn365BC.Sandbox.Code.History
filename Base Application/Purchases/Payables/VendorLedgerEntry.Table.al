@@ -725,13 +725,13 @@ table 25 "Vendor Ledger Entry"
         {
             Clustered = true;
         }
-        key(Key2; "Vendor No.", "Posting Date", "Currency Code")
+        key(Key2; "Vendor No.", "Currency Code")
         {
             SumIndexFields = "Purchase (LCY)", "Inv. Discount (LCY)";
         }
         key(Key3; "Vendor No.", "Currency Code", "Posting Date")
         {
-            Enabled = false;
+            IncludedFields = "Purchase (LCY)", "Inv. Discount (LCY)";
         }
         key(Key4; "Document No.")
         {
@@ -745,12 +745,6 @@ table 25 "Vendor Ledger Entry"
         key(Key7; Open, "Due Date")
         {
         }
-        key(Key8; "Document Type", "Vendor No.", "Posting Date", "Currency Code")
-        {
-            MaintainSIFTIndex = false;
-            MaintainSQLIndex = false;
-            SumIndexFields = "Purchase (LCY)", "Inv. Discount (LCY)";
-        }
         key(Key9; "Closed by Entry No.")
         {
         }
@@ -759,22 +753,7 @@ table 25 "Vendor Ledger Entry"
         }
         key(Key11; "Vendor No.", "Global Dimension 1 Code", "Global Dimension 2 Code", "Posting Date", "Currency Code")
         {
-            Enabled = false;
-            SumIndexFields = "Purchase (LCY)", "Inv. Discount (LCY)";
-        }
-        key(Key12; "Vendor No.", Open, "Global Dimension 1 Code", "Global Dimension 2 Code", Positive, "Due Date", "Currency Code")
-        {
-            Enabled = false;
-        }
-        key(Key13; Open, "Global Dimension 1 Code", "Global Dimension 2 Code", "Due Date")
-        {
-            Enabled = false;
-        }
-        key(Key14; "Document Type", "Vendor No.", "Global Dimension 1 Code", "Global Dimension 2 Code", "Posting Date", "Currency Code")
-        {
-            Enabled = false;
-            MaintainSIFTIndex = false;
-            MaintainSQLIndex = false;
+            IncludedFields = "Purchase (LCY)", "Inv. Discount (LCY)";
         }
         key(Key15; "Vendor No.", "Applies-to ID", Open, Positive, "Due Date")
         {

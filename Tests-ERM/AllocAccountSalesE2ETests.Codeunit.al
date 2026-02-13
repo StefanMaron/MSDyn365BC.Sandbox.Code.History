@@ -50,7 +50,8 @@ codeunit 134830 "Alloc. Account Sales E2E Tests"
         PostedAmount: Decimal;
         I: Integer;
     begin
-        // [SCENARIO] Sales invoice with allocation account using four fixed percentages should not have rounding errors
+        // [FEATURE] [AI test]
+        // [SCENARIO 617826 Sales invoice with allocation account using four fixed percentages should not have rounding errors
         Initialize();
 
         // [GIVEN] Four G/L Accounts "A", "B", "C", "D" for sales setup
