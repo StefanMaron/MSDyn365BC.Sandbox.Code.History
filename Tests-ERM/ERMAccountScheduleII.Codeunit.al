@@ -2563,6 +2563,134 @@
         Assert.AreEqual(Format(CalcDate(FilterDateFormula[2], FilterDate[4]), 0, '<Month Text>'), AccScheduleOverview.ColumnValues3.Caption, 'Heading for 2M comparison period is incorrect after Next Period.');
     end;
 
+    [Test]
+    [HandlerFunctions('RenameDefinitionConfirmHandler')]
+    procedure RenameReportDefinitionFromCard()
+    var
+        AccScheduleName: Record "Acc. Schedule Name";
+        FinancialReport: Record "Financial Report";
+        GLSetup: Record "General Ledger Setup";
+        AccScheduleOverview: TestPage "Acc. Schedule Overview";
+        FinancialReports: TestPage "Financial Reports";
+        NewFinancialReportName: Code[10];
+    begin
+        // [SCENARIO] Renaming a report definition from the card page correctly renames the record and update G/L setup
+        Initialize();
+
+        // [GIVEN] A report definition linked to G/L setup
+        LibraryERM.CreateAccScheduleName(AccScheduleName);
+        FinancialReport.Get(AccScheduleName.Name);
+        GLSetup.Get();
+        GLSetup.Validate("Fin. Rep. for Income Stmt.", FinancialReport.Name);
+        GLSetup.Modify();
+
+        // [WHEN] The report definition is renamed from the card page
+        FinancialReports.OpenEdit();
+        FinancialReports.Filter.SetFilter(Name, AccScheduleName.Name);
+        AccScheduleOverview.Trap();
+        FinancialReports.Overview.Invoke();
+
+        NewFinancialReportName := CopyStr(LibraryRandom.RandText(MaxStrLen(NewFinancialReportName)), 1, MaxStrLen(NewFinancialReportName));
+        AccScheduleOverview.FinancialReportName.SetValue(NewFinancialReportName);
+        AccScheduleOverview.Close();
+
+        // [THEN] The report definition is renamed and G/L setup is updated
+        Assert.IsTrue(FinancialReport.Get(NewFinancialReportName), 'financial report was not renamed');
+        GLSetup.Get();
+        Assert.AreEqual(FinancialReport.Name, GLSetup."Fin. Rep. for Income Stmt.", 'GL setup was not updated with the new financial report name');
+    end;
+
+    [Test]
+    [HandlerFunctions('RenameDefinitionConfirmHandler')]
+    procedure RenameRowDefinitionFromCard()
+    var
+        AccScheduleName: Record "Acc. Schedule Name";
+        GLSetup: Record "General Ledger Setup";
+        FinRepUseFilters: Record "Financial Report User Filters";
+        AccScheduleNames: TestPage "Account Schedule Names";
+        AccSchedule: TestPage "Account Schedule";
+        NewAccScheduleName: Code[10];
+    begin
+        // [SCENARIO] Renaming an row definition from the card page correctly renames the record and updates G/L setup and user filters
+        Initialize();
+
+        // [GIVEN] A row definition linked to G/L setup and a user filter
+        LibraryERM.CreateAccScheduleName(AccScheduleName);
+
+        FinRepUseFilters.Init();
+        FinRepUseFilters."User ID" := UserId();
+        FinRepUseFilters."Financial Report Name" := AccScheduleName.Name;
+        FinRepUseFilters."Row Definition" := AccScheduleName.Name;
+        FinRepUseFilters.Insert();
+
+        GLSetup.Get();
+        GLSetup.Validate("Fin. Rep. Bal. Sheet Row", AccScheduleName.Name);
+        GLSetup.Modify();
+
+        // [WHEN] The row definition is renamed from the card page
+        AccScheduleNames.OpenEdit();
+        AccScheduleNames.Filter.SetFilter(Name, AccScheduleName.Name);
+        AccSchedule.Trap();
+        AccScheduleNames.EditAccountSchedule.Invoke();
+        NewAccScheduleName := CopyStr(LibraryRandom.RandText(MaxStrLen(NewAccScheduleName)), 1, MaxStrLen(NewAccScheduleName));
+        AccSchedule.CurrentSchedName.SetValue(NewAccScheduleName);
+        AccSchedule.Close();
+
+        // [THEN] The row definition is renamed, G/L setup and user filters are updated
+        Assert.IsTrue(AccScheduleName.Get(NewAccScheduleName), 'account schedule was not renamed');
+        GLSetup.Get();
+        Assert.AreEqual(AccScheduleName.Name, GLSetup."Fin. Rep. Bal. Sheet Row", 'GL setup was not updated with the new account schedule name');
+        FinRepUseFilters.Find();
+        Assert.AreEqual(AccScheduleName.Name, FinRepUseFilters."Row Definition", 'User filter was not updated with the new account schedule name');
+    end;
+
+    [Test]
+    [HandlerFunctions('RenameDefinitionConfirmHandler')]
+    procedure RenameColumnDefinitionFromCard()
+    var
+        AccScheduleName: Record "Acc. Schedule Name";
+        ColumnLayoutName: Record "Column Layout Name";
+        GLSetup: Record "General Ledger Setup";
+        FinRepUseFilters: Record "Financial Report User Filters";
+        ColumnLayoutNames: TestPage "Column Layout Names";
+        ColumnLayout: TestPage "Column Layout";
+        NewColumnLayoutName: Code[10];
+    begin
+        // [SCENARIO] Renaming a column definition from the card page correctly renames the record and updates G/L setup and user filters
+        Initialize();
+
+        // [GIVEN] A column definition linked to G/L setup and a user filter
+        LibraryERM.CreateAccScheduleName(AccScheduleName);
+        LibraryERM.CreateColumnLayoutName(ColumnLayoutName);
+
+        FinRepUseFilters.Init();
+        FinRepUseFilters."User ID" := UserId();
+        FinRepUseFilters."Financial Report Name" := AccScheduleName.Name;
+        FinRepUseFilters."Column Definition" := ColumnLayoutName.Name;
+        FinRepUseFilters.Insert();
+
+        GLSetup.Get();
+        GLSetup.Validate("Fin. Rep. Net Change Column", ColumnLayoutName.Name);
+        GLSetup.Modify();
+
+        // [WHEN] The column definition is renamed from the card page
+        ColumnLayoutNames.OpenEdit();
+        ColumnLayoutNames.Filter.SetFilter(Name, ColumnLayoutName.Name);
+        ColumnLayout.Trap();
+        ColumnLayoutNames.EditColumnLayoutSetup.Invoke();
+
+        NewColumnLayoutName := CopyStr(LibraryRandom.RandText(MaxStrLen(NewColumnLayoutName)), 1, MaxStrLen(NewColumnLayoutName));
+        ColumnLayout.CurrentColumnName.SetValue(NewColumnLayoutName);
+        ColumnLayout.Close();
+
+        // [THEN] The column definition is renamed, G/L setup and user filters are updated
+        Assert.IsTrue(ColumnLayoutName.Get(NewColumnLayoutName), 'column layout was not renamed');
+        GLSetup.Get();
+        Assert.AreEqual(ColumnLayoutName.Name, GLSetup."Fin. Rep. Net Change Column", 'GL setup was not updated with the new column layout name');
+        FinRepUseFilters.Find();
+        Assert.AreEqual(ColumnLayoutName.Name, FinRepUseFilters."Column Definition", 'User filter was not updated with the new column layout name');
+    end;
+
     local procedure Initialize()
     var
         FinancialReportMgt: Codeunit "Financial Report Mgt.";
@@ -3248,5 +3376,11 @@
     procedure CopyColumnLayoutSuccessMessageHandler(Message: Text[1024])
     begin
         Assert.ExpectedMessage(CopyColumnLayoutSuccessMsg, Message);
+    end;
+
+    [ConfirmHandler]
+    procedure RenameDefinitionConfirmHandler(Question: Text[1024]; var Reply: Boolean)
+    begin
+        Reply := true;
     end;
 }
