@@ -84,7 +84,8 @@ using System.Utilities;
 /// </summary>
 codeunit 80 "Sales-Post"
 {
-    Permissions = TableData "Sales Line" = rimd,
+    Permissions = TableData "Sales Header" = rimd,
+                  TableData "Sales Line" = rimd,
                   TableData "Purchase Header" = rm,
                   TableData "Purchase Line" = rm,
                   TableData "G/L Register" = rimd,

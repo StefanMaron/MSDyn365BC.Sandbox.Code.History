@@ -74,6 +74,7 @@ codeunit 90 "Purch.-Post"
 {
     Permissions = TableData "Sales Header" = rm,
                   TableData "Sales Line" = rm,
+                  TableData "Purchase Header" = rimd,
                   TableData "Purchase Line" = rimd,
                   TableData "G/L Register" = rimd,
                   TableData "Vendor Posting Group" = rimd,
