@@ -682,7 +682,7 @@ table 5965 "Service Contract Header"
             CalcFormula = sum("Service Contract Line"."Line Amount" where("Contract Type" = field("Contract Type"),
                                                                            "Contract No." = field("Contract No.")));
             Caption = 'Calcd. Annual Amount';
-            ToolTip = 'Specifies the sum of the Line Amount field values on all contract lines associated with the service contract or contract quote.';
+            ToolTip = 'Specifies the sum of the Line Amount field values on all contract lines associated with the service contract or contract quote, disregarding starting date and expiration date.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -692,7 +692,7 @@ table 5965 "Service Contract Header"
             AutoFormatType = 1;
             BlankZero = true;
             Caption = 'Annual Amount';
-            ToolTip = 'Specifies the amount that will be invoiced annually for the service contract or contract quote.';
+            ToolTip = 'Specifies the total amount for all service contract lines that will be invoiced annually for the service contract or contract quote, disregarding starting date and expiration date. Changes to this amount will be distributed among the service contract lines.';
             MinValue = 0;
 
             trigger OnValidate()
@@ -2543,6 +2543,33 @@ table 5965 "Service Contract Header"
                 end;
             end;
         end;
+    end;
+
+    procedure GetActiveAnnualAmount(): Decimal
+    var
+        ServiceContractLine: Record "Service Contract Line";
+    begin
+        FilterToCurrentContractLines(ServiceContractLine);
+        ServiceContractLine.CalcSums("Line Amount");
+        exit(ServiceContractLine."Line Amount");
+    end;
+
+    procedure ShowActiveServiceContractLines()
+    var
+        ServiceContractLine: Record "Service Contract Line";
+    begin
+        ServiceContractLine.FilterGroup(2);
+        FilterToCurrentContractLines(ServiceContractLine);
+        ServiceContractLine.FilterGroup(0);
+        Page.Run(0, ServiceContractLine);
+    end;
+
+    local procedure FilterToCurrentContractLines(var ServiceContractLine: Record "Service Contract Line")
+    begin
+        ServiceContractLine.SetRange("Contract Type", Rec."Contract Type");
+        ServiceContractLine.SetRange("Contract No.", Rec."Contract No.");
+        ServiceContractLine.SetFilter("Contract Expiration Date", '%1|>=%2', 0D, Workdate());
+        ServiceContractLine.SetFilter("Starting Date", '%1|<=%2', 0D, Workdate());
     end;
 
     procedure SetHideValidationDialog(Hide: Boolean)
