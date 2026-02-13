@@ -50,6 +50,12 @@ page 5633 "FA Journal Batches"
                     ApplicationArea = FixedAssets;
                     Visible = true;
                 }
+                field("No. of Lines"; Rec."No. of Lines")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the number of lines in this journal batch.';
+                    Visible = false;
+                }
             }
         }
         area(factboxes)
