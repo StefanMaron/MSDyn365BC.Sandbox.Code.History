@@ -14,6 +14,7 @@ using Microsoft.Foundation.Period;
 using System.Reflection;
 using System.Telemetry;
 using System.Text;
+using System.Utilities;
 
 /// <summary>
 /// Provides comprehensive account schedule overview interface with matrix-style financial data presentation.
@@ -67,12 +68,30 @@ page 490 "Acc. Schedule Overview"
                 field(FinancialReportName; TempFinancialReport.Name)
                 {
                     ApplicationArea = Basic, Suite;
-                    Editable = false;
                     Caption = 'Name';
                     Tooltip = 'Specifies the name (code) of the financial report.';
-                    trigger OnAssistEdit()
+
+                    trigger OnValidate()
+                    var
+                        FinancialReport: Record "Financial Report";
+                        ConfirmMgt: Codeunit "Confirm Management";
+                        NewName: Code[10];
+                        RenameQst: Label 'Your change might update related records, which can take a while. Do you want to continue?';
                     begin
-                        Page.RunModal(Page::"Financial Reports");
+                        if not FinancialReport.Get(FinancialReportCode) then
+                            Error('');
+                        if FinancialReport.Name = TempFinancialReport.Name then
+                            Error('');
+                        if not ConfirmMgt.GetResponse(RenameQst) then
+                            Error('');
+                        NewName := TempFinancialReport.Name;
+                        TempFinancialReport.Name := FinancialReport.Name;
+                        SaveStateToFinancialReport();
+                        SaveStateToUserFilters();
+                        FinancialReport.Find();
+                        FinancialReport.Rename(NewName);
+                        FinancialReportCode := NewName;
+                        ReloadPage();
                     end;
                 }
 
