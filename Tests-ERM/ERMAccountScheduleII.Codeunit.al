@@ -25,6 +25,7 @@
         LibraryJournals: Codeunit "Library - Journals";
         LibraryCostAccounting: Codeunit "Library - Cost Accounting";
         LibraryCashFlow: Codeunit "Library - Cash Flow";
+        LibraryLowerPermissions: Codeunit "Library - Lower Permissions";
         DimFilterErr: Label 'Wrong Dimension filter.';
         DimFilterStrTok: Label '%1 FILTER';
         DimFilterStringTok: Label 'Dimension 1 Filter: %1, Dimension 2 Filter: %2, Dimension 3 Filter: %3, Dimension 4 Filter: %4';
@@ -2729,6 +2730,117 @@
         Assert.AreEqual(ColumnLayoutName.Name, FinRepUseFilters."Column Definition", 'User filter was not updated with the new column layout name');
     end;
 
+    [Test]
+    procedure FinancialReportWithBlockedStatus()
+    var
+        AccScheduleName: Record "Acc. Schedule Name";
+        FinancialReport: Record "Financial Report";
+        FinRepStatus: Record "Financial Report Status";
+        FinancialReports: TestPage "Financial Reports";
+    begin
+        // [SCENARIO] Financial reports with blocked status are only visible to users with write permission on status table
+        Initialize();
+
+        // [GIVEN] Financial report status that is blocked
+        FinRepStatus := CreateFinancialReportStatus(true);
+        // [GIVEN] Financial report with the blocked status
+        LibraryERM.CreateAccScheduleName(AccScheduleName);
+        FinancialReport.Get(AccScheduleName.Name);
+        FinancialReport.Validate(Status, FinRepStatus.Code);
+        FinancialReport.Modify(true);
+        Commit();
+
+        // [WHEN] Viewing financial reports as user with write permission on status
+        LibraryLowerPermissions.SetO365Full();
+        FinancialReports.OpenView();
+        FinancialReports.Filter.SetFilter(Name, AccScheduleName.Name);
+        // [THEN] The blocked financial report is visible
+        Assert.IsTrue(FinancialReports.First(), 'Blocked financial reports are visible to users with write permission on status.');
+        Assert.AreEqual(FinRepStatus.Code, FinancialReports.Status.Value(), 'Financial report status code is incorrect.');
+        FinancialReports.Close();
+
+        // [WHEN] Viewing financial reports as user without write permission on status
+        LibraryLowerPermissions.SetRead();
+        Clear(FinancialReports);
+        FinancialReports.OpenView();
+        FinancialReports.Filter.SetFilter(Name, AccScheduleName.Name);
+        // [THEN] The blocked financial report is not visible
+        Assert.IsFalse(FinancialReports.First(), 'Blocked financial reports are not visible to users without write permission on status.');
+    end;
+
+    [Test]
+    procedure RowDefinitionWithBlockedStatus()
+    var
+        AccScheduleName: Record "Acc. Schedule Name";
+        FinRepStatus: Record "Financial Report Status";
+        AccScheduleNames: TestPage "Account Schedule Names";
+    begin
+        // [SCENARIO] Row definitions with blocked status are only visible to users with write permission on status table
+        // Unfortunately it's not possible to test the visibility of row blocked group nor the field styling on the financial report card page.
+        Initialize();
+
+        // [GIVEN] Financial report status that is blocked
+        FinRepStatus := CreateFinancialReportStatus(true);
+        // [GIVEN] Account schedule name with the blocked status
+        LibraryERM.CreateAccScheduleName(AccScheduleName);
+        AccScheduleName.Validate(Status, FinRepStatus.Code);
+        AccScheduleName.Modify(true);
+        Commit();
+
+        // [WHEN] Viewing account schedule names as user with write permission on status
+        LibraryLowerPermissions.SetO365Full();
+        AccScheduleNames.OpenView();
+        AccScheduleNames.Filter.SetFilter(Name, AccScheduleName.Name);
+        // [THEN] The blocked row definition is visible
+        Assert.IsTrue(AccScheduleNames.First(), 'Blocked row definitions are visible to users with write permission on status.');
+        Assert.AreEqual(FinRepStatus.Code, AccScheduleNames.Status.Value(), 'Row definition status code is incorrect.');
+        AccScheduleNames.Close();
+
+        // [WHEN] Viewing account schedule names as user without write permission on status
+        LibraryLowerPermissions.SetRead();
+        Clear(AccScheduleNames);
+        AccScheduleNames.OpenView();
+        // [THEN] The blocked row definition is not visible
+        AccScheduleNames.Filter.SetFilter(Name, AccScheduleName.Name);
+        Assert.IsFalse(AccScheduleNames.First(), 'Blocked row definitions are not visible to users without write permission on status.');
+    end;
+
+    [Test]
+    procedure ColumnDefinitionWithBlockedStatus()
+    var
+        ColumnLayoutName: Record "Column Layout Name";
+        FinRepStatus: Record "Financial Report Status";
+        ColumnLayoutNames: TestPage "Column Layout Names";
+    begin
+        // [SCENARIO] Column definitions with blocked status are only visible to users with write
+        Initialize();
+
+        // [GIVEN] Financial report status that is blocked
+        FinRepStatus := CreateFinancialReportStatus(true);
+        // [GIVEN] Column layout name with the blocked status
+        LibraryERM.CreateColumnLayoutName(ColumnLayoutName);
+        ColumnLayoutName.Validate(Status, FinRepStatus.Code);
+        ColumnLayoutName.Modify(true);
+        Commit();
+
+        // [WHEN] Viewing column layout names as user with write permission on status
+        LibraryLowerPermissions.SetO365Full();
+        ColumnLayoutNames.OpenView();
+        ColumnLayoutNames.Filter.SetFilter(Name, ColumnLayoutName.Name);
+        // [THEN] The blocked column definition is visible
+        Assert.IsTrue(ColumnLayoutNames.First(), 'Blocked column definitions are visible to users with write permission on status.');
+        Assert.AreEqual(FinRepStatus.Code, ColumnLayoutNames.Status.Value(), 'Column definition status code is incorrect.');
+        ColumnLayoutNames.Close();
+
+        // [WHEN] Viewing column layout names as user without write permission on status
+        LibraryLowerPermissions.SetRead();
+        Clear(ColumnLayoutNames);
+        ColumnLayoutNames.OpenView();
+        ColumnLayoutNames.Filter.SetFilter(Name, ColumnLayoutName.Name);
+        // [THEN] The blocked column definition is not visible
+        Assert.IsFalse(ColumnLayoutNames.First(), 'Blocked column definitions are not visible to users without write permission on status.');
+    end;
+
     local procedure Initialize()
     var
         FinancialReportMgt: Codeunit "Financial Report Mgt.";
@@ -3179,6 +3291,14 @@
         GenJournalLine.Modify(true);
 
         LibraryERM.PostGeneralJnlLine(GenJournalLine);
+    end;
+
+    local procedure CreateFinancialReportStatus(IsBlocked: Boolean) FinRepStatus: Record "Financial Report Status";
+    begin
+        FinRepStatus.Init();
+        FinRepStatus.Validate(Code, LibraryUtility.GenerateRandomCode(FinRepStatus.FieldNo(Code), Database::"Financial Report Status"));
+        FinRepStatus.Validate(Blocked, IsBlocked);
+        FinRepStatus.Insert(true);
     end;
 
     [RequestPageHandler]

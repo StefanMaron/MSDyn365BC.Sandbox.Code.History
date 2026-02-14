@@ -1271,6 +1271,12 @@ table 98 "General Ledger Setup"
             ToolTip = 'Specifies the name of the Net Change column on Financial Reports.';
             ValidateTableRelation = false;
         }
+        field(204; DefaultFinancialReportStatus; Code[10])
+        {
+            Caption = 'Default Financial Report Status';
+            DataClassification = CustomerContent;
+            TableRelation = "Financial Report Status";
+        }
         field(10001; "VAT in Use"; Boolean)
         {
             Caption = 'VAT in Use';
