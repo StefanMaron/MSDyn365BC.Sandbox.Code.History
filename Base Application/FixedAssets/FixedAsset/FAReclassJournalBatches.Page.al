@@ -31,6 +31,12 @@ page 5640 "FA Reclass. Journal Batches"
                 {
                     ApplicationArea = FixedAssets;
                 }
+                field("No. of Lines"; Rec."No. of Lines")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the number of lines in this journal batch.';
+                    Visible = false;
+                }
             }
         }
         area(factboxes)

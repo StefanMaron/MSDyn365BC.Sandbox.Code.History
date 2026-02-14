@@ -53,7 +53,7 @@ table 502 "Reminder Attachment Text"
             ToolTip = 'Specifies the file name of the attachment.';
             DataClassification = CustomerContent;
         }
-#if not CLEANSCHEMA28
+#if not CLEANSCHEMA29
         /// <summary>
         /// Contains the text that appears at the beginning of the reminder attachment.
         /// </summary>
@@ -61,16 +61,16 @@ table 502 "Reminder Attachment Text"
         {
             Caption = 'Beginning Line';
             DataClassification = CustomerContent;
-#if not CLEAN26
+#if not CLEAN27
             ObsoleteReason = 'To support the use of multiple lines, this field will be replaced by the Reminder Attachment Text Line table.';
             ObsoleteState = Pending;
 #pragma warning disable AS0074
-            ObsoleteTag = '26.0';
+            ObsoleteTag = '27.0';
 #pragma warning restore AS0074
 #else
             ObsoleteReason = 'To support the use of multiple lines, this is replaced by Reminder Attachment Text Line table.';
             ObsoleteState = Removed;
-            ObsoleteTag = '28.0';
+            ObsoleteTag = '29.0';
 #endif
         }
 #endif
@@ -83,7 +83,7 @@ table 502 "Reminder Attachment Text"
             ToolTip = 'Specifies the description line that will appear in the attachment along side the fee.';
             DataClassification = CustomerContent;
         }
-#if not CLEANSCHEMA28
+#if not CLEANSCHEMA29
         /// <summary>
         /// Contains the text that appears at the end of the reminder attachment.
         /// </summary>
@@ -91,16 +91,16 @@ table 502 "Reminder Attachment Text"
         {
             Caption = 'Ending Line';
             DataClassification = CustomerContent;
-#if not CLEAN26
+#if not CLEAN27
             ObsoleteReason = 'To support the use of multiple lines, this field will be replaced by the Reminder Attachment Text Line table.';
             ObsoleteState = Pending;
 #pragma warning disable AS0074
-            ObsoleteTag = '26.0';
+            ObsoleteTag = '27.0';
 #pragma warning restore AS0074
 #else
             ObsoleteReason = 'To support the use of multiple lines, this is replaced by Reminder Attachment Text Line table.';
             ObsoleteState = Removed;
-            ObsoleteTag = '28.0';
+            ObsoleteTag = '29.0';
 #endif
         }
 #endif

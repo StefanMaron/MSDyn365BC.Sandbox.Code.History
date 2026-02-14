@@ -117,6 +117,14 @@ table 7310 "Warehouse Journal Batch"
             DataClassification = EndUserIdentifiableInformation;
             TableRelation = "Warehouse Employee" where("Location Code" = field("Location Code"));
         }
+        field(40; "No. of Lines"; Integer)
+        {
+            CalcFormula = count("Warehouse Journal Line" where("Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field(Name), "Location Code" = field("Location Code")));
+            Caption = 'No. of Lines';
+            Editable = false;
+            FieldClass = FlowField;
+            ToolTip = 'Specifies the number of lines in this journal batch.';
+        }
     }
 
     keys
