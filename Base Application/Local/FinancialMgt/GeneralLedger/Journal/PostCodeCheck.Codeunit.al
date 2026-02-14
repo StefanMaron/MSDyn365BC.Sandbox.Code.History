@@ -13,8 +13,10 @@ using Microsoft.HumanResources.Employee;
 using Microsoft.HumanResources.Setup;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Transfer;
+#if not CLEAN28
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.WorkCenter;
+#endif
 using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Document;
@@ -1300,6 +1302,7 @@ codeunit 28000 "Post Code Check"
           DATABASE::Location, xRec.GetPosition(), 0, DATABASE::Location, Rec.GetPosition(), 0);
     end;
 
+#if not CLEAN28
     // Table "Machine Center"
     [EventSubscriber(ObjectType::Table, Database::"Machine Center", 'OnBeforeValidateEvent', 'Address', false, false)]
     local procedure MachineCenterAddress(var Rec: Record "Machine Center"; CurrFieldNo: Integer)
@@ -1356,6 +1359,7 @@ codeunit 28000 "Post Code Check"
         MoveAddressIDRecord(
           DATABASE::"Machine Center", xRec.GetPosition(), 0, DATABASE::"Machine Center", Rec.GetPosition(), 0);
     end;
+#endif
 
     // Table "Order Address"
     [EventSubscriber(ObjectType::Table, Database::"Order Address", 'OnBeforeValidateEvent', 'Address', false, false)]
@@ -2574,6 +2578,7 @@ codeunit 28000 "Post Code Check"
           Database::Union, xRec.GetPosition(), 0, Database::Union, Rec.GetPosition(), 0);
     end;
 
+#if not CLEAN28
     // Table "Work Center"
     [EventSubscriber(ObjectType::Table, Database::"Work Center", 'OnBeforeValidateEvent', 'Address', false, false)]
     local procedure WorkCenterAddress(var Rec: Record "Work Center"; CurrFieldNo: Integer)
@@ -2630,6 +2635,7 @@ codeunit 28000 "Post Code Check"
         MoveAddressIDRecord(
           DATABASE::"Work Center", xRec.GetPosition(), 0, DATABASE::"Work Center", Rec.GetPosition(), 0);
     end;
+#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterVerifyCity(var PostCodeRec: Record "Post Code"; var CityTxt: Text[30]; var PostCode: Code[20]; var CountyTxt: Text[30]; var CountryCode: Code[10])
