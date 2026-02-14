@@ -138,6 +138,7 @@ page 108 "Financial Reports"
                         DimPerspectiveName.Modify();
                     end;
                 }
+                field(Status; Rec.Status) { }
                 field("Internal Description"; Rec."Internal Description")
                 {
                     ApplicationArea = Basic, Suite;
@@ -404,9 +405,25 @@ page 108 "Financial Reports"
         FinancialReportMgt.Initialize();
     end;
 
+    trigger OnOpenPage()
+    var
+        FinancialReportStatus: Record "Financial Report Status";
+        LastFilterGroup: Integer;
+    begin
+        if not FinancialReportStatus.WritePermission() then begin
+            LastFilterGroup := Rec.FilterGroup();
+            Rec.FilterGroup(4);
+            Rec.SetRange("Status Blocked", false);
+            Rec.FilterGroup(LastFilterGroup);
+        end;
+    end;
+
     trigger OnNewRecord(BelowxRec: Boolean)
+    var
+        FinancialReportMgt: Codeunit "Financial Report Mgt.";
     begin
         Clear(PerspectiveAnalysisView);
+        Rec.Status := FinancialReportMgt.GetDefaultStatus();
     end;
 
     trigger OnAfterGetCurrRecord()
