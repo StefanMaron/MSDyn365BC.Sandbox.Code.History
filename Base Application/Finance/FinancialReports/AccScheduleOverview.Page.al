@@ -119,9 +119,12 @@ page 490 "Acc. Schedule Overview"
                     Importance = Additional;
                     Lookup = true;
                     LookupPageID = "Account Schedule Names";
+                    Style = Attention;
+                    StyleExpr = RowDefinitionBlocked;
                     ToolTip = 'Specifies the name (code) of the row definition to be used for the report.';
                     AboutTitle = 'About row definition';
                     AboutText = 'Change the row definition of the report. You can use the built-in row definitions, or create your own';
+
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         FinancialReportRowGroup: Text[10];
@@ -141,6 +144,12 @@ page 490 "Acc. Schedule Overview"
                         CurrentSchedNameOnAfterValidate();
                     end;
                 }
+                group(RowBlocked)
+                {
+                    ShowCaption = false;
+                    InstructionalText = 'The current row definition has a blocked status.';
+                    Visible = RowDefinitionBlocked;
+                }
                 field(CurrentColumnName; TempFinancialReport."Financial Report Column Group")
                 {
                     ApplicationArea = Basic, Suite;
@@ -149,6 +158,8 @@ page 490 "Acc. Schedule Overview"
                     Importance = Additional;
                     Lookup = true;
                     LookupPageId = "Column Layout Names";
+                    Style = Attention;
+                    StyleExpr = ColDefinitionBlocked;
                     ToolTip = 'Specifies the name (code) of the column definition to be used for the report.';
                     AboutTitle = 'About column definition';
                     AboutText = 'Change the column definition of the report. You can use the built-in column definitions, or create your own.';
@@ -174,6 +185,12 @@ page 490 "Acc. Schedule Overview"
                         CurrentColumnName := TempFinancialReport."Financial Report Column Group";
                         CurrentColumnNameOnAfterValidate();
                     end;
+                }
+                group(ColBlocked)
+                {
+                    ShowCaption = false;
+                    InstructionalText = 'The current column definition has a blocked status.';
+                    Visible = ColDefinitionBlocked;
                 }
                 field(DimPerspectiveName; TempFinancialReport.DimPerspective)
                 {
@@ -397,6 +414,14 @@ page 490 "Acc. Schedule Overview"
                         SaveStateToFinancialReport();
                         CurrPage.Update();
                     end;
+                }
+                field(FinancialReportStatus; TempFinancialReport.Status)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Status';
+                    Editable = not ViewOnlyMode;
+                    TableRelation = "Financial Report Status";
+                    ToolTip = 'Specifies the status code for the financial report. The status code helps you organize the lifecycle of your financial reports.';
                 }
                 field(InternalDescription; TempFinancialReport."Internal Description")
                 {
@@ -1470,6 +1495,8 @@ page 490 "Acc. Schedule Overview"
 #if not CLEAN28
         FinancialReportDefaultsEnabled: Boolean;
 #endif
+        RowDefinitionBlocked: Boolean;
+        ColDefinitionBlocked: Boolean;
 
     protected var
         AnalysisView: Record "Analysis View";
@@ -1600,6 +1627,7 @@ page 490 "Acc. Schedule Overview"
 
     protected procedure LoadPageState()
     var
+        ColumnLayoutName: Record "Column Layout Name";
         IsHandled: Boolean;
     begin
         GLSetup.Get();
@@ -1626,7 +1654,8 @@ page 490 "Acc. Schedule Overview"
         SetLoadedDimFilters();
         SetLoadedOtherFilters();
 
-        if AccSchedName.Get(TempFinancialReport."Financial Report Row Group") then
+        AccSchedName.SetAutoCalcFields("Status Blocked");
+        if AccSchedName.Get(TempFinancialReport."Financial Report Row Group") then begin
             if AccSchedName."Analysis View Name" <> '' then
                 AnalysisView.Get(AccSchedName."Analysis View Name")
             else begin
@@ -1634,12 +1663,21 @@ page 490 "Acc. Schedule Overview"
                 AnalysisView."Dimension 1 Code" := GLSetup."Global Dimension 1 Code";
                 AnalysisView."Dimension 2 Code" := GLSetup."Global Dimension 2 Code";
             end;
+            RowDefinitionBlocked := AccSchedName."Status Blocked";
+        end;
+
+        ColumnLayoutName.SetAutoCalcFields("Status Blocked");
+        if ColumnLayoutName.Get(TempFinancialReport."Financial Report Column Group") then
+            ColDefinitionBlocked := ColumnLayoutName."Status Blocked";
 
         FinReportMgt.CalcAccScheduleLineDateFilter(TempFinancialReport, Rec);
         ApplyShowFilter();
         UpdateDimFilterControls();
         DateFilter := Rec.GetFilter("Date Filter");
         UpdateColumnCaptions();
+
+        FinReportMgt.CheckStatus(TempFinancialReport.TableCaption(), TempFinancialReport.Status);
+
         OnBeforeCurrentColumnNameOnAfterValidate(TempFinancialReport."Financial Report Column Group");
         OnAfterOnOpenPage(Rec, TempFinancialReport."Financial Report Column Group");
     end;
