@@ -316,6 +316,21 @@ table 88 "Financial Report"
             ToolTip = 'Specifies the category code for the financial report.';
             DataClassification = CustomerContent;
         }
+        field(64; Status; Code[10])
+        {
+            Caption = 'Status';
+            DataClassification = CustomerContent;
+            TableRelation = "Financial Report Status";
+            ToolTip = 'Specifies the status code for the financial report. The status code helps you organize the lifecycle of your financial reports.';
+        }
+        field(65; "Status Blocked"; Boolean)
+        {
+            CalcFormula = exist("Financial Report Status" where("Code" = field(Status), "Blocked" = const(true)));
+            Caption = 'Status Blocked';
+            Editable = false;
+            FieldClass = FlowField;
+            ToolTip = 'Specifies the status code is a blocked status.';
+        }
     }
     keys
     {
@@ -471,5 +486,16 @@ table 88 "Financial Report"
             exit(Enum::"Fin. Report Logo Position".FromInteger(LogoPositionDefault.AsInteger()));
         ReadGLSetup();
         exit(Enum::"Fin. Report Logo Position".FromInteger(GLSetup."Fin. Rep. Company Logo Pos.".AsInteger()));
+    end;
+
+    procedure SetDefaultStatusFromGLSetup()
+    var
+        GLSetup: Record "General Ledger Setup";
+    begin
+        if Rec.Status <> '' then
+            exit;
+        GLSetup.Get();
+        if GLSetup.DefaultFinancialReportStatus <> '' then
+            Rec.Status := GLSetup.DefaultFinancialReportStatus;
     end;
 }
