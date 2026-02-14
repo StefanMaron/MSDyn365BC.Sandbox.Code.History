@@ -89,12 +89,28 @@ page 489 "Column Layout"
                         ColumnLayoutName.Modify();
                     end;
                 }
-                field(InternalDescription; InternalDescription)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Internal Description';
-                    MultiLine = true;
-                    ToolTip = 'Specifies the internal description of the column definition. The internal description is not shown on the final report but is used to provide more context when using the definition.';
+            field(DefinitionStatus; DefinitionStatus)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Status';
+                TableRelation = "Financial Report Status";
+                ToolTip = 'Specifies the status code for the column definition. The status code helps you organize the lifecycle of your column definitions.';
+
+                trigger OnValidate()
+                var
+                    ColumnLayoutName: Record "Column Layout Name";
+                begin
+                    ColumnLayoutName.Get(CurrentColumnName);
+                    ColumnLayoutName.Status := DefinitionStatus;
+                    ColumnLayoutName.Modify();
+                end;
+            }
+            field(InternalDescription; InternalDescription)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Internal Description';
+                MultiLine = true;
+                ToolTip = 'Specifies the internal description of the column definition. The internal description is not shown on the final report but is used to provide more context when using the definition.';
 
                     trigger OnValidate()
                     var
@@ -409,6 +425,7 @@ page 489 "Column Layout"
     var
         AccSchedManagement: Codeunit AccSchedManagement;
         CurrentColumnName: Code[10];
+        DefinitionStatus: Code[10];
         DimCaptionsInitialized: Boolean;
         CurrentDescription: Text[80];
         InternalDescription: Text[500];
@@ -417,12 +434,15 @@ page 489 "Column Layout"
     local procedure GetDescriptions()
     var
         ColumnLayoutName: Record "Column Layout Name";
+        FinancialReportMgt: Codeunit "Financial Report Mgt.";
     begin
         CurrentDescription := '';
         InternalDescription := '';
         if ColumnLayoutName.Get(CurrentColumnName) then begin
+            DefinitionStatus := ColumnLayoutName.Status;
             CurrentDescription := ColumnLayoutName.Description;
             InternalDescription := ColumnLayoutName."Internal Description";
+            FinancialReportMgt.CheckStatus(ColumnLayoutName.TableCaption(), ColumnLayoutName.Status);
         end;
     end;
 
