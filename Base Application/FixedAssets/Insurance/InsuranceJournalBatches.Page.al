@@ -15,7 +15,7 @@ page 5655 "Insurance Journal Batches"
     RefreshOnActivate = true;
     SourceTable = "Insurance Journal Batch";
     AnalysisModeEnabled = false;
-    
+
     layout
     {
         area(content)
@@ -43,6 +43,12 @@ page 5655 "Insurance Journal Batches"
                 {
                     ApplicationArea = FixedAssets;
                     Visible = true;
+                }
+                field("No. of Lines"; Rec."No. of Lines")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the number of lines in this journal batch.';
+                    Visible = false;
                 }
             }
         }

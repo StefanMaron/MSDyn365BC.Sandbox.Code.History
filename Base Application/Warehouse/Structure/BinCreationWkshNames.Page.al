@@ -31,6 +31,12 @@ page 7369 "Bin Creation Wksh. Names"
                 {
                     ApplicationArea = Location;
                 }
+                field("No. of Lines"; Rec."No. of Lines")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTip = 'Specifies the number of lines in this worksheet.';
+                    Visible = false;
+                }
             }
         }
         area(factboxes)

@@ -1065,6 +1065,7 @@ page 31 "Item List"
                     RunObject = Report "Item Cost and Price List";
                     ToolTip = 'View, print, or save a list of your items and their price and cost information. The report specifies direct unit cost, last direct cost, unit price, profit percentage, and profit.';
                 }
+#if not CLEAN28
                 action("Inventory Availability")
                 {
                     ApplicationArea = Basic, Suite;
@@ -1072,7 +1073,11 @@ page 31 "Item List"
                     Image = "Report";
                     RunObject = Report "Availability Status";
                     ToolTip = 'View, print, or save a summary of historical inventory transactions with selected items, for example, to decide when to purchase the items. The report specifies quantity on sales order, quantity on purchase order, back orders from vendors, minimum inventory, and whether there are reorders.';
+                    ObsoleteReason = 'Prepare for extraction of Manufacturing app';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 group("Item Register")
                 {
                     Caption = 'Item Register';
@@ -1152,6 +1157,7 @@ page 31 "Item List"
                         RunObject = Report "Item Age Composition - Qty.";
                         ToolTip = 'View, print, or save an overview of the current age composition of selected items in your inventory.';
                     }
+#if not CLEAN28
                     action("Availability Projection")
                     {
                         ApplicationArea = Basic, Suite;
@@ -1161,7 +1167,11 @@ page 31 "Item List"
                         //PromotedCategory = "Report";
                         RunObject = Report "Availability Projection";
                         ToolTip = 'View the projected availability of your inventory for seven periods into the future.';
+                        ObsoleteReason = 'Prepare for extraction of Manufacturing app';
+                        ObsoleteState = Pending;
+                        ObsoleteTag = '28.0';
                     }
+#endif
                     action("Item Turnover")
                     {
                         ApplicationArea = Basic, Suite;
