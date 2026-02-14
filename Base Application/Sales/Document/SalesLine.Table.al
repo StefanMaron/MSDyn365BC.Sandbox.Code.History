@@ -4351,8 +4351,6 @@ table 37 "Sales Line"
         if not HasSalesHeader then
             Error(CannotInsertSalesLineWithoutHeaderErr);
 
-        EnsurePositiveLineNo();
-
         if Quantity <> 0 then begin
             OnBeforeVerifyReservedQty(Rec, xRec, 0);
             SalesLineReserve.VerifyQuantity(Rec, xRec);
@@ -4394,27 +4392,12 @@ table 37 "Sales Line"
         Error(Text001, TableCaption);
     end;
 
-    local procedure EnsurePositiveLineNo()
-    var
-        SalesLine: Record "Sales Line";
-        MaxLineNo: Integer;
-    begin
-        if SkipEnsurePositiveLineNo then
-            exit;
-
-        if "Line No." < 0 then begin
-            SalesLine.SetRange("Document Type", "Document Type");
-            SalesLine.SetRange("Document No.", "Document No.");
-            if SalesLine.FindLast() then
-                MaxLineNo := SalesLine."Line No.";
-            "Line No." := MaxLineNo + 10000;
-        end;
-    end;
-
+#if not CLEAN28
+    [Obsolete('Not used anymore', '28.0')]
     procedure SetSkipEnsurePositiveLineNo(NewSkipEnsurePositiveLineNo: Boolean)
     begin
-        SkipEnsurePositiveLineNo := NewSkipEnsurePositiveLineNo;
     end;
+#endif
 
     var
         ItemUOMForCaption: Record "Item Unit of Measure";
@@ -4468,7 +4451,6 @@ table 37 "Sales Line"
         GLSetupRead: Boolean;
         HasSalesHeader: Boolean;
         SkipDefaultItemQuantity: Boolean;
-        SkipEnsurePositiveLineNo: Boolean;
 #pragma warning disable AA0074
 #pragma warning disable AA0470
         Text000: Label 'You cannot delete the order line because it is associated with purchase order %1 line %2.';
