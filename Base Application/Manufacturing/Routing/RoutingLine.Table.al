@@ -12,6 +12,8 @@ using Microsoft.Manufacturing.WorkCenter;
 table 99000764 "Routing Line"
 {
     Caption = 'Routing Line';
+    DrillDownPageId = "Routing Line List";
+    LookupPageId = "Routing Line List";
     DataClassification = CustomerContent;
 
     fields

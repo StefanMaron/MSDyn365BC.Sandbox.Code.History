@@ -4163,8 +4163,6 @@ table 39 "Purchase Line"
         if not HasPurchHeader then
             Error(CannotInsertPurchLineWithoutHeaderErr);
 
-        EnsurePositiveLineNo();
-
         if Quantity <> 0 then begin
             OnBeforeVerifyReservedQty(Rec, xRec, 0);
             PurchLineReserve.VerifyQuantity(Rec, xRec);
@@ -4203,27 +4201,12 @@ table 39 "Purchase Line"
         Error(Text000, TableCaption);
     end;
 
-    local procedure EnsurePositiveLineNo()
-    var
-        PurchaseLine: Record "Purchase Line";
-        MaxLineNo: Integer;
-    begin
-        if SkipEnsurePositiveLineNo then
-            exit;
-
-        if "Line No." < 0 then begin
-            PurchaseLine.SetRange("Document Type", "Document Type");
-            PurchaseLine.SetRange("Document No.", "Document No.");
-            if PurchaseLine.FindLast() then
-                MaxLineNo := PurchaseLine."Line No.";
-            "Line No." := MaxLineNo + 10000;
-        end;
-    end;
-
+#if not CLEAN28
+    [Obsolete('Not used for anything', '28.0')]
     procedure SetSkipEnsurePositiveLineNo(NewSkipEnsurePositiveLineNo: Boolean)
     begin
-        SkipEnsurePositiveLineNo := NewSkipEnsurePositiveLineNo;
     end;
+#endif    
 
     var
         PurchHeader: Record "Purchase Header";
@@ -4267,7 +4250,6 @@ table 39 "Purchase Line"
         PrePaymentLineAmountEntered: Boolean;
         PurchSetupRead: Boolean;
         HasPurchHeader: Boolean;
-        SkipEnsurePositiveLineNo: Boolean;	
         OnesText: array[20] of Text[30];
         TensText: array[10] of Text[30];
         ExponentText: array[5] of Text[30];
