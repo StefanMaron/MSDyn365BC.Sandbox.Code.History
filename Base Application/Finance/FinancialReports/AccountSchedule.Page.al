@@ -91,6 +91,22 @@ page 104 "Account Schedule"
                         AccScheduleName.Modify();
                     end;
                 }
+                field(DefinitionStatus; DefinitionStatus)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Status';
+                    TableRelation = "Financial Report Status";
+                    ToolTip = 'Specifies the status code for the row definition. The status code helps you organize the lifecycle of your row definitions.';
+
+                    trigger OnValidate()
+                    var
+                        AccScheduleName: Record "Acc. Schedule Name";
+                    begin
+                        AccScheduleName.Get(CurrentSchedName);
+                        AccScheduleName.Status := DefinitionStatus;
+                        AccScheduleName.Modify();
+                    end;
+                }
                 field(InternalDescription; InternalDescription)
                 {
                     ApplicationArea = Basic, Suite;
@@ -566,6 +582,7 @@ page 104 "Account Schedule"
     var
         AccSchedManagement: Codeunit AccSchedManagement;
         CurrentSchedName: Code[10];
+        DefinitionStatus: Code[10];
         DimCaptionsInitialized: Boolean;
         CostObjectTotallingEnabled: Boolean;
         CostCenterTotallingEnabled: Boolean;
@@ -595,12 +612,15 @@ page 104 "Account Schedule"
     local procedure GetDescriptions()
     var
         AccScheduleName: Record "Acc. Schedule Name";
+        FinancialReportMgt: Codeunit "Financial Report Mgt.";
     begin
         CurrentDescription := '';
         InternalDescription := '';
         if AccScheduleName.Get(CurrentSchedName) then begin
+            DefinitionStatus := AccScheduleName.Status;
             CurrentDescription := AccScheduleName.Description;
             InternalDescription := AccScheduleName."Internal Description";
+            FinancialReportMgt.CheckStatus(AccScheduleName.TableCaption(), AccScheduleName.Status);
         end;
     end;
 

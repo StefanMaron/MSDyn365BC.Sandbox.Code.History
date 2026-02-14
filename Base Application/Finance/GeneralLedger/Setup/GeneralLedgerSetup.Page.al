@@ -542,6 +542,10 @@ page 118 "General Ledger Setup"
                     {
                         Caption = 'Default Company Logo Position';
                     }
+                    field(DefaultFinancialReportStatus; Rec.DefaultFinancialReportStatus)
+                    {
+                        Caption = 'Default Status';
+                    }
                 }
             }
             group(Application)
