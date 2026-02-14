@@ -565,7 +565,7 @@
   </Item>
   <Item ItemId=";Codeunit 850258468 - NamedType 2682043698" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[The user [%1]5D; does not have permission to [%2]5D;. This can be changed by navigating to Quality Management Permissions.]]></Val>
+      <Val><![CDATA[The user [%1]5D; does not have permission to [%2]5D;.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
