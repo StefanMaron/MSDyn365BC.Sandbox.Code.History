@@ -45,23 +45,23 @@ table 6752 "Reminder Action Log"
         field(5; "Total Records Processed"; Integer)
         {
         }
-#if not CLEANSCHEMA28
+#if not CLEANSCHEMA29
         /// <summary>
         /// Contains the total number of errors encountered during this action.
         /// </summary>
         field(6; "Total Errors"; Integer)
         {
             ToolTip = 'Specifies the total number of errors that occurred during the action job.';
-#if not CLEAN26
+#if not CLEAN27
             ObsoleteState = Pending;
             ObsoleteReason = 'This field is obsolete and should not be used.';
 #pragma warning disable AS0074
-            ObsoleteTag = '26.0';
+            ObsoleteTag = '27.0';
 #pragma warning restore AS0074
 #else
             ObsoleteState = Removed;
             ObsoleteReason = 'This field is obsolete and should not be used.';
-            ObsoleteTag = '28.0';
+            ObsoleteTag = '29.0';
 #endif
         }
 #endif
