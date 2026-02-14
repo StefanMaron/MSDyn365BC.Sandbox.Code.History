@@ -40,6 +40,12 @@ page 272 "Resource Jnl. Batches"
                 {
                     ApplicationArea = Jobs;
                 }
+                field("No. of Lines"; Rec."No. of Lines")
+                {
+                    ApplicationArea = Jobs;
+                    ToolTip = 'Specifies the number of lines in this journal batch.';
+                    Visible = false;
+                }
             }
         }
         area(factboxes)
