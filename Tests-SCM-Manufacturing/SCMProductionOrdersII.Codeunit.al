@@ -7608,6 +7608,79 @@ codeunit 137072 "SCM Production Orders II"
         VerifyReverseItemLedgerEntry(CompItem."No.", UnitOfMeasure.Code);
     end;
 
+    [Test]
+    [HandlerFunctions('ProductionJnlPageHandler,ConfirmHandler,MessageHandlerNoText')]
+    procedure PutAwayTemplateEvaluationForProductionOutput()
+    var
+        Bin: Record Bin;
+        Item: Record Item;
+        Location: Record Location;
+        ProdOrderLine: Record "Prod. Order Line";
+        ProductionOrder: Record "Production Order";
+        PutAwayTemplateHeader: Record "Put-away Template Header";
+        PutAwayTemplateLine: Record "Put-away Template Line";
+        WarehouseActivityLine: Record "Warehouse Activity Line";
+        WarehouseEmployee: Record "Warehouse Employee";
+        Zone: Record Zone;
+        Quantity: Decimal;
+        BinTypeCode: Code[10];
+    begin
+        // [SCENARIO 618276] If you create a put away by posting a production journal out of a Production order a random bin is added
+        // and the put-away template is ignored.
+        Initialize();
+
+        // [GIVEN] Create a Location with warehouse put-away for production output.
+        LibraryWarehouse.CreateLocationWMS(Location, true, true, true, true, true);
+        Location.Validate("Always Create Put-away Line", true);
+        Location.Validate("Directed Put-away and Pick", true);
+        Location.Validate("Prod. Output Whse. Handling", Location."Prod. Output Whse. Handling"::"Warehouse Put-away");
+
+        // [GIVEN] Create Put-away template with "Find Same Item" and "Find Fixed Bin" enabled
+        LibraryWarehouse.CreatePutAwayTemplateHeader(PutAwayTemplateHeader);
+        LibraryWarehouse.CreatePutAwayTemplateLine(
+            PutAwayTemplateHeader, PutAwayTemplateLine,
+            true, false, true, false, true, false);
+
+        // [GIVEN] Assign put-away template on Location.
+        Location.Validate("Put-away Template Code", PutAwayTemplateHeader.Code);
+        Location.Modify(true);
+
+        // [GIVEN] Create an Item.
+        LibraryInventory.CreateItem(Item);
+
+        // [GIVEN] Create a Bin and Warehouse Employee for Location.
+        BinTypeCode := LibraryWarehouse.SelectBinType(false, false, true, true);
+        LibraryWarehouse.CreateZone(Zone, '', Location.Code, BinTypeCode, '', '', 0, false);
+        LibraryWarehouse.CreateBin(Bin, Location.Code, '', Zone.Code, BinTypeCode);
+        LibraryWarehouse.CreateWarehouseEmployee(WarehouseEmployee, Location.Code, true);
+
+        // [GIVEN] Create a Production Order and Validate Location Code.
+        Quantity := LibraryRandom.RandIntInRange(1, 5);
+        LibraryManufacturing.CreateProductionOrder(ProductionOrder, ProductionOrder.Status::Released, ProductionOrder."Source Type"::Item, '', Quantity);
+        ProductionOrder.Validate("Location Code", Location.Code);
+        ProductionOrder.Modify(true);
+
+        // [GIVEN] Create a Prod Order Line and Validate Bin Code.
+        LibraryManufacturing.CreateProdOrderLine(ProdOrderLine, ProdOrderLine.Status::Released, ProductionOrder."No.", Item."No.", '', Location.Code, Quantity);
+        ProdOrderLine.Validate("Bin Code", Bin.Code);
+        ProdOrderLine.Modify(true);
+
+        // [WHEN] Create and Post Production Journal.
+        CreateAndPostProductionJournal(ProductionOrder, ProdOrderLine."Line No.");
+
+        // [THEN] Find the Warehouse Put-away Activity Line for Place action.
+        FindWarehouseActivityLine(
+            WarehouseActivityLine,
+            ProductionOrder."No.",
+            WarehouseActivityLine."Source Document"::"Prod. Output",
+            WarehouseActivityLine."Activity Type"::"Put-away");
+        WarehouseActivityLine.SetRange("Action Type", WarehouseActivityLine."Action Type"::Place);
+        WarehouseActivityLine.FindFirst();
+
+        // [THEN] Verify that the Bin Code on the Place line is empty (not randomly assigned).
+        WarehouseActivityLine.TestField("Bin Code", '');
+    end;
+    
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";

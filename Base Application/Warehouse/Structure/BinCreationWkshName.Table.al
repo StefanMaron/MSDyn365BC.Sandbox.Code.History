@@ -56,6 +56,14 @@ table 7337 "Bin Creation Wksh. Name"
             OptionCaption = 'Put-away,Pick,Movement';
             OptionMembers = "Put-away",Pick,Movement;
         }
+        field(40; "No. of Lines"; Integer)
+        {
+            CalcFormula = count("Bin Creation Worksheet Line" where("Worksheet Template Name" = field("Worksheet Template Name"), Name = field(Name), "Location Code" = field("Location Code")));
+            Caption = 'No. of Lines';
+            Editable = false;
+            FieldClass = FlowField;
+            ToolTip = 'Specifies the number of lines in this worksheet.';
+        }
     }
 
     keys

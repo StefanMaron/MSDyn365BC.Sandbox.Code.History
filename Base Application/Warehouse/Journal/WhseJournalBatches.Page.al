@@ -48,6 +48,12 @@ page 7323 "Whse. Journal Batches"
                     ApplicationArea = Warehouse;
                     Visible = false;
                 }
+                field("No. of Lines"; Rec."No. of Lines")
+                {
+                    ApplicationArea = Warehouse;
+                    ToolTip = 'Specifies the number of lines in this journal batch.';
+                    Visible = false;
+                }
             }
         }
         area(factboxes)
