@@ -99,6 +99,14 @@ table 233 "Item Journal Batch"
             Editable = false;
             FieldClass = FlowField;
         }
+        field(40; "No. of Lines"; Integer)
+        {
+            CalcFormula = count("Item Journal Line" where("Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field(Name)));
+            Caption = 'No. of Lines';
+            Editable = false;
+            FieldClass = FlowField;
+            ToolTip = 'Specifies the number of lines in this journal batch.';
+        }
         field(6500; "Item Tracking on Lines"; Boolean)
         {
             Caption = 'Item Tracking on Lines';

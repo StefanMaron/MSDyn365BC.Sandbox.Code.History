@@ -898,6 +898,7 @@ page 291 "Req. Worksheet"
         }
         area(reporting)
         {
+#if not CLEAN28
             action("Inventory Availability")
             {
                 ApplicationArea = Planning;
@@ -905,7 +906,11 @@ page 291 "Req. Worksheet"
                 Image = "Report";
                 RunObject = Report "Availability Status";
                 ToolTip = 'View, print, or save a summary of historical inventory transactions with selected items, for example, to decide when to purchase the items. The report specifies quantity on sales order, quantity on purchase order, back orders from vendors, minimum inventory, and whether there are reorders.';
+                ObsoleteReason = 'Prepare for extraction of Manufacturing app';
+                ObsoleteState = Pending;
+                ObsoleteTag = '28.0';
             }
+#endif
             action(Status)
             {
                 ApplicationArea = Planning;
@@ -1061,9 +1066,14 @@ page 291 "Req. Worksheet"
             {
                 Caption = 'Report', Comment = 'Generated from the PromotedActionCategories property index 2.';
 
+#if not CLEAN28
                 actionref("Inventory Availability_Promoted"; "Inventory Availability")
                 {
+                    ObsoleteReason = 'Prepare for extraction of Manufacturing app';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 actionref(Status_Promoted; Status)
                 {
                 }

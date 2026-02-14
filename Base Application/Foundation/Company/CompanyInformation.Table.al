@@ -398,6 +398,12 @@ table 79 "Company Information"
             Caption = 'Alternative Language Code';
             TableRelation = Language;
         }
+        field(201; "Default Language Code"; Code[10])
+        {
+            Caption = 'Default Language Code';
+            ToolTip = 'Specifies a default language code to be used for e.g. printing sales and purchase documents instead of the user language.';
+            TableRelation = Language;
+        }
         field(300; "Brand Color Value"; Code[10])
         {
             Caption = 'Brand Color Value';
