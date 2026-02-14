@@ -26,6 +26,12 @@ page 295 "Req. Wksh. Names"
                 {
                     ApplicationArea = Planning;
                 }
+                field("No. of Lines"; Rec."No. of Lines")
+                {
+                    ApplicationArea = Planning;
+                    ToolTip = 'Specifies the number of lines in this worksheet.';
+                    Visible = false;
+                }
             }
         }
         area(factboxes)

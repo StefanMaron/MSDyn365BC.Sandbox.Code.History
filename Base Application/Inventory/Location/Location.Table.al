@@ -401,8 +401,6 @@ table 14 Location
 
                 if not "Bin Mandatory" then begin
                     "Open Shop Floor Bin Code" := '';
-                    "To-Production Bin Code" := '';
-                    "From-Production Bin Code" := '';
                     "Adjustment Bin Code" := '';
                     "Receipt Bin Code" := '';
                     "Shipment Bin Code" := '';
@@ -544,28 +542,6 @@ table 14 Location
             trigger OnValidate()
             begin
                 CheckBinCode(Code, "Open Shop Floor Bin Code", FieldCaption("Open Shop Floor Bin Code"), Code);
-            end;
-        }
-        field(7314; "To-Production Bin Code"; Code[20])
-        {
-            Caption = 'To-Production Bin Code';
-            ToolTip = 'Specifies the bin in the production area where components picked for production are placed by default, before they can be consumed.';
-            TableRelation = Bin.Code where("Location Code" = field(Code));
-
-            trigger OnValidate()
-            begin
-                CheckBinCode(Code, "To-Production Bin Code", FieldCaption("To-Production Bin Code"), Code);
-            end;
-        }
-        field(7315; "From-Production Bin Code"; Code[20])
-        {
-            Caption = 'From-Production Bin Code';
-            ToolTip = 'Specifies the bin in the production area, where finished end items are taken from by default, when the process involves warehouse activity.';
-            TableRelation = Bin.Code where("Location Code" = field(Code));
-
-            trigger OnValidate()
-            begin
-                CheckBinCode(Code, "From-Production Bin Code", FieldCaption("From-Production Bin Code"), Code);
             end;
         }
         field(7317; "Adjustment Bin Code"; Code[20])
@@ -1043,16 +1019,16 @@ table 14 Location
           ("Shipment Bin Code" <> '') and (BinCode = "Shipment Bin Code"));
     end;
 
-    procedure IsBinBWProdOutput(BinCode: Code[20]): Boolean
-    begin
-        exit(("To-Production Bin Code" <> '') and (BinCode = "To-Production Bin Code"));
-    end;
-
     procedure IsInTransit(LocationCode: Code[10]): Boolean
     begin
         if Location.Get(LocationCode) then
             exit(Location."Use As In-Transit");
         exit(false);
+    end;
+
+    procedure IsProdConsumpWhseHandlingTypeWarehousePick() Result: Boolean
+    begin
+        OnIsProdConsumpWhseHandlingTypeWarehousePick(Rec, Result);
     end;
 
     local procedure CreateInboundWhseRequest()
@@ -1209,7 +1185,12 @@ table 14 Location
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateBinMandatoryOnAfterCheckBins(Location: Record Location)
+    local procedure OnValidateBinMandatoryOnAfterCheckBins(var Location: Record Location)
+    begin
+    end;
+
+    [InternalEvent(false)]
+    local procedure OnIsProdConsumpWhseHandlingTypeWarehousePick(var Location: Record Location; var Result: Boolean)
     begin
     end;
 }

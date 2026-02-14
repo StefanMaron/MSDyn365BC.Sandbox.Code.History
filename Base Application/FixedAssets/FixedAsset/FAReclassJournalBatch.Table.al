@@ -30,6 +30,14 @@ table 5623 "FA Reclass. Journal Batch"
             Caption = 'Description';
             ToolTip = 'Specifies the journal batch that you are creating.';
         }
+        field(40; "No. of Lines"; Integer)
+        {
+            CalcFormula = count("FA Reclass. Journal Line" where("Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field(Name)));
+            Caption = 'No. of Lines';
+            Editable = false;
+            FieldClass = FlowField;
+            ToolTip = 'Specifies the number of lines in this journal batch.';
+        }
     }
 
     keys

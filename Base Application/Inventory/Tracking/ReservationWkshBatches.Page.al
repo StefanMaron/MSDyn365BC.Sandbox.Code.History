@@ -27,6 +27,12 @@ page 329 "Reservation Wksh. Batches"
                 {
                     Caption = 'Description';
                 }
+                field("No. of Lines"; Rec."No. of Lines")
+                {
+                    ApplicationArea = Reservation;
+                    ToolTip = 'Specifies the number of lines in this worksheet batch.';
+                    Visible = false;
+                }
             }
         }
     }
