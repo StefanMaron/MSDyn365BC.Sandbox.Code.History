@@ -41,7 +41,7 @@ table 6753 "Reminder Action Group Log"
         field(11; "Last Step ID"; Integer)
         {
         }
-#if not CLEAN26
+#if not CLEAN27
 #pragma warning disable AA0232
         /// <summary>
         /// Contains the total number of errors encountered during this automation run.
@@ -52,7 +52,7 @@ table 6753 "Reminder Action Group Log"
             ObsoleteReason = 'Field is removed do not use';
             ObsoleteState = Pending;
 #pragma warning disable AS0074
-            ObsoleteTag = '26.0';
+            ObsoleteTag = '27.0';
 #pragma warning restore AS0074
             FieldClass = FlowField;
             CalcFormula = sum("Reminder Action Log"."Total Errors" where("Reminder Action Group ID" = field("Reminder Action Group ID"), "Run Id" = field("Run Id")));

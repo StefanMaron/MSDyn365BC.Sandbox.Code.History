@@ -21,212 +21,153 @@ page 32 "Item Lookup"
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = All;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("No. 2"; Rec."No. 2")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the alternative number of the item.';
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = All;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Base Unit of Measure"; Rec."Base Unit of Measure")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the unit in which the item is held in inventory. The base unit of measure also serves as the conversion basis for alternate units of measure.';
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Unit Price"; Rec."Unit Price")
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies the price for one unit of the item.';
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field(InventoryCtrl; Rec.Inventory)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the quantity in stock for this item.';
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Created From Nonstock Item"; Rec."Created From Nonstock Item")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Stockkeeping Unit Exists"; Rec."Stockkeeping Unit Exists")
                 {
                     ApplicationArea = Warehouse;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Shelf No."; Rec."Shelf No.")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Costing Method"; Rec."Costing Method")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Cost is Adjusted"; Rec."Cost is Adjusted")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Standard Cost"; Rec."Standard Cost")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Unit Cost"; Rec."Unit Cost")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the cost per unit of the item.';
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Last Direct Cost"; Rec."Last Direct Cost")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the most recent direct unit cost that was paid for the item.';
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Price/Profit Calculation"; Rec."Price/Profit Calculation")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Profit %"; Rec."Profit %")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Inventory Posting Group"; Rec."Inventory Posting Group")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Gen. Prod. Posting Group"; Rec."Gen. Prod. Posting Group")
                 {
                     ApplicationArea = Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("VAT Prod. Posting Group"; Rec."VAT Prod. Posting Group")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Item Disc. Group"; Rec."Item Disc. Group")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Vendor No."; Rec."Vendor No.")
                 {
                     ApplicationArea = Basic, Suite;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Vendor Item No."; Rec."Vendor Item No.")
                 {
                     ApplicationArea = Basic, Suite;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
+                    Visible = false;
                 }
                 field(GTIN; Rec.GTIN)
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Alternative Item No."; Rec."Alternative Item No.")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an alternative number for the item.';
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Common Item No."; Rec."Common Item No.")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a commonly used number for the item.';
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Tariff No."; Rec."Tariff No.")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Search Description"; Rec."Search Description")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Overhead Rate"; Rec."Overhead Rate")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Indirect Cost %"; Rec."Indirect Cost %")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Item Category Code"; Rec."Item Category Code")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field(Blocked; Rec.Blocked)
                 {
@@ -248,65 +189,47 @@ page 32 "Item Lookup"
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Sales Unit of Measure"; Rec."Sales Unit of Measure")
                 {
                     ApplicationArea = Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Replenishment System"; Rec."Replenishment System")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Purch. Unit of Measure"; Rec."Purch. Unit of Measure")
                 {
                     ApplicationArea = Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Lead Time Calculation"; Rec."Lead Time Calculation")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Manufacturing Policy"; Rec."Manufacturing Policy")
                 {
                     ApplicationArea = Manufacturing;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Flushing Method"; Rec."Flushing Method")
                 {
                     ApplicationArea = Manufacturing;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Assembly Policy"; Rec."Assembly Policy")
                 {
                     ApplicationArea = Assembly;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Item Tracking Code"; Rec."Item Tracking Code")
                 {
                     ApplicationArea = ItemTracking;
                     ToolTip = 'Specifies how items are tracked in the supply chain.';
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
                 field("Default Deferral Template Code"; Rec."Default Deferral Template Code")
                 {
@@ -314,8 +237,6 @@ page 32 "Item Lookup"
                     Caption = 'Default Deferral Template';
                     Importance = Additional;
                     Visible = false;
-                    Style = Subordinate;
-                    StyleExpr = Rec.Blocked;
                 }
             }
         }
@@ -363,7 +284,7 @@ page 32 "Item Lookup"
 
     trigger OnOpenPage()
     begin
-        SetLoadFieldsForDropDown();
+        Rec.SetRange(Blocked, false);
     end;
 
     trigger OnFindRecord(Which: Text): Boolean
@@ -371,19 +292,12 @@ page 32 "Item Lookup"
         Found: Boolean;
         IsHandled: Boolean;
     begin
-        SetLoadFieldsForDropDown();
         IsHandled := false;
         OnBeforeFindRecord(Rec, Which, CrossColumnSearchFilter, Found, IsHandled);
         if IsHandled then
             exit(Found);
-        exit(Rec.Find(Which));
-    end;
 
-    local procedure SetLoadFieldsForDropDown()
-    begin
-        // initially only load the fields shown in field group 'dropdown'
-        Rec.SetLoadFields("No.", Description, "Base Unit of Measure", "Unit Price", Inventory, Blocked, "Vendor Item No.", "No. 2", "Alternative Item No.", "Common Item No.", GTIN, "Shelf No.");
-        Rec.SetAutoCalcFields(Inventory);
+        exit(Rec.Find(Which));
     end;
 
     [IntegrationEvent(false, false)]
