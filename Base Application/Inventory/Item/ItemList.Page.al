@@ -2228,6 +2228,15 @@ page 31 "Item List"
         }
     }
 
+    views
+    {
+        view(ItemsWithNegativeInventory)
+        {
+            Caption = 'Items with Negative Inventory';
+            Filters = where(Inventory = filter(< 0));
+        }
+    }
+
     trigger OnAfterGetCurrRecord()
     var
         FilteredItem: Record Item;
