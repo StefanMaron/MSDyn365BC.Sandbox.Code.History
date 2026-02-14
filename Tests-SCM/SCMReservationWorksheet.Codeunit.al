@@ -26,7 +26,7 @@ codeunit 137023 "SCM Reservation Worksheet"
         QtyCannotExceedErr: Label 'Qty. to Reserve cannot exceed';
         DateSequenceErr: Label 'Start Date Formula must be less than or equal to End Date Formula';
         ChangeLocationMessage: Label 'You have changed Location Code on the sales header, but it has not been changed on the existing sales lines.';
-        AvailableQtyToReserveErr: Label '%1 should be greater than 0.', Comment = '%1 = Available Qty. to Reserve';
+        AvailableQtyToReserveErr: Label 'There is no available quantity to reserve. %1 must be greater than zero.', Comment = '%1 = Available Qty. to Reserve';
         RemainingQtyToReserveErr: Label '%1 should equal the quantity on the sales line.', Comment = '%1 = Remaining Qty. to Reserve';
 
     [Test]
