@@ -528,6 +528,16 @@ page 5701 "Stockkeeping Unit List"
             }
         }
     }
+
+    views
+    {
+        view(ItemsWithNegativeInventory)
+        {
+            Caption = 'Stockkeeping Units with negative Inventory';
+            Filters = where(Inventory = filter(< 0));
+        }
+    }
+
     trigger OnAfterGetRecord()
     begin
         EnableControls();
