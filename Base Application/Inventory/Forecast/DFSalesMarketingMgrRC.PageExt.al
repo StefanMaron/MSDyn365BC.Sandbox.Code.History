@@ -6,7 +6,7 @@ namespace Microsoft.CRM.RoleCenters;
 
 using Microsoft.Manufacturing.Forecast;
 
-pageextension 99000777 "Mfg. Sales Marketing Mgr. RC" extends "Sales & Marketing Manager RC"
+pageextension 99000777 "DF Sales Marketing Mgr. RC" extends "Sales & Marketing Manager RC"
 {
     actions
     {
@@ -15,7 +15,7 @@ pageextension 99000777 "Mfg. Sales Marketing Mgr. RC" extends "Sales & Marketing
             action("Forecast")
             {
                 ApplicationArea = Manufacturing;
-                Caption = 'Production Forecast';
+                Caption = 'Demand Forecast';
                 RunObject = page "Demand Forecast Names";
             }
         }
