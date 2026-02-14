@@ -87,6 +87,15 @@ codeunit 570 "G/L Account Category Mgt."
         JobSalesContraTxt: Label 'Job Sales Contra';
         OverwriteConfirmationQst: Label 'How do you want to generate standard financial reports?';
         GenerateAccountSchedulesOptionsTxt: Label 'Keep existing financial reports with their row definitions and create new ones.,Overwrite existing financial reports and row defintions.';
+        DraftCodeTxt: Label 'DRAFT', Locked = true, MaxLength = 10;
+        DraftNameTxt: Label 'Draft', MaxLength = 50;
+        DraftDescTxt: Label 'Report is under development and not available to users', MaxLength = 100;
+        ActiveCodeTxt: Label 'ACTIVE', Locked = true, MaxLength = 10;
+        ActiveNameTxt: Label 'Active', MaxLength = 50;
+        ActiveDescTxt: Label 'Report has been tested and is available to users', MaxLength = 100;
+        RetiredCodeTxt: Label 'RETIRED', Locked = true, MaxLength = 10;
+        RetiredNameTxt: Label 'Retired', MaxLength = 50;
+        RetiredDescTxt: Label 'Report is phased out and no longer available', MaxLength = 100;
         GeneratedFromGLAccountCategoriesPageTxt: Label 'Generated from G/L Account Categories.', MaxLength = 40;
         ProfitabilityCatCodeTxt: Label 'PROFITABILITY', MaxLength = 20;
         ProfitabilityCatNameTxt: Label 'Profitability', MaxLength = 100;
@@ -307,6 +316,7 @@ codeunit 570 "G/L Account Category Mgt."
     procedure InitializeStandardAccountSchedules()
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
+        FinancialReportStatus: Record "Financial Report Status";
     begin
         if not GeneralLedgerSetup.Get() then
             exit;
@@ -367,7 +377,15 @@ codeunit 570 "G/L Account Category Mgt."
             CreateAccountScheduleForRetainedEarnings := true;
         end;
 
+        if FinancialReportStatus.IsEmpty() and (GeneralLedgerSetup.DefaultFinancialReportStatus = '') then
+            GeneralLedgerSetup.DefaultFinancialReportStatus := DraftCodeTxt;
+
         GeneralLedgerSetup.Modify();
+
+        AddFinancialReportStatus(DraftCodeTxt, DraftNameTxt, DraftDescTxt, true);
+        AddFinancialReportStatus(ActiveCodeTxt, ActiveNameTxt, ActiveDescTxt, false);
+        AddFinancialReportStatus(RetiredCodeTxt, RetiredNameTxt, RetiredDescTxt, true);
+
         AddColumnLayout(GeneralLedgerSetup."Fin. Rep. Bal. Sheet Column", BalanceColumnDescTxt, true, StrSubstNo('%1 %2', GeneratedFromGLAccountCategoriesPageTxt, BalanceColumnInternalDescTxt));
         AddColumnLayout(GeneralLedgerSetup."Fin. Rep. Net Change Column", NetChangeColumnDescTxt, false, StrSubstNo('%1 %2', GeneratedFromGLAccountCategoriesPageTxt, NetChangeColumnInternalDescTxt));
 
@@ -390,13 +408,13 @@ codeunit 570 "G/L Account Category Mgt."
         AddFinancialReportCategory(PerformanceMetricsCatCodeTxt, PerformanceMetricsCatNameTxt, PerformanceMetricsCatDescTxt);
         AddFinancialReportCategory(PeriodEndClosingCatCodeTxt, PeriodEndClosingCatNameTxt, PeriodEndClosingCatDescTxt);
 
-        AddFinancialReport(GeneralLedgerSetup."Fin. Rep. for Balance Sheet", BalanceSheetDescTxt, GeneralLedgerSetup."Fin. Rep. Bal. Sheet Row", GeneralLedgerSetup."Fin. Rep. Bal. Sheet Column", BalanceSheetFinReportInternalDescTxt, BalanceSheetCatCodeTxt);
-        AddFinancialReport(GeneralLedgerSetup."Fin. Rep. for Income Stmt.", IncomeStmdDescTxt, GeneralLedgerSetup."Fin. Rep. Income Stmt. Row", GeneralLedgerSetup."Fin. Rep. Net Change Column", IncomeStmdFinReportInternalDescTxt, ProfitabilityCatCodeTxt);
-        AddFinancialReport(GeneralLedgerSetup."Fin. Rep. for Cash Flow Stmt", CashFlowDescTxt, GeneralLedgerSetup."Fin. Rep. Cash Flow Stmt. Row", GeneralLedgerSetup."Fin. Rep. Net Change Column", CashFlowFinReportInternalDescTxt, CashFlowCatCodeTxt);
-        AddFinancialReport(GeneralLedgerSetup."Fin. Rep. for Retained Earn.", RetainedEarnDescTxt, GeneralLedgerSetup."Fin. Rep. Retained Earn. Row", GeneralLedgerSetup."Fin. Rep. Net Change Column", RetainedEarnFinReportInternalDescTxt, EquityCapitalCatCodeTxt);
+        AddFinancialReport(GeneralLedgerSetup."Fin. Rep. for Balance Sheet", BalanceSheetDescTxt, GeneralLedgerSetup."Fin. Rep. Bal. Sheet Row", GeneralLedgerSetup."Fin. Rep. Bal. Sheet Column", BalanceSheetFinReportInternalDescTxt, BalanceSheetCatCodeTxt, DraftCodeTxt);
+        AddFinancialReport(GeneralLedgerSetup."Fin. Rep. for Income Stmt.", IncomeStmdDescTxt, GeneralLedgerSetup."Fin. Rep. Income Stmt. Row", GeneralLedgerSetup."Fin. Rep. Net Change Column", IncomeStmdFinReportInternalDescTxt, ProfitabilityCatCodeTxt, DraftCodeTxt);
+        AddFinancialReport(GeneralLedgerSetup."Fin. Rep. for Cash Flow Stmt", CashFlowDescTxt, GeneralLedgerSetup."Fin. Rep. Cash Flow Stmt. Row", GeneralLedgerSetup."Fin. Rep. Net Change Column", CashFlowFinReportInternalDescTxt, CashFlowCatCodeTxt, DraftCodeTxt);
+        AddFinancialReport(GeneralLedgerSetup."Fin. Rep. for Retained Earn.", RetainedEarnDescTxt, GeneralLedgerSetup."Fin. Rep. Retained Earn. Row", GeneralLedgerSetup."Fin. Rep. Net Change Column", RetainedEarnFinReportInternalDescTxt, EquityCapitalCatCodeTxt, DraftCodeTxt);
     end;
 
-    local procedure AddFinancialReport(Name: Code[10]; Description: Text[80]; RowGroupCode: Code[10]; ColumnGroupCode: Code[10]; NewInternalDescription: Text[500]; CategoryCode: Code[20])
+    local procedure AddFinancialReport(Name: Code[10]; Description: Text[80]; RowGroupCode: Code[10]; ColumnGroupCode: Code[10]; NewInternalDescription: Text[500]; CategoryCode: Code[20]; StatusCode: Code[10])
     var
         FinancialReport: Record "Financial Report";
     begin
@@ -411,6 +429,7 @@ codeunit 570 "G/L Account Category Mgt."
             FinancialReport."Financial Report Column Group" := ColumnGroupCode;
             FinancialReport."Internal Description" := NewInternalDescription;
             FinancialReport.CategoryCode := CategoryCode;
+            FinancialReport.Status := StatusCode;
             FinancialReport.Insert();
         end;
     end;
@@ -478,6 +497,20 @@ codeunit 570 "G/L Account Category Mgt."
         FinRepCategory.Name := Name;
         FinRepCategory.Description := Description;
         FinRepCategory.Insert();
+    end;
+
+    local procedure AddFinancialReportStatus(Code: Code[10]; Name: Text[50]; Description: Text[100]; Blocked: Boolean)
+    var
+        FinancialReportStatus: Record "Financial Report Status";
+    begin
+        if FinancialReportStatus.Get(Code) then
+            exit;
+        FinancialReportStatus.Init();
+        FinancialReportStatus.Code := Code;
+        FinancialReportStatus.Name := Name;
+        FinancialReportStatus.Description := Description;
+        FinancialReportStatus.Blocked := Blocked;
+        FinancialReportStatus.Insert();
     end;
 
     /// <summary>
