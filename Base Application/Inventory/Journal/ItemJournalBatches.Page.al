@@ -45,6 +45,12 @@ page 262 "Item Journal Batches"
                 {
                     ApplicationArea = ItemTracking;
                 }
+                field("No. of Lines"; Rec."No. of Lines")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the number of lines in this journal batch.';
+                    Visible = false;
+                }
             }
         }
         area(factboxes)

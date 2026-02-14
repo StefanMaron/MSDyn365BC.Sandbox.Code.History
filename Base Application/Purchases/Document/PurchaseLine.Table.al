@@ -196,7 +196,9 @@ table 39 "Purchase Line"
             else
             if (Type = const("Charge (Item)")) "Item Charge"
             else
-            if (Type = const(Item)) Item
+            if (Type = const(Item), "Document Type" = filter(<> "Credit Memo" & <> "Return Order")) Item where(Blocked = const(false), "Purchasing Blocked" = const(false))
+            else
+            if (Type = const(Item), "Document Type" = filter("Credit Memo" | "Return Order")) Item where(Blocked = const(false))
             else
             if (Type = const("Allocation Account")) "Allocation Account"
             else
@@ -480,7 +482,9 @@ table 39 "Purchase Line"
             else
             if (Type = const("G/L Account"), "System-Created Entry" = const(true)) "G/L Account".Name
             else
-            if (Type = const(Item)) Item.Description
+            if (Type = const(Item), "Document Type" = filter(<> "Credit Memo" & <> "Return Order")) Item.Description where(Blocked = const(false), "Purchasing Blocked" = const(false))
+            else
+            if (Type = const(Item), "Document Type" = filter("Credit Memo" | "Return Order")) Item.Description where(Blocked = const(false))
             else
             if (Type = const("Fixed Asset")) "Fixed Asset".Description
             else
