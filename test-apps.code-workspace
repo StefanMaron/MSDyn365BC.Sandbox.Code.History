@@ -4,7 +4,7 @@
       "path": "./Application Test Library"
     },
     {
-      "path": "./Shopify/test/Shopify Connector Test"
+      "path": "./Shopify/test/Shopify Connector Test/DisabledTests"
     },
     {
       "path": "./PEPPOL/Test/PEPPOL Tests"
@@ -362,11 +362,11 @@
     }
   ],
   "settings": {
+    "al.enableCodeAnalysis": false,
+    "allint.enabled": false,
     "search.exclude": {
       "**.xlf": true
     },
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
     "al.enableCodeActions": false
   }
 }

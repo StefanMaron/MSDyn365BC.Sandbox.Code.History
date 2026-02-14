@@ -901,7 +901,7 @@ codeunit 99000893 "Mfg. Create Put-away"
 
     local procedure IsTemplateLineEnableForFindBinFields(): Boolean
     begin
-        exit((PutAwayTemplateLine."Find Empty Bin" or PutAwayTemplateLine."Find Floating Bin") or
+        exit(not (PutAwayTemplateLine."Find Empty Bin" or PutAwayTemplateLine."Find Floating Bin") or
             PutAwayTemplateLine."Find Fixed Bin" or
             PutAwayTemplateLine."Find Same Item" or
             PutAwayTemplateLine."Find Unit of Measure Match" or
