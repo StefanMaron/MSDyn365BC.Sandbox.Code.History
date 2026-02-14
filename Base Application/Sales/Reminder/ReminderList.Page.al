@@ -239,7 +239,7 @@ page 436 "Reminder List"
         }
         area(reporting)
         {
-#if not CLEAN26
+#if not CLEAN27
             action("Reminder Nos.")
             {
                 ApplicationArea = Basic, Suite;
@@ -253,7 +253,7 @@ page 436 "Reminder List"
                 ObsoleteState = Pending;
                 ObsoleteReason = 'The related report doesn''t exist anymore';
 #pragma warning disable AS0074
-                ObsoleteTag = '26.0';
+                ObsoleteTag = '27.0';
 #pragma warning restore AS0074
             }
 #endif
