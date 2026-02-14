@@ -91,6 +91,14 @@ table 5620 "FA Journal Batch"
             Editable = false;
             FieldClass = FlowField;
         }
+        field(40; "No. of Lines"; Integer)
+        {
+            CalcFormula = count("FA Journal Line" where("Journal Template Name" = field("Journal Template Name"), "Journal Batch Name" = field(Name)));
+            Caption = 'No. of Lines';
+            Editable = false;
+            FieldClass = FlowField;
+            ToolTip = 'Specifies the number of lines in this journal batch.';
+        }
     }
 
     keys
