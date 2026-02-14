@@ -113,6 +113,21 @@ table 84 "Acc. Schedule Name"
             Caption = 'Internal Description';
             ToolTip = 'Specifies the internal description of row definition. The internal description is not shown on the final report but is used to provide more context when using the definition.';
         }
+        field(6; Status; Code[10])
+        {
+            Caption = 'Status';
+            DataClassification = CustomerContent;
+            TableRelation = "Financial Report Status";
+            ToolTip = 'Specifies the status code for the row definition. The status code helps you organize the lifecycle of your row definitions.';
+        }
+        field(7; "Status Blocked"; Boolean)
+        {
+            CalcFormula = exist("Financial Report Status" where("Code" = field(Status), "Blocked" = const(true)));
+            Caption = 'Status Blocked';
+            Editable = false;
+            FieldClass = FlowField;
+            ToolTip = 'Specifies the status code is a blocked status.';
+        }
     }
 
     keys
