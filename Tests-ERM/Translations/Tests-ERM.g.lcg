@@ -5288,15 +5288,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Purchase Subform - NamedType ItemTestDescriptionLbl)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 3517920733 - NamedType 1270879818" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Line No. should be positive after insert with negative]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Purchase Subform - NamedType LineNoPositiveAfterInsertNegativeLbl)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 3517920733 - NamedType 887439132" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Line No. should remain zero as zero is allowed]]></Val>
@@ -5313,15 +5304,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Purchase Subform - NamedType MustMatchErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 3517920733 - NamedType 1606094091" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[New Line No. should be greater than previous]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Purchase Subform - NamedType NewLineNoGreaterThanPreviousLbl)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3517920733 - NamedType 1566103418" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -6764,15 +6746,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Sales Subform - NamedType ItemTestDescriptionLbl)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 3883241108 - NamedType 1270879818" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Line No. should be positive after insert with negative]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Sales Subform - NamedType LineNoPositiveAfterInsertNegativeLbl)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 3883241108 - NamedType 887439132" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Line No. should remain zero as zero is allowed]]></Val>
@@ -6789,15 +6762,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Sales Subform - NamedType MustMatchErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 3883241108 - NamedType 1606094091" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[New Line No. should be greater than previous]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Sales Subform - NamedType NewLineNoGreaterThanPreviousLbl)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3883241108 - NamedType 1566103418" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
