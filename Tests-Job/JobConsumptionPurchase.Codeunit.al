@@ -4516,6 +4516,61 @@ codeunit 136302 "Job Consumption Purchase"
                 StrSubstNo(ValueMustMatchErr, UnplannedDemand.FieldCaption("Quantity (Base)"), Quantity[2]));
     end;
 
+    [Test]
+    procedure CorrectiveCredMemoPreservesJobUnitPrice()
+    var
+        JobTask: Record "Job Task";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        PurchInvHeader: Record "Purch. Inv. Header";
+        PurchCredMemoHeader: Record "Purchase Header";
+        PurchCredMemoLine: Record "Purchase Line";
+        JobUnitPrice: Decimal;
+    begin
+        // [SCENARIO 620561] Job Unit Price (field 1003) is copied to Corrective Credit Memo from Posted Purchase Invoice
+        Initialize();
+
+        // [GIVEN] Create Job and Job Task
+        CreateJobWithJobTask(JobTask);
+
+        // [GIVEN] Create Purchase Invoice with Job
+        CreatePurchaseDocumentWithJobTask(
+            PurchaseHeader,
+            JobTask,
+            PurchaseHeader."Document Type"::Invoice,
+            PurchaseLine.Type::Item,
+            CreateItem());
+        UpdatePurchaseLineDirectUnitCost(PurchaseHeader);
+
+        // [GIVEN] Populate Job fields on Purchase Line
+        GetPurchaseLines(PurchaseHeader, PurchaseLine);
+        JobUnitPrice := LibraryRandom.RandDec(100, 2);
+        PurchaseLine."Job No." := JobTask."Job No.";
+        PurchaseLine."Job Task No." := JobTask."Job Task No.";
+        PurchaseLine."Job Line Type" := PurchaseLine."Job Line Type"::"Both Budget and Billable";
+        PurchaseLine.Validate("Job Unit Price", JobUnitPrice);
+        PurchaseLine.Validate("Job Unit Price (LCY)", JobUnitPrice);
+        PurchaseLine.Validate("Job Line Amount", JobUnitPrice);
+        PurchaseLine.Validate("Job Line Amount (LCY)", JobUnitPrice);
+        PurchaseLine.Modify(true);
+
+        // [GIVEN] Post Purchase Invoice
+        PurchInvHeader.Get(LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true));
+
+        // [WHEN] Create Corrective Credit Memo
+        CreateCorrectiveCreditMemoFromPostedInvoice(PurchInvHeader, PurchCredMemoHeader);
+
+        // [THEN] Verify Job fields correctly copied to Credit Memo line
+        PurchCredMemoLine.SetRange("Document Type", PurchCredMemoLine."Document Type"::"Credit Memo");
+        PurchCredMemoLine.SetRange("Document No.", PurchCredMemoHeader."No.");
+        PurchCredMemoLine.SetFilter(Type, '<>%1', PurchCredMemoLine.Type::" ");
+        PurchCredMemoLine.FindFirst();
+
+        PurchCredMemoLine.TestField("Job Unit Price", PurchaseLine."Job Unit Price");
+        PurchCredMemoLine.TestField("Job Total Price", PurchaseLine."Job Total Price");
+        PurchCredMemoLine.TestField("Job Line Amount", PurchaseLine."Job Line Amount");
+    end;
+
     local procedure Initialize()
     var
         WarehouseEmployee: Record "Warehouse Employee";
@@ -6712,6 +6767,19 @@ codeunit 136302 "Job Consumption Purchase"
         PurchaseLine.Validate("Job Line Type", PurchaseLine."Job Line Type"::Budget);
         PurchaseLine.Validate("Job Planning Line No.", JobPlanningLine."Line No.");
         PurchaseLine.Modify(true);
+    end;
+
+    local procedure CreateCorrectiveCreditMemoFromPostedInvoice(PurchInvHeader: Record "Purch. Inv. Header"; var PurchCredMemoHeader: Record "Purchase Header")
+    var
+        CopyDocumentMgt: Codeunit "Copy Document Mgt.";
+    begin
+        LibraryPurchase.CreatePurchHeader(
+          PurchCredMemoHeader, PurchCredMemoHeader."Document Type"::"Credit Memo", PurchInvHeader."Buy-from Vendor No.");
+        PurchCredMemoHeader."Vendor Cr. Memo No." := PurchInvHeader."No.";
+        PurchCredMemoHeader.Modify();
+
+        CopyDocumentMgt.SetProperties(true, false, false, false, true, false, false);
+        CopyDocumentMgt.CopyPurchDoc("Purchase Document Type From"::"Posted Invoice", PurchInvHeader."No.", PurchCredMemoHeader);
     end;
 
     [ConfirmHandler]
