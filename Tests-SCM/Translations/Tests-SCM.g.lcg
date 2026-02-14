@@ -8863,7 +8863,7 @@
   </Item>
   <Item ItemId=";Codeunit 1767918677 - NamedType 4249786749" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[%1 should be greater than 0.]]></Val>
+      <Val><![CDATA[There is no available quantity to reserve. %1 must be greater than zero.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
