@@ -692,6 +692,71 @@ codeunit 137301 "SCM Inventory Reports - I"
     end;
 
     [Test]
+    [HandlerFunctions('InventoryVendorPurchasesRequestPageHandler')]
+    [Scope('OnPrem')]
+    procedure InventoryVendorPurchasesTotals()
+    var
+        Item: Record Item;
+        PurchaseHeader: Record "Purchase Header";
+        ValueEntry: Record "Value Entry";
+        PurchaseQuantity: Decimal;
+        ItemNos: Array[2] of Code[20];
+        SubtotalsCostAmount: Array[2] of Decimal;
+        SubtotalsDiscountAmount: Array[2] of Decimal;
+        RequestPageXML: Text;
+    begin
+        // [SCENARIO] Report "Inventory - Vendor Purchases" should correctly represent Subtotals and Totals values
+        Initialize();
+
+        // [GIVEN] Create Item "I1", Create And Post Purchase Order with one Item Line.
+        CreateItem(Item);
+        ItemNos[1] := Item."No.";
+        PurchaseQuantity := LibraryRandom.RandDec(100, 2);
+        CreatePurchaseOrder(PurchaseHeader, Item."No.", PurchaseQuantity, LibraryRandom.RandDec(100, 2), 1);
+        LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
+
+        // [GIVEN] Create and Post a second Purchase Order with one Item "I1" Line.
+        PurchaseQuantity := LibraryRandom.RandDec(100, 2);
+        CreatePurchaseOrder(PurchaseHeader, Item."No.", PurchaseQuantity, LibraryRandom.RandDec(100, 2), 1);
+        LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
+
+        // [GIVEN] Create another Item, Create And Post Purchase Order with one Item Line "I2".
+        CreateItem(Item);
+        ItemNos[2] := Item."No.";
+        PurchaseQuantity := LibraryRandom.RandDec(100, 2);
+        CreatePurchaseOrder(PurchaseHeader, Item."No.", PurchaseQuantity, LibraryRandom.RandDec(100, 2), 1);
+        LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
+
+        Commit();
+        // [WHEN] Run Inventory - Vendor Purchases report.
+        Item.SetFilter("No.", '%1|%2', ItemNos[1], ItemNos[2]);
+        RequestPageXML := Report.RunRequestPage(Report::"Inventory - Vendor Purchases", RequestPageXML);
+        LibraryReportDataset.RunReportAndLoad(Report::"Inventory - Vendor Purchases", Item, RequestPageXML);
+
+        // [THEN] Subtotals elements exist and their values match those in the associated "Purchase Line" records for "I1"
+        ValueEntry.SetRange("Item No.", ItemNos[1]);
+        ValueEntry.CalcSums("Invoiced Quantity", "Cost Amount (Actual)", "Discount Amount");
+        SubtotalsCostAmount[1] := ValueEntry."Cost Amount (Actual)";
+        SubtotalsDiscountAmount[1] := ValueEntry."Discount Amount";
+        LibraryReportDataset.AssertElementWithValueExists('Subtotals_CostAmount', SubtotalsCostAmount[1]);
+        LibraryReportDataset.AssertElementWithValueExists('Subtotals_DiscountAmount', SubtotalsDiscountAmount[1]);
+
+        // [THEN] Subtotals elements exist and their values match those in the associated "Purchase Line" records for "I2"
+        ValueEntry.SetRange("Item No.", ItemNos[2]);
+        ValueEntry.CalcSums("Invoiced Quantity", "Cost Amount (Actual)", "Discount Amount");
+        SubtotalsCostAmount[2] := ValueEntry."Cost Amount (Actual)";
+        SubtotalsDiscountAmount[2] := ValueEntry."Discount Amount";
+        LibraryReportDataset.AssertElementWithValueExists('Subtotals_CostAmount', SubtotalsCostAmount[2]);
+        LibraryReportDataset.AssertElementWithValueExists('Subtotals_DiscountAmount', SubtotalsDiscountAmount[2]);
+
+        // [THEN] Totals elements exist and their values match the sum total of subtotals for "Purchase Line" records for "I1" and "I2"
+        LibraryReportDataset.AssertElementWithValueExists('Totals_CostAmount', (SubtotalsCostAmount[1] + SubtotalsCostAmount[2]));
+        LibraryReportDataset.AssertElementWithValueExists('Totals_DiscountAmount', (SubtotalsDiscountAmount[1] + SubtotalsDiscountAmount[2]));
+
+        Clear(LibraryReportDataset);
+    end;
+
+    [Test]
     [HandlerFunctions('MessageHandler,InvtSalesBackOrdersRequestPageHandler')]
     [Scope('OnPrem')]
     procedure InventorySalesBackOrders()
@@ -1889,6 +1954,12 @@ codeunit 137301 "SCM Inventory Reports - I"
 
     [RequestPageHandler]
     [Scope('OnPrem')]
+    procedure InventoryVendorPurchasesRequestPageHandler(var InventoryVendorPurchases: TestRequestPage "Inventory - Vendor Purchases")
+    begin
+    end;
+
+    [RequestPageHandler]
+    [Scope('OnPrem')]
     procedure InvtSalesBackOrdersRequestPageHandler(var InventorySalesBackOrders: TestRequestPage "Inventory - Sales Back Orders")
     begin
     end;
@@ -1991,4 +2062,3 @@ codeunit 137301 "SCM Inventory Reports - I"
         PostInventoryCostToGL.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
     end;
 }
-
