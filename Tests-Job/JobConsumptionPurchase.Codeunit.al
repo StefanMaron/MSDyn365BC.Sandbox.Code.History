@@ -4463,6 +4463,59 @@ codeunit 136302 "Job Consumption Purchase"
         end;
     end;
 
+    [Test]
+    [Scope('OnPrem')]
+    procedure PurchaseOrderQuantityForDifferentItemsInSameJobTask()
+    var
+        Item: array[2] of Record Item;
+        JobTask: Record "Job Task";
+        JobPlanningLine1: Record "Job Planning Line";
+        JobPlanningLine2: Record "Job Planning Line";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        UnplannedDemand: Record "Unplanned Demand";
+        GetUnplannedDemand: Codeunit "Get Unplanned Demand";
+        Quantity: array[2] of Decimal;
+        PurchaseQty: Decimal;
+    begin
+        // [SCENARIO 617485] When creating purchase orders for different items in the same Job Task, the system should only consider purchase orders for the same item
+        Initialize();
+
+        // [GIVEN] A Job with a Task
+        CreateJobWithJobTask(JobTask);
+
+        // [GIVEN] Create an Item with Job Planning Line with Quantity.
+        Quantity[1] := LibraryRandom.RandIntInRange(30, 50);
+        Item[1].Get(CreateItem());
+        CreateJobPlanningLine(JobPlanningLine1, JobTask, JobPlanningLine1.Type::Item, Item[1]."No.", Quantity[1], true);
+
+        // [GIVEN] Purchase Order for Item1 with Quantity linked to the Job Planning Line.
+        PurchaseQty := LibraryRandom.RandInt(20);
+        CreatePurchaseDocumentWithJobTask(PurchaseHeader, JobTask, PurchaseHeader."Document Type"::Order, PurchaseLine.Type::Item, Item[1]."No.");
+        GetPurchaseLines(PurchaseHeader, PurchaseLine);
+        PurchaseLine.Validate(Quantity, PurchaseQty);
+        PurchaseLine.Validate("Job Planning Line No.", JobPlanningLine1."Line No.");
+        PurchaseLine.Modify(true);
+
+        // [GIVEN] Item2 with Job Planning Line with Quantity = 30 in the same Job Task
+        Quantity[2] := LibraryRandom.RandIntInRange(30, 50);
+        Item[2].Get(CreateItem());
+        CreateJobPlanningLine(JobPlanningLine2, JobTask, JobPlanningLine2.Type::Item, Item[2]."No.", Quantity[2], true);
+
+        // [WHEN] Calculate unplanned demand for the job
+        JobPlanningLine1.SetRange("Job No.", JobTask."Job No.");
+        JobPlanningLine1.SetRange("Job Task No.", JobTask."Job Task No.");
+        GetUnplannedDemand.SetIncludeMetDemandForSpecificJobNo(JobTask."Job No.");
+        GetUnplannedDemand.Run(UnplannedDemand);
+
+        // [THEN] The needed quantity for Item2 should be 30 (not affected by Item1's purchase order)
+        UnplannedDemand.SetRange("Item No.", Item[2]."No.");
+        UnplannedDemand.SetRange("Demand Order No.", JobTask."Job No.");
+        if UnplannedDemand.FindFirst() then
+            Assert.AreEqual(Quantity[2], UnplannedDemand."Quantity (Base)",
+                StrSubstNo(ValueMustMatchErr, UnplannedDemand.FieldCaption("Quantity (Base)"), Quantity[2]));
+    end;
+
     local procedure Initialize()
     var
         WarehouseEmployee: Record "Warehouse Employee";

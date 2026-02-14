@@ -754,6 +754,42 @@ table 77 "Report Selections"
         SaveReportAsPDFInTempBlob(TempBlob, TempBodyReportSelections."Report ID", RecordVariant, TempBodyReportSelections."Custom Report Layout Code", ReportUsage);
     end;
 
+    /// <summary>
+    /// Gets File Path to the PDF report for a vendor
+    /// </summary>
+    /// <param name="ServerEmailBodyFilePath">File Path</param>
+    /// <param name="ReportUsage">Vendor based report usage</param>
+    /// <param name="RecordVariant">Record applied to report dataitem</param>
+    /// <param name="VendNo">Vendor No.</param>
+    [Scope('OnPrem')]
+    procedure GetPdfReportForVend(var ServerEmailBodyFilePath: Text[250]; ReportUsage: Enum "Report Selection Usage"; RecordVariant: Variant; VendNo: Code[20])
+    var
+        TempBodyReportSelections: Record "Report Selections" temporary;
+    begin
+        ServerEmailBodyFilePath := '';
+
+        FindReportUsageForVend(ReportUsage, VendNo, TempBodyReportSelections);
+
+        ServerEmailBodyFilePath :=
+            SaveReportAsPDF(TempBodyReportSelections."Report ID", RecordVariant, TempBodyReportSelections."Custom Report Layout Code", ReportUsage);
+    end;
+
+    /// <summary>
+    /// Gets the PDF report for a vendor to TempBlob
+    /// </summary>
+    /// <param name="TempBlob">The temporary blob to store the generated PDF report</param>
+    /// <param name="ReportUsage">Vendor based report usage</param>
+    /// <param name="RecordVariant">Record applied to report dataitem</param>
+    /// <param name="VendNo">Vendor No.</param>
+    procedure GetPdfReportForVend(var TempBlob: Codeunit "Temp Blob"; ReportUsage: Enum "Report Selection Usage"; RecordVariant: Variant; VendNo: Code[20])
+    var
+        TempBodyReportSelections: Record "Report Selections" temporary;
+    begin
+        FindReportUsageForVend(ReportUsage, VendNo, TempBodyReportSelections);
+
+        SaveReportAsPDFInTempBlob(TempBlob, TempBodyReportSelections."Report ID", RecordVariant, TempBodyReportSelections."Custom Report Layout Code", ReportUsage);
+    end;
+
 #if not CLEAN27
     [Scope('OnPrem')]
     [Obsolete('Replaced with GetEmailBodyForCust that accepts a TempBlob as parameter.', '27.0')]

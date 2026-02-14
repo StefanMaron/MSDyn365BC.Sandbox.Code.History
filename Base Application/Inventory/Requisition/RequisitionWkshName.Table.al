@@ -47,6 +47,14 @@ table 245 "Requisition Wksh. Name"
             Editable = false;
             FieldClass = FlowField;
         }
+        field(40; "No. of Lines"; Integer)
+        {
+            CalcFormula = count("Requisition Line" where("Worksheet Template Name" = field("Worksheet Template Name"), "Journal Batch Name" = field(Name)));
+            Caption = 'No. of Lines';
+            Editable = false;
+            FieldClass = FlowField;
+            ToolTip = 'Specifies the number of lines in this worksheet.';
+        }
     }
 
     keys
