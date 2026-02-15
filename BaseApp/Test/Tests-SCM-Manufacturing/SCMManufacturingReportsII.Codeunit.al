@@ -48,6 +48,7 @@ codeunit 137310 "SCM Manufacturing Reports -II"
         LibraryUtility: Codeunit "Library - Utility";
         Assert: Codeunit Assert;
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
+        LibrarySetupStorage: Codeunit "Library - Setup Storage";
         isInitialized: Boolean;
         NoOfLinesError: Label 'Number of Lines must be the same.';
         FinishProductionOrder: Label 'Do you still want to finish the order?';
@@ -552,10 +553,48 @@ codeunit 137310 "SCM Manufacturing Reports -II"
         LibraryReportDataset.AssertCurrentRowValueEquals('SourceNo_ProductionOrder', ProductionOrder."Source No.");
         LibraryReportDataset.AssertCurrentRowValueEquals('ValueOfOutput',
           -(ValueEntry."Cost Posted to G/L" + ValueEntry."Expected Cost Posted to G/L"));
+    end;
 
-        // Tear down: Restore the values of Inventory Setup and General Ledger Setup.
-        UpdateInventorySetup(InventorySetup."Automatic Cost Posting", InventorySetup."Expected Cost Posting to G/L",
-          InventorySetup."Automatic Cost Adjustment");
+    [Test]
+    [HandlerFunctions('ExpCostPostingConfirmHandler,ExpCostPostingMsgHandler,InventoryValuationWIPRequestPageHandler')]
+    [Scope('OnPrem')]
+    procedure InventoryValuationWIPReportTotals()
+    var
+        Item: Record Item;
+        ProductionOrder: Record "Production Order";
+        InventorySetup: Record "Inventory Setup";
+        ValueEntry: Record "Value Entry";
+        ProductionOrderNos: Array[2] of Code[20];
+        ValueOfOutput: Array[2] of Decimal;
+    begin
+        // [SCENARIO] Report "Inventory Valuation - WIP" should correctly represent Subtotals and Totals values
+        Initialize();
+
+        // [GIVEN] Update Automatic Cost Setup. Create Item.
+        ExecuteUIHandlers();
+        UpdateInventorySetup(true, true, InventorySetup."Automatic Cost Adjustment"::Never);
+        CreateItem(Item, '', '');
+        // [GIVEN] Create and refresh two Released Production Orders.
+        ProductionOrderNos[1] := CreateAndRefreshProductionOrder(ProductionOrder, Item."No.");
+        ExplodeRoutingAndPostOutputJournal(ProductionOrderNos[1]);  // Explode Routing and Post Output Journal.
+        ProductionOrderNos[2] := CreateAndRefreshProductionOrder(ProductionOrder, Item."No.");
+        ExplodeRoutingAndPostOutputJournal(ProductionOrderNos[2]);  // Explode Routing and Post Output Journal.
+
+        // [WHEN] Run "Inventory Valuation - WIP" Report.
+        ProductionOrder.SetFilter("No.", '%1|%2', ProductionOrderNos[1], ProductionOrderNos[2]);
+        LibraryVariableStorage.Enqueue(WorkDate());
+        LibraryVariableStorage.Enqueue(WorkDate());
+        REPORT.Run(REPORT::"Inventory Valuation - WIP", true, false, ProductionOrder);
+
+        // [THEN] Verify the Cost Posted to GL field and the Total Costs Posted to GL on Inventory Valuation WIP Report.
+        FindValueEntryForOutput(ValueEntry, Item."No.");
+        ValueOfOutput[1] := -(ValueEntry."Cost Posted to G/L" + ValueEntry."Expected Cost Posted to G/L");
+        LibraryReportDataset.LoadDataSetFile();
+        LibraryReportDataset.AssertElementWithValueExists('ValueOfOutput', ValueOfOutput[1]);
+        ValueEntry.Next();
+        ValueOfOutput[2] := -(ValueEntry."Cost Posted to G/L" + ValueEntry."Expected Cost Posted to G/L");
+        LibraryReportDataset.AssertElementWithValueExists('ValueOfOutput', ValueOfOutput[2]);
+        LibraryReportDataset.AssertElementWithValueExists('ValueOfOutputSum', (ValueOfOutput[1] + ValueOfOutput[2]));
     end;
 
     [Test]
@@ -710,6 +749,8 @@ codeunit 137310 "SCM Manufacturing Reports -II"
     begin
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"SCM Manufacturing Reports -II");
         LibraryVariableStorage.Clear();
+        // Lazy Setup.
+        LibrarySetupStorage.Restore();
 
         if isInitialized then
             exit;
@@ -719,6 +760,7 @@ codeunit 137310 "SCM Manufacturing Reports -II"
         ItemJournalSetup();
         ConsumptionJournalSetup();
         OutputJournalSetup();
+        LibrarySetupStorage.Save(DATABASE::"Inventory Setup");
 
         isInitialized := true;
         Commit();
@@ -931,6 +973,13 @@ codeunit 137310 "SCM Manufacturing Reports -II"
     begin
         LibraryManufacturing.CreateProductionOrder(ProductionOrder, Status, ProductionOrder."Source Type"::Item, SourceNo, Quantity);
         LibraryManufacturing.RefreshProdOrder(ProductionOrder, false, true, true, true, false);
+    end;
+
+    local procedure CreateAndRefreshProductionOrder(var ProductionOrder: Record "Production Order"; SourceNo: Code[20]): Code[20]
+    begin
+        CreateAndRefreshProductionOrder(
+          ProductionOrder, ProductionOrder.Status::Released, SourceNo, LibraryRandom.RandDec(100, 2));
+        exit(ProductionOrder."No.");
     end;
 
     local procedure FindProductionOrderComponent(var ProdOrderComponent: Record "Prod. Order Component"; ProdOrderNo: Code[20]; Status: Enum "Production Order Status")
