@@ -536,6 +536,59 @@ codeunit 137301 "SCM Inventory Reports - I"
     end;
 
     [Test]
+    [HandlerFunctions('InventoryPurchaseOrdersRequestPageHandler')]
+    [Scope('OnPrem')]
+    procedure InventoryPurchaseOrderTotals()
+    var
+        Item: Record Item;
+        PurchaseLine: Record "Purchase Line";
+        PurchaseQuantity: Decimal;
+        RequestPageXML: Text;
+        ItemNos: Array[2] of Code[20];
+        PurchaseHeaderNos: Array[2] of Code[20];
+        SubtotalsOutstandingAmount: Array[2] of Decimal;
+    begin
+        // [SCENARIO] Check that correct Totals and Subtotals are available on the Inventory Purchase Orders Report after creating Purchase Orders.
+        Initialize();
+
+        // [GIVEN] Create Item "I1", and Purchase Order "PO1" with one Item Line.
+        ItemNos[1] := CreateItem();
+        PurchaseQuantity := LibraryRandom.RandDec(100, 2);
+        PurchaseHeaderNos[1] := CreatePurchaseOrder(ItemNos[1], PurchaseQuantity);
+
+        // [GIVEN] Create Item "I2", and Purchase Order "PO2" with one Item Line.
+        ItemNos[2] := CreateItem();
+        PurchaseQuantity := LibraryRandom.RandDec(100, 2);
+        PurchaseHeaderNos[2] := CreatePurchaseOrder(ItemNos[2], PurchaseQuantity);
+
+        Commit();
+        Item.SetFilter("No.", '%1|%2', ItemNos[1], ItemNos[2]);
+
+        // [WHEN] Run report "Inventory Purchase Orders"
+        RequestPageXML := Report.RunRequestPage(Report::"Inventory Purchase Orders", RequestPageXML);
+        LibraryReportDataset.RunReportAndLoad(Report::"Inventory Purchase Orders", Item, RequestPageXML);
+
+        // [THEN] The Subtotals on the report match those in the Purchase Line table
+        PurchaseLine.SetRange("Document Type", PurchaseLine."Document Type"::Order);
+        PurchaseLine.SetRange("Document No.", PurchaseHeaderNos[1]);
+        PurchaseLine.CalcSums("Outstanding Amount", "Outstanding Quantity");
+        SubtotalsOutstandingAmount[1] := PurchaseLine."Outstanding Amount";
+        LibraryReportDataset.AssertElementWithValueExists('Subtotals_OutstandingQuantity', PurchaseLine."Outstanding Quantity");
+        LibraryReportDataset.AssertElementWithValueExists('Subtotals_AmountOnOrder', SubtotalsOutstandingAmount[1]);
+        
+        PurchaseLine.SetRange("Document No.", PurchaseHeaderNos[2]);
+        PurchaseLine.CalcSums("Outstanding Amount", "Outstanding Quantity");
+        SubtotalsOutstandingAmount[2] := PurchaseLine."Outstanding Amount";
+        LibraryReportDataset.AssertElementWithValueExists('Subtotals_OutstandingQuantity', PurchaseLine."Outstanding Quantity");
+        LibraryReportDataset.AssertElementWithValueExists('Subtotals_AmountOnOrder', SubtotalsOutstandingAmount[2]);
+
+        // [THEN] The Total for the Outstanding Amount on the report matches those on the Purchase Line table
+        LibraryReportDataset.AssertElementWithValueExists('Totals_OutstandingAmount', (SubtotalsOutstandingAmount[1] + SubtotalsOutstandingAmount[2]));
+
+        Clear(LibraryReportDataset);
+    end;
+
+    [Test]
     [HandlerFunctions('InvtSalesStatisticsRequestPageHandler')]
     [Scope('OnPrem')]
     procedure InventorySalesStatistic()
@@ -1487,6 +1540,14 @@ codeunit 137301 "SCM Inventory Reports - I"
         LibraryTestInitialize.OnAfterTestSuiteInitialize(CODEUNIT::"SCM Inventory Reports - I");
     end;
 
+    local procedure CreateItem(): Code[20]
+    var
+        Item: Record Item;
+    begin
+        CreateItem(Item);
+        exit(Item."No.");
+    end;
+
     local procedure CreateItem(var Item: Record Item)
     begin
         LibraryManufacturing.CreateItemManufacturing(
@@ -1545,6 +1606,14 @@ codeunit 137301 "SCM Inventory Reports - I"
         SalesLine.Validate("Unit Price", LibraryRandom.RandDec(100, 2));
         SalesLine.Validate("Location Code", LocationCode);
         SalesLine.Modify(true);
+    end;
+
+    local procedure CreatePurchaseOrder(ItemNo: Code[20]; PurchaseQuantity: Decimal): Code[20]
+    var
+        PurchaseHeader: Record "Purchase Header";
+    begin
+        CreatePurchaseOrder(PurchaseHeader, ItemNo, PurchaseQuantity, LibraryRandom.RandDec(100, 2), 1);
+        exit(PurchaseHeader."No.");
     end;
 
     local procedure CreatePurchaseOrder(var PurchaseHeader: Record "Purchase Header"; ItemNo: Code[20]; Quantity: Decimal; DirectUnitCost: Decimal; NoOfItemLines: Integer)
@@ -1923,6 +1992,12 @@ codeunit 137301 "SCM Inventory Reports - I"
     procedure InvtPurchaseOrdersRequestPageHandler(var InventoryPurchaseOrder: TestRequestPage "Inventory Purchase Orders")
     begin
         InventoryPurchaseOrder.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
+    end;
+
+    [RequestPageHandler]
+    [Scope('OnPrem')]
+    procedure InventoryPurchaseOrdersRequestPageHandler(var InventoryPurchaseOrder: TestRequestPage "Inventory Purchase Orders")
+    begin
     end;
 
     [RequestPageHandler]
