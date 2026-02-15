@@ -597,6 +597,15 @@ table 5405 "Production Order"
             Editable = false;
             FieldClass = FlowField;
         }
+        field(95; "Inventory Adjmt. Entry Exists"; Boolean)
+        {
+            CalcFormula = exist("Inventory Adjmt. Entry (Order)" where("Order Type" = const(Production),
+                                                                  "Order No." = field("No."),
+                                                                  "Completely Invoiced" = const(false)));
+            Caption = 'Inventory Adjmt. Entry (Order) Exists';
+            Editable = false;
+            FieldClass = FlowField;
+        }
         field(98; "Starting Date-Time"; DateTime)
         {
             Caption = 'Starting Date-Time';
