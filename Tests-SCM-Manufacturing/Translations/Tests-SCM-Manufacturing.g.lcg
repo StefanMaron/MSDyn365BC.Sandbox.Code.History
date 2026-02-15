@@ -959,6 +959,24 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit SCM Manufacturing Reports -II - NamedType NoOfLinesError)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 4114220431 - Method 1038186742 - NamedType 2915252239" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[CategoryName]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit SCM Manufacturing Reports -II - Method VerifyInvAvailabilityPlanReportInventoryRow - NamedType CategoryNameLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4114220431 - Method 1038186742 - NamedType 3691251604" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Inventory]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit SCM Manufacturing Reports -II - Method VerifyInvAvailabilityPlanReportInventoryRow - NamedType InventoryLbl)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1981732821 - NamedType 2632635105" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Bin Codes are not equal.]]></Val>
