@@ -4883,6 +4883,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Reports - III - NamedType WIPInventory)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1587373818 - Method 2066228100 - NamedType 3691251604" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Inventory]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Reports - III - Method VerifyQuantityOnInvAvailabilityPlanReport - NamedType InventoryLbl)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1787207747 - NamedType 3709947237" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Calculate Inventory report is not correctly initialized.]]></Val>
@@ -13998,6 +14007,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Warehouse Reports - NamedType WhsePostAndPrintMsg)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2761472087 - Method 1841246927 - NamedType 3691251604" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Inventory]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Warehouse Reports - Method InvAvailabilityPlanReport - NamedType InventoryLbl)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3751593413 - NamedType 345566136" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
