@@ -356,6 +356,62 @@ page 6520 "Item Tracing"
                     ToolTip = 'View the history of transactions that have been posted for the selected record.';
                 }
             }
+            group("Item Tracking")
+            {
+                Caption = 'Item Tracking';
+                Image = ItemTrackingLines;
+                action("Serial No. Information Card")
+                {
+                    ApplicationArea = ItemTracking;
+                    Caption = 'Serial No. Information Card';
+                    Image = SNInfo;
+                    ToolTip = 'View or edit detailed information about the serial number.';
+
+                    trigger OnAction()
+                    var
+                        SerialNoInformation: Record "Serial No. Information";
+                        TrackingSpecification: Record "Tracking Specification";
+                    begin
+                        Rec.TestField("Serial No.");
+                        GetTrackingSpecification(TrackingSpecification);
+                        SerialNoInformation.ShowCard(Rec."Serial No.", TrackingSpecification);
+                    end;
+                }
+                action("Lot No. Information Card")
+                {
+                    ApplicationArea = ItemTracking;
+                    Caption = 'Lot No. Information Card';
+                    Image = LotInfo;
+                    ToolTip = 'View or edit detailed information about the lot number.';
+
+                    trigger OnAction()
+                    var
+                        LotNoInformation: Record "Lot No. Information";
+                        TrackingSpecification: Record "Tracking Specification";
+                    begin
+                        Rec.TestField("Lot No.");
+                        GetTrackingSpecification(TrackingSpecification);
+                        LotNoInformation.ShowCard(Rec."Lot No.", TrackingSpecification);
+                    end;
+                }
+                action("Package No. Information Card")
+                {
+                    ApplicationArea = ItemTracking;
+                    Caption = 'Package No. Information Card';
+                    Image = LotInfo;
+                    ToolTip = 'View or edit detailed information about the package number.';
+
+                    trigger OnAction()
+                    var
+                        PackageNoInformation: Record "Package No. Information";
+                        TrackingSpecification: Record "Tracking Specification";
+                    begin
+                        Rec.TestField("Package No.");
+                        GetTrackingSpecification(TrackingSpecification);
+                        PackageNoInformation.ShowCard(Rec."Package No.", TrackingSpecification);
+                    end;
+                }
+            }
         }
         area(processing)
         {
@@ -704,6 +760,15 @@ page 6520 "Item Tracing"
             TempTrackEntry.FindFirst();
             CurrPage.SetRecord(TempTrackEntry);
         end;
+    end;
+
+    local procedure GetTrackingSpecification(var TrackingSpecification: Record "Tracking Specification")
+    var
+        ItemTrackingSetup: Record "Item Tracking Setup";
+    begin
+        ItemTrackingSetup.CopyTrackingFromItemTracingBuffer(Rec);
+        TrackingSpecification.SetItemData(Rec."Item No.", '', Rec."Location Code", Rec."Variant Code", '', 0);
+        TrackingSpecification.CopyTrackingFromItemTrackingSetup(ItemTrackingSetup);
     end;
 
     [IntegrationEvent(false, false)]
