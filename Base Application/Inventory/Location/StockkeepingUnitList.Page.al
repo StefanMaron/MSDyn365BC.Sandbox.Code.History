@@ -420,12 +420,25 @@ page 5701 "Stockkeeping Unit List"
                 RunObject = Report "Inventory Availability";
                 ToolTip = 'View, print, or save a summary of historical inventory transactions with selected items, for example, to decide when to purchase the items. The report specifies quantity on sales order, quantity on purchase order, back orders from vendors, minimum inventory, and whether there are reorders.';
             }
+#if not CLEAN28
             action("Inventory - Availability Plan")
             {
                 ApplicationArea = Planning;
-                Caption = 'Inventory - Availability Plan';
+                Caption = 'Inventory - Availability Plan (Obsolete)';
                 Image = ItemAvailability;
                 RunObject = Report "Inventory - Availability Plan";
+                ToolTip = 'View a list of the quantity of each item in customer, purchase, and transfer orders and the quantity available in inventory. The list is divided into columns that cover six periods with starting and ending dates as well as the periods before and after those periods. The list is useful when you are planning your inventory purchases.';
+                ObsoleteState = Pending;
+                ObsoleteReason = 'This report has been replaced by the report Inventory - Availability Plan (Excel). This report will be removed in a future release.';
+                ObsoleteTag = '28.0';
+            }
+#endif
+            action("Inventory - Availability Plan Excel")
+            {
+                ApplicationArea = Planning;
+                Caption = 'Inventory - Availability Plan (Excel)';
+                Image = ItemAvailability;
+                RunObject = Report "Inv. Availability Plan";
                 ToolTip = 'View a list of the quantity of each item in customer, purchase, and transfer orders and the quantity available in inventory. The list is divided into columns that cover six periods with starting and ending dates as well as the periods before and after those periods. The list is useful when you are planning your inventory purchases.';
             }
             action("Item/Vendor Catalog")
@@ -519,7 +532,15 @@ page 5701 "Stockkeeping Unit List"
                 actionref("Inventory Availability_Promoted"; "Inventory Availability")
                 {
                 }
+#if not CLEAN28
                 actionref("Inventory - Availability Plan_Promoted"; "Inventory - Availability Plan")
+                {
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'This report has been replaced by the report Inventory - Availability Plan (Excel). This report will be removed in a future release.';
+                    ObsoleteTag = '28.0';
+                }
+#endif
+                actionref("Inventory - Availability Plan Excel_Promoted"; "Inventory - Availability Plan Excel")
                 {
                 }
                 actionref("Item/Vendor Catalog_Promoted"; "Item/Vendor Catalog")
