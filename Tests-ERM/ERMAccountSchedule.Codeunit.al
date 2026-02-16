@@ -5908,6 +5908,7 @@ codeunit 134902 "ERM Account Schedule"
         AccountScheduleOverview.Trap();
         FinancialReports.Overview.Invoke();
         AccountScheduleOverview.NegativeAmountFormatDefault.SetValue(Enum::"Fin. Report Negative Format"::Default);
+        Commit();
 
         // [WHEN] Running account schedule report from account schedule overview
         LibraryVariableStorage.Enqueue(Enum::"Analysis Negative Format"::"Minus Sign");
@@ -5948,6 +5949,7 @@ codeunit 134902 "ERM Account Schedule"
         AccountScheduleOverview.Trap();
         FinancialReports.Overview.Invoke();
         AccountScheduleOverview.NegativeAmountFormatDefault.SetValue(Enum::"Fin. Report Negative Format"::Default);
+        Commit();
 
         // [WHEN] Running account schedule report from account schedule overview again
         LibraryVariableStorage.Enqueue(Enum::"Analysis Negative Format"::Parentheses);

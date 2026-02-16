@@ -1173,14 +1173,19 @@ page 31 "Item List"
                         RunObject = Report "Item Charges - Specification";
                         ToolTip = 'View a specification of the direct costs that your company has assigned and posted as item charges. The report shows the various value entries that have been posted as item charges. It includes all costs, both those posted as invoiced and those posted as expected.';
                     }
+#if not CLEAN28
                     action("Item Age Composition - Quantity")
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Item Age Composition - Quantity';
+                        Caption = 'Item Age Composition - Quantity (Obsolete)';
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'This report has been deprecated and will be removed in a future release.';
+                        ObsoleteTag = '28.0';
                         Image = "Report";
                         RunObject = Report "Item Age Composition - Qty.";
                         ToolTip = 'View, print, or save an overview of the current age composition of selected items in your inventory.';
                     }
+#endif
                     action("Item Expiration - Quantity")
                     {
                         ApplicationArea = ItemTracking;
