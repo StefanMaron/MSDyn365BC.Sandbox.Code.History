@@ -172,6 +172,7 @@ permissionset 191 "D365 SETUP"
                   tabledata "Financial Report User Filters" = RIMD,
                   tabledata "Fin. Report Excel Template" = RIMD,
                   tabledata "Financial Report Category" = RIMD,
+                  tabledata "Financial Report Audit Log" = i,
                   tabledata "Financial Report Status" = RIMD,
                   tabledata "Accounting Period" = IMD,
                   tabledata "Action Message Entry" = D,
