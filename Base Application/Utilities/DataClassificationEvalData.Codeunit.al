@@ -391,6 +391,7 @@ codeunit 1751 "Data Classification Eval. Data"
     local procedure ClassifyFinancialReports()
     var
         FinancialReportUserFilters: Record "Financial Report User Filters";
+        FinancialReportAuditLog: Record "Financial Report Audit Log";
     begin
         SetTableFieldsToNormal(Database::"Financial Report");
         SetTableFieldsToNormal(Database::"Financial Report Schedule");
@@ -401,8 +402,10 @@ codeunit 1751 "Data Classification Eval. Data"
         SetTableFieldsToNormal(Database::"Dimension Perspective Name");
         SetTableFieldsToNormal(Database::"Dimension Perspective Line");
         SetTableFieldsToNormal(Database::"Financial Report Category");
+        SetTableFieldsToNormal(Database::"Financial Report Audit Log");
         SetTableFieldsToNormal(Database::"Financial Report Status");
         SetFieldToPersonal(Database::"Financial Report User Filters", FinancialReportUserFilters.FieldNo("User ID"));
+        SetFieldToPersonal(Database::"Financial Report Audit Log", FinancialReportAuditLog.FieldNo("User"));
     end;
 
     local procedure ClassifyTablesToNormalPart1()
