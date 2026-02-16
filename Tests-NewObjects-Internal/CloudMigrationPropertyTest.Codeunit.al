@@ -1148,6 +1148,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Financial Report Recipient");
         ListOfTablesToMigrate.Add(Database::"Financial Report Schedule");
         ListOfTablesToMigrate.Add(Database::"Financial Report User Filters");
+        ListOfTablesToMigrate.Add(Database::"Financial Report Audit Log");
         ListOfTablesToMigrate.Add(Database::"Fin. Report Excel Template");
         ListOfTablesToMigrate.Add(Database::"Financial Report Status");
         ListOfTablesToMigrate.Add(Database::"Fixed Asset");

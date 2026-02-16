@@ -22,6 +22,7 @@ permissionset 5417 "Account Schedules - View"
                   tabledata "Financial Report User Filters" = RIMD,
                   tabledata "Fin. Report Excel Template" = RIMD,
                   tabledata "Financial Report Category" = R,
+                  tabledata "Financial Report Audit Log" = Ri,
                   tabledata "Financial Report Status" = R,
                   tabledata "Analysis View" = R,
                   tabledata "Analysis View Budget Entry" = R,
