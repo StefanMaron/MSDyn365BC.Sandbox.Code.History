@@ -431,6 +431,22 @@ page 490 "Acc. Schedule Overview"
                     MultiLine = true;
                     Editable = not ViewOnlyMode;
                 }
+                field("Last Run by User"; TempFinancialReport."Last Run by User")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Your Last Run';
+                    ToolTip = 'Specifies the last date-time this report was run by you.';
+                    Editable = false;
+
+                    trigger OnDrillDown()
+                    var
+                        FinReportAuditLog: Record "Financial Report Audit Log";
+                    begin
+                        FinReportAuditLog.SetRange("Report Name", TempFinancialReport.Name);
+                        FinReportAuditLog.SetRange(User, UserId());
+                        Page.Run(0, FinReportAuditLog);
+                    end;
+                }
             }
             group(IntroductoryParagraphGroup)
             {
@@ -1307,6 +1323,22 @@ page 490 "Acc. Schedule Overview"
 #endif
                 }
             }
+
+            action("Audit Logs")
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Audit Logs';
+                Image = Log;
+                ToolTip = 'Opens the Financial Report Audit Logs for the selected report.';
+
+                trigger OnAction()
+                var
+                    FinReportAuditLog: Record "Financial Report Audit Log";
+                begin
+                    FinReportAuditLog.SetRange("Report Name", TempFinancialReport.Name);
+                    Page.Run(0, FinReportAuditLog);
+                end;
+            }
         }
         area(Promoted)
         {
@@ -1383,6 +1415,7 @@ page 490 "Acc. Schedule Overview"
             {
                 Caption = 'Report', Comment = 'Generated from the PromotedActionCategories property index 2.';
             }
+            actionref("Audit Logs_Promoted"; "Audit Logs") { }
         }
     }
 
@@ -1423,12 +1456,15 @@ page 490 "Acc. Schedule Overview"
     end;
 
     trigger OnOpenPage()
+    var
+        FinancialReportAuditing: Codeunit "Financial Report Auditing";
     begin
         Clear(Rec);
         Clear(TempFinancialReport);
         ViewLayout := ViewLayout::"Show All";
         ReloadPage();
         LogUsageTelemetry();
+        FinancialReportAuditing.LogReportUsage(TempFinancialReport.Name, Enum::"Financial Report Format"::View);
 #if not CLEAN28
         FinancialReportDefaultsEnabled := FeatureFinancialReportDef.IsDefaultsFeatureEnabled();
 #endif
@@ -1756,6 +1792,7 @@ page 490 "Acc. Schedule Overview"
         // Transfer filters from FinancialReport
         FinancialReportToLoadTemp.Init();
         FinancialReportToLoadTemp.TransferFields(FinancialReport);
+        FinancialReportToLoadTemp.CalcFields("Last Run by User");
         IntroductoryParagraph := FinancialReport.GetIntroductoryParagraph();
         ClosingParagraph := FinancialReport.GetClosingParagraph();
         if not ViewOnlyMode then
