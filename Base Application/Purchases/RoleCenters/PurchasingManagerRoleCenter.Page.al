@@ -604,12 +604,17 @@ page 8905 "Purchasing Manager Role Center"
                         Caption = 'Item Cost and Price List';
                         RunObject = Report "Item Cost and Price List";
                     }
+#if not CLEAN28
                     action("Item Age Composition - Qty.")
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Item Age Composition - Qty.';
+                        Caption = 'Item Age Composition - Qty. (Obsolete)';
                         RunObject = report "Item Age Composition - Qty.";
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'This report has been deprecated and will be removed in a future release.';
+                        ObsoleteTag = '28.0';
                     }
+#endif
                     action("Inventory - Cost Variance1")
                     {
                         ApplicationArea = Basic, Suite;

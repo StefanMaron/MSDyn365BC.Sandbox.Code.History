@@ -2731,6 +2731,83 @@
     end;
 
     [Test]
+    [Scope('OnPrem')]
+    procedure FinRepAuditLogOnView()
+    var
+        AccScheduleName: Record "Acc. Schedule Name";
+        FinancialReportAuditLog: Record "Financial Report Audit Log";
+        FinancialReports: Testpage "Financial Reports";
+        AccScheduleOverview: TestPage "Acc. Schedule Overview";
+    begin
+        // [SCENARIO] When a financial report is viewed, an audit log entry is created
+        Initialize();
+
+        // [GIVEN] A financial report
+        LibraryERM.CreateAccScheduleName(AccScheduleName);
+        FinancialReports.OpenEdit();
+        FinancialReports.Filter.SetFilter(Name, AccScheduleName.Name);
+        AccScheduleOverview.Trap();
+        // [WHEN] The financial report is viewed
+        FinancialReports.Overview.Invoke();
+        AccScheduleOverview.Close();
+
+        // [THEN] An audit log entry is created for the action
+        FinancialReportAuditLog.SetRange("Report Name", AccScheduleName.Name);
+        FinancialReportAuditLog.SetRange(User, UserId);
+        FinancialReportAuditLog.SetRange(Format, FinancialReportAuditLog.Format::View);
+        Assert.AreEqual(1, FinancialReportAuditLog.Count(), 'Audit log entry was not created after viewing the financial report.');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    [HandlerFunctions('RHAccountSchedule')]
+    procedure FinRepAuditLogOnPDF()
+    var
+        AccScheduleName: Record "Acc. Schedule Name";
+        ColumnLayoutName: Record "Column Layout Name";
+        FinancialReportAuditLog: Record "Financial Report Audit Log";
+    begin
+        // [SCENARIO] When a financial report is exported to PDF, an audit log entry is created
+        Initialize();
+
+        // [GIVEN] A financial report
+        LibraryERM.CreateAccScheduleName(AccScheduleName);
+        LibraryERM.CreateColumnLayoutName(ColumnLayoutName);
+        // [WHEN] The financial report is exported to PDF
+        RunAccountScheduleReport(AccScheduleName.Name, ColumnLayoutName.Name);
+
+        // [THEN] An audit log entry is created for the action
+        FinancialReportAuditLog.SetRange("Report Name", AccScheduleName.Name);
+        FinancialReportAuditLog.SetRange(User, UserId);
+        FinancialReportAuditLog.SetRange(Format, FinancialReportAuditLog.Format::PDF);
+        Assert.AreEqual(1, FinancialReportAuditLog.Count(), 'Audit log entry was not created after export the financial report to PDF.');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure FinRepAuditLogOnExcel()
+    var
+        AccScheduleName: Record "Acc. Schedule Name";
+        AccScheduleLine: Record "Acc. Schedule Line";
+        FinancialReportAuditLog: Record "Financial Report Audit Log";
+    begin
+        // [SCENARIO] When a financial report is exported to Excel, an audit log entry is created
+        Initialize();
+
+        // [GIVEN] A financial report
+        LibraryERM.CreateAccScheduleName(AccScheduleName);
+        // [WHEN] The financial report is exported to Excel
+        AccScheduleLine.SetRange("Schedule Name", AccScheduleName.Name);
+        AccScheduleLine.SetRange("Date Filter", CalcDate('<-CY>', WorkDate()), CalcDate('<CY>', WorkDate()));
+        RunExportAccSchedule(AccScheduleLine, AccScheduleName);
+
+        // [THEN] An audit log entry is created for the action
+        FinancialReportAuditLog.SetRange("Report Name", AccScheduleName.Name);
+        FinancialReportAuditLog.SetRange(User, UserId);
+        FinancialReportAuditLog.SetRange(Format, FinancialReportAuditLog.Format::Excel);
+        Assert.AreEqual(1, FinancialReportAuditLog.Count(), 'Audit log entry was not created after export the financial report to PDF.');
+    end;			
+
     procedure FinancialReportWithBlockedStatus()
     var
         AccScheduleName: Record "Acc. Schedule Name";
