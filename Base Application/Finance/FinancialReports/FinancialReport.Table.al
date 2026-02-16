@@ -309,6 +309,16 @@ table 88 "Financial Report"
                     AccSchedManagement.CheckPerspectiveAnalysisView(Rec."Financial Report Row Group", Rec.DimPerspective);
             end;
         }
+        field(62; "Last Run by User"; DateTime)
+        {
+            Caption = 'Your Last Run';
+            ToolTip = 'Specifies the last date-time this report was run by you.';
+            Fieldclass = FlowField;
+            Calcformula = max("Financial Report Audit Log".SystemCreatedAt where(
+                "Report Name" = field(Name),
+                User = filter('%user')));
+            Editable = false;
+        }
         field(63; CategoryCode; Code[20])
         {
             Caption = 'Category';
