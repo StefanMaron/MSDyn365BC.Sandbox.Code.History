@@ -335,6 +335,7 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Financial Report User Filters" = RIMD,
                   tabledata "Fin. Report Excel Template" = RM,
                   tabledata "Financial Report Category" = RM,
+                  tabledata "Financial Report Audit Log" = Rimd,
                   tabledata "Financial Report Status" = RM,
                   tabledata "Account Schedules Chart Setup" = RM,
                   tabledata "Account Use Buffer" = RM,

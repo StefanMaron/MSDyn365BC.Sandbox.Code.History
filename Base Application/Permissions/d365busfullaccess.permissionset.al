@@ -442,6 +442,7 @@ permissionset 959 "D365 BUS FULL ACCESS"
                   tabledata "Field Monitoring Setup" = Rm,
                   tabledata "Filter Item Attributes Buffer" = RIMD,
                   tabledata "Finance Cue" = RIMD,
+                  tabledata "Financial Report Audit Log" = Rimd,
                   tabledata "Flow Service Configuration" = Rimd,
                   tabledata "Flow User Environment Buffer" = RIMD,
                   tabledata "Flow User Environment Config" = RIMD,
