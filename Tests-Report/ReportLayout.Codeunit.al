@@ -142,6 +142,7 @@ codeunit 132600 "Report Layout"
         REPORT.Run(REPORT::"FA Posting Group - Net Change");
     end;
 
+#if not CLEAN28
     [Test]
     [HandlerFunctions('RHItemAgeCompositionQty')]
     [Scope('OnPrem')]
@@ -150,6 +151,7 @@ codeunit 132600 "Report Layout"
         Initialize();
         REPORT.Run(REPORT::"Item Age Composition - Qty.");
     end;
+#endif
 
     [Test]
     [HandlerFunctions('RHItemAgeCompositionValue')]
@@ -680,6 +682,7 @@ codeunit 132600 "Report Layout"
         FAPostingGroupNetChange.SaveAsPdf(FormatFileName(FAPostingGroupNetChange.Caption));
     end;
 
+#if not CLEAN28
     [RequestPageHandler]
     [Scope('OnPrem')]
     procedure RHItemAgeCompositionQty(var ItemAgeCompositionQty: TestRequestPage "Item Age Composition - Qty.")
@@ -688,6 +691,7 @@ codeunit 132600 "Report Layout"
         ItemAgeCompositionQty.PeriodLength.SetValue('1M');
         ItemAgeCompositionQty.SaveAsPdf(FormatFileName(ItemAgeCompositionQty.Caption));
     end;
+#endif
 
     [RequestPageHandler]
     [Scope('OnPrem')]
@@ -695,7 +699,7 @@ codeunit 132600 "Report Layout"
     begin
         ItemAgeCompositionValue.EndingDate.SetValue(WorkDate());
         ItemAgeCompositionValue.PeriodLength.SetValue('1M');
-        ItemAgeCompositionValue.SaveAsPdf(FormatFileName(ItemAgeCompositionValue.Caption));
+        ItemAgeCompositionValue.SaveAsExcel(FormatFileName(ItemAgeCompositionValue.Caption));
     end;
 
     [RequestPageHandler]

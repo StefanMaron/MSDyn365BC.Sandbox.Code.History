@@ -243,6 +243,7 @@ codeunit 104000 "Upgrade - BaseApp"
         UpgradePurchRcptLineFields();
         UpgradeSalesShptLineFields();
         UpgradeServiceShptLineFields();
+        UpgradeFinancialReportAuditLogAddRetentionPolicy();
     end;
 
     local procedure ClearTemporaryTables()
@@ -4050,5 +4051,12 @@ codeunit 104000 "Upgrade - BaseApp"
         end;
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetInitializeABCAnalysisSetupUpgradeTag());
+    end;
+
+    local procedure UpgradeFinancialReportAuditLogAddRetentionPolicy()
+    var
+        FinancialReportAutiting: Codeunit "Financial Report Auditing";
+    begin
+        FinancialReportAutiting.AddRetentionPolicy();
     end;
 }
