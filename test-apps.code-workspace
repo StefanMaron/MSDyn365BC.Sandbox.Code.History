@@ -289,6 +289,9 @@
       "path": "./PowerBIReports/Test/PowerBI Reports Tests"
     },
     {
+      "path": "./PowerBIReports/Test Library/PowerBI Reports Test Library"
+    },
+    {
       "path": "./AuditFileExport/Test/Audit File Export Tests"
     },
     {
