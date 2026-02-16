@@ -143,6 +143,10 @@ page 108 "Financial Reports"
                 {
                     ApplicationArea = Basic, Suite;
                 }
+                field("Last Run by User"; Rec."Last Run by User")
+                {
+                    ApplicationArea = Basic, Suite;
+                }
             }
         }
 
@@ -350,6 +354,23 @@ page 108 "Financial Reports"
                     Page.Run(0, FinancialReportSchedule);
                 end;
             }
+            action("Audit Logs")
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Audit Logs';
+                Image = Log;
+                ToolTip = 'Opens the Financial Report Audit Logs for the selected report.';
+                RunObject = Page "Financial Report Audit Logs";
+                RunPageLink = "Report Name" = field(Name);
+            }
+            action("All Audit Logs")
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'All Audit Logs';
+                Image = Log;
+                ToolTip = 'Opens the Financial Report Audit Logs showing all entries.';
+                RunObject = Page "Financial Report Audit Logs";
+            }
         }
         area(reporting)
         {
@@ -394,6 +415,13 @@ page 108 "Financial Reports"
                 actionref(CopyFinancialReport_Promoted; CopyFinancialReport) { }
                 actionref(ExportFinancialReport_Promoted; ExportFinancialReport) { }
                 actionref(ImportFinancialReport_Promoted; ImportFinancialReport) { }
+            }
+            group(Audit)
+            {
+                Caption = 'Audit';
+                ShowAs = SplitButton;
+                actionref("Audit Logs_Promoted"; "Audit Logs") { }
+                actionref("All Audit Logs_Promoted"; "All Audit Logs") { }
             }
         }
     }
