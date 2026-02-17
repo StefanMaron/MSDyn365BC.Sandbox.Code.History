@@ -8186,6 +8186,60 @@ codeunit 137079 "SCM Production Order III"
         Assert.RecordIsNotEmpty(ValueEntry);
     end;
 
+    [Test]
+    [HandlerFunctions('PostProductionJournalHandlerWithUpdateQuantity,ConfirmHandlerTRUE,MessageHandler')]
+    [Scope('OnPrem')]
+    procedure PostPartialProductionJournalWithItemFlushingPickAndBackward()
+    var
+        Item: Record Item;
+        ChildItem: Record Item;
+        Bin: Record Bin;
+        ProductionOrder: Record "Production Order";
+        ProductionOrder2: Record "Production Order";
+        WarehouseActivityLine: Record "Warehouse Activity Line";
+        ItemJournalLine: Record "Item Journal Line";
+        Quantity1: Decimal;
+        Quantity2: Decimal;
+        PartialQty: Decimal;
+    begin
+        // [SCENARIO 616539] Allow posting picked quantity from another production order if partial posting has been made on the production order and the component is set to pick + backward
+        Initialize();
+
+        // [GIVEN] Create Item with BOM and Routing, Child Item with Pick + Backward flushing method
+        CreateItemWithBOMAndRouting(Item, ChildItem, 1); // QuantityPer = 1 for simplicity
+        UpdateLocationAndBins(LocationSilver);
+        LibraryWarehouse.FindBin(Bin, LocationSilver.Code, '', 1);
+
+        // [GIVEN] Inventory for child item = 10 units
+        CreateAndPostItemJournalLine(ChildItem."No.", 10, LocationSilver.Code, Bin.Code);
+
+        // [GIVEN] First Production Order with Quantity = 8, create and register warehouse pick
+        Quantity1 := 8;
+        CreateAndRefreshReleasedProductionOrder(
+          ProductionOrder, Item."No.", Quantity1, LocationSilver.Code, '');
+        LibraryManufacturing.CreateWhsePickFromProduction(ProductionOrder);
+        RegisterWarehouseActivity(ProductionOrder."No.", WarehouseActivityLine."Activity Type"::Pick);
+
+        // [GIVEN] Second Production Order with Quantity = 3
+        Quantity2 := 3;
+        CreateAndRefreshReleasedProductionOrder(
+          ProductionOrder2, Item."No.", Quantity2, LocationSilver.Code, LocationSilver."To-Production Bin Code");
+
+        // [GIVEN] Create and register warehouse pick for second order (only 2 units available)
+        LibraryManufacturing.CreateWhsePickFromProduction(ProductionOrder2);
+        RegisterWarehouseActivity(ProductionOrder2."No.", WarehouseActivityLine."Activity Type"::Pick);
+
+        // [WHEN] Post Production Journal with partial quantity = 2
+        PartialQty := 2;
+        OpenProductionJournalPage(ProductionOrder2, Item."No.", Item."No.", PartialQty, ItemJournalLine."Entry Type"::Output);
+
+        // [THEN] Error should occur because total consumption (2 + 1 = 3) exceeds picked quantity (2)
+        CreateOutputJournalWithExplodeRouting(ItemJournalLine, ProductionOrder2."No.");
+        ItemJournalLine.Validate("Output Quantity", 1);
+        ItemJournalLine.Modify(true);
+        asserterror LibraryInventory.PostItemJournalLine(OutputItemJournalBatch."Journal Template Name", OutputItemJournalBatch.Name);
+    end;
+
     local procedure Initialize()
     begin
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"SCM Production Order III");
