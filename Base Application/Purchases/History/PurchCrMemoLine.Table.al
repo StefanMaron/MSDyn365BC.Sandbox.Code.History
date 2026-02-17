@@ -1030,7 +1030,6 @@ table 125 "Purch. Cr. Memo Line"
     internal procedure GetPurchaseInvoiceLine(var PurchInvLine: Record "Purch. Inv. Line")
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
-        PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.";
         ValueEntry: Record "Value Entry";
     begin
         CheckApplFromItemLedgEntry(ItemLedgerEntry);
@@ -1048,14 +1047,8 @@ table 125 "Purch. Cr. Memo Line"
         end;
 
         if ItemLedgerEntry."Entry No." = 0 then begin
-            PurchCrMemoHdr.Get("Document No.");
-            if PurchCrMemoHdr."Applies-to Doc. Type" <> PurchCrMemoHdr."Applies-to Doc. Type"::Invoice then
-                exit;
-
-            PurchInvLine.Reset();
-            PurchInvLine.SetRange("Document No.", PurchCrMemoHdr."Applies-to Doc. No.");
-            PurchInvLine.SetRange(Type, Type);
-            PurchInvLine.SetRange("No.", "No.");
+            PurchInvLine.SetRange("Order No.", "Order No.");
+            PurchInvLine.SetRange("Order Line No.", "Order Line No.");
             if PurchInvLine.FindFirst() then;
         end;
     end;
