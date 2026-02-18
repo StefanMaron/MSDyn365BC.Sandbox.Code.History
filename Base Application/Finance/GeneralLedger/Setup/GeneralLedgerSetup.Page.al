@@ -526,6 +526,7 @@ page 118 "General Ledger Setup"
                     }
                     field("Fin. Rep. Period Type"; Rec."Fin. Rep. Period Type")
                     {
+                        ApplicationArea = Basic, Suite;
                         Caption = 'Default View by';
 #if not CLEAN27
                         Visible = FinancialReportDefaultsEnabled;
@@ -533,6 +534,7 @@ page 118 "General Ledger Setup"
                     }
                     field("Fin. Rep. Neg. Amount Format"; Rec."Fin. Rep. Neg. Amount Format")
                     {
+                        ApplicationArea = Basic, Suite;
                         Caption = 'Default Negative Amount Format';
 #if not CLEAN27
                         Visible = FinancialReportDefaultsEnabled;
@@ -540,10 +542,12 @@ page 118 "General Ledger Setup"
                     }
                     field("Fin. Rep. Company Logo Pos."; Rec."Fin. Rep. Company Logo Pos.")
                     {
+                        ApplicationArea = Basic, Suite;
                         Caption = 'Default Company Logo Position';
                     }
                     field(DefaultFinancialReportStatus; Rec.DefaultFinancialReportStatus)
                     {
+                        ApplicationArea = Basic, Suite;
                         Caption = 'Default Status';
                     }
                 }
