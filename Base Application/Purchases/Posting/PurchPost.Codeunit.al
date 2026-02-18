@@ -3304,6 +3304,10 @@ codeunit 90 "Purch.-Post"
                         PostUpdateOrderNo(PurchCrMemoHeader);
                     end;
                 else begin
+                    UpdateAssociatedSalesOrder(TempDropShptPostBuffer, PurchHeader);
+                    if DropShipOrder then
+                        InsertTrackingSpecification(PurchHeader);
+
                     ResetTempLines(TempPurchLine);
                     TempPurchLine.SetFilter("Prepayment %", '<>0');
                     if TempPurchLine.FindSet() then
