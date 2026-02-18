@@ -1275,6 +1275,7 @@ table 98 "General Ledger Setup"
         {
             Caption = 'Default Financial Report Status';
             DataClassification = CustomerContent;
+            ToolTip = 'Specifies the name of the Default Financial Report Status on Financial Reports.';
             TableRelation = "Financial Report Status";
         }
         field(10001; "VAT in Use"; Boolean)
