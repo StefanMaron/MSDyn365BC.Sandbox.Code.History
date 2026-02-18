@@ -9154,6 +9154,68 @@
         VerifyPurchaseOrderQuantityforManualPurchaseCreditMemo(PurchaseHeader."No.", Quantity);
     end;
 
+    [Test]
+    procedure DeferralScheduleUpdatesOnVATProdPostingGroupChange()
+    var
+        DeferralHeader: Record "Deferral Header";
+        DeferralTemplate: Record "Deferral Template";
+        GLAccount: Record "G/L Account";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        VATPostingSetup: array[2] of Record "VAT Posting Setup";
+        Vendor: Record Vendor;
+        ExpectedDeferralAmount1: Decimal;
+        ExpectedDeferralAmount2: Decimal;
+    begin
+        // [SCENARIO 620755] Verify deferral schedule is recalculated when VAT Prod. Posting Group is changed on a purchase line with a deferral code.
+        Initialize();
+
+        // [GIVEN] Create a vendor.
+        LibraryPurchase.CreateVendor(Vendor);
+
+        // [GIVEN] Create G/L Account with Direct Posting and Non-deductible VAT.
+        LibraryERM.CreateGLAccount(GLAccount);
+        GLAccount.Validate("Direct Posting", true);
+        GLAccount.Validate("% Non deductible VAT", LibraryRandom.RandIntInRange(100, 100));
+        GLAccount.Modify(true);
+
+        // [GIVEN] Create VAT Posting Setups with Reverse Charge VAT.
+        LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup[1], VATPostingSetup[1]."VAT Calculation Type"::"Reverse Charge VAT", LibraryRandom.RandIntInRange(2, 5));
+        LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup[2], VATPostingSetup[2]."VAT Calculation Type"::"Reverse Charge VAT", LibraryRandom.RandIntInRange(2, 5));
+        VATPostingSetup[2].Rename(VATPostingSetup[1]."VAT Bus. Posting Group", VATPostingSetup[2]."VAT Prod. Posting Group");
+
+        // [GIVEN] Update vendor with VAT Business Posting Group same as VAT Posting Setup.
+        Vendor.Validate("VAT Bus. Posting Group", VATPostingSetup[1]."VAT Bus. Posting Group");
+        Vendor.Modify(true);
+
+        // [GIVEN] Create a deferral template.
+        LibraryERM.CreateDeferralTemplate(DeferralTemplate, DeferralTemplate."Calc. Method"::"Equal per Period", DeferralTemplate."Start Date"::"Beginning of Next Period", LibraryRandom.RandIntInRange(12, 12));
+
+        // [GIVEN] Create a purchase order with a line using the deferral template and  VAT Prod. Posting Group.
+        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Order, Vendor."No.");
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::"G/L Account", GLAccount."No.", LibraryRandom.RandIntInRange(1, 10));
+        PurchaseLine.Validate("Deferral Code", DeferralTemplate."Deferral Code");
+        PurchaseLine.Validate("VAT Prod. Posting Group", VATPostingSetup[1]."VAT Prod. Posting Group");
+        PurchaseLine.Validate("Direct Unit Cost", LibraryRandom.RandDecInRange(100, 200, 2));
+        PurchaseLine.Modify();
+
+        // [GIVEN] Check the deferral schedule before changing VAT Prod. Posting Group
+        ExpectedDeferralAmount1 := PurchaseLine.GetDeferralAmount();
+        DeferralHeader.Get("Deferral Document Type"::Purchase, '', '', PurchaseLine."Document Type", PurchaseLine."Document No.", PurchaseLine."Line No.");
+        Assert.AreEqual(ExpectedDeferralAmount1, DeferralHeader."Amount to Defer",
+            StrSubstNo(AmountError, DeferralHeader.FieldCaption("Amount to Defer"), ExpectedDeferralAmount1, DeferralHeader.TableCaption()));
+
+        // [WHEN] Change the VAT Prod. Posting Group.
+        PurchaseLine.Validate("VAT Prod. Posting Group", VATPostingSetup[2]."VAT Prod. Posting Group");
+        PurchaseLine.Modify();
+
+        // [THEN] Verify deferral schedule is recalculated when VAT Prod. Posting Group is changed on a purchase line.
+        ExpectedDeferralAmount2 := PurchaseLine.GetDeferralAmount();
+        DeferralHeader.Get("Deferral Document Type"::Purchase, '', '', PurchaseLine."Document Type", PurchaseLine."Document No.", PurchaseLine."Line No.");
+        Assert.AreEqual(ExpectedDeferralAmount2, DeferralHeader."Amount to Defer",
+            StrSubstNo(AmountError, DeferralHeader.FieldCaption("Amount to Defer"), ExpectedDeferralAmount2, DeferralHeader.TableCaption()));
+    end;
+    
     local procedure Initialize()
     var
         PurchaseHeader: Record "Purchase Header";

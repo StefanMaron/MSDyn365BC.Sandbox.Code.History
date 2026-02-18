@@ -1585,6 +1585,8 @@ table 39 "Purchase Line"
                             Currency."Unit-Amount Rounding Precision"));
                     UpdateAmounts();
                 end;
+                if ("VAT Prod. Posting Group" <> xRec."VAT Prod. Posting Group") and ("Deferral Code" <> '') then
+                    UpdateDeferralAmounts();
             end;
         }
         field(91; "Currency Code"; Code[10])
