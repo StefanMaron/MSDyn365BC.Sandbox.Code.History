@@ -2,18 +2,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.QualityManagement.Setup.ApplicationAreas;
+namespace System.Environment.Configuration;
 
-enum 20423 "Qlty. Management Visibility"
+enumextension 20400 "Qlty. Manual Setup Category" extends "Manual Setup Category"
 {
-    Caption = 'Quality Management Visibility';
-
-    value(0; Show)
+    value(20400; "Quality Management")
     {
-        Caption = 'Show Quality Management';
-    }
-    value(1; Hide)
-    {
-        Caption = 'Hide Quality Management';
+        Caption = 'Quality Management';
     }
 }

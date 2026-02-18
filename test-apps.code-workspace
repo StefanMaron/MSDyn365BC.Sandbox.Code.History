@@ -78,7 +78,7 @@
       "path": "./APIV1/Test/_Exclude_APIV1_ Tests"
     },
     {
-      "path": "./Quality Management/Test/Quality Management-Tests"
+      "path": "./Quality Management/Test/Quality Management-Tests/DisabledTests"
     },
     {
       "path": "./Quality Management/Test Library/Quality Management Test Library"
