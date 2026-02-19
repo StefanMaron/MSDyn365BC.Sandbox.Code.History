@@ -5627,7 +5627,7 @@ codeunit 22 "Item Jnl.-Post Line"
 
         TempSplitItemJnlLine."Line No." := TempTrackingSpecification."Entry No.";
 
-        if TempTrackingSpecification.Correction or TempSplitItemJnlLine."Drop Shipment" or IsServUndoConsumption then
+        if TempTrackingSpecification.Correction or CheckDropShipmentForSetupTempSplitItemJnlLine(TempSplitItemJnlLine) or IsServUndoConsumption then
             TempSplitItemJnlLine."Applies-to Entry" := TempTrackingSpecification."Item Ledger Entry No."
         else
             TempSplitItemJnlLine."Applies-to Entry" := TempTrackingSpecification."Appl.-to Item Entry";
@@ -7616,6 +7616,17 @@ codeunit 22 "Item Jnl.-Post Line"
 
         CostAmt := ItemJnlLine.Amount;
         CostAmtACY := ItemJnlLine."Amount (ACY)";
+    end;
+
+    local procedure CheckDropShipmentForSetupTempSplitItemJnlLine(ItemJournalLine: Record "Item Journal Line"): Boolean
+    begin
+        if (ItemJournalLine."Drop Shipment") then
+            if (ItemJournalLine."Document Type" = ItemJournalLine."Document Type"::"Purchase Receipt") and (ItemJournalLine.Quantity > 0) then
+                exit(false)
+            else
+                exit(true);
+
+        exit(false);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sequence No. Mgt.", 'OnPreviewableLedgerEntry', '', false, false)]
