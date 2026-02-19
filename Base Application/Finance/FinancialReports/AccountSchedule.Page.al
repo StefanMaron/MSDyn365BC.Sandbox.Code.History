@@ -351,7 +351,7 @@ page 104 "Account Schedule"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Hide Header';
                 Image = ListPage;
-                ToolTip = 'Show the page header.';
+                ToolTip = 'Hide the page header.';
                 Visible = not HeaderHidden;
 
                 trigger OnAction()
@@ -365,7 +365,7 @@ page 104 "Account Schedule"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Show Header';
                 Image = TaskPage;
-                ToolTip = 'Hide the page header.';
+                ToolTip = 'Show the page header.';
                 Visible = HeaderHidden;
 
                 trigger OnAction()
