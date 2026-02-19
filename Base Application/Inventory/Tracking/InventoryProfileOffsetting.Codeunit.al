@@ -95,6 +95,8 @@ codeunit 99000854 "Inventory Profile Offsetting"
         NextStateTxt: Label 'StartOver,MatchDates,MatchQty,CreateSupply,ReduceSupply,CloseDemand,CloseSupply,CloseLoop';
         NextState: Option StartOver,MatchDates,MatchQty,CreateSupply,ReduceSupply,CloseDemand,CloseSupply,CloseLoop;
         LotAccumulationPeriodStartDate: Date;
+        PlanningParametersTakenFromItemCardTxt: Label 'Planning Parameters were take Item card becuase %1 is %2 but SKU does not exist for Item %3 at Location %4', Comment = '%1: FieldCaption, %2: Missing SKU Policy, %3: Item No., %4: Location Code';
+        SKUNotPlannedTxt: Label 'Item %1 at Location %2 was not planned because SKU does not exist and %3 at Location is %4', Comment = '%1: Item No., %2: Location Code, %3: FieldCaption, %4: Missing SKU Policy';
 
 #if not CLEAN27
     [Obsolete('Replaced by same procedure without parameter Manufacturing Setup', '27.0')]
@@ -4458,12 +4460,38 @@ codeunit 99000854 "Inventory Profile Offsetting"
 
     local procedure CheckPlanSKU(SKU: Record "Stockkeeping Unit"; DemandExists: Boolean; SupplyExists: Boolean; IsReorderPointPlanning: Boolean): Boolean
     var
+        SKU2: Record "Stockkeeping Unit";
+        Location: Record Location;
+        Item: Record Item;
         IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeCheckPlanSKU(SKU, IsHandled);
         if IsHandled then
             exit(false);
+
+        Item.SetLoadFields("No.");
+        if not SKU2.Get(SKU."Location Code", SKU."Item No.", SKU."Variant Code") then
+            if Location.Get(SKU."Location Code") then begin
+                if PlanningResiliency then begin
+                    Item.Get(SKU."Item No.");
+                    case Location."Missing SKU Planning Policy" of
+                        Enum::"Missing SKU Planning Policy"::"Item Card":
+                            begin
+                                ReqLine.SetResiliencyError(StrSubstNo(PlanningParametersTakenFromItemCardTxt, Location.FieldCaption("Missing SKU Planning Policy"), Location."Missing SKU Planning Policy", SKU."Item No.", SKU."Location Code"), Database::Item, Item.GetPosition());
+                                Error('');
+                            end;
+                        Enum::"Missing SKU Planning Policy"::"Dont Plan":
+                            begin
+                                ReqLine.SetResiliencyError(StrSubstNo(SKUNotPlannedTxt, SKU."Item No.", SKU."Location Code", Location.FieldCaption("Missing SKU Planning Policy"), Location."Missing SKU Planning Policy"), Database::Item, Item.GetPosition());
+                                Error('');
+                            end;
+                    end;
+                end;
+
+                if Location."Missing SKU Planning Policy" = Location."Missing SKU Planning Policy"::"Dont Plan" then
+                    exit(false);
+            end;
 
         if (CurrWorksheetType = CurrWorksheetType::Requisition) and (SKU.IsMfgSKU() or SKU.IsAssemblySKU()) then
             exit(false);
