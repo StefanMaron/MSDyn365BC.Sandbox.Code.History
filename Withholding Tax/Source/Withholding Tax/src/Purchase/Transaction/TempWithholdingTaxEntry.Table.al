@@ -15,7 +15,7 @@ using Microsoft.Sales.Customer;
 table 6790 "Temp Withholding Tax Entry"
 {
     Caption = 'Temp Withholding Tax Entry';
-    LookupPageID = "Withholding Tax Entry";
+    LookupPageID = "Withholding Tax Entries";
     DataClassification = CustomerContent;
 
     fields

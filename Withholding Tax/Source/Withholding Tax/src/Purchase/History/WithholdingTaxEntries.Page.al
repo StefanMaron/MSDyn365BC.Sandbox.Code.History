@@ -4,11 +4,16 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.WithholdingTax;
 
-page 6788 "Withholding Tax Entry"
+page 6788 "Withholding Tax Entries"
 {
-    Caption = 'Withholding Tax Entry';
+    Caption = 'Withholding Tax Entries';
+    ApplicationArea = Basic, Suite;
+    InsertAllowed = false;
+    DeleteAllowed = false;
+    ModifyAllowed = false;
     Editable = false;
     PageType = List;
+    UsageCategory = History;
     SourceTable = "Withholding Tax Entry";
 
     layout
@@ -237,11 +242,6 @@ page 6788 "Withholding Tax Entry"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies an auto-generated field based on the no. series defined in the Withholding Tax Posting Setup for a particular Withholding Tax Report Type.';
-                }
-                field("Withholding Tax Report"; Rec."Withholding Tax Report")
-                {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies that this field is assigned from Withholding Tax Posting Setup based on Withholding Tax Business and Withholding Tax Product Posting Group.';
                 }
             }
         }

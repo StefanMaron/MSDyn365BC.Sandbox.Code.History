@@ -17,8 +17,8 @@ using System.Telemetry;
 table 6788 "Withholding Tax Entry"
 {
     Caption = 'Withholding Tax Entry';
-    DrillDownPageID = "Withholding Tax Entry";
-    LookupPageID = "Withholding Tax Entry";
+    DrillDownPageID = "Withholding Tax Entries";
+    LookupPageID = "Withholding Tax Entries";
     DataClassification = CustomerContent;
 
     fields
@@ -277,12 +277,6 @@ table 6788 "Withholding Tax Entry"
         field(50; "Wthldg. Tax Report Line No"; Code[20])
         {
             Caption = 'Withholding Tax Report Line No';
-        }
-        field(51; "Withholding Tax Report"; Option)
-        {
-            Caption = 'Withholding Tax Report';
-            OptionCaption = ' ,Por Ngor Dor 1,Por Ngor Dor 2,Por Ngor Dor 3,Por Ngor Dor 53,Por Ngor Dor 54';
-            OptionMembers = " ","Por Ngor Dor 1","Por Ngor Dor 2","Por Ngor Dor 3","Por Ngor Dor 53","Por Ngor Dor 54";
         }
         field(52; "Applies-to Doc. Type"; Enum "Gen. Journal Document Type")
         {

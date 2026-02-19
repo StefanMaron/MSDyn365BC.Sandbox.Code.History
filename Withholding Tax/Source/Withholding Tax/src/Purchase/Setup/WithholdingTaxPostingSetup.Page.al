@@ -61,11 +61,6 @@ page 6786 "Withholding Tax Posting Setup"
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the G/L account number to which you want to post Purchase Withholding for the particular combination of Withholding Tax business and product posting groups.';
                 }
-                field("Withholding Tax Report"; Rec."Withholding Tax Report")
-                {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the Withholding Tax report type for a particular Business and Product Posting group combination.';
-                }
                 field("Bal. Prepaid Account Type"; Rec."Bal. Prepaid Account Type")
                 {
                     ApplicationArea = Basic, Suite;

@@ -4,18 +4,20 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.WithholdingTax;
 
+using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.WithholdingTax;
 
-codeunit 6791 "WHT Purch. Tax Cr.Memo-Printed"
+codeunit 6788 "G/L Reg.-Withholding Entries"
 {
-    Permissions = TableData "WHT Purch. Tax Cr. Memo Hdr." = rimd;
-    TableNo = "WHT Purch. Tax Cr. Memo Hdr.";
+    TableNo = "G/L Register";
 
     trigger OnRun()
     begin
-        Rec.Find();
-        Rec."No. Printed" := Rec."No. Printed" + 1;
-        Rec.Modify();
-        Commit();
+        WithholdingTaxEntry.SetRange("Entry No.", Rec."From Withholding Tax Entry No.", Rec."To Withholding Tax Entry No.");
+        PAGE.Run(PAGE::"Withholding Tax Entries", WithholdingTaxEntry);
     end;
+
+    var
+        WithholdingTaxEntry: Record "Withholding Tax Entry";
 }
+

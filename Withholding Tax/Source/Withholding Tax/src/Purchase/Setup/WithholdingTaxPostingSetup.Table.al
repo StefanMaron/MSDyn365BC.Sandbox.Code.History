@@ -42,12 +42,6 @@ table 6786 "Withholding Tax Posting Setup"
             Caption = 'Payable Withholding Tax Account Code';
             TableRelation = "G/L Account";
         }
-        field(7; "Withholding Tax Report"; Option)
-        {
-            Caption = 'Withholding Tax Report';
-            OptionCaption = ' ,Por Ngor Dor 1,Por Ngor Dor 2,Por Ngor Dor 3,Por Ngor Dor 53,Por Ngor Dor 54';
-            OptionMembers = " ","Por Ngor Dor 1","Por Ngor Dor 2","Por Ngor Dor 3","Por Ngor Dor 53","Por Ngor Dor 54";
-        }
         field(8; "Wthldg. Tax Rep Line No Series"; Code[20])
         {
             Caption = 'Withholding Tax Report Line No. Series';
