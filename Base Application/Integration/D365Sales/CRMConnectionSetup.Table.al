@@ -472,6 +472,7 @@ table 5330 "CRM Connection Setup"
         if CDSConnectionSetup.Get() then
             if CDSConnectionSetup."Is Enabled" then begin
                 "Server Address" := CDSConnectionSetup."Server Address";
+                CRMIntegrationManagement.CheckCRMConnectionURL("Server Address");
                 "User Name" := CDSConnectionSetup."User Name";
                 "User Password Key" := CDSConnectionSetup."User Password Key";
                 "Authentication Type" := CDSConnectionSetup."Authentication Type";
@@ -503,7 +504,10 @@ table 5330 "CRM Connection Setup"
         DummyCRMConnectionSetup.EnsureCDSConnectionIsEnabled();
         case "Authentication Type" of
             "Authentication Type"::Office365:
-                CDSIntegrationImpl.GetAccessToken("Server Address", true, AccessToken);
+                begin
+                    CRMIntegrationManagement.CheckCRMConnectionURL("Server Address");
+                    CDSIntegrationImpl.GetAccessToken("Server Address", true, AccessToken);
+                end;
             "Authentication Type"::AD:
                 if not PromptForCredentials(AdminEmail, AdminPasswordProvided, AdminADDomain) then begin
                     AdminPassword := AdminPasswordProvided;
@@ -516,6 +520,7 @@ table 5330 "CRM Connection Setup"
                 end;
         end;
 
+        CRMIntegrationManagement.CheckCRMConnectionURL("Server Address");
         if CRMIntegrationManagement.ImportCRMSolution("Server Address", "User Name", AdminEmail, AdminPassword, AccessToken, AdminADDomain, GetProxyVersion(), ForceRedeploy, ImportSolutionFailed) then
             Message(DeploySucceedMsg)
         else
@@ -623,6 +628,8 @@ table 5330 "CRM Connection Setup"
         // if auth type is Office365 and connection string contains {ClientSecret} token
         // then we will connect via OAuth client credentials grant flow, and construct the connection string accordingly, with the actual client secret
         if "Authentication Type" = "Authentication Type"::Office365 then begin
+            CRMIntegrationManagement.CheckCRMConnectionURL("Server Address");
+
             if ConnectionStringWithPlaceholders.Contains(ClientSecretTok) then begin
                 ConnectionStringWithPlaceholders := StrSubstNo(ClientSecretConnectionStringFormatTxt, ClientSecretAuthTxt, "Server Address", CDSIntegrationImpl.GetCDSConnectionClientId(), '%1', GetProxyVersion());
                 ConnectionString := SecretStrSubstNo(ConnectionStringWithPlaceholders, CDSIntegrationImpl.GetCDSConnectionClientSecret());
@@ -895,6 +902,8 @@ table 5330 "CRM Connection Setup"
     begin
         if CRMIntegrationManagement.IsCRMSolutionInstalled() then
             exit;
+
+        CRMIntegrationManagement.CheckCRMConnectionURL("Server Address");
 
         case "Authentication Type" of
             "Authentication Type"::Office365:
@@ -1249,6 +1258,8 @@ table 5330 "CRM Connection Setup"
     [Scope('OnPrem')]
     procedure UpdateConnectionString() ConnectionString: Text
     begin
+        CRMIntegrationManagement.CheckCRMConnectionURL("Server Address");
+
         if "Authentication Type" <> "Authentication Type"::Office365 then
             ConnectionString := StrSubstNo(ConnectionStringFormatTok, "Server Address", GetUserName(), MissingPasswordTok, GetProxyVersion(), CrmAuthenticationType())
         else
