@@ -79,6 +79,7 @@ table 5700 "Stockkeeping Unit"
 
             trigger OnValidate()
             begin
+                CheckSKUCreationPolicy();
                 if "Location Code" = '' then
                     Validate("Replenishment System");
                 CheckTransferRoute();
@@ -1189,6 +1190,14 @@ table 5700 "Stockkeeping Unit"
         "Rolled-up Mfg. Ovhd Cost" := Item."Rolled-up Mfg. Ovhd Cost";
         "Rolled-up Cap. Overhead Cost" := Item."Rolled-up Cap. Overhead Cost";
         "Rolled-up Mat. Non-Invt. Cost" := Item."Rolled-up Mat. Non-Invt. Cost";
+    end;
+
+    local procedure CheckSKUCreationPolicy()
+    var
+        Location: Record Location;
+    begin
+        if Location.Get("Location Code") then
+            Location.TestField("SKU Creation Policy", Location."SKU Creation Policy"::Allowed);
     end;
 
     [IntegrationEvent(false, false)]
