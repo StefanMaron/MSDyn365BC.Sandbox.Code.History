@@ -2,27 +2,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sustainability.ExciseTax;
+namespace Microsoft.ExciseTaxes;
 
-enum 6229 "Sust. Excise Document Type"
+using Microsoft.Sustainability.ExciseTax;
+
+enumextension 7412 "Sust. Excise Document Type" extends "Sust. Excise Document Type"
 {
-    Extensible = true;
-    Caption = 'Excise Document Type';
-
-    value(0; " ")
+    value(7412; "Production Order")
     {
-        Caption = ' ';
+        Caption = 'Production Order';
     }
-    value(1; Invoice)
+    value(7413; "Assembly Order")
     {
-        Caption = 'Invoice';
-    }
-    value(2; "Credit Memo")
-    {
-        Caption = 'Credit Memo';
-    }
-    value(3; Journal)
-    {
-        Caption = 'Journal';
+        Caption = 'Assembly Order';
     }
 }

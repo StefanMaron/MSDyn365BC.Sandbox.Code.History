@@ -59,6 +59,16 @@ tableextension 99000761 "Mfg. Location" extends Location
                         Error(InvalidProdOutputHandlingErr, Rec."Prod. Output Whse. Handling", Rec.TableCaption, Rec.Code, Rec.FieldCaption("Directed Put-away and Pick"));
             end;
         }
+        field(7350; "Missing SKU Planning Policy"; Enum "Missing SKU Planning Policy")
+        {
+            Caption = 'Missing SKU Planning Policy';
+            DataClassification = SystemMetadata;
+        }
+        field(7351; "SKU Creation Policy"; Enum "SKU Creation Policy")
+        {
+            Caption = 'SKU Creation Policy';
+            DataClassification = SystemMetadata;
+        }
     }
 
     procedure IsBinBWProdOutput(BinCode: Code[20]): Boolean
