@@ -89,28 +89,28 @@ page 489 "Column Layout"
                         ColumnLayoutName.Modify();
                     end;
                 }
-            field(DefinitionStatus; DefinitionStatus)
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Status';
-                TableRelation = "Financial Report Status";
-                ToolTip = 'Specifies the status code for the column definition. The status code helps you organize the lifecycle of your column definitions.';
+                field(DefinitionStatus; DefinitionStatus)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Status';
+                    TableRelation = "Financial Report Status";
+                    ToolTip = 'Specifies the status code for the column definition. The status code helps you organize the lifecycle of your column definitions.';
 
-                trigger OnValidate()
-                var
-                    ColumnLayoutName: Record "Column Layout Name";
-                begin
-                    ColumnLayoutName.Get(CurrentColumnName);
-                    ColumnLayoutName.Status := DefinitionStatus;
-                    ColumnLayoutName.Modify();
-                end;
-            }
-            field(InternalDescription; InternalDescription)
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Internal Description';
-                MultiLine = true;
-                ToolTip = 'Specifies the internal description of the column definition. The internal description is not shown on the final report but is used to provide more context when using the definition.';
+                    trigger OnValidate()
+                    var
+                        ColumnLayoutName: Record "Column Layout Name";
+                    begin
+                        ColumnLayoutName.Get(CurrentColumnName);
+                        ColumnLayoutName.Status := DefinitionStatus;
+                        ColumnLayoutName.Modify();
+                    end;
+                }
+                field(InternalDescription; InternalDescription)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Internal Description';
+                    MultiLine = true;
+                    ToolTip = 'Specifies the internal description of the column definition. The internal description is not shown on the final report but is used to provide more context when using the definition.';
 
                     trigger OnValidate()
                     var
@@ -358,7 +358,7 @@ page 489 "Column Layout"
             {
                 Caption = 'Hide Header';
                 Image = ListPage;
-                ToolTip = 'Show the page header.';
+                ToolTip = 'Hide the page header.';
                 Visible = not HeaderHidden;
 
                 trigger OnAction()
@@ -371,7 +371,7 @@ page 489 "Column Layout"
             {
                 Caption = 'Show Header';
                 Image = TaskPage;
-                ToolTip = 'Hide the page header.';
+                ToolTip = 'Show the page header.';
                 Visible = HeaderHidden;
 
                 trigger OnAction()
