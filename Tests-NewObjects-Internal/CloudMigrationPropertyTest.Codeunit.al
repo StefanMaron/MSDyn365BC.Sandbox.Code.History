@@ -122,6 +122,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Manufacturing Setup");
         ListOfTablesToMigrate.Add(Database::"Manufacturing User Template");
         ListOfTablesToMigrate.Add(Database::"Marketing Setup");
+        ListOfTablesToMigrate.Add(Database::"Matched Order Line");
         ListOfTablesToMigrate.Add(Database::"Memoized Result");
         ListOfTablesToMigrate.Add(Database::"Miniform Function Group");
         ListOfTablesToMigrate.Add(Database::"Miniform Function");
@@ -222,6 +223,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Posted Invt. Pick Line");
         ListOfTablesToMigrate.Add(Database::"Posted Invt. Put-away Header");
         ListOfTablesToMigrate.Add(Database::"Posted Invt. Put-away Line");
+        ListOfTablesToMigrate.Add(Database::"Posted Matched Order Line");
         ListOfTablesToMigrate.Add(Database::"Posted Payment Recon. Hdr");
         ListOfTablesToMigrate.Add(Database::"Posted Payment Recon. Line");
         ListOfTablesToMigrate.Add(Database::"Posted Whse. Receipt Header");
