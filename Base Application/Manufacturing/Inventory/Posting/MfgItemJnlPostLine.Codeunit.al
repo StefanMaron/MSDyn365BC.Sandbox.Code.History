@@ -471,14 +471,14 @@ codeunit 99000822 "Mfg. Item Jnl.-Post Line"
 
         sender.CalcDirAndIndirCostAmts(DirCostAmt, IndirCostAmt, ValuedQty, ItemJnlLine);
 
-        OnPostOutputOnBeforeInsertCostValueEntries(ItemJnlLine, CapLedgEntry, ValuedQty, DirCostAmt, IndirCostAmt);
+        OnPostOutputOnBeforeInsertCostValueEntries(ItemJnlLine, CapLedgEntry, ValuedQty, DirCostAmt, IndirCostAmt, sender);
 #if not CLEAN27
         sender.RunOnPostOutputOnBeforeInsertCostValueEntries(ItemJnlLine, CapLedgEntry, ValuedQty, DirCostAmt, IndirCostAmt);
 #endif
         sender.InsertCapValueEntry(ItemJnlLine, CapLedgEntry, ItemJnlLine."Value Entry Type"::"Direct Cost", ValuedQty, ValuedQty, DirCostAmt);
         sender.InsertCapValueEntry(ItemJnlLine, CapLedgEntry, ItemJnlLine."Value Entry Type"::"Indirect Cost", ValuedQty, 0, IndirCostAmt);
 
-        OnPostOutputOnAfterInsertCostValueEntries(ItemJnlLine, CapLedgEntry, sender.GetCalledFromAdjustment(), sender.GetPostToGL());
+        OnPostOutputOnAfterInsertCostValueEntries(ItemJnlLine, CapLedgEntry, sender.GetCalledFromAdjustment(), sender.GetPostToGL(), sender);
 #if not CLEAN27
         sender.RunOnPostOutputOnAfterInsertCostValueEntries(ItemJnlLine, CapLedgEntry, sender.GetCalledFromAdjustment(), sender.GetPostToGL());
 #endif
@@ -1235,12 +1235,12 @@ codeunit 99000822 "Mfg. Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnPostOutputOnBeforeInsertCostValueEntries(var ItemJournalLine: Record "Item Journal Line"; var CapacityLedgerEntry: Record "Capacity Ledger Entry"; var ValuedQty: Decimal; var DirCostAmt: Decimal; var IndirCostAmt: Decimal)
+    local procedure OnPostOutputOnBeforeInsertCostValueEntries(var ItemJournalLine: Record "Item Journal Line"; var CapacityLedgerEntry: Record "Capacity Ledger Entry"; var ValuedQty: Decimal; var DirCostAmt: Decimal; var IndirCostAmt: Decimal; var ItemJnlPostLine: Codeunit "Item Jnl.-Post Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPostOutputOnAfterInsertCostValueEntries(ItemJournalLine: Record "Item Journal Line"; var CapLedgEntry: Record "Capacity Ledger Entry"; CalledFromAdjustment: Boolean; PostToGL: Boolean)
+    local procedure OnPostOutputOnAfterInsertCostValueEntries(ItemJournalLine: Record "Item Journal Line"; var CapLedgEntry: Record "Capacity Ledger Entry"; CalledFromAdjustment: Boolean; PostToGL: Boolean; var ItemJnlPostLine: Codeunit "Item Jnl.-Post Line")
     begin
     end;
 
