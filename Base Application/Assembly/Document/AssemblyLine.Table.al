@@ -864,6 +864,11 @@ table 901 "Assembly Line"
 #pragma warning restore AA0074
         AvailabilityPageTitleLbl: Label 'The available inventory for item %1 is lower than the entered quantity at this location.', Comment = '%1=Item No.';
         ConfirmDeleteQst: Label '%1 = %2 is greater than %3 = %4. If you delete the %5, the items will remain in the operation area until you put them away.\Any related item tracking information defined during the pick process will be deleted.\Do you still want to delete the %5?', Comment = '%1 = FieldCaption("Qty. Picked"), %2 = "Qty. Picked", %3 = FieldCaption(Consumed Quantity), %4 = Consumed Quantity, %5 = TableCaption';
+        CannotAutoReserveErr: Label 'Quantity %1 in line %2 cannot be reserved automatically.', Comment = '%1 - quantity, %2 - line number';
+#pragma warning disable AA0470
+        ProgressMsg: Label 'Reserving inventory...\#1##############\@2@@@@@';
+#pragma warning restore AA0470
+        CountFromTotalLineLbl: Label '%1 of %2', Comment = '%1= Current line number, %2= Total line number';
 
     protected var
         StatusCheckSuspended: Boolean;
@@ -2157,6 +2162,43 @@ table 901 "Assembly Line"
     procedure GetSuspendDeletionCheck(): Boolean
     begin
         exit(CalledFromHeader);
+    end;
+
+    procedure ReserveFromInventory(var AssemblyLine: Record "Assembly Line")
+    var
+        ReservMgt: Codeunit "Reservation Management";
+        SourceRecRef: RecordRef;
+        AutoReserved: Boolean;
+        Window: Dialog;
+        TotalLines: Integer;
+        CurrentLine: Integer;
+    begin
+        AssemblyLine.SetAutoCalcFields("Reserved Quantity", "Reserved Qty. (Base)");
+        if AssemblyLine.FindSet() then begin
+            TotalLines := AssemblyLine.Count();
+            CurrentLine := 0;
+
+            Window.Open(ProgressMsg);
+            repeat
+                CurrentLine += 1;
+
+                Window.Update(1, StrSubstNo(CountFromTotalLineLbl, CurrentLine, TotalLines));
+                Window.Update(2, Round(CurrentLine * 100 / TotalLines, 1));
+                SourceRecRef.GetTable(AssemblyLine);
+                ReservMgt.SetReservSource(SourceRecRef);
+                AssemblyLine.TestField("Due Date");
+                ReservMgt.AutoReserveToShip(
+                  AutoReserved, '', AssemblyLine."Due Date",
+                  AssemblyLine."Quantity to Consume" - AssemblyLine."Reserved Quantity",
+                  AssemblyLine."Quantity to Consume (Base)" - AssemblyLine."Reserved Qty. (Base)");
+
+                if not AutoReserved then begin
+                    Window.Close();
+                    Error(CannotAutoReserveErr, AssemblyLine."Quantity to Consume (Base)", AssemblyLine."Line No.");
+                end;
+            until AssemblyLine.Next() = 0;
+            Window.Close();
+        end;
     end;
 
     local procedure CheckingRoundingPrecision()

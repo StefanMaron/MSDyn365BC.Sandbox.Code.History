@@ -1228,6 +1228,18 @@ page 46 "Sales Order Subform"
                             ShowNonstockItems();
                         end;
                     }
+                    action(ReserveFromInventory)
+                    {
+                        ApplicationArea = Reservation;
+                        Caption = 'Reserve from Inventory';
+                        Image = LineReserve;
+                        ToolTip = 'Reserve items for the selected line from inventory.';
+
+                        trigger OnAction()
+                        begin
+                            ReserveSelectedLines();
+                        end;
+                    }
                 }
                 group("Item Availability by")
                 {
@@ -1851,6 +1863,14 @@ page 46 "Sales Order Subform"
         BackgroundErrorCheck := DocumentErrorsMgt.BackgroundValidationEnabled();
         AttachingLinesEnabled :=
             SalesSetup."Auto Post Non-Invt. via Whse." = SalesSetup."Auto Post Non-Invt. via Whse."::"Attached/Assigned";
+    end;
+
+    local procedure ReserveSelectedLines()
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        CurrPage.SetSelectionFilter(SalesLine);
+        Rec.ReserveFromInventory(SalesLine);
     end;
 
     /// <summary>
