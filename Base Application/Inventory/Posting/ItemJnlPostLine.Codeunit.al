@@ -2193,7 +2193,7 @@ codeunit 22 "Item Jnl.-Post Line"
             exit;
 
         IsHandled := false;
-        OnBeforePostValueEntryToGL(ValueEntry, IsHandled);
+        OnBeforePostValueEntryToGL(ValueEntry, IsHandled, PostToGL);
         if IsHandled then
             exit;
         PostValueEntryToGL(ValueEntry);
@@ -7115,7 +7115,7 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforePostValueEntryToGL(var ValueEntry: Record "Value Entry"; var IsHandled: Boolean)
+    local procedure OnBeforePostValueEntryToGL(var ValueEntry: Record "Value Entry"; var IsHandled: Boolean; PostToGL: Boolean)
     begin
     end;
 
