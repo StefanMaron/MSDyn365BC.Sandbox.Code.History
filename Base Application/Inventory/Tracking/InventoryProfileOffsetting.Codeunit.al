@@ -866,6 +866,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
         ReservEntry.SetRange("Variant Code", SKU."Variant Code");
         ReservEntry.SetRange("Location Code", SKU."Location Code");
         ReservEntry.SetFilter(ReservEntry."Reservation Status", '<>%1', ReservEntry."Reservation Status"::Prospect);
+        OnDeleteTrackingOnAfterSetReservEntryFilters(ReservEntry, SKU, ToDate);
         if ReservEntry.Find('-') then
             repeat
                 Item.SetLoadFields("Manufacturing Policy", "Replenishment System", "Reordering Policy", "Order Tracking Policy");
@@ -2696,6 +2697,8 @@ codeunit 99000854 "Inventory Profile Offsetting"
                 if (SalesLine."Blanket Order No." = DocumentNo) and (SalesLine."Blanket Order Line No." = LineNo) then
                     RemQty += InventoryProfile."Remaining Quantity (Base)";
             until InventoryProfile.Next() = 0;
+
+        OnAfterCalcInventoryProfileRemainingQty(InventoryProfile, DocumentNo, LineNo, RemQty);
     end;
 
     procedure CalcReorderQty(NeededQty: Decimal; ProjectedInventory: Decimal; SupplyLineNo: Integer) QtyToOrder: Decimal
