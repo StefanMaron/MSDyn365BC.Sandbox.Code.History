@@ -1256,6 +1256,11 @@ table 5407 "Prod. Order Component"
         Text99000009: Label 'Automatic reservation is not possible.\Do you want to reserve items manually?';
 #pragma warning restore AA0074
         ConfirmDeleteQst: Label '%1 = %2 is greater than %3 = %4. If you delete the %5, the items will remain in the operation area until you put them away.\Any related item tracking information defined during the pick process will be deleted.\Do you still want to delete the %5?', Comment = '%1 = FieldCaption("Qty. Picked"), %2 = "Qty. Picked", %3 = Qty. Posted, %4 = ("Expected Quantity" - "Remaining Quantity"), %5 = TableCaption';
+        CannotAutoReserveErr: Label 'Quantity %1 in line %2 cannot be reserved automatically.', Comment = '%1 - quantity, %2 - line number';
+#pragma warning disable AA0470
+        ProgressMsg: Label 'Reserving inventory...\#1##############\@2@@@@@';
+#pragma warning restore AA0470
+        CountFromTotalLineLbl: Label '%1 of %2', Comment = '%1= Current line number, %2= Total line number';
         IgnoreErrors: Boolean;
         ErrorOccured: Boolean;
 #if not CLEAN27
@@ -2308,6 +2313,43 @@ table 5407 "Prod. Order Component"
         if Item."No." <> "Item No." then
             Item.Get("Item No.");
         exit(Item.IsInventoriableType());
+    end;
+
+    procedure ReserveFromInventory(var ProdOrderComponent: Record "Prod. Order Component")
+    var
+        ReserveMgt: Codeunit "Reservation Management";
+        SourceRecRef: RecordRef;
+        AutoReserved: Boolean;
+        Window: Dialog;
+        TotalLines: Integer;
+        CurrentLine: Integer;
+    begin
+        ProdOrderComponent.SetAutoCalcFields("Reserved Quantity", "Reserved Qty. (Base)");
+        if ProdOrderComponent.FindSet() then begin
+            TotalLines := ProdOrderComponent.Count();
+            CurrentLine := 0;
+
+            Window.Open(ProgressMsg);
+            repeat
+                CurrentLine += 1;
+
+                Window.Update(1, StrSubstNo(CountFromTotalLineLbl, CurrentLine, TotalLines));
+                Window.Update(2, Round(CurrentLine * 100 / TotalLines, 1));
+                SourceRecRef.GetTable(ProdOrderComponent);
+                ReserveMgt.SetReservSource(SourceRecRef);
+                ProdOrderComponent.TestField("Due Date");
+                ReserveMgt.AutoReserveToShip(
+                  AutoReserved, '', ProdOrderComponent."Due Date",
+                  ProdOrderComponent.Quantity - ProdOrderComponent."Reserved Quantity",
+                  ProdOrderComponent."Quantity (Base)" - ProdOrderComponent."Reserved Qty. (Base)");
+
+                if not AutoReserved then begin
+                    Window.Close();
+                    Error(CannotAutoReserveErr, ProdOrderComponent."Quantity (Base)", ProdOrderComponent."Line No.");
+                end;
+            until ProdOrderComponent.Next() = 0;
+            Window.Close();
+        end;
     end;
 
     local procedure ConfirmDeletion()

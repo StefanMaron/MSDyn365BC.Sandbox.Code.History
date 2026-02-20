@@ -591,6 +591,21 @@ page 99000818 "Prod. Order Components"
                         Rec.ShowReservation();
                     end;
                 }
+                action(ReserveFromInventory)
+                {
+                    ApplicationArea = Reservation;
+                    Caption = 'Reserve from Inventory';
+                    Image = LineReserve;
+                    ToolTip = 'Reserve items for the selected line from inventory.';
+
+                    trigger OnAction()
+                    var
+                        ProdOrderComponent: Record "Prod. Order Component";
+                    begin
+                        CurrPage.SetSelectionFilter(ProdOrderComponent);
+                        Rec.ReserveFromInventory(ProdOrderComponent);
+                    end;
+                }
                 action(OrderTracking)
                 {
                     ApplicationArea = Manufacturing;
