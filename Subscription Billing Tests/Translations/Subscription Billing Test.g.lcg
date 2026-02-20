@@ -32,6 +32,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.SubscriptionBilling)(LookupHint=Codeunit Item Service Comm. Type Test - NamedType ServiceCommitmentItemErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 837722888 - NamedType 4138002660" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Document No. should be empty for the first contract]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.SubscriptionBilling)(LookupHint=Codeunit Recurring Billing Test - NamedType DocumentNoShouldBeEmptyErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 540279428 - Method 4244044965 - NamedType 2283387991" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The Subscription Line cannot be deleted because it is linked to a contract line which is not yet marked as "Closed".]]></Val>
