@@ -212,6 +212,15 @@
       <Cmt Name="Dev"><![CDATA[%1 = GL Account No. %2 = Page Name]D;]A;(LookupHint=Codeunit Alloc. Account Sales E2E Tests - NamedType DestinationAccountErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3312798875 - NamedType 3160204665" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The allowed date range is invalid. The "Allow From" date %1 must not be after the "Allow To" date %2 on %3.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 - Allow From caption, %2 - Allow To caption, %3 - Setup name]D;]A;(LookupHint=Codeunit Calc. Posting Date Test - NamedType InvalidAllowedDateRangeErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3312798875 - NamedType 1887292331" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[This posting date will cause an overdue payment.]]></Val>
@@ -228,6 +237,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Calc. Posting Date Test - NamedType PmtDiscUnavailableErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3312798875 - NamedType 2627172048" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Posting Date is not within your range of allowed posting dates]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Calc. Posting Date Test - NamedType PostingDateNotAllowedErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3312798875 - NamedType 3160827587" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -7500,6 +7518,24 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Sales Order - NamedType RecreateSalesLinesMsg)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3999279336 - NamedType 711799781" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Reserved quantity should be %1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Expected Quantity.]D;]A;(LookupHint=Codeunit ERM Sales Order - NamedType ReservedQtyExpectedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3999279336 - NamedType 3113121775" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Reserved quantity should match line quantity.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Sales Order - NamedType ReservedQtyShouldMatchLineQtyErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3999279336 - NamedType 4202832386" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
