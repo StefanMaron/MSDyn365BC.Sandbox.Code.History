@@ -4535,6 +4535,11 @@ table 37 "Sales Line"
         NonInvReserveTypeErr: Label 'Non-inventory and service items must have the reserve type Never. The current reserve type for item %1 is %2.', Comment = '%1 is Item No., %2 is Reserve';
         ChangeExtendedTextErr: Label 'You cannot change %1 for Extended Text Line.', Comment = '%1= Field Caption';
         CannotInsertSalesLineWithoutHeaderErr: Label 'You cannot insert a sales line without a sales header.';
+        CannotAutoReserveErr: Label 'Quantity %1 in line %2 cannot be reserved automatically.', Comment = '%1 - quantity, %2 - line number';
+#pragma warning disable AA0470
+        ProgressMsg: Label 'Reserving inventory...\#1##############\@2@@@@@';
+#pragma warning restore AA0470
+        CountFromTotalLineLbl: Label '%1 of %2', Comment = '%1= Current line number, %2= Total line number';
 
     protected var
         HideValidationDialog: Boolean;
@@ -11225,6 +11230,43 @@ table 37 "Sales Line"
     begin
         VATPct := "VAT %";
         OnAfterGetVATPct(Rec, VATPct);
+    end;
+
+    procedure ReserveFromInventory(var SalesLine: Record "Sales Line")
+    var
+        ReservMgt: Codeunit "Reservation Management";
+        SourceRecRef: RecordRef;
+        AutoReserved: Boolean;
+        Window: Dialog;
+        TotalLines: Integer;
+        CurrentLine: Integer;
+    begin
+        SalesLine.SetAutoCalcFields("Reserved Quantity", "Reserved Qty. (Base)");
+        if SalesLine.FindSet() then begin
+            TotalLines := SalesLine.Count();
+            CurrentLine := 0;
+
+            Window.Open(ProgressMsg);
+            repeat
+                CurrentLine += 1;
+
+                Window.Update(1, StrSubstNo(CountFromTotalLineLbl, CurrentLine, TotalLines));
+                Window.Update(2, Round(CurrentLine * 100 / TotalLines, 1));
+                SourceRecRef.GetTable(SalesLine);
+                ReservMgt.SetReservSource(SourceRecRef);
+                SalesLine.TestField("Shipment Date");
+                ReservMgt.AutoReserveToShip(
+                  AutoReserved, '', SalesLine."Shipment Date",
+                  SalesLine."Qty. to Ship" - SalesLine."Reserved Quantity",
+                  SalesLine."Qty. to Ship (Base)" - SalesLine."Reserved Qty. (Base)");
+
+                if not AutoReserved then begin
+                    Window.Close();
+                    Error(CannotAutoReserveErr, SalesLine."Qty. to Ship (Base)", SalesLine."Line No.");
+                end;
+            until SalesLine.Next() = 0;
+            Window.Close();
+        end;
     end;
 
     internal procedure GetPrepaymentVATPct() PrepaymentVATPct: Decimal
