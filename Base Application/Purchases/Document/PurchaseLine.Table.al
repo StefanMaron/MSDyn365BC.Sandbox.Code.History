@@ -1372,8 +1372,12 @@ table 39 "Purchase Line"
             TableRelation = "Gen. Business Posting Group";
 
             trigger OnValidate()
+            var
+                ValidateVATBusPostingGroup: Boolean;
             begin
-                if xRec."Gen. Bus. Posting Group" <> "Gen. Bus. Posting Group" then
+                ValidateVATBusPostingGroup := xRec."Gen. Bus. Posting Group" <> "Gen. Bus. Posting Group";
+                OnValidateGenBusPostingGroupOnBeforeValidateVATBusPostingGroup(Rec, ValidateVATBusPostingGroup);
+                if ValidateVATBusPostingGroup then
                     if GenBusPostingGrp.ValidateVatBusPostingGroup(GenBusPostingGrp, "Gen. Bus. Posting Group") then
                         Validate("VAT Bus. Posting Group", GenBusPostingGrp."Def. VAT Bus. Posting Group");
             end;
@@ -3488,6 +3492,11 @@ table 39 "Purchase Line"
         {
             AutoFormatExpression = Rec."Currency Code";
             Caption = 'Prepmt. on-Deductible VAT Amount';
+            Editable = false;
+        }
+        field(6206; "Item Charge Has Non.Ded. VAT"; Boolean)
+        {
+            Caption = 'Item Charge Has Non-Deductible VAT';
             Editable = false;
         }
         field(6600; "Return Shipment No."; Code[20])
@@ -6265,8 +6274,8 @@ table 39 "Purchase Line"
         ItemChargeAssgntPurch: Record "Item Charge Assignment (Purch)";
         AssignItemChargePurch: Codeunit "Item Charge Assgnt. (Purch.)";
         ItemChargeAssgnts: Page "Item Charge Assignment (Purch)";
-        ItemChargeAssgntLineAmt: Decimal;
-        IsHandled: Boolean;
+        ItemChargeAssgntLineAmt, NonDedVATAmount : Decimal;
+        IsHandled, IncludeNonDedVATAmount : Boolean;
     begin
         Get("Document Type", "Document No.", "Line No.");
         CheckNoAndQuantityForItemChargeAssgnt();
@@ -6284,9 +6293,14 @@ table 39 "Purchase Line"
         if ("Inv. Discount Amount" = 0) and
            ("Line Discount Amount" = 0) and
            (not PurchHeader."Prices Including VAT")
-        then
-            ItemChargeAssgntLineAmt := "Line Amount" + NonDeductibleVAT.GetNonDeductibleVATAmountForItemCost(Rec)
-        else
+        then begin
+            ItemChargeAssgntLineAmt := "Line Amount";
+            NonDedVATAmount := NonDeductibleVAT.GetNonDeductibleVATAmountForItemCost(Rec);
+            if NonDedVATAmount <> 0 then begin
+                ItemChargeAssgntLineAmt += NonDedVATAmount;
+                IncludeNonDedVATAmount := true;
+            end;
+        end else
             if PurchHeader."Prices Including VAT" then
                 ItemChargeAssgntLineAmt :=
                   Round(CalcLineAmount() / (1 + GetVATPct() / 100), Currency."Amount Rounding Precision") + NonDeductibleVAT.GetNonDeductibleVATAmountForItemCost(Rec)
@@ -6319,6 +6333,12 @@ table 39 "Purchase Line"
         else
             AssignItemChargePurch.CreateDocChargeAssgnt(ItemChargeAssgntPurch, "Receipt No.");
         Clear(AssignItemChargePurch);
+
+        if IncludeNonDedVATAmount then begin
+            Rec."Item Charge Has Non.Ded. VAT" := IncludeNonDedVATAmount;
+            Rec.Modify();
+        end;
+
         Commit();
 
         ItemChargeAssgnts.Initialize(Rec, ItemChargeAssgntLineAmt);
@@ -8297,13 +8317,16 @@ table 39 "Purchase Line"
     procedure IsServiceCharge(): Boolean
     var
         VendorPostingGroup: Record "Vendor Posting Group";
+        ServiceCharged: Boolean;
     begin
         if Type <> Type::"G/L Account" then
             exit(false);
 
         GetPurchHeader();
-        VendorPostingGroup.Get(PurchHeader."Vendor Posting Group");
-        exit(VendorPostingGroup."Service Charge Acc." = "No.");
+        ServiceCharged := VendorPostingGroup.Get(PurchHeader."Vendor Posting Group");
+        ServiceCharged := VendorPostingGroup."Service Charge Acc." = "No.";
+        OnAfterIsServiceCharge(Rec, ServiceCharged);
+        exit(ServiceCharged);
     end;
 
     /// <summary>
@@ -11913,6 +11936,16 @@ table 39 "Purchase Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckAcquisitionCost(var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterIsServiceCharge(var PurchaseLine: Record "Purchase Line"; var ServiceCharged: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateGenBusPostingGroupOnBeforeValidateVATBusPostingGroup(var PurchaseLine: Record "Purchase Line"; var ValidateVATBusPostingGroup: Boolean)
     begin
     end;
 }
