@@ -3693,6 +3693,7 @@ table 37 "Sales Line"
         HasBeenShown: Boolean;
         PlannedShipmentDateCalculated: Boolean;
         PlannedDeliveryDateCalculated: Boolean;
+        SkipDefaultItemQuantity: Boolean;
 #pragma warning disable AA0074
 #pragma warning disable AA0470
         Text000: Label 'You cannot delete the order line because it is associated with purchase order %1 line %2.';
@@ -4866,7 +4867,8 @@ table 37 "Sales Line"
     var
         PriceCalculation: Interface "Price Calculation";
     begin
-        GetSalesHeader();
+        if Rec."Document No." <> '' then
+            SalesHeader.Get(Rec."Document Type", Rec."Document No.");
         GetPriceCalculationHandler(PriceType::Sale, SalesHeader, PriceCalculation);
         PriceCalculation.PickPrice();
         GetLineWithCalculatedPrice(PriceCalculation);
@@ -7965,6 +7967,9 @@ table 37 "Sales Line"
         if IsHandled then
             exit;
 
+        if SkipDefaultItemQuantity then
+            exit;
+
         GetSalesSetup();
         if SalesSetup."Default Item Quantity" then begin
             Validate(Quantity, 1);
@@ -8832,6 +8837,11 @@ table 37 "Sales Line"
         UpdateAmounts();
 
         OnAfterValidateLineDiscountPercent(Rec, CurrFieldNo);
+    end;
+
+    procedure ExcludeDefaultItemQuantity(DefaultItemQuantity: Boolean)
+    begin
+        SkipDefaultItemQuantity := DefaultItemQuantity;
     end;
 
     local procedure ReduceInvoiceDiscValueOnHeader(InvDiscountAmount: Decimal)
