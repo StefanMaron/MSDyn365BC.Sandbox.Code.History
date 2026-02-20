@@ -504,6 +504,7 @@ codeunit 5988 "Serv-Documents Mgt."
                             ServAmountsMgt.InvoiceRounding(ServHeader, ServLine, TotalServiceLine,
                               LastLineRetrieved, false, BiggestLineNo);
                 end;
+                ServAmountsMgt.RunOnAfterUpdateInvoiceRounding(ServHeader, ServLine, TotalServiceLine, false, BiggestLineNo, LastLineRetrieved);
                 ErrorMessageMgt.PopContext(ErrorContextElementPostLine);
             until LastLineRetrieved;
 
