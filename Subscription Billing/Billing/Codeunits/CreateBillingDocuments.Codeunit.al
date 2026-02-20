@@ -14,20 +14,12 @@ codeunit 8060 "Create Billing Documents"
     trigger OnRun()
     var
         BillingLine: Record "Billing Line";
-        PartnerFilter: Text;
-        ShowNotification: Boolean;
     begin
         BillingLine.Copy(Rec);
-        PartnerFilter := BillingLine.GetFilter(Partner);
-        ShowNotification := PartnerFilter <> BillingLine.GetFilters();
-        BillingLine.Reset();
-        BillingLine.SetFilter(Partner, PartnerFilter);
         BillingLine.SetRange("Document Type", Enum::"Rec. Billing Document Type"::None);
         if CreateContractInvoice then
             BillingLine.SetRange("Billing Template Code", '');
         CreateBillingDocuments(BillingLine);
-        if ShowNotification and (not CreateContractInvoice) then
-            ShowFiltersIgnoredNotification();
     end;
 
     local procedure CreateBillingDocuments(var BillingLine: Record "Billing Line")
@@ -926,7 +918,7 @@ codeunit 8060 "Create Billing Documents"
 
     procedure GetBillingPeriodDescriptionTxt() DescriptionText: Text
     begin
-        DescriptionText := ServicePeriodDescriptionTxt;
+        DescriptionText := BillingPeriodDescriptionTxt;
     end;
 
     procedure GetBillingPeriodDescriptionTxt(LanguageCode: Code[10]) DescriptionText: Text
@@ -1035,17 +1027,6 @@ codeunit 8060 "Create Billing Documents"
 
         OnAfterIsNewHeaderNeededPerContract(CreateNewHeader, TempBillingLine, PreviousSubContractNo);
     end;
-
-    local procedure ShowFiltersIgnoredNotification()
-    var
-        FiltersIgnoredNotification: Notification;
-        FiltersIgnoredMsg: Label 'You have set filters on the Recurring Billing page. The filters were ignored to maintain data consistency.';
-    begin
-        FiltersIgnoredNotification.Message(FiltersIgnoredMsg);
-        FiltersIgnoredNotification.Scope := NotificationScope::LocalScope;
-        FiltersIgnoredNotification.Send();
-    end;
-
 
     internal procedure ErrorIfItemUnitOfMeasureCodeDoesNotExist(ItemNo: Code[20]; ServiceObject: Record "Subscription Header")
     var
@@ -1216,7 +1197,7 @@ codeunit 8060 "Create Billing Documents"
         ProgressTxt: Label 'Creating documents...\Partner No. #1#################################\Contract No. #2#################################', Comment = '%1=Partner No., %2=Contract No.';
         OnlyOneServicePartnerErr: Label 'You can create documents only for one type of partner at a time (Customer or Vendor). Please check your filters.';
         UpdateRequiredErr: Label 'At least one Subscription Line was changed after billing proposal was created. Please check the lines marked with "Update Required" field and update the billing proposal before the billing documents can be created.';
-        ServicePeriodDescriptionTxt: Label 'Subscription period: %1 to %2', Comment = '%1=Recurring Billing from, %2=Recurring Billing to';
+        BillingPeriodDescriptionTxt: Label 'Billing period: %1 to %2', Comment = '%1=Recurring Billing from, %2=Recurring Billing to';
         NoDocumentsCreatedMsg: Label 'No documents have been created.';
         DocumentsCreatedMsg: Label 'Creation of documents completed.\\%1 document(s) for %2 contract(s) were created.', Comment = '%1=Number of documents, %2=Number of contracts';
         DocumentsCreatedAndPostedMsg: Label 'Creation of documents completed.\\%1 document(s) for %2 contract(s) were created and posted.', Comment = '%1=Number of documents, %2=Number of contracts';
