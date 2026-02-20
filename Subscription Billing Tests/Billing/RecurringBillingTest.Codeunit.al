@@ -66,6 +66,7 @@ codeunit 139688 "Recurring Billing Test"
         RecurringBillingPage: TestPage "Recurring Billing";
         IsPartnerVendor: Boolean;
         PostDocuments: Boolean;
+        DocumentNoShouldBeEmptyErr: Label 'Document No. should be empty for the first contract';
 
     #region Tests
 
@@ -286,6 +287,9 @@ codeunit 139688 "Recurring Billing Test"
 
         CreateBillingProposalForCustomerContractUsingTempTemplate("Period Calculation"::"Align to End of Month", '<1Y>', '<1Q>', 20230228D, 20230614D);
         CheckBillingLineAmountAndPrice(116.304);
+
+        CreateBillingProposalForCustomerContractUsingTempTemplate("Period Calculation"::"Align to End of Month", '<3M>', '<1M>', 20250226D, 20250228D);
+        CheckBillingLineAmountAndPrice(10.714);
     end;
 
     [Test]
@@ -1451,6 +1455,32 @@ codeunit 139688 "Recurring Billing Test"
         Assert.AreEqual("Sales Document Type"::"Credit Memo", BillingLine.GetSalesDocumentTypeForContractNo(), 'Sales Document Type is not calculated correctly for Credit Memo.');
     end;
 
+    [Test]
+    [HandlerFunctions('CreateBillingDocsCustomerPageHandlerwithoutPost,ExchangeRateSelectionModalPageHandler,MessageHandler,BillingTemplateModalPageHandler')]
+    procedure CreateCustomerDocumentForSelectedContract()
+    begin
+        // [SCENARIO] otherwise, all billing lines will not be included in the document which will lead to wrong invoices and corrupted billing lines
+        Initialize();
+
+        // [GIVEN] Create Recurring Billing Page setup for Customer
+        RecurringBillingPageSetupForCustomer();
+
+        // [WHEN] Filter billing lines to exclude the last line and create/post documents
+        RecurringBillingPage.OpenEdit();
+        RecurringBillingPage.BillingTemplateField.Lookup();
+        PostDocuments := true;
+        RecurringBillingPage.CreateBillingProposalAction.Invoke();
+        RecurringBillingPage.Filter.SetFilter("Subscription Contract No.", CustomerContract2."No.");
+        RecurringBillingPage.CreateDocuments.Invoke();
+        Commit();
+
+        // [THEN] Only billing lines for the selected contract should be Created document.
+        BillingLine.Reset();
+        BillingLine.SetRange("Subscription Contract No.", CustomerContract."No.");
+        BillingLine.FindLast();
+        Assert.AreEqual('', BillingLine."Document No.", DocumentNoShouldBeEmptyErr);
+    end;
+
     #endregion Tests
 
     #region Procedures
@@ -1806,6 +1836,12 @@ codeunit 139688 "Recurring Billing Test"
     procedure ExchangeRateSelectionModalPageHandler(var ExchangeRateSelectionPage: TestPage "Exchange Rate Selection")
     begin
         ExchangeRateSelectionPage.OK().Invoke();
+    end;
+
+    [ModalPageHandler]
+    procedure CreateBillingDocsCustomerPageHandlerwithoutPost(var CreateBillingDocsCustomerPage: TestPage "Create Customer Billing Docs")
+    begin
+        CreateBillingDocsCustomerPage.OK().Invoke();
     end;
 
     [MessageHandler]
