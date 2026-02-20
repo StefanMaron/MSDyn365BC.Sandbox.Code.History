@@ -9,7 +9,7 @@ using Microsoft.Inventory.Item;
 page 903 "Assembly Lines"
 {
     ApplicationArea = Basic, Suite;
-	AutoSplitKey = true;
+    AutoSplitKey = true;
     Caption = 'Assembly Lines';
     Editable = false;
     PageType = List;
@@ -166,6 +166,21 @@ page 903 "Assembly Lines"
                     trigger OnAction()
                     begin
                         Rec.OpenItemTrackingLines();
+                    end;
+                }
+                action(ReserveFromInventory)
+                {
+                    ApplicationArea = Reservation;
+                    Caption = 'Reserve from Inventory';
+                    Image = LineReserve;
+                    ToolTip = 'Reserve items for the selected line from inventory.';
+
+                    trigger OnAction()
+                    var
+                        AssemblyLine: Record "Assembly Line";
+                    begin
+                        CurrPage.SetSelectionFilter(AssemblyLine);
+                        Rec.ReserveFromInventory(AssemblyLine);
                     end;
                 }
             }
