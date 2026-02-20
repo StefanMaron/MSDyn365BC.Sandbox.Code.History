@@ -3105,7 +3105,8 @@ page 6510 "Item Tracking Lines"
     begin
         if IncStr(CustomizedSN) = '' then
             Error(UnincrementableStringErr, CustomizedSN);
-        NoSeries.TestManual(Item."Serial Nos.");
+        if Item."Serial Nos." <> '' then
+            NoSeries.TestManual(Item."Serial Nos.");
 
         if QtyToCreate <= 0 then
             Error(Text009);
