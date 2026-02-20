@@ -6899,6 +6899,62 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
                 ValueEntry[1].TableCaption()));
     end;
 
+    [Test]
+    procedure CopySalesInvoiceWithDefaultItemQuantityAndZeroQuantityLine()
+    var
+        SalesReceivablesSetup: Record "Sales & Receivables Setup";
+        SalesHeaderOrder: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesHeaderInvoice: Record "Sales Header";
+        Item: array[2] of Record Item;
+        CustomerNo: Code[20];
+    begin
+        // [SCENARIO 613812] Copy posted sales invoice with "Recalculate Lines" enabled should succeed when "Default Item Quantity" is enabled and source has lines with zero quantity
+        Initialize();
+
+        // [GIVEN] Sales & Receivables Setup with "Default Item Quantity" = TRUE
+        SalesReceivablesSetup.Get();
+        SalesReceivablesSetup.Validate("Default Item Quantity", true);
+        SalesReceivablesSetup.Modify(true);
+
+        // [GIVEN] Create two items
+        LibraryInventory.CreateItem(Item[1]);
+        LibraryInventory.CreateItem(Item[2]);
+
+        // [GIVEN] Create customer
+        CustomerNo := LibrarySales.CreateCustomerNo();
+
+        // [GIVEN] Create sales order with two item lines
+        LibrarySales.CreateSalesHeader(SalesHeaderOrder, SalesHeaderOrder."Document Type"::Order, CustomerNo);
+
+        // [GIVEN] First line with Item1 and Quantity = 2
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeaderOrder, SalesLine.Type::Item, Item[1]."No.", 2);
+        SalesLine.Validate("Unit Price", LibraryRandom.RandDec(100, 2));
+        SalesLine.Modify(true);
+
+        // [GIVEN] Second line with Item2 and Quantity = 1, but Qty. to Ship and Qty. to Invoice = 0
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeaderOrder, SalesLine.Type::Item, Item[2]."No.", 1);
+        SalesLine.Validate("Unit Price", LibraryRandom.RandDec(100, 2));
+        SalesLine.Validate("Qty. to Ship", 0);
+        SalesLine.Validate("Qty. to Invoice", 0);
+        SalesLine.Modify(true);
+
+        // [GIVEN] Post the sales order to create a posted sales invoice with one line having quantity and one having zero quantity
+        SalesInvoiceHeader.Get(LibrarySales.PostSalesDocument(SalesHeaderOrder, true, true));
+
+        // [WHEN] Create new sales invoice and copy the posted invoice with "Recalculate Lines" = TRUE
+        SalesHeaderInvoice.Init();
+        SalesHeaderInvoice.Validate("Document Type", SalesHeaderInvoice."Document Type"::Invoice);
+        SalesHeaderInvoice.Insert(true);
+        Commit();
+        RunCopySalesDoc(SalesInvoiceHeader."No.", SalesHeaderInvoice, "Sales Document Type From"::"Posted Invoice", true, true);
+
+        // [THEN] The copy operation succeeds without error
+        SalesHeaderInvoice.Get(SalesHeaderInvoice."Document Type", SalesHeaderInvoice."No.");
+        Assert.RecordIsNotEmpty(SalesInvoiceHeader);
+    end;
+
     local procedure Initialize()
     var
         PriceListLine: Record "Price List Line";
