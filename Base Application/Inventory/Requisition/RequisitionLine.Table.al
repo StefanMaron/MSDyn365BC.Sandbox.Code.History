@@ -1538,10 +1538,14 @@ table 246 "Requisition Line"
     local procedure CopyFromGLAcc()
     var
         GLAcc: Record "G/L Account";
+        ShouldTestFieldDirectPosting: Boolean;
     begin
         GLAcc.Get("No.");
         GLAcc.CheckGLAcc();
-        GLAcc.TestField("Direct Posting", true);
+        ShouldTestFieldDirectPosting := true;
+        OnCopyFromGLAccOnBeforeTestFieldDirectPosting(Rec, GLAcc, ShouldTestFieldDirectPosting);
+        if ShouldTestFieldDirectPosting then
+            GLAcc.TestField("Direct Posting", true);
         CopyDescriptionFromGLAcc(GLAcc);
     end;
 
@@ -3692,6 +3696,11 @@ table 246 "Requisition Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCopyDescriptionFromGLAcc(var RequisitionLine: Record "Requisition Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCopyFromGLAccOnBeforeTestFieldDirectPosting(var RequisitionLine: Record "Requisition Line"; GLAccount: Record "G/L Account"; var ShouldTestFieldDirectPosting: Boolean)
     begin
     end;
 
