@@ -22,7 +22,6 @@ codeunit 10500 "Postcode Business Logic"
     var
         PostcodeServiceManager: Codeunit "Postcode Service Manager";
         SavePostcode: Boolean;
-        UKPostcodeAutocompleteLbl: Label 'UK Postcode Service';
         NoDataRetrievedErr: Label 'Postal code service did not return any results.';
         SavePostcodeSet: Boolean;
         DiscoverabilityMessageMsg: Label 'You can retrieve and validate addresses based on postcodes.';
@@ -225,28 +224,6 @@ codeunit 10500 "Postcode Business Logic"
         end;
 
         exit(true);
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"Service Connection", 'OnRegisterServiceConnection', '', false, false)]
-    local procedure RegisterServiceOnRegisterServiceConnection(var ServiceConnection: Record "Service Connection")
-    var
-        PostcodeServiceConfig: Record "Postcode Service Config";
-        Configured: Boolean;
-    begin
-        PostcodeServiceManager.IsServiceConfigured(ServiceNameTxt, Configured);
-        if Configured then
-            ServiceConnection.Status := ServiceConnection.Status::Enabled
-        else
-            ServiceConnection.Status := ServiceConnection.Status::Disabled;
-
-        if not PostcodeServiceConfig.FindFirst() then begin
-            PostcodeServiceConfig.Init();
-            PostcodeServiceConfig.Insert();
-            PostcodeServiceConfig.SaveServiceKey('Disabled');
-        end;
-
-        ServiceConnection.InsertServiceConnection(ServiceConnection, PostcodeServiceConfig.RecordId,
-          UKPostcodeAutocompleteLbl, '', PAGE::"Postcode Configuration Page");
     end;
 }
 

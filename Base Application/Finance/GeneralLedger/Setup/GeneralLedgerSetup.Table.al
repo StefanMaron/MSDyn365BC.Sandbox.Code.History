@@ -68,6 +68,13 @@ table 98 "General Ledger Setup"
             trigger OnValidate()
             begin
                 CheckAllowedPostingDates(0);
+
+                if xRec."Allow Posting From" <> Rec."Allow Posting From" then begin
+                    if Rec."Allow Posting From" <> 0D then
+                        Evaluate(Rec."Allow Posting From DateFormula", '');
+
+                    CheckDateRange();
+                end;
             end;
         }
         /// <summary>
@@ -80,6 +87,13 @@ table 98 "General Ledger Setup"
             trigger OnValidate()
             begin
                 CheckAllowedPostingDates(0);
+
+                if xRec."Allow Posting To" <> Rec."Allow Posting To" then begin
+                    if Rec."Allow Posting To" <> 0D then
+                        Evaluate(Rec."Allow Posting To DateFormula", '');
+
+                    CheckDateRange();
+                end;
             end;
         }
         /// <summary>
@@ -1279,6 +1293,34 @@ table 98 "General Ledger Setup"
             ToolTip = 'Specifies the name of the Default Financial Report Status on Financial Reports.';
             TableRelation = "Financial Report Status";
         }
+        field(205; "Allow Posting From DateFormula"; DateFormula)
+        {
+            Caption = 'Allow Posting From DateFormula';
+
+            trigger OnValidate()
+            begin
+                if xRec."Allow Posting From DateFormula" <> Rec."Allow Posting From DateFormula" then begin
+                    if Format(Rec."Allow Posting From DateFormula") <> '' then
+                        Rec.Validate("Allow Posting From", 0D);
+
+                    CheckDateRange();
+                end;
+            end;
+        }
+        field(206; "Allow Posting To DateFormula"; DateFormula)
+        {
+            Caption = 'Allow Posting To DateFormula';
+
+            trigger OnValidate()
+            begin
+                if xRec."Allow Posting To DateFormula" <> Rec."Allow Posting To DateFormula" then begin
+                    if Format(Rec."Allow Posting To DateFormula") <> '' then
+                        Rec.Validate("Allow Posting To", 0D);
+
+                    CheckDateRange();
+                end;
+            end;
+        }
 #if not CLEANSCHEMA30
         field(10500; "Threshold applies"; Boolean)
         {
@@ -1608,6 +1650,22 @@ table 98 "General Ledger Setup"
     local procedure HideDialog(): Boolean
     begin
         exit((CurrFieldNo = 0) or not GuiAllowed);
+    end;
+
+    local procedure CheckDateRange()
+    var
+        AllowedFrom: Date;
+        AllowedTo: Date;
+    begin
+        if (Format(Rec."Allow Posting From DateFormula") = '') and (Format(Rec."Allow Posting To DateFormula") = '') then
+            exit;
+
+        AllowedFrom := Rec."Allow Posting From";
+        AllowedTo := Rec."Allow Posting To";
+        UserSetupManagement.GetDateRange(
+            AllowedFrom, AllowedTo,
+            Rec."Allow Posting From DateFormula", Rec."Allow Posting To DateFormula",
+            Rec.RecordId());
     end;
 
     /// <summary>
