@@ -204,6 +204,7 @@ page 98 "Purch. Cr. Memo Subform"
 
                     trigger OnValidate()
                     begin
+                        ForceTotalsCalculation();
                         DeltaUpdateTotals();
                     end;
                 }
@@ -214,6 +215,7 @@ page 98 "Purch. Cr. Memo Subform"
 
                     trigger OnValidate()
                     begin
+                        ForceTotalsCalculation();
                         DeltaUpdateTotals();
                     end;
                 }
