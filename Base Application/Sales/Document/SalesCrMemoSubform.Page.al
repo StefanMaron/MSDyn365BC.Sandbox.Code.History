@@ -215,6 +215,7 @@ page 96 "Sales Cr. Memo Subform"
 
                     trigger OnValidate()
                     begin
+                        ForceTotalsCalculation();
                         DeltaUpdateTotals();
                     end;
                 }
@@ -225,6 +226,7 @@ page 96 "Sales Cr. Memo Subform"
 
                     trigger OnValidate()
                     begin
+                        ForceTotalsCalculation();
                         DeltaUpdateTotals();
                     end;
                 }
