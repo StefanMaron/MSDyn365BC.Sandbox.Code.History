@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -190,6 +190,7 @@ page 96 "Sales Cr. Memo Subform"
 
                     trigger OnValidate()
                     begin
+                        ForceTotalsCalculation();
                         DeltaUpdateTotals();
                     end;
                 }
@@ -200,6 +201,7 @@ page 96 "Sales Cr. Memo Subform"
 
                     trigger OnValidate()
                     begin
+                        ForceTotalsCalculation();
                         DeltaUpdateTotals();
                     end;
                 }
