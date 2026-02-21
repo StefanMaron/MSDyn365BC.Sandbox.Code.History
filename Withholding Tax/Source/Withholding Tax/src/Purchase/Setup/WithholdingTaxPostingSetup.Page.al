@@ -38,11 +38,14 @@ page 6786 "Withholding Tax Posting Setup"
                 }
                 field("Wthldg. Tax Min. Inv. Amount"; Rec."Wthldg. Tax Min. Inv. Amount")
                 {
+                    AutoFormatType = 1;
+                    AutoFormatExpression = '';
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the threshold amount for Withholding Tax, below which there will not be any Withholding Tax deduction.';
                 }
                 field("Withholding Tax %"; Rec."Withholding Tax %")
                 {
+                    AutoFormatType = 0;
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the relevant Withholding Tax rate for the particular combination of Withholding Tax Business Posting group and Withholding Tax Product Posting group.';
                 }

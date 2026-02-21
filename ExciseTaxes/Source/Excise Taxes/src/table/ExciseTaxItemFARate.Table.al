@@ -53,6 +53,7 @@ table 7413 "Excise Tax Item/FA Rate"
         }
         field(4; "Excise Duty"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Excise Duty';
             DecimalPlaces = 2 : 5;
             MinValue = 0;

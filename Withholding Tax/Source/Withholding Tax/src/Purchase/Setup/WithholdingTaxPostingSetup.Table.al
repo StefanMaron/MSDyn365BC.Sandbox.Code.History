@@ -27,6 +27,7 @@ table 6786 "Withholding Tax Posting Setup"
         }
         field(3; "Withholding Tax %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Withholding Tax %';
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
@@ -100,6 +101,8 @@ table 6786 "Withholding Tax Posting Setup"
         }
         field(24; "Wthldg. Tax Min. Inv. Amount"; Decimal)
         {
+            AutoFormatType = 2;
+            AutoFormatExpression = '';
             Caption = 'Withholding Tax Minimum Invoice Amount';
         }
         field(25; "Wthldg. Tax Calculation Rule"; Option)

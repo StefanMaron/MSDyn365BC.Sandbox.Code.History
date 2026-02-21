@@ -58,12 +58,14 @@ table 6788 "Withholding Tax Entry"
         field(8; Base; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Base';
             Editable = false;
         }
         field(9; Amount; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Amount';
             Editable = false;
         }
@@ -132,24 +134,28 @@ table 6788 "Withholding Tax Entry"
         field(22; "Unrealized Amount"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Unrealized Amount';
             Editable = false;
         }
         field(23; "Unrealized Base"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Unrealized Base';
             Editable = false;
         }
         field(24; "Remaining Unrealized Amount"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Remaining Unrealized Amount';
             Editable = false;
         }
         field(25; "Remaining Unrealized Base"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Remaining Unrealized Base';
             Editable = false;
         }
@@ -191,31 +197,34 @@ table 6788 "Withholding Tax Entry"
         field(32; "Base (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Base (LCY)';
             Editable = false;
         }
         field(33; "Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Amount (LCY)';
             Editable = false;
         }
         field(34; "Unrealized Amount (LCY)"; Decimal)
         {
-            AutoFormatExpression = GetCurrencyCode();
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Unrealized Amount (LCY)';
             Editable = false;
         }
         field(35; "Unrealized Base (LCY)"; Decimal)
         {
-            AutoFormatExpression = GetCurrencyCode();
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Unrealized Base (LCY)';
             Editable = false;
         }
         field(36; "Withholding Tax %"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Withholding Tax %';
             DecimalPlaces = 0 : 5;
             Editable = false;
@@ -224,14 +233,14 @@ table 6788 "Withholding Tax Entry"
         }
         field(37; "Rem Unrealized Amount (LCY)"; Decimal)
         {
-            AutoFormatExpression = GetCurrencyCode();
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Rem Unrealized Amount (LCY)';
             Editable = false;
         }
         field(38; "Rem Unrealized Base (LCY)"; Decimal)
         {
-            AutoFormatExpression = GetCurrencyCode();
+            AutoFormatExpression = '';
             AutoFormatType = 1;
             Caption = 'Rem Unrealized Base (LCY)';
             Editable = false;
@@ -239,6 +248,7 @@ table 6788 "Withholding Tax Entry"
         field(39; "Withholding Tax Difference"; Decimal)
         {
             AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Withholding Tax Difference';
             Editable = false;
         }
@@ -301,6 +311,8 @@ table 6788 "Withholding Tax Entry"
         }
         field(57; "Payment Amount"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Payment Amount';
         }
         field(58; "Reversed by Entry No."; Integer)
@@ -319,23 +331,29 @@ table 6788 "Withholding Tax Entry"
         }
         field(61; "Rem Realized Amount"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Rem Realized Amount';
             Editable = false;
         }
         field(62; "Rem Realized Amount (LCY)"; Decimal)
         {
-            AutoFormatExpression = GetCurrencyCode();
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Rem Realized Amount (LCY)';
             Editable = false;
         }
         field(63; "Rem Realized Base"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Rem Realized Base';
             Editable = false;
         }
         field(64; "Rem Realized Base (LCY)"; Decimal)
         {
-            AutoFormatExpression = GetCurrencyCode();
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Rem Realized Base (LCY)';
             Editable = false;
         }
@@ -345,10 +363,14 @@ table 6788 "Withholding Tax Entry"
         }
         field(28101; "Pymt. Disc. Diff. Base"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Pymt. Disc. Diff. Base';
         }
         field(28102; "Pymt. Disc. Diff. Amount"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = Rec."Currency Code";
             Caption = 'Pymt. Disc. Diff. Amount';
         }
     }

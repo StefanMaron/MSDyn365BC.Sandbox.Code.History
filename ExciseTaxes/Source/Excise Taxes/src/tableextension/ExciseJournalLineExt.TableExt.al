@@ -54,6 +54,7 @@ tableextension 7413 "Excise Journal Line Ext" extends "Sust. Excise Jnl. Line"
         }
         field(7415; "Quantity for Excise Tax"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Quantity for Excise Tax';
             DecimalPlaces = 0 : 5;
             MinValue = 0;
@@ -66,6 +67,7 @@ tableextension 7413 "Excise Journal Line Ext" extends "Sust. Excise Jnl. Line"
         }
         field(7416; "Excise Duty"; Decimal)
         {
+            AutoFormatType = 0;
             Caption = 'Excise Duty';
             DecimalPlaces = 2 : 5;
             MinValue = 0;
@@ -82,6 +84,8 @@ tableextension 7413 "Excise Journal Line Ext" extends "Sust. Excise Jnl. Line"
         }
         field(7417; "Tax Amount"; Decimal)
         {
+            AutoFormatType = 1;
+            AutoFormatExpression = '';
             Caption = 'Tax Amount';
             DataClassification = CustomerContent;
             Editable = false;
