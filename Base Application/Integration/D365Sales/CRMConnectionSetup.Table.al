@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -39,6 +39,7 @@ table 5330 "CRM Connection Setup"
         field(2; "Server Address"; Text[250])
         {
             Caption = 'Dynamics 365 Sales URL';
+            ToolTip = 'Specifies the URL of the Dynamics 365 Sales server that hosts the Dynamics 365 Sales solution that you want to connect to.';
 
             trigger OnValidate()
             var
@@ -57,6 +58,7 @@ table 5330 "CRM Connection Setup"
         field(3; "User Name"; Text[250])
         {
             Caption = 'User Name';
+            ToolTip = 'Specifies the user name of a Dynamics 365 Sales account.';
             DataClassification = EndUserIdentifiableInformation;
 
             trigger OnValidate()
@@ -86,6 +88,7 @@ table 5330 "CRM Connection Setup"
         field(60; "Is Enabled"; Boolean)
         {
             Caption = 'Is Enabled';
+            ToolTip = 'Specifies if the connection to Dynamics 365 Sales is enabled. When you check this checkbox, you will be prompted to sign-in to Dataverse with an administrator user account. The account will be used one time to give consent to, install and configure applications and components that the integration requires.';
 
             trigger OnValidate()
             var
@@ -139,6 +142,7 @@ table 5330 "CRM Connection Setup"
         field(64; "Use Newest UI"; Boolean)
         {
             Caption = 'Use Newest UI';
+            ToolTip = 'Specifies that coupled Dynamics 365 Sales entities should open in Sales Hub.';
             DataClassification = SystemMetadata;
 
             trigger OnValidate()
@@ -158,6 +162,7 @@ table 5330 "CRM Connection Setup"
         field(66; "Is S.Order Integration Enabled"; Boolean)
         {
             Caption = 'Is S.Order Integration Enabled';
+            ToolTip = 'Specifies that it is possible for Dynamics 365 Sales users to submit sales orders that can then be viewed and imported in Dynamics 365.';
 
             trigger OnValidate()
             begin
@@ -179,6 +184,7 @@ table 5330 "CRM Connection Setup"
         field(67; "Is CRM Solution Installed"; Boolean)
         {
             Caption = 'Is CRM Solution Installed';
+            ToolTip = 'Specifies if the Integration Solution is installed and configured in Dynamics 365 Sales. You cannot change this setting.';
         }
 #if not CLEANSCHEMA26
         field(68; "Is Enabled For User"; Boolean)
@@ -192,6 +198,7 @@ table 5330 "CRM Connection Setup"
         field(69; "Dynamics NAV URL"; Text[250])
         {
             Caption = 'Dynamics NAV URL';
+            ToolTip = 'Specifies the URL to the Business Central web client. From records in Dynamics 365 Sales, such as an account or product, users can open a corresponding (coupled) record in Business Central. Set this field to the URL of the Business Central web client instance to use.';
 
             trigger OnValidate()
             begin
@@ -205,6 +212,7 @@ table 5330 "CRM Connection Setup"
         field(76; "Proxy Version"; Integer)
         {
             Caption = 'Proxy Version';
+            ToolTip = 'Specifies the Microsoft Dynamics 365 (CRM) software development kit version that is used to connect to Dynamics 365 Sales.';
             DataClassification = SystemMetadata;
 
             trigger OnValidate()
@@ -215,6 +223,7 @@ table 5330 "CRM Connection Setup"
         field(80; "Auto Create Sales Orders"; Boolean)
         {
             Caption = 'Automatically Create Sales Orders';
+            ToolTip = 'Specifies that sales orders will be created automatically from sales orders that are submitted in Dynamics 365 Sales.';
             DataClassification = SystemMetadata;
 
             trigger OnValidate()
@@ -230,6 +239,7 @@ table 5330 "CRM Connection Setup"
         field(81; "Auto Process Sales Quotes"; Boolean)
         {
             Caption = 'Automatically Process Sales Quotes';
+            ToolTip = 'Specifies that sales quotes will be automatically processed on sales quotes creation/revision/winning submitted in Dynamics 365 Sales quotes entities.';
             DataClassification = SystemMetadata;
 
             trigger OnValidate()
@@ -268,6 +278,7 @@ table 5330 "CRM Connection Setup"
         field(135; "Authentication Type"; Option)
         {
             Caption = 'Authentication Type';
+            ToolTip = 'Specifies the authentication type that will be used to authenticate with Dynamics 365 Sales';
             OptionCaption = 'OAuth 2.0,AD,IFD,OAuth';
             OptionMembers = Office365,AD,IFD,OAuth;
 
@@ -289,6 +300,7 @@ table 5330 "CRM Connection Setup"
         field(137; Domain; Text[250])
         {
             Caption = 'Domain';
+            ToolTip = 'Specifies the domain name of your Dynamics 365 Sales deployment.';
             DataClassification = OrganizationIdentifiableInformation;
             Editable = false;
         }
@@ -303,6 +315,7 @@ table 5330 "CRM Connection Setup"
         field(140; "Item Availability Enabled"; Boolean)
         {
             Caption = 'Item Availability Enabled';
+            ToolTip = 'Specifies that item availability job queue entry will be scheduled.';
 
             trigger OnValidate()
             var
@@ -318,6 +331,7 @@ table 5330 "CRM Connection Setup"
         field(141; "Bidirectional Sales Order Int."; Boolean)
         {
             Caption = 'Bidirectional Sales Order Int.';
+            ToolTip = 'Specifies that it is possible to synchronize Sales Order bidirectionally. This feature will also enable Archiving Orders.';
 
             trigger OnValidate()
             var
@@ -338,6 +352,7 @@ table 5330 "CRM Connection Setup"
         field(151; "Unit Group Mapping Enabled"; Boolean)
         {
             Caption = 'Unit Group Mapping Enabled';
+            ToolTip = 'Specifies that unit group mapping is enabled.';
             InitValue = true;
 
             trigger OnValidate()
