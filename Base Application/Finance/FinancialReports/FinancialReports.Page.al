@@ -177,6 +177,8 @@ page 108 "Financial Reports"
                 ToolTip = 'View the selected financial report with data.';
                 AboutTitle = 'View Financial Report';
                 AboutText = 'This action will open the financial report in a sandbox like environment, where all changes are saved to the user and not the report';
+                ShortCutKey = 'Return';
+
                 trigger OnAction()
                 var
                     AccScheduleOverview: Page "Acc. Schedule Overview";
@@ -191,7 +193,6 @@ page 108 "Financial Reports"
                 ApplicationArea = Basic, Suite;
                 Caption = 'Edit Row Definition';
                 Image = Edit;
-                ShortCutKey = 'Return';
                 ToolTip = 'Edit the row definition of the selected financial report.';
 
                 trigger OnAction()
