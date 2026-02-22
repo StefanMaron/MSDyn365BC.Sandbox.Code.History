@@ -2,7 +2,7 @@
   "id": "2ac317ef-11a5-4753-92f4-31c84b520c7b",
   "name": "Subscription Billing Test",
   "publisher": "Microsoft",
-  "version": "28.0.46489.0",
+  "version": "28.0.46503.0",
   "brief": "Test for Subscription Billing",
   "description": "The app enables the selling of recurring subscriptions and provides accurate billing for a wide range of pricing models.",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
@@ -48,12 +48,24 @@
   "application": "28.0.0.0",
   "idRanges": [
     {
-      "from": 139684,
+      "from": 139685,
       "to": 139694
     },
     {
-      "from": 139875,
-      "to": 139898
+      "from": 139884,
+      "to": 139885
+    },
+    {
+      "from": 139887,
+      "to": 139889
+    },
+    {
+      "from": 139892,
+      "to": 139893
+    },
+    {
+      "from": 139895,
+      "to": 139895
     },
     {
       "from": 139912,
@@ -61,7 +73,7 @@
     },
     {
       "from": 148152,
-      "to": 148161
+      "to": 148160
     },
     {
       "from": 148455,
