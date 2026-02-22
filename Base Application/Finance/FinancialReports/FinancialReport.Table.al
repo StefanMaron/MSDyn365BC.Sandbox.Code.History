@@ -349,10 +349,6 @@ table 88 "Financial Report"
             Clustered = true;
         }
     }
-    fieldgroups
-    {
-        fieldgroup(Brick; CategoryCode, Description, Status, Name, "Last Run by User", "Internal Description") { }
-    }
 
     var
         GLSetup: Record "General Ledger Setup";
