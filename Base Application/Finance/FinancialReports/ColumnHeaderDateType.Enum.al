@@ -4,7 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.FinancialReports;
 
-enum 5002000 ColumnHeaderDateType
+enum 764 ColumnHeaderDateType
 {
     value(0; Blank)
     {
