@@ -1,0 +1,10 @@
+{
+  "id": "9d71307c-b6e4-4a16-b5ca-6d1314bd3ee2",
+  "name": "BuildTools",
+  "publisher": "Microsoft",
+  "version": "$(app_currentVersion)",
+  "platform": "$(app_platformVersion)",
+  "application": "$(app_minimumVersion)",
+  "target": "Cloud",
+  "showMyCode": true
+}
