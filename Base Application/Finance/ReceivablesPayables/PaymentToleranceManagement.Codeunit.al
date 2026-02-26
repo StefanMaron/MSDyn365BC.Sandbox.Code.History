@@ -2114,11 +2114,15 @@ codeunit 426 "Payment Tolerance Management"
                                 NewCustLedgEntry."Posting Date");
                         AppliedAmount := AppliedAmount + AppliedCustLedgEntry."Remaining Pmt. Disc. Possible";
                         AmountToApply := AmountToApply + AppliedCustLedgEntry."Remaining Pmt. Disc. Possible";
-                    end else begin
-                        NewCustLedgEntry.Amount += AppliedCustLedgEntry."Remaining Pmt. Disc. Possible";
-                        UpdateGenJournalLineAmount(NewCustLedgEntry.Amount);
-                        AdjustRemainingAmount(NewCustLedgEntry, AppliedCustLedgEntry."Remaining Amount");
-                    end;
+                    end else
+                        if (AppliedCustLedgEntry."Remaining Pmt. Disc. Possible" - AppliedCustLedgEntry."Remaining Amount") <> NewCustLedgEntry.Amount then
+                            if NewCustLedgEntry.Amount < (AppliedCustLedgEntry."Remaining Pmt. Disc. Possible" - AppliedCustLedgEntry."Remaining Amount") then begin
+                                NewCustLedgEntry.Amount += AppliedCustLedgEntry."Remaining Pmt. Disc. Possible";
+                                UpdateGenJournalLineAmount(NewCustLedgEntry.Amount);
+                                AdjustRemainingAmount(NewCustLedgEntry, AppliedCustLedgEntry."Remaining Amount");
+                                if not SuppressCommit then
+                                    Commit();
+                            end;
                 end else begin
                     DelCustPmtTolAcc(NewCustLedgEntry, GenJnlLineApplID);
                     exit(false);
@@ -2282,10 +2286,14 @@ codeunit 426 "Payment Tolerance Management"
         if (GenJnlLineGlobal."Journal Template Name" = '') or (GenJnlLineGlobal."Journal Batch Name" = '') then
             exit;
 
-        GenJnlLine.Get(
+        if not GenJnlLine.Get(
             GenJnlLineGlobal."Journal Template Name",
             GenJnlLineGlobal."Journal Batch Name",
-            GenJnlLineGlobal."Line No.");
+            GenJnlLineGlobal."Line No.") then
+            exit;
+
+        if (GenJnlLine."Applies-to ID" = '') then
+            exit;
 
         GenJnlLine.Amount := NewAmount;
 
