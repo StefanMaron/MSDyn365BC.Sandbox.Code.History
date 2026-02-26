@@ -1604,3 +1604,4 @@ page 6050 "Service Contract"
     begin
     end;
 }
+
