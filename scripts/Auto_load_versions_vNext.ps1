@@ -199,10 +199,10 @@ $Versions | Sort-Object -Property Country, Version | % {
 
             Get-ChildItem -Recurse -Filter "*.xlf" | Remove-Item
 
-            "$($country)-$($version.ToString())" > version.txt
+            "$($country)-$($version.ToString())-vNext" > version.txt
 
             git add -A | out-null
-            git commit -a -m "$($country)-$($version.ToString())" | out-null
+            git commit -a -m "$($country)-$($version.ToString())-vNext" | out-null
 
             # Get the hash of the new commit
             $NewCommitHash = git rev-parse HEAD
@@ -289,10 +289,10 @@ $Versions | Sort-Object -Property Country, Version | % {
 
             Get-ChildItem -Recurse -Filter "*.xlf" | Remove-Item
 
-            "$($country)-$($version.ToString())" > version.txt
+            "$($country)-$($version.ToString())-vNext" > version.txt
 
             git add -A | out-null
-            git commit -a -m "$($country)-$($version.ToString())" | out-null
+            git commit -a -m "$($country)-$($version.ToString())-vNext" | out-null
 
             # Pull with rebase to handle concurrent updates (e.g., late hotfixes)
             Write-Host "Pulling with rebase from origin..."
@@ -313,7 +313,7 @@ $Versions | Sort-Object -Property Country, Version | % {
         
         Flush-ContainerHelperCache -keepDays 0 -ErrorAction SilentlyContinue
 
-        Write-Host "$($country)-$($version.ToString())"
+        Write-Host "$($country)-$($version.ToString())-vNext"
     }
     else {
         Write-Host "###############################################"
