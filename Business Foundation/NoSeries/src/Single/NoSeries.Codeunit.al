@@ -162,6 +162,7 @@ codeunit 310 "No. Series"
     /// <summary>
     /// Verifies that the No. Series allows using manual numbers.
     /// </summary>
+    /// <remark>This function allows manual numbers for blank No. Series Codes.</remark>
     /// <param name="NoSeriesCode">Code for the No. Series.</param>
     procedure TestManual(NoSeriesCode: Code[20])
     var
@@ -173,6 +174,7 @@ codeunit 310 "No. Series"
     /// <summary>
     /// Verifies that the No. Series allows using manual numbers and throws an error for the document no. if it does not.
     /// </summary>
+    /// <remark>This function allows manual numbers for blank No. Series Codes.</remark>
     /// <param name="NoSeriesCode">Code for the No. Series.</param>
     /// <param name="DocumentNo">Document No. to be shown in the error message.</param>
     procedure TestManual(NoSeriesCode: Code[20]; DocumentNo: Code[20])
@@ -185,6 +187,7 @@ codeunit 310 "No. Series"
     /// <summary>
     /// Determines whether the No. Series allows using manual numbers.
     /// </summary>
+    /// <remark>This function allows manual numbers for blank No. Series Codes.</remark>
     /// <param name="NoSeriesCode">Code for the No. Series.</param>
     /// <returns>True if the No. Series allows manual numbers, false otherwise.</returns>
     procedure IsManual(NoSeriesCode: Code[20]): Boolean
