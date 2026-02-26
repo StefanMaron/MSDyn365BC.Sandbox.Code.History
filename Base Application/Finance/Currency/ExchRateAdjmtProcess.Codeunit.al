@@ -315,7 +315,6 @@ codeunit 699 "Exch. Rate Adjmt. Process"
         VATEntryNoTotal := VATEntry.Count();
         if VATEntryNoTotal = 0 then
             exit;
-        SetVATEntryFilters(VATEntry, ExchRateAdjmtParameters."Start Date", ExchRateAdjmtParameters."End Date");
         if VATPostingSetup.FindSet() then
             repeat
                 VATEntryNo := VATEntryNo + 1;
@@ -498,6 +497,7 @@ codeunit 699 "Exch. Rate Adjmt. Process"
         TaxJurisdiction: Record "Tax Jurisdiction";
         VATEntry: Record "VAT Entry";
     begin
+        SetVATEntryFilters(VATEntry, ExchRateAdjmtParameters."Start Date", ExchRateAdjmtParameters."End Date");
         VATEntry.SetRange("VAT Bus. Posting Group", VATPostingSetup."VAT Bus. Posting Group");
         VATEntry.SetRange("VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
 
@@ -1167,7 +1167,7 @@ codeunit 699 "Exch. Rate Adjmt. Process"
                 if ExchRateAdjmtParameters."Adjust Per Entry" then
                     TempExchRateAdjmtBuffer2.SetRange("Entry No.", TempExchRateAdjmtBuffer."Entry No.");
 
-                Found := TempExchRateAdjmtBuffer2.FindFirst();
+                                Found := TempExchRateAdjmtBuffer2.FindFirst();
 
                 if not Found then begin
                     TempExchRateAdjmtBuffer2.BuildPrimaryKey();
