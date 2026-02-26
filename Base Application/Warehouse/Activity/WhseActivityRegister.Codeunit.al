@@ -797,6 +797,7 @@ codeunit 7307 "Whse.-Activity-Register"
           ProdCompLine."Qty. Picked" = ProdCompLine."Expected Quantity";
         OnBeforeProdCompLineModify(ProdCompLine, WhseActivityLine);
         ProdCompLine.Modify();
+        UpdateCompletelyPickedProdOrderComponent(WhseActivityLine);
         OnAfterProdCompLineModify(ProdCompLine);
     end;
 
@@ -1153,6 +1154,7 @@ codeunit 7307 "Whse.-Activity-Register"
                 repeat
                     // Per Lot/SN
                     TempWhseActivLine.SetRange("Item No.", TempWhseActivLine."Item No.");
+                    TempWhseActivLine.SetRange("Variant Code", TempWhseActivLine."Variant Code");
                     QtyAvailToInsertBase := CalcQtyAvailToInsertBase(TempWhseActivLine);
                     TempWhseActivLine.SetTrackingFilterFromWhseActivityLine(TempWhseActivLine);
                     OnCheckWhseItemTrkgLineOnBeforeCalcQtyToRegisterBase(TempWhseActivLine, WhseActivLine, QtyAvailToInsertBase);
@@ -1180,6 +1182,7 @@ codeunit 7307 "Whse.-Activity-Register"
                     // Clear filters, Lot/SN
                     TempWhseActivLine.ClearTrackingFilter();
                     TempWhseActivLine.SetRange("Item No.");
+                    TempWhseActivLine.SetRange("Variant Code");
                     OnCheckWhseItemTrkgLineOnAfterClearFilters(TempWhseActivLine, WhseActivLine);
                 until TempWhseActivLine.Next() = 0; // Per Lot/SN
                                                     // Clear filters, document
@@ -1780,7 +1783,8 @@ codeunit 7307 "Whse.-Activity-Register"
                                                      (ReservEntry."Source Ref. No." = WhseActivLine."Source Subline No."))) and
                                                not ReservEntry.Positive
                                             then
-                        QtyBasePicked := QtyBasePicked + Abs(ReservEntry."Quantity (Base)");
+                        if HasSourceLineActuallyBeenPicked(ReservEntry) then
+                            QtyBasePicked := QtyBasePicked + Abs(ReservEntry."Quantity (Base)");
                 end else
                     if not ((ReservEntry."Source Type" = WhseActivLine."Source Type") and
                             (ReservEntry."Source Subtype" = WhseActivLine."Source Subtype") and
@@ -1789,12 +1793,32 @@ codeunit 7307 "Whse.-Activity-Register"
                              (ReservEntry."Source Ref. No." = WhseActivLine."Source Subline No."))) and
                        not ReservEntry.Positive
                     then
-                        QtyBasePicked := QtyBasePicked + Abs(ReservEntry."Quantity (Base)");
+                        if HasSourceLineActuallyBeenPicked(ReservEntry) then
+                            QtyBasePicked := QtyBasePicked + Abs(ReservEntry."Quantity (Base)");
             until ReservEntry.Next() = 0;
 
         CalcQtyBasePicked(WhseActivLine, WhseItemTrackingSetup, QtyBasePicked);
 
         exit(QtyBasePicked);
+    end;
+
+    local procedure HasSourceLineActuallyBeenPicked(ReservEntry: Record "Reservation Entry"): Boolean
+    var
+        WarehouseShipmentLine: Record "Warehouse Shipment Line";
+        WarehouseActivityLine: Record "Warehouse Activity Line";
+    begin
+        WarehouseShipmentLine.SetSourceFilter(ReservEntry."Source Type", ReservEntry."Source Subtype", ReservEntry."Source ID", ReservEntry."Source Ref. No.", false);
+        WarehouseShipmentLine.SetFilter("Qty. Picked (Base)", '>0');
+        if not WarehouseShipmentLine.IsEmpty() then
+            exit(true);
+
+        WarehouseActivityLine.SetSourceFilter(ReservEntry."Source Type", ReservEntry."Source Subtype", ReservEntry."Source ID", ReservEntry."Source Ref. No.", -1, true);
+        WarehouseActivityLine.SetRange("Activity Type", WarehouseActivityLine."Activity Type"::Pick);
+        WarehouseActivityLine.SetFilter("Action Type", '%1|%2', WarehouseActivityLine."Action Type"::Take, WarehouseActivityLine."Action Type"::" ");
+        if not WarehouseActivityLine.IsEmpty() then
+            exit(true);
+
+        exit(false);
     end;
 
     local procedure CalcQtyBasePicked(WhseActivLine: Record "Warehouse Activity Line"; WhseItemTrackingSetup: Record "Item Tracking Setup"; var QtyBasePicked: Decimal)
@@ -2382,6 +2406,27 @@ codeunit 7307 "Whse.-Activity-Register"
         QtyToPick += ReservationEntry."Quantity (Base)"
     end;
 
+    local procedure UpdateCompletelyPickedProdOrderComponent(WarehouseActivityLine: Record "Warehouse Activity Line")
+    var
+        ProdOrderComponent: Record "Prod. Order Component";
+        Item: Record Item;
+    begin
+        ProdOrderComponent.SetRange("Prod. Order No.", WarehouseActivityLine."Source No.");
+        ProdOrderComponent.SetRange(Status, ProdOrderComponent.Status::Released);
+        ProdOrderComponent.SetRange("Completely Picked", false);
+        ProdOrderComponent.SetLoadFields("Item No.", "Flushing Method", "Completely Picked");
+        if ProdOrderComponent.FindSet() then
+            repeat
+                ProdOrderComponent.CalcFields("Pick Qty.");
+                Item.SetLoadFields("No.", Type);
+                if Item.Get(ProdOrderComponent."Item No.") then
+                    if ((ProdOrderComponent."Flushing Method" = ProdOrderComponent."Flushing Method"::Backward) or Item.IsNonInventoriableType())
+                        and (ProdOrderComponent."Pick Qty." = 0) then begin
+                        ProdOrderComponent."Completely Picked" := true;
+                        ProdOrderComponent.Modify();
+                    end;
+            until ProdOrderComponent.Next() = 0;
+    end;
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCode(var WarehouseActivityLine: Record "Warehouse Activity Line")
