@@ -1,84 +1,307 @@
-name: Test Blob Storage Access
+name: Test Download Speed - Range Requests vs Full Download
 
 on:
   workflow_dispatch:
 
 jobs:
-  test-download-speed:
+  benchmark-download:
     runs-on: ubuntu-latest
     steps:
-      - name: Test CDN vs Blob download speed
+      - name: Install dependencies
+        shell: bash
+        run: |
+          sudo apt-get update && sudo apt-get install -y aria2 p7zip-full
+
+      - name: Install bccontainerhelper
         shell: pwsh
         run: |
           Install-Module bccontainerhelper -force -AllowPrerelease
           Import-Module bccontainerhelper
 
-          $cdnUrl = Get-BCArtifactUrl -select Latest -Type Sandbox -country de
-          Write-Host "CDN URL: $cdnUrl"
+      - name: Get artifact URL
+        id: url
+        shell: pwsh
+        run: |
+          $url = Get-BCArtifactUrl -select Latest -Type Sandbox -country de
+          Write-Host "Artifact URL: $url"
+          "url=$url" >> $env:GITHUB_OUTPUT
 
-          # Derive blob URL
-          $blobUrl = $cdnUrl -replace 'bcartifacts-[^/]+\.b02\.azurefd\.net', 'bcartifacts.blob.core.windows.net'
-          Write-Host "Blob URL: $blobUrl"
+          # HEAD request to get total size and verify Range support
+          $response = Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing
+          $totalSize = $response.Headers['Content-Length']
+          $acceptRanges = $response.Headers['Accept-Ranges']
+          Write-Host "Total size: $([math]::Round([long]$totalSize / 1MB)) MB"
+          Write-Host "Accept-Ranges: $acceptRanges"
+          "totalSize=$totalSize" >> $env:GITHUB_OUTPUT
 
-          # Test 1: Check if blob URL is accessible
-          Write-Host ""
-          Write-Host "=== Testing blob URL accessibility ==="
-          try {
-              $response = Invoke-WebRequest -Uri $blobUrl -Method Head -TimeoutSec 10 -UseBasicParsing
-              Write-Host "Blob HEAD: $($response.StatusCode) - Content-Length: $($response.Headers['Content-Length'])"
-              $blobAccessible = $true
-          } catch {
-              Write-Host "Blob HEAD failed: $($_.Exception.Message)"
-              $blobAccessible = $false
-          }
+      - name: "Benchmark 1: Full download via Download-Artifacts"
+        shell: pwsh
+        run: |
+          Import-Module bccontainerhelper
+          $url = "${{ steps.url.outputs.url }}"
 
-          # Test 2: Time CDN download
-          Write-Host ""
-          Write-Host "=== Timing CDN download ==="
-          Flush-ContainerHelperCache -keepDays 0
+          Write-Host "=== Full download via Download-Artifacts ==="
+          Write-Host "URL: $url"
+
+          Flush-ContainerHelperCache -keepDays 0 -ErrorAction SilentlyContinue
+
           $sw = [System.Diagnostics.Stopwatch]::StartNew()
-          $cdnPath = Download-Artifacts -artifactUrl $cdnUrl
+          $path = Download-Artifacts -artifactUrl $url
           $sw.Stop()
-          $cdnTime = $sw.Elapsed
-          Write-Host "CDN download completed in $($cdnTime.ToString())"
-          Write-Host "CDN artifact path: $cdnPath"
-          Write-Host "CDN artifact size: $((Get-ChildItem -Path $cdnPath -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB) MB"
 
-          # Test 3: Time blob download (if accessible)
-          if ($blobAccessible) {
-              Write-Host ""
-              Write-Host "=== Timing Blob download ==="
-              Flush-ContainerHelperCache -keepDays 0
-              $sw = [System.Diagnostics.Stopwatch]::StartNew()
-              $blobPath = Download-Artifacts -artifactUrl $blobUrl
-              $sw.Stop()
-              $blobTime = $sw.Elapsed
-              Write-Host "Blob download completed in $($blobTime.ToString())"
-              Write-Host "Blob artifact path: $blobPath"
-              Write-Host "Blob artifact size: $((Get-ChildItem -Path $blobPath -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB) MB"
+          Write-Host "Time: $($sw.Elapsed.ToString())"
+          Write-Host "Path: $path"
 
-              Write-Host ""
-              Write-Host "=== Summary ==="
-              Write-Host "CDN:  $($cdnTime.ToString())"
-              Write-Host "Blob: $($blobTime.ToString())"
-              Write-Host "Speedup: $([math]::Round($cdnTime.TotalSeconds / $blobTime.TotalSeconds, 1))x"
-          } else {
-              Write-Host ""
-              Write-Host "=== Summary ==="
-              Write-Host "CDN:  $($cdnTime.ToString())"
-              Write-Host "Blob: NOT ACCESSIBLE from GitHub Actions runner"
+          $totalSize = (Get-ChildItem -Path $path -Recurse | Measure-Object -Property Length -Sum).Sum
+          Write-Host "Extracted size: $([math]::Round($totalSize / 1MB)) MB"
+
+          # Check Applications.DE folder
+          $appsDE = Join-Path $path "Applications.DE"
+          if (Test-Path $appsDE) {
+              $appsSize = (Get-ChildItem -Path $appsDE -Recurse | Measure-Object -Property Length -Sum).Sum
+              Write-Host "Applications.DE size: $([math]::Round($appsSize / 1MB)) MB"
+              $sourceZips = Get-ChildItem -Path $appsDE -Recurse -Filter "*.Source.zip"
+              Write-Host "Source ZIPs: $($sourceZips.Count) files, $([math]::Round(($sourceZips | Measure-Object -Property Length -Sum).Sum / 1MB)) MB"
           }
 
-          # Test 4: Also test insider blob URL
+          Flush-ContainerHelperCache -keepDays 0 -ErrorAction SilentlyContinue
+
+      - name: "Benchmark 2: Range request - download only Applications.DE"
+        shell: pwsh
+        run: |
+          $url = "${{ steps.url.outputs.url }}"
+          $totalSize = [long]"${{ steps.url.outputs.totalSize }}"
+          $workDir = "/tmp/range-test"
+          New-Item -ItemType Directory -Path $workDir -Force | Out-Null
+
+          Write-Host "=== Range request - download only Applications.DE ==="
+          Write-Host "URL: $url"
+          Write-Host "Total archive size: $([math]::Round($totalSize / 1MB)) MB"
+
+          $sw = [System.Diagnostics.Stopwatch]::StartNew()
+
+          # Step 1: Download last 64KB to read ZIP central directory
           Write-Host ""
-          Write-Host "=== Testing insider blob URL ==="
-          $insiderCdnUrl = Get-BCArtifactUrl -select Latest -Type Sandbox -country de -accept_insiderEula -storageAccount bcinsider
-          $insiderBlobUrl = $insiderCdnUrl -replace 'bcinsider-[^/]+\.b02\.azurefd\.net', 'bcinsider.blob.core.windows.net'
-          Write-Host "Insider CDN URL: $insiderCdnUrl"
-          Write-Host "Insider Blob URL: $insiderBlobUrl"
-          try {
-              $response = Invoke-WebRequest -Uri $insiderBlobUrl -Method Head -TimeoutSec 10 -UseBasicParsing
-              Write-Host "Insider Blob HEAD: $($response.StatusCode)"
-          } catch {
-              Write-Host "Insider Blob HEAD failed: $($_.Exception.Message)"
+          Write-Host "--- Step 1: Download ZIP central directory (last 64KB) ---"
+          $tailSize = 65536
+          $tailStart = $totalSize - $tailSize
+          $tailFile = Join-Path $workDir "tail.bin"
+
+          $swStep = [System.Diagnostics.Stopwatch]::StartNew()
+          $handler = New-Object System.Net.Http.HttpClientHandler
+          $client = New-Object System.Net.Http.HttpClient($handler)
+          $client.Timeout = [TimeSpan]::FromSeconds(30)
+          $request = New-Object System.Net.Http.HttpRequestMessage([System.Net.Http.HttpMethod]::Get, $url)
+          $request.Headers.Range = New-Object System.Net.Http.Headers.RangeHeaderValue($tailStart, $totalSize - 1)
+          $response = $client.SendAsync($request).GetAwaiter().GetResult()
+          Write-Host "Range response status: $($response.StatusCode)"
+          $bytes = $response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult()
+          [System.IO.File]::WriteAllBytes($tailFile, $bytes)
+          $swStep.Stop()
+          Write-Host "Downloaded $($bytes.Length) bytes in $($swStep.Elapsed.TotalSeconds.ToString('F2'))s"
+
+          # Step 2: Parse ZIP End of Central Directory
+          Write-Host ""
+          Write-Host "--- Step 2: Parse ZIP central directory ---"
+          $tailBytes = [System.IO.File]::ReadAllBytes($tailFile)
+
+          # Find EOCD signature (0x06054b50) scanning backwards
+          $eocdPos = -1
+          for ($i = $tailBytes.Length - 22; $i -ge 0; $i--) {
+              if ($tailBytes[$i] -eq 0x50 -and $tailBytes[$i+1] -eq 0x4B -and
+                  $tailBytes[$i+2] -eq 0x05 -and $tailBytes[$i+3] -eq 0x06) {
+                  $eocdPos = $i
+                  break
+              }
           }
+
+          if ($eocdPos -eq -1) {
+              Write-Host "##[error]Could not find EOCD signature"
+              exit 1
+          }
+
+          # Parse EOCD
+          $cdSize = [BitConverter]::ToUInt32($tailBytes, $eocdPos + 12)
+          $cdOffset = [BitConverter]::ToUInt32($tailBytes, $eocdPos + 16)
+          $entryCount = [BitConverter]::ToUInt16($tailBytes, $eocdPos + 10)
+          Write-Host "Central directory: $entryCount entries, $([math]::Round($cdSize / 1KB)) KB at offset $cdOffset"
+
+          # Check if we have the full central directory in our tail download
+          $cdStartInTail = $tailBytes.Length - ($totalSize - $cdOffset)
+          if ($cdStartInTail -lt 0) {
+              Write-Host "Central directory not fully in tail, downloading more..."
+              $cdFile = Join-Path $workDir "cd.bin"
+              $request2 = New-Object System.Net.Http.HttpRequestMessage([System.Net.Http.HttpMethod]::Get, $url)
+              $request2.Headers.Range = New-Object System.Net.Http.Headers.RangeHeaderValue($cdOffset, $totalSize - 1)
+              $response2 = $client.SendAsync($request2).GetAwaiter().GetResult()
+              $tailBytes = $response2.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult()
+              $cdStartInTail = 0
+          }
+
+          # Parse central directory entries
+          $entries = @()
+          $pos = [int]$cdStartInTail
+          for ($e = 0; $e -lt $entryCount; $e++) {
+              # Verify signature 0x02014b50
+              if ($tailBytes[$pos] -ne 0x50 -or $tailBytes[$pos+1] -ne 0x4B -or
+                  $tailBytes[$pos+2] -ne 0x01 -or $tailBytes[$pos+3] -ne 0x02) {
+                  Write-Host "##[warning]Invalid CD entry signature at position $pos"
+                  break
+              }
+
+              $compSize = [BitConverter]::ToUInt32($tailBytes, $pos + 20)
+              $uncompSize = [BitConverter]::ToUInt32($tailBytes, $pos + 24)
+              $nameLen = [BitConverter]::ToUInt16($tailBytes, $pos + 28)
+              $extraLen = [BitConverter]::ToUInt16($tailBytes, $pos + 30)
+              $commentLen = [BitConverter]::ToUInt16($tailBytes, $pos + 32)
+              $localHeaderOffset = [BitConverter]::ToUInt32($tailBytes, $pos + 42)
+              $name = [System.Text.Encoding]::UTF8.GetString($tailBytes, $pos + 46, $nameLen)
+
+              $entries += [PSCustomObject]@{
+                  Name = $name
+                  CompressedSize = $compSize
+                  UncompressedSize = $uncompSize
+                  Offset = $localHeaderOffset
+              }
+
+              $pos += 46 + $nameLen + $extraLen + $commentLen
+          }
+
+          Write-Host "Parsed $($entries.Count) entries"
+
+          # Step 3: Find Applications.DE entries and their byte range
+          Write-Host ""
+          Write-Host "--- Step 3: Find Applications.DE byte range ---"
+          $appEntries = $entries | Where-Object { $_.Name -like "Applications.DE/*" -and $_.CompressedSize -gt 0 }
+          Write-Host "Applications.DE entries: $($appEntries.Count) files"
+
+          if ($appEntries.Count -eq 0) {
+              Write-Host "##[error]No Applications.DE entries found"
+              exit 1
+          }
+
+          # Find the byte range we need
+          # Each local file header is 30 bytes + filename length + extra field length
+          # We need from the first entry's offset to past the last entry's data
+          $firstOffset = ($appEntries | Sort-Object Offset | Select-Object -First 1).Offset
+
+          # For the end, we need the last entry's offset + header + compressed data
+          $lastEntry = $appEntries | Sort-Object { $_.Offset + $_.CompressedSize } | Select-Object -Last 1
+          # Local file header: 30 + name length + extra length (estimate extra as 0, add padding)
+          $lastEntryEnd = $lastEntry.Offset + 30 + $lastEntry.Name.Length + 256 + $lastEntry.CompressedSize
+
+          # Also check for entries between our app entries (they should be contiguous)
+          $allInRange = $entries | Where-Object { $_.Offset -ge $firstOffset -and $_.Offset -le $lastEntry.Offset } | Sort-Object Offset
+          $rangeEnd = 0
+          foreach ($entry in $allInRange) {
+              $entryEnd = $entry.Offset + 30 + $entry.Name.Length + 256 + $entry.CompressedSize
+              if ($entryEnd -gt $rangeEnd) { $rangeEnd = $entryEnd }
+          }
+
+          $downloadSize = $rangeEnd - $firstOffset
+          Write-Host "Byte range: $firstOffset - $rangeEnd"
+          Write-Host "Range size: $([math]::Round($downloadSize / 1MB)) MB"
+          Write-Host "Savings vs full: $([math]::Round((1 - $downloadSize / $totalSize) * 100))%"
+
+          $appTotalCompressed = ($appEntries | Measure-Object -Property CompressedSize -Sum).Sum
+          $appTotalUncompressed = ($appEntries | Measure-Object -Property UncompressedSize -Sum).Sum
+          Write-Host "Applications.DE compressed: $([math]::Round($appTotalCompressed / 1MB)) MB"
+          Write-Host "Applications.DE uncompressed: $([math]::Round($appTotalUncompressed / 1MB)) MB"
+
+          # Step 4: Download just the Applications.DE range using aria2c
+          Write-Host ""
+          Write-Host "--- Step 4: Download Applications.DE range via aria2c (16 connections) ---"
+          $rangeFile = Join-Path $workDir "apps_range.bin"
+
+          $swStep = [System.Diagnostics.Stopwatch]::StartNew()
+          # aria2c doesn't support byte ranges directly, use curl for the range download
+          # But we CAN use aria2c with a specific byte range via --header
+          & curl -s -o $rangeFile -H "Range: bytes=$firstOffset-$($rangeEnd - 1)" $url
+          $swStep.Stop()
+          $rangeFileSize = (Get-Item $rangeFile).Length
+          Write-Host "Downloaded $([math]::Round($rangeFileSize / 1MB)) MB in $($swStep.Elapsed.TotalSeconds.ToString('F2'))s"
+
+          # Step 5: Extract the source ZIPs from the range
+          Write-Host ""
+          Write-Host "--- Step 5: Extract source ZIPs ---"
+          $extractDir = Join-Path $workDir "extracted"
+          New-Item -ItemType Directory -Path $extractDir -Force | Out-Null
+
+          $swStep = [System.Diagnostics.Stopwatch]::StartNew()
+          $sourceZipCount = 0
+          $sourceZipTotalSize = 0
+
+          foreach ($entry in $appEntries) {
+              if ($entry.Name -notlike "*.Source.zip" -and $entry.Name -notlike "*..Source.zip") { continue }
+
+              # Calculate position in our range file
+              $posInRange = $entry.Offset - $firstOffset
+
+              # Read local file header to get actual extra field length
+              $rangeBytes = [System.IO.File]::ReadAllBytes($rangeFile)
+              if ($posInRange + 30 -gt $rangeBytes.Length) { continue }
+
+              $localNameLen = [BitConverter]::ToUInt16($rangeBytes, $posInRange + 26)
+              $localExtraLen = [BitConverter]::ToUInt16($rangeBytes, $posInRange + 28)
+              $dataStart = $posInRange + 30 + $localNameLen + $localExtraLen
+
+              if ($dataStart + $entry.CompressedSize -gt $rangeBytes.Length) {
+                  Write-Host "##[warning]Entry $($entry.Name) extends beyond range, skipping"
+                  continue
+              }
+
+              # Extract the compressed data
+              $compMethod = [BitConverter]::ToUInt16($rangeBytes, $posInRange + 8)
+
+              $outName = [System.IO.Path]::GetFileName($entry.Name)
+              $outPath = Join-Path $extractDir $outName
+
+              if ($compMethod -eq 0) {
+                  # Stored (no compression)
+                  $fileData = New-Object byte[] $entry.CompressedSize
+                  [Array]::Copy($rangeBytes, $dataStart, $fileData, 0, $entry.CompressedSize)
+                  [System.IO.File]::WriteAllBytes($outPath, $fileData)
+              } else {
+                  # Deflated - need to decompress
+                  $compData = New-Object byte[] $entry.CompressedSize
+                  [Array]::Copy($rangeBytes, $dataStart, $compData, 0, $entry.CompressedSize)
+
+                  $memStream = New-Object System.IO.MemoryStream(,$compData)
+                  $deflateStream = New-Object System.IO.Compression.DeflateStream($memStream, [System.IO.Compression.CompressionMode]::Decompress)
+                  $outStream = [System.IO.File]::Create($outPath)
+                  $deflateStream.CopyTo($outStream)
+                  $outStream.Close()
+                  $deflateStream.Close()
+                  $memStream.Close()
+              }
+
+              $sourceZipCount++
+              $sourceZipTotalSize += (Get-Item $outPath).Length
+              Write-Host "  Extracted: $outName ($([math]::Round((Get-Item $outPath).Length / 1MB, 1)) MB)"
+          }
+
+          $swStep.Stop()
+          Write-Host "Extracted $sourceZipCount source ZIPs ($([math]::Round($sourceZipTotalSize / 1MB)) MB) in $($swStep.Elapsed.TotalSeconds.ToString('F2'))s"
+
+          $sw.Stop()
+
+          # Summary
+          Write-Host ""
+          Write-Host "=========================================="
+          Write-Host "  RANGE REQUEST TOTAL TIME: $($sw.Elapsed.ToString())"
+          Write-Host "  Downloaded: $([math]::Round($rangeFileSize / 1MB)) MB (vs $([math]::Round($totalSize / 1MB)) MB full)"
+          Write-Host "  Source ZIPs extracted: $sourceZipCount"
+          Write-Host "=========================================="
+
+          $client.Dispose()
+
+      - name: Print summary
+        shell: pwsh
+        run: |
+          Write-Host ""
+          Write-Host "=========================================="
+          Write-Host "  BENCHMARK COMPLETE"
+          Write-Host "  Compare the times above:"
+          Write-Host "  - Benchmark 1: Full Download-Artifacts"
+          Write-Host "  - Benchmark 2: Range request + extract"
+          Write-Host "=========================================="
