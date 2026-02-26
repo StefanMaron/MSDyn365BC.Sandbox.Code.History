@@ -900,12 +900,12 @@ codeunit 99000854 "Inventory Profile Offsetting"
         Item.SetLoadFields("Manufacturing Policy", "Replenishment System");
         Item.Get(ReservEntry."Item No.");
         DeleteCondition :=
-            (ReservEntry."Reservation Status" <> ReservEntry."Reservation Status"::Reservation) and
-            (((ReservEntry."Expected Receipt Date" <= ToDate) and
+            ((ReservEntry."Reservation Status" <> ReservEntry."Reservation Status"::Reservation) and
+            (ReservEntry."Expected Receipt Date" <= ToDate) and
             (ReservEntry."Shipment Date" <= ToDate)) or
             ((ReservEntry.Binding = ReservEntry.Binding::"Order-to-Order") and (ReservEntry."Shipment Date" <= ToDate) and
             (Item."Manufacturing Policy" = Item."Manufacturing Policy"::"Make-to-Stock") and Item.IsMfgItem() and
-            (not IsReservedForProdComponent)));
+            (not IsReservedForProdComponent));
 
         OnAfterShouldDeleteReservEntry(ReservEntry, ToDate, DeleteCondition, CurrTemplateName, CurrWorksheetName);
         exit(DeleteCondition);
@@ -4517,8 +4517,6 @@ codeunit 99000854 "Inventory Profile Offsetting"
         xFromInventoryProfile: Record "Inventory Profile";
         xToInventoryProfile: Record "Inventory Profile";
         UntrackedQty: Decimal;
-        ToInventoryUntrackedQty: Decimal;
-        FromInventoryUntrackedQty: Decimal;
     begin
         xToInventoryProfile.CopyFilters(FromInventoryProfile);
         xFromInventoryProfile.CopyFilters(ToInventoryProfile);
@@ -4533,8 +4531,6 @@ codeunit 99000854 "Inventory Profile Offsetting"
                 ToInventoryProfile.SetTrackingFilter(FromInventoryProfile);
                 OnDemandMatchedSupplyOnAfterSetFiltersToInvProfile(ToInventoryProfile, FromInventoryProfile);
                 ToInventoryProfile.CalcSums("Untracked Quantity");
-                ToInventoryUntrackedQty += ToInventoryProfile."Untracked Quantity";
-                FromInventoryUntrackedQty += FromInventoryProfile."Untracked Quantity";
                 UntrackedQty += ToInventoryProfile."Untracked Quantity";
                 UntrackedQty -= FromInventoryProfile."Untracked Quantity";
             until FromInventoryProfile.Next() = 0;
@@ -4550,12 +4546,6 @@ codeunit 99000854 "Inventory Profile Offsetting"
         end;
         FromInventoryProfile.CopyFilters(xToInventoryProfile);
         ToInventoryProfile.CopyFilters(xFromInventoryProfile);
-
-        if (Abs(ToInventoryUntrackedQty) = Abs(FromInventoryUntrackedQty)) and (ToInventoryUntrackedQty <> 0) and (FromInventoryUntrackedQty <> 0) and
-           (SKU."Replenishment System" = SKU."Replenishment System"::"Prod. Order") and
-           (SKU."Reordering Policy" <> SKU."Reordering Policy"::"Lot-for-Lot") then
-            exit(true);
-
         exit(false);
     end;
 
