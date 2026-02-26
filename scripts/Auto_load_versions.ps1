@@ -121,30 +121,49 @@ $Versions | Sort-Object -Property Country, Version | % {
             }
         }
         
-        if ($country -eq 'w1'){
-            $Paths = Download-Artifacts -artifactUrl $_.URL -includePlatform
-            $LocalizationPath = $Paths[0]
-            $PlatformPath = $Paths[1]
-        }
-        else {
-            $Paths = Download-Artifacts -artifactUrl $_.URL
-            $LocalizationPath = $Paths
-            $PlatformPath = ''
-        }
-
-        #Localization folder
+        # Try range-request download first
         $TargetPathOfVersion = $null
-        $LocalizationApps = Get-ChildItem -Path $LocalizationPath -filter "Applications.$($country.ToUpper())" -ErrorAction SilentlyContinue
-        if ($LocalizationApps) {
-            $TargetPathOfVersion = Join-Path $LocalizationPath $LocalizationApps[0].Name
+        $RangeDownloadUsed = $false
+
+        if ($country -eq 'w1') {
+            # Construct platform URL: replace last path segment with "platform"
+            $PlatformUrl = [string]$_.URL -replace '/[^/]+$', '/platform'
+            $RangePath = & "$PSScriptRoot/Download-ApplicationsRange.ps1" -ArtifactUrl $PlatformUrl -TargetFolderPrefix "Applications"
+        } else {
+            $RangePath = & "$PSScriptRoot/Download-ApplicationsRange.ps1" -ArtifactUrl ([string]$_.URL) -TargetFolderPrefix "Applications.$($country.ToUpper())"
         }
 
-        if (-not $TargetPathOfVersion -or -not (Test-Path $TargetPathOfVersion)) {
-            #Platform Folder
-            if ($PlatformPath -ne '') {
-                $PlatformApps = Get-ChildItem -Path $PlatformPath -filter "Applications" -ErrorAction SilentlyContinue
-                if ($PlatformApps) {
-                    $TargetPathOfVersion = Join-Path $PlatformPath $PlatformApps[0].Name
+        if ($RangePath) {
+            $TargetPathOfVersion = $RangePath
+            $RangeDownloadUsed = $true
+            Write-Host "Range download succeeded: $RangePath"
+        } else {
+            # Fallback: full Download-Artifacts (existing method)
+            Write-Host "Falling back to full Download-Artifacts"
+            if ($country -eq 'w1'){
+                $Paths = Download-Artifacts -artifactUrl $_.URL -includePlatform
+                $LocalizationPath = $Paths[0]
+                $PlatformPath = $Paths[1]
+            }
+            else {
+                $Paths = Download-Artifacts -artifactUrl $_.URL
+                $LocalizationPath = $Paths
+                $PlatformPath = ''
+            }
+
+            #Localization folder
+            $LocalizationApps = Get-ChildItem -Path $LocalizationPath -filter "Applications.$($country.ToUpper())" -ErrorAction SilentlyContinue
+            if ($LocalizationApps) {
+                $TargetPathOfVersion = Join-Path $LocalizationPath $LocalizationApps[0].Name
+            }
+
+            if (-not $TargetPathOfVersion -or -not (Test-Path $TargetPathOfVersion)) {
+                #Platform Folder
+                if ($PlatformPath -ne '') {
+                    $PlatformApps = Get-ChildItem -Path $PlatformPath -filter "Applications" -ErrorAction SilentlyContinue
+                    if ($PlatformApps) {
+                        $TargetPathOfVersion = Join-Path $PlatformPath $PlatformApps[0].Name
+                    }
                 }
             }
         }
@@ -290,6 +309,9 @@ $Versions | Sort-Object -Property Country, Version | % {
             }
         }
         
+        if ($RangeDownloadUsed -and $TargetPathOfVersion -and (Test-Path $TargetPathOfVersion)) {
+            Remove-Item -Recurse -Force $TargetPathOfVersion -ErrorAction SilentlyContinue
+        }
         Flush-ContainerHelperCache -keepDays 0 -ErrorAction SilentlyContinue
 
         Write-Host "$($country)-$($version.ToString())"
