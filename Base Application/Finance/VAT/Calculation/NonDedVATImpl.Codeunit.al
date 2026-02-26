@@ -16,6 +16,7 @@ using Microsoft.FixedAssets.Ledger;
 using Microsoft.Foundation.Enums;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
 using Microsoft.Foundation.Company;
 using Microsoft.Projects.Project.Journal;
 using Microsoft.Projects.Project.Job;
@@ -385,6 +386,14 @@ codeunit 6201 "Non-Ded. VAT Impl."
         VATAmountLine."Deductible VAT Amount" := Round(VATAmountLine."Deductible VAT Amount", Currency."Amount Rounding Precision");
         VATAmountLine."Calc. Non-Ded. VAT Amount" := Round(VATAmountLine."Calc. Non-Ded. VAT Amount", Currency."Amount Rounding Precision");
         VATAmountLine."Non-Deductible VAT Diff." += PurchaseLine."Non-Deductible VAT Diff.";
+        // Ensure deductible amounts are not negative due to rounding
+        if VATAmountLine."Deductible VAT Base" < 0 then begin
+            VATAmountLine."Non-Deductible VAT Base" += VATAmountLine."Deductible VAT Base";
+            VATAmountLine."Deductible VAT Base" := 0;
+            VATAmountLine."Non-Deductible VAT Amount" += VATAmountLine."Deductible VAT Amount";
+            VATAmountLine."Deductible VAT Amount" := 0;
+        end;
+
     end;
 
     procedure CopyNonDedVATFromPurchInvLineToVATAmountLine(var VATAmountLine: Record "VAT Amount Line"; PurchInvLine: Record "Purch. Inv. Line")
@@ -403,6 +412,13 @@ codeunit 6201 "Non-Ded. VAT Impl."
         VATAmountLine."Calc. Non-Ded. VAT Amount" := PurchInvLine."Non-Deductible VAT Amount" - PurchInvLine."Non-Deductible VAT Diff.";
         VATAmountLine."Deductible VAT Base" := VATAmountLine."VAT Base" - VATAmountLine."Non-Deductible VAT Base";
         VATAmountLine."Deductible VAT Amount" := VATAmountLine."VAT Amount" - VATAmountLine."Non-Deductible VAT Amount";
+        // Ensure deductible amounts are not negative due to rounding
+        if VATAmountLine."Deductible VAT Base" < 0 then begin
+            VATAmountLine."Non-Deductible VAT Base" += VATAmountLine."Deductible VAT Base";
+            VATAmountLine."Deductible VAT Base" := 0;
+            VATAmountLine."Non-Deductible VAT Amount" += VATAmountLine."Deductible VAT Amount";
+            VATAmountLine."Deductible VAT Amount" := 0;
+        end;
     end;
 
     procedure CopyNonDedVATFromPurchCrMemoLineToVATAmountLine(var VATAmountLine: Record "VAT Amount Line"; PurchCrMemoLine: Record "Purch. Cr. Memo Line")
@@ -951,6 +967,8 @@ codeunit 6201 "Non-Ded. VAT Impl."
         GeneralLedgerSetup.GetRecordOnce();
         UpdateNonDeductibleAmounts(GenJournalLine."Non-Deductible VAT Base ACY", GenJournalLine."Non-Deductible VAT Amount ACY", BaseAmountACY, VATAmountACY, GetNonDedVATPctFromGenJournalLine(GenJournalLine), GeneralLedgerSetup."Amount Rounding Precision");
         AdjustVATAmounts(VATAmountACY, BaseAmountACY, GenJournalLine."Non-Deductible VAT Amount ACY", GenJournalLine."Non-Deductible VAT Base ACY");
+        if IsNormalVATInvoiceForVendor(GenJournalLine) then
+            UpdateNonDeductibleAmounts(GenJournalLine."Non-Deductible VAT Base LCY", GenJournalLine."Non-Deductible VAT Amount LCY", BaseAmount, VATAmount, GetNonDedVATPctFromGenJournalLine(GenJournalLine), GeneralLedgerSetup."Amount Rounding Precision");
         AdjustVATAmounts(VATAmount, BaseAmount, GenJournalLine."Non-Deductible VAT Amount LCY", GenJournalLine."Non-Deductible VAT Base LCY");
     end;
 
@@ -1150,6 +1168,17 @@ codeunit 6201 "Non-Ded. VAT Impl."
         if GeneralLedgerSetup."Amount Rounding Precision" > DocAmountRoundingPrecision then
             exit(GeneralLedgerSetup."Amount Rounding Precision");
         exit(DocAmountRoundingPrecision);
+    end;
+
+    local procedure IsNormalVATInvoiceForVendor(GenJournalLine: Record "Gen. Journal Line"): Boolean
+    var
+        Vendor: Record Vendor;
+    begin
+        if (GenJournalLine."Document Type" = GenJournalLine."Document Type"::Invoice) and
+            (GenJournalLine."VAT Calculation Type" = GenJournalLine."VAT Calculation Type"::"Normal VAT") and
+            (Vendor.Get(GenJournalLine."Bill-to/Pay-to No.") and (Vendor."Prices Including VAT")) then
+            exit(true);
+        exit(false);
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Company-Initialize", 'OnCompanyInitialize', '', false, false)]
