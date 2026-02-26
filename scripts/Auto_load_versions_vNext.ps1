@@ -31,6 +31,12 @@ Get-BCArtifactUrl -select All -Type Sandbox -country $country -accept_insiderEul
 git config user.email "stefanmaron@outlook.de"
 git config user.name "Stefan Maron"
 
+# Copy range download scripts to temp (they won't survive branch switches)
+$RangeScriptDir = Join-Path ([System.IO.Path]::GetTempPath()) "range-scripts"
+New-Item -ItemType Directory -Path $RangeScriptDir -Force | Out-Null
+Copy-Item -Path "$PSScriptRoot/Download-ApplicationsRange.ps1" -Destination $RangeScriptDir -Force
+Copy-Item -Path "$PSScriptRoot/download_range_helper.py" -Destination $RangeScriptDir -Force
+
 $Versions | Sort-Object -Property Country, Version | % {
     [version]$Version = $_.Version
     $country = $_.Country.Trim()
@@ -103,9 +109,9 @@ $Versions | Sort-Object -Property Country, Version | % {
         if ($country -eq 'w1') {
             # Construct platform URL: replace last path segment with "platform"
             $PlatformUrl = [string]$_.URL -replace '/[^/]+$', '/platform'
-            $RangePath = & "$PSScriptRoot/Download-ApplicationsRange.ps1" -ArtifactUrl $PlatformUrl -TargetFolderPrefix "Applications"
+            $RangePath = & "$RangeScriptDir/Download-ApplicationsRange.ps1" -ArtifactUrl $PlatformUrl -TargetFolderPrefix "Applications"
         } else {
-            $RangePath = & "$PSScriptRoot/Download-ApplicationsRange.ps1" -ArtifactUrl ([string]$_.URL) -TargetFolderPrefix "Applications.$($country.ToUpper())"
+            $RangePath = & "$RangeScriptDir/Download-ApplicationsRange.ps1" -ArtifactUrl ([string]$_.URL) -TargetFolderPrefix "Applications.$($country.ToUpper())"
         }
 
         if ($RangePath) {
