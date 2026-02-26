@@ -194,6 +194,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Prepayment - NamedType WrongPrepaymentStatusErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3369365645 - NamedType 2423632712" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Posted Sales Cr.Memo Amount Including VAT should equal Remaining Amount on Customer Ledger Entry]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Prepayment - VAT Rounding - NamedType PostedSalesCrMemoAmountShouldEqualRemAmtErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3369365645 - NamedType 3607882583" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Balance is wrong for G/L Account: %1 filterd on document no.: %2.]]></Val>
@@ -516,6 +525,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Prepayment V - NamedType SalesInvDiscForPrepmtExceededErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2731302931 - NamedType 762352760" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Your reference must be the same in customer ledger entry as in sales order]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Prepayment V - NamedType YourReferenceMustBeTheSameErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2904175643 - NamedType 158892399" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
