@@ -48,7 +48,12 @@ $Versions | Sort-Object -Property Country, Version | % {
         if (Test-Path $RebaseApplyDir) { Remove-Item -Recurse -Force $RebaseApplyDir }
     }
 
-    git fetch --all
+    # Fetch only the branches we need instead of all branches
+    git fetch origin main 2>&1 | Out-Null
+    git fetch origin "$($country)-$($Version.Major)" 2>&1 | Out-Null
+    if ($Version.Major -gt 15) {
+        git fetch origin "$($country)-$($Version.Major - 1)" 2>&1 | Out-Null
+    }
 
     $LastCommit = git log --all --grep="^$($country)-$($version.ToString())$"
 
