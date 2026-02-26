@@ -327,13 +327,16 @@ $Versions | Sort-Object -Property Country, Version | % {
             git add -A | out-null
             git commit -a -m "$($country)-$($version.ToString())-vNext" | out-null
 
-            # Pull with rebase to handle concurrent updates (e.g., late hotfixes)
-            Write-Host "Pulling with rebase from origin..."
-            git pull --rebase origin "$($country)-$($Version.Major)-vNext" 2>&1 | Out-Null
-            if ($LASTEXITCODE -ne 0) {
-                Write-Host "##[error]Pull --rebase failed for $($country)-$($Version.Major)-vNext"
-                git rebase --abort 2>&1 | Out-Null
-                exit 1
+            # Pull with rebase to handle concurrent updates (only if remote branch exists)
+            $RemoteBranchExists = git ls-remote --heads origin "$($country)-$($Version.Major)-vNext" 2>&1
+            if ($RemoteBranchExists) {
+                Write-Host "Pulling with rebase from origin..."
+                git pull --rebase origin "$($country)-$($Version.Major)-vNext" 2>&1 | Out-Null
+                if ($LASTEXITCODE -ne 0) {
+                    Write-Host "##[error]Pull --rebase failed for $($country)-$($Version.Major)-vNext"
+                    git rebase --abort 2>&1 | Out-Null
+                    exit 1
+                }
             }
 
             Write-Host "Pushing to origin..."
