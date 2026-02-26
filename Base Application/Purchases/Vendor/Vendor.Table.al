@@ -1743,7 +1743,7 @@ table 23 Vendor
 
     fieldgroups
     {
-        fieldgroup(DropDown; "No.", Name, Address, City, "Post Code", "Phone No.", Contact, "E-Mail", "Pay-to Vendor No.", "Registration Number", "VAT Registration No.")
+        fieldgroup(DropDown; "No.", Name, Address, City, "Post Code", "Phone No.", Contact, "E-Mail", "Pay-to Vendor No.", "Registration Number")
         {
         }
         fieldgroup(Brick; "No.", Name, "Balance (LCY)", Contact, "Balance Due (LCY)", Image)
