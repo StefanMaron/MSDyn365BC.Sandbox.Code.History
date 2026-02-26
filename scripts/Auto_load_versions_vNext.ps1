@@ -2,8 +2,6 @@
     [string]$country = 'de'
 )
 
-$ErrorActionPreference = "SilentlyContinue"
-
 $requestedCountry = $country
 
 [System.Collections.ArrayList]$Versions = @()
@@ -29,6 +27,9 @@ Get-BCArtifactUrl -select All -Type Sandbox -country $country -accept_insiderEul
         $Versions.Add($ourObject)
     }
 }
+
+git config user.email "stefanmaron@outlook.de"
+git config user.name "Stefan Maron"
 
 $Versions | Sort-Object -Property Country, Version | % {
     [version]$Version = $_.Version
@@ -172,8 +173,6 @@ $Versions | Sort-Object -Property Country, Version | % {
 
             "$($country)-$($version.ToString())" > version.txt
 
-            git config user.email "stefanmaron@outlook.de"
-            git config user.name "Stefan Maron"
             git add -A | out-null
             git commit -a -m "$($country)-$($version.ToString())" | out-null
 
@@ -197,16 +196,12 @@ $Versions | Sort-Object -Property Country, Version | % {
                 if ($ConflictedFiles) {
                     Write-Host "Conflicted files: $($ConflictedFiles -join ', ')"
 
-                    # For metadata files, use --ours (keep the commit being rebased)
+                    # Resolve all conflicts with --ours (keep the commit being rebased)
+                    # This is safe because each commit is a complete artifact snapshot
                     foreach ($file in $ConflictedFiles) {
-                        if ($file -match "app\.json$" -or $file -match "AppSourceCop\.json$" -or $file -eq "version.txt") {
-                            Write-Host "Auto-resolving $file (keeping rebased commit's version)"
-                            git checkout --ours $file 2>&1 | Out-Null
-                            git add $file 2>&1 | Out-Null
-                        }
-                        else {
-                            Write-Host "##[error]Unexpected conflict in non-metadata file: $file"
-                        }
+                        Write-Host "Auto-resolving $file (keeping rebased commit's version)"
+                        git checkout --ours $file 2>&1 | Out-Null
+                        git add $file 2>&1 | Out-Null
                     }
 
                     # Try to continue rebase
@@ -214,16 +209,15 @@ $Versions | Sort-Object -Property Country, Version | % {
                     $ContinueResult = git -c core.editor=true rebase --continue 2>&1
 
                     # Keep resolving conflicts until rebase completes
-                    while ($LASTEXITCODE -ne 0 -and $ContinueResult -match "git rebase --continue") {
+                    while ($LASTEXITCODE -ne 0) {
                         $ConflictedFiles = git diff --name-only --diff-filter=U 2>&1
                         if ($ConflictedFiles) {
                             foreach ($file in $ConflictedFiles) {
-                                if ($file -match "app\.json$" -or $file -match "AppSourceCop\.json$" -or $file -eq "version.txt") {
-                                    git checkout --ours $file 2>&1 | Out-Null
-                                    git add $file 2>&1 | Out-Null
-                                }
+                                Write-Host "Auto-resolving $file (keeping rebased commit's version)"
+                                git checkout --ours $file 2>&1 | Out-Null
+                                git add $file 2>&1 | Out-Null
                             }
-                            $ContinueResult = git -c core.editor=true rebase --continue 2>&1
+                            git -c core.editor=true rebase --continue 2>&1 | Out-Null
                         }
                         else {
                             break
@@ -245,18 +239,20 @@ $Versions | Sort-Object -Property Country, Version | % {
                     if (Test-Path $RebaseMergeDir) { Remove-Item -Recurse -Force $RebaseMergeDir }
                     if (Test-Path $RebaseApplyDir) { Remove-Item -Recurse -Force $RebaseApplyDir }
 
-                    # Use exit instead of throw to bypass SilentlyContinue
                     Write-Host "##[error]Exiting due to rebase failure"
                     exit 1
                 }
             }
 
             Write-Host "Rebase completed successfully"
-            git gc | out-null
 
             # Force push with lease to prevent overwriting concurrent changes
             Write-Host "Force pushing rebased history..."
             git push --force-with-lease origin "$($country)-$($Version.Major)-vNext"
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "##[error]Force push failed for $($country)-$($Version.Major)-vNext"
+                exit 1
+            }
         }
         else {
             # Normal linear commit (not a late hotfix)
@@ -267,16 +263,24 @@ $Versions | Sort-Object -Property Country, Version | % {
 
             "$($country)-$($version.ToString())" > version.txt
 
-            git config user.email "stefanmaron@outlook.de"
-            git config user.name "Stefan Maron"
             git add -A | out-null
             git commit -a -m "$($country)-$($version.ToString())" | out-null
-            git gc | out-null
 
             # Pull with rebase to handle concurrent updates (e.g., late hotfixes)
+            Write-Host "Pulling with rebase from origin..."
             git pull --rebase origin "$($country)-$($Version.Major)-vNext" 2>&1 | Out-Null
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "##[error]Pull --rebase failed for $($country)-$($Version.Major)-vNext"
+                git rebase --abort 2>&1 | Out-Null
+                exit 1
+            }
 
+            Write-Host "Pushing to origin..."
             git push --set-upstream origin "$($country)-$($Version.Major)-vNext"
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "##[error]Push failed for $($country)-$($Version.Major)-vNext"
+                exit 1
+            }
         }
         
         Flush-ContainerHelperCache -keepDays 0 -ErrorAction SilentlyContinue
