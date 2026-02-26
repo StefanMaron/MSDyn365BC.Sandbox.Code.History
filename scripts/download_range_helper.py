@@ -124,6 +124,8 @@ def main():
         print(f"Matching '{target_prefix}': {len(matching)} files")
 
         if not matching:
+            prefixes = sorted(set(e['name'].split('/')[0] for e in entries if '/' in e['name']))
+            print(f"Available folders: {prefixes}")
             print("ERROR: No matching entries found")
             sys.exit(1)
 
