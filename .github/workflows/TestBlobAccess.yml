@@ -28,9 +28,9 @@ jobs:
 
           # HEAD request to get total size and verify Range support
           $response = Invoke-WebRequest -Uri $url -Method Head -UseBasicParsing
-          $totalSize = $response.Headers['Content-Length']
-          $acceptRanges = $response.Headers['Accept-Ranges']
-          Write-Host "Total size: $([math]::Round([long]$totalSize / 1MB)) MB"
+          $totalSize = [long]($response.Headers['Content-Length'] | Select-Object -First 1)
+          $acceptRanges = $response.Headers['Accept-Ranges'] | Select-Object -First 1
+          Write-Host "Total size: $([math]::Round($totalSize / 1MB)) MB"
           Write-Host "Accept-Ranges: $acceptRanges"
           "totalSize=$totalSize" >> $env:GITHUB_OUTPUT
 
