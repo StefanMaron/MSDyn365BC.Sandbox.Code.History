@@ -98,6 +98,9 @@
         GlobalDimensionCodeErr: Label '%1 must be blank in %2.', Comment = '%1=Field Caption; %2 Page Caption.';
         SourceCurrencyErr: Label '%1 must be negative.', Comment = '%1=Field Caption.';
         PurchaseLineQtyErr: Label 'Purchase Line %1 must be equal to %2', Comment = '%1= Field ,%2= Value';
+        ItemFilterOnAnalysisViewCardMatchesCreatedItemErr: Label 'The created item should be selected in the analysis view card.';
+        ItemChargeCalculatedProportionallyErr: Label 'Item Charge %1 should be calculated proportionally to avoid rounding differences', Comment = '%1=Field Caption';
+        OptionString: Option PostedReturnReceipt,PostedInvoices,PostedShipments,PostedCrMemo;
 
     [Test]
     [Scope('OnPrem')]
@@ -8823,6 +8826,183 @@
         // [THEN] No error should appear and Warehouse Receipt should be posted successfully.
     end;
 
+    [Test]
+    [HandlerFunctions('ItemListOkModalPageHandler')]
+    procedure VerifyCreatedItemSelectedInPurchaseAnalysisViewCard()
+    var
+        Item: Record Item;
+        ItemAnalysisView: Record "Item Analysis View";
+        ItemNo: Code[20];
+        PurchaseAnalysisViewCard: TestPage "Purchase Analysis View Card";
+    begin
+        // [SCENARIO 601502] Verify created item is selected in purchase analysis view Card when ok is clicked on item lookup page.
+        Initialize();
+
+        // [GIVEN] Create a new item.
+        LibraryInventory.CreateItem(Item);
+
+        // [GIVEN] Create Purchase Analysis View
+        LibraryERM.CreateItemAnalysisView(ItemAnalysisView, ItemAnalysisView."Analysis Area"::Purchase);
+
+        // [GIVEN] Open Purchase Analysis View Card.
+        PurchaseAnalysisViewCard.OpenView();
+        PurchaseAnalysisViewCard.GoToRecord(ItemAnalysisView);
+        LibraryVariableStorage.Enqueue(Item."No.");
+
+        // [WHEN] Set Item Filter via lookup and select the created item
+        PurchaseAnalysisViewCard."Item Filter".Lookup();
+        ItemNo := PurchaseAnalysisViewCard."Item Filter".Value();
+        PurchaseAnalysisViewCard.Close();
+
+        // [THEN] Verify the Item Filter on Purchase Analysis View Card matches the created item
+        Assert.AreEqual(Item."No.", ItemNo, ItemFilterOnAnalysisViewCardMatchesCreatedItemErr);
+        LibraryVariableStorage.AssertEmpty();
+    end;
+
+    [Test]
+    [HandlerFunctions('ItemListCancelModalPageHandler')]
+    procedure VerifyCreatedItemNotSelectedInPurchaseAnalysisViewCard()
+    var
+        Item: Record Item;
+        ItemAnalysisView: Record "Item Analysis View";
+        ItemNo: Code[20];
+        PurchaseAnalysisViewCard: TestPage "Purchase Analysis View Card";
+    begin
+        // [SCENARIO 601502] Verify created item is not selected in purchase analysis view card when cancel is clicked on item lookup page.
+        Initialize();
+
+        // [GIVEN] Create a new item.
+        LibraryInventory.CreateItem(Item);
+
+        // [GIVEN] Create Purchase Analysis View
+        LibraryERM.CreateItemAnalysisView(ItemAnalysisView, ItemAnalysisView."Analysis Area"::Purchase);
+
+        // [GIVEN] Open Purchase Analysis View Card.
+        PurchaseAnalysisViewCard.OpenView();
+        PurchaseAnalysisViewCard.GoToRecord(ItemAnalysisView);
+        LibraryVariableStorage.Enqueue(Item."No.");
+
+        // [WHEN] Set Item Filter via lookup and select the created item
+        PurchaseAnalysisViewCard."Item Filter".Lookup();
+        ItemNo := PurchaseAnalysisViewCard."Item Filter".Value();
+        PurchaseAnalysisViewCard.Close();
+
+        // [THEN] Verify that the Item Filter on the Purchase Analysis View Card is cleared when canceled.
+        Assert.AreEqual('', ItemNo, ItemFilterOnAnalysisViewCardMatchesCreatedItemErr);
+        LibraryVariableStorage.AssertEmpty();
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandler,PostedPurchaseDocumentLinesHandler')]
+    procedure VerifyManuallyCreatedPurchaseCrMemoUpdateExistingPurchaseOrder()
+    var
+        Item: Record Item;
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseHeader2: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        Vendor: Record Vendor;
+        PurchCreditMemo: TestPage "Purchase Credit Memo";
+    begin
+        // [SCENARIO 578769] Verify manually created Purchase Credit Memo with get posted document lines to reverse should update the existing Purchase Order.
+        Initialize();
+
+        // [GIVEN] Create an Item.
+        LibraryInventory.CreateItem(Item);
+
+        // [GIVEN] Create Vendor.
+        LibraryPurchase.CreateVendor(Vendor);
+
+        // [GIVEN] Create Purchase Header.
+        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Order, Vendor."No.");
+
+        // [GIVEN] Create Purchase Line with Quanity as 10.
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, Item."No.", LibraryRandom.RandIntInRange(10, 10));
+
+        // [GIVEN] Update Qty To Receive in Purchase Line.
+        PurchaseLine.Validate("Qty. to Receive", LibraryRandom.RandIntInRange(5, 5));
+        PurchaseLine.Modify(true);
+
+        // [GIVEN] Post the Purchase Order.
+        LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
+
+        // [GIVEN] Create Purchase Credit Memo
+        LibraryPurchase.CreatePurchHeader(PurchaseHeader2, PurchaseHeader2."Document Type"::"Credit Memo", Vendor."No.");
+
+        // [GIVEN] Run Get Document Lines to Reverse and copy from posted purchase invoice
+        GetPostedDocumentLines(PurchaseHeader2."No.", OptionString::PostedInvoices);
+        FindPurchaseLine(PurchaseLine, PurchaseHeader2."Document Type", PurchaseHeader2."No.", PurchaseLine.Type::Item);
+
+        // [WHEN] Post the Credit Memo
+        PurchCreditMemo.OpenView();
+        PurchCreditMemo.GotoRecord(PurchaseHeader2);
+        PurchCreditMemo.Post.Invoke();
+
+        // [THEN] Verify Purchase Order Qty. to Receive and Qty. to Invoice are updated as 10 in the Purchase line.
+        VerifyPurchaseOrderQuantityforManualPurchaseCreditMemo(PurchaseHeader."No.", 10);
+    end;
+
+    [Test]
+    [HandlerFunctions('ItemChargeSetupHandler')]
+    [Scope('OnPrem')]
+    procedure ItemChargeAssignmentRoundingOnGetReceiptLines()
+    var
+        PurchaseHeaderOrder: Record "Purchase Header";
+        PurchaseHeaderInvoice: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        PurchRcptLine: Record "Purch. Rcpt. Line";
+        ItemChargeAssignmentPurch: Record "Item Charge Assignment (Purch)";
+        PurchGetReceipt: Codeunit "Purch.-Get Receipt";
+        Qty: Decimal;
+        UnitCost: Decimal;
+        ExpectedAmount: Decimal;
+    begin
+        // [SCENARIO 616450] Item Charge Assignment amounts should be calculated proportionally when using Get Receipt Lines to avoid rounding differences
+        Initialize();
+
+        // [GIVEN] Create Purchase Order with item and item charge lines with specific quantities that can cause rounding issues
+        Qty := 1023; //A fixed value was used to reproduce the rounding issue.
+        UnitCost := 6.72355; //A fixed value was used to reproduce the rounding issue.
+        CreatePurchaseHeader(PurchaseHeaderOrder, PurchaseHeaderOrder."Document Type"::Order);
+        CreatePurchaseLineWithDirectUnitCost(
+            PurchaseLine, PurchaseHeaderOrder, PurchaseLine.Type::Item, CreateItem(), Qty, UnitCost);
+        CreatePurchaseLineWithDirectUnitCost(
+            PurchaseLine, PurchaseHeaderOrder, PurchaseLine.Type::"Charge (Item)", LibraryInventory.CreateItemChargeNo(), Qty, UnitCost);
+
+        // [GIVEN] Assign item charge to the item line
+        OpenItemChargeAssgnt(PurchaseLine, true, Qty);
+
+        // [GIVEN] Get the Amount to Assign from the order
+        FindItemChargeAssignmentPurch(ItemChargeAssignmentPurch, PurchaseHeaderOrder);
+
+        // [GIVEN] Receive the purchase order
+        LibraryPurchase.PostPurchaseDocument(PurchaseHeaderOrder, true, false);
+
+        // [WHEN] Create Purchase Invoice using Get Receipt Lines for partial quantity
+        LibraryPurchase.CreatePurchHeader(
+            PurchaseHeaderInvoice, PurchaseHeaderInvoice."Document Type"::Invoice, PurchaseHeaderOrder."Buy-from Vendor No.");
+        PurchRcptLine.SetRange("Order No.", PurchaseHeaderOrder."No.");
+        PurchGetReceipt.SetPurchHeader(PurchaseHeaderInvoice);
+        PurchGetReceipt.CreateInvLines(PurchRcptLine);
+
+        // [THEN] Item charge assignment amount should be proportional to the original amount
+        FindItemChargeAssignmentPurch(ItemChargeAssignmentPurch, PurchaseHeaderInvoice);
+
+        // [THEN] Calculate expected proportional amount
+        ExpectedAmount := Round(Qty * UnitCost, LibraryERM.GetAmountRoundingPrecision());
+
+        // [THEN] Verify the Amount to Assign matches the expected proportional amount
+        Assert.AreEqual(
+            ExpectedAmount, ItemChargeAssignmentPurch."Amount to Assign",
+            StrSubstNo(
+                ItemChargeCalculatedProportionallyErr, ItemChargeAssignmentPurch.FieldCaption("Amount to Assign")));
+
+        // [THEN] Verify the Amount to Handle also matches the expected proportional amount
+        Assert.AreEqual(
+            ExpectedAmount, ItemChargeAssignmentPurch."Amount to Handle",
+            StrSubstNo(
+                ItemChargeCalculatedProportionallyErr, ItemChargeAssignmentPurch.FieldCaption("Amount to Handle")));
+    end;
+
     local procedure Initialize()
     var
         PurchaseHeader: Record "Purchase Header";
@@ -12287,6 +12467,46 @@
         WarehouseReceiptLine.Modify(true);
     end;
 
+    local procedure GetPostedDocumentLines(No: Code[20]; OptionStr: Option)
+    var
+        PurchCreditMemo: TestPage "Purchase Credit Memo";
+    begin
+        LibraryVariableStorage.Enqueue(OptionStr);
+        PurchCreditMemo.OpenEdit();
+        PurchCreditMemo.FILTER.SetFilter("No.", No);
+        PurchCreditMemo.GetPostedDocumentLinesToReverse.Invoke();
+    end;
+
+    local procedure FindPurchaseLine(var PurchaseLine: Record "Purchase Line"; DocumentType: Enum "Purchase Document Type"; DocumentNo: Code[20]; Type: Enum "Purchase Line Type")
+    begin
+        PurchaseLine.SetRange("Document Type", DocumentType);
+        PurchaseLine.SetRange("Document No.", DocumentNo);
+        PurchaseLine.SetRange(Type, Type);
+        PurchaseLine.FindFirst();
+    end;
+
+    local procedure VerifyPurchaseOrderQuantityforManualPurchaseCreditMemo(PurchaseHeaderNo: Code[20]; ExpectedQuantity: Decimal)
+    var
+        PurchaseLine: Record "Purchase Line";
+    begin
+        PurchaseLine.SetRange("Document No.", PurchaseHeaderNo);
+        PurchaseLine.SetRange("Document Type", PurchaseLine."Document Type"::Order);
+        PurchaseLine.FindSet();
+        repeat
+            Assert.AreEqual(ExpectedQuantity, PurchaseLine."Qty. to Receive", StrSubstNo(
+                PurchaseLineQtyErr, PurchaseLine.FieldName("Qty. to Receive"), ExpectedQuantity));
+            Assert.AreEqual(ExpectedQuantity, PurchaseLine."Qty. to Invoice", StrSubstNo(
+                PurchaseLineQtyErr, PurchaseLine.FieldName("Qty. to Invoice"), ExpectedQuantity));
+        until PurchaseLine.Next() = 0;
+    end;
+
+    local procedure FindItemChargeAssignmentPurch(var ItemChargeAssignmentPurch: Record "Item Charge Assignment (Purch)"; PurchaseHeader: Record "Purchase Header")
+    begin
+        ItemChargeAssignmentPurch.SetRange("Document Type", PurchaseHeader."Document Type");
+        ItemChargeAssignmentPurch.SetRange("Document No.", PurchaseHeader."No.");
+        ItemChargeAssignmentPurch.FindFirst();
+    end;
+
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure StandardVendorPurchCodesHndlr(var StandardVendorPurchaseCodes: TestPage "Standard Vendor Purchase Codes")
@@ -12708,5 +12928,37 @@
     procedure PrintPurchaseOrderRequestPageHandler(var StandardPurchaseOrder: TestRequestPage "Standard Purchase - Order")
     begin
         Assert.IsTrue(StandardPurchaseOrder.LogInteraction.Enabled(), InteractionLogErr);
+    end;
+
+    [ModalPageHandler]
+    procedure ItemListOkModalPageHandler(var ItemList: TestPage "Item List")
+    begin
+        ItemList.Filter.SetFilter("No.", LibraryVariableStorage.DequeueText());
+        ItemList.OK().Invoke();
+    end;
+
+    [ModalPageHandler]
+    procedure ItemListCancelModalPageHandler(var ItemList: TestPage "Item List")
+    begin
+        ItemList.Filter.SetFilter("No.", LibraryVariableStorage.DequeueText());
+        ItemList.Cancel().Invoke();
+    end;
+
+    [ModalPageHandler]
+    procedure PostedPurchaseDocumentLinesHandler(var PostedPurchaseDocumentLines: TestPage "Posted Purchase Document Lines")
+    var
+        DocumentType: Option "Posted Shipments","Posted Invoices","Posted Return Receipts","Posted Cr. Memos";
+    begin
+        case LibraryVariableStorage.DequeueInteger() of
+            OptionString::PostedReturnReceipt:
+                PostedPurchaseDocumentLines.PostedReceiptsBtn.SetValue(Format(DocumentType::"Posted Return Receipts"));
+            OptionString::PostedInvoices:
+                PostedPurchaseDocumentLines.PostedReceiptsBtn.SetValue(Format(DocumentType::"Posted Invoices"));
+            OptionString::PostedShipments:
+                PostedPurchaseDocumentLines.PostedReceiptsBtn.SetValue(Format(DocumentType::"Posted Shipments"));
+            OptionString::PostedCrMemo:
+                PostedPurchaseDocumentLines.PostedReceiptsBtn.SetValue(Format(DocumentType::"Posted Cr. Memos"));
+        end;
+        PostedPurchaseDocumentLines.OK().Invoke();
     end;
 }
