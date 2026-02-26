@@ -90,12 +90,6 @@ report 1017 "Job Task Quote"
             column(TotalPriceCaption; TotalPriceLbl)
             {
             }
-            column(LineDiscountPctCaption; LineDiscountPctLbl)
-            {
-            }
-            column(LineDiscountAmountCaption; LineDiscountAmountLbl)
-            {
-            }
             column(JobTaskTypeCaption; JobTaskTypeLbl)
             {
             }
@@ -144,18 +138,12 @@ report 1017 "Job Task Quote"
                 column(UnitPrice; "Unit Price")
                 {
                 }
-                column(TotalPriceLCY; "Total Price (LCY)" - "Line Discount Amount (LCY)")
+                column(TotalPriceLCY; "Total Price (LCY)")
                 {
                     AutoFormatExpression = CurrencyFormat;
                     AutoFormatType = 10;
                 }
-                column(TotalPrice; "Total Price" - "Line Discount Amount")
-                {
-                }
-                column(LineDiscountPct; "Line Discount %")
-                {
-                }
-                column(LineDiscountAmount; "Line Discount Amount")
+                column(TotalPrice; "Total Price")
                 {
                 }
                 column(Type; Type)
@@ -187,7 +175,7 @@ report 1017 "Job Task Quote"
                         PrintSection := false;
                         CurrReport.Skip();
                     end;
-                    JobTotalValue += (("Unit Price" * Quantity) - "Line Discount Amount");
+                    JobTotalValue += ("Unit Price" * Quantity);
 
                     if FirstLineHasBeenOutput then
                         Clear(CompanyInfo.Picture);
@@ -304,8 +292,6 @@ report 1017 "Job Task Quote"
         QuantityLbl: Label 'Quantity';
         UnitPriceLbl: Label 'Unit Price';
         TotalPriceLbl: Label 'Total Price';
-        LineDiscountPctLbl: Label 'Discount %';
-        LineDiscountAmountLbl: Label 'Discount Amt';
         JobTaskTypeLbl: Label 'Project Task Type';
         NoLbl: Label 'No.';
         CompanyLogoPosition: Integer;
