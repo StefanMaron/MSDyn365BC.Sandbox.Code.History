@@ -31,11 +31,6 @@ page 5401 "Item Variants"
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = Planning;
-
-                    trigger OnValidate()
-                    begin
-                        CurrPage.Update(true);
-                    end;
                 }
                 field(Description; Rec.Description)
                 {
