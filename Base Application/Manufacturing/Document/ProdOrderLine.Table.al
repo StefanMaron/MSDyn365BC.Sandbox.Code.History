@@ -102,7 +102,7 @@ table 5406 "Prod. Order Line"
                                 Validate("Routing No.", Item."Routing No.");
                     OnAfterCopyFromItem(Rec, Item, xRec, CurrFieldNo);
                     if ProdOrder."Source Type" = ProdOrder."Source Type"::Family then
-                        "Routing Reference No." := 0
+                        "Routing Reference No." := "Line No."
                     else
                         if "Line No." = 0 then
                             "Routing Reference No." := -10000
@@ -1287,8 +1287,8 @@ table 5406 "Prod. Order Line"
         CalcFields("Reserved Quantity", "Reserved Qty. (Base)");
         QtyReserved := "Reserved Quantity";
         QtyReservedBase := "Reserved Qty. (Base)";
-        QtyToReserve := "Remaining Quantity";
-        QtyToReserveBase := "Remaining Qty. (Base)";
+        QtyToReserve := "Remaining Quantity" - "Reserved Quantity";
+        QtyToReserveBase := "Remaining Qty. (Base)" - "Reserved Qty. (Base)";
         exit("Qty. per Unit of Measure");
     end;
 
