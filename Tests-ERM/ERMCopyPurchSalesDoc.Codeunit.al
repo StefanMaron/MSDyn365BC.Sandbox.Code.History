@@ -36,6 +36,8 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         AddrChangedErr: Label 'field on the purchase order %1 must be the same as on sales order %2.', Comment = '%1: Purchase Order No., %2: Sales Order No.';
         ValueMustBeEqualErr: Label '%1 must be equal to %2 in the %3.', Comment = '%1 = Field Caption , %2 = Expected Value, %3 = Table Caption';
         GLEntryExistLabel: Label 'G/L Entry with zero amount is posted.';
+        CostAmountErr: Label '%1 must be %2 in %3.', Comment = '%1= Field Name, %2= Field Value, %3= Table name.';
+        SalesLineQtyToShipErr: Label 'Sales Line qty. to ship must not be zero';
 
 #if not CLEAN25
     [Test]
@@ -6823,6 +6825,131 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         Assert.AreEqual(false, VerifyZeroAmountEntryGLEntryExist(SalesInvHeader."No."), GLEntryExistLabel);
     end;
 
+    [Test]
+    procedure CorrectiveCreditMemoCostAmountHasCorrectValues()
+    var
+        Currency: Record Currency;
+        Item: Record Item;
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        PurchInvHeader: Record "Purch. Inv. Header";
+        ValueEntry: array[2] of Record "Value Entry";
+        Vendor: Record Vendor;
+        CorrectPostedPurchInvoice: Codeunit "Correct Posted Purch. Invoice";
+        DocumentNo: Code[20];
+    begin
+        // [SCENARIO 600681] Corrective Credit Memo Cost Amount (Actual) has correct values.
+        Initialize();
+
+        // [GIVEN] Create a Vendor.
+        LibraryPurchase.CreateVendor(Vendor);
+
+        // [GIVEN] Create a Currency 
+        Currency.Get(LibraryERM.CreateCurrencyWithExchangeRate(WorkDate(), LibraryRandom.RandIntInRange(1, 10), LibraryRandom.RandIntInRange(5, 10)));
+        Currency.Validate("Amount Rounding Precision", LibraryRandom.RandDecInDecimalRange(0.00000001, 0.00000001, 8));
+        Currency.Modify(true);
+
+        // [GIVEN] Create an Item with FIFO Costing Method.
+        LibraryInventory.CreateItem(Item);
+        Item.Validate("Costing Method", Item."Costing Method"::FIFO);
+        Item.Modify(true);
+
+        // [GIVEN] Create and Post a Purchase Invoice.
+        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Invoice, Vendor."No.");
+        PurchaseHeader.Validate("Currency Code", Currency.Code);
+        PurchaseHeader.Validate("Currency Factor", LibraryRandom.RandIntInRange(1, 10));
+        PurchaseHeader.Modify(true);
+
+        //[GIVEN] Create a Purchase Line.
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, Item."No.", LibraryRandom.RandIntInRange(1, 10));
+        PurchaseLine.Validate("Direct Unit Cost", LibraryRandom.RandIntInRange(10, 100));
+        PurchaseLine.Modify(true);
+
+        // [GIVEN] Post Purchase Invoice.
+        DocumentNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
+
+        // [GIVEN] Create Value Entry for Purchase Order.
+        ValueEntry[1].SetRange("Document No.", DocumentNo);
+        ValueEntry[1].SetRange("Item No.", Item."No.");
+        ValueEntry[1].FindFirst();
+
+        // [GIVEN] Create Purchase Credit Memo.
+        LibraryPurchase.CreatePurchaseCreditMemo(PurchaseHeader);
+
+        // [GIVEN] Copy Purchase Order to Purchase Credit Memo.
+        PurchInvHeader.Get(DocumentNo);
+
+        // [GIVEN] Create Corrective Credit Memo Copy Document.
+        CorrectPostedPurchInvoice.CreateCreditMemoCopyDocument(PurchInvHeader, PurchaseHeader);
+        PurchaseHeader.Validate("Vendor Cr. Memo No.", LibraryRandom.RandText(2));
+        PurchaseHeader.Modify(true);
+
+        // [WHEN] Post Purchase Credit Memo.
+        DocumentNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
+
+        // [THEN] Find Value Entry for Purchase Credit Memo.
+        ValueEntry[2].SetRange("Document No.", DocumentNo);
+        ValueEntry[2].SetRange("Item No.", Item."No.");
+        ValueEntry[2].FindFirst();
+
+        // [THEN] "Cost Amount (Actual)" must be same as negative of "Cost Amount (Non-Invtbl.)" from Purchase Order.
+        Assert.AreEqual(
+            ValueEntry[1]."Cost Amount (Actual)",
+            -ValueEntry[2]."Cost Amount (Actual)",
+            StrSubstNo(
+                CostAmountErr,
+                ValueEntry[1].FieldCaption("Cost Amount (Actual)"),
+                ValueEntry[1]."Cost Amount (Actual)",
+                ValueEntry[1].TableCaption()));
+    end;
+
+    [Test]
+    [HandlerFunctions('ReceiveAndInvoiceSalesReturnOrderStrMenuHandler')]
+    procedure VerifyQtyToShipNotClearedAfterPostingSalesReturnOrder()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        Item2: Record Item;
+        SalesHeader: Record "Sales Header";
+        SalesHeader2: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        PostedDocumentNo: Code[20];
+        SalesReturnOrder: TestPage "Sales Return Order";
+    begin
+        // [SCENARIO 616052] After posting a sales return order if the sales order remains live the system does not remove the posted quantity reference.
+        Initialize();
+
+        // [GIVEN] Create Customer and two Items.
+        LibrarySales.CreateCustomer(Customer);
+        LibraryInventory.CreateItem(Item);
+        LibraryInventory.CreateItem(Item2);
+
+        // [GIVEN] Create and Post Sales Order with two lines , Post only first line.
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.");
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", LibraryRandom.RandIntInRange(1, 10));
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item2."No.", LibraryRandom.RandIntInRange(1, 10));
+        SalesLine.Validate("Qty. to Ship", 0);
+        SalesLine.Validate("Qty. to Invoice", 0);
+        SalesLine.Modify(true);
+        PostedDocumentNo := LibrarySales.PostSalesDocument(SalesHeader, true, true);
+
+        // [GIVEN] Create Return Order by copying Posted Sales Invoice.
+        LibrarySales.CreateSalesHeader(SalesHeader2, SalesHeader2."Document Type"::"Return Order", Customer."No.");
+        SalesCopyDocument(SalesHeader2, PostedDocumentNo, "Sales Document Type From"::"Posted Invoice");
+        SalesHeader2.Modify(true);
+
+        // [GIVEN] Modify Sales Return Order line to link to Item Ledger Entry of first Item only and post.
+        ModifySalesReturnOrderLine(Item."No.", SalesHeader2);
+
+        // [WHEN] Receive and Invoice Sales Return Order.
+        SalesReturnOrder.OpenView();
+        SalesReturnOrder.GotoRecord(SalesHeader2);
+        SalesReturnOrder.Post.Invoke();
+
+        // [THEN] Verify Sales Line "Qty. to Ship" is not zero after posting Sales Return Order.
+        VerifySalesLineQtyToShip(SalesHeader);
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -8488,6 +8615,53 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
             exit(true);
     end;
 
+    local procedure VerifySalesLineQtyToShip(SalesHeader: Record "Sales Header")
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        SalesLine.Reset();
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.FindFirst();
+        Assert.AreNotEqual(SalesLine."Qty. to Ship", 0, SalesLineQtyToShipErr);
+    end;
+
+    local procedure ModifySalesReturnOrderLine(ItemNo: Code[20]; SalesHeader2: Record "Sales Header")
+    var
+        SalesLine: Record "Sales Line";
+        ItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        ItemLedgerEntry.Reset();
+        ItemLedgerEntry.SetRange("Item No.", ItemNo);
+        if ItemLedgerEntry.FindFirst() then;
+
+        SalesLine.Reset();
+        SalesLine.SetRange("Document Type", SalesHeader2."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader2."No.");
+        SalesLine.SetRange(Quantity, 0);
+        if SalesLine.FindSet() then
+            SalesLine.DeleteAll(true);
+
+        SalesLine.Reset();
+        SalesLine.SetRange("Document Type", SalesHeader2."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader2."No.");
+        SalesLine.SetFilter(Quantity, '<>%1', 0);
+        if SalesLine.FindFirst() then
+            SalesLine.Validate("Appl.-from Item Entry", ItemLedgerEntry."Entry No.");
+        SalesLine.Modify(true);
+    end;
+
+    local procedure SalesCopyDocument(SalesHeader: Record "Sales Header"; DocumentNo: Code[20]; DocumentType: Enum "Sales Document Type From")
+    var
+        CopySalesDocument: Report "Copy Sales Document";
+    begin
+        Clear(CopySalesDocument);
+        CopySalesDocument.SetSalesHeader(SalesHeader);
+        CopySalesDocument.SetParameters(DocumentType, DocumentNo, true, false);
+        CopySalesDocument.UseRequestPage(false);
+        CopySalesDocument.Run();
+    end;
+
     [RequestPageHandler]
     [Scope('OnPrem')]
     procedure CopySalesDocReportHandlerOKWithEmptyDocumentNo(var CopySalesDocument: TestRequestPage "Copy Sales Document")
@@ -8586,5 +8760,11 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         CopySalesDocument.RecalculateLines.SetValue(ValueFromQueue);
 
         CopySalesDocument.OK().Invoke();
+    end;
+
+    [StrMenuHandler]
+    procedure ReceiveAndInvoiceSalesReturnOrderStrMenuHandler(Options: Text[1024]; var Choice: Integer; Instructions: Text[1024])
+    begin
+        Choice := 3;
     end;
 }
