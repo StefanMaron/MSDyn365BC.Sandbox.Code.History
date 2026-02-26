@@ -2731,12 +2731,14 @@ table 27 Item
         PurchaseLine: Record "Purchase Line";
         TransferLine: Record "Transfer Line";
         ItemAttributeValueMapping: Record "Item Attribute Value Mapping";
+        JobPlanningLine: Record "Job Planning Line";
     begin
         SalesLine.RenameNo(SalesLine.Type::Item, xRec."No.", "No.");
         PurchaseLine.RenameNo(PurchaseLine.Type::Item, xRec."No.", "No.");
         TransferLine.RenameNo(xRec."No.", "No.");
         DimMgt.RenameDefaultDim(DATABASE::Item, xRec."No.", "No.");
         CommentLine.RenameCommentLine(CommentLine."Table Name"::Item, xRec."No.", "No.");
+        JobPlanningLine.RenameNo(JobPlanningLine.Type::Item, xRec."No.", "No.");
 
         ApprovalsMgmt.OnRenameRecordInApprovalRequest(xRec.RecordId, RecordId);
         ItemAttributeValueMapping.RenameItemAttributeValueMapping(xRec."No.", "No.");
@@ -3578,10 +3580,8 @@ table 27 Item
         FoundRecordCount :=
             FindRecordMgt.FindRecordByDescriptionAndView(ReturnValue, SalesLine.Type::Item.AsInteger(), ItemText, View);
 
-        if FoundRecordCount = 1 then begin
-            ReturnValue := DelChr(ReturnValue, '<>', '''');
+        if FoundRecordCount = 1 then
             exit(true);
-        end;
 
         if FoundRecordCount = 0 then begin
             ReturnValue := CopyStr(ItemText, 1, MaxStrLen(ReturnValue));
@@ -3682,14 +3682,20 @@ table 27 Item
     procedure PickItem(var Item: Record Item): Code[20]
     var
         ItemList: Page "Item List";
+        FindRecordMgt: Codeunit "Find Record Management";
+        RaiseNotification: Boolean;
     begin
         if Item.FilterGroup = -1 then
             ItemList.SetTempFilteredItemRec(Item);
+
+        RaiseNotification := Item.Count > FindRecordMgt.GetMaxRecordCountToReturn();
 
         if Item.FindFirst() then;
         ItemList.SetTableView(Item);
         ItemList.SetRecord(Item);
         ItemList.LookupMode := true;
+        if RaiseNotification then
+            ItemList.DoShowNotification();
         if ItemList.RunModal() = ACTION::LookupOK then
             ItemList.GetRecord(Item)
         else
