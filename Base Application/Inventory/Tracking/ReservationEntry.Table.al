@@ -914,7 +914,7 @@ table 337 "Reservation Entry"
         ReservEntry.SetFilter("Entry No.", '<>%1', "Entry No.");
         ReservEntry.SetSourceFilter("Source Type", "Source Subtype", "Source ID", "Source Ref. No.", false);
         ReservEntry.SetSourceFilter("Source Batch Name", "Source Prod. Order Line");
-        ReservEntry.SetRange("Reservation Status", "Reservation Status"::Reservation);
+        ReservEntry.SetFilter("Reservation Status", '%1|%2', "Reservation Status"::Reservation, "Reservation Status"::Tracking);
         ReservEntry.CalcSums("Quantity (Base)", Quantity);
         exit(
           Round((ReservEntry."Quantity (Base)" + "Quantity (Base)") / "Qty. per Unit of Measure", UOMMgt.QtyRndPrecision()) -
@@ -1140,6 +1140,11 @@ table 337 "Reservation Entry"
             NewReservationEntry."Reservation Status" := NewReservationEntry."Reservation Status"::Surplus;
             NewReservationEntry.Modify(true);
         end;
+    end;
+
+    procedure HasNoTrackingWithSpec() IsNoTracking: Boolean
+    begin
+        IsNoTracking := ("Serial No." = '') and ("Lot No." = '') and ("Package No." = '');
     end;
 
     [IntegrationEvent(false, false)]
