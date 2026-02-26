@@ -3885,6 +3885,9 @@ codeunit 1751 "Data Classification Eval. Data"
         SetFieldToCompanyConfidential(2000000281, 6); // Description
         SetFieldToCompanyConfidential(2000000281, 8); // Page Caption
         SetFieldToCompanyConfidential(2000000281, 9); // Client Context
+
+        SetTableFieldsToNormal(2000000239); // Tenant Application Storage Data table
+        SetFieldToCompanyConfidential(2000000239, 11); // Blob
     end;
 
     local procedure ClasifyScheduledPerformanceProfiling()
