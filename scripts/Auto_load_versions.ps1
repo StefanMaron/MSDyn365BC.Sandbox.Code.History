@@ -133,12 +133,18 @@ $Versions | Sort-Object -Property Country, Version | % {
         }
 
         #Localization folder
-        
-        $TargetPathOfVersion = (Join-Path $LocalizationPath (Get-ChildItem -Path $LocalizationPath -filter "Applications.$($country.ToUpper())")[0].Name)
+        $TargetPathOfVersion = $null
+        $LocalizationApps = Get-ChildItem -Path $LocalizationPath -filter "Applications.$($country.ToUpper())" -ErrorAction SilentlyContinue
+        if ($LocalizationApps) {
+            $TargetPathOfVersion = Join-Path $LocalizationPath $LocalizationApps[0].Name
+        }
 
-        if (-not (Test-Path $TargetPathOfVersion)) {
+        if (-not $TargetPathOfVersion -or -not (Test-Path $TargetPathOfVersion)) {
             #Platform Folder
-            $TargetPathOfVersion = (Join-Path $PlatformPath (Get-ChildItem -Path $PlatformPath -filter "Applications")[0].Name)
+            $PlatformApps = Get-ChildItem -Path $PlatformPath -filter "Applications" -ErrorAction SilentlyContinue
+            if ($PlatformApps) {
+                $TargetPathOfVersion = Join-Path $PlatformPath $PlatformApps[0].Name
+            }
         }
         
         if ($IsLateHotfix) {
