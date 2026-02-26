@@ -1,0 +1,84 @@
+name: Test Blob Storage Access
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-download-speed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test CDN vs Blob download speed
+        shell: pwsh
+        run: |
+          Install-Module bccontainerhelper -force -AllowPrerelease
+          Import-Module bccontainerhelper
+
+          $cdnUrl = Get-BCArtifactUrl -select Latest -Type Sandbox -country de
+          Write-Host "CDN URL: $cdnUrl"
+
+          # Derive blob URL
+          $blobUrl = $cdnUrl -replace 'bcartifacts-[^/]+\.b02\.azurefd\.net', 'bcartifacts.blob.core.windows.net'
+          Write-Host "Blob URL: $blobUrl"
+
+          # Test 1: Check if blob URL is accessible
+          Write-Host ""
+          Write-Host "=== Testing blob URL accessibility ==="
+          try {
+              $response = Invoke-WebRequest -Uri $blobUrl -Method Head -TimeoutSec 10 -UseBasicParsing
+              Write-Host "Blob HEAD: $($response.StatusCode) - Content-Length: $($response.Headers['Content-Length'])"
+              $blobAccessible = $true
+          } catch {
+              Write-Host "Blob HEAD failed: $($_.Exception.Message)"
+              $blobAccessible = $false
+          }
+
+          # Test 2: Time CDN download
+          Write-Host ""
+          Write-Host "=== Timing CDN download ==="
+          Flush-ContainerHelperCache -keepDays 0
+          $sw = [System.Diagnostics.Stopwatch]::StartNew()
+          $cdnPath = Download-Artifacts -artifactUrl $cdnUrl
+          $sw.Stop()
+          $cdnTime = $sw.Elapsed
+          Write-Host "CDN download completed in $($cdnTime.ToString())"
+          Write-Host "CDN artifact path: $cdnPath"
+          Write-Host "CDN artifact size: $((Get-ChildItem -Path $cdnPath -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB) MB"
+
+          # Test 3: Time blob download (if accessible)
+          if ($blobAccessible) {
+              Write-Host ""
+              Write-Host "=== Timing Blob download ==="
+              Flush-ContainerHelperCache -keepDays 0
+              $sw = [System.Diagnostics.Stopwatch]::StartNew()
+              $blobPath = Download-Artifacts -artifactUrl $blobUrl
+              $sw.Stop()
+              $blobTime = $sw.Elapsed
+              Write-Host "Blob download completed in $($blobTime.ToString())"
+              Write-Host "Blob artifact path: $blobPath"
+              Write-Host "Blob artifact size: $((Get-ChildItem -Path $blobPath -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB) MB"
+
+              Write-Host ""
+              Write-Host "=== Summary ==="
+              Write-Host "CDN:  $($cdnTime.ToString())"
+              Write-Host "Blob: $($blobTime.ToString())"
+              Write-Host "Speedup: $([math]::Round($cdnTime.TotalSeconds / $blobTime.TotalSeconds, 1))x"
+          } else {
+              Write-Host ""
+              Write-Host "=== Summary ==="
+              Write-Host "CDN:  $($cdnTime.ToString())"
+              Write-Host "Blob: NOT ACCESSIBLE from GitHub Actions runner"
+          }
+
+          # Test 4: Also test insider blob URL
+          Write-Host ""
+          Write-Host "=== Testing insider blob URL ==="
+          $insiderCdnUrl = Get-BCArtifactUrl -select Latest -Type Sandbox -country de -accept_insiderEula -storageAccount bcinsider
+          $insiderBlobUrl = $insiderCdnUrl -replace 'bcinsider-[^/]+\.b02\.azurefd\.net', 'bcinsider.blob.core.windows.net'
+          Write-Host "Insider CDN URL: $insiderCdnUrl"
+          Write-Host "Insider Blob URL: $insiderBlobUrl"
+          try {
+              $response = Invoke-WebRequest -Uri $insiderBlobUrl -Method Head -TimeoutSec 10 -UseBasicParsing
+              Write-Host "Insider Blob HEAD: $($response.StatusCode)"
+          } catch {
+              Write-Host "Insider Blob HEAD failed: $($_.Exception.Message)"
+          }
