@@ -7,7 +7,7 @@ param(
 )
 
 if (-not $SourcePath) {
-    $SourcePath = "~/.bcartifacts.cache/sandbox/$Version/$Localization/Applications.DE/"
+    $SourcePath = "~/.bcartifacts.cache/sandbox/$Version/$Localization/Applications.$($Localization.ToUpper())/"
 }
 
 $zips = Get-ChildItem -Path $SourcePath -Filter *.zip -Recurse

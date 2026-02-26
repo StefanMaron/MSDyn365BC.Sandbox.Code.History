@@ -141,12 +141,20 @@ $Versions | Sort-Object -Property Country, Version | % {
 
         if (-not $TargetPathOfVersion -or -not (Test-Path $TargetPathOfVersion)) {
             #Platform Folder
-            $PlatformApps = Get-ChildItem -Path $PlatformPath -filter "Applications" -ErrorAction SilentlyContinue
-            if ($PlatformApps) {
-                $TargetPathOfVersion = Join-Path $PlatformPath $PlatformApps[0].Name
+            if ($PlatformPath -ne '') {
+                $PlatformApps = Get-ChildItem -Path $PlatformPath -filter "Applications" -ErrorAction SilentlyContinue
+                if ($PlatformApps) {
+                    $TargetPathOfVersion = Join-Path $PlatformPath $PlatformApps[0].Name
+                }
             }
         }
-        
+
+        if (-not $TargetPathOfVersion -or -not (Test-Path $TargetPathOfVersion)) {
+            Write-Host "##[warning]No Applications folder found for $($country)-$($version.ToString()), skipping (artifact may not contain source code)"
+            Flush-ContainerHelperCache -keepDays 0 -ErrorAction SilentlyContinue
+            return
+        }
+
         if ($IsLateHotfix) {
             # Checkout the insertion point
             git checkout $InsertionPoint
