@@ -1252,21 +1252,6 @@ codeunit 137415 "SCM Item Variant Attributes"
         ItemVariantCard.Close();
     end;
 
-    local procedure EnqueueValuesForCopyItemPageHandler(CopyItemBuffer: Record "Copy Item Buffer")
-    begin
-        LibraryVariableStorage.Enqueue(CopyItemBuffer."Target Item No.");
-    end;
-
-    local procedure CopyItem(ItemNo: Code[20])
-    var
-        ItemCard: TestPage "Item Card";
-    begin
-        ItemCard.OpenEdit();
-        ItemCard.FILTER.SetFilter("No.", ItemNo);
-        Commit();  // COMMIT is required to handle Item Copy  page.
-        ItemCard.CopyItem.Invoke();
-    end;
-
     [ModalPageHandler]
     procedure ModifyItemAttributeValueListHandler(var ItemVariantAttributeValueEditor: TestPage "Item Variant Attribute Editor")
     var
@@ -1310,13 +1295,5 @@ codeunit 137415 "SCM Item Variant Attributes"
     procedure ConfirmHandlerYes(Question: Text; var Reply: Boolean)
     begin
         Reply := true;
-    end;
-
-    [ModalPageHandler]
-    procedure CopyItemPageHandler(var CopyItem: TestPage "Copy Item")
-    begin
-        CopyItem.TargetItemNo.SetValue(LibraryVariableStorage.DequeueText());
-        CopyItem.GeneralItemInformation.SetValue(true);
-        CopyItem.OK().Invoke();
     end;
 }
