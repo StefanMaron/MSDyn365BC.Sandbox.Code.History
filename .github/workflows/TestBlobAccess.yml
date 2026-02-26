@@ -67,241 +67,233 @@ jobs:
           Flush-ContainerHelperCache -keepDays 0 -ErrorAction SilentlyContinue
 
       - name: "Benchmark 2: Range request - download only Applications.DE"
-        shell: pwsh
+        shell: bash
+        env:
+          ARTIFACT_URL: ${{ steps.url.outputs.url }}
+          TOTAL_SIZE: ${{ steps.url.outputs.totalSize }}
         run: |
-          $url = "${{ steps.url.outputs.url }}"
-          $totalSize = [long]"${{ steps.url.outputs.totalSize }}"
-          $workDir = "/tmp/range-test"
-          New-Item -ItemType Directory -Path $workDir -Force | Out-Null
+          set -e
+          URL="$ARTIFACT_URL"
+          TOTAL_SIZE="$TOTAL_SIZE"
+          WORK_DIR="/tmp/range-test"
+          mkdir -p "$WORK_DIR"
 
-          Write-Host "=== Range request - download only Applications.DE ==="
-          Write-Host "URL: $url"
-          Write-Host "Total archive size: $([math]::Round($totalSize / 1MB)) MB"
+          echo "=== Range request - download only Applications.DE ==="
+          echo "URL: $URL"
+          echo "Total archive size: $((TOTAL_SIZE / 1048576)) MB"
 
-          $sw = [System.Diagnostics.Stopwatch]::StartNew()
+          OVERALL_START=$(date +%s%N)
 
           # Step 1: Download last 64KB to read ZIP central directory
-          Write-Host ""
-          Write-Host "--- Step 1: Download ZIP central directory (last 64KB) ---"
-          $tailSize = 65536
-          $tailStart = $totalSize - $tailSize
-          $tailFile = Join-Path $workDir "tail.bin"
+          echo ""
+          echo "--- Step 1: Download ZIP central directory (last 64KB) ---"
+          TAIL_START=$((TOTAL_SIZE - 65536))
+          STEP_START=$(date +%s%N)
+          curl -s -o "$WORK_DIR/tail.bin" -r "${TAIL_START}-${TOTAL_SIZE}" "$URL"
+          STEP_END=$(date +%s%N)
+          TAIL_SIZE=$(stat -c%s "$WORK_DIR/tail.bin")
+          echo "Downloaded $TAIL_SIZE bytes in $(( (STEP_END - STEP_START) / 1000000 ))ms"
 
-          $swStep = [System.Diagnostics.Stopwatch]::StartNew()
-          $handler = New-Object System.Net.Http.HttpClientHandler
-          $client = New-Object System.Net.Http.HttpClient($handler)
-          $client.Timeout = [TimeSpan]::FromSeconds(30)
-          $request = New-Object System.Net.Http.HttpRequestMessage([System.Net.Http.HttpMethod]::Get, $url)
-          $request.Headers.Range = New-Object System.Net.Http.Headers.RangeHeaderValue($tailStart, $totalSize - 1)
-          $response = $client.SendAsync($request).GetAwaiter().GetResult()
-          Write-Host "Range response status: $($response.StatusCode)"
-          $bytes = $response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult()
-          [System.IO.File]::WriteAllBytes($tailFile, $bytes)
-          $swStep.Stop()
-          Write-Host "Downloaded $($bytes.Length) bytes in $($swStep.Elapsed.TotalSeconds.ToString('F2'))s"
+          # Step 2: Parse ZIP central directory using Python (reliable binary parsing)
+          echo ""
+          echo "--- Step 2: Parse ZIP central directory ---"
+          python3 << 'PYEOF'
+          import struct, sys, os, json
 
-          # Step 2: Parse ZIP End of Central Directory
-          Write-Host ""
-          Write-Host "--- Step 2: Parse ZIP central directory ---"
-          $tailBytes = [System.IO.File]::ReadAllBytes($tailFile)
+          url = os.environ['ARTIFACT_URL']
+          total_size = int(os.environ['TOTAL_SIZE'])
+          work_dir = "/tmp/range-test"
 
-          # Find EOCD signature (0x06054b50) scanning backwards
-          $eocdPos = -1
-          for ($i = $tailBytes.Length - 22; $i -ge 0; $i--) {
-              if ($tailBytes[$i] -eq 0x50 -and $tailBytes[$i+1] -eq 0x4B -and
-                  $tailBytes[$i+2] -eq 0x05 -and $tailBytes[$i+3] -eq 0x06) {
-                  $eocdPos = $i
-                  break
-              }
-          }
+          with open(f"{work_dir}/tail.bin", "rb") as f:
+              tail = f.read()
 
-          if ($eocdPos -eq -1) {
-              Write-Host "##[error]Could not find EOCD signature"
-              exit 1
-          }
+          # Find EOCD signature scanning backwards
+          eocd_sig = b'\x50\x4b\x05\x06'
+          eocd_pos = tail.rfind(eocd_sig)
+          if eocd_pos == -1:
+              print("ERROR: Could not find EOCD signature")
+              sys.exit(1)
 
-          # Parse EOCD
-          $cdSize = [BitConverter]::ToUInt32($tailBytes, $eocdPos + 12)
-          $cdOffset = [BitConverter]::ToUInt32($tailBytes, $eocdPos + 16)
-          $entryCount = [BitConverter]::ToUInt16($tailBytes, $eocdPos + 10)
-          Write-Host "Central directory: $entryCount entries, $([math]::Round($cdSize / 1KB)) KB at offset $cdOffset"
+          entry_count = struct.unpack_from('<H', tail, eocd_pos + 10)[0]
+          cd_size = struct.unpack_from('<I', tail, eocd_pos + 12)[0]
+          cd_offset = struct.unpack_from('<I', tail, eocd_pos + 16)[0]
+          print(f"Central directory: {entry_count} entries, {cd_size // 1024} KB at offset {cd_offset}")
 
-          # Check if we have the full central directory in our tail download
-          $cdStartInTail = $tailBytes.Length - ($totalSize - $cdOffset)
-          if ($cdStartInTail -lt 0) {
-              Write-Host "Central directory not fully in tail, downloading more..."
-              $cdFile = Join-Path $workDir "cd.bin"
-              $request2 = New-Object System.Net.Http.HttpRequestMessage([System.Net.Http.HttpMethod]::Get, $url)
-              $request2.Headers.Range = New-Object System.Net.Http.Headers.RangeHeaderValue($cdOffset, $totalSize - 1)
-              $response2 = $client.SendAsync($request2).GetAwaiter().GetResult()
-              $tailBytes = $response2.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult()
-              $cdStartInTail = 0
-          }
+          # Check if central directory is in our tail
+          cd_start_in_tail = len(tail) - (total_size - cd_offset)
+          if cd_start_in_tail < 0:
+              print(f"Need to download central directory separately (starts at {cd_offset})")
+              import subprocess
+              subprocess.run([
+                  "curl", "-s", "-o", f"{work_dir}/cd.bin",
+                  "-r", f"{cd_offset}-{total_size - 1}", url
+              ], check=True)
+              with open(f"{work_dir}/cd.bin", "rb") as f:
+                  tail = f.read()
+              cd_start_in_tail = 0
 
           # Parse central directory entries
-          $entries = @()
-          $pos = [int]$cdStartInTail
-          for ($e = 0; $e -lt $entryCount; $e++) {
-              # Verify signature 0x02014b50
-              if ($tailBytes[$pos] -ne 0x50 -or $tailBytes[$pos+1] -ne 0x4B -or
-                  $tailBytes[$pos+2] -ne 0x01 -or $tailBytes[$pos+3] -ne 0x02) {
-                  Write-Host "##[warning]Invalid CD entry signature at position $pos"
+          entries = []
+          pos = cd_start_in_tail
+          for _ in range(entry_count):
+              sig = tail[pos:pos+4]
+              if sig != b'\x50\x4b\x01\x02':
+                  print(f"WARNING: Invalid CD entry at pos {pos}")
                   break
-              }
+              comp_size = struct.unpack_from('<I', tail, pos + 20)[0]
+              uncomp_size = struct.unpack_from('<I', tail, pos + 24)[0]
+              name_len = struct.unpack_from('<H', tail, pos + 28)[0]
+              extra_len = struct.unpack_from('<H', tail, pos + 30)[0]
+              comment_len = struct.unpack_from('<H', tail, pos + 32)[0]
+              local_offset = struct.unpack_from('<I', tail, pos + 42)[0]
+              name = tail[pos+46:pos+46+name_len].decode('utf-8')
+              entries.append({
+                  'name': name,
+                  'comp_size': comp_size,
+                  'uncomp_size': uncomp_size,
+                  'offset': local_offset
+              })
+              pos += 46 + name_len + extra_len + comment_len
 
-              $compSize = [BitConverter]::ToUInt32($tailBytes, $pos + 20)
-              $uncompSize = [BitConverter]::ToUInt32($tailBytes, $pos + 24)
-              $nameLen = [BitConverter]::ToUInt16($tailBytes, $pos + 28)
-              $extraLen = [BitConverter]::ToUInt16($tailBytes, $pos + 30)
-              $commentLen = [BitConverter]::ToUInt16($tailBytes, $pos + 32)
-              $localHeaderOffset = [BitConverter]::ToUInt32($tailBytes, $pos + 42)
-              $name = [System.Text.Encoding]::UTF8.GetString($tailBytes, $pos + 46, $nameLen)
+          print(f"Parsed {len(entries)} entries")
 
-              $entries += [PSCustomObject]@{
-                  Name = $name
-                  CompressedSize = $compSize
-                  UncompressedSize = $uncompSize
-                  Offset = $localHeaderOffset
-              }
+          # Find Applications.DE entries
+          app_entries = [e for e in entries if e['name'].startswith('Applications.DE/') and e['comp_size'] > 0]
+          print(f"Applications.DE entries: {len(app_entries)} files")
 
-              $pos += 46 + $nameLen + $extraLen + $commentLen
-          }
+          if not app_entries:
+              print("ERROR: No Applications.DE entries found")
+              sys.exit(1)
 
-          Write-Host "Parsed $($entries.Count) entries"
+          # Find contiguous byte range
+          first_offset = min(e['offset'] for e in app_entries)
 
-          # Step 3: Find Applications.DE entries and their byte range
-          Write-Host ""
-          Write-Host "--- Step 3: Find Applications.DE byte range ---"
-          $appEntries = $entries | Where-Object { $_.Name -like "Applications.DE/*" -and $_.CompressedSize -gt 0 }
-          Write-Host "Applications.DE entries: $($appEntries.Count) files"
+          # Find the actual end by checking all entries in the range
+          all_in_range = sorted([e for e in entries if e['offset'] >= first_offset and
+                                  e['offset'] <= max(e['offset'] for e in app_entries)],
+                                 key=lambda e: e['offset'])
 
-          if ($appEntries.Count -eq 0) {
-              Write-Host "##[error]No Applications.DE entries found"
-              exit 1
-          }
+          range_end = 0
+          for e in all_in_range:
+              # local header (30) + name + extra (estimate 64) + compressed data
+              entry_end = e['offset'] + 30 + len(e['name']) + 64 + e['comp_size']
+              range_end = max(range_end, entry_end)
 
-          # Find the byte range we need
-          # Each local file header is 30 bytes + filename length + extra field length
-          # We need from the first entry's offset to past the last entry's data
-          $firstOffset = ($appEntries | Sort-Object Offset | Select-Object -First 1).Offset
+          download_size = range_end - first_offset
+          app_comp_total = sum(e['comp_size'] for e in app_entries)
+          app_uncomp_total = sum(e['uncomp_size'] for e in app_entries)
+          savings = round((1 - download_size / total_size) * 100)
 
-          # For the end, we need the last entry's offset + header + compressed data
-          $lastEntry = $appEntries | Sort-Object { $_.Offset + $_.CompressedSize } | Select-Object -Last 1
-          # Local file header: 30 + name length + extra length (estimate extra as 0, add padding)
-          $lastEntryEnd = $lastEntry.Offset + 30 + $lastEntry.Name.Length + 256 + $lastEntry.CompressedSize
+          print(f"Byte range: {first_offset} - {range_end}")
+          print(f"Range size: {download_size // 1048576} MB")
+          print(f"Savings vs full: {savings}%")
+          print(f"Applications.DE compressed: {app_comp_total // 1048576} MB")
+          print(f"Applications.DE uncompressed: {app_uncomp_total // 1048576} MB")
 
-          # Also check for entries between our app entries (they should be contiguous)
-          $allInRange = $entries | Where-Object { $_.Offset -ge $firstOffset -and $_.Offset -le $lastEntry.Offset } | Sort-Object Offset
-          $rangeEnd = 0
-          foreach ($entry in $allInRange) {
-              $entryEnd = $entry.Offset + 30 + $entry.Name.Length + 256 + $entry.CompressedSize
-              if ($entryEnd -gt $rangeEnd) { $rangeEnd = $entryEnd }
-          }
+          # Write range info for bash to use
+          with open(f"{work_dir}/range_info.json", "w") as f:
+              json.dump({
+                  'first_offset': first_offset,
+                  'range_end': range_end,
+                  'download_size': download_size,
+                  'app_entries': app_entries
+              }, f)
+          PYEOF
 
-          $downloadSize = $rangeEnd - $firstOffset
-          Write-Host "Byte range: $firstOffset - $rangeEnd"
-          Write-Host "Range size: $([math]::Round($downloadSize / 1MB)) MB"
-          Write-Host "Savings vs full: $([math]::Round((1 - $downloadSize / $totalSize) * 100))%"
+          # Step 3: Download just the Applications.DE range
+          echo ""
+          echo "--- Step 3: Download Applications.DE range ---"
+          FIRST_OFFSET=$(python3 -c "import json; d=json.load(open('/tmp/range-test/range_info.json')); print(d['first_offset'])")
+          RANGE_END=$(python3 -c "import json; d=json.load(open('/tmp/range-test/range_info.json')); print(d['range_end'])")
 
-          $appTotalCompressed = ($appEntries | Measure-Object -Property CompressedSize -Sum).Sum
-          $appTotalUncompressed = ($appEntries | Measure-Object -Property UncompressedSize -Sum).Sum
-          Write-Host "Applications.DE compressed: $([math]::Round($appTotalCompressed / 1MB)) MB"
-          Write-Host "Applications.DE uncompressed: $([math]::Round($appTotalUncompressed / 1MB)) MB"
+          STEP_START=$(date +%s%N)
+          curl -s -o "$WORK_DIR/apps_range.bin" -r "${FIRST_OFFSET}-${RANGE_END}" "$URL"
+          STEP_END=$(date +%s%N)
+          RANGE_FILE_SIZE=$(stat -c%s "$WORK_DIR/apps_range.bin")
+          echo "Downloaded $((RANGE_FILE_SIZE / 1048576)) MB in $(( (STEP_END - STEP_START) / 1000000 ))ms"
 
-          # Step 4: Download just the Applications.DE range using aria2c
-          Write-Host ""
-          Write-Host "--- Step 4: Download Applications.DE range via aria2c (16 connections) ---"
-          $rangeFile = Join-Path $workDir "apps_range.bin"
+          # Step 4: Extract source ZIPs from the partial download using Python
+          echo ""
+          echo "--- Step 4: Extract source ZIPs ---"
+          STEP_START=$(date +%s%N)
+          python3 << 'PYEOF'
+          import json, struct, zlib, os
 
-          $swStep = [System.Diagnostics.Stopwatch]::StartNew()
-          # aria2c doesn't support byte ranges directly, use curl for the range download
-          # But we CAN use aria2c with a specific byte range via --header
-          & curl -s -o $rangeFile -H "Range: bytes=$firstOffset-$($rangeEnd - 1)" $url
-          $swStep.Stop()
-          $rangeFileSize = (Get-Item $rangeFile).Length
-          Write-Host "Downloaded $([math]::Round($rangeFileSize / 1MB)) MB in $($swStep.Elapsed.TotalSeconds.ToString('F2'))s"
+          work_dir = "/tmp/range-test"
+          extract_dir = f"{work_dir}/extracted"
+          os.makedirs(extract_dir, exist_ok=True)
 
-          # Step 5: Extract the source ZIPs from the range
-          Write-Host ""
-          Write-Host "--- Step 5: Extract source ZIPs ---"
-          $extractDir = Join-Path $workDir "extracted"
-          New-Item -ItemType Directory -Path $extractDir -Force | Out-Null
+          with open(f"{work_dir}/range_info.json") as f:
+              info = json.load(f)
 
-          $swStep = [System.Diagnostics.Stopwatch]::StartNew()
-          $sourceZipCount = 0
-          $sourceZipTotalSize = 0
+          with open(f"{work_dir}/apps_range.bin", "rb") as f:
+              data = f.read()
 
-          foreach ($entry in $appEntries) {
-              if ($entry.Name -notlike "*.Source.zip" -and $entry.Name -notlike "*..Source.zip") { continue }
+          first_offset = info['first_offset']
+          source_count = 0
+          source_total = 0
 
-              # Calculate position in our range file
-              $posInRange = $entry.Offset - $firstOffset
-
-              # Read local file header to get actual extra field length
-              $rangeBytes = [System.IO.File]::ReadAllBytes($rangeFile)
-              if ($posInRange + 30 -gt $rangeBytes.Length) { continue }
-
-              $localNameLen = [BitConverter]::ToUInt16($rangeBytes, $posInRange + 26)
-              $localExtraLen = [BitConverter]::ToUInt16($rangeBytes, $posInRange + 28)
-              $dataStart = $posInRange + 30 + $localNameLen + $localExtraLen
-
-              if ($dataStart + $entry.CompressedSize -gt $rangeBytes.Length) {
-                  Write-Host "##[warning]Entry $($entry.Name) extends beyond range, skipping"
+          for entry in info['app_entries']:
+              name = entry['name']
+              if not (name.endswith('.Source.zip') or name.endswith('..Source.zip')):
                   continue
-              }
 
-              # Extract the compressed data
-              $compMethod = [BitConverter]::ToUInt16($rangeBytes, $posInRange + 8)
+              pos = entry['offset'] - first_offset
+              if pos + 30 > len(data):
+                  continue
 
-              $outName = [System.IO.Path]::GetFileName($entry.Name)
-              $outPath = Join-Path $extractDir $outName
+              # Read local file header
+              name_len = struct.unpack_from('<H', data, pos + 26)[0]
+              extra_len = struct.unpack_from('<H', data, pos + 28)[0]
+              comp_method = struct.unpack_from('<H', data, pos + 8)[0]
+              data_start = pos + 30 + name_len + extra_len
 
-              if ($compMethod -eq 0) {
-                  # Stored (no compression)
-                  $fileData = New-Object byte[] $entry.CompressedSize
-                  [Array]::Copy($rangeBytes, $dataStart, $fileData, 0, $entry.CompressedSize)
-                  [System.IO.File]::WriteAllBytes($outPath, $fileData)
-              } else {
-                  # Deflated - need to decompress
-                  $compData = New-Object byte[] $entry.CompressedSize
-                  [Array]::Copy($rangeBytes, $dataStart, $compData, 0, $entry.CompressedSize)
+              if data_start + entry['comp_size'] > len(data):
+                  print(f"  WARNING: {os.path.basename(name)} extends beyond range, skipping")
+                  continue
 
-                  $memStream = New-Object System.IO.MemoryStream(,$compData)
-                  $deflateStream = New-Object System.IO.Compression.DeflateStream($memStream, [System.IO.Compression.CompressionMode]::Decompress)
-                  $outStream = [System.IO.File]::Create($outPath)
-                  $deflateStream.CopyTo($outStream)
-                  $outStream.Close()
-                  $deflateStream.Close()
-                  $memStream.Close()
-              }
+              comp_data = data[data_start:data_start + entry['comp_size']]
 
-              $sourceZipCount++
-              $sourceZipTotalSize += (Get-Item $outPath).Length
-              Write-Host "  Extracted: $outName ($([math]::Round((Get-Item $outPath).Length / 1MB, 1)) MB)"
-          }
+              if comp_method == 0:
+                  file_data = comp_data
+              elif comp_method == 8:
+                  file_data = zlib.decompress(comp_data, -15)
+              else:
+                  print(f"  WARNING: Unknown compression method {comp_method} for {name}")
+                  continue
 
-          $swStep.Stop()
-          Write-Host "Extracted $sourceZipCount source ZIPs ($([math]::Round($sourceZipTotalSize / 1MB)) MB) in $($swStep.Elapsed.TotalSeconds.ToString('F2'))s"
+              out_name = os.path.basename(name)
+              out_path = os.path.join(extract_dir, out_name)
+              with open(out_path, 'wb') as f:
+                  f.write(file_data)
 
-          $sw.Stop()
+              source_count += 1
+              source_total += len(file_data)
+              print(f"  Extracted: {out_name} ({len(file_data) / 1048576:.1f} MB)")
 
-          # Summary
-          Write-Host ""
-          Write-Host "=========================================="
-          Write-Host "  RANGE REQUEST TOTAL TIME: $($sw.Elapsed.ToString())"
-          Write-Host "  Downloaded: $([math]::Round($rangeFileSize / 1MB)) MB (vs $([math]::Round($totalSize / 1MB)) MB full)"
-          Write-Host "  Source ZIPs extracted: $sourceZipCount"
-          Write-Host "=========================================="
+          print(f"Extracted {source_count} source ZIPs ({source_total // 1048576} MB total)")
+          PYEOF
+          STEP_END=$(date +%s%N)
+          echo "Extraction took $(( (STEP_END - STEP_START) / 1000000 ))ms"
 
-          $client.Dispose()
+          OVERALL_END=$(date +%s%N)
+          OVERALL_MS=$(( (OVERALL_END - OVERALL_START) / 1000000 ))
+          OVERALL_SEC=$((OVERALL_MS / 1000))
+          OVERALL_MS_REM=$((OVERALL_MS % 1000))
+
+          echo ""
+          echo "=========================================="
+          echo "  RANGE REQUEST TOTAL TIME: ${OVERALL_SEC}.${OVERALL_MS_REM}s"
+          echo "  Downloaded: $((RANGE_FILE_SIZE / 1048576)) MB (vs $((TOTAL_SIZE / 1048576)) MB full)"
+          echo "=========================================="
 
       - name: Print summary
-        shell: pwsh
+        shell: bash
         run: |
-          Write-Host ""
-          Write-Host "=========================================="
-          Write-Host "  BENCHMARK COMPLETE"
-          Write-Host "  Compare the times above:"
-          Write-Host "  - Benchmark 1: Full Download-Artifacts"
-          Write-Host "  - Benchmark 2: Range request + extract"
-          Write-Host "=========================================="
+          echo ""
+          echo "=========================================="
+          echo "  BENCHMARK COMPLETE"
+          echo "  Compare the times above:"
+          echo "  - Benchmark 1: Full Download-Artifacts"
+          echo "  - Benchmark 2: Range request + extract"
+          echo "=========================================="
