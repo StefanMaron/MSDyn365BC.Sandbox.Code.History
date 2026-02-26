@@ -120,10 +120,7 @@ codeunit 905 "Assembly Line Management"
         AssemblyLine.Validate("Unit of Measure Code", BOMComponent."Unit of Measure Code");
         OnAddBOMLineOnAfterValidateUOMCode(AssemblyLine, BOMComponent, AssemblyHeader);
         if AssemblyLine.Type <> AssemblyLine.Type::" " then
-            AssemblyLine.Validate(
-                "Quantity per",
-                AssemblyLine.CalcBOMQuantity(
-                BOMComponent.Type, BOMComponent."Quantity per", 1, QtyPerUoM, AssemblyLine."Resource Usage Type"));
+            AssemblyLine."Quantity per" := BOMComponent."Quantity per" * QtyPerUoM;
         IsHandled := false;
         OnAddBOMLineOnBeforeValidateQuantity(AssemblyHeader, AssemblyLine, BOMComponent, IsHandled, QtyPerUoM);
         if not IsHandled then begin
@@ -818,6 +815,7 @@ codeunit 905 "Assembly Line Management"
         LineStartingDate: Date;
         EarliestStartingDate: Date;
         LineAbleToAssemble: Decimal;
+        IsHandled: Boolean;
     begin
         SetLinkToItemLines(AsmHeader, AssemblyLine);
         AssemblyLine.SetFilter("No.", '<>%1', '');
@@ -828,8 +826,11 @@ codeunit 905 "Assembly Line Management"
             repeat
                 LineAbleToAssemble := CalcAvailToAssemble(AssemblyLine, AsmHeader, LineAvailabilityDate);
 
-                if LineAbleToAssemble < OrderAbleToAssemble then
-                    OrderAbleToAssemble := LineAbleToAssemble;
+                IsHandled := false;
+                OnAvailToPromiseOnBeforeAssignOrderAbleToAssemble(AssemblyLine, IsHandled);
+                if not IsHandled then
+                    if LineAbleToAssemble < OrderAbleToAssemble then
+                        OrderAbleToAssemble := LineAbleToAssemble;
 
                 if LineAvailabilityDate > 0D then begin
                     LineStartingDate := CalcDate(AssemblyLine."Lead-Time Offset", LineAvailabilityDate);
@@ -1088,6 +1089,11 @@ codeunit 905 "Assembly Line Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateAndSendNotification(var AssemblyHeader: Record "Assembly Header"; var AssemblyLine: Record "Assembly Line"; var IsHandled: Boolean; var Rollback: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAvailToPromiseOnBeforeAssignOrderAbleToAssemble(var AssemblyLine: Record "Assembly Line"; var IsHandled: Boolean)
     begin
     end;
 

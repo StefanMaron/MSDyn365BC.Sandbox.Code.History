@@ -13,12 +13,15 @@ codeunit 137055 "SCM Warehouse Pick"
         WarehouseJournalBatch: Record "Warehouse Journal Batch";
         WarehouseJournalTemplate: Record "Warehouse Journal Template";
         ItemJournalTemplate: Record "Item Journal Template";
+        ItemJournalTemplatePhysInvt: Record "Item Journal Template";
         ItemJournalBatch: Record "Item Journal Batch";
+        ItemJournalBatchPhysInvt: Record "Item Journal Batch";
         LocationWhite: Record Location;
         LocationBlue: Record Location;
         LocationYellow: Record Location;
         LocationOrange: Record Location;
         LibraryInventory: Codeunit "Library - Inventory";
+        LibraryItemTracking: Codeunit "Library - Item Tracking";
         LibrarySales: Codeunit "Library - Sales";
         LibraryUtility: Codeunit "Library - Utility";
         LibraryWarehouse: Codeunit "Library - Warehouse";
@@ -41,6 +44,8 @@ codeunit 137055 "SCM Warehouse Pick"
         LocationCodeMustNotOccurErr: Label 'Location code %1 must not occur.  Expected value - %2', Comment = '%1 : occured location code, %2 : expected location code.';
         ReturnQtyMismatchErr: Label 'The value in the %1 field in the %2 does not match.', Comment = '%1 :FieldCaption, %2:Table Caption';
         ReservationAction: Option AutoReserve,GetQuantities;
+        PickQuantityErr: Label 'Expected picked quantity %1 %2, but got %3 %2', Comment = '%1, %3 - Quantity; %2 - Unit of Measure Code';
+        ShipQtyErr: Label 'Sales line should be fully shipped with no residual quantity';
 
     [Test]
     [HandlerFunctions('ReservationPageHandler')]
@@ -188,7 +193,7 @@ codeunit 137055 "SCM Warehouse Pick"
 
         // Create Blank Item Journal Line.
         LibraryInventory.CreateItemJournalLine(
-          ItemJournalLine, ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name,
+          ItemJournalLine, ItemJournalBatchPhysInvt."Journal Template Name", ItemJournalBatchPhysInvt.Name,
           ItemJournalLine."Entry Type"::"Positive Adjmt.", '', 0.0);
         Commit();
 
@@ -1776,6 +1781,182 @@ codeunit 137055 "SCM Warehouse Pick"
             StrSubstNo(ReturnQtyMismatchErr, PurchaseLine."Return Qty. Shipped", PurchaseLine.TableCaption));
     end;
 
+    [Test]
+    [Scope('OnPrem')]
+    [HandlerFunctions('CreateInvtPutAwayPickRequestPageHandler,MessageHandler')]
+    procedure InventoryPickRoundingCausesResidualQuantity()
+    var
+        Item: Record Item;
+        ItemUnitOfMeasure: Record "Item Unit of Measure";
+        Location: Record Location;
+        WarehouseEmployee: Record "Warehouse Employee";
+        Customer: Record Customer;
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        WarehouseActivityHeader: Record "Warehouse Activity Header";
+        WarehouseActivityLine: Record "Warehouse Activity Line";
+        UnitOfMeasure: Record "Unit of Measure";
+        Bin: Record Bin;
+        TotalPickedQty: Decimal;
+        QtyPerUOM: Decimal;
+        QtyRoundingPrecision: Decimal;
+        OrderQuantity: Decimal;
+        BinCode: Code[20];
+    begin
+        // [SCENARIO 579500] Inventory pick rounding causes residual quantity When picking items with non-integer UOM conversion and very small 
+        // Quantity Rounding Precision, the pick process may result in rounding residuals
+        Initialize();
+
+        // [GIVEN] Setup variables for rounding test with random values within problematic ranges
+        SetStaticValues579500(QtyPerUOM, QtyRoundingPrecision, OrderQuantity);
+
+        // [GIVEN] Generate random bin code
+        BinCode := LibraryUtility.GenerateRandomCode(SalesLine.FieldNo("Bin Code"), Database::"Sales Line"); // Random bin code
+
+        // [GIVEN] Create item with specific UOM configuration for rounding test and LOT tracking with expiration dates
+        LibraryInventory.CreateItem(Item);
+        SetupItemTrackingWithExpirationDates(Item);
+
+        // [GIVEN] Add secondary UOM with problematic conversion factor and very small rounding precision
+        CreateItemUnitOfMeasure(ItemUnitOfMeasure, UnitOfMeasure, Item, QtyPerUOM, QtyRoundingPrecision);
+
+        // [GIVEN] Set Sales Unit of Measure to the secondary UOM
+        Item.Validate("Sales Unit of Measure", UnitOfMeasure.Code);
+        Item.Modify(true);
+
+        // [GIVEN] Setup Location with Require Pick = YES and Pick According to FEFO = Yes
+        LibraryWarehouse.CreateLocationWMS(Location, false, false, true, false, false);
+        Location.Validate("Bin Mandatory", true);
+        Location.Validate("Pick According to FEFO", true);
+        Location.Modify(true);
+
+        // [GIVEN] Add Warehouse Employee for location
+        LibraryWarehouse.CreateWarehouseEmployee(WarehouseEmployee, Location.Code, true);
+
+        // [GIVEN] Create bin for the location
+        LibraryWarehouse.CreateBin(Bin, Location.Code, BinCode, '', '');
+
+        // [GIVEN] Add inventory for the item (sufficient for order quantity)
+        CreateInventoryForLotAndExpiry579500(Item."No.", Location.Code, Bin.Code);
+
+        // [GIVEN] Create Customer
+        LibrarySales.CreateCustomer(Customer);
+
+        // [GIVEN] Create Sales Order with random quantity 
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.");
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", OrderQuantity);
+        SalesLine.Validate("Location Code", Location.Code);
+        SalesLine.Modify(true);
+
+        // [GIVEN] Release Sales Order
+        LibrarySales.ReleaseSalesDocument(SalesHeader);
+
+        // [GiVEN] Create Inventory Pick from Sales Order
+        Commit();
+        SalesHeader.CreateInvtPutAwayPick();
+
+        // [WHEN] autofill Qty. to Handle, post the pick
+        PostInventoryActivity(WarehouseActivityHeader."Source Document"::"Sales Order", SalesHeader."No.", WarehouseActivityLine."Activity Type"::"Invt. Pick");
+
+        // [GIVEN] Get total picked quantity from Item Ledger Entries
+        GetTotalPickedQuantity(Item."No.", Location.Code, QtyPerUOM, TotalPickedQty);
+
+        // [THEN] Assert that picked quantity equals expected with tolerance for rounding
+        Assert.AreNearlyEqual(OrderQuantity, TotalPickedQty, QtyRoundingPrecision * 10,
+            StrSubstNo(PickQuantityErr, OrderQuantity, UnitOfMeasure.Code, TotalPickedQty));
+
+        // [THEN] Validate that no residual quantity remains (no second pick is required) Check that sales line is fully shipped
+        SalesLine.Get(SalesLine."Document Type", SalesLine."Document No.", SalesLine."Line No.");
+        Assert.AreEqual(SalesLine.Quantity, SalesLine."Quantity Shipped", ShipQtyErr);
+    end;
+
+    [Test]
+    [HandlerFunctions('ItemTrackingLinesAssignLotPageHandler,AvailabilityWarningConfirmHandler')]
+    [Scope('OnPrem')]
+    procedure RegisterPickWhenAnotherOrderHasExcessiveItemTrackingAssignment()
+    var
+        Location: Record Location;
+        WarehouseEmployee: Record "Warehouse Employee";
+        Item: Record Item;
+        ItemTrackingCode: Record "Item Tracking Code";
+        ItemJournalLine: Record "Item Journal Line";
+        SalesHeader: array[2] of Record "Sales Header";
+        SalesLine: array[2] of Record "Sales Line";
+        WarehouseShipmentHeader: array[2] of Record "Warehouse Shipment Header";
+        WarehouseActivityHeader: Record "Warehouse Activity Header";
+        WarehouseActivityLine: Record "Warehouse Activity Line";
+        LotNo: Code[50];
+        InventoryQty: Decimal;
+        SalesQty1: Decimal;
+        SalesQty2: Decimal;
+        ExpectedPickQty2: Decimal;
+    begin
+        // [SCENARIO 563605] Warehouse pick can be registered when another sales order has item tracking assigned for excessive quantity (not yet picked)
+        // Bug fix: CalcQtyPickedNotShipped should not count surplus reservation entries from item tracking assignment without actual warehouse picks
+        Initialize();
+
+        // [GIVEN] Create Location with Require Shipment = Yes, Require Pick = Yes (non-directed put-away and pick)
+        LibraryWarehouse.CreateLocationWMS(Location, false, false, true, false, true);
+        LibraryWarehouse.CreateWarehouseEmployee(WarehouseEmployee, Location.Code, false);
+
+        // [GIVEN] Create Item with Lot-specific Item Tracking
+        LibraryInventory.CreateItemTrackingCode(ItemTrackingCode);
+        ItemTrackingCode.Validate("Lot Specific Tracking", true);
+        ItemTrackingCode.Validate("Lot Warehouse Tracking", true);
+        ItemTrackingCode.Modify(true);
+
+        LibraryInventory.CreateItem(Item);
+        Item.Validate("Item Tracking Code", ItemTrackingCode.Code);
+        Item.Validate("Lot Nos.", LibraryUtility.GetGlobalNoSeriesCode());
+        Item.Modify(true);
+
+        // [GIVEN] Post positive adjustment for 15 units with a Lot No.
+        InventoryQty := 15;
+        LotNo := LibraryUtility.GenerateGUID();
+        CreateAndPostItemJournalLineWithLotNo(ItemJournalLine, Item."No.", Location.Code, InventoryQty, LotNo);
+
+        // [GIVEN] Create Sales Order 1 for 10 units, assign item tracking with the Lot No. for 10 units
+        SalesQty1 := 10;
+        CreateSalesOrderWithLotTracking(SalesHeader[1], SalesLine[1], Item."No.", Location.Code, SalesQty1, LotNo);
+
+        // [GIVEN] Create Warehouse Shipment for Sales Order 1
+        LibrarySales.ReleaseSalesDocument(SalesHeader[1]);
+        LibraryWarehouse.CreateWhseShipmentFromSO(SalesHeader[1]);
+        FindWarehouseShipmentHeader(WarehouseShipmentHeader[1], SalesHeader[1]."No.");
+
+        // [GIVEN] Create Pick from Warehouse Shipment for Sales Order 1 (do NOT register yet)
+        LibraryWarehouse.CreatePick(WarehouseShipmentHeader[1]);
+
+        // [GIVEN] Create Sales Order 2 for 11 units, assign item tracking with the Lot No. for 11 units
+        // (Availability warning will be shown because only 5 units are available, user confirms)
+        SalesQty2 := 11;
+        LibraryVariableStorage.Enqueue(LotNo);
+        LibraryVariableStorage.Enqueue(SalesQty2);
+        CreateSalesOrderWithExcessiveLotTracking(SalesHeader[2], SalesLine[2], Item."No.", Location.Code, SalesQty2);//, LotNo);
+
+        // [GIVEN] Create Warehouse Shipment for Sales Order 2 (do NOT create pick yet)
+        LibrarySales.ReleaseSalesDocument(SalesHeader[2]);
+        LibraryWarehouse.CreateWhseShipmentFromSO(SalesHeader[2]);
+        FindWarehouseShipmentHeader(WarehouseShipmentHeader[2], SalesHeader[2]."No.");
+
+        // [WHEN] Register the Warehouse Pick for Sales Order 1
+        FindWarehouseActivityHeader(WarehouseActivityHeader, WarehouseActivityHeader.Type::Pick, Location.Code, SalesHeader[1]."No.");
+        LibraryWarehouse.RegisterWhseActivity(WarehouseActivityHeader);
+
+        // [THEN] Pick is registered successfully (no error "Lot No. is not available on inventory...")
+        WarehouseActivityLine.SetRange("Activity Type", WarehouseActivityLine."Activity Type"::Pick);
+        WarehouseActivityLine.SetRange("Source No.", SalesHeader[1]."No.");
+        Assert.RecordIsEmpty(WarehouseActivityLine);
+
+        // [WHEN] Create Pick from Warehouse Shipment for Sales Order 2
+        LibraryWarehouse.CreatePick(WarehouseShipmentHeader[2]);
+
+        // [THEN] Pick is created with Quantity = 5 (15 inventory - 10 already picked = 5 remaining)
+        ExpectedPickQty2 := InventoryQty - SalesQty1;
+        FindWarehouseActivityLine(WarehouseActivityLine, WarehouseActivityLine."Activity Type"::Pick, Location.Code, SalesHeader[2]."No.", WarehouseActivityLine."Action Type"::" ");
+        Assert.AreEqual(ExpectedPickQty2, WarehouseActivityLine.Quantity, 'Pick quantity for second sales order should be remaining inventory');
+    end;
+
     local procedure Initialize()
     var
         WarehouseActivityLine: Record "Warehouse Activity Line";
@@ -1923,6 +2104,8 @@ codeunit 137055 "SCM Warehouse Pick"
     begin
         LibraryInventory.SelectItemJournalTemplateName(ItemJournalTemplate, ItemJournalTemplate.Type::Item);
         LibraryInventory.SelectItemJournalBatchName(ItemJournalBatch, ItemJournalTemplate.Type::Item, ItemJournalTemplate.Name);
+        LibraryInventory.SelectItemJournalTemplateName(ItemJournalTemplatePhysInvt, ItemJournalTemplatePhysInvt.Type::"Phys. Inventory");
+        LibraryInventory.SelectItemJournalBatchName(ItemJournalBatchPhysInvt, ItemJournalTemplatePhysInvt.Type::"Phys. Inventory", ItemJournalTemplatePhysInvt.Name);
         ItemJournalBatch.Validate("No. Series", LibraryUtility.GetGlobalNoSeriesCode());
         ItemJournalBatch.Modify(true);
     end;
@@ -2604,6 +2787,224 @@ codeunit 137055 "SCM Warehouse Pick"
         exit(-PurchaseLine."Return Qty. to Ship");
     end;
 
+    local procedure SetupItemTrackingWithExpirationDates(var Item: Record Item)
+    var
+        ItemTrackingCode: Record "Item Tracking Code";
+    begin
+        LibraryInventory.CreateItemTrackingCode(ItemTrackingCode);
+        ItemTrackingCode.Validate("Lot Specific Tracking", true);
+        ItemTrackingCode.Validate("Use Expiration Dates", true);
+        ItemTrackingCode.Validate("Man. Expir. Date Entry Reqd.", true);
+        ItemTrackingCode.Modify(true);
+
+        Item.Validate("Item Tracking Code", ItemTrackingCode.Code);
+        Item.Modify(true);
+    end;
+
+    local procedure SetStaticValues579500(var QtyPerUOM: Decimal; var QtyRoundingPrecision: Decimal; var OrderQuantity: Decimal)
+    begin
+        QtyPerUOM := 2.888;
+        QtyRoundingPrecision := 0.00001;
+        OrderQuantity := 248;
+    end;
+
+    local procedure GetTotalPickedQuantity(ItemNo: Code[20]; LocationCode: Code[10]; QtyPerUOM: Decimal; var TotalPickedQty: Decimal)
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        TotalPickedQty := 0;
+        ItemLedgerEntry.SetRange("Item No.", ItemNo);
+        ItemLedgerEntry.SetRange("Location Code", LocationCode);
+        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Sale);
+        if ItemLedgerEntry.FindSet() then
+            repeat
+                TotalPickedQty += Abs(ItemLedgerEntry.Quantity) / QtyPerUOM;
+            until ItemLedgerEntry.Next() = 0;
+    end;
+
+    local procedure PostInventoryActivity(SourceDocument: Enum "Warehouse Activity Source Document"; SourceNo: Code[20]; ActivityType: Enum "Warehouse Activity Type")
+    var
+        WarehouseActivityHeader: Record "Warehouse Activity Header";
+        WarehouseActivityLine: Record "Warehouse Activity Line";
+    begin
+        WarehouseActivityHeader.SetRange("Source Document", SourceDocument);
+        WarehouseActivityHeader.SetRange("Source No.", SourceNo);
+        WarehouseActivityHeader.SetRange(Type, WarehouseActivityHeader.Type::"Invt. Pick");
+        WarehouseActivityHeader.FindFirst();
+
+        // Autofill Qty. to Handle
+        WarehouseActivityLine.SetRange("Activity Type", ActivityType);
+        WarehouseActivityLine.SetRange("No.", WarehouseActivityHeader."No.");
+        WarehouseActivityLine.SetRange("Action Type", WarehouseActivityLine."Action Type"::Take);
+        if WarehouseActivityLine.FindSet() then
+            repeat
+                WarehouseActivityLine.Validate("Qty. to Handle", WarehouseActivityLine.Quantity);
+                WarehouseActivityLine.Modify(true);
+            until WarehouseActivityLine.Next() = 0;
+
+        // Post the pick (Ship)
+        LibraryWarehouse.PostInventoryActivity(WarehouseActivityHeader, false);
+    end;
+
+    local procedure CreateInventoryForLotAndExpiry579500(ItemNo: Code[20]; LocationCode: Code[10]; BinCode: Code[20])
+    var
+        LotNo: array[10] of Code[50];
+        ExpiryDate: array[10] of Date;
+        Quantity: array[10] of Decimal;
+        i: Integer;
+    begin
+        LotNo[1] := 'LOT01';
+        LotNo[2] := 'LOT03';
+        LotNo[3] := 'LOT06';
+        LotNo[4] := 'LOT01';
+        LotNo[5] := 'LOT02';
+        LotNo[6] := 'LOT03';
+        LotNo[7] := 'LOT04';
+        LotNo[8] := 'LOT02';
+        LotNo[9] := 'LOT03';
+        LotNo[10] := 'LOT05';
+
+        ExpiryDate[1] := 20251130D;
+        ExpiryDate[2] := 20250925D;
+        ExpiryDate[3] := 20250925D;
+        ExpiryDate[4] := 20250925D;
+        ExpiryDate[5] := 20251130D;
+        ExpiryDate[6] := 20250925D;
+        ExpiryDate[7] := 20250606D;
+        ExpiryDate[8] := 20250616D;
+        ExpiryDate[9] := 20250925D;
+        ExpiryDate[10] := 20250713D;
+
+        Quantity[1] := 434.97616;
+        Quantity[2] := 17.3126;
+        Quantity[3] := 17.0373;
+        Quantity[4] := 4.13394;
+        Quantity[5] := 4.34355;
+        Quantity[6] := 151.33333;
+        Quantity[7] := 40.01221;
+        Quantity[8] := 1.78787;
+        Quantity[9] := 42.73313;
+        Quantity[10] := 4.013;
+
+        for i := 1 to ArrayLen(LotNo) do
+            UpdateItemInventoryWithLot(ItemNo, LocationCode, BinCode, Quantity[i], LotNo[i], ExpiryDate[i]);
+    end;
+
+    local procedure UpdateItemInventoryWithLot(ItemNo: Code[20]; LocationCode: Code[10]; BinCode: Code[20]; Quantity: Decimal; LotNo: Code[50]; ExpiryDate: Date)
+    var
+        ItemJournalLine: Record "Item Journal Line";
+    begin
+        LibraryInventory.ClearItemJournal(ItemJournalTemplate, ItemJournalBatch);
+        ItemJournalBatch.Validate("Item Tracking on Lines", true);
+        ItemJournalBatch.Modify(true);
+
+        LibraryInventory.CreateItemJournalLine(
+            ItemJournalLine, ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name,
+            ItemJournalLine."Entry Type"::"Positive Adjmt.", ItemNo, Quantity);
+        ItemJournalLine.Validate("Location Code", LocationCode);
+        ItemJournalLine.Validate("Bin Code", BinCode);
+        ItemJournalLine."Lot No." := LotNo;
+        ItemJournalLine."Expiration Date" := ExpiryDate;
+        ItemJournalLine.Modify(true);
+        LibraryInventory.PostItemJournalLine(ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name);
+    end;
+
+    local procedure CreateItemUnitOfMeasure(
+        var ItemUnitOfMeasure: Record "Item Unit of Measure";
+        var UnitOfMeasure: Record "Unit of Measure";
+        Item: Record Item;
+        QtyPerUOM: Decimal;
+        QtyRoundingPrecision: Decimal)
+    begin
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        ItemUnitOfMeasure.SetRange("Item No.", Item."No.");
+        ItemUnitOfMeasure.SetRange(Code, Item."Base Unit of Measure");
+        ItemUnitOfMeasure.FindFirst();
+        ItemUnitOfMeasure.Validate("Qty. Rounding Precision", QtyRoundingPrecision);
+        ItemUnitOfMeasure.Modify(true);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUnitOfMeasure, Item."No.", UnitOfMeasure.Code, QtyPerUOM);
+        ItemUnitOfMeasure.Validate("Qty. Rounding Precision", QtyRoundingPrecision);
+        ItemUnitOfMeasure.Modify(true);
+    end;
+
+    local procedure CreateAndPostItemJournalLineWithLotNo(var ItemJournalLine: Record "Item Journal Line"; ItemNo: Code[20]; LocationCode: Code[10]; Quantity: Decimal; LotNo: Code[50])
+    var
+        ItemJournalBatch: Record "Item Journal Batch";
+        ReservationEntry: Record "Reservation Entry";
+    begin
+        LibraryInventory.SelectItemJournalBatchName(ItemJournalBatch, ItemJournalTemplate.Type::Item, ItemJournalTemplate.Name);
+        LibraryInventory.CreateItemJournalLine(
+            ItemJournalLine, ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name,
+            ItemJournalLine."Entry Type"::"Positive Adjmt.", ItemNo, Quantity);
+        ItemJournalLine.Validate("Location Code", LocationCode);
+        ItemJournalLine.Modify(true);
+
+        LibraryItemTracking.CreateItemJournalLineItemTracking(ReservationEntry, ItemJournalLine, '', LotNo, Quantity);
+        LibraryInventory.PostItemJournalLine(ItemJournalLine."Journal Template Name", ItemJournalLine."Journal Batch Name");
+    end;
+
+    local procedure CreateSalesOrderWithLotTracking(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; ItemNo: Code[20]; LocationCode: Code[10]; Quantity: Decimal; LotNo: Code[50])
+    var
+        ReservationEntry: Record "Reservation Entry";
+    begin
+        LibrarySales.CreateSalesDocumentWithItem(
+            SalesHeader, SalesLine, SalesHeader."Document Type"::Order,
+            LibrarySales.CreateCustomerNo(), ItemNo, Quantity, LocationCode, WorkDate());
+        LibraryItemTracking.CreateSalesOrderItemTracking(ReservationEntry, SalesLine, '', LotNo, Quantity);
+    end;
+
+    local procedure CreateSalesOrderWithExcessiveLotTracking(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; ItemNo: Code[20]; LocationCode: Code[10]; Quantity: Decimal)
+    begin
+        LibrarySales.CreateSalesDocumentWithItem(
+            SalesHeader, SalesLine, SalesHeader."Document Type"::Order,
+            LibrarySales.CreateCustomerNo(), ItemNo, Quantity, LocationCode, WorkDate());
+
+        // Open item tracking lines - handler will assign lot with excessive quantity and confirm availability warning
+        SalesLine.OpenItemTrackingLines();
+    end;
+
+    local procedure FindWarehouseActivityHeader(var WarehouseActivityHeader: Record "Warehouse Activity Header"; ActivityType: Enum "Warehouse Activity Type"; LocationCode: Code[10]; SourceNo: Code[20])
+    var
+        WarehouseActivityLine: Record "Warehouse Activity Line";
+    begin
+        WarehouseActivityLine.SetRange("Activity Type", ActivityType);
+        WarehouseActivityLine.SetRange("Location Code", LocationCode);
+        WarehouseActivityLine.SetRange("Source No.", SourceNo);
+        WarehouseActivityLine.FindFirst();
+        WarehouseActivityHeader.Get(WarehouseActivityLine."Activity Type", WarehouseActivityLine."No.");
+    end;
+
+    local procedure FindWarehouseActivityLine(var WarehouseActivityLine: Record "Warehouse Activity Line"; ActivityType: Enum "Warehouse Activity Type"; LocationCode: Code[10]; SourceNo: Code[20]; ActionType: Enum "Warehouse Action Type")
+    begin
+        WarehouseActivityLine.SetRange("Activity Type", ActivityType);
+        WarehouseActivityLine.SetRange("Location Code", LocationCode);
+        WarehouseActivityLine.SetRange("Source No.", SourceNo);
+        WarehouseActivityLine.SetRange("Action Type", ActionType);
+        WarehouseActivityLine.FindFirst();
+    end;
+
+    [ModalPageHandler]
+    [Scope('OnPrem')]
+    procedure ItemTrackingLinesAssignLotPageHandler(var ItemTrackingLines: TestPage "Item Tracking Lines")
+    var
+        LotNo: Code[50];
+        Qty: Decimal;
+    begin
+        LotNo := LibraryVariableStorage.DequeueText();
+        Qty := LibraryVariableStorage.DequeueDecimal();
+        ItemTrackingLines."Lot No.".SetValue(LotNo);
+        ItemTrackingLines."Quantity (Base)".SetValue(Qty);
+        ItemTrackingLines.OK().Invoke();
+    end;
+
+    [ConfirmHandler]
+    [Scope('OnPrem')]
+    procedure AvailabilityWarningConfirmHandler(Question: Text[1024]; var Reply: Boolean)
+    begin
+        // Confirm the availability warning when assigning excessive item tracking
+        Reply := true;
+    end;
+
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure ReservationPageHandler(var Reservation: TestPage Reservation)
@@ -2715,6 +3116,13 @@ codeunit 137055 "SCM Warehouse Pick"
         ProdOrderRouting.Type.SetValue(ProdOrderRoutingLine.Type::"Machine Center".AsInteger());
         ProdOrderRouting."No.".SetValue(MachineCenter."No.");
         ProdOrderRouting."Setup Time".SetValue(100);
+    end;
+
+    [RequestPageHandler]
+    procedure CreateInvtPutAwayPickRequestPageHandler(var CreateInvtPutAwayPickMvmt: TestRequestPage "Create Invt Put-away/Pick/Mvmt")
+    begin
+        CreateInvtPutAwayPickMvmt.CInvtPick.SetValue(true);
+        CreateInvtPutAwayPickMvmt.OK().Invoke();
     end;
 }
 
