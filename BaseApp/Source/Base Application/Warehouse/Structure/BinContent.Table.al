@@ -9,6 +9,7 @@ using Microsoft.Warehouse.Journal;
 using Microsoft.Warehouse.Ledger;
 using Microsoft.Warehouse.Setup;
 using Microsoft.Warehouse.Tracking;
+using Microsoft.Warehouse.Worksheet;
 using System.Globalization;
 using System.Telemetry;
 using System.Utilities;
@@ -756,7 +757,9 @@ table 7302 "Bin Content"
         exit(
           Round("Min. Qty." * "Qty. per Unit of Measure", UOMMgt.QtyRndPrecision()) >
           "Quantity (Base)" +
-          Abs("Put-away Quantity (Base)" - ExcludeQtyBase + "Positive Adjmt. Qty. (Base)"));
+          Abs("Put-away Quantity (Base)" - ExcludeQtyBase + "Positive Adjmt. Qty. (Base)") +
+          CalcWorksheetQty());
+
     end;
 
     procedure CalcQtyToReplenish(ExcludeQtyBase: Decimal) Result: Decimal
@@ -919,9 +922,14 @@ table 7302 "Bin Content"
             then begin
                 if "Max. Qty." <> 0 then begin
                     QtyAvailToPutAwayBase := CalcQtyAvailToPutAway(DeductQtyBase);
-                    WMSMgt.CheckPutAwayAvailability(
-                        "Bin Code", WhseActivLine.FieldCaption("Qty. (Base)"), TableCaption(), QtyBase, Math.Min(QtyAvailToPutAwayBase, "Max. Qty."),
-                        (Location."Bin Capacity Policy" = Location."Bin Capacity Policy"::"Prohibit More Than Max. Cap.") and CalledbyPosting);
+                    if Location."Bin Capacity Policy" = Location."Bin Capacity Policy"::"Prohibit More Than Max. Cap." then
+                        WMSMgt.CheckPutAwayAvailability(
+                            "Bin Code", WhseActivLine.FieldCaption("Qty. (Base)"), TableCaption(), QtyBase, Math.Min(QtyAvailToPutAwayBase, "Max. Qty."),
+                            (Location."Bin Capacity Policy" = Location."Bin Capacity Policy"::"Prohibit More Than Max. Cap.") and CalledbyPosting)
+                    else
+                        WMSMgt.CheckPutAwayAvailability(
+                            "Bin Code", WhseActivLine.FieldCaption("Qty. (Base)"), TableCaption(), QtyBase, Math.Min(QtyAvailToPutAwayBase, ("Max. Qty." * "Qty. per Unit of Measure")),
+                            (Location."Bin Capacity Policy" = Location."Bin Capacity Policy"::"Prohibit More Than Max. Cap.") and CalledbyPosting);
                 end;
                 if Location."Bin Capacity Policy" in [Location."Bin Capacity Policy"::"Prohibit More Than Max. Cap.", Location."Bin Capacity Policy"::"Allow More Than Max. Capacity"] then begin
                     GetBin("Location Code", "Bin Code");
@@ -1442,6 +1450,20 @@ table 7302 "Bin Content"
     begin
         IsTrackingFiltersExist := (GetFilter("Lot No. Filter") <> '') or (GetFilter("Serial No. Filter") <> '');
         OnAfterTrackingFiltersExist(Rec, IsTrackingFiltersExist);
+    end;
+
+    local procedure CalcWorksheetQty(): Decimal
+    var
+        WhseWorksheetLine: Record "Whse. Worksheet Line";
+    begin
+        WhseWorksheetLine.SetRange("Item No.", "Item No.");
+        WhseWorksheetLine.SetRange("To Zone Code", "Zone Code");
+        WhseWorksheetLine.SetRange("Location Code", "Location Code");
+        WhseWorksheetLine.SetRange("Variant Code", "Variant Code");
+        WhseWorksheetLine.SetRange("Unit of Measure Code", "Unit of Measure Code");
+        WhseWorksheetLine.SetRange("To Bin Code", "Bin Code");
+        WhseWorksheetLine.CalcSums("Qty. Outstanding (Base)");
+        exit(WhseWorksheetLine."Qty. Outstanding (Base)");
     end;
 
     [IntegrationEvent(false, false)]

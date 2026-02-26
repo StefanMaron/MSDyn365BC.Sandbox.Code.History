@@ -630,8 +630,8 @@ codeunit 139767 "UT Report Bank Deposit"
         BankDepositHeader.Delete();
     end;
 
-    [Test]
     [HandlerFunctions('DepositTestReportRequestHandler,ApplyCustEntriesOKPageHandler')]
+    [Test]
     procedure AcceptedPaymentToleranceWhenPaymentAppliedMultipleInvoices()
     var
         BankDepositHeader: Record "Bank Deposit Header";
@@ -1030,7 +1030,7 @@ codeunit 139767 "UT Report Bank Deposit"
         ApplyCustomerEntries."Max. Payment Tolerance".SetValue(1);
         ApplyCustomerEntries.OK().Invoke();
     end;
-    
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInitialize(var InitializeHandled: Boolean)
     begin
