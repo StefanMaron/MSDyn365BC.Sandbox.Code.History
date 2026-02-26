@@ -150,8 +150,21 @@ $Versions | Sort-Object -Property Country, Version | % {
         }
 
         if (-not $TargetPathOfVersion -or -not (Test-Path $TargetPathOfVersion)) {
-            Write-Host "##[warning]No Applications folder found for $($country)-$($version.ToString()), skipping (artifact may not contain source code)"
+            Write-Host "##[warning]No Applications folder found for $($country)-$($version.ToString()), creating version marker commit only"
+
+            "$($country)-$($version.ToString())" > version.txt
+            git add -A | out-null
+            git commit -a -m "$($country)-$($version.ToString())" | out-null
+
+            Write-Host "Pushing to origin..."
+            git push --set-upstream origin "$($country)-$($Version.Major)"
+            if ($LASTEXITCODE -ne 0) {
+                Write-Host "##[error]Push failed for $($country)-$($Version.Major)"
+                exit 1
+            }
+
             Flush-ContainerHelperCache -keepDays 0 -ErrorAction SilentlyContinue
+            Write-Host "$($country)-$($version.ToString())"
             return
         }
 
