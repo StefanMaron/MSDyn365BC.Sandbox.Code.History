@@ -2417,7 +2417,7 @@ table 18 Customer
 
     fieldgroups
     {
-        fieldgroup(DropDown; "No.", Name, Address, City, "Post Code", "Phone No.", Contact, "E-Mail", "Bill-to Customer No.", "Registration Number", "VAT Registration No.")
+        fieldgroup(DropDown; "No.", Name, Address, City, "Post Code", "Phone No.", Contact, "E-Mail", "Bill-to Customer No.", "Registration Number")
         {
         }
         fieldgroup(Brick; "No.", Name, "Balance (LCY)", Contact, "Balance Due (LCY)", Image)
