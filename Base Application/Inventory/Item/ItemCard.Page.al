@@ -2374,9 +2374,6 @@ page 30 "Item Card"
                 actionref(ApplyTemplate_Promoted; ApplyTemplate)
                 {
                 }
-                actionref("Update Variant Attributes_Promoted"; "Update Variant Attributes")
-                {
-                }
             }
             group(Category_Category7)
             {
