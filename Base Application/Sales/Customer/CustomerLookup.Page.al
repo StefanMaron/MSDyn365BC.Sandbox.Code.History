@@ -84,10 +84,7 @@ page 33 "Customer Lookup"
                 field(RegistrationNumber; Rec."Registration Number")
                 {
                     ApplicationArea = All;
-                }
-                field("VAT Registration No."; Rec."VAT Registration No.")
-                {
-                    ApplicationArea = All;
+                    Visible = false;
                 }
                 field("Customer Posting Group"; Rec."Customer Posting Group")
                 {
