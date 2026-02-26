@@ -1042,7 +1042,7 @@ table 18 Customer
             trigger OnLookup()
             var
                 ReminderTermsRecord: Record "Reminder Terms";
-                ReminderTerms: Page "Reminder Terms";
+                ReminderTerms: Page "Reminder Terms List";
             begin
                 ReminderTerms.LookupMode(true);
                 if ReminderTerms.RunModal() <> ACTION::LookupOK then
@@ -1434,7 +1434,8 @@ table 18 Customer
                 if "Primary Contact No." <> '' then begin
                     Cont.Get("Primary Contact No.");
 
-                    CheckCustomerContactRelation(Cont);
+                    if Rec."Contact Type" = Rec."Contact Type"::Company then
+                        CheckCustomerContactRelation(Cont);
 
                     if Cont.Type = Cont.Type::Person then begin
                         Contact := Cont.Name;
@@ -2168,9 +2169,13 @@ table 18 Customer
             exit;
 
         ContactForLookup.FilterGroup(2);
-        if ContactBusinessRelation.FindByRelation(ContactBusinessRelation."Link to Table"::Customer, "No.") then
-            ContactForLookup.SetRange("Company No.", ContactBusinessRelation."Contact No.")
-        else
+        if ContactBusinessRelation.FindByRelation(ContactBusinessRelation."Link to Table"::Customer, "No.") then begin
+            if ContactForLookup.Get(ContactBusinessRelation."Contact No.") and (ContactForLookup.Type = ContactForLookup.Type::Person) then begin
+                ContactForLookup.SetRange(Type, ContactForLookup.Type::Person);
+                ContactForLookup.SetRange("No.", ContactBusinessRelation."Contact No.");
+            end else
+                ContactForLookup.SetRange("Company No.", ContactBusinessRelation."Contact No.")
+        end else
             ContactForLookup.SetRange("Company No.", '');
 
         if "Primary Contact No." <> '' then
@@ -3505,14 +3510,20 @@ table 18 Customer
     var
         SalesShippedNotInvoicedLCY: Query "Sales Shipped Not Invoiced LCY";
         ShippedFromOrderLCY: Decimal;
+        SalesOrderNo: Code[20];
     begin
+        SalesOrderNo := '';
         ShippedFromOrderLCY := 0;
         SalesShippedNotInvoicedLCY.SetRange(BillToCustomerNo, "No.");
         SalesShippedNotInvoicedLCY.SetFilter(OrderNo, '<>%1', '');
         SalesShippedNotInvoicedLCY.SetFilter(OrderLineNo, '<>%1', 0);
         if SalesShippedNotInvoicedLCY.Open() then
-            while SalesShippedNotInvoicedLCY.Read() do
-                ShippedFromOrderLCY += SalesShippedNotInvoicedLCY.ShippedNotInvoicedLCY;
+            while SalesShippedNotInvoicedLCY.Read() do begin
+                if SalesShippedNotInvoicedLCY.OrderNo <> SalesOrderNo then
+                    ShippedFromOrderLCY += SalesShippedNotInvoicedLCY.ShippedNotInvoicedLCY;
+
+                SalesOrderNo := SalesShippedNotInvoicedLCY.OrderNo;
+            end;
         exit(ShippedFromOrderLCY);
     end;
 
