@@ -9,6 +9,18 @@
   },
   "folders": [
     {
+      "path": "./system application/Test/System Application Test Library"
+    },
+    {
+      "path": "./system application/Test/System Application Test/DisabledTests"
+    },
+    {
+      "path": "./system application/Test/System Application Test/Extension Management/testArtifacts"
+    },
+    {
+      "path": "./system application/source/System Application/Email/src/Test Email"
+    },
+    {
       "path": "./Shopify/test/Shopify Connector Test"
     },
     {
@@ -16,6 +28,9 @@
     },
     {
       "path": "./EDocumentConnectors/B2Brouter/Test/E-Document Connector - B2Brouter Tests"
+    },
+    {
+      "path": "./EDocumentConnectors/Continia/Test/E-Document Connector - Continia Tests"
     },
     {
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
@@ -46,24 +61,6 @@
     },
     {
       "path": "./EssentialBusinessHeadlines/Test/Essential Business Headlines Test"
-    },
-    {
-      "path": "./businessfoundation/Test/Business Foundation Test Libraries"
-    },
-    {
-      "path": "./businessfoundation/Test/Business Foundation Tests/DisabledTests"
-    },
-    {
-      "path": "./system application/source/System Application/Email/src/Test Email"
-    },
-    {
-      "path": "./system application/Test/System Application Test Library"
-    },
-    {
-      "path": "./system application/Test/System Application Test/DisabledTests"
-    },
-    {
-      "path": "./system application/Test/System Application Test/Extension Management/testArtifacts"
     },
     {
       "path": "./APIV1/Test/_Exclude_APIV1_ Tests"
@@ -225,6 +222,12 @@
       "path": "./ServiceDeclaration/Test/Service Declaration Tests"
     },
     {
+      "path": "./businessfoundation/Test/Business Foundation Test Libraries"
+    },
+    {
+      "path": "./businessfoundation/Test/Business Foundation Tests/DisabledTests"
+    },
+    {
       "path": "./BankAccRecWithAI/Test/Bank Account Reconciliation With AI Tests"
     },
     {
@@ -265,18 +268,6 @@
     },
     {
       "path": "./ContosoCoffeeDemoDataset/Test/Contoso Coffee Demo Dataset Tests/src/TestImplementations"
-    },
-    {
-      "path": "./System Application/Test/System Application Test Library"
-    },
-    {
-      "path": "./System Application/Test/System Application Test/DisabledTests"
-    },
-    {
-      "path": "./System Application/Test/System Application Test/Extension Management/testArtifacts"
-    },
-    {
-      "path": "./System Application/Source/System Application/Email/src/Test Email"
     },
     {
       "path": "./Onprem Permissions/Test/OnPrem Permissions Tests"
