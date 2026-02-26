@@ -1809,7 +1809,7 @@ codeunit 90 "Purch.-Post"
             else
                 ItemJnlLine.CopyDocumentFields(
                   ItemJnlLine."Document Type"::"Purchase Receipt",
-                  PurchRcptHeader."No.", PurchRcptHeader."Vendor Shipment No.", SrcCode, PurchRcptHeader."No. Series");
+                  PurchRcptHeader."No.", SetExternalDocumentNo(), SrcCode, PurchRcptHeader."No. Series");
             if QtyToBeInvoiced <> 0 then
                 if ItemJnlLine."Document No." = '' then
                     if PurchLine."Document Type" = PurchLine."Document Type"::"Credit Memo" then
@@ -3527,8 +3527,12 @@ codeunit 90 "Purch.-Post"
             end;
         end;
 
-        DeferralUtilities.AdjustTotalAmountForDeferrals(
-          PurchLine."Deferral Code", AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, TotalVATBase, TotalVATBaseACY, PurchLine."Inv. Discount Amount" + PurchLine."Line Discount Amount", PurchLineACY."Inv. Discount Amount" + PurchLineACY."Line Discount Amount");
+        if PurchSetup."Discount Posting" = PurchSetup."Discount Posting"::"No Discounts" then
+            DeferralUtilities.AdjustTotalAmountForDeferrals(
+              PurchLine."Deferral Code", AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, TotalVATBase, TotalVATBaseACY, 0, 0)
+        else
+            DeferralUtilities.AdjustTotalAmountForDeferrals(
+              PurchLine."Deferral Code", AmtToDefer, AmtToDeferACY, TotalAmount, TotalAmountACY, TotalVATBase, TotalVATBaseACY, PurchLine."Inv. Discount Amount" + PurchLine."Line Discount Amount", PurchLineACY."Inv. Discount Amount" + PurchLineACY."Line Discount Amount");
 
         IsHandled := false;
         OnBeforeInvoicePostingBufferSetAmounts(
@@ -3584,7 +3588,10 @@ codeunit 90 "Purch.-Post"
         if PurchLine."Deferral Code" <> '' then begin
             OnBeforeFillDeferralPostingBuffer(
               PurchLine, InvoicePostBuffer, TempInvoicePostBuffer, PurchHeader.GetUseDate(), InvDefLineNo, DeferralLineNo, SuppressCommit);
-            FillDeferralPostingBuffer(PurchHeader, PurchLine, InvoicePostBuffer, AmtToDefer, AmtToDeferACY, DeferralAccount, PurchAccount, PurchLine."Inv. Discount Amount" + PurchLine."Line Discount Amount", PurchLineACY."Inv. Discount Amount" + PurchLineACY."Line Discount Amount");
+            if PurchSetup."Discount Posting" = PurchSetup."Discount Posting"::"No Discounts" then
+                FillDeferralPostingBuffer(PurchHeader, PurchLine, InvoicePostBuffer, AmtToDefer, AmtToDeferACY, DeferralAccount, PurchAccount, 0, 0)
+            else
+                FillDeferralPostingBuffer(PurchHeader, PurchLine, InvoicePostBuffer, AmtToDefer, AmtToDeferACY, DeferralAccount, PurchAccount, PurchLine."Inv. Discount Amount" + PurchLine."Line Discount Amount", PurchLineACY."Inv. Discount Amount" + PurchLineACY."Line Discount Amount");
         end;
 
         if PurchLine."Prepayment Line" then
@@ -5715,6 +5722,7 @@ codeunit 90 "Purch.-Post"
     local procedure CreatePrepmtLines(PurchHeader: Record "Purchase Header"; CompleteFunctionality: Boolean)
     var
         GLAcc: Record "G/L Account";
+        PurchRcptLine: Record "Purch. Rcpt. Line";
         TempPurchLine: Record "Purchase Line" temporary;
         TempExtTextLine: Record "Extended Text Line" temporary;
         GenPostingSetup: Record "General Posting Setup";
@@ -5836,6 +5844,10 @@ codeunit 90 "Purch.-Post"
                         TempPrepmtPurchLine."Job No." := TempPurchLine."Job No.";
                         TempPrepmtPurchLine."Job Task No." := TempPurchLine."Job Task No.";
                         TempPrepmtPurchLine."Job Line Type" := TempPurchLine."Job Line Type";
+                        if PurchRcptLine.Get(TempPurchLine."Receipt No.", TempPurchLine."Receipt Line No.") then begin
+                            TempPrepmtPurchLine."Order No." := PurchRcptLine."Order No.";
+                            TempPrepmtPurchLine."Order Line No." := PurchRcptLine."Order Line No.";
+                        end;
                         TempPrepmtPurchLine."Line No." := NextLineNo;
                         NextLineNo := NextLineNo + 10000;
                         OnBeforeTempPrepmtPurchLineInsert(TempPrepmtPurchLine, TempPurchLine, PurchHeader, CompleteFunctionality);
@@ -10408,6 +10420,14 @@ codeunit 90 "Purch.-Post"
     begin
         ItemChargeAssgntPurch.SetFilter("Applies-to Doc. Line No.", '<>%1', ItemChargeAssgntPurch."Applies-to Doc. Line No.");
         ItemChargeAssgntPurch.DeleteAll();
+    end;
+
+    local procedure SetExternalDocumentNo(): Code[35]
+    begin
+        if PurchRcptHeader."Vendor Shipment No." <> '' then
+            exit(PurchRcptHeader."Vendor Shipment No.");
+
+        exit(GenJnlLineExtDocNo);
     end;
 
     [IntegrationEvent(false, false)]

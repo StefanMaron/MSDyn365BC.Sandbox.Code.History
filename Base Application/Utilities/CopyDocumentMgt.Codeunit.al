@@ -2161,6 +2161,9 @@ codeunit 6620 "Copy Document Mgt."
                 PurchaseHeader."Posting Date" := WorkDate()
             else
                 PurchaseHeader."Posting Date" := OriginalPurchaseHeader."Posting Date";
+#if not CLEAN25
+        PurchaseHeader.Validate("IRS 1099 Amount", 0);
+#endif
     end;
 
     local procedure UpdatePurchHeaderWhenCopyFromPurchHeaderArchive(var PurchaseHeader: Record "Purchase Header")
@@ -7893,7 +7896,9 @@ codeunit 6620 "Copy Document Mgt."
 
         ToSalesLine."Job No." := FromSalesLine."Job No.";
         ToSalesLine."Job Task No." := FromSalesLine."Job Task No.";
-        if ToSalesHeader."Document Type" = ToSalesHeader."Document Type"::Invoice then
+        if (ToSalesHeader."Document Type" = ToSalesHeader."Document Type"::Invoice) and
+           (FromSalesLine."Job Contract Entry No." <> 0)
+        then
             ToSalesLine."Job Contract Entry No." :=
               CreateJobPlanningLine(ToSalesHeader, ToSalesLine, FromSalesLine."Job Contract Entry No.")
         else
