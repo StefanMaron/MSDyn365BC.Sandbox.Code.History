@@ -1021,6 +1021,7 @@ page 490 "Acc. Schedule Overview"
                     AccSchedManagement.FindPeriod(Rec, '>=', TempFinancialReport.GetEffectivePeriodType());
                     DateFilter := Rec.GetFilter("Date Filter");
                     UpdateColumnCaptions();
+                    CurrPage.Update();
                 end;
             }
             action(PreviousPeriod)
@@ -1035,6 +1036,7 @@ page 490 "Acc. Schedule Overview"
                     AccSchedManagement.FindPeriod(Rec, '<=', TempFinancialReport.GetEffectivePeriodType());
                     DateFilter := Rec.GetFilter("Date Filter");
                     UpdateColumnCaptions();
+                    CurrPage.Update();
                 end;
             }
             action(NextColumn)
