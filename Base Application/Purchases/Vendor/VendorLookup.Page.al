@@ -76,7 +76,10 @@ page 34 "Vendor Lookup"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the vendor''s registration number.';
-                    Visible = false;
+                }
+                field("VAT Registration No."; Rec."VAT Registration No.")
+                {
+                    ApplicationArea = Basic, Suite;
                 }
                 field("Fax No."; Rec."Fax No.")
                 {
