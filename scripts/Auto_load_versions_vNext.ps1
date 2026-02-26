@@ -24,7 +24,7 @@ Get-BCArtifactUrl -select All -Type Sandbox -country $country -accept_insiderEul
     $ourObject = New-Object -TypeName psobject -Property $objectProperty
 
     if ($Version -ge [version]::Parse('23.5.0.0')) {
-        $Versions.Add($ourObject)
+        $Versions.Add($ourObject) | Out-Null
     }
 }
 
@@ -35,7 +35,7 @@ $Versions | Sort-Object -Property Country, Version | % {
     [version]$Version = $_.Version
     $country = $_.Country.Trim()
 
-    Write-Host ($($country)-$($version.ToString()))
+    Write-Host "$($country)-$($version.ToString())"
 
     # Defensive check: clean up any stuck rebase state before processing
     $RebaseMergeDir = Join-Path (Get-Location) ".git/rebase-merge"
