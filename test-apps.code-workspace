@@ -16,6 +16,9 @@
       "path": "./EDocumentConnectors/Avalara/Test/E-Document Connector - Avalara Tests"
     },
     {
+      "path": "./EDocumentConnectors/FORNAV/Test/E-Document Connector - FORNAV Tests"
+    },
+    {
       "path": "./EDocumentConnectors/Pagero/Test/E-Document Connector - Pagero Tests"
     },
     {
