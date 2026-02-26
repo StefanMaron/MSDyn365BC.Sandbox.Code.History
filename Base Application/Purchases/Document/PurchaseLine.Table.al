@@ -136,6 +136,9 @@ table 39 "Purchase Line"
                                 PurchHeader.TestField(Status, PurchHeader.Status::Open);
                         Type::"Charge (Item)":
                             DeleteChargeChargeAssgnt("Document Type", "Document No.", "Line No.");
+                        Type::" ":
+                            if ("Attached to Line No." <> 0) and (Quantity = 0) then
+                                Error(ChangeExtendedTextErr, FieldCaption(Type));
                     end;
                     if xRec."Deferral Code" <> '' then
                         DeferralUtilities.RemoveOrSetDeferralSchedule('',
@@ -2115,6 +2118,12 @@ table 39 "Purchase Line"
                     UpdateJobPrices();
                 end;
                 UpdateDimensionsFromJobTask();
+
+                if (xRec."Line Discount %" <> "Line Discount %") and
+                   (xRec."Job Task No." <> "Job Task No.") and
+                   ("Line Discount Amount" <> 0)
+                then
+                    UpdateLineDiscPct();
             end;
         }
         field(1002; "Job Line Type"; Enum "Job Line Type")
@@ -4108,6 +4117,7 @@ table 39 "Purchase Line"
         CannotChangeVATGroupWithPrepmInvErr: Label 'You cannot change the VAT product posting group because prepayment invoices have been posted.\\You need to post the prepayment credit memo to be able to change the VAT product posting group.';
         CannotChangePrepmtAmtDiffVAtPctErr: Label 'You cannot change the prepayment amount because the prepayment invoice has been posted with a different VAT percentage. Please check the settings on the prepayment G/L account.';
         LineAmountInvalidErr: Label 'You have set the line amount to a value that results in a discount that is not valid. Consider increasing the unit cost instead.';
+        ChangeExtendedTextErr: Label 'You cannot change %1 for Extended Text Line.', Comment = '%1= Field Caption';
 
     protected var
         HideValidationDialog: Boolean;
@@ -6340,7 +6350,7 @@ table 39 "Purchase Line"
         else
             if PurchHeader."Prices Including VAT" then
                 ItemChargeAssgntLineAmt :=
-                  Round(CalcLineAmount() / (1 + "VAT %" / 100), Currency."Amount Rounding Precision")
+                  Round(CalcLineAmount() / (1 + "VAT %" / 100), Currency."Amount Rounding Precision") + NonDeductibleVAT.GetNonDeductibleVATAmountForItemCost(Rec)
             else
                 ItemChargeAssgntLineAmt := CalcLineAmount();
 
@@ -11031,6 +11041,21 @@ table 39 "Purchase Line"
     begin
         PurchaseHeader.Get(Rec."Document Type", Rec."Document No.");
         ShowDeferrals(PurchaseHeader."Posting Date", PurchaseHeader."Currency Code");
+    end;
+
+    procedure RecalculateAmounts(DocumentType: Enum "Purchase Document Type"; DocumentNo: Code[20]; ExcludeLineNo: Integer)
+    var
+        PurchaseLine: Record "Purchase Line";
+    begin
+        PurchaseLine.SetRange("Document Type", DocumentType);
+        PurchaseLine.SetRange("Document No.", DocumentNo);
+        PurchaseLine.SetFilter("Line No.", '<>%1', ExcludeLineNo);
+        PurchaseLine.SetFilter("Direct Unit Cost", '<>%1', 0);
+        if PurchaseLine.FindSet(true) then
+            repeat
+                PurchaseLine.UpdateAmounts();
+                PurchaseLine.Modify(true);
+            until PurchaseLine.Next() = 0;
     end;
 
     [IntegrationEvent(false, false)]
