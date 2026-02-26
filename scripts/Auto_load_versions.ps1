@@ -74,6 +74,24 @@ $Versions | Sort-Object -Property Country, Version | % {
             $CommitIDLastCUFromPreviousMajor = $null
         }
 
+        # Try range-request download BEFORE branch switch (scripts only exist on main)
+        $TargetPathOfVersion = $null
+        $RangeDownloadUsed = $false
+
+        if ($country -eq 'w1') {
+            # Construct platform URL: replace last path segment with "platform"
+            $PlatformUrl = [string]$_.URL -replace '/[^/]+$', '/platform'
+            $RangePath = & "$PSScriptRoot/Download-ApplicationsRange.ps1" -ArtifactUrl $PlatformUrl -TargetFolderPrefix "Applications"
+        } else {
+            $RangePath = & "$PSScriptRoot/Download-ApplicationsRange.ps1" -ArtifactUrl ([string]$_.URL) -TargetFolderPrefix "Applications.$($country.ToUpper())"
+        }
+
+        if ($RangePath) {
+            $TargetPathOfVersion = $RangePath
+            $RangeDownloadUsed = $true
+            Write-Host "Range download succeeded: $RangePath"
+        }
+
         $BranchAlreadyExists = ((git branch --list -r "origin/$($country)-$($Version.Major)") -ne $null) -or ((git branch --list "$($country)-$($Version.Major)") -ne $null)
 
         if ($BranchAlreadyExists) {
@@ -125,25 +143,9 @@ $Versions | Sort-Object -Property Country, Version | % {
                 }
             }
         }
-        
-        # Try range-request download first
-        $TargetPathOfVersion = $null
-        $RangeDownloadUsed = $false
 
-        if ($country -eq 'w1') {
-            # Construct platform URL: replace last path segment with "platform"
-            $PlatformUrl = [string]$_.URL -replace '/[^/]+$', '/platform'
-            $RangePath = & "$PSScriptRoot/Download-ApplicationsRange.ps1" -ArtifactUrl $PlatformUrl -TargetFolderPrefix "Applications"
-        } else {
-            $RangePath = & "$PSScriptRoot/Download-ApplicationsRange.ps1" -ArtifactUrl ([string]$_.URL) -TargetFolderPrefix "Applications.$($country.ToUpper())"
-        }
-
-        if ($RangePath) {
-            $TargetPathOfVersion = $RangePath
-            $RangeDownloadUsed = $true
-            Write-Host "Range download succeeded: $RangePath"
-        } else {
-            # Fallback: full Download-Artifacts (existing method)
+        # Fallback: full Download-Artifacts if range download didn't work
+        if (-not $RangeDownloadUsed) {
             Write-Host "Falling back to full Download-Artifacts"
             if ($country -eq 'w1'){
                 $Paths = Download-Artifacts -artifactUrl $_.URL -includePlatform
