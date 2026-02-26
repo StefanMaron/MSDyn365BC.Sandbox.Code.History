@@ -5873,7 +5873,7 @@ codeunit 134920 "ERM General Journal UT"
         GenJournalLine[4].RenumberDocumentNo();
 
         // [THEN] The "Document No." has been renumbered in the following way
-        // [THEN] "Document Type" = "", "Document No." = "Z1", "Account Type" = G/L Account, "Account No." = Y, "Bal. Account No." is blank
+        // [GIVEN] "Document Type" = "", "Document No." = "Z1", "Account Type" = G/L Account, "Account No." = Y, "Bal. Account No." is blank
         // [GIVEN] "Document Type" = "", "Document No." = "Z1", "Account Type" = Vendor, "Account No." = 10000, "Bal. Account No." is blank
         // [GIVEN] "Document Type" = "", "Document No." = "Z1", "Account Type" = G/L Account, "Account No." = Y, "Bal. Account No." is blank
         // [GIVEN] "Document Type" = "", "Document No." = "Z1", "Account Type" = Vendor, "Account No." = 20000, "Bal. Account No." is blank
