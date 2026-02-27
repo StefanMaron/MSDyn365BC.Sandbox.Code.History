@@ -1629,7 +1629,7 @@ table 98 "General Ledger Setup"
         DimensionValue: Record "Dimension Value";
         DimensionSetEntry: Record "Dimension Set Entry";
     begin
-        if Dim.CheckIfDimUsed(DimCode, ShortcutDimNo, '', '', 0) then
+        if Dim.CheckIfDimUsed(DimCode, Enum::"Dim Type Checked".FromInteger(ShortcutDimNo), '', '', 0) then
             Error(Text023, Dim.GetCheckDimErr());
         if xDimCode <> '' then begin
             DimensionValue.SetRange("Dimension Code", xDimCode);
