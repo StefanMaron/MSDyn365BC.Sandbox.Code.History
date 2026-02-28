@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "al.enableCodeAnalysis": false,
+    "al.enableCodeActions": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "allint.enabled": false
+  },
   "folders": [
     {
       "path": "./Application Test Library"
@@ -360,13 +368,5 @@
     {
       "path": "./EDocument Core/Test/E-Document Core Tests/DisabledTests"
     }
-  ],
-  "settings": {
-    "al.enableCodeActions": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false
-  }
+  ]
 }
