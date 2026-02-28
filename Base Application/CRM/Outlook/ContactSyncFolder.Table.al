@@ -25,8 +25,13 @@ table 7101 "Contact Sync Folder"
             ToolTip = 'Select this folder';
             DataClassification = CustomerContent;
         }
-    }
 
+        field(4; "Parent Id"; Text[2048])
+        {
+            Caption = 'Parent Id';
+            DataClassification = SystemMetadata;
+        }
+    }
     keys
     {
         key(PK; "Entry No.")
