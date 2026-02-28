@@ -19,6 +19,7 @@ codeunit 99000843 "Undo Prod. Posting Mgmt."
 {
     var
         SourceCodeSetup: Record "Source Code Setup";
+        HideDialog: Boolean;
         ReverseEntriesMsg: Label 'To reverse these entries, correcting entries will be posted.';
         ReverseEntriesQst: Label 'Do you want to reverse the entries?';
         PostedSuccessfullyMsg: Label 'The journal lines were successfully posted.';
@@ -326,10 +327,18 @@ codeunit 99000843 "Undo Prod. Posting Mgmt."
         ItemJnlPostLine.RunWithCheck(ItemJnlLine);
     end;
 
+    procedure SetHideDialog(NewHideDialog: Boolean)
+    begin
+        HideDialog := NewHideDialog;
+    end;
+
     local procedure CanPostReversal(): Boolean
     var
         QuestionTxt: Text;
     begin
+        if HideDialog then
+            exit(true);
+
         if not GuiAllowed() then
             exit(true);
 
