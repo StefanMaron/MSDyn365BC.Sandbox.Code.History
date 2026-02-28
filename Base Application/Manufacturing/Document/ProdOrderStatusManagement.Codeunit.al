@@ -210,7 +210,13 @@ codeunit 5407 "Prod. Order Status Management"
     local procedure ShowReleasedProdOrderDocument(var ProdOrder: Record "Production Order")
     var
         NewProductionOrder: Record "Production Order";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeShowReleasedProdOrderDocument(ProdOrder, IsHandled);
+        if IsHandled then
+            exit;
+
         if not Confirm(StrSubstNo(OpenReleasedProdOrderQst, ProdOrder."No.")) then
             exit;
 
@@ -2005,6 +2011,11 @@ codeunit 5407 "Prod. Order Status Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnTransferReopenProdOrderRtngLineOnAfterInsert(FromProdOrderRoutingLine: Record "Prod. Order Routing Line"; ToProdOrderRoutingLine: Record "Prod. Order Routing Line"; FromProductionOrder: Record "Production Order")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeShowReleasedProdOrderDocument(var ProductionOrder: Record "Production Order"; var IsHandled: Boolean)
     begin
     end;
 }
