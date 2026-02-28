@@ -21,7 +21,7 @@ codeunit 134897 "ERM Source Currency"
         SourceCurrencyCodeErr: Label 'The Source Currency Code should be equal to the Currency Code on the General Journal Line', Locked = true;
         SourceCurrencyCodeFXGainLossErr: Label 'The Source Currency Code should be empty on the G/L Entry for FX Gain/Loss', Locked = true;
         SourceCurrencyAmountShouldBeZeroErr: Label 'The Source Currency Amount should be 0', Locked = true;
-        SourceCurrencyAmountShouldMatchEnteredAmountErr: Label 'Source Currency Amount should match manually entered amount', Locked = true;
+        SourceCurrencyAmountShouldMatchEnteredAmount: Label 'Source Currency Amount should match manually entered amount', Locked = true;
 
     [Test]
     procedure GenJournalPurchaseNormalVATLCY()
@@ -1371,7 +1371,7 @@ codeunit 134897 "ERM Source Currency"
                     Assert.AreEqual(Factor, GLEntry."Source Currency Amount" / Abs(GLEntry."Source Currency Amount"), AmountIncorrectSignErr);
                 GenJournalLine."Bal. Account No.":
                     // [THEN] Balancing account should have the negative of the manually entered amount
-                    Assert.AreEqual(-ManualFCYAmount, GLEntry."Source Currency Amount", SourceCurrencyAmountShouldMatchEnteredAmountErr);
+                    Assert.AreEqual(-ManualFCYAmount, GLEntry."Source Currency Amount", SourceCurrencyAmountShouldMatchEnteredAmount);
             end;
         until GLEntry.Next() = 0;
     end;
@@ -2112,70 +2112,6 @@ codeunit 134897 "ERM Source Currency"
         PostedDeferralLine.FindSet();
     end;
 
-    local procedure CreatePostGenJnlLineWithCurrency(
-        var GenJournalLine: Record "Gen. Journal Line";
-        DocumentType: Enum "Gen. Journal Document Type";
-        AccountType: Enum "Gen. Journal Account Type";
-        AccountNo: Code[20];
-        CurrencyCode: Code[10];
-        Amount: Decimal;
-        PostingDate: Date)
-    var
-        GenJournalBatch: Record "Gen. Journal Batch";
-    begin
-        LibraryERM.SelectGenJnlBatch(GenJournalBatch);
-        LibraryERM.ClearGenJournalLines(GenJournalBatch);
-        LibraryERM.CreateGeneralJnlLine(
-            GenJournalLine, GenJournalBatch."Journal Template Name", GenJournalBatch.Name,
-            DocumentType, AccountType, AccountNo, 0);
-        GenJournalLine.Validate("Posting Date", PostingDate);
-        GenJournalLine.Validate("Currency Code", CurrencyCode);
-        GenJournalLine.Validate(GenJournalLine.Amount, Amount);
-        GenJournalLine.Modify(true);
-        LibraryERM.PostGeneralJnlLine(GenJournalLine);
-    end;
-
-    local procedure CreatePostGenJnlLineWithCurrencyAndApply(
-        var GenJournalLine: Record "Gen. Journal Line";
-        DocumentType: Enum "Gen. Journal Document Type";
-        AccountType: Enum "Gen. Journal Account Type";
-        AccountNo: Code[20];
-        CurrencyCode: Code[10];
-        Amount: Decimal;
-        PostingDate: Date;
-        AppliesToDocType: Enum "Gen. Journal Document Type";
-        AppliesToDocNo: Code[20])
-    var
-        GenJournalBatch: Record "Gen. Journal Batch";
-    begin
-        LibraryERM.SelectGenJnlBatch(GenJournalBatch);
-        LibraryERM.ClearGenJournalLines(GenJournalBatch);
-        LibraryERM.CreateGeneralJnlLine(
-            GenJournalLine, GenJournalBatch."Journal Template Name", GenJournalBatch.Name,
-            DocumentType, AccountType, AccountNo, 0);
-        GenJournalLine.Validate("Posting Date", PostingDate);
-        GenJournalLine.Validate("Currency Code", CurrencyCode);
-        GenJournalLine.Validate(GenJournalLine.Amount, Amount);
-        GenJournalLine.Validate("Applies-to Doc. Type", AppliesToDocType);
-        GenJournalLine.Validate("Applies-to Doc. No.", AppliesToDocNo);
-        GenJournalLine.Modify(true);
-        LibraryERM.PostGeneralJnlLine(GenJournalLine);
-    end;
-
-    local procedure CreateCurrencyExchangeRate(CurrencyCode: Code[10]; StartingDate: Date; ExchRateAmount: Decimal; RelationalExchRateAmount: Decimal)
-    var
-        CurrencyExchangeRate: Record "Currency Exchange Rate";
-    begin
-        CurrencyExchangeRate.Init();
-        CurrencyExchangeRate."Currency Code" := CurrencyCode;
-        CurrencyExchangeRate."Starting Date" := StartingDate;
-        CurrencyExchangeRate."Exchange Rate Amount" := ExchRateAmount;
-        CurrencyExchangeRate."Relational Exch. Rate Amount" := RelationalExchRateAmount;
-        CurrencyExchangeRate."Adjustment Exch. Rate Amount" := ExchRateAmount;
-        CurrencyExchangeRate."Relational Adjmt Exch Rate Amt" := RelationalExchRateAmount;
-        CurrencyExchangeRate.Insert(true);
-    end;
-
     local procedure UpdateAdjustForPaymentDiscount(var VATPostingSetup: Record "VAT Posting Setup")
     begin
         if VATPostingSetup."Adjust for Payment Discount" then begin
@@ -2183,5 +2119,4 @@ codeunit 134897 "ERM Source Currency"
             VATPostingSetup.Modify();
         end;
     end;
-
 }
