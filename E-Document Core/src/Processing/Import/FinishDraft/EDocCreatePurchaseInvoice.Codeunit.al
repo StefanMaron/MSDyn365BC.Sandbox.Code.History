@@ -89,14 +89,12 @@ codeunit 6117 "E-Doc. Create Purchase Invoice" implements IEDocumentFinishDraft,
         PurchaseHeader.SetRange("E-Document Link", EDocument.SystemId);
         if not PurchaseHeader.FindFirst() then
             exit;
-
         EDocPOMatching.TransferPOMatchesFromInvoiceToEDocument(PurchaseHeader);
         DocumentAttachmentMgt.CopyAttachments(PurchaseHeader, EDocument);
         DocumentAttachmentMgt.DeleteAttachedDocuments(PurchaseHeader);
-
         PurchaseHeader.TestField("Document Type", "Purchase Document Type"::Invoice);
         Clear(PurchaseHeader."E-Document Link");
-        PurchaseHeader.Modify();
+        PurchaseHeader.Delete(true);
     end;
 
     procedure CreatePurchaseInvoice(EDocument: Record "E-Document"): Record "Purchase Header"
