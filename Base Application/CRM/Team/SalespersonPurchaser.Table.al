@@ -12,6 +12,7 @@ using Microsoft.CRM.Segment;
 using Microsoft.CRM.Task;
 using Microsoft.Finance.Dimension;
 using Microsoft.Integration.Dataverse;
+using Microsoft.Purchases.Payables;
 using System.Email;
 
 table 13 "Salesperson/Purchaser"
@@ -450,7 +451,13 @@ table 13 "Salesperson/Purchaser"
         TeamSalesperson: Record "Team Salesperson";
         TodoTask: Record "To-do";
         Opportunity: Record Opportunity;
+        VendLedgEntry: Record "Vendor Ledger Entry";
     begin
+        VendLedgEntry.Reset();
+        VendLedgEntry.SetRange("Purchaser Code", Code);
+        if not VendLedgEntry.IsEmpty() then
+            Error(CannotDeleteBecauseVendLedgerEntriesErr, Code);
+
         TodoTask.Reset();
         TodoTask.SetCurrentKey("Salesperson Code", Closed);
         TodoTask.SetRange("Salesperson Code", Code);
@@ -499,6 +506,7 @@ table 13 "Salesperson/Purchaser"
         BlockedSalesPersonPurchErr: Label 'You cannot %1 this document because %2 %3 is blocked due to privacy.', Comment = '%1 = post or create, %2 = Salesperson / Purchaser, %3 = salesperson / purchaser code.';
         PrivacyBlockedGenericTxt: Label 'Privacy Blocked must not be true for %1 %2.', Comment = '%1 = Salesperson / Purchaser, %2 = salesperson / purchaser code.';
         CannotDeleteBecauseActiveOpportunitiesErr: Label 'You cannot delete the salesperson/purchaser with code %1 because it has open opportunities.', Comment = '%1 = Salesperson/Purchaser code.';
+        CannotDeleteBecauseVendLedgerEntriesErr: Label 'The salesperson/purchaser %1 cannot be deleted because vendor ledger entries exist.', Comment = '%1 = Salesperson/Purchaser code.';
 
     procedure CreateInteraction()
     var
