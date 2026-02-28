@@ -259,11 +259,11 @@ page 46 "Sales Order Subform"
                         UpdateEditableOnRow();
 
                         Rec.RestoreLookupSelection();
+                        NoOnAfterValidate();
 
                         if Rec."No." = xRec."No." then
                             exit;
 
-                        NoOnAfterValidate();
                         Rec.ShowShortcutDimCode(ShortcutDimCode);
                         UpdateTypeText();
                         DeltaUpdateTotals();
