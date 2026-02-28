@@ -276,6 +276,13 @@ page 6181 "E-Document Purchase Draft"
 
                 trigger OnAction()
                 begin
+                    Session.LogMessage('0000PCO', FinalizeDraftInvokedTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', EDocumentPurchaseHeader.FeatureName());
+                    Rec.SetAutoCalcFields("Import Processing Status");
+                    if Rec.Get(Rec."Entry No") then
+                        if Rec."Import Processing Status" = "Import E-Doc. Proc. Status"::Processed then begin
+                            Rec.ShowRecord();
+                            exit;
+                        end;
                     FinalizeEDocument();
                 end;
             }
