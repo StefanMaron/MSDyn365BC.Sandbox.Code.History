@@ -8137,7 +8137,8 @@ codeunit 12 "Gen. Jnl.-Post Line"
             end;
             InitGLEntry(
                 GenJnlLine, GLEntry, GLAcc, TotalAmountLCY + AdjAmount[ArrayIndex],
-                TotalAmountAddCurr + AdjAmount[ArrayIndex + 1], true, true, TotalAmountAddCurr);
+                TotalAmountAddCurr + AdjAmount[ArrayIndex + 1], true, true,
+                CalcAmountSrcCurr(GenJnlLine, TotalAmountLCY + AdjAmount[ArrayIndex]));
             AdjAmount[ArrayIndex] := 0;
             AdjAmount[ArrayIndex + 1] := 0;
             exit(true);
