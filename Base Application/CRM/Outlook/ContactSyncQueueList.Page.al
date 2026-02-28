@@ -1,4 +1,5 @@
-﻿namespace Microsoft.CRM.Outlook;
+#if not CLEAN29
+namespace Microsoft.CRM.Outlook;
 
 page 7031 "Contact Sync Queue List"
 {
@@ -8,6 +9,9 @@ page 7031 "Contact Sync Queue List"
     SourceTable = "Contact Sync Queue";
     Caption = 'Contact Sync Queue';
     Editable = false;
+    ObsoleteReason = 'Removed due to Contact Sync redesign, will be deleted in future release.';
+    ObsoleteState = Pending;
+    ObsoleteTag = '29.0';
 
     layout
     {
@@ -160,3 +164,4 @@ page 7031 "Contact Sync Queue List"
     }
 
 }
+#endif
