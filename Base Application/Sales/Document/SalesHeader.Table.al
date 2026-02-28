@@ -9210,10 +9210,13 @@ table 36 "Sales Header"
     local procedure CalcQuoteValidUntilDate()
     var
         BlankDateFormula: DateFormula;
+        QuoteValidityCalculation: DateFormula;
     begin
         GetSalesSetup();
-        if SalesSetup."Quote Validity Calculation" <> BlankDateFormula then
-            "Quote Valid Until Date" := CalcDate(SalesSetup."Quote Validity Calculation", "Document Date");
+        QuoteValidityCalculation := SalesSetup."Quote Validity Calculation";
+        OnCalcQuoteValidUntilDateOnBeforeAssign(Rec, xRec, QuoteValidityCalculation, UpdateDocumentDate);
+        if QuoteValidityCalculation <> BlankDateFormula then
+            "Quote Valid Until Date" := CalcDate(QuoteValidityCalculation, "Document Date");
     end;
 
     /// <summary>
@@ -14217,6 +14220,11 @@ table 36 "Sales Header"
     /// <param name="CustomerName">The customer name text.</param>
     [IntegrationEvent(false, false)]
     local procedure OnLookupSellToCustomerNameOnBeforeSelectCustomer(SalesHeader: Record "Sales Header"; var Customer: Record Customer; var CustomerName: Text)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcQuoteValidUntilDateOnBeforeAssign(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; var QuoteValidityCalculation: DateFormula; UpdateDocumentDate: Boolean)
     begin
     end;
 }

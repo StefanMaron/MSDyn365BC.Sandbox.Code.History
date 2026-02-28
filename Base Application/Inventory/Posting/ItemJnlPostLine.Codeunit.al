@@ -1899,9 +1899,13 @@ codeunit 22 "Item Jnl.-Post Line"
         OnBeforeInsertTransferEntry(NewItemLedgEntry, OldItemLedgEntry, ItemJnlLine);
 
         InsertItemLedgEntry(NewItemLedgEntry, true);
-        InsertValueEntry(NewValueEntry, NewItemLedgEntry, true);
 
-        UpdateUnitCost(NewValueEntry);
+        IsHandled := false;
+        OnInsertTransferEntryOnBeforeInsertValueEntry(NewValueEntry, NewItemLedgEntry, ValueEntryNo, IsHandled);
+        if not IsHandled then begin
+            InsertValueEntry(NewValueEntry, NewItemLedgEntry, true);
+            UpdateUnitCost(NewValueEntry);
+        end;
 
         xValueEntryNo := ValueEntryNo;
         OnAfterInsertTransferEntry(ItemJnlLine, NewItemLedgEntry, OldItemLedgEntry, NewValueEntry, ValueEntryNo);
@@ -3024,6 +3028,11 @@ codeunit 22 "Item Jnl.-Post Line"
           CalcCostPerUnit(ValueEntry."Cost Amount (Actual)", ValueEntry."Valued Quantity", false);
         ValueEntry."Cost per Unit (ACY)" :=
           CalcCostPerUnit(ValueEntry."Cost Amount (Actual) (ACY)", ValueEntry."Valued Quantity", true);
+
+        IsHandled := false;
+        OnInsertVarValueEntryOnBeforeInsertValueEntry(ValueEntry, GlobalItemLedgEntry, IsHandled);
+        if IsHandled then
+            exit;
 
         InsertValueEntry(ValueEntry, GlobalItemLedgEntry, false);
     end;
@@ -4463,6 +4472,7 @@ codeunit 22 "Item Jnl.-Post Line"
     local procedure InsertCorrValueEntry(OldValueEntry: Record "Value Entry"; var NewValueEntry: Record "Value Entry"; ItemLedgEntry: Record "Item Ledger Entry"; DocumentLineNo: Integer; Sign: Integer; QtyToShip: Decimal; QtyToInvoice: Decimal)
     var
         xValueEntryNo: Integer;
+        ShouldInsertValueEntry: Boolean;
     begin
         ValueEntryNo := GetNextValueEntryNo(ValueEntryNo);
 
@@ -4519,6 +4529,12 @@ codeunit 22 "Item Jnl.-Post Line"
 
         InsertItemReg(0, 0, NewValueEntry."Entry No.", 0);
         NewValueEntry."Item Register No." := ItemReg."No.";
+
+        ShouldInsertValueEntry := true;
+        OnInsertCorrValueEntryOnBeforeInsert(NewValueEntry, ItemLedgEntry, ShouldInsertValueEntry);
+        if not ShouldInsertValueEntry then
+            exit;
+
         NewValueEntry.Insert(true);
 
         xValueEntryNo := ValueEntryNo;
@@ -8602,6 +8618,21 @@ codeunit 22 "Item Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetValuationDate(OldItemLedgerEntry: Record "Item Ledger Entry"; OldValuationDate: Date; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertVarValueEntryOnBeforeInsertValueEntry(var ValueEntry: Record "Value Entry"; var GlobalItemLedgerEntry: Record "Item Ledger Entry"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertTransferEntryOnBeforeInsertValueEntry(var NewValueEntry: Record "Value Entry"; var NewItemLedgerEntry: Record "Item Ledger Entry"; var ValueEntryNo: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertCorrValueEntryOnBeforeInsert(var NewValueEntry: Record "Value Entry"; var ItemLedgerEntry: Record "Item Ledger Entry"; var ShouldInsertValueEntry: Boolean)
     begin
     end;
 }
