@@ -3744,7 +3744,7 @@ table 83 "Item Journal Line"
             Item.TestField(Type, Item.Type::Inventory);
     end;
 
-    local procedure IsEntryTypeConsumption() Result: Boolean
+    procedure IsEntryTypeConsumption() Result: Boolean
     begin
         OnAfterIsEntryTypeConsumption(Rec, Result);
     end;
@@ -3754,12 +3754,12 @@ table 83 "Item Journal Line"
         OnAfterIsEntryTypeOutput(Rec, Result);
     end;
 
-    local procedure IsEntryTypeProduction() Result: Boolean
+    procedure IsEntryTypeProduction() Result: Boolean
     begin
         OnAfterIsEntryTypeProduction(Rec, Result);
     end;
 
-    local procedure IsOrderTypeAsmOrProd() Result: Boolean
+    procedure IsOrderTypeAsmOrProd() Result: Boolean
     begin
         OnAfterIsOrderTypeAsmOrProd(Rec, Result);
     end;
