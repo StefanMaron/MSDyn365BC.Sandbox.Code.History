@@ -2402,6 +2402,8 @@ table 5080 "To-do"
     var
         Salesperson: Record "Salesperson/Purchaser";
     begin
+        OnBeforeCheckStatus(Rec);
+
         if Date = 0D then
             ErrorMessage(FieldCaption(Date));
 
@@ -3347,6 +3349,11 @@ table 5080 "To-do"
 
     [IntegrationEvent(false, false)]
     local procedure OnProcessAttendeeAppointmentOnAfterFindAttendeeTask(var Attendee: Record Attendee; var Todo: Record "To-do"; var Todo2: Record "To-do"; var SalesPersonList: Text; CreateExchangeAppointment: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckStatus(var Todo: Record "To-do")
     begin
     end;
 }
