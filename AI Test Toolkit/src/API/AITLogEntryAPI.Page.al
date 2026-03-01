@@ -58,16 +58,6 @@ page 149038 "AIT Log Entry API"
                 {
                     Caption = 'Total Tokens Consumed';
                 }
-                field(copilotCredits; CopilotCredits)
-                {
-                    Caption = 'Copilot credits';
-                    Editable = false;
-                }
-                field(agentTaskIDs; AgentTaskIDs)
-                {
-                    Caption = 'Agent tasks';
-                    Editable = false;
-                }
                 field("startTime"; Rec."Start Time")
                 {
                     Caption = 'Start Time';
@@ -137,8 +127,6 @@ page 149038 "AIT Log Entry API"
     }
 
     trigger OnAfterGetRecord()
-    var
-        AgentTestContextImpl: Codeunit "Agent Test Context Impl.";
     begin
         InputText := Rec.GetInputBlob();
         OutputText := Rec.GetOutputBlob();
@@ -146,8 +134,6 @@ page 149038 "AIT Log Entry API"
         ErrorCallStackText := Rec.GetErrorCallStack();
         SuiteDescription := Rec.GetSuiteDescription();
         TestMethodLineDescription := Rec.GetTestMethodLineDescription();
-        CopilotCredits := AgentTestContextImpl.GetCopilotCreditsForLogEntry(Rec."Entry No.");
-        AgentTaskIDs := AgentTestContextImpl.GetAgentTaskIDsForLogEntry(Rec."Entry No.");
     end;
 
     var
@@ -157,6 +143,4 @@ page 149038 "AIT Log Entry API"
         ErrorCallStackText: Text;
         SuiteDescription: Text[250];
         TestMethodLineDescription: Text[250];
-        CopilotCredits: Decimal;
-        AgentTaskIDs: Text;
 }
