@@ -193,14 +193,14 @@ table 20406 "Qlty. Inspection Line"
         {
             Clustered = true;
         }
-        key(Key2; "Template Code", "Inspection No.", "Re-inspection No.", "Test Code", "Result Code")
+        key(byResult; "Template Code", "Inspection No.", "Re-inspection No.", "Test Code", "Result Code")
         {
             SumIndexFields = "Evaluation Sequence";
         }
-        key(Key3; "Template Code", "Inspection No.", "Re-inspection No.", "Evaluation Sequence")
+        key(byEvaluationSequence; "Template Code", "Inspection No.", "Re-inspection No.", "Evaluation Sequence")
         {
         }
-        key(Key4; "Template Code", "Inspection No.", "Re-inspection No.", "Test Code", SystemCreatedAt, SystemModifiedAt)
+        key(byDate; "Template Code", "Inspection No.", "Re-inspection No.", "Test Code", SystemCreatedAt, SystemModifiedAt)
         {
         }
     }
