@@ -33,10 +33,6 @@ page 149031 "AIT Test Suite"
                 field(Description; Rec.Description)
                 {
                 }
-                field(TestType; Rec."Test Type")
-                {
-                    Importance = Additional;
-                }
                 field(Dataset; Rec."Input Dataset")
                 {
                     ShowMandatory = true;
@@ -223,7 +219,7 @@ page 149031 "AIT Test Suite"
                 {
                     Editable = false;
                     Caption = 'Average Tokens Consumed';
-                    ToolTip = 'Specifies the average number of tokens consumed by the evals in the last run. Tokens consumed by agent sessions are not included in this number.';
+                    ToolTip = 'Specifies the average number of tokens consumed by the evals in the last run.';
                 }
             }
 
