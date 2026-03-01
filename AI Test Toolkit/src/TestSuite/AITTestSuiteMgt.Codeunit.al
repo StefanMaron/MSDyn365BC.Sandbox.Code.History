@@ -163,12 +163,10 @@ codeunit 149034 "AIT Test Suite Mgt."
     var
         AITRunHistory: Record "AIT Run History";
         AITTestContext: Codeunit "AIT Test Context";
-        AgentTestContextImpl: Codeunit "Agent Test Context Impl.";
     begin
         AITRunHistory."Test Suite Code" := Code;
         AITRunHistory.Version := Version;
         AITRunHistory.Tag := Tag;
-        AITRunHistory."Copilot Credits" := AgentTestContextImpl.GetCopilotCredits(Code, Version, Tag, 0);
         AITRunHistory.Insert();
 
         AITTestContext.OnAfterRunComplete(Code, Version, Tag);
@@ -333,7 +331,6 @@ codeunit 149034 "AIT Test Suite Mgt."
         TestInput: Record "Test Input";
         AITTestRunIteration: Codeunit "AIT Test Run Iteration"; // single instance
         TestSuiteMgt: Codeunit "Test Suite Mgt.";
-        AgentTestContextImpl: Codeunit "Agent Test Context Impl.";
         ModifiedOperation: Text;
         ModifiedExecutionSuccess: Boolean;
         ModifiedMessage: Text;
@@ -400,7 +397,6 @@ codeunit 149034 "AIT Test Suite Mgt."
         AITLogEntry."No. of Turns Passed" := AITTestRunIteration.GetNumberOfTurnsPassedForLastTestMethodLine();
         AITLogEntry."Test Method Line Accuracy" := AITTestRunIteration.GetAccuracyForLastTestMethodLine();
         AITLogEntry.Insert(true);
-        AgentTestContextImpl.LogAgentTasks(AITLogEntry);
 
         Commit();
         AITTestRunIteration.AddToNoOfLogEntriesInserted();
