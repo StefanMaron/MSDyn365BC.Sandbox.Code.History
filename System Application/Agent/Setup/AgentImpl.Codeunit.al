@@ -399,16 +399,11 @@ codeunit 4301 "Agent Impl."
 
     procedure SelectAgent(var Agent: Record "Agent")
     begin
-        SelectAgent(Agent, false);
-    end;
-
-    procedure SelectAgent(var Agent: Record "Agent"; AlwaysShowUI: Boolean)
-    begin
         Agent.SetRange(State, Agent.State::Enabled);
         if Agent.Count() = 0 then
             Error(NoActiveAgentsErr);
 
-        if (Agent.Count() = 1) and (not AlwaysShowUI) then begin
+        if Agent.Count() = 1 then begin
             Agent.FindFirst();
             exit;
         end;
