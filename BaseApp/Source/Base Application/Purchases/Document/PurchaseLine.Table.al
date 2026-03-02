@@ -5176,6 +5176,8 @@ table 39 "Purchase Line"
             UpdateAmounts();
 
         ShouldExit := ((CalledByFieldNo <> CurrFieldNo) and (CurrFieldNo <> 0)) or IsProdOrder();
+
+        OverturnExitConditionForNoViaDescription(CalledByFieldNo, ShouldExit);
         OverturnExitConditionForDefaultGLAccountQuantityValidation(ShouldExit);
         OnUpdateDirectUnitCostByFieldOnAfterCalcShouldExit(Rec, xRec, CalledByFieldNo, CurrFieldNo, ShouldExit);
         if ShouldExit then
@@ -9984,6 +9986,12 @@ table 39 "Purchase Line"
               MustSpecifyErr,
               PurchaseHeader.FieldCaption("Pay-to Vendor No."),
               PurchaseHeader.FieldCaption("Pay-to Vendor Templ. Code"));
+    end;
+
+    local procedure OverturnExitConditionForNoViaDescription(CalledByFieldNo: Integer; var ShouldExit: Boolean)
+    begin
+        if (CalledByFieldNo = FieldNo("No.")) and (CurrFieldNo = FieldNo(Description)) and (ShouldExit) then
+            ShouldExit := false;
     end;
 
     local procedure OverturnExitConditionForDefaultGLAccountQuantityValidation(var ShouldExit: Boolean)
