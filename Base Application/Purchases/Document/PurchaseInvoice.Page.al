@@ -277,6 +277,7 @@ page 51 "Purchase Invoice"
                 {
                     ApplicationArea = Basic, Suite;
                     ShowMandatory = VendorInvoiceNoMandatory;
+                    Editable = IsVendorInvoiceEditable;
                 }
                 field("Purchaser Code"; Rec."Purchaser Code")
                 {
@@ -1836,6 +1837,7 @@ page 51 "Purchase Invoice"
         BuyFromContact.GetOrClear(Rec."Buy-from Contact No.");
         PayToContact.GetOrClear(Rec."Pay-to Contact No.");
         CurrPage.IncomingDocAttachFactBox.Page.SetCurrentRecordID(Rec.RecordId);
+        IsVendorInvoiceEditable := not Rec."Self-Billing Invoice";
 
         OnAfterOnAfterGetRecord(Rec);
     end;
@@ -1913,6 +1915,7 @@ page 51 "Purchase Invoice"
                     ICInboxOutboxMgt.ShowDuplicateICDocumentWarning(PurchaseHeader, ICIncomingInvoiceFromOriginalOrderMsg);
         end;
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
+        IsVendorInvoiceEditable := not Rec."Self-Billing Invoice";
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -1975,6 +1978,7 @@ page 51 "Purchase Invoice"
         RejectICPurchaseInvoiceEnabled: Boolean;
         VATDateEnabled: Boolean;
         DocAmountEnable, DocAmountsEditable : Boolean;
+        IsVendorInvoiceEditable: Boolean;
 
     protected var
         ShipToOptions: Option "Default (Company Address)",Location,"Custom Address";
