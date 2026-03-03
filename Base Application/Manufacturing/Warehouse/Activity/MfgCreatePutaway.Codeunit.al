@@ -1190,7 +1190,14 @@ codeunit 99000893 "Mfg. Create Put-away"
     end;
 
     local procedure GetPutAwayUOMForProdOrderLine(ProdOrderLine: Record "Prod. Order Line")
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetPutAwayUOMForProdOrderLine(PutAwayItemUnitOfMeasure, ProdOrderLine, IsHandled);
+        if IsHandled then
+            exit;
+
         if not CurrLocation."Directed Put-away and Pick" then begin
             PutAwayItemUnitOfMeasure.Code := ProdOrderLine."Unit of Measure Code";
             PutAwayItemUnitOfMeasure."Qty. per Unit of Measure" := ProdOrderLine."Qty. per Unit of Measure";
@@ -1363,6 +1370,11 @@ codeunit 99000893 "Mfg. Create Put-away"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCreateWhsePutAwayForProdOutput(ProdOrderLine: Record "Prod. Order Line"; var TempProdOrdLineTrackingBuff: Record "Prod. Ord. Line Tracking Buff." temporary; var WarehouseActivityHeader: Record "Warehouse Activity Header"; var WarehouseActivityLine: Record "Warehouse Activity Line"; QtyToPickBase: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetPutAwayUOMForProdOrderLine(var ItemUnitOfMeasure: Record "Item Unit of Measure"; ProdOrderLine: Record "Prod. Order Line"; var IsHandled: Boolean)
     begin
     end;
 }
