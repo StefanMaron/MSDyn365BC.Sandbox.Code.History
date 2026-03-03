@@ -4950,7 +4950,7 @@ table 39 "Purchase Line"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeGetPurchHeader(Rec, PurchHeader, IsHandled, Currency, HasPurchHeader);
+        OnBeforeGetPurchHeader(Rec, PurchHeader, IsHandled, Currency);
         if IsHandled then
             exit;
 
@@ -4965,10 +4965,8 @@ table 39 "Purchase Line"
                     Currency.Get(PurchHeader."Currency Code");
                     Currency.TestField("Amount Rounding Precision");
                 end
-            end else begin
+            end else
                 Clear(PurchHeader);
-                HasPurchHeader := false;
-            end;
 
         OnAfterGetPurchHeader(Rec, PurchHeader, Currency);
         OutPurchHeader := PurchHeader;
@@ -11459,7 +11457,7 @@ table 39 "Purchase Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetPurchHeader(var PurchaseLine: Record "Purchase Line"; var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean; var Currency: Record Currency; var HasPurchHeader: Boolean)
+    local procedure OnBeforeGetPurchHeader(var PurchaseLine: Record "Purchase Line"; var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean; var Currency: Record Currency)
     begin
     end;
 
