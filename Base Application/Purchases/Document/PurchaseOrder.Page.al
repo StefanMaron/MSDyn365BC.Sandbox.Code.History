@@ -289,7 +289,6 @@ page 50 "Purchase Order"
                 {
                     ApplicationArea = Suite;
                     ShowMandatory = VendorInvoiceNoMandatory;
-                    Editable = IsVendorInvoiceEditable;
                 }
                 field("Your Reference"; Rec."Your Reference")
                 {
@@ -2403,7 +2402,6 @@ page 50 "Purchase Order"
         PayToContact.GetOrClear(Rec."Pay-to Contact No.");
         FillRemitToFields(false);
         CurrPage.IncomingDocAttachFactBox.Page.SetCurrentRecordID(Rec.RecordId);
-        IsVendorInvoiceEditable := not Rec."Self-Billing Invoice";
 
         OnAfterOnAfterGetRecord(Rec);
     end;
@@ -2478,7 +2476,6 @@ page 50 "Purchase Order"
         end;
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
         SalesTaxStatisticsVisible := Rec."Tax Area Code" <> '';
-        IsVendorInvoiceEditable := not Rec."Self-Billing Invoice";
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -2540,7 +2537,6 @@ page 50 "Purchase Order"
         IsRemitToCountyVisible: Boolean;
         RejectICPurchaseOrderEnabled: Boolean;
         VATDateEnabled: Boolean;
-        IsVendorInvoiceEditable: Boolean;
 
     protected var
         ShipToOptions: Enum "Purchase Order Ship-to Options";
