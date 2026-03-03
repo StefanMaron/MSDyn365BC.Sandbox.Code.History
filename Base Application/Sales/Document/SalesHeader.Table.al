@@ -3312,8 +3312,14 @@ table 36 "Sales Header"
             TableRelation = "Responsibility Center";
 
             trigger OnValidate()
+            var
+                IsHandled: Boolean;
             begin
                 TestStatusOpen();
+                IsHandled := false;
+                OnBeforeResponsibilityCenterValidate(Rec, xRec, IsHandled);
+                if IsHandled then
+                    exit;
                 if not UserSetupMgt.CheckRespCenter(0, "Responsibility Center") then
                     Error(
                       Text027,
@@ -4753,7 +4759,7 @@ table 36 "Sales Header"
 
                 SalesLine.Init();
                 SalesLine."Line No." := 0;
-                OnRecreateSalesLinesOnBeforeTempSalesLineFindSet(TempSalesLine);
+                OnRecreateSalesLinesOnBeforeTempSalesLineFindSet(TempSalesLine, SalesLine);
                 TempSalesLine.FindSet();
                 ExtendedTextAdded := false;
                 SalesLine.BlockDynamicTracking(true);
@@ -6892,7 +6898,7 @@ table 36 "Sales Header"
         ErrorMessageMgt.PushContext(ErrorContextElement, RecordId, 0, '');
         IsSuccess := CODEUNIT.Run(PostingCodeunitID, Rec);
 
-        OnSendToPostingOnAfterPost(Rec);
+        OnSendToPostingOnAfterPost(Rec, IsSuccess);
         if not IsSuccess then begin
             if Rec.Status <> Rec.Status::Released then
                 DeleteWarehouseRequest();
@@ -13077,7 +13083,7 @@ table 36 "Sales Header"
     /// </summary>
     /// <param name="TempSalesLine">The temporary sales line record.</param>
     [IntegrationEvent(false, false)]
-    local procedure OnRecreateSalesLinesOnBeforeTempSalesLineFindSet(var TempSalesLine: Record "Sales Line" temporary)
+    local procedure OnRecreateSalesLinesOnBeforeTempSalesLineFindSet(var TempSalesLine: Record "Sales Line" temporary; var SalesLine: Record "Sales Line")
     begin
     end;
 
@@ -13947,8 +13953,9 @@ table 36 "Sales Header"
     /// Raised after posting when sending to posting.
     /// </summary>
     /// <param name="SalesHeader">The sales header record that was posted.</param>
+    /// <param name="IsSuccess">Indicates whether the posting was successful.</param>
     [IntegrationEvent(false, false)]
-    local procedure OnSendToPostingOnAfterPost(var SalesHeader: Record "Sales Header")
+    local procedure OnSendToPostingOnAfterPost(var SalesHeader: Record "Sales Header"; IsSuccess: Boolean)
     begin
     end;
 
@@ -14443,6 +14450,11 @@ table 36 "Sales Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcQuoteValidUntilDateOnBeforeAssign(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; var QuoteValidityCalculation: DateFormula; UpdateDocumentDate: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeResponsibilityCenterValidate(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     begin
     end;
 }
