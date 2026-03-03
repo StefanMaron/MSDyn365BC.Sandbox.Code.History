@@ -21,6 +21,7 @@ codeunit 134897 "ERM Source Currency"
         SourceCurrencyCodeErr: Label 'The Source Currency Code should be equal to the Currency Code on the General Journal Line', Locked = true;
         SourceCurrencyCodeFXGainLossErr: Label 'The Source Currency Code should be empty on the G/L Entry for FX Gain/Loss', Locked = true;
         SourceCurrencyAmountShouldBeZeroErr: Label 'The Source Currency Amount should be 0', Locked = true;
+        SourceCurrencyAmountShouldMatchEnteredAmount: Label 'Source Currency Amount should match manually entered amount', Locked = true;
 
     [Test]
     procedure GenJournalPurchaseNormalVATLCY()
@@ -1316,6 +1317,247 @@ codeunit 134897 "ERM Source Currency"
                     Assert.AreEqual(Factor * 2, GLEntry.Amount / GLEntry."Source Currency Amount", 'Incorrect currency factor');
             end;
         until GLEntry.Next() = 0;
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure GenJournalWithManualForeignCurrencyAmount()
+    var
+        VATPostingSetup: Record "VAT Posting Setup";
+        GenJournalLine: Record "Gen. Journal Line";
+        Currency: Record Currency;
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+        GLEntry: Record "G/L Entry";
+        ManualFCYAmount: Decimal;
+        CalculatedFCYAmount: Decimal;
+        Factor: Integer;
+    begin
+        Initialize();
+
+        // [SCENARIO] When a user manually enters a foreign currency amount in a general journal line that differs from 
+        // the exchange rate calculation, the system should preserve the manually entered amount when posting.
+
+        // [GIVEN] A currency with an exchange rate
+        Currency.Get(CreateCurrency());
+        CurrencyExchangeRate.SetRange("Currency Code", Currency.Code);
+        CurrencyExchangeRate.FindFirst();
+
+        // [GIVEN] VAT Posting Setup with normal VAT
+        LibraryERM.FindVATPostingSetup(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT");
+        UpdateAdjustForPaymentDiscount(VATPostingSetup);
+
+        // [GIVEN] A General Journal Line with foreign currency
+        CreateGeneralJournalLine(
+            GenJournalLine,
+            LibraryERM.CreateGLAccountNoWithDirectPosting(),
+            LibraryERM.CreateGLAccountNoWithDirectPosting(),
+            Enum::"General Posting Type"::Purchase,
+            VATPostingSetup,
+            true);
+        GenJournalLine.Validate("Currency Code", Currency.Code);
+
+        // [GIVEN] Calculate what the FCY amount would be based on the exchange rate
+        CalculatedFCYAmount := GenJournalLine.Amount;
+
+        // [GIVEN] Manually override the foreign currency amount to a different value
+        ManualFCYAmount := CalculatedFCYAmount * 1.1; // 10% different from calculated
+        GenJournalLine.Validate(Amount, ManualFCYAmount);
+        GenJournalLine.Modify(true);
+
+        // [WHEN] Posting the General Journal Line
+        LibraryERM.PostGeneralJnlLine(GenJournalLine);
+
+        // [THEN] The GL entries should preserve the manually entered foreign currency amount
+        GetGLEntries(GLEntry, GenJournalLine."Document No.", GenJournalLine."Document Type");
+
+        repeat
+            // [THEN] Source Currency Code on G/L Entries should be correct
+            Assert.AreEqual(GenJournalLine."Currency Code", GLEntry."Source Currency Code", SourceCurrencyCodeErr);
+
+            Factor := GLEntry.Amount <> 0 ? GLEntry.Amount / Abs(GLEntry.Amount) : 1;
+
+            case GLEntry."G/L Account No." of
+                VATPostingSetup."Purchase VAT Account":
+                    // [THEN] VAT entry should have the correct VAT amount based on manual amount
+                    Assert.AreEqual(Factor, GLEntry."Source Currency Amount" / Abs(GLEntry."Source Currency Amount"), AmountIncorrectSignErr);
+                GenJournalLine."Bal. Account No.":
+                    // [THEN] Balancing account should have the negative of the manually entered amount
+                    Assert.AreEqual(-ManualFCYAmount, GLEntry."Source Currency Amount", SourceCurrencyAmountShouldMatchEnteredAmount);
+            end;
+        until GLEntry.Next() = 0;
+    end;
+
+    [Test]
+    procedure PurchaseInvoiceSourceCurrencyRoundingPrecision()
+    var
+        VendorPostingGroup: Record "Vendor Posting Group";
+        GeneralPostingSetup: Record "General Posting Setup";
+        VATPostingSetup: Record "VAT Posting Setup";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        GLAccount: Record "G/L Account";
+        GLEntry: Record "G/L Entry";
+        Currency: Record Currency;
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+        VendorNo: Code[20];
+        PostedPurchaseInvoiceNo: Code[20];
+    begin
+        // [SCENARIO 614172] Source Currency Amounts preserve original invoice amounts within rounding precision
+        Initialize();
+
+        // [GIVEN] Vendor with new posting groups with normal VAT (7% as in the repro scenario).
+        VendorNo := CreateVendorWithNewPostingGroups(VendorPostingGroup, GeneralPostingSetup, VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT");
+        VATPostingSetup.Validate("VAT %", 0);
+        VATPostingSetup.Modify(true);
+
+        // [GIVEN] Create a foreign currency (SGD) with specific exchange rate that causes rounding issues
+        // Exchange Rate: 1 SGD = 0.74 USD (from repro: Exch. Rate Amount = 1, Relational Exch. Rate Amount = 0.74)
+        Currency.Get(LibraryERM.CreateCurrencyWithGLAccountSetup());
+        Currency.Validate("Amount Rounding Precision", 0.01);
+        Currency.Modify(true);
+
+        CurrencyExchangeRate.Init();
+        CurrencyExchangeRate."Currency Code" := Currency.Code;
+        CurrencyExchangeRate."Starting Date" := WorkDate();
+        CurrencyExchangeRate."Exchange Rate Amount" := 1;
+        CurrencyExchangeRate."Relational Exch. Rate Amount" := 0.74;
+        CurrencyExchangeRate."Adjustment Exch. Rate Amount" := 1;
+        CurrencyExchangeRate."Relational Adjmt Exch Rate Amt" := 0.74;
+        CurrencyExchangeRate.Insert(true);
+
+        // [GIVEN] A Purchase Invoice with specific amounts that trigger rounding issues
+        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Invoice, VendorNo);
+        PurchaseHeader.Validate("Posting Date", WorkDate() + 1);
+        PurchaseHeader.Validate("Vendor Invoice No.", PurchaseHeader."No.");
+        PurchaseHeader."Posting Description" := 'Test Purchase Invoice';
+        PurchaseHeader.Validate("Currency Code", Currency.Code);
+        PurchaseHeader.Modify(true);
+
+        // [GIVEN] Create GL Account for posting
+        CreateGLAccount(GLAccount, Enum::"General Posting Type"::Purchase, GeneralPostingSetup, VATPostingSetup);
+
+        // [GIVEN] Create purchase lines with amounts from the repro scenario
+        // Line 1: G/L Account 8510 - Gasoline and Motor Oil: Direct Unit Cost = 320.63 SGD
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::"G/L Account", GLAccount."No.", 1);
+        PurchaseLine.Validate("Direct Unit Cost", 320.63);
+        PurchaseLine.Modify(true);
+
+        // Line 2: G/L Account 8520 - Registration Fees: Direct Unit Cost = 389.88 SGD
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::"G/L Account", GLAccount."No.", 1);
+        PurchaseLine.Validate("Direct Unit Cost", 389.88);
+        PurchaseLine.Modify(true);
+
+        // Line 3: G/L Account 8530 - Repairs and Maintenance: Direct Unit Cost = 174.08 SGD (Expected LCY = 128.82)
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::"G/L Account", GLAccount."No.", 1);
+        PurchaseLine.Validate("Direct Unit Cost", 174.08);
+        PurchaseLine.Modify(true);
+
+        // Line 4: G/L Account 8530 - Repairs and Maintenance: Direct Unit Cost = 35.96 SGD (Expected LCY = 26.61)
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::"G/L Account", GLAccount."No.", 1);
+        PurchaseLine.Validate("Direct Unit Cost", 35.96);
+        PurchaseLine.Modify(true);
+
+        PurchaseHeader.CalcFields(Amount, "Amount Including VAT");
+        PurchaseHeader."Doc. Amount Incl. VAT" := PurchaseHeader."Amount Including VAT";
+        PurchaseHeader."Doc. Amount VAT" := PurchaseHeader."Amount Including VAT" - PurchaseHeader.Amount;
+        PurchaseHeader.Modify();
+
+        // [WHEN] Posting the Purchase Invoice
+        PostedPurchaseInvoiceNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
+
+        // [THEN] Source Currency Amounts on G/L Entries should match the original invoice amounts
+        GLEntry.SetRange("Document No.", PostedPurchaseInvoiceNo);
+        GLEntry.SetRange("Source Currency Amount", -PurchaseHeader.Amount);
+        Assert.IsTrue(GLEntry.FindFirst(), AmountExclVATIncorrectErr);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure GenJournalBankAccountFCYPreviewSourceCurrencyRounding()
+    var
+        BankAccount: Record "Bank Account";
+        BankAccountPostingGroup: Record "Bank Account Posting Group";
+        Currency: Record Currency;
+        CurrencyExchangeRate: Record "Currency Exchange Rate";
+        GenJournalBatch: Record "Gen. Journal Batch";
+        GenJournalLine: Record "Gen. Journal Line";
+        GenJnlPost: Codeunit "Gen. Jnl.-Post";
+        GLPostingPreview: TestPage "G/L Posting Preview";
+        GLEntriesPreview: TestPage "G/L Entries Preview";
+        FCYAmount: Decimal;
+    begin
+        // [SCENARIO] Source Currency Amount should be correctly rounded when previewing General Journal with Bank Account in FCY.
+        // Bug repro: Foreign currency amount of 1,000,000 with FX rate shows LCY correctly but preview displays 999,999.98 instead of 1,000,000.
+        Initialize();
+
+        // [GIVEN] A Currency with a specific exchange rate that can cause rounding issues.
+        // Using exchange rate similar to AED-USD: Exchange Rate Amount = 100, Relational Exch. Rate Amount = 27.2294
+        Currency.Get(LibraryERM.CreateCurrencyWithGLAccountSetup());
+        Currency.Validate("Amount Rounding Precision", 0.01);
+        Currency.Modify(true);
+
+        CurrencyExchangeRate.SetRange("Currency Code", Currency.Code);
+        CurrencyExchangeRate.DeleteAll();
+
+        CurrencyExchangeRate.Init();
+        CurrencyExchangeRate."Currency Code" := Currency.Code;
+        CurrencyExchangeRate."Starting Date" := WorkDate();
+        CurrencyExchangeRate."Exchange Rate Amount" := 100;
+        CurrencyExchangeRate."Relational Exch. Rate Amount" := 27.2294;
+        CurrencyExchangeRate."Adjustment Exch. Rate Amount" := 100;
+        CurrencyExchangeRate."Relational Adjmt Exch Rate Amt" := 27.2294;
+        CurrencyExchangeRate.Insert(true);
+
+        // [GIVEN] A Bank Account with the foreign currency.
+        BankAccountPostingGroup.SetFilter("G/L Account No.", '<>''''');
+        BankAccountPostingGroup.FindFirst();
+        LibraryERM.CreateBankAccount(BankAccount);
+        BankAccount.Validate("Currency Code", Currency.Code);
+        BankAccount.Validate("Bank Acc. Posting Group", BankAccountPostingGroup.Code);
+        BankAccount.Modify(true);
+
+        // [GIVEN] A General Journal Line with Bank Account and FCY Amount of 1,000,000.
+        FCYAmount := 1000000;
+
+        LibraryERM.SelectGenJnlBatch(GenJournalBatch);
+        LibraryERM.ClearGenJournalLines(GenJournalBatch);
+        LibraryERM.CreateGeneralJnlLine(
+            GenJournalLine,
+            GenJournalBatch."Journal Template Name",
+            GenJournalBatch.Name,
+            GenJournalLine."Document Type"::" ",
+            GenJournalLine."Account Type"::"Bank Account",
+            BankAccount."No.",
+            FCYAmount);
+        GenJournalLine.Validate("Posting Date", WorkDate());
+        GenJournalLine.Modify(true);
+
+        Commit();
+
+        // [WHEN] Preview Post is invoked on the General Journal.
+        GLPostingPreview.Trap();
+        asserterror GenJnlPost.Preview(GenJournalLine);
+
+        // [THEN] The preview should complete without error (empty error from preview is expected).
+        Assert.ExpectedError('');
+
+        // [THEN] Open G/L Entries Preview and verify Source Currency Amount is correctly rounded.
+        GLEntriesPreview.Trap();
+        GLPostingPreview.Filter.SetFilter("Table ID", Format(Database::"G/L Entry"));
+        GLPostingPreview.Show.Invoke();
+
+        // [THEN] Source Currency Amount should be exactly 1,000,000, not 999,999.98.
+        GLEntriesPreview.First();
+        repeat
+            if GLEntriesPreview."Source Currency Amount".AsDecimal() <> 0 then
+                Assert.AreEqual(
+                    FCYAmount,
+                    Abs(GLEntriesPreview."Source Currency Amount".AsDecimal()),
+                    'Source Currency Amount should be correctly rounded to match the entered FCY amount');
+        until not GLEntriesPreview.Next();
+
+        GLEntriesPreview.Close();
+        GLPostingPreview.Close();
     end;
 
     local procedure CreatePurchaseInvoice(var PurchaseHeader: Record "Purchase Header"; VendorNo: Code[20]; GLAccountNo: Code[20]; WithForeignCurrency: Boolean)
