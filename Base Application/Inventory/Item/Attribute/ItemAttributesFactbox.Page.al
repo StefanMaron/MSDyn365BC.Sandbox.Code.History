@@ -76,9 +76,34 @@ page 9110 "Item Attributes Factbox"
                         exit;
                     if not Item.Get(ContextValue) then
                         exit;
+
                     PAGE.RunModal(PAGE::"Item Attribute Value Editor", Item);
                     CurrPage.SaveRecord();
                     LoadItemAttributesData(ContextValue);
+                end;
+            }
+            action(EditVariant)
+            {
+                AccessByPermission = TableData "Item Attribute" = R;
+                ApplicationArea = Basic, Suite;
+                Caption = 'Edit';
+                Image = Edit;
+                ToolTip = 'Edit item''s variant attributes, such as color, size, or other characteristics that help to describe the item.';
+                Visible = IsItemVariant;
+
+                trigger OnAction()
+                var
+                    ItemVariant: Record "Item Variant";
+                begin
+                    if not IsItemVariant then
+                        exit;
+
+                    if not ItemVariant.Get(ContextItemNo, ContextValue) then
+                        exit;
+
+                    Page.RunModal(Page::"Item Variant Attribute Editor", ItemVariant);
+                    CurrPage.SaveRecord();
+                    LoadItemVariantAttributesData(ItemVariant."Item No.", ItemVariant.Code);
                 end;
             }
         }
@@ -89,13 +114,18 @@ page 9110 "Item Attributes Factbox"
         Rec.SetAutoCalcFields("Attribute Name");
         TranslatedValuesVisible := ClientTypeManagement.GetCurrentClientType() <> CLIENTTYPE::Phone;
         IsVisible := true;
-        if ItemAttCode <> '' then begin
-            if VariantAttCode <> '' then
-                LoadItemVariantAttributesData(ItemAttCode, VariantAttCode)
-            else
-                LoadItemAttributesData(ItemAttCode);
+        if (ItemAttCode <> '') and (VariantAttCode <> '') then begin
+            if IsVariant then
+                LoadItemVariantAttributesData(ItemAttCode, VariantAttCode);
+
             ItemAttCode := '';
             VariantAttCode := '';
+            IsVariant := false;
+        end;
+
+        if (ItemAttCode <> '') and not IsVariant then begin
+            LoadItemAttributesData(ItemAttCode);
+            ItemAttCode := '';
         end;
 
         if CategoryAttCode <> '' then begin
@@ -110,8 +140,11 @@ page 9110 "Item Attributes Factbox"
     protected var
         ContextType: Option "None",Item,Category,"Item Variant";
         ContextValue: Code[20];
+        ContextItemNo: Code[20];
         IsItem: Boolean;
         IsVisible: Boolean;
+        IsItemVariant: Boolean;
+        IsVariant: Boolean;
         ItemAttCode: Code[20];
         CategoryAttCode: Code[20];
         VariantAttCode: Code[10];
@@ -133,10 +166,12 @@ page 9110 "Item Attributes Factbox"
         if not IsVisible then begin
             ItemAttCode := ItemNo;
             VariantAttCode := VariantCode;
+            IsVariant := true;
             exit;
         end;
         Rec.LoadItemVariantAttributesFactBoxData(ItemNo, VariantCode);
         SetContext(ContextType::"Item Variant", VariantCode);
+        ContextItemNo := ItemNo;
         CurrPage.Update(false);
     end;
 
@@ -156,6 +191,7 @@ page 9110 "Item Attributes Factbox"
         ContextType := NewType;
         ContextValue := NewValue;
         IsItem := ContextType = ContextType::Item;
+        IsItemVariant := ContextType = ContextType::"Item Variant";
     end;
 }
 
