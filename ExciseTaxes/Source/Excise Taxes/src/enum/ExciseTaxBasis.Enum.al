@@ -18,7 +18,7 @@ enum 7414 "Excise Tax Basis"
     }
     value(2; "THC Content")
     {
-        Caption = 'Active Content';
+        Caption = 'THC Content';
     }
     value(3; Volume)
     {
@@ -26,10 +26,6 @@ enum 7414 "Excise Tax Basis"
     }
     value(4; "Spirit Volume")
     {
-        Caption = 'Pure Alcohol (ABV)';
-    }
-    value(5; "Quantity")
-    {
-        Caption = 'Quantity';
+        Caption = 'Spirit Volume';
     }
 }
