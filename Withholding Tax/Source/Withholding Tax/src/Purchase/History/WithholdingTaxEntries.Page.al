@@ -217,7 +217,6 @@ page 6788 "Withholding Tax Entries"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the Actual Vendor No. from which Invoices or Journals is copied.';
-                    Visible = false;
                 }
                 field("Withholding Certificate No."; Rec."Wthldg. Tax Certificate No.")
                 {
