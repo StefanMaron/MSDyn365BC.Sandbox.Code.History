@@ -232,6 +232,7 @@ codeunit 104000 "Upgrade - BaseApp"
         UpgradeCountryVATSchemeDK();
         UpgradeJobConsumpWhseHandlingForDirectedPutAwayAndPickLocation();
         UpgradeIntegrationTableMappingTemplates();
+        UpgradePermissionBuffer();
     end;
 
     local procedure ClearTemporaryTables()
@@ -289,6 +290,14 @@ codeunit 104000 "Upgrade - BaseApp"
         VATAmountLine.DeleteAll();
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetClearVATAmountLineTableUpgradeTag());
+    end;
+
+    local procedure UpgradePermissionBuffer()
+    var
+        PermissionBuffer: Record "Permission Buffer";
+    begin
+        if not PermissionBuffer.IsEmpty() then
+            PermissionBuffer.DeleteAll();
     end;
 
     local procedure UpgradeBankExportImportSetup()
