@@ -136,8 +136,6 @@ table 38 "Purchase Header"
                 Validate("Lead Time Calculation", Vend."Lead Time Calculation");
                 "Shipment Method Code" := Vend."Shipment Method Code";
                 "Self-Billing Invoice" := Vend."Self-Billing Agreement" and Rec."Document Type" in [Rec."Document Type"::Order, Rec."Document Type"::Invoice];
-                if "Self-Billing Invoice" then
-                    CheckAndUpdatePostingNoSeriesForSelfBillingInvoice();
 
                 IsHandled := false;
                 OnValidateBuyFromVendorNoOnBeforeAssignResponsibilityCenter(Rec, xRec, CurrFieldNo, IsHandled);
@@ -3470,10 +3468,7 @@ table 38 "Purchase Header"
             if not GLSetup."Journal Templ. Name Mandatory" then
                 case "Document Type" of
                     "Document Type"::Invoice:
-                        if Rec."Self-Billing Invoice" then
-                            PurchSetup.TestField("Posted Self-Billing Inv. Nos.")
-                        else
-                            PurchSetup.TestField("Posted Invoice Nos.");
+                        PurchSetup.TestField("Posted Invoice Nos.");
                     "Document Type"::"Credit Memo":
                         PurchSetup.TestField("Posted Credit Memo Nos.");
                 end
@@ -3574,10 +3569,7 @@ table 38 "Purchase Header"
             if IsCreditDocType() then
                 PostingNos := PurchSetup."Posted Credit Memo Nos."
             else
-                if Rec."Self-Billing Invoice" then
-                    PostingNos := PurchSetup."Posted Self-Billing Inv. Nos."
-                else
-                    PostingNos := PurchSetup."Posted Invoice Nos."
+                PostingNos := PurchSetup."Posted Invoice Nos."
         else begin
             GenJournalTemplate.Get("Journal Templ. Name");
             PostingNos := GenJournalTemplate."Posting No. Series";
@@ -6740,10 +6732,7 @@ table 38 "Purchase Header"
             if IsCreditDocType() then
                 PostingNoSeries := PurchSetup."Posted Credit Memo Nos."
             else
-                if Rec."Self-Billing Invoice" then
-                    PostingNoSeries := PurchSetup."Posted Self-Billing Inv. Nos."
-                else
-                    PostingNoSeries := PurchSetup."Posted Invoice Nos.";
+                PostingNoSeries := PurchSetup."Posted Invoice Nos.";
 
         case "Document Type" of
             "Document Type"::Quote, "Document Type"::Order:
@@ -8255,15 +8244,6 @@ table 38 "Purchase Header"
         if GetFilter("Buy-from Contact No.") <> '' then
             if GetRangeMin("Buy-from Contact No.") = GetRangeMax("Buy-from Contact No.") then
                 exit(GetRangeMax("Buy-from Contact No."));
-    end;
-
-    local procedure CheckAndUpdatePostingNoSeriesForSelfBillingInvoice()
-    begin
-        GetPurchSetup();
-        PurchSetup.TestField("Posted Self-Billing Inv. Nos.");
-
-        if not InsertMode then
-            InitPostingNoSeries();
     end;
 
     [IntegrationEvent(false, false)]
