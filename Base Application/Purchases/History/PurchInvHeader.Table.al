@@ -810,8 +810,12 @@ table 122 "Purch. Inv. Header"
         OnBeforePrintRecords(Rec, ShowRequestPage, IsHandled);
         if not IsHandled then begin
             PurchInvHeader.Copy(Rec);
-            ReportSelection.PrintWithDialogForVend(
-              ReportSelection.Usage::"P.Invoice", PurchInvHeader, ShowRequestPage, PurchInvHeader.FieldNo("Buy-from Vendor No."));
+            if PurchInvHeader."Self-Billing Invoice" then
+                ReportSelection.PrintWithDialogForVend(
+                  ReportSelection.Usage::"P.Self Billing Invoice", PurchInvHeader, ShowRequestPage, PurchInvHeader.FieldNo("Buy-from Vendor No."))
+            else
+                ReportSelection.PrintWithDialogForVend(
+                  ReportSelection.Usage::"P.Invoice", PurchInvHeader, ShowRequestPage, PurchInvHeader.FieldNo("Buy-from Vendor No."));
         end;
     end;
 
@@ -834,8 +838,12 @@ table 122 "Purch. Inv. Header"
             exit;
 
         PurchInvHeaderLocal.SetRecFilter();
-        ReportSelections.SaveAsDocumentAttachment(
-            ReportSelections.Usage::"P.Invoice".AsInteger(), PurchInvHeaderLocal, PurchInvHeaderLocal."No.", PurchInvHeaderLocal."Buy-from Vendor No.", true);
+        if PurchInvHeaderLocal."Self-Billing Invoice" then
+            ReportSelections.SaveAsDocumentAttachment(
+                ReportSelections.Usage::"P.Self Billing Invoice".AsInteger(), PurchInvHeaderLocal, PurchInvHeaderLocal."No.", PurchInvHeaderLocal."Buy-from Vendor No.", true)
+        else
+            ReportSelections.SaveAsDocumentAttachment(
+                ReportSelections.Usage::"P.Invoice".AsInteger(), PurchInvHeaderLocal, PurchInvHeaderLocal."No.", PurchInvHeaderLocal."Buy-from Vendor No.", true);
     end;
 
     procedure Navigate()
