@@ -45,7 +45,12 @@ codeunit 5446 "Purch. Invoice PDF Doc.Handler" implements IPdfDocumentHandler
             exit(false);
 
         PurchInvHeader.SetRange("No.", PurchInvHeader."No.");
-        ReportUsage := "Report Selection Usage"::"P.Invoice";
+
+        if PurchInvHeader."Self-Billing Invoice" then
+            ReportUsage := "Report Selection Usage"::"P.Self Billing Invoice"
+        else
+            ReportUsage := "Report Selection Usage"::"P.Invoice";
+
         ReportSelections.GetPdfReportForVend(TempBlob, ReportUsage, PurchInvHeader, PurchInvHeader."Buy-from Vendor No.");
         DocumentMailing.GetAttachmentFileName(Name, PurchInvHeader."No.", PurchaseInvoiceTxt, ReportUsage.AsInteger());
         exit(PDFDocumentManagement.AddToTempAttachmentEntityBuffer(DocumentId, DocumentType, TempBlob, Name, TempAttachmentEntityBuffer));
