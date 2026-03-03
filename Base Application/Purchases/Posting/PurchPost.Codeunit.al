@@ -688,6 +688,7 @@ codeunit 90 "Purch.-Post"
     begin
         OnBeforeCheckAndUpdate(PurchHeader, ModifyHeader);
         DocumentIsReadyToBeChecked := true;
+        
         CheckPurchDocument(PurchHeader);
 
         if GuiAllowed() and not HideProgressWindow then
@@ -851,8 +852,13 @@ codeunit 90 "Purch.-Post"
 
         CheckAssociatedOrderLines(PurchHeader);
 
-        if PurchHeader.Invoice and PurchSetup."Ext. Doc. No. Mandatory" then
-            CheckExtDocNo(PurchHeader);
+        if PurchHeader.Invoice then
+            if not SelfBillingInvoiceDocument(PurchHeader) then begin
+                if PurchSetup."Ext. Doc. No. Mandatory" then
+                    CheckExtDocNo(PurchHeader);
+            end else
+                UpdateVendorInvoiceNoForSelfBilling(PurchHeader);
+
         ErrorMessageMgt.PopContext(ErrorContextElement);
 
         CheckPurchLines(PurchHeader);
@@ -8820,6 +8826,30 @@ codeunit 90 "Purch.-Post"
                 TempPurchLineGlobal := TempPrepmtPurchaseLine;
                 TempPurchLineGlobal.Insert(true);
             until TempPrepmtPurchaseLine.Next() = 0;
+    end;
+
+    local procedure UpdateVendorInvoiceNoForSelfBilling(var PurchHeader: Record "Purchase Header")
+    var
+        NoSeries: Codeunit "No. Series";
+    begin
+        if not (PurchHeader."Document Type" in [PurchHeader."Document Type"::Invoice, PurchHeader."Document Type"::Order]) then
+            exit;
+
+        PurchSetup.GetRecordOnce();
+        PurchSetup.TestField("Posted Self-Billing Inv. Nos.");
+
+        if PreviewMode then
+            PurchHeader."Vendor Invoice No." := PostingPreviewNoTok
+        else
+            PurchHeader."Vendor Invoice No." := NoSeries.GetNextNo(PurchSetup."Posted Self-Billing Inv. Nos.", PurchHeader."Posting Date");
+    end;
+
+    local procedure SelfBillingInvoiceDocument(PurchHeader: Record "Purchase Header"): Boolean
+    begin
+        if not PurchHeader."Self-Billing Invoice" then
+            exit(false);
+
+        exit(PurchHeader."Document Type" in [PurchHeader."Document Type"::Order, PurchHeader."Document Type"::Invoice]);
     end;
 
     local procedure CheckApplicationExistForCreditMemo(PurchaseHeader: Record "Purchase Header"): Boolean
