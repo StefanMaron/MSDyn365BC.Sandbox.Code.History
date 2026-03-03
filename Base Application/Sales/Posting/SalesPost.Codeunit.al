@@ -473,7 +473,7 @@ codeunit 80 "Sales-Post"
         // Lines
         GetZeroSalesLineRecID(SalesHeader, ZeroSalesLineRecID);
         ErrorMessageMgt.PushContext(ErrorContextElementProcessLines, ZeroSalesLineRecID, 0, PostDocumentLinesMsg);
-        OnBeforePostLines(TempSalesLineGlobal, SalesHeader, SuppressCommit, PreviewMode, TempWhseShptHeader, ItemJnlPostLine);
+        OnBeforePostLines(TempSalesLineGlobal, SalesHeader, SuppressCommit, PreviewMode, TempWhseShptHeader, ItemJnlPostLine, TempWhseRcptHeader);
 
         LineCount := 0;
         RoundingLineInserted := false;
@@ -9456,8 +9456,9 @@ codeunit 80 "Sales-Post"
     /// <param name="PreviewMode">Indicates whether the posting is in preview mode.</param>
     /// <param name="TempWhseShptHeader">The temporary warehouse shipment header.</param>
     /// <param name="ItemJnlPostLine">The item journal post line codeunit instance.</param>
+    /// <param name="TempWarehouseReceiptHeader">The temporary warehouse receipt header.</param>
     [IntegrationEvent(false, false)]
-    local procedure OnBeforePostLines(var SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"; CommitIsSuppressed: Boolean; PreviewMode: Boolean; var TempWhseShptHeader: Record "Warehouse Shipment Header" temporary; var ItemJnlPostLine: Codeunit "Item Jnl.-Post Line")
+    local procedure OnBeforePostLines(var SalesLine: Record "Sales Line"; SalesHeader: Record "Sales Header"; CommitIsSuppressed: Boolean; PreviewMode: Boolean; var TempWhseShptHeader: Record "Warehouse Shipment Header" temporary; var ItemJnlPostLine: Codeunit "Item Jnl.-Post Line"; var TempWarehouseReceiptHeader: Record "Warehouse Receipt Header" temporary)
     begin
     end;
 
