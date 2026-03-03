@@ -160,10 +160,7 @@ codeunit 95 "Purch Post Batch via Job Queue"
             PurchInvHeader."No." := PurchaseHeader."Last Posting No.";
         PurchInvHeader.SetRecFilter();
         RecRef.GetTable(PurchInvHeader);
-        if PurchaseHeader."Self-Billing Invoice" then
-            Result := PrintDocument(Enum::"Report Selection Usage"::"P.Self Billing Invoice", RecRef, PurchaseHeader, JobQueueEntry)
-        else
-            Result := PrintDocument(Enum::"Report Selection Usage"::"P.Invoice", RecRef, PurchaseHeader, JobQueueEntry);
+        Result := PrintDocument(Enum::"Report Selection Usage"::"P.Invoice", RecRef, PurchaseHeader, JobQueueEntry);
     end;
 
     local procedure PrintCrMemoDocument(PurchaseHeader: Record "Purchase Header"; JobQueueEntry: Record "Job Queue Entry") Result: Boolean
