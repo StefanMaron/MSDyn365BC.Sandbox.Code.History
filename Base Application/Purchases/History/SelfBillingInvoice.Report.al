@@ -24,11 +24,11 @@ using System.Email;
 using System.Globalization;
 using System.Utilities;
 
-report 406 "Purchase - Invoice"
+report 413 "Self Billing Invoice"
 {
-    Caption = 'Purchase - Invoice';
+    Caption = 'Self Billing Invoice';
     PreviewMode = PrintLayout;
-    DefaultRenderingLayout = "PurchaseInvoice.rdlc";
+    DefaultRenderingLayout = "SelfBillingInvoice.rdlc";
     WordMergeDataItem = "Purch. Inv. Header";
 
     dataset
@@ -45,6 +45,15 @@ report 406 "Purchase - Invoice"
             {
             }
             column(AllowInvDiscCaption; AllowInvDiscCaptionLbl)
+            {
+            }
+            column(PayToVendNo_PurchInvHeaderCaption; "Purch. Inv. Header".FieldCaption("Pay-to Vendor No."))
+            {
+            }
+            column(PricesIncVAT_PurchInvHeaderCaption; "Purch. Inv. Header".FieldCaption("Prices Including VAT"))
+            {
+            }
+            column(BuyFromVendNo_PurchInvHeaderCaption; "Purch. Inv. Header".FieldCaption("Buy-from Vendor No."))
             {
             }
             column(BuyFromContactPhoneNoLbl; BuyFromContactPhoneNoLbl)
@@ -98,6 +107,9 @@ report 406 "Purchase - Invoice"
                     column(DocCaptionCopyText; StrSubstNo(DocumentCaption(), CopyText))
                     {
                     }
+                    column(SelfBillingCaption; StrSubstNo(SelfBillingCaptionLbl, CopyText))
+                    {
+                    }
                     column(VendAddr1; VendAddr[1])
                     {
                     }
@@ -137,10 +149,10 @@ report 406 "Purchase - Invoice"
                     column(CompanyInfoEMail; CompanyInfo."E-Mail")
                     {
                     }
-                    column(CompanyInfoEnterpriseNo; CompanyInfo."Enterprise No.")
+                    column(CompanyPicture; DummyCompanyInfo.Picture)
                     {
                     }
-                    column(CompanyPicture; DummyCompanyInfo.Picture)
+                    column(CompanyInfoVATRegNo; CompanyInfo."VAT Registration No.")
                     {
                     }
                     column(CompanyInfoGiroNo; CompanyInfo."Giro No.")
@@ -150,6 +162,15 @@ report 406 "Purchase - Invoice"
                     {
                     }
                     column(CompanyInfoBankAccountNo; CompanyInfo."Bank Account No.")
+                    {
+                    }
+                    column(CompanyInfoSwiftCode; CompanyInfo."SWIFT Code")
+                    {
+                    }
+                    column(CompanyInfoIBAN; CompanyInfo.IBAN)
+                    {
+                    }
+                    column(CompanyInfoBankBranchNo; CompanyInfo."Bank Branch No.")
                     {
                     }
                     column(PayToVendNo_PurchInvHeader; "Purch. Inv. Header"."Pay-to Vendor No.")
@@ -165,9 +186,6 @@ report 406 "Purchase - Invoice"
                     {
                     }
                     column(DueDate_PurchInvHeader; Format("Purch. Inv. Header"."Due Date"))
-                    {
-                    }
-                    column(NoText; NoText)
                     {
                     }
                     column(PurchaserText; PurchaserText)
@@ -236,7 +254,7 @@ report 406 "Purchase - Invoice"
                     column(EMailCaption; EMailCaptionLbl)
                     {
                     }
-                    column(EnterpriseNoCaption; EnterpriseNoLbl)
+                    column(VATRegNoCaption; VATRegNoCaptionLbl)
                     {
                     }
                     column(GiroNoCaption; GiroNoCaptionLbl)
@@ -269,15 +287,6 @@ report 406 "Purchase - Invoice"
                     column(DocDateCaption; DocDateCaptionLbl)
                     {
                     }
-                    column(PayToVendNo_PurchInvHeaderCaption; "Purch. Inv. Header".FieldCaption("Pay-to Vendor No."))
-                    {
-                    }
-                    column(PricesIncVAT_PurchInvHeaderCaption; "Purch. Inv. Header".FieldCaption("Prices Including VAT"))
-                    {
-                    }
-                    column(BuyFromVendNo_PurchInvHeaderCaption; "Purch. Inv. Header".FieldCaption("Buy-from Vendor No."))
-                    {
-                    }
                     column(VATPercentageCaption; VATPercentageCaptionLbl)
                     {
                     }
@@ -300,6 +309,12 @@ report 406 "Purchase - Invoice"
                     {
                     }
                     column(TotalCaption; TotalCaptionLbl)
+                    {
+                    }
+                    column(SwiftCodeCaption; SwiftCodeCaptionLbl)
+                    {
+                    }
+                    column(CompanyIBAN_Lbl; CompanyInfo.FieldCaption(IBAN))
                     {
                     }
                     dataitem(DimensionLoop1; "Integer")
@@ -556,7 +571,6 @@ report 406 "Purchase - Invoice"
                             if "Allow Invoice Disc." then
                                 TempVATAmountLine."Inv. Disc. Base Amount" := "Line Amount";
                             TempVATAmountLine."Invoice Discount Amount" := "Inv. Discount Amount";
-                            TempVATAmountLine."VAT Base (Lowered)" := "VAT Base Amount";
                             TempVATAmountLine.InsertLine();
 
                             AllowVATDisctxt := Format("Allow Invoice Disc.");
@@ -624,9 +638,6 @@ report 406 "Purchase - Invoice"
                         {
                             AutoFormatExpression = "Purch. Inv. Header"."Currency Code";
                             AutoFormatType = 1;
-                        }
-                        column(VATAmtLineVATBaseLowered; TempVATAmountLine."VAT Base (Lowered)")
-                        {
                         }
                         column(VATAmtLineInvDiscAmt; TempVATAmountLine."Invoice Discount Amount")
                         {
@@ -830,8 +841,6 @@ report 406 "Purchase - Invoice"
 
             trigger OnAfterGetRecord()
             begin
-                VATNoText := '';
-                NoText := '';
                 FirstLineHasBeenOutput := false;
                 CurrReport.Language := LanguageMgt.GetLanguageIdOrDefault("Language Code");
                 CurrReport.FormatRegion := LanguageMgt.GetFormatRegionOrDefault("Format Region");
@@ -844,17 +853,6 @@ report 406 "Purchase - Invoice"
                 PricesInclVATtxt := Format("Prices Including VAT");
 
                 DimSetEntry1.SetRange("Dimension Set ID", "Dimension Set ID");
-
-                if not Country.DetermineCountry("Pay-to Country/Region Code") then begin
-                    if "VAT Registration No." <> '' then begin
-                        VATNoText := FieldCaption("VAT Registration No.");
-                        NoText := "VAT Registration No.";
-                    end
-                end else
-                    if "Enterprise No." <> '' then begin
-                        VATNoText := FieldCaption("Enterprise No.");
-                        NoText := "Enterprise No.";
-                    end;
             end;
 
             trigger OnPreDataItem()
@@ -916,12 +914,12 @@ report 406 "Purchase - Invoice"
 
     rendering
     {
-        layout("PurchaseInvoice.rdlc")
+        layout("SelfBillingInvoice.rdlc")
         {
             Type = RDLC;
-            LayoutFile = './Purchases/History/PurchaseInvoice.rdlc';
-            Caption = 'Purchase Invoice (RDLC)';
-            Summary = 'The Purchase Invoice (RDLC) is the most detailed layout and provides most flexible layout options.';
+            LayoutFile = './Purchases/History/SelfBillingInvoice.rdlc';
+            Caption = 'Self-Billing Invoice (RDLC)';
+            Summary = 'The Self-Billing Invoice (RDLC) is the most detailed layout and provides most flexible layout options.';
         }
     }
 
@@ -960,7 +958,6 @@ report 406 "Purchase - Invoice"
         CurrExchRate: Record "Currency Exchange Rate";
         BuyFromContact: Record Contact;
         PayToContact: Record Contact;
-        Country: Record "Country/Region";
         RemitAddressBuffer: Record "Remit Address Buffer";
         LanguageMgt: Codeunit Language;
         FormatAddr: Codeunit "Format Address";
@@ -995,7 +992,6 @@ report 406 "Purchase - Invoice"
         AllowVATDisctxt: Text[30];
         VATAmountText: Text[30];
         PurchInLineTypeNo: Integer;
-        NoText: Text[50];
         LogInteractionEnable: Boolean;
         TotalSubTotal: Decimal;
         TotalAmount: Decimal;
@@ -1020,7 +1016,7 @@ report 406 "Purchase - Invoice"
         PhoneNoCaptionLbl: Label 'Phone No.';
         HomePageCaptionLbl: Label 'Home Page';
         EMailCaptionLbl: Label 'Email';
-        EnterpriseNoLbl: Label 'Enterprise No.';
+        VATRegNoCaptionLbl: Label 'VAT Registration No.';
         GiroNoCaptionLbl: Label 'Giro No.';
         BankNameCaptionLbl: Label 'Bank';
         BankAccNoCaptionLbl: Label 'Account No.';
@@ -1056,6 +1052,8 @@ report 406 "Purchase - Invoice"
         PayToContactPhoneNoLbl: Label 'Pay-to Contact Phone No.';
         PayToContactMobilePhoneNoLbl: Label 'Pay-to Contact Mobile Phone No.';
         PayToContactEmailLbl: Label 'Pay-to Contact E-Mail';
+        SelfBillingCaptionLbl: Label 'Self Billing Invoice %1', Comment = '%1 = Document No.';
+        SwiftCodeCaptionLbl: Label 'SWIFT Code';
 
     protected var
         CompanyInfo: Record "Company Information";
