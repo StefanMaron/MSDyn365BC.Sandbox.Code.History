@@ -5240,7 +5240,7 @@ table 37 "Sales Line"
     var
         IsHandled: Boolean;
     begin
-        OnBeforeGetSalesHeader(Rec, SalesHeader, IsHandled, Currency, HasSalesHeader);
+        OnBeforeGetSalesHeader(Rec, SalesHeader, IsHandled, Currency);
         if IsHandled then
             exit;
 
@@ -5255,10 +5255,8 @@ table 37 "Sales Line"
                     Currency.Get(SalesHeader."Currency Code");
                     Currency.TestField("Amount Rounding Precision");
                 end
-            end else begin
+            end else
                 Clear(SalesHeader);
-                HasSalesHeader := false;
-            end;
 
         OnAfterGetSalesHeader(Rec, SalesHeader, Currency);
         OutSalesHeader := SalesHeader;
@@ -12743,9 +12741,8 @@ table 37 "Sales Line"
     /// <param name="SalesHeader">The sales header to get.</param>
     /// <param name="IsHanded">Set to true to skip the default processing.</param>
     /// <param name="Currency">The currency record.</param>
-    /// <param name="HasSalesHeader">Set to true to indicate whether the sales header has been retrieved.</param>
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeGetSalesHeader(var SalesLine: Record "Sales Line"; var SalesHeader: Record "Sales Header"; var IsHanded: Boolean; var Currency: Record Currency; var HasSalesHeader: Boolean)
+    local procedure OnBeforeGetSalesHeader(var SalesLine: Record "Sales Line"; var SalesHeader: Record "Sales Header"; var IsHanded: Boolean; var Currency: Record Currency)
     begin
     end;
 
