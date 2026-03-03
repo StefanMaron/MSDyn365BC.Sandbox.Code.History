@@ -104,12 +104,7 @@ codeunit 5467 "PDF Document Management"
         if not DocumentFound then
             if PurchInvAggregator.GetPurchaseInvoiceHeaderFromId(DocumentId, PurchInvHeader) then begin
                 PurchInvHeader.SetRange("No.", PurchInvHeader."No.");
-
-                if PurchInvHeader."Self-Billing Invoice" then
-                    ReportUsage := "Report Selection Usage"::"P.Self Billing Invoice"
-                else
-                    ReportUsage := "Report Selection Usage"::"P.Invoice";
-
+                ReportUsage := "Report Selection Usage"::"P.Invoice";
                 ReportSelections.GetPdfReportForCust(Path, ReportUsage, PurchInvHeader, PurchInvHeader."Buy-from Vendor No.");
                 DocumentMailing.GetAttachmentFileName(Name, PurchInvHeader."No.", PurchaseInvoiceTxt, ReportUsage.AsInteger());
                 DocumentFound := true;
