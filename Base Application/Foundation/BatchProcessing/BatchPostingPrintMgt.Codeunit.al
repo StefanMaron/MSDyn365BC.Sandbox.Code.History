@@ -138,16 +138,10 @@ codeunit 1373 "Batch Posting Print Mgt."
                     if PurchaseHeader.Invoice then begin
                         PurchInvHeader."No." := PurchaseHeader."Last Posting No.";
                         PurchInvHeader.SetRecFilter();
-                        if PurchaseHeader."Self-Billing Invoice" then
-                            PrintDocument(
-                                ReportSelections.Usage::"P.Self Billing Invoice", PurchInvHeader,
-                                PurchasesPayablesSetup."Post & Print with Job Queue",
-                                PurchasesPayablesSetup."Report Output Type")
-                        else
-                            PrintDocument(
-                                ReportSelections.Usage::"P.Invoice", PurchInvHeader,
-                                PurchasesPayablesSetup."Post & Print with Job Queue",
-                                PurchasesPayablesSetup."Report Output Type");
+                        PrintDocument(
+                            ReportSelections.Usage::"P.Invoice", PurchInvHeader,
+                            PurchasesPayablesSetup."Post & Print with Job Queue",
+                            PurchasesPayablesSetup."Report Output Type");
                     end;
                 end;
             PurchaseHeader."Document Type"::Invoice:
@@ -157,16 +151,10 @@ codeunit 1373 "Batch Posting Print Mgt."
                     else
                         PurchInvHeader."No." := PurchaseHeader."Last Posting No.";
                     PurchInvHeader.SetRecFilter();
-                    if PurchaseHeader."Self-Billing Invoice" then
-                        PrintDocument(
-                            ReportSelections.Usage::"P.Self Billing Invoice", PurchInvHeader,
-                            PurchasesPayablesSetup."Post & Print with Job Queue",
-                            PurchasesPayablesSetup."Report Output Type")
-                    else
-                        PrintDocument(
-                            ReportSelections.Usage::"P.Invoice", PurchInvHeader,
-                            PurchasesPayablesSetup."Post & Print with Job Queue",
-                            PurchasesPayablesSetup."Report Output Type");
+                    PrintDocument(
+                        ReportSelections.Usage::"P.Invoice", PurchInvHeader,
+                        PurchasesPayablesSetup."Post & Print with Job Queue",
+                        PurchasesPayablesSetup."Report Output Type");
                 end;
             PurchaseHeader."Document Type"::"Credit Memo":
                 begin
