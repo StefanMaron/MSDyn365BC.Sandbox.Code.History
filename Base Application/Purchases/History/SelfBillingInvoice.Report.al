@@ -12,7 +12,6 @@ using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Calculation;
-using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.PaymentTerms;
@@ -25,11 +24,11 @@ using System.Email;
 using System.Globalization;
 using System.Utilities;
 
-report 406 "Purchase - Invoice"
+report 413 "Self Billing Invoice"
 {
-    Caption = 'Purchase - Invoice';
+    Caption = 'Self Billing Invoice';
     PreviewMode = PrintLayout;
-    DefaultRenderingLayout = "PurchaseInvoice.rdlc";
+    DefaultRenderingLayout = "SelfBillingInvoice.rdlc";
     WordMergeDataItem = "Purch. Inv. Header";
 
     dataset
@@ -42,40 +41,19 @@ report 406 "Purchase - Invoice"
             column(No_PurchInvHeader; "No.")
             {
             }
-            column(CompanyinfoHomePage; CompanyInfo."Home Page")
+            column(InvDiscAmtCaption; InvDiscAmtCaptionLbl)
             {
             }
-            column(CompanyInfoEmail; CompanyInfo."E-Mail")
+            column(AllowInvDiscCaption; AllowInvDiscCaptionLbl)
             {
             }
-            column(PaymentTermsDescription; PaymentTerms.Description)
+            column(PayToVendNo_PurchInvHeaderCaption; "Purch. Inv. Header".FieldCaption("Pay-to Vendor No."))
             {
             }
-            column(ShipmentMethodDescription; ShipmentMethod.Description)
+            column(PricesIncVAT_PurchInvHeaderCaption; "Purch. Inv. Header".FieldCaption("Prices Including VAT"))
             {
             }
-            column(InvDiscountAmountCaption; InvDiscountAmountCaptionLbl)
-            {
-            }
-            column(VATAmountLineVATCaption; VATAmountLineVATCaptionLbl)
-            {
-            }
-            column(VATAmtLineVATBaseCaption; VATAmtLineVATBaseCaptionLbl)
-            {
-            }
-            column(VATAmtLineVATAmtCaption; VATAmtLineVATAmtCaptionLbl)
-            {
-            }
-            column(PaymentTermsDescCaption; PaymentTermsDescCaptionLbl)
-            {
-            }
-            column(ShipmentMethodDescCaption; ShipmentMethodDescCaptionLbl)
-            {
-            }
-            column(DocumentDateCaption; DocumentDateCaptionLbl)
-            {
-            }
-            column(AllowInvoiceDisc_PurchInvLineCaption; AllowInvoiceDisc_PurchInvLineCaptionLbl)
+            column(BuyFromVendNo_PurchInvHeaderCaption; "Purch. Inv. Header".FieldCaption("Buy-from Vendor No."))
             {
             }
             column(BuyFromContactPhoneNoLbl; BuyFromContactPhoneNoLbl)
@@ -120,7 +98,16 @@ report 406 "Purchase - Invoice"
                 dataitem(PageLoop; "Integer")
                 {
                     DataItemTableView = sorting(Number) where(Number = const(1));
-                    column(DocumentCaptionCopyText; StrSubstNo(DocumentCaption(), CopyText))
+                    column(PaymentTermsDesc; PaymentTerms.Description)
+                    {
+                    }
+                    column(ShipmentMethodDesc; ShipmentMethod.Description)
+                    {
+                    }
+                    column(DocCaptionCopyText; StrSubstNo(DocumentCaption(), CopyText))
+                    {
+                    }
+                    column(SelfBillingCaption; StrSubstNo(SelfBillingCaptionLbl, CopyText))
                     {
                     }
                     column(VendAddr1; VendAddr[1])
@@ -156,6 +143,12 @@ report 406 "Purchase - Invoice"
                     column(VendAddr6; VendAddr[6])
                     {
                     }
+                    column(CompanyInfoHomePage; CompanyInfo."Home Page")
+                    {
+                    }
+                    column(CompanyInfoEMail; CompanyInfo."E-Mail")
+                    {
+                    }
                     column(CompanyPicture; DummyCompanyInfo.Picture)
                     {
                     }
@@ -171,13 +164,19 @@ report 406 "Purchase - Invoice"
                     column(CompanyInfoBankAccountNo; CompanyInfo."Bank Account No.")
                     {
                     }
-                    column(PaytoVendNo_PurchInvHeader; "Purch. Inv. Header"."Pay-to Vendor No.")
+                    column(CompanyInfoSwiftCode; CompanyInfo."SWIFT Code")
                     {
                     }
-                    column(BuyfromVendNo_PurchInvHdr; "Purch. Inv. Header"."Buy-from Vendor No.")
+                    column(CompanyInfoIBAN; CompanyInfo.IBAN)
                     {
                     }
-                    column(DocDate_PurchInvHeader; Format("Purch. Inv. Header"."Document Date", 0, 4))
+                    column(CompanyInfoBankBranchNo; CompanyInfo."Bank Branch No.")
+                    {
+                    }
+                    column(PayToVendNo_PurchInvHeader; "Purch. Inv. Header"."Pay-to Vendor No.")
+                    {
+                    }
+                    column(DocDate_PurchInvHeader; Format("Purch. Inv. Header"."Document Date"))
                     {
                     }
                     column(VATNoText; VATNoText)
@@ -195,10 +194,7 @@ report 406 "Purchase - Invoice"
                     column(SalesPurchPersonName; SalesPurchPerson.Name)
                     {
                     }
-                    column(No_PageLoop; "Purch. Inv. Header"."No.")
-                    {
-                    }
-                    column(ReferenceText; ReferenceText)
+                    column(RefText; ReferenceText)
                     {
                     }
                     column(YourRef_PurchInvHeader; "Purch. Inv. Header"."Your Reference")
@@ -228,10 +224,10 @@ report 406 "Purchase - Invoice"
                     column(CompanyAddr8; CompanyAddr[8])
                     {
                     }
-                    column(PostingDate_PurchInvHdr; Format("Purch. Inv. Header"."Posting Date"))
+                    column(PostingDate_PurchInvHeader; Format("Purch. Inv. Header"."Posting Date"))
                     {
                     }
-                    column(PricesIncluVAT_PurchInvHdr; "Purch. Inv. Header"."Prices Including VAT")
+                    column(PricesIncVAT_PurchInvHeader; "Purch. Inv. Header"."Prices Including VAT")
                     {
                     }
                     column(OutputNo; OutputNo)
@@ -240,59 +236,92 @@ report 406 "Purchase - Invoice"
                     column(ShowInternalInfo; ShowInternalInfo)
                     {
                     }
-                    column(VATBaseDis_PurchInvHdr; "Purch. Inv. Header"."VAT Base Discount %")
+                    column(VATBaseDisc_PurchInvHeader; "Purch. Inv. Header"."VAT Base Discount %")
                     {
                     }
                     column(PricesInclVATtxt; PricesInclVATtxt)
                     {
                     }
-                    column(CompanyInfoPhoneNoCaption; CompanyInfoPhoneNoCaptionLbl)
+                    column(BuyFromVendNo_PurchInvHeader; "Purch. Inv. Header"."Buy-from Vendor No.")
                     {
                     }
-                    column(CompanyInfVATRegNoCaption; CompanyInfVATRegNoCaptionLbl)
-                    {
-                    }
-                    column(CompanyInfoGiroNoCaption; CompanyInfoGiroNoCaptionLbl)
-                    {
-                    }
-                    column(CompanyInfBankNameCaption; CompanyInfBankNameCaptionLbl)
-                    {
-                    }
-                    column(CompanyInfBankAcNoCaption; CompanyInfBankAcNoCaptionLbl)
-                    {
-                    }
-                    column(PurchInvHdrDueDateCaption; PurchInvHdrDueDateCaptionLbl)
-                    {
-                    }
-                    column(InvoiceNoCaption; InvoiceNoCaptionLbl)
-                    {
-                    }
-                    column(PurchInvHdrPostDtCaption; PurchInvHdrPostDtCaptionLbl)
-                    {
-                    }
-                    column(PageCaption; PageCaptionLbl)
-                    {
-                    }
-                    column(EmailCaption; EmailCaptionLbl)
+                    column(PhoneNoCaption; PhoneNoCaptionLbl)
                     {
                     }
                     column(HomePageCaption; HomePageCaptionLbl)
                     {
                     }
-                    column(PaytoVendNo_PurchInvHeaderCaption; "Purch. Inv. Header".FieldCaption("Pay-to Vendor No."))
+                    column(EMailCaption; EMailCaptionLbl)
                     {
                     }
-                    column(BuyfromVendNo_PurchInvHdrCaption; "Purch. Inv. Header".FieldCaption("Buy-from Vendor No."))
+                    column(VATRegNoCaption; VATRegNoCaptionLbl)
                     {
                     }
-                    column(PricesIncluVAT_PurchInvHdrCaption; "Purch. Inv. Header".FieldCaption("Prices Including VAT"))
+                    column(GiroNoCaption; GiroNoCaptionLbl)
+                    {
+                    }
+                    column(BankNameCaption; BankNameCaptionLbl)
+                    {
+                    }
+                    column(BankAccNoCaption; BankAccNoCaptionLbl)
+                    {
+                    }
+                    column(DueDateCaption; DueDateCaptionLbl)
+                    {
+                    }
+                    column(InvoiceNoCaption; InvoiceNoCaptionLbl)
+                    {
+                    }
+                    column(PostingDateCaption; PostingDateCaptionLbl)
+                    {
+                    }
+                    column(PageCaption; PageCaptionLbl)
+                    {
+                    }
+                    column(PaymentTermsCaption; PaymentTermsCaptionLbl)
+                    {
+                    }
+                    column(ShipmentMethodCaption; ShipmentMethodCaptionLbl)
+                    {
+                    }
+                    column(DocDateCaption; DocDateCaptionLbl)
+                    {
+                    }
+                    column(VATPercentageCaption; VATPercentageCaptionLbl)
+                    {
+                    }
+                    column(VATBaseCaption; VATBaseCaptionLbl)
+                    {
+                    }
+                    column(VATAmtCaption; VATAmtCaptionLbl)
+                    {
+                    }
+                    column(VATAmtSpecificationCaption; VATAmtSpecificationCaptionLbl)
+                    {
+                    }
+                    column(InvDiscBaseAmtCaption; InvDiscBaseAmtCaptionLbl)
+                    {
+                    }
+                    column(LineAmtCaption; LineAmtCaptionLbl)
+                    {
+                    }
+                    column(VATIdentifierCaption; VATIdentifierCaptionLbl)
+                    {
+                    }
+                    column(TotalCaption; TotalCaptionLbl)
+                    {
+                    }
+                    column(SwiftCodeCaption; SwiftCodeCaptionLbl)
+                    {
+                    }
+                    column(CompanyIBAN_Lbl; CompanyInfo.FieldCaption(IBAN))
                     {
                     }
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Purch. Inv. Header";
                         DataItemTableView = sorting(Number) where(Number = filter(1 ..));
-                        column(DimText; DimText)
+                        column(DimText_DimensionLoop1; DimText)
                         {
                         }
                         column(HeaderDimensionsCaption; HeaderDimensionsCaptionLbl)
@@ -338,21 +367,21 @@ report 406 "Purchase - Invoice"
                         DataItemLink = "Document No." = field("No.");
                         DataItemLinkReference = "Purch. Inv. Header";
                         DataItemTableView = sorting("Document No.", "Line No.");
-                        column(LineAmount_PurchInvLine; "Line Amount")
+                        column(LineAmt_PurchInvLine; "Line Amount")
                         {
                             AutoFormatExpression = GetCurrencyCode();
                             AutoFormatType = 1;
                         }
-                        column(Description_PurchInvLine; Description)
+                        column(Desc_PurchInvLine; Description)
                         {
                         }
                         column(No_PurchInvLine; "No.")
                         {
                         }
-                        column(Quantity_PurchInvLine; Quantity)
+                        column(Qty_PurchInvLine; Quantity)
                         {
                         }
-                        column(UnitofMeasure_PurchInvLine; "Unit of Measure")
+                        column(UOM_PurchInvLine; "Unit of Measure")
                         {
                         }
                         column(DirectUnitCost_PurchInvLine; "Direct Unit Cost")
@@ -360,11 +389,12 @@ report 406 "Purchase - Invoice"
                             AutoFormatExpression = GetCurrencyCode();
                             AutoFormatType = 2;
                         }
-                        column(LineDiscount_PurchInvLine; "Line Discount %")
+                        column(LineDisc_PurchInvLine; "Line Discount %")
                         {
                         }
-                        column(AllowInvoiceDisc_PurchInvLine; "Allow Invoice Disc.")
+                        column(AllowInvDisc_PurchInvLine; "Allow Invoice Disc.")
                         {
+                            IncludeCaption = false;
                         }
                         column(VATIdentifier_PurchInvLine; "VAT Identifier")
                         {
@@ -378,10 +408,10 @@ report 406 "Purchase - Invoice"
                         column(PurchInLineTypeNo; PurchInLineTypeNo)
                         {
                         }
-                        column(VATAmountText; VATAmountText)
+                        column(VATAmtText; VATAmountText)
                         {
                         }
-                        column(InvDiscountAmount; -"Inv. Discount Amount")
+                        column(NegInvDiscAmt_PurchInvLine; -"Inv. Discount Amount")
                         {
                             AutoFormatExpression = GetCurrencyCode();
                             AutoFormatType = 1;
@@ -389,7 +419,7 @@ report 406 "Purchase - Invoice"
                         column(TotalText; TotalText)
                         {
                         }
-                        column(Amount_PurchInvLine; Amount)
+                        column(PurchInvLineAmt; Amount)
                         {
                             AutoFormatExpression = GetCurrencyCode();
                             AutoFormatType = 1;
@@ -397,58 +427,60 @@ report 406 "Purchase - Invoice"
                         column(TotalInclVATText; TotalInclVATText)
                         {
                         }
-                        column(AmtIncluVAT_PurchInvLine; "Amount Including VAT")
+                        column(AmtIncVAT_PurchInvLine; "Amount Including VAT")
                         {
                             AutoFormatExpression = GetCurrencyCode();
                             AutoFormatType = 1;
                         }
-                        column(AmtIncluVATAmt_PurchInvLine; "Amount Including VAT" - Amount)
+                        column(AmtIncVATAmt_PurchInvLine; "Amount Including VAT" - Amount)
                         {
                             AutoFormatExpression = GetCurrencyCode();
                             AutoFormatType = 1;
                         }
-                        column(VATAmountLineVATAmountText; TempVATAmountLine.VATAmountText())
+                        column(VATAmtLineVATAmtText; TempVATAmountLine.VATAmountText())
                         {
                         }
                         column(TotalExclVATText; TotalExclVATText)
                         {
                         }
-                        column(DocumentNo_PurchInvLine; "Document No.")
+                        column(NegLineAmtInvDiscAmtAmtIncVAT_PurchInvLine; -("Line Amount" - "Inv. Discount Amount" - "Amount Including VAT"))
                         {
+                            AutoFormatExpression = "Purch. Inv. Header"."Currency Code";
+                            AutoFormatType = 1;
                         }
                         column(TotalSubTotal; TotalSubTotal)
                         {
                             AutoFormatExpression = "Purch. Inv. Header"."Currency Code";
                             AutoFormatType = 1;
                         }
-                        column(TotalInvoiceDiscountAmount; TotalInvoiceDiscountAmount)
+                        column(TotalInvDiscAmt; TotalInvoiceDiscountAmount)
                         {
                             AutoFormatExpression = "Purch. Inv. Header"."Currency Code";
                             AutoFormatType = 1;
                         }
-                        column(TotalAmount; TotalAmount)
+                        column(TotalAmt; TotalAmount)
                         {
                             AutoFormatExpression = "Purch. Inv. Header"."Currency Code";
                             AutoFormatType = 1;
                         }
-                        column(TotalAmountInclVAT; TotalAmountInclVAT)
+                        column(TotalAmtInclVAT; TotalAmountInclVAT)
                         {
                             AutoFormatExpression = "Purch. Inv. Header"."Currency Code";
                             AutoFormatType = 1;
                         }
-                        column(TotalAmountVAT; TotalAmountVAT)
+                        column(TotalAmtVAT; TotalAmountVAT)
                         {
                             AutoFormatExpression = "Purch. Inv. Header"."Currency Code";
                             AutoFormatType = 1;
                         }
-                        column(TotalPaymentDiscountOnVAT; TotalPaymentDiscountOnVAT)
+                        column(TotalPaymentDiscOnVAT; TotalPaymentDiscountOnVAT)
                         {
                             AutoFormatType = 1;
                         }
                         column(DirectUnitCostCaption; DirectUnitCostCaptionLbl)
                         {
                         }
-                        column(PurchInvLineLinDisCaption; PurchInvLineLinDisCaptionLbl)
+                        column(DiscountPctCaption; DiscountPctCaptionLbl)
                         {
                         }
                         column(AmountCaption; AmountCaptionLbl)
@@ -457,19 +489,19 @@ report 406 "Purchase - Invoice"
                         column(SubtotalCaption; SubtotalCaptionLbl)
                         {
                         }
-                        column(PaymentDisOnVATCaption; PaymentDisOnVATCaptionLbl)
+                        column(PymtDiscOnVATCaption; PymtDiscOnVATCaptionLbl)
                         {
                         }
-                        column(Description_PurchInvLineCaption; FieldCaption(Description))
+                        column(Desc_PurchInvLineCaption; FieldCaption(Description))
                         {
                         }
                         column(No_PurchInvLineCaption; FieldCaption("No."))
                         {
                         }
-                        column(Quantity_PurchInvLineCaption; FieldCaption(Quantity))
+                        column(Qty_PurchInvLineCaption; FieldCaption(Quantity))
                         {
                         }
-                        column(UnitofMeasure_PurchInvLineCaption; FieldCaption("Unit of Measure"))
+                        column(UOM_PurchInvLineCaption; FieldCaption("Unit of Measure"))
                         {
                         }
                         column(VATIdentifier_PurchInvLineCaption; FieldCaption("VAT Identifier"))
@@ -551,8 +583,6 @@ report 406 "Purchase - Invoice"
                             TotalAmountInclVAT += "Amount Including VAT";
                             TotalPaymentDiscountOnVAT += -("Line Amount" - "Inv. Discount Amount" - "Amount Including VAT");
 
-                            PrintCashVATFooter := PrintCashVATFooter or ("Purch. Inv. Line"."VAT Prod. Posting Group" = CashVATProdGrp);
-
                             if FirstLineHasBeenOutput then
                                 Clear(DummyCompanyInfo.Picture);
                             FirstLineHasBeenOutput := true;
@@ -589,51 +619,36 @@ report 406 "Purchase - Invoice"
                     dataitem(VATCounter; "Integer")
                     {
                         DataItemTableView = sorting(Number);
-                        column(VATAmountLineVATBase; TempVATAmountLine."VAT Base")
+                        column(VATAmtLineVATBase; TempVATAmountLine."VAT Base")
                         {
                             AutoFormatExpression = "Purch. Inv. Header"."Currency Code";
                             AutoFormatType = 1;
                         }
-                        column(VATAmountLineVATAmount; TempVATAmountLine."VAT Amount")
+                        column(VATAmtLineVATAmt; TempVATAmountLine."VAT Amount")
                         {
                             AutoFormatExpression = "Purch. Inv. Header"."Currency Code";
                             AutoFormatType = 1;
                         }
-                        column(VATAmountLineLineAmount; TempVATAmountLine."Line Amount")
+                        column(VATAmtLineLineAmt; TempVATAmountLine."Line Amount")
                         {
                             AutoFormatExpression = "Purch. Inv. Header"."Currency Code";
                             AutoFormatType = 1;
                         }
-                        column(VATAmountLineInvDiscBaseAmount; TempVATAmountLine."Inv. Disc. Base Amount")
+                        column(VATAmtLineInvDiscBaseAmt; TempVATAmountLine."Inv. Disc. Base Amount")
                         {
                             AutoFormatExpression = "Purch. Inv. Header"."Currency Code";
                             AutoFormatType = 1;
                         }
-                        column(VATAmountLineInvDisAmt; TempVATAmountLine."Invoice Discount Amount")
+                        column(VATAmtLineInvDiscAmt; TempVATAmountLine."Invoice Discount Amount")
                         {
                             AutoFormatExpression = "Purch. Inv. Header"."Currency Code";
                             AutoFormatType = 1;
                         }
-                        column(VATAmountLineVAT; TempVATAmountLine."VAT %")
+                        column(VATAmtLineVAT_VATCounter; TempVATAmountLine."VAT %")
                         {
                             DecimalPlaces = 0 : 5;
                         }
-                        column(VATAmountLineVATIdentifier; TempVATAmountLine."VAT Identifier")
-                        {
-                        }
-                        column(VATAmtSpecCaption; VATAmtSpecCaptionLbl)
-                        {
-                        }
-                        column(InvDiscBaseAmtCaption; InvDiscBaseAmtCaptionLbl)
-                        {
-                        }
-                        column(VATAmtLineLineAmtCaption; VATAmtLineLineAmtCaptionLbl)
-                        {
-                        }
-                        column(VATAmtLineVATIdentCaption; VATAmtLineVATIdentCaptionLbl)
-                        {
-                        }
-                        column(TotalCaption; TotalCaptionLbl)
+                        column(VATAmtLineVATIdentifier_VATCounter; TempVATAmountLine."VAT Identifier")
                         {
                         }
 
@@ -656,7 +671,7 @@ report 406 "Purchase - Invoice"
                         column(VALSpecLCYHeader; VALSpecLCYHeader)
                         {
                         }
-                        column(VALVATAmountLCY; VALVATAmountLCY)
+                        column(VALVATAmtLCY; VALVATAmountLCY)
                         {
                             AutoFormatType = 1;
                         }
@@ -668,10 +683,7 @@ report 406 "Purchase - Invoice"
                         {
                             DecimalPlaces = 0 : 5;
                         }
-                        column(VATIdentifier_VATCounterLCY; TempVATAmountLine."VAT Identifier")
-                        {
-                        }
-                        column(VATIdentCaption; VATIdentCaptionLbl)
+                        column(VATAmtLineVATIdentifier_VATCounterLCY; TempVATAmountLine."VAT Identifier")
                         {
                         }
 
@@ -750,7 +762,7 @@ report 406 "Purchase - Invoice"
                         column(ShipToAddr8; ShipToAddr[8])
                         {
                         }
-                        column(ShiptoAddressCaption; ShiptoAddressCaptionLbl)
+                        column(ShipToAddressCaption; ShipToAddressCaptionLbl)
                         {
                         }
                         column(ShipToPhoneNo; "Purch. Inv. Header"."Ship-to Phone No.")
@@ -761,22 +773,6 @@ report 406 "Purchase - Invoice"
                         begin
                             if ShipToAddr[1] = '' then
                                 CurrReport.Break();
-                        end;
-                    }
-                    dataitem(CashVATFooter; "Integer")
-                    {
-                        DataItemTableView = sorting(Number) where(Number = const(1));
-                        column(CashVATFooterText; CashVATFooterText)
-                        {
-                        }
-                        column(PrintCashVATFooter; PrintCashVATFooter)
-                        {
-                        }
-
-                        trigger OnAfterGetRecord()
-                        begin
-                            if not PrintCashVATFooter then
-                                CurrReport.Skip();
                         end;
                     }
                     dataitem(RemitToAddressDataItem; "Integer")
@@ -918,12 +914,12 @@ report 406 "Purchase - Invoice"
 
     rendering
     {
-        layout("PurchaseInvoice.rdlc")
+        layout("SelfBillingInvoice.rdlc")
         {
             Type = RDLC;
-            LayoutFile = './Purchases/History/PurchaseInvoice.rdlc';
-            Caption = 'Purchase Invoice (RDLC)';
-            Summary = 'The Purchase Invoice (RDLC) is the most detailed layout and provides most flexible layout options.';
+            LayoutFile = './Purchases/History/SelfBillingInvoice.rdlc';
+            Caption = 'Self-Billing Invoice (RDLC)';
+            Summary = 'The Self-Billing Invoice (RDLC) is the most detailed layout and provides most flexible layout options.';
         }
     }
 
@@ -932,19 +928,10 @@ report 406 "Purchase - Invoice"
     }
 
     trigger OnInitReport()
-    var
-        VATProdPostingGr: Record "VAT Product Posting Group";
     begin
         GLSetup.Get();
         CompanyInfo.SetAutoCalcFields(Picture);
         CompanyInfo.Get();
-
-        CashVATProdGrp := GLSetup."CashVAT Product Posting Group";
-        if StrLen(CashVATProdGrp) > 0 then begin
-            VATProdPostingGr.Get(CashVATProdGrp);
-            CashVATFooterText := VATProdPostingGr.Description;
-        end else
-            CashVATFooterText := '';
 
         OnAfterInitReport();
     end;
@@ -1005,9 +992,6 @@ report 406 "Purchase - Invoice"
         AllowVATDisctxt: Text[30];
         VATAmountText: Text[30];
         PurchInLineTypeNo: Integer;
-        CashVATFooterText: Text[100];
-        CashVATProdGrp: Code[20];
-        PrintCashVATFooter: Boolean;
         LogInteractionEnable: Boolean;
         TotalSubTotal: Decimal;
         TotalAmount: Decimal;
@@ -1029,46 +1013,47 @@ report 406 "Purchase - Invoice"
 #pragma warning restore AA0470
         Text012: Label 'VAT Amount';
 #pragma warning restore AA0074
-        CompanyInfoPhoneNoCaptionLbl: Label 'Phone No.';
+        PhoneNoCaptionLbl: Label 'Phone No.';
         HomePageCaptionLbl: Label 'Home Page';
-        EmailCaptionLbl: Label 'Email';
-        CompanyInfVATRegNoCaptionLbl: Label 'VAT Registration No.';
-        CompanyInfoGiroNoCaptionLbl: Label 'Giro No.';
-        CompanyInfBankNameCaptionLbl: Label 'Bank';
-        CompanyInfBankAcNoCaptionLbl: Label 'Account No.';
-        PurchInvHdrDueDateCaptionLbl: Label 'Due Date';
+        EMailCaptionLbl: Label 'Email';
+        VATRegNoCaptionLbl: Label 'VAT Registration No.';
+        GiroNoCaptionLbl: Label 'Giro No.';
+        BankNameCaptionLbl: Label 'Bank';
+        BankAccNoCaptionLbl: Label 'Account No.';
+        DueDateCaptionLbl: Label 'Due Date';
         InvoiceNoCaptionLbl: Label 'Invoice No.';
-        PurchInvHdrPostDtCaptionLbl: Label 'Posting Date';
+        PostingDateCaptionLbl: Label 'Posting Date';
         PageCaptionLbl: Label 'Page';
+        PaymentTermsCaptionLbl: Label 'Payment Terms';
+        ShipmentMethodCaptionLbl: Label 'Shipment Method';
+        DocDateCaptionLbl: Label 'Document Date';
         HeaderDimensionsCaptionLbl: Label 'Header Dimensions';
         DirectUnitCostCaptionLbl: Label 'Direct Unit Cost';
-        PurchInvLineLinDisCaptionLbl: Label 'Discount %';
+        DiscountPctCaptionLbl: Label 'Discount %';
         AmountCaptionLbl: Label 'Amount';
         SubtotalCaptionLbl: Label 'Subtotal';
-        PaymentDisOnVATCaptionLbl: Label 'Payment Discount on VAT';
+        PymtDiscOnVATCaptionLbl: Label 'Payment Discount on VAT';
         LineDimensionsCaptionLbl: Label 'Line Dimensions';
-        VATAmtSpecCaptionLbl: Label 'VAT Amount Specification';
+        VATPercentageCaptionLbl: Label 'VAT %';
+        VATBaseCaptionLbl: Label 'VAT Base';
+        VATAmtCaptionLbl: Label 'VAT Amount';
+        VATAmtSpecificationCaptionLbl: Label 'VAT Amount Specification';
         InvDiscBaseAmtCaptionLbl: Label 'Inv. Disc. Base Amount';
-        VATAmtLineLineAmtCaptionLbl: Label 'Line Amount';
-        VATAmtLineVATIdentCaptionLbl: Label 'VAT Identifier';
+        LineAmtCaptionLbl: Label 'Line Amount';
+        VATIdentifierCaptionLbl: Label 'VAT Identifier';
         TotalCaptionLbl: Label 'Total';
-        VATIdentCaptionLbl: Label 'VAT Identifier';
-        ShiptoAddressCaptionLbl: Label 'Ship-to Address';
-        InvDiscountAmountCaptionLbl: Label 'Invoice Discount Amount';
-        VATAmountLineVATCaptionLbl: Label 'VAT %';
-        VATAmtLineVATBaseCaptionLbl: Label 'VAT Base';
-        VATAmtLineVATAmtCaptionLbl: Label 'VAT Amount';
-        PaymentTermsDescCaptionLbl: Label 'Payment Terms';
-        ShipmentMethodDescCaptionLbl: Label 'Shipment Method';
-        DocumentDateCaptionLbl: Label 'Document Date';
-        AllowInvoiceDisc_PurchInvLineCaptionLbl: Label 'Allow Invoice Discount';
+        ShipToAddressCaptionLbl: Label 'Ship-to Address';
         RemitToAddressCaptionLbl: Label 'Remit-to Address';
+        InvDiscAmtCaptionLbl: Label 'Invoice Discount Amount';
+        AllowInvDiscCaptionLbl: Label 'Allow Invoice Discount';
         BuyFromContactPhoneNoLbl: Label 'Buy-from Contact Phone No.';
         BuyFromContactMobilePhoneNoLbl: Label 'Buy-from Contact Mobile Phone No.';
         BuyFromContactEmailLbl: Label 'Buy-from Contact E-Mail';
         PayToContactPhoneNoLbl: Label 'Pay-to Contact Phone No.';
         PayToContactMobilePhoneNoLbl: Label 'Pay-to Contact Mobile Phone No.';
         PayToContactEmailLbl: Label 'Pay-to Contact E-Mail';
+        SelfBillingCaptionLbl: Label 'Self Billing Invoice %1', Comment = '%1 = Document No.';
+        SwiftCodeCaptionLbl: Label 'SWIFT Code';
 
     protected var
         CompanyInfo: Record "Company Information";
