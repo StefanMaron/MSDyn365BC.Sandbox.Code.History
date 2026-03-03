@@ -226,6 +226,7 @@ report 6790 "Withholding Tax Certificate"
                     PayToVendor.Get("Bill-to/Pay-to No.")
                 else
                     PaytoCustomer.Get("Bill-to/Pay-to No.");
+
                 FormatAddr.Vendor(VendAddr, Vendor);
                 FormatAddr.Vendor(PayToVendAddr, PayToVendor);
             end;

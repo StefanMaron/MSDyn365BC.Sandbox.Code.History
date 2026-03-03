@@ -49,10 +49,11 @@ codeunit 6785 "Withholding Tax Mgmt."
         WithholdingRevenueType: Code[10];
         Dim1: Code[20];
         Dim2: Code[20];
-        ExtDocNo: Code[20];
+        ExtDocNo: Code[35];
         WithholdingReportLineNo: Code[10];
         SourceCode: Code[10];
         ReasonCode: Code[10];
+        CountryRegionCode: Code[10];
         GenBusPostGrp: Code[20];
         GenProdPostGrp: Code[20];
         ActualVendorNo: Code[20];
@@ -73,7 +74,6 @@ codeunit 6785 "Withholding Tax Mgmt."
         NextWithholdingTaxEntryNo: Integer;
         ExitLoop: Boolean;
         UnrealizedWithholding: Boolean;
-        ActualVendorNo: Code[20];
         CurrencyCodeSameErr: Label 'Currency Code should be same for Payment and Invoice.';
         WithholdingMinInvNotConsistentErr: Label 'You cannot post a transaction using different Withholding Tax minimum invoice amounts on lines.';
         DiffWithholdingPostGroupsErr: Label 'The Withholding Tax posting groups are different and thus the entries cannot be apply.';
@@ -177,6 +177,7 @@ codeunit 6785 "Withholding Tax Mgmt."
         GLSetup: Record "General Ledger Setup";
         Vendor: Record Vendor;
         PrepaymentAmtDeducted: Decimal;
+        IsWHTAbsorbBase: Boolean;
     begin
         PurchInvLine.Reset();
         PurchInvLine.SetCurrentKey("Document No.", "Wthldg. Tax Bus. Post. Group", "Wthldg. Tax Prod. Post. Group");
@@ -205,6 +206,7 @@ codeunit 6785 "Withholding Tax Mgmt."
         if GLSetup."Enable Withholding Tax" then begin
             Vendor.Get(PurchInvHeader."Pay-to Vendor No.");
 
+            IsWHTAbsorbBase := CheckWithhodingAbsorbBase(PurchInvHeader);
             TotalInvoiceAmount := 0;
             TotalInvoiceAmountLCY := 0;
             PurchaseInvLine.Reset();
@@ -252,6 +254,8 @@ codeunit 6785 "Withholding Tax Mgmt."
                         PayToAccType := PayToAccType::Vendor;
                         PayToVendCustNo := PurchInvHeader."Pay-to Vendor No.";
                         BuyFromAccType := BuyFromAccType::Vendor;
+                        ExtDocNo := PurchInvHeader."Vendor Invoice No.";
+                        CountryRegionCode := PurchInvHeader."Pay-to Country/Region Code";
                         GenBusPostGrp := PurchInvLine."Gen. Bus. Posting Group";
                         GenProdPostGrp := PurchInvLine."Gen. Prod. Posting Group";
                         TransType := TransType::Purchase;
@@ -293,7 +297,11 @@ codeunit 6785 "Withholding Tax Mgmt."
                             AbsorbBase := 0;
                             AmountVAT := 0;
                             PurchInvHeader.Amount := PurchInvHeader.Amount + PurchInvLine.Amount;
-                            AbsorbBase := AbsorbBase + PurchInvLine."Withholding Tax Absorb Base";
+                            if IsWHTAbsorbBase then
+                                if PurchInvLine."Withholding Tax Absorb Base" = 0 then
+                                    AbsorbBase := AbsorbBase + PurchInvLine.Amount
+                                else
+                                    AbsorbBase := AbsorbBase + PurchInvLine."Withholding Tax Absorb Base";
 
                             if AbsorbBase <> 0 then
                                 AmountVAT := AbsorbBase
@@ -303,7 +311,11 @@ codeunit 6785 "Withholding Tax Mgmt."
                             WithholdingBusPostGrp := PurchInvLine."Wthldg. Tax Bus. Post. Group";
                             WithholdingProdPostGrp := PurchInvLine."Wthldg. Tax Prod. Post. Group";
                             PurchInvHeader.Amount := PurchInvHeader.Amount + PurchInvLine.Amount;
-                            AbsorbBase := AbsorbBase + PurchInvLine."Withholding Tax Absorb Base";
+                            if IsWHTAbsorbBase then
+                                if PurchInvLine."Withholding Tax Absorb Base" = 0 then
+                                    AbsorbBase := AbsorbBase + PurchInvLine.Amount
+                                else
+                                    AbsorbBase := AbsorbBase + PurchInvLine."Withholding Tax Absorb Base";
 
                             if AbsorbBase <> 0 then
                                 AmountVAT := AbsorbBase
@@ -524,7 +536,6 @@ codeunit 6785 "Withholding Tax Mgmt."
         PayToVendCustNo := GenJnlLine."Account No.";
         BuyFromAccType := BuyFromAccType::Vendor;
         BuyFromVendCustNo := GenJnlLine."Account No.";
-        ActualVendorNo := GenJnlLine."WHT Actual Vendor No.";
         ApplyDocType := GenJnlLine."Applies-to Doc. Type";
         ApplyDocNo := GenJnlLine."Applies-to Doc. No.";
         "Applies-toID" := GenJnlLine."Applies-to ID";
@@ -550,6 +561,7 @@ codeunit 6785 "Withholding Tax Mgmt."
         Dim1 := GenJnlLine."Shortcut Dimension 1 Code";
         Dim2 := GenJnlLine."Shortcut Dimension 2 Code";
         ExtDocNo := GenJnlLine."External Document No.";
+        CountryRegionCode := GenJnlLine."Country/Region Code";
         CurrencyCode := GenJnlLine."Currency Code";
         SourceCode := GenJnlLine."Source Code";
 
@@ -628,10 +640,12 @@ codeunit 6785 "Withholding Tax Mgmt."
                 WithholdingTaxEntry."Posting Date" := PostingDate;
                 WithholdingTaxEntry."Document Date" := DocDate;
                 WithholdingTaxEntry."Document No." := DocNo;
+                WithholdingTaxEntry."External Document No." := ExtDocNo;
                 WithholdingTaxEntry."Withholding Tax %" := WithholdingPostingSetup."Withholding Tax %";
                 WithholdingTaxEntry."Applies-to Doc. Type" := ApplyDocType;
                 WithholdingTaxEntry."Applies-to Doc. No." := ApplyDocNo;
                 WithholdingTaxEntry."Source Code" := SourceCode;
+                WithholdingTaxEntry."Country/Region Code" := CountryRegionCode;
                 WithholdingTaxEntry."Reason Code" := ReasonCode;
                 WithholdingTaxEntry."Withholding Tax Revenue Type" := WithholdingPostingSetup."Revenue Type";
                 WithholdingTaxEntry."Document Type" := DocType;
@@ -2179,7 +2193,6 @@ codeunit 6785 "Withholding Tax Mgmt."
                             GenBusPostGrp := PurchLine."Gen. Bus. Posting Group";
                             GenProdPostGrp := PurchLine."Gen. Prod. Posting Group";
                             TransType := TransType::Purchase;
-                            BuyFromVendCustNo := PurchInvHeader."WHT Actual Vendor No.";
                             PostingDate := PurchInvHeader."Posting Date";
                             DocDate := PurchInvHeader."Document Date";
                             CurrencyCode := PurchInvHeader."Currency Code";
@@ -2256,7 +2269,6 @@ codeunit 6785 "Withholding Tax Mgmt."
                             GenBusPostGrp := PurchLine."Gen. Bus. Posting Group";
                             GenProdPostGrp := PurchLine."Gen. Prod. Posting Group";
                             TransType := TransType::Purchase;
-                            BuyFromVendCustNo := PurchHeader."WHT Actual Vendor No.";
                             PostingDate := PurchHeader."Posting Date";
                             DocDate := PurchHeader."Document Date";
                             CurrencyCode := PurchHeader."Currency Code";
@@ -2334,7 +2346,6 @@ codeunit 6785 "Withholding Tax Mgmt."
                 else
                     WithholdingTaxEntry."Transaction Type" := WithholdingTaxEntry."Transaction Type"::Sale;
 
-                WithholdingTaxEntry."Actual Vendor No." := ActualVendorNo;
                 WithholdingTaxEntry."Source Code" := SourceCode;
                 WithholdingTaxEntry."Bill-to/Pay-to No." := PayToVendCustNo;
                 WithholdingTaxEntry."User ID" := UserId;
@@ -4097,7 +4108,6 @@ codeunit 6785 "Withholding Tax Mgmt."
                     WithholdingTaxEntry2."Applies-to Entry No." := WithholdingTaxEntry."Entry No.";
                     WithholdingTaxEntry2."User ID" := UserId;
                     WithholdingTaxEntry2."External Document No." := GenJnlLine."External Document No.";
-                    WithholdingTaxEntry2."Actual Vendor No." := GenJnlLine."WHT Actual Vendor No.";
                     WithholdingTaxEntry2."Original Document No." := GenJnlLine."Document No.";
                     WithholdingTaxEntry2."Source Code" := GenJnlLine."Source Code";
                     WithholdingTaxEntry2."Transaction No." := TransactionNo;
@@ -4879,7 +4889,6 @@ codeunit 6785 "Withholding Tax Mgmt."
                     WithholdingTaxEntry2."Applies-to Entry No." := WithholdingTaxEntry."Entry No.";
                     WithholdingTaxEntry2."User ID" := UserId;
                     WithholdingTaxEntry2."External Document No." := GenJnlLine."External Document No.";
-                    WithholdingTaxEntry2."Actual Vendor No." := GenJnlLine."WHT Actual Vendor No.";
                     WithholdingTaxEntry2."Original Document No." := GenJnlLine."Document No.";
                     WithholdingTaxEntry2."Source Code" := GenJnlLine."Source Code";
                     WithholdingTaxEntry2."Transaction No." := TransactionNo;
@@ -4970,6 +4979,17 @@ codeunit 6785 "Withholding Tax Mgmt."
             WithholdingPostingSetup."Realized Withholding Tax Type"::Payment)
         then
             exit(WithholdingTaxEntry2."Entry No." + 1);
+    end;
+
+    local procedure CheckWithhodingAbsorbBase(PurchInvHeader: Record "Purch. Inv. Header"): Boolean
+    var
+        PurchaseInvoiceLine: Record "Purch. Inv. Line";
+    begin
+        PurchaseInvoiceLine.SetLoadFields("Document No.", "Withholding Tax Absorb Base");
+        PurchaseInvoiceLine.SetRange("Document No.", PurchInvHeader."No.");
+        PurchaseInvoiceLine.SetFilter("Withholding Tax Absorb Base", '<>0');
+        if not PurchaseInvoiceLine.IsEmpty() then
+            exit(true);
     end;
 
     procedure CheckVendorWithholdingTaxLiable(GenJnlLine: Record "Gen. Journal Line"): Boolean
