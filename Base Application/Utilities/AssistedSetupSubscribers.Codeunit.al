@@ -167,6 +167,10 @@ codeunit 1814 "Assisted Setup Subscribers"
         UpdateUsersFromOfficeTitleTxt: Label 'Fetch users from Microsoft 365';
         UpdateUsersFromOfficeShortTitleTxt: Label 'Update users', MaxLength = 50;
         UpdateUsersFromOfficeDescriptionTxt: Label 'Get the latest information about users and licenses for Business Central from Microsoft 365.';
+        SetupContactsTitleTxt: Label 'Set up Contact Sync';
+        SetupContactsShortTitleTxt: Label 'Set up Contact Sync', MaxLength = 50;
+        SetupContactsDescriptionTxt: Label 'Synchronize contacts between Business Central and Outlook to keep your contact information up to date in both applications.';
+        SetupContactsHelpTxt: Label 'https://learn.microsoft.com/en-us/dynamics365/business-central/admin-synchronize-outlook-contacts', Locked = true;
         SetupTimeSheetsTitleTxt: Label 'Set Up Time Sheets';
         SetupTimeSheetsShortTitleTxt: Label 'Set up Time Sheets', MaxLength = 50;
         SetupTimeSheetsHelpTxt: Label 'https://go.microsoft.com/fwlink/?linkid=2166666';
@@ -203,6 +207,13 @@ codeunit 1814 "Assisted Setup Subscribers"
 
         GuidedExperience.InsertAssistedSetup(SetupCopilotAICapabilitiesTitleTxt, SetupCopilotAICapabilitiesShortTitleTxt, SetupCopilotAICapabilitiesDescriptionTxt, 5, ObjectType::Page,
             Page::"Copilot AI Capabilities", AssistedSetupGroup::GettingStarted, '', VideoCategory::GettingStarted, SetupCopilotAICapabilitiesHelpTxt);
+
+        GuidedExperience.InsertAssistedSetup(SetupContactsTitleTxt, SetupContactsShortTitleTxt, SetupContactsDescriptionTxt, 15,
+             ObjectType::Page, Page::"Contact Sync", AssistedSetupGroup::Connect, '', VideoCategory::GettingStarted, SetupContactsHelpTxt);
+        GlobalLanguage(Language.GetDefaultApplicationLanguageId());
+        GuidedExperience.AddTranslationForSetupObjectTitle(GuidedExperienceType::"Assisted Setup", ObjectType::Page,
+            Page::"Contact Sync", Language.GetDefaultApplicationLanguageId(), SetupContactsTitleTxt);
+        GlobalLanguage(CurrentGlobalLanguage);
 
         GuidedExperience.InsertAssistedSetup(VATSetupWizardTitleTxt, VATSetupWizardShortTitleTxt, VATSetupWizardDescriptionTxt, 15,
             ObjectType::Page, Page::"VAT Setup Wizard", AssistedSetupGroup::GettingStarted, '', VideoCategory::GettingStarted, VATSetupWizardLinkTxt);
