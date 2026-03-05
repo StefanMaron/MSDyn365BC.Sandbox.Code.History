@@ -1855,25 +1855,6 @@ table 352 "Default Dimension"
     begin
     end;
 
-#if not CLEAN26
-    internal procedure RunOnUpdateWorkCenterGlobalDimCodeCaseElse(GlobalDimCodeNo: Integer; WorkCenterNo: Code[20]; NewDimValue: Code[20])
-    begin
-        OnUpdateWorkCenterGlobalDimCodeCaseElse(GlobalDimCodeNo, WorkCenterNo, NewDimValue);
-    end;
-
-    /// <summary>
-    /// Integration event raised when updating work center global dimension code for cases not handled by standard processing.
-    /// </summary>
-    /// <param name="GlobalDimCodeNo">Global dimension code number being updated</param>
-    /// <param name="WorkCenterNo">Work center number being updated</param>
-    /// <param name="NewDimValue">New dimension value to assign</param>
-    [Obsolete('Moved to codeunit Mfg. Dimension Management', '26.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateWorkCenterGlobalDimCodeCaseElse(GlobalDimCodeNo: Integer; WorkCenterNo: Code[20]; NewDimValue: Code[20])
-    begin
-    end;
-#endif
-
     /// <summary>
     /// Integration event raised before setting range filter to the last field in primary key during default dimension validation.
     /// Enables custom field identification logic and primary key range filtering.
