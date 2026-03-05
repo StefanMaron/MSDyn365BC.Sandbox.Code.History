@@ -1685,59 +1685,6 @@ codeunit 134099 "Purchase Documents"
         asserterror PurchaseHeader.Validate("Doc. Amount VAT", PurchaseHeader."Doc. Amount Incl. VAT" + LibraryRandom.RandDec(10, 0));
     end;
 
-#if not CLEAN26
-    [Obsolete('The statistics action will be replaced with the PurchaseStatistics action. The new action uses RunObject and does not run the action trigger', '26.0')]
-    [Test]
-    [HandlerFunctions('PurchaseInvoiceStatisticsUpdateVATAmountModalPageHandler')]
-    procedure PurchaseInvoiceCheckDocTotalAmountsVATInVATDifference()
-    var
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        PurchaseInvoicePage: TestPage "Purchase Invoice";
-        DirectUnitCost: Decimal;
-        MaxAllowedVATDifference: Decimal;
-    begin
-        // [FEATURE] [Check Doc. Total Amounts]
-        // [SCENARIO] When on Purchase Invoice "VAT Amount" is higher then sum of lines then error is shown
-        Initialize();
-
-        // [GIVEN] Allow VAT Difference
-        MaxAllowedVATDifference := 1;
-        LibraryERM.SetMaxVATDifferenceAllowed(MaxAllowedVATDifference);
-        LibraryPurchase.SetAllowVATDifference(true);
-
-        // [GIVEN] Create Purchase Invoice
-        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Invoice, LibraryPurchase.CreateVendorNo());
-
-        // [GIVEN] Create Purchase Line
-        DirectUnitCost := LibraryRandom.RandDecInRange(1, 100, 2);
-        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::"G/L Account", LibraryERM.CreateGLAccountWithPurchSetup(), 1);
-        PurchaseLine.Validate("Direct Unit Cost", DirectUnitCost);
-        PurchaseLine.Modify(true);
-
-        // [GIVEN] VAT Amount Increased on Statistics page
-        LibraryVariableStorage.Enqueue(MaxAllowedVATDifference / 3);
-        PurchaseInvoicePage.OpenEdit();
-        PurchaseInvoicePage.Filter.SetFilter("No.", PurchaseHeader."No.");
-        PurchaseInvoicePage.Statistics.Invoke();
-        PurchaseInvoicePage.Close();
-        Commit();
-
-        // [GIVEN] Set Doc. Amount Incl. VAT
-        PurchaseHeader.CalcFields("Amount Including VAT", Amount);
-        PurchaseHeader.Validate("Doc. Amount Incl. VAT", PurchaseHeader."Amount Including VAT");
-        PurchaseHeader.Modify();
-
-        // [WHEN] Set Doc Amount VAT
-        PurchaseHeader.Validate("Doc. Amount VAT",
-            (PurchaseHeader."Amount Including VAT" - PurchaseHeader.Amount)
-            + MaxAllowedVATDifference / 3);
-
-        // [THEN] Nothing is happen
-        Assert.IsTrue(PurchaseHeader."Doc. Amount Incl. VAT" > PurchaseHeader."Doc. Amount VAT", 'Doc. Amount VAT is higher then Doc. Amount Incl. VAT');
-    end;
-#endif
-
     [Test]
     [HandlerFunctions('PurchaseInvoiceStatisticsUpdateVATAmountPageHandler')]
     procedure PurchaseInvoiceCheckDocTotalAmountsVATInVATDiff()
@@ -2623,18 +2570,6 @@ codeunit 134099 "Purchase Documents"
         ContactList.GotoKey(LibraryVariableStorage.DequeueText());
         ContactList.OK().Invoke();
     end;
-
-#if not CLEAN26
-    [Obsolete('The statistics action will be replaced with the PurchaseStatistics action. The new action uses RunObject and does not run the action trigger', '26.0')]
-    [ModalPageHandler]
-    [Scope('OnPrem')]
-    procedure PurchaseInvoiceStatisticsUpdateVATAmountModalPageHandler(var PurchaseStatistics: TestPage "Purchase Statistics")
-    begin
-        PurchaseStatistics.SubForm.Last();
-        PurchaseStatistics.SubForm."VAT Amount".SetValue(
-          PurchaseStatistics.SubForm."VAT Amount".AsDecimal() + LibraryVariableStorage.DequeueDecimal()); // increase VAT amount with the given value.
-    end;
-#endif
 
     [PageHandler]
     [Scope('OnPrem')]
