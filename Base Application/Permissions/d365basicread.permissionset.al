@@ -446,6 +446,8 @@ permissionset 209 "D365 Basic - Read"
                   tabledata "Error Message Register" = R,
                   tabledata "Excel Buffer" = R,
                   tabledata "Excel Template Storage" = R,
+                  tabledata "Contact Sync User" = R,
+                  tabledata "Outlook Contacts" = R,
 #if not CLEAN28
                   tabledata "Exchange Contact" = R,
 #endif
