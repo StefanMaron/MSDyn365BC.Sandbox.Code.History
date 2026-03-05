@@ -419,6 +419,8 @@ permissionset 959 "D365 BUS FULL ACCESS"
                   tabledata "Error Message Register" = RIMD,
                   tabledata "Excel Buffer" = RIMD,
                   tabledata "Excel Template Storage" = RIMD,
+                  tabledata "Contact Sync User" = RIMD,
+                  tabledata "Outlook Contacts" = RIMD,
 #if not CLEAN28
                   tabledata "Exchange Contact" = RIMD,
 #endif
