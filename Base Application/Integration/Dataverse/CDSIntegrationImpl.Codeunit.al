@@ -5320,14 +5320,6 @@ codeunit 7201 "CDS Integration Impl."
     begin
     end;
 
-#if not CLEAN26
-    [Obsolete('This event is not used. Integration Sync Job records are not cleaned up.', '26.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCleanCRMIntegrationSyncJob(var DisableIntegrationSyncJobCleanup: Boolean)
-    begin
-    end;
-#endif
-
     [EventSubscriber(ObjectType::Table, Database::"Integration Synch. Job Errors", 'OnIsDataIntegrationEnabled', '', false, false)]
     local procedure IsDataIntegrationEnabled(var IsIntegrationEnabled: Boolean)
     begin
