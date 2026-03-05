@@ -9,6 +9,7 @@ using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Comment;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Outlook;
 using Microsoft.CRM.Profiling;
 using Microsoft.CRM.Reports;
 using Microsoft.CRM.Segment;
@@ -949,6 +950,21 @@ page 5052 "Contact List"
                     CurrPage.SetSelectionFilter(Contact);
                     WordTemplateSelectionWizard.SetData(Contact);
                     WordTemplateSelectionWizard.RunModal();
+                end;
+            }
+            action(SynchronizeWithOutlookAndTeams)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Synchronize with Outlook';
+                Image = Refresh;
+                Ellipsis = true;
+                ToolTip = 'Synchronize this list with your contacts stored in Microsoft 365, so that you can get to them easily from your Outlook or Teams apps. You will be able to choose which specific contacts are synchronized.';
+
+                trigger OnAction()
+                var
+                    ContactSyncPage: Page "Contact Sync";
+                begin
+                    ContactSyncPage.RunModal();
                 end;
             }
             action(Email)
