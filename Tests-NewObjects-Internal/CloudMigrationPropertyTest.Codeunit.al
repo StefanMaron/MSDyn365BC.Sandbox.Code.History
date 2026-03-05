@@ -802,7 +802,9 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(9987); // Database::"Word Templates Table"
 
         // E-Document
-        ListOfTablesToMigrate.Add(7013);
+        ListOfTablesToMigrate.Add(7013); // Database::"Contact Sync Queue"
+        ListOfTablesToMigrate.Add(7121); // Database::"Contact Sync User"
+        ListOfTablesToMigrate.Add(7122); // Database::"Outlook Contacts"
         ListOfTablesToMigrate.Add(6121); // Database::"E-Document"
         ListOfTablesToMigrate.Add(6103); // Database::"E-Document Service"
 
