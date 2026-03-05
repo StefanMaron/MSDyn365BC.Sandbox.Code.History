@@ -554,6 +554,16 @@ codeunit 132201 "Library - Inventory"
         ItemChargeAssignmentPurch.Modify(true);
     end;
 
+#if not CLEAN26
+    [Obsolete('Moved to codeunit Library Manufacturing', '26.0')]
+    procedure CreateItemJournal(var ItemJournalBatch: Record "Item Journal Batch"; ItemNo: Code[20]; ItemJournalTemplateType: Enum "Item Journal Template Type"; ProductionOrderNo: Code[20])
+    var
+        LibraryManufacturing: Codeunit "Library - Manufacturing";
+    begin
+        LibraryManufacturing.CreateProdItemJournal(ItemJournalBatch, ItemNo, ItemJournalTemplateType, ProductionOrderNo);
+    end;
+#endif
+
     procedure CreateItemJournalTemplate(var ItemJournalTemplate: Record "Item Journal Template")
     begin
         ItemJournalTemplate.Init();
@@ -1371,6 +1381,16 @@ codeunit 132201 "Library - Inventory"
         ItemJournalLine."Line No." := LibraryUtility.GetNewLineNo(RecRef, ItemJournalLine.FieldNo("Line No."));
     end;
 
+#if not CLEAN26
+    [Obsolete('Moved to codeunit Library Manufacturing', '26.0')]
+    procedure OutputJnlExplRoute(var ItemJournalLine: Record "Item Journal Line")
+    var
+        LibraryManufacturing: Codeunit "Library - Manufacturing";
+    begin
+        LibraryManufacturing.OutputJnlExplodeRoute(ItemJournalLine);
+    end;
+#endif
+
     procedure PostDirectTransferOrder(var TransferHeader: Record "Transfer Header")
     var
         TransferOrderPostTransfer: Codeunit "TransferOrder-Post Transfer";
@@ -1667,6 +1687,9 @@ codeunit 132201 "Library - Inventory"
         InventoryPostingSetup.Validate("Capacity Variance Account", LibraryERM.CreateGLAccountNo());
         OnBeforeModifyInventoryPostingSetup(InventoryPostingSetup);
         InventoryPostingSetup.Modify(true);
+        // NAVCZ
+        UpdateInventoryPostingSetupAccounts(InventoryPostingSetup);
+        // NAVCZ
     end;
 
     procedure UpdateSalesLine(var SalesLine: Record "Sales Line"; FieldNo: Integer; Value: Variant)
@@ -1765,6 +1788,37 @@ codeunit 132201 "Library - Inventory"
         CreateExtendedTextLineItem(ExtendedTextLine, ExtendedTextHeader);
         ExtendedTextLine.Validate(Text, CopyStr(ExtText, 1, MaxStrLen(ExtendedTextLine.Text)));
         ExtendedTextLine.Modify();
+    end;
+
+    local procedure UpdateInventoryPostingSetupAccounts(var InventoryPostingSetup: Record "Inventory Posting Setup")
+    var
+        InventoryPostingSetupRecordRef: RecordRef;
+        ValueModified: Boolean;
+    begin
+        InventoryPostingSetupRecordRef.GetTable(InventoryPostingSetup);
+        ValueModified := false;
+        if SetAccountFieldIfEmpty(InventoryPostingSetupRecordRef, 'Consumption Account CZL') then
+            ValueModified := true;
+        if SetAccountFieldIfEmpty(InventoryPostingSetupRecordRef, 'Change In Inv.Of WIP Acc. CZL') then
+            ValueModified := true;
+        if SetAccountFieldIfEmpty(InventoryPostingSetupRecordRef, 'Change In Inv.OfProd. Acc. CZL') then
+            ValueModified := true;
+        if ValueModified then
+            InventoryPostingSetupRecordRef.Modify();
+    end;
+
+    local procedure SetAccountFieldIfEmpty(var InventoryPostingSetupRecordRef: RecordRef; FieldName: Text): Boolean
+    var
+        DataTypeManagement: Codeunit "Data Type Management";
+        AccountFieldRef: FieldRef;
+        FieldValue: Text;
+    begin
+        DataTypeManagement.FindFieldByName(InventoryPostingSetupRecordRef, AccountFieldRef, FieldName);
+        FieldValue := AccountFieldRef.Value;
+        if FieldValue <> '' then
+            exit(false);
+        AccountFieldRef.Value := LibraryERM.CreateGLAccountNo();
+        exit(true);
     end;
 
     [IntegrationEvent(false, false)]
