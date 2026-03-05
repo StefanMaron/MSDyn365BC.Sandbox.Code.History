@@ -706,8 +706,6 @@ permissionset 1044 "D365 READ"
                   tabledata "Excel Template Storage" = R,
                   tabledata "Exch. Rate Adjmt. Reg." = R,
                   tabledata "Exch. Rate Adjmt. Ledg. Entry" = R,
-                  tabledata "Contact Sync User" = R,
-                  tabledata "Outlook Contacts" = R,
 #if not CLEAN28
                   tabledata "Exchange Contact" = R,
 #endif
