@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -37,23 +37,19 @@ page 345 Reconciliation
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Account';
-                    ToolTip = 'Specifies the bank account that is being reconciled.';
                 }
                 field(Name; Rec.Name)
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the name of the record.';
                 }
                 field("Net Change in Jnl."; Rec."Net Change in Jnl.")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the net change that will occur on the bank when you post the journal.';
                 }
                 field("Balance after Posting"; Rec."Balance after Posting")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Balance after Posting';
-                    ToolTip = 'Specifies the current balance on the bank account.';
                 }
             }
         }
