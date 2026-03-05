@@ -2250,16 +2250,6 @@ table 5767 "Warehouse Activity Line"
         OnAfterTransferFromIntPickLine(Rec, WhseInternalPickLine);
     end;
 
-#if not CLEAN26
-    [Obsolete('Moved to codeunit ProdOrderWarehouseMgt', '26.0')]
-    procedure TransferFromCompLine(ProdOrderCompLine: Record Microsoft.Manufacturing.Document."Prod. Order Component")
-    var
-        ProdOrderWarehouseMgt: Codeunit Microsoft.Manufacturing.Document."Prod. Order Warehouse Mgt.";
-    begin
-        ProdOrderWarehouseMgt.TransferFromCompLine(Rec, ProdOrderCompLine);
-    end;
-#endif
-
     procedure TransferFromAssemblyLine(AssemblyLine: Record "Assembly Line")
     begin
         TransferAllButWhseDocDetailsFromAssemblyLine(AssemblyLine);
@@ -3383,19 +3373,6 @@ table 5767 "Warehouse Activity Line"
     begin
     end;
 
-#if not CLEAN26
-    internal procedure RunOnAfterTransferFromCompLine(var WarehouseActivityLine: Record "Warehouse Activity Line"; ProdOrderComponent: Record Microsoft.Manufacturing.Document."Prod. Order Component")
-    begin
-        OnAfterTransferFromCompLine(WarehouseActivityLine, ProdOrderComponent);
-    end;
-
-    [Obsolete('Moved to codeunit ProdOrderWarehouseMgt', '26.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterTransferFromCompLine(var WarehouseActivityLine: Record "Warehouse Activity Line"; ProdOrderComponent: Record Microsoft.Manufacturing.Document."Prod. Order Component")
-    begin
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterTransferFromAssemblyLine(var WarehouseActivityLine: Record "Warehouse Activity Line"; AssemblyLine: Record "Assembly Line")
     begin
@@ -3465,19 +3442,6 @@ table 5767 "Warehouse Activity Line"
     local procedure OnBeforeCheckExceedQtyAvailBase(var WarehouseActivityLine: Record "Warehouse Activity Line"; QtyAvailBase: Decimal; NewBinCode: Code[20]; var IsHandled: Boolean)
     begin
     end;
-
-#if not CLEAN26
-    internal procedure RunOnBeforeCheckBinCodeFromProdOrderCompLine(var WarehouseActivityLine: Record "Warehouse Activity Line"; ProdOrderCompLine: Record Microsoft.Manufacturing.Document."Prod. Order Component"; var IsHandled: Boolean)
-    begin
-        OnBeforeCheckBinCodeFromProdOrderCompLine(WarehouseActivityLine, ProdOrderCompLine, IsHandled);
-    end;
-
-    [Obsolete('Moved to codeunit ProdOrderWarehouseMgt', '26.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckBinCodeFromProdOrderCompLine(var WarehouseActivityLine: Record "Warehouse Activity Line"; ProdOrderCompLine: Record Microsoft.Manufacturing.Document."Prod. Order Component"; var IsHandled: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckBinCodeFromWhseShptLine(var WarehouseActivityLine: Record "Warehouse Activity Line"; WhseShptLine: Record "Warehouse Shipment Line"; var IsHandled: Boolean)
