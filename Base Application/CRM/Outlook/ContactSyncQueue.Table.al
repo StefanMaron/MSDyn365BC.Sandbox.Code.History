@@ -28,7 +28,7 @@ table 7013 "Contact Sync Queue"
         {
             DataClassification = SystemMetadata;
             Caption = 'Contact ID';
-            ToolTip = 'Specifies the contact ID from Business Central.';
+            ToolTip = 'Specifies the O365 contact ID.';
         }
         field(4; "Display Name"; Text[100])
         {
@@ -130,7 +130,6 @@ table 7013 "Contact Sync Queue"
             DataClassification = SystemMetadata;
             Caption = 'Initials';
         }
-#if not CLEANSCHEMA29
         field(22; "Office Location"; Text[50])
         {
             DataClassification = SystemMetadata;
@@ -161,7 +160,6 @@ table 7013 "Contact Sync Queue"
             DataClassification = SystemMetadata;
             Caption = 'Categories';
         }
-#endif
         field(28; "Created DateTime"; DateTime)
         {
             DataClassification = SystemMetadata;
@@ -209,8 +207,7 @@ table 7013 "Contact Sync Queue"
         {
         }
     }
-#if not CLEAN29
-    [Obsolete('Removed due to Contact Sync redesign, will be deleted in future release.', '29.0')]
+
     procedure CopyFromO365Contact(GraphContact: Record "O365 Contact"; Direction: Option "To Graph","To Local")
     begin
         "Sync Direction" := Direction;
@@ -228,34 +225,6 @@ table 7013 "Contact Sync Queue"
         Address := GraphContact.Address;
         City := GraphContact.City;
         "Post Code" := GraphContact."Post Code";
-        "Country/Region Code" := GraphContact."Country/Region Code";
-        "Middle Name" := GraphContact."Middle Name";
-        Initials := GraphContact.Initials;
-        "Home Page" := GraphContact."Home Page";
-        Categories := GraphContact.Categories;
-        "Created DateTime" := GraphContact."Created DateTime";
-        "Last Modified DateTime" := GraphContact."Last Modified DateTime";
-        "Sync Status" := "Sync Status"::Pending;
-    end;
-#endif
-    procedure CopyFromO365Contact(GraphContact: Record "Outlook Contacts"; Direction: Option "To Graph","To Local")
-    begin
-        "Sync Direction" := Direction;
-        "Contact ID" := GraphContact."Contact ID";
-        "Display Name" := GraphContact."Display Name";
-        "Given Name" := GraphContact."Given Name";
-        Surname := GraphContact.Surname;
-        "Job Title" := GraphContact."Job Title";
-        "Company Name" := GraphContact."Company Name";
-        "Mobile Phone" := GraphContact."Mobile Phone";
-        "Business Phone" := GraphContact."Business Phone";
-        "Home Phone" := GraphContact."Home Phone";
-        "Email Address" := GraphContact."Email Address";
-        "Email 2" := GraphContact."Email 2";
-        Address := GraphContact.Address;
-        City := GraphContact.City;
-        "Post Code" := GraphContact."Post Code";
-        County := GraphContact.County;
         "Country/Region Code" := GraphContact."Country/Region Code";
         "Middle Name" := GraphContact."Middle Name";
         Initials := GraphContact.Initials;

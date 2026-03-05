@@ -499,8 +499,6 @@ permissionset 732 "D365 BASIC ISV"
                   tabledata "Excel Template Storage" = RIMD,
                   tabledata "Exch. Rate Adjmt. Reg." = Rimd,
                   tabledata "Exch. Rate Adjmt. Ledg. Entry" = Rimd,
-                  tabledata "Contact Sync User" = RIMD,
-                  tabledata "Outlook Contacts" = RIMD,
 #if not CLEAN28
                   tabledata "Exchange Contact" = RIMD,
 #endif
