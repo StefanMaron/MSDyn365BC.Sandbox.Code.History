@@ -370,16 +370,6 @@ codeunit 6500 "Item Tracking Management"
         exit(false);
     end;
 
-#if not CLEAN26
-    [Obsolete('Moved to codeunit Mfg. Item Tracking Mgt.', '26.0')]
-    procedure RetrieveConsumpItemTracking(ItemJnlLine: Record "Item Journal Line"; var TempHandlingSpecification: Record "Tracking Specification" temporary): Boolean
-    var
-        MfgItemTrackingMgt: Codeunit "Mfg. Item Tracking Mgt.";
-    begin
-        exit(MfgItemTrackingMgt.RetrieveConsumpItemTracking(ItemJnlLine, TempHandlingSpecification));
-    end;
-#endif
-
     procedure SumUpItemTracking(var ReservEntry: Record "Reservation Entry"; var TempHandlingSpecification: Record "Tracking Specification" temporary; SumPerLine: Boolean; SumPerTracking: Boolean): Boolean
     var
         ItemTrackingCode: Record "Item Tracking Code";
@@ -3824,19 +3814,6 @@ codeunit 6500 "Item Tracking Management"
     begin
     end;
 
-#if not CLEAN26
-    internal procedure RunOnBeforeRetrieveSubcontrItemTracking(ItemJnlLine: Record "Item Journal Line"; var TempHandlingSpecification: Record "Tracking Specification" temporary; var Result: Boolean; var IsHandled: Boolean)
-    begin
-        OnBeforeRetrieveSubcontrItemTracking(ItemJnlLine, TempHandlingSpecification, Result, IsHandled);
-    end;
-
-    [Obsolete('Moved to codeunit Mfg. Item Tracking Mgt.', '26.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeRetrieveSubcontrItemTracking(ItemJnlLine: Record "Item Journal Line"; var TempHandlingSpecification: Record "Tracking Specification" temporary; var Result: Boolean; var IsHandled: Boolean)
-    begin
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSumUpItemTracking(var ReservEntry: Record "Reservation Entry"; var TempHandlingSpecification: Record "Tracking Specification" temporary; var SumPerLine: Boolean; var SumPerTracking: Boolean; var IsHandled: Boolean)
     begin
@@ -4022,32 +3999,6 @@ codeunit 6500 "Item Tracking Management"
     begin
     end;
 
-#if not CLEAN26
-    internal procedure RunOnRetrieveSubcontrItemTrackingOnAfterDeleteReservEntries(var TempHandlingSpecification: Record "Tracking Specification" temporary; var ReservationEntry: Record "Reservation Entry")
-    begin
-        OnRetrieveSubcontrItemTrackingOnAfterDeleteReservEntries(TempHandlingSpecification, ReservationEntry);
-    end;
-
-    [Obsolete('Moved to codeunit Mfg. Item Tracking Mgt.', '26.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnRetrieveSubcontrItemTrackingOnAfterDeleteReservEntries(var TempHandlingSpecification: Record "Tracking Specification" temporary; var ReservationEntry: Record "Reservation Entry")
-    begin
-    end;
-#endif
-
-#if not CLEAN26
-    internal procedure RunOnRetrieveConsumpItemTrackingOnAfterSetFilters(var ReservationEntry: Record "Reservation Entry"; ItemJournalLine: Record "Item Journal Line")
-    begin
-        OnRetrieveConsumpItemTrackingOnAfterSetFilters(ReservationEntry, ItemJournalLine);
-    end;
-
-    [Obsolete('Moved to codeunit Mfg. Item Tracking Mgt.', '26.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnRetrieveConsumpItemTrackingOnAfterSetFilters(var ReservationEntry: Record "Reservation Entry"; ItemJournalLine: Record "Item Journal Line")
-    begin
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnAfterSynchronizeItemTracking2(FromReservEntry: Record "Reservation Entry"; ReservEntry2: Record "Reservation Entry")
     begin
@@ -4077,19 +4028,6 @@ codeunit 6500 "Item Tracking Management"
     local procedure OnTempPostedWhseRcptLineSetFilters(var PostedWhseReceiptLine: Record "Posted Whse. Receipt Line"; ItemLedgerEntry: Record "Item Ledger Entry"; WhseItemEntryRelation: Record "Whse. Item Entry Relation")
     begin
     end;
-
-#if not CLEAN26
-    internal procedure RunOnRetrieveSubcontrItemTrackingOnBeforeCheckLastOperation(ProdOrderRoutingLine: Record Microsoft.Manufacturing.Document."Prod. Order Routing Line"; var IsLastOperation: Boolean)
-    begin
-        OnRetrieveSubcontrItemTrackingOnBeforeCheckLastOperation(ProdOrderRoutingLine, IsLastOperation);
-    end;
-
-    [Obsolete('Moved to codeunit Mfg. Item Tracking Mgt.', '26.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnRetrieveSubcontrItemTrackingOnBeforeCheckLastOperation(ProdOrderRoutingLine: Record Microsoft.Manufacturing.Document."Prod. Order Routing Line"; var IsLastOperation: Boolean)
-    begin
-    end;
-#endif
 
     [IntegrationEvent(false, false)]
     local procedure OnSplitWhseJnlLineOnAfterCheckWhseItemTrkgSetup(var TempWhseJnlLine: Record "Warehouse Journal Line" temporary; var TempWhseSplitTrackingSpec: Record "Tracking Specification" temporary; var WhseSNRequired: Boolean; var WhseLNRequired: Boolean; var TempWhseJnlLine2: Record "Warehouse Journal Line" temporary; var IsHandled: Boolean)
