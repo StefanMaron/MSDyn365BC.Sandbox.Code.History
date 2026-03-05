@@ -1,5 +1,4 @@
-﻿#if not CLEAN29
-namespace System.Integration;
+﻿namespace System.Integration;
 
 using Microsoft.CRm.BusinessRelation;
 using Microsoft.CRM.Contact;
@@ -14,9 +13,6 @@ using System.Security.User;
 
 codeunit 5323 "Exchange Add-in Setup"
 {
-    ObsoleteReason = 'Exchange is depracated. Please deploy add-in manually.';
-    ObsoleteState = Pending;
-    ObsoleteTag = '29.0';
 
     trigger OnRun()
     begin
@@ -254,4 +250,4 @@ codeunit 5323 "Exchange Add-in Setup"
             exit(FirstContactEmail);
     end;
 }
-#endif
+
