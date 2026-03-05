@@ -742,6 +742,8 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Excel Template Storage" = RM,
                   tabledata "Exch. Rate Adjmt. Reg." = Rm,
                   tabledata "Exch. Rate Adjmt. Ledg. Entry" = Rm,
+                  tabledata "Contact Sync User" = RM,
+                  tabledata "Outlook Contacts" = RM,
 #if not CLEAN28
                   tabledata "Exchange Contact" = RM,
 #endif
