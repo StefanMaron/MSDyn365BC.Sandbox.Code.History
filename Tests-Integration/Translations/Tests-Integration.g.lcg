@@ -221,33 +221,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Office Addin Initiate Tasks - NamedType ReportAsPdfFileNameMsg)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 476794310 - NamedType 2971158673" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[cfca30bd-9846-4819-a6fc-56c89c5aae96]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Office Addin Redeploy - NamedType ApplicationIDTxt)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 476794310 - NamedType 71665210" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[%1  field is displayed]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Office Addin Redeploy - NamedType FieldIsDisplayedErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 476794310 - NamedType 2731290131" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[%1  field is not displayed]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Office Addin Redeploy - NamedType FieldNotDisplayedErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 799481124 - NamedType 1322938434" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Create from Attachment is not visible when in the Outlook Mobile App Add-in]]></Val>
