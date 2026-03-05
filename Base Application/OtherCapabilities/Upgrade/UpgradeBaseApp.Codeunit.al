@@ -185,9 +185,6 @@ codeunit 104000 "Upgrade - BaseApp"
         UpgradeTemplates();
         AddPowerBIWorkspaces();
         UpgradePowerBiDisplayedElements();
-#if not CLEAN26        
-        UpgradePurchaseRcptLineOverReceiptCode();
-#endif
         UpgradeContactMobilePhoneNo();
         UpgradePostCodeServiceKey();
         UpgradeDimensionSetEntry();
@@ -2231,13 +2228,6 @@ codeunit 104000 "Upgrade - BaseApp"
 
         exit(true);
     end;
-
-#if not CLEAN26
-    [Obsolete('Field "Over-Receipt Code" has been deleted in version 26.', '26.0')]
-    procedure UpgradePurchaseRcptLineOverReceiptCode()
-    begin
-    end;
-#endif
 
     local procedure UpgradePurchRcptLineDocumentId()
     var

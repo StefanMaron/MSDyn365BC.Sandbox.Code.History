@@ -426,35 +426,6 @@ table 290 "VAT Amount Line"
         exit(true);
     end;
 
-#if not CLEAN26
-    /// <summary>
-    /// Creates new VAT amount line with specified parameters. Obsolete - replaced by procedures using Source Record.
-    /// </summary>
-    /// <param name="VATIdentifier">VAT identifier for grouping</param>
-    /// <param name="VATCalcType">VAT calculation type</param>
-    /// <param name="TaxGroupCode">Tax group code for sales tax</param>
-    /// <param name="UseTax">Whether to use tax calculation</param>
-    /// <param name="TaxRate">VAT percentage rate</param>
-    /// <param name="IsPositive">Whether amounts are positive</param>
-    /// <param name="IsPrepayment">Whether line includes prepayment</param>
-    /// <param name="NonDeductibleVATPct">Non-deductible VAT percentage</param>
-    [Obsolete('Replaced by procedures using Source Record.', '26.0')]
-    procedure InsertNewLine(VATIdentifier: Code[20]; VATCalcType: Enum "Tax Calculation Type"; TaxGroupCode: Code[20]; UseTax: Boolean; TaxRate: Decimal; IsPositive: Boolean; IsPrepayment: Boolean; NonDeductibleVATPct: Decimal)
-    begin
-        Rec.Init();
-        Rec."VAT Identifier" := VATIdentifier;
-        Rec."VAT Calculation Type" := VATCalcType;
-        Rec."Tax Group Code" := TaxGroupCode;
-        Rec."Use Tax" := UseTax;
-        Rec."VAT %" := TaxRate;
-        Rec.Modified := true;
-        Rec.Positive := IsPositive;
-        Rec."Includes Prepayment" := IsPrepayment;
-        Rec."Non-Deductible VAT %" := NonDeductibleVATPct;
-        Rec.Insert();
-    end;
-#endif
-
     /// <summary>
     /// Retrieves VAT amount line by sequential number from the recordset.
     /// </summary>
