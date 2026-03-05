@@ -22,12 +22,11 @@ using System.Utilities;
 
 report 7050 "Item Price List"
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './Pricing/Reports/ItemPriceList.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Item Price List';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
+    DefaultRenderingLayout = RDLCLayout;
 
     dataset
     {
@@ -442,6 +441,16 @@ report 7050 "Item Price List"
         begin
             ValidateMethod();
         end;
+    }
+
+    rendering
+    {
+        layout(RDLCLayout)
+        {
+            Type = RDLC;
+            LayoutFile = './Pricing/Reports/ItemPriceList.rdlc';
+            Summary = 'Report layout made in the legacy RDLC format. Use an RDLC editor to modify the layout.';
+        }
     }
 
     labels
