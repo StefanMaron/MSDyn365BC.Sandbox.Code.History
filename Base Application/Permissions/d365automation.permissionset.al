@@ -762,8 +762,6 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Exchange Folder" = RIMD,
                   tabledata "Exchange Object" = RIMD,
                   tabledata "Exchange Service Setup" = RIMD,
-                  tabledata "Contact Sync User" = RIMD,
-                  tabledata "Outlook Contacts" = RIMD,
 #if not CLEAN28
                   tabledata "Exchange Sync" = RIMD,
 #endif
