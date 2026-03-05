@@ -347,6 +347,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.QualityManagement)(LookupHint=Codeunit Qlty. Tests - Insepctions - NamedType SecondFileNameTxt)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1685620549 - NamedType 507316189" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Response should not be empty.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.QualityManagement)(LookupHint=Codeunit Qlty. Tests - Inspections API - NamedType EmptyResponseErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3706942664 - NamedType 4294544915" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Cannot create negative tracking entries on the item %1 in the purchase document %2]]></Val>
