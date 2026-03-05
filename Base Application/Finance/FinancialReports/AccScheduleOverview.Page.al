@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -678,7 +678,6 @@ page 490 "Acc. Schedule Overview"
                 field("Row No."; Rec."Row No.")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies a number that identifies the line.';
                     Visible = false;
                 }
                 field(Description; Rec.Description)
