@@ -58,9 +58,8 @@ codeunit 6091 "FA Card Notifications"
         if not FASetup.WritePermission then
             exit;
         FASetup.Get();
-        if FASetup."Last time scanned" <> 0DT then
-            if (FASetup."Last time scanned" + GetCacheRefreshInterval()) > CurrentDateTime then
-                exit;
+        if (FASetup."Last time scanned" + GetCacheRefreshInterval()) > CurrentDateTime then
+            exit;
 
         CLEAR(FASetup);
         FASetup.LockTable();
