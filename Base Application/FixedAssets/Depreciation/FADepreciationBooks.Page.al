@@ -21,6 +21,8 @@ page 5619 "FA Depreciation Books"
     AnalysisModeEnabled = false;
     AboutTitle = 'About FA Depreciation Books';
     AboutText = 'The **FA Depreciation Books** help us to maintain multiple depreciation books for a fixed asset with different Depreciation percentages.';
+    UsageCategory = Lists;
+    ApplicationArea = FixedAssets;
 
     layout
     {
@@ -204,6 +206,26 @@ page 5619 "FA Depreciation Books"
                 field("Default FA Depreciation Book"; Rec."Default FA Depreciation Book")
                 {
                     ApplicationArea = FixedAssets;
+                }
+                field("Use Bonus Depreciation"; Rec."Use Bonus Depreciation")
+                {
+                    ApplicationArea = FixedAssets;
+                    Visible = false;
+                }
+                field("Acquisition Cost"; Rec."Acquisition Cost")
+                {
+                    ApplicationArea = FixedAssets;
+                    Visible = false;
+                }
+                field("Bonus Depreciation Applied Amount"; Rec."Bonus Depr. Applied Amount")
+                {
+                    ApplicationArea = FixedAssets;
+                    Visible = false;
+                }
+                field(Depreciation; Rec.Depreciation)
+                {
+                    ApplicationArea = FixedAssets;
+                    Visible = false;
                 }
             }
         }
