@@ -441,12 +441,14 @@ report 115 "Salesperson - Commission"
             Caption = 'Salesperson Commission Excel';
             Type = Excel;
             LayoutFile = './Sales/Reports/SalespersonCommission.xlsx';
+            Summary = 'Report layout primarily made for data analysis. Use an Excel editor to modify the layout.';
         }
         layout(Word)
         {
             Caption = 'Salesperson Commission Word';
             Type = Word;
             LayoutFile = './Sales/Reports/SalespersonCommission.docx';
+            Summary = 'Report layout made for print. Use a Word editor to modify the layout.';
         }
 #if not CLEAN27
         layout(RDLC)
@@ -457,6 +459,7 @@ report 115 "Salesperson - Commission"
             ObsoleteState = Pending;
             ObsoleteReason = 'The RDLC layout has been replaced by the Excel and Word layouts and will be removed in a future release.';
             ObsoleteTag = '27.0';
+            Summary = 'Report layout made in the legacy RDLC format. Use an RDLC editor to modify the layout.';
         }
 #endif
     }
