@@ -198,6 +198,7 @@ page 6641 "Purchase Return Order Subform"
 
                     trigger OnValidate()
                     begin
+                        ForceTotalsCalculation();
                         DeltaUpdateTotals();
                     end;
                 }
@@ -209,6 +210,7 @@ page 6641 "Purchase Return Order Subform"
 
                     trigger OnValidate()
                     begin
+                        ForceTotalsCalculation();
                         DeltaUpdateTotals();
                     end;
                 }
