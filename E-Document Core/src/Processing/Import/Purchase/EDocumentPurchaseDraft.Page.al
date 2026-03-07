@@ -256,7 +256,7 @@ page 6181 "E-Document Purchase Draft"
             }
             part(ErrorMessagesFactBox; "Error Messages Part")
             {
-                Visible = false;
+                Visible = HasErrorsOrWarnings;
                 ShowFilter = false;
                 UpdatePropagation = Both;
             }
@@ -276,13 +276,6 @@ page 6181 "E-Document Purchase Draft"
 
                 trigger OnAction()
                 begin
-                    Session.LogMessage('0000PCO', FinalizeDraftInvokedTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', EDocumentPurchaseHeader.FeatureName());
-                    Rec.SetAutoCalcFields("Import Processing Status");
-                    if Rec.Get(Rec."Entry No") then
-                        if Rec."Import Processing Status" = "Import E-Doc. Proc. Status"::Processed then begin
-                            Rec.ShowRecord();
-                            exit;
-                        end;
                     FinalizeEDocument();
                 end;
             }
@@ -466,7 +459,7 @@ page 6181 "E-Document Purchase Draft"
         SetPageCaption();
 
         Rec.CalcFields("Import Processing Status");
-        ShowFinalizeDraftAction := Rec."Import Processing Status" = Enum::"Import E-Doc. Proc. Status"::"Draft Ready";
+        ShowFinalizeDraftAction := Rec."Import Processing Status" in [Enum::"Import E-Doc. Proc. Status"::"Ready for draft", Enum::"Import E-Doc. Proc. Status"::"Draft Ready"];
         ShowAnalyzeDocumentAction :=
             (Rec."Import Processing Status" = Enum::"Import E-Document Steps"::"Structure received data") and
             (Rec.Status = Enum::"E-Document Status"::Error);
