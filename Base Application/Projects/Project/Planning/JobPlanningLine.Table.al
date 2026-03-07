@@ -146,6 +146,9 @@ table 1003 "Job Planning Line"
                     "Work Type Code" := '';
                     "Gen. Bus. Posting Group" := '';
                     "Gen. Prod. Posting Group" := '';
+                    Description := '';
+                    "Description 2" := '';
+                    Reserve := Reserve::Never;
                     DeleteAmounts();
                     "Cost Factor" := 0;
                     if Type = Type::Item then begin
