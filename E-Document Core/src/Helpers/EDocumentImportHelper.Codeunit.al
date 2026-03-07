@@ -138,9 +138,6 @@ codeunit 6109 "E-Document Import Helper"
         if GTIN = '' then
             exit(false);
 
-        if StrLen(GTIN) > MaxStrLen(Item.GTIN) then
-            exit(false);
-
         Item.SetRange(GTIN, GTIN);
         if not Item.FindFirst() then
             exit(false);
