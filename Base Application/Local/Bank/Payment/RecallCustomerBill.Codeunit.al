@@ -248,6 +248,7 @@ codeunit 12170 "Recall Customer Bill"
                 CustLedgEntry."Customer Bill No." := CustLedgEntry2."Customer Bill No.";
                 CustLedgEntry."Bank Receipts List No." := CustLedgEntry2."Bank Receipts List No.";
                 CustLedgEntry."Document Occurrence" := CustLedgEntry2."Document Occurrence";
+                OnRecallIssuedBillOnBeforeCustLedgerEntryModify(CustLedgEntry, CustLedgEntry2);
                 CustLedgEntry.Modify();
 
                 InitGenJnlLine(BalanceAccountNo);
@@ -305,6 +306,11 @@ codeunit 12170 "Recall Customer Bill"
 
     [IntegrationEvent(false, false)]
     local procedure OnRecallIssuedBillOnAfterInitGenJnlLine(var GenJournalLine: Record "Gen. Journal Line"; BillPostingGroup: Record "Bill Posting Group"; IssuedCustomerBillHeader: Record "Issued Customer Bill Header"; var IssuedCustomerBillLine: Record "Issued Customer Bill Line"; var CustLedgerEntry2: Record "Cust. Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRecallIssuedBillOnBeforeCustLedgerEntryModify(var CustLedgerEntry: Record "Cust. Ledger Entry"; var CustLedgerEntry2: Record "Cust. Ledger Entry")
     begin
     end;
 }
