@@ -1014,7 +1014,7 @@ codeunit 99000845 "Reservation Management"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeSetValueArray(EntryStatus, ValueArray, ArrayCounter, IsHandled);
+        OnBeforeSetValueArray(EntryStatus, ValueArray, ArrayCounter, IsHandled, CalcReservEntry);
         if not IsHandled then begin
             Clear(ValueArray);
             case EntryStatus of
@@ -2441,7 +2441,7 @@ codeunit 99000845 "Reservation Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetValueArray(EntryStatus: Option; var ValueArray: array[30] of Integer; var ArrayCounter: Integer; var IsHandled: Boolean)
+    local procedure OnBeforeSetValueArray(EntryStatus: Option; var ValueArray: array[30] of Integer; var ArrayCounter: Integer; var IsHandled: Boolean; var CalcReservationEntry: Record "Reservation Entry")
     begin
     end;
 
