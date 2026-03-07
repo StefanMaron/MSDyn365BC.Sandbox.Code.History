@@ -530,6 +530,7 @@ page 6050 "Service Contract"
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the sum of the Line Amount field values on all contract lines associated with the service contract or contract quote.';
+                    Importance = Additional;
                 }
                 field(ActiveAnnualAmount; Rec.GetActiveAnnualAmount())
                 {
