@@ -3099,6 +3099,8 @@ codeunit 22 "Item Jnl.-Post Line"
                 ValueEntry."Cost per Unit (ACY)" := 0;
             end;
 
+            OnInitTransValueEntryOnAfterCalcAdjustedCost(ValueEntry, GlobalValueEntry);
+
             GlobalValueEntry."Cost Amount (Actual)" := GlobalValueEntry."Cost Amount (Actual)" - ValueEntry."Cost Amount (Actual)";
             if GLSetup."Additional Reporting Currency" <> '' then
                 GlobalValueEntry."Cost Amount (Actual) (ACY)" :=
@@ -4681,7 +4683,7 @@ codeunit 22 "Item Jnl.-Post Line"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckSerialNo(ItemJnlLine, IsHandled);
+        OnBeforeCheckSerialNo(ItemJnlLine, IsHandled, SkipSerialNoQtyValidation);
         if IsHandled then
             exit;
 
@@ -6308,7 +6310,7 @@ codeunit 22 "Item Jnl.-Post Line"
 #endif
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckSerialNo(ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean)
+    local procedure OnBeforeCheckSerialNo(ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean; var SkipSerialNoQtyValidation: Boolean)
     begin
     end;
 
@@ -8070,7 +8072,7 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCodeOnBeforeCheckItemTracking(var ItemJnlLine: Record "Item Journal Line"; DisableItemTracking: Boolean; var IsHandled: Boolean; var TempTrackingSpecification: Record "Tracking Specification"; var ItemTrackingSetup: Record "Item Tracking Setup")
+    local procedure OnCodeOnBeforeCheckItemTracking(var ItemJnlLine: Record "Item Journal Line"; var DisableItemTracking: Boolean; var IsHandled: Boolean; var TempTrackingSpecification: Record "Tracking Specification"; var ItemTrackingSetup: Record "Item Tracking Setup")
     begin
     end;
 
@@ -8333,6 +8335,11 @@ codeunit 22 "Item Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnInitTransValueEntryOnBeforeCalcAdjustedCost(OldItemLedgEntry: Record "Item Ledger Entry"; var ValueEntry: Record "Value Entry"; var AdjCostInvoicedLCY: Decimal; var AdjCostInvoicedACY: Decimal; var DiscountAmount: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInitTransValueEntryOnAfterCalcAdjustedCost(var ValueEntry: Record "Value Entry"; var GlobalValueEntry: Record "Value Entry")
     begin
     end;
 
