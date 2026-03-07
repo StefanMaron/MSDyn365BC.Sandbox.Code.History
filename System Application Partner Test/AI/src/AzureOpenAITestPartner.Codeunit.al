@@ -142,4 +142,5 @@ codeunit 139021 "Azure OpenAI Test Partner"
 
         CopilotCapability.RegisterCapability(Capability, Availability, BillingType, LearMoreUrlLbl);
     end;
+
 }
