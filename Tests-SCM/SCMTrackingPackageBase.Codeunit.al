@@ -505,6 +505,70 @@ codeunit 137263 "SCM Tracking Package Base"
                 InvtDocumentLine.FieldCaption("Unit Amount")));
     end;
 
+    [Test]
+    procedure PostingDateModifiableInInventoryReceiptWithItemTracking()
+    var
+        InvtDocumentHeader: Record "Invt. Document Header";
+        InvtDocumentLine: Record "Invt. Document Line";
+        Item: Record Item;
+        Location: Record Location;
+        ItemTrackingCode: Record "Item Tracking Code";
+        ReservationEntry: Record "Reservation Entry";
+        InvtDocType: Enum "Invt. Doc. Document Type";
+        Quantity: Decimal;
+        PostingDate: Date;
+    begin
+        // [SCENARIO 610879] In Inventory Receipts with an Item Tracked Item, adjusting the Posting Date is allowed.
+        Initialize();
+
+        // [GIVEN] Create Item Tracking Code.
+        LibraryInventory.CreateItemTrackingCode(ItemTrackingCode);
+        ItemTrackingCode.Validate("SN Specific Tracking", true);
+        ItemTrackingCode.Modify(true);
+
+        // [GIVEN]  Create Item with Item Tracking Code.
+        LibraryInventory.CreateItem(Item);
+        Item.Validate("Item Tracking Code", ItemTrackingCode.Code);
+        Item.Validate("Serial Nos.", LibraryUtility.GetGlobalNoSeriesCode());
+        Item.Validate("Lot Nos.", LibraryUtility.GetGlobalNoSeriesCode());
+        Item.Modify(true);
+
+        // [GIVEN] Create Location with Inventory Posting Setup.
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
+
+        // [GIVEN] Create Invt. Document Receipt.
+        LibraryInventory.CreateInvtDocument(InvtDocumentHeader, InvtDocType::Receipt, Location.Code);
+
+        // [GIVEN] Create Quantity for Invt. Document Line.
+        Quantity := LibraryRandom.RandInt(10);
+
+        // [GIVEN] Create Invt. Document Line.
+        LibraryInventory.CreateInvtDocumentLine(
+            InvtDocumentHeader,
+            InvtDocumentLine,
+            Item."No.",
+            LibraryRandom.RandDec(100, 2),
+            Quantity);
+
+        // [GIVEN] Create Item Receipt Item Tracking.
+        LibraryItemTracking.CreateItemReceiptItemTracking(ReservationEntry, InvtDocumentLine, LibraryUtility.GenerateGUID(), '', '', LibraryRandom.RandIntInRange(1, 1));
+
+        // [GIVEN] Store the Posting Date to be assigned.
+        PostingDate := LibraryRandom.RandDate(10);
+
+        // [WHEN] Assign the Posting Date to Invt. Document Header.
+        InvtDocumentHeader.Validate("Posting Date", PostingDate);
+        InvtDocumentHeader.Modify(true);
+
+        // [THEN] Posting Date should be modifiable in Inventory Receipt with Item Tracking.
+        Assert.AreEqual(
+            PostingDate,
+            InvtDocumentHeader."Posting Date",
+            StrSubstNo(
+                UnitAmountErr,
+                InvtDocumentHeader.FieldCaption("Posting Date")));
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
