@@ -2,7 +2,7 @@
   "id": "40bf2bab-2a57-4c34-9002-c11d23fcbff6",
   "name": "Quality Management Contoso Coffee Demo Dataset",
   "publisher": "Microsoft",
-  "version": "29.0.47259.0",
+  "version": "29.0.47263.0",
   "brief": "To help partners demonstrate the capabilities of the Quality Management extension, we are making demo data available for various quality management scenarios.",
   "description": "Quality management specialists can run the tool on top of Cronus or My Company and get the setup and demo data they'll need when they demonstrate various quality management scenarios.",
   "privacyStatement": "https://go.microsoft.com/fwlink/?linkid=724009",
