@@ -1117,6 +1117,7 @@ codeunit 1720 "Deferral Utilities"
             end;
             PostDate := AccountingPeriod."Starting Date";
         end;
+        OnAfterInitializeDeferralHeaderAndSetPostDate(DeferralLine, DeferralHeader, PeriodicCount, PostDate);
     end;
 
     local procedure IsAccountingPeriodExist(var AccountingPeriod: Record "Accounting Period"; PostingDate: Date): Boolean
@@ -1948,6 +1949,22 @@ codeunit 1720 "Deferral Utilities"
     /// </remarks>
     [IntegrationEvent(false, false)]
     local procedure OnInitializeDeferralHeaderAndSetPostDateAfterInitDeferralLine(var DeferralLine: Record "Deferral Line")
+    begin
+    end;
+
+    /// <summary>
+    /// Integration event raised after initializing deferral header and setting the post date.
+    /// Enables custom control over the PostDate variable assignment.
+    /// </summary>
+    /// <param name="DeferralLine">Deferral line record that was initialized</param>
+    /// <param name="DeferralHeader">Deferral header containing source information</param>
+    /// <param name="PeriodicCount">Current period number in the deferral schedule</param>
+    /// <param name="PostDate">Posting date that was set based on period calculations</param>
+    /// <remarks>
+    /// Raised from InitializeDeferralHeaderAndSetPostDate procedure after all initialization is complete.
+    /// </remarks>
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInitializeDeferralHeaderAndSetPostDate(var DeferralLine: Record "Deferral Line"; DeferralHeader: Record "Deferral Header"; PeriodicCount: Integer; var PostDate: Date)
     begin
     end;
 
