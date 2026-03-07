@@ -824,6 +824,8 @@ table 83 "Item Journal Line"
             DecimalPlaces = 0 : 5;
 
             trigger OnValidate()
+            var
+                SkipQuantityCheck: Boolean;
             begin
                 TestField("Phys. Inventory", true);
 
@@ -837,13 +839,16 @@ table 83 "Item Journal Line"
 
                 PhysInvtEntered := true;
                 Quantity := 0;
-                if "Qty. (Phys. Inventory)" >= "Qty. (Calculated)" then begin
-                    Validate("Entry Type", "Entry Type"::"Positive Adjmt.");
-                    Validate(Quantity, "Qty. (Phys. Inventory)" - "Qty. (Calculated)");
-                end else begin
-                    Validate("Entry Type", "Entry Type"::"Negative Adjmt.");
-                    Validate(Quantity, "Qty. (Calculated)" - "Qty. (Phys. Inventory)");
-                end;
+                SkipQuantityCheck := false;
+                OnValidateQtyPhysInventoryOnBeforeCheckQuantity(Rec, xRec, SkipQuantityCheck);
+                if not SkipQuantityCheck then
+                    if "Qty. (Phys. Inventory)" >= "Qty. (Calculated)" then begin
+                        Validate("Entry Type", "Entry Type"::"Positive Adjmt.");
+                        Validate(Quantity, "Qty. (Phys. Inventory)" - "Qty. (Calculated)");
+                    end else begin
+                        Validate("Entry Type", "Entry Type"::"Negative Adjmt.");
+                        Validate(Quantity, "Qty. (Calculated)" - "Qty. (Phys. Inventory)");
+                    end;
                 PhysInvtEntered := false;
             end;
         }
@@ -5285,6 +5290,11 @@ table 83 "Item Journal Line"
     
     [IntegrationEvent(false, false)]
     local procedure OnCreateNewDimOnBeforeUpdateGlobalDimFromDimSetID(var ItemJournalLine: Record "Item Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateQtyPhysInventoryOnBeforeCheckQuantity(var ItemJournalLine: Record "Item Journal Line"; xItemJournalLine: Record "Item Journal Line"; var SkipQuantityCheck: Boolean)
     begin
     end;
 }
