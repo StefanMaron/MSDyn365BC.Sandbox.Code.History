@@ -3342,6 +3342,7 @@ page 6510 "Item Tracking Lines"
         SetBinCode();
         OnSelectEntriesOnBeforeSelectMultipleTrackingNo(ItemTrackingDataCollection, CurrentSignFactor);
         ItemTrackingDataCollection.SelectMultipleTrackingNo(Rec, MaxQuantity, CurrentSignFactor);
+        OnSelectEntriesOnAfterSelectMultipleTrackingNo(ItemTrackingDataCollection);
         Rec."Bin Code" := '';
         if Rec.FindSet() then
             repeat
@@ -4213,6 +4214,11 @@ page 6510 "Item Tracking Lines"
 
     [IntegrationEvent(false, false)]
     local procedure OnSelectEntriesOnBeforeSelectMultipleTrackingNo(var ItemTrackingDataCollection: Codeunit "Item Tracking Data Collection"; CurrentSignFactor: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSelectEntriesOnAfterSelectMultipleTrackingNo(var ItemTrackingDataCollection: Codeunit "Item Tracking Data Collection")
     begin
     end;
 
