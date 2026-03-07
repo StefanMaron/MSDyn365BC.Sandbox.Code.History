@@ -1619,6 +1619,8 @@ codeunit 6620 "Copy Document Mgt."
         ToSalesLine."Document Type" := ToSalesHeader."Document Type";
         ToSalesLine."Document No." := ToSalesHeader."No.";
         ToSalesLine."Line No." := NextLineNo;
+        if ToSalesHeader."Document Type" = ToSalesHeader."Document Type"::Quote then
+            ToSalesLine."Promised Delivery Date" := 0D;
         if not IncludeHeader then
             CheckSalesVATBusPostingGroup(ToSalesHeader, ToSalesLine);
         ToSalesLine."Copied From Posted Doc." := FromSalesLine."Copied From Posted Doc.";
