@@ -246,6 +246,7 @@ codeunit 1720 "Deferral Utilities"
         FractionOfPeriod: Decimal;
         PeriodicDeferralAmount: Decimal;
         RunningDeferralTotal: Decimal;
+        NoOfLoops: Integer;
         PeriodicCount: Integer;
         HowManyDaysLeftInPeriod: Integer;
         NumberOfDaysInPeriod: Integer;
@@ -276,10 +277,13 @@ codeunit 1720 "Deferral Utilities"
             PeriodicDeferralAmount := Round(DeferralHeader."Amount to Defer" / DeferralHeader."No. of Periods", AmountRoundingPrecision);
         end;
 
-        for PeriodicCount := 1 to (DeferralHeader."No. of Periods" + 1) do begin
+        NoOfLoops := DeferralHeader."No. of Periods" + 1;
+        OnCalculateStraightlineOnAfterCalcPeriodicDeferralAmount(DeferralHeader, NoOfLoops);
+
+        for PeriodicCount := 1 to NoOfLoops do begin
             InitializeDeferralHeaderAndSetPostDate(DeferralLine, DeferralHeader, PeriodicCount, PostDate);
 
-            if (PeriodicCount = 1) or (PeriodicCount = (DeferralHeader."No. of Periods" + 1)) then begin
+            if (PeriodicCount = 1) or (PeriodicCount = NoOfLoops) then begin
                 if PeriodicCount = 1 then begin
                     Clear(RunningDeferralTotal);
 
@@ -1814,6 +1818,20 @@ codeunit 1720 "Deferral Utilities"
     /// </remarks>
     [IntegrationEvent(false, false)]
     local procedure OnCalculateStraightlineOnBeforeCalcPeriodicDeferralAmount(var DeferralHeader: Record "Deferral Header"; var PeriodicDeferralAmount: Decimal; AmountRoundingPrecision: Decimal; var IsHandled: Boolean);
+    begin
+    end;
+
+    /// <summary>
+    /// Integration event raised after calculating periodic deferral amount in straight-line method.
+    /// Enables subscribers to control the number of loops within CalculateStraightline.
+    /// </summary>
+    /// <param name="DeferralHeader">Deferral header record containing calculation parameters</param>
+    /// <param name="NoOfLoops">Number of loop iterations (can be modified by subscribers)</param>
+    /// <remarks>
+    /// Raised from CalculateStraightline procedure after calculating the periodic deferral amount and before the loop starts.
+    /// </remarks>
+    [IntegrationEvent(false, false)]
+    local procedure OnCalculateStraightlineOnAfterCalcPeriodicDeferralAmount(var DeferralHeader: Record "Deferral Header"; var NoOfLoops: Integer)
     begin
     end;
 
