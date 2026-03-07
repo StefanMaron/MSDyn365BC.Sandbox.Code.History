@@ -282,7 +282,11 @@ codeunit 442 "Sales-Post Prepayments"
             TempPrepmtInvLineBuffer.Modify();
         until TempPrepmtInvLineBuffer.Next() = 0;
 
-        TempPrepmtInvLineBuffer.Reset();
+
+        if (TotalPrepmtInvLineBuffer."VAT Amount" <> 0) and (SalesLine."VAT %" = 0) then
+            SalesAssertPrepmtAmountNotMoreThanDocAmountBeforePost(TotalPrepmtInvLineBuffer, SalesHeader);
+
+       TempPrepmtInvLineBuffer.Reset();
         TempPrepmtInvLineBuffer.SetCurrentKey(Adjustment);
         TempPrepmtInvLineBuffer.Find('+');
         repeat
@@ -387,6 +391,30 @@ codeunit 442 "Sales-Post Prepayments"
             PrepaymentMgt.AssertPrepmtAmountNotMoreThanDocAmount(
                 SalesLine."Amount Including VAT", CustLedgEntry.Amount, SalesHeader."Currency Code", SalesSetup."Invoice Rounding");
         end;
+    end;
+
+    local procedure SalesAssertPrepmtAmountNotMoreThanDocAmountBeforePost(TotalPrepmtInvLineBuffer: Record "Prepayment Inv. Line Buffer"; SalesHeader: Record "Sales Header")
+    var
+        FromSalesLine: Record "Sales Line";
+        PrepaymentMgt: Codeunit "Prepayment Mgt.";
+        PrepmtAmountInclVAT: Decimal;
+        SalesPrepmtAmount: Decimal;
+    begin
+        if not (SalesHeader."Document Type" = SalesHeader."Document Type"::Order) then
+            exit;
+        FromSalesLine.SetLoadFields("Document Type", "Document No.", "Type", "Prepayment %", "Amount Including VAT");
+        FromSalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        FromSalesLine.SetRange("Document No.", SalesHeader."No.");
+        FromSalesLine.SetFilter(Type, '<>%1', FromSalesLine.Type::" ");
+        FromSalesLine.SetFilter("Line Amount", '<>0');
+        FromSalesLine.SetFilter("Prepayment %", '<>0');
+        if FromSalesLine.FindSet() then
+            repeat
+                SalesPrepmtAmount += FromSalesLine."Amount Including VAT" * FromSalesLine."Prepayment %" / 100;
+            until FromSalesLine.Next() = 0;
+        PrepmtAmountInclVAT := -TotalPrepmtInvLineBuffer."Amount Incl. VAT";
+        PrepaymentMgt.AssertPrepmtAmountNotMoreThanDocAmount(
+             SalesPrepmtAmount, PrepmtAmountInclVAT, SalesHeader."Currency Code", SalesSetup."Invoice Rounding");
     end;
 
     procedure CheckPrepmtDoc(SalesHeader: Record "Sales Header"; DocumentType: Option Invoice,"Credit Memo")
