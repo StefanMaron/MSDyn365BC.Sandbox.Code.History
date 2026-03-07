@@ -195,7 +195,9 @@ table 39 "Purchase Line"
             else
             if (Type = const("Charge (Item)")) "Item Charge"
             else
-            if (Type = const(Item)) Item
+            if (Type = const(Item), "Document Type" = filter(<> "Credit Memo" & <> "Return Order")) Item where(Blocked = const(false), "Purchasing Blocked" = const(false))
+            else
+            if (Type = const(Item), "Document Type" = filter("Credit Memo" | "Return Order")) Item where(Blocked = const(false))
             else
             if (Type = const("Allocation Account")) "Allocation Account"
             else
@@ -477,7 +479,9 @@ table 39 "Purchase Line"
             else
             if (Type = const("G/L Account"), "System-Created Entry" = const(true)) "G/L Account".Name
             else
-            if (Type = const(Item)) Item.Description
+            if (Type = const(Item), "Document Type" = filter(<> "Credit Memo" & <> "Return Order")) Item.Description where(Blocked = const(false), "Purchasing Blocked" = const(false))
+            else
+            if (Type = const(Item), "Document Type" = filter("Credit Memo" | "Return Order")) Item.Description where(Blocked = const(false))
             else
             if (Type = const("Fixed Asset")) "Fixed Asset".Description
             else
@@ -4119,8 +4123,6 @@ table 39 "Purchase Line"
     begin
         TestStatusOpen();
 
-        EnsurePositiveLineNo();
-
         if Quantity <> 0 then begin
             OnBeforeVerifyReservedQty(Rec, xRec, 0);
             PurchLineReserve.VerifyQuantity(Rec, xRec);
@@ -4159,19 +4161,12 @@ table 39 "Purchase Line"
         Error(Text000, TableCaption);
     end;
 
-    local procedure EnsurePositiveLineNo()
-    var
-        PurchaseLine: Record "Purchase Line";
-        MaxLineNo: Integer;
+#if not CLEAN28
+    [Obsolete('Not used for anything', '28.0')]
+    procedure SetSkipEnsurePositiveLineNo(NewSkipEnsurePositiveLineNo: Boolean)
     begin
-        if "Line No." < 0 then begin
-            PurchaseLine.SetRange("Document Type", "Document Type");
-            PurchaseLine.SetRange("Document No.", "Document No.");
-            if PurchaseLine.FindLast() then
-                MaxLineNo := PurchaseLine."Line No.";
-            "Line No." := MaxLineNo + 10000;
-        end;
     end;
+#endif    
 
     var
         PurchHeader: Record "Purchase Header";
