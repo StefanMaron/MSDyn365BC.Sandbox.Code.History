@@ -8172,11 +8172,16 @@ table 81 "Gen. Journal Line"
     local procedure GetFAAccount()
     var
         FA: Record "Fixed Asset";
+        SkipFixedAssetTestFields: Boolean;
     begin
+        SkipFixedAssetTestFields := false;
         FA.Get("Account No.");
-        FA.TestField(Blocked, false);
-        FA.TestField(Inactive, false);
-        FA.TestField("Budgeted Asset", false);
+        OnGetFAAccountOnBeforeFixedAssetTestField(Rec, FA, SkipFixedAssetTestFields);
+        if not SkipFixedAssetTestFields then begin
+            FA.TestField(Blocked, false);
+            FA.TestField(Inactive, false);
+            FA.TestField("Budgeted Asset", false);
+        end;
         UpdateDescription(FA.Description);
         GetFADeprBook("Account No.");
         GetFAVATSetup();
@@ -8188,11 +8193,16 @@ table 81 "Gen. Journal Line"
     local procedure GetFABalAccount()
     var
         FA: Record "Fixed Asset";
+        SkipFixedAssetTestFields: Boolean;
     begin
+        SkipFixedAssetTestFields := false;
         FA.Get("Bal. Account No.");
-        FA.TestField(Blocked, false);
-        FA.TestField(Inactive, false);
-        FA.TestField("Budgeted Asset", false);
+        OnGetFABalAccountOnBeforeFixedAssetTestField(Rec, FA, SkipFixedAssetTestFields);
+        if not SkipFixedAssetTestFields then begin
+            FA.TestField(Blocked, false);
+            FA.TestField(Inactive, false);
+            FA.TestField("Budgeted Asset", false);
+        end;
         UpdateDescriptionFromBalAccount(FA.Description);
         GetFADeprBook("Bal. Account No.");
         GetFAVATSetup();
@@ -9237,6 +9247,25 @@ table 81 "Gen. Journal Line"
     end;
 
     /// <summary>
+    /// Event triggered before the fixed asset validation TestFields (Blocked, Inactive, Budgeted Asset) are executed
+    /// in the GetFAAccount procedure. Subscribing to this event allows developers to skip the standard
+    /// validation checks for specific scenarios or business rules.
+    /// </summary>
+    /// <param name="GenJournalLine">
+    /// The general journal line record for which the fixed asset account is being processed.
+    /// </param>
+    /// <param name="FixedAsset">
+    /// The fixed asset record retrieved for the account number on the general journal line.
+    /// </param>
+    /// <param name="SkipFixedAssetTestFields">
+    /// Set to true to skip the Blocked, Inactive, and Budgeted Asset TestField validations.
+    /// </param>
+    [IntegrationEvent(false, false)]
+    local procedure OnGetFAAccountOnBeforeFixedAssetTestField(GenJournalLine: Record "Gen. Journal Line"; var FixedAsset: Record "Fixed Asset"; var SkipFixedAssetTestFields: Boolean)
+    begin
+    end;
+
+    /// <summary>
     /// Event triggered after retrieving a fixed asset record for the balancing account in the general journal line.
     /// Subscribing to this event allows developers to extend or customize the behavior
     /// when processing fixed asset data for the balancing account. This can be useful for implementing additional logic,
@@ -9250,6 +9279,25 @@ table 81 "Gen. Journal Line"
     /// </param>
     [IntegrationEvent(false, false)]
     local procedure OnAfterAccountNoOnValidateGetFABalAccount(var GenJournalLine: Record "Gen. Journal Line"; var FixedAsset: Record "Fixed Asset")
+    begin
+    end;
+
+    /// <summary>
+    /// Event triggered before the fixed asset validation TestFields (Blocked, Inactive, Budgeted Asset) are executed
+    /// in the GetFABalAccount procedure. Subscribing to this event allows developers to skip the standard
+    /// validation checks for specific scenarios or business rules.
+    /// </summary>
+    /// <param name="GenJournalLine">
+    /// The general journal line record for which the balancing fixed asset account is being processed.
+    /// </param>
+    /// <param name="FixedAsset">
+    /// The fixed asset record retrieved for the balancing account number on the general journal line.
+    /// </param>
+    /// <param name="SkipFixedAssetTestFields">
+    /// Set to true to skip the Blocked, Inactive, and Budgeted Asset TestField validations.
+    /// </param>
+    [IntegrationEvent(false, false)]
+    local procedure OnGetFABalAccountOnBeforeFixedAssetTestField(GenJournalLine: Record "Gen. Journal Line"; var FixedAsset: Record "Fixed Asset"; var SkipFixedAssetTestFields: Boolean)
     begin
     end;
 
