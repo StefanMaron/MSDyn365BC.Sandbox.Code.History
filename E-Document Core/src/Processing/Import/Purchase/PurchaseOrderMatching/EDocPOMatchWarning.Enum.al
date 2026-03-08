@@ -16,13 +16,4 @@ enum 6111 "E-Doc PO Match Warning"
     value(2; MissingInformationForMatch)
     {
     }
-    value(3; ExceedsInvoiceableQty)
-    {
-    }
-    value(4; ExceedsRemainingToInvoice)
-    {
-    }
-    value(5; OverReceipt)
-    {
-    }
 }
