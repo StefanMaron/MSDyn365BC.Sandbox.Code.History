@@ -6269,6 +6269,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Purchase Subform - NamedType ChangeCurrencyConfirmQst)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3517920733 - NamedType 200415287" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The direct cost is not being calculated correctly or missing.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Purchase Subform - NamedType DirectUnitCostErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3517920733 - NamedType 2964215133" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[%1 should be editable]]></Val>
