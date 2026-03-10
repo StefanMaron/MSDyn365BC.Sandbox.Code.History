@@ -60,9 +60,6 @@ codeunit 5616 "Depreciation Calculation"
         if Date2DMY(EndingDate + 1, 1) = 1 then
             EndingDay := 30;
 
-        if UseAccountingPeriod then
-            exit(EndingDate - StartingDate + 1);
-
         NumbefOfDeprDays := 1 + EndingDay - StartingDay + 30 * (EndingMonth - StartingMonth) +
           360 * (EndingYear - StartingYear);
 
