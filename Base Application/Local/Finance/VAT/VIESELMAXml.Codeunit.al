@@ -23,7 +23,6 @@ codeunit 11001 "VIES ELMA Xml"
         ELMANamespacePrefix: Text;
         ELANNamespacePrefix: Text;
         ZMNamespacePrefix: Text;
-        BOPUserAccountIDMissingErr: Label 'The BOP User Account ID must be specified in the VAT Report Setup before generating the ELMA XML file.';
         ELMANamespaceTxt: Label 'http://www.itzbund.de/elan', Locked = true;
         ELANNamespaceTxt: Label 'http://www.itzbund.de/elan/elemente', Locked = true;
         ZMNamespaceTxt: Label 'http://www.itzbund.de/ZM/01', Locked = true;
@@ -31,7 +30,7 @@ codeunit 11001 "VIES ELMA Xml"
         ELANNamespacePrefixTxt: Label 'elan', Locked = true;
         ZMNamespacePrefixTxt: Label 'zm', Locked = true;
 
-    procedure Create(VATReportHeader: Record "VAT Report Header"; var FileID: Text; var TempBlob: Codeunit "Temp Blob")
+    procedure Create(VATReportHeader: Record "VAT Report Header"; var TempBlob: Codeunit "Temp Blob")
     var
         VATReportLine: Record "VAT Report Line";
         Telemetry: Codeunit Telemetry;
@@ -46,12 +45,6 @@ codeunit 11001 "VIES ELMA Xml"
         Telemetry.LogMessage('0000R2T', 'Create VIES ELMA xml started', Verbosity::Normal, DataClassification::SystemMetadata);
         InitializeNamespaces();
 
-        VATReportSetup.Get();
-        if VATReportSetup."BOP User Account ID" = '' then
-            Error(BOPUserAccountIDMissingErr);
-
-        FileID := CreateUUID();
-
         XMLDoc := XmlDocument.Create();
         XMLDoc.SetDeclaration(XmlDeclaration.Create('1.0', 'UTF-8', 'yes'));
 
@@ -60,7 +53,7 @@ codeunit 11001 "VIES ELMA Xml"
         XMLDoc.Add(RootElement);
 
         // Add ELMAHeader
-        ELMAHeaderElement := CreateELMAHeader(VATReportHeader, FileID);
+        ELMAHeaderElement := CreateELMAHeader(VATReportHeader);
         RootElement.Add(ELMAHeaderElement);
 
         // Add zms element
@@ -83,6 +76,7 @@ codeunit 11001 "VIES ELMA Xml"
                 AddVIESReportLineElement(ZMElement, VATReportLine);
             until VATReportLine.Next() = 0;
 
+        VATReportSetup.Get();
         if VATReportSetup."Export Cancellation Lines" then
             VATReportLine.SetFilter("Line Type", '<>%1', VATReportLine."Line Type"::New)
         else
@@ -100,16 +94,6 @@ codeunit 11001 "VIES ELMA Xml"
 
         Telemetry.LogMessage('0000R2U', 'Create VIES ELMA xml completed', Verbosity::Normal, DataClassification::SystemMetadata);
     end;
-
-#if not CLEAN29
-    [Obsolete('Use the overload that returns FileID instead.', '29.0')]
-    procedure Create(VATReportHeader: Record "VAT Report Header"; var TempBlob: Codeunit "Temp Blob")
-    var
-        FileID: Text;
-    begin
-        Create(VATReportHeader, FileID, TempBlob);
-    end;
-#endif
 
     local procedure InitializeNamespaces()
     begin
@@ -135,7 +119,7 @@ codeunit 11001 "VIES ELMA Xml"
         exit(RootElement);
     end;
 
-    local procedure CreateELMAHeader(VATReportHeader: Record "VAT Report Header"; FileID: Text): XmlElement
+    local procedure CreateELMAHeader(VATReportHeader: Record "VAT Report Header"): XmlElement
     var
         HeaderElement: XmlElement;
         TransportRouteElement: XmlElement;
@@ -144,16 +128,13 @@ codeunit 11001 "VIES ELMA Xml"
     begin
         HeaderElement := XmlElement.Create('ELMAHeader', ELANNamespace);
 
-        // BenutzerkontoID is mandatory
-        HeaderElement.Add(CreateELANElement('BenutzerkontoID', VATReportSetup."BOP User Account ID"));
-
         TransportRouteElement := XmlElement.Create('Transportweg', ELANNamespace);
         TransportRouteElement.Add(CreateELANElement('Datenart', 'ZMDO'));
         TransportRouteElement.Add(CreateELANElement('Umgebung', GetEnvironment(VATReportHeader."Test Export")));
         HeaderElement.Add(TransportRouteElement);
 
         IdentificationElement := XmlElement.Create('Identifizierung', ELANNamespace);
-        IdentificationElement.Add(CreateELANElement('EingangsID', FileID));
+        IdentificationElement.Add(CreateELANElement('EingangsID', CreateUUID()));
         HeaderElement.Add(IdentificationElement);
 
         TimestampsElement := XmlElement.Create('Zeitpunkte', ELANNamespace);
@@ -382,20 +363,16 @@ codeunit 11001 "VIES ELMA Xml"
         exit(Format(DateTimeValue, 0, '<Year4>-<Month,2>-<Day,2>T<Hours24,2>:<Minutes,2>:<Seconds,2>'));
     end;
 
-    procedure MakeFileName(VATReportHeader: Record "VAT Report Header"; FileID: Text): Text[250]
-    var
-        FileNamePatternLbl: Label 'ZMDO.%1.%2.xml', Locked = true;
-    begin
-        // File name format: ZMDO.<BenutzerkontoID>.<FileID>.xml
-        VATReportSetup.Get();
-        exit(StrSubstNo(FileNamePatternLbl, VATReportSetup."BOP User Account ID", FileID));
-    end;
-
-#if not CLEAN29
-    [Obsolete('Use the overload with explicit FileID parameter instead.', '29.0')]
     procedure MakeFileName(VATReportHeader: Record "VAT Report Header"): Text[250]
+    var
+        FileNamePatternLbl: Label 'ZMDO_%1_%2%3_%4.xml', Locked = true;
     begin
-        exit(MakeFileName(VATReportHeader, CreateUUID()));
+        // Generate filename for XML export
+        // Format: ZMDO_[VATRegNo]_[Period]_[DateTime].xml
+        exit(StrSubstNo(FileNamePatternLbl,
+            FormatDEVATRegNo(VATReportHeader."VAT Registration No."),
+            GetPeriodCode(VATReportHeader),
+            VATReportHeader."Report Year",
+            Format(CurrentDateTime(), 0, '<Year4><Month,2><Day,2>_<Hours24,2><Minutes,2><Seconds,2>')));
     end;
-#endif
 }
