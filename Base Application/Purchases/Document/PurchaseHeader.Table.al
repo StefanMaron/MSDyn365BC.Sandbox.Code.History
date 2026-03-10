@@ -8456,7 +8456,7 @@ table 38 "Purchase Header"
         if (Contact.Type = Contact.Type::Person) and (Contact."Company No." <> '') then
             Contact.Get(Contact."Company No.");
 
-        if not Contact.ContactToCustBusinessRelationExist() then
+        if not Contact.ContactToVendBusinessRelationExist() then
             if ConfirmManagement.GetResponse(SelectVendorTemplateQst, false) then begin
                 Commit();
 
