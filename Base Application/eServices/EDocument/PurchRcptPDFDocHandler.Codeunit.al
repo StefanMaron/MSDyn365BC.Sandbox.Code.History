@@ -13,7 +13,7 @@ using System.Utilities;
 codeunit 5007 "Purch. Rcpt. PDF Doc.Handler" implements IPdfDocumentHandler
 {
     var
-        PurchRcptTxt: Label 'Purchase Receipt';
+        PurchRcptLbl: Label 'Purchase Receipt';
 
     /// <summary>
     /// Generates a PDF blob for Purchase Receipt
@@ -38,7 +38,7 @@ codeunit 5007 "Purch. Rcpt. PDF Doc.Handler" implements IPdfDocumentHandler
         PurchRcptHeader.SetRange("No.", PurchRcptHeader."No.");
         ReportUsage := "Report Selection Usage"::"P.Receipt";
         ReportSelections.GetPdfReportForVend(TempBlob, ReportUsage, PurchRcptHeader, PurchRcptHeader."Buy-from Vendor No.");
-        DocumentMailing.GetAttachmentFileName(Name, PurchRcptHeader."No.", PurchRcptTxt, ReportUsage.AsInteger());
+        DocumentMailing.GetAttachmentFileName(Name, PurchRcptHeader."No.", PurchRcptLbl, ReportUsage.AsInteger());
         exit(PDFDocumentManagement.AddToTempAttachmentEntityBuffer(DocumentId, DocumentType, TempBlob, Name, TempAttachmentEntityBuffer));
     end;
 }
