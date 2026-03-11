@@ -317,7 +317,10 @@ codeunit 5642 "FA Reclass. Transfer Line"
         GenJnlLine."Line No." := 0;
         FAJnlSetup.SetGenJnlTrailCodes(GenJnlLine);
         GenJnlLine."Account Type" := GenJnlLine."Account Type"::"Fixed Asset";
-        GenJnlLine."FA Posting Type" := "Gen. Journal Line FA Posting Type".FromInteger(FAPostingType.AsInteger() + 1);
+        if FAPostingType = FAPostingType::"Bonus Depreciation" then
+            GenJnlLine."FA Posting Type" := GenJnlLine."FA Posting Type"::"Bonus Depreciation"
+        else
+            GenJnlLine."FA Posting Type" := Enum::"Gen. Journal Line FA Posting Type".FromInteger(FAPostingType.AsInteger() + 1);
         GenJnlLine.Validate("Account No.", FANo);
         GenJnlLine.Validate("Depreciation Book Code", FAReclassJnlLine."Depreciation Book Code");
         GenJnlLine."FA Posting Date" := FAReclassJnlLine."FA Posting Date";
