@@ -4,22 +4,19 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.EServices.EDocument;
 
-using Microsoft.CRM.BusinessRelation;
-using Microsoft.CRM.Contact;
 using Microsoft.Foundation.Reporting;
 using Microsoft.Integration.Graph;
-using Microsoft.Sales.Customer;
+using Microsoft.Inventory.Transfer;
 using System.EMail;
 using System.Utilities;
 
-codeunit 5445 "Cust. St. PDF Doc.Handler" implements IPdfDocumentHandler
+codeunit 5019 "Trans. Rcpt. PDF Doc.Handler" implements IPdfDocumentHandler
 {
     var
-        CannotFindContactErr: Label 'The Contact cannot be found with SystemId %1.', Comment = '%1 - Contact System id';
-        CustomerStatementLbl: Label 'Customer Statement';
+        TransferReceiptLbl: Label 'Transfer Receipt';
 
     /// <summary>
-    /// Generates a PDF blob for Customer Statement
+    /// Generates a PDF blob for Transfer Receipt
     /// </summary>
     /// <param name="DocumentId">Document ID</param>
     /// <param name="DocumentType">Document Type</param>
@@ -27,9 +24,7 @@ codeunit 5445 "Cust. St. PDF Doc.Handler" implements IPdfDocumentHandler
     /// <returns>True if the generated report successfully added to the buffer, otherwise false.</returns>
     procedure GeneratePdfBlobWithDocumentType(DocumentId: Guid; DocumentType: Enum "Attachment Entity Buffer Document Type"; var TempAttachmentEntityBuffer: Record "Attachment Entity Buffer" temporary): Boolean
     var
-        Customer: Record Customer;
-        Contact: Record Contact;
-        ContactBusinessRelation: Record "Contact Business Relation";
+        TransferReceiptHeader: Record "Transfer Receipt Header";
         ReportSelections: Record "Report Selections";
         DocumentMailing: Codeunit "Document-Mailing";
         PDFDocumentManagement: Codeunit "PDF Document Management";
@@ -37,20 +32,13 @@ codeunit 5445 "Cust. St. PDF Doc.Handler" implements IPdfDocumentHandler
         Name: Text[250];
         ReportUsage: Enum "Report Selection Usage";
     begin
-        if not Contact.GetBySystemId(DocumentId) then
-            Error(CannotFindContactErr, DocumentId);
-
-        Clear(Customer);
-        ContactBusinessRelation.SetRange("Contact No.", Contact."Company No.");
-        ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Customer);
-        if not ContactBusinessRelation.FindFirst() then
+        if not TransferReceiptHeader.GetBySystemId(DocumentId) then
             exit(false);
 
-        Customer.Get(ContactBusinessRelation."No.");
-        Customer.SetRange("No.", Customer."No.");
-        ReportUsage := "Report Selection Usage"::"C.Statement";
-        ReportSelections.GetPdfReportForCust(TempBlob, ReportUsage, Customer, Customer."No.");
-        DocumentMailing.GetAttachmentFileName(Name, Customer."No.", CustomerStatementLbl, ReportUsage.AsInteger());
+        TransferReceiptHeader.SetRange("No.", TransferReceiptHeader."No.");
+        ReportUsage := "Report Selection Usage"::Inv3;
+        ReportSelections.GetPdfReportForTable(TempBlob, ReportUsage, TransferReceiptHeader, Database::"Transfer Receipt Header");
+        DocumentMailing.GetAttachmentFileName(Name, TransferReceiptHeader."No.", TransferReceiptLbl, ReportUsage.AsInteger());
         exit(PDFDocumentManagement.AddToTempAttachmentEntityBuffer(DocumentId, DocumentType, TempBlob, Name, TempAttachmentEntityBuffer));
     end;
 }
