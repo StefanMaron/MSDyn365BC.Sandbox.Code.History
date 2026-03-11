@@ -3158,6 +3158,8 @@ table 5050 Contact
     var
         PurchaseHeader: Record "Purchase Header";
     begin
+        OnBeforeCreatePurchaseQuoteFromContact(Rec);
+
         CheckIfPrivacyBlockedGeneric();
 
         PurchaseHeader.Init();
@@ -3927,6 +3929,11 @@ table 5050 Contact
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateSalesQuoteFromContact(var Contact: Record Contact; var SalesHeader: Record "Sales Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreatePurchaseQuoteFromContact(var Contact: Record Contact)
     begin
     end;
 
