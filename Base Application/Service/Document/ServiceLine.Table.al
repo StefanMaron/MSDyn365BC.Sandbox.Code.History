@@ -3213,7 +3213,7 @@ table 5902 "Service Line"
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", DimensionSetID, DATABASE::Customer);
         DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
 
-        OnAfterCreateDim(Rec, CurrFieldNo);
+        OnAfterCreateDim(Rec, CurrFieldNo, xRec);
     end;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
@@ -7147,7 +7147,7 @@ table 5902 "Service Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDim(var ServiceLine: Record "Service Line"; CurrFieldNo: Integer)
+    local procedure OnAfterCreateDim(var ServiceLine: Record "Service Line"; CurrFieldNo: Integer; xServiceLine: Record "Service Line")
     begin
     end;
 
