@@ -13,7 +13,7 @@ using System.Utilities;
 codeunit 5008 "Return Receipt PDF Doc.Handler" implements IPdfDocumentHandler
 {
     var
-        ReturnReceiptTxt: Label 'Return Receipt';
+        ReturnReceiptLbl: Label 'Return Receipt';
 
     /// <summary>
     /// Generates a PDF blob for Return Receipt
@@ -38,7 +38,7 @@ codeunit 5008 "Return Receipt PDF Doc.Handler" implements IPdfDocumentHandler
         ReturnReceiptHeader.SetRange("No.", ReturnReceiptHeader."No.");
         ReportUsage := "Report Selection Usage"::"S.Ret.Rcpt.";
         ReportSelections.GetPdfReportForCust(TempBlob, ReportUsage, ReturnReceiptHeader, ReturnReceiptHeader."Bill-to Customer No.");
-        DocumentMailing.GetAttachmentFileName(Name, ReturnReceiptHeader."No.", ReturnReceiptTxt, ReportUsage.AsInteger());
+        DocumentMailing.GetAttachmentFileName(Name, ReturnReceiptHeader."No.", ReturnReceiptLbl, ReportUsage.AsInteger());
         exit(PDFDocumentManagement.AddToTempAttachmentEntityBuffer(DocumentId, DocumentType, TempBlob, Name, TempAttachmentEntityBuffer));
     end;
 }
