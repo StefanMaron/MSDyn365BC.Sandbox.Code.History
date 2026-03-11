@@ -13,7 +13,7 @@ using System.Utilities;
 codeunit 4999 "Return Shpt. PDF Doc.Handler" implements IPdfDocumentHandler
 {
     var
-        ReturnShipmentTxt: Label 'Return Shipment';
+        ReturnShipmentLbl: Label 'Return Shipment';
 
     /// <summary>
     /// Generates a PDF blob for Return Shipment
@@ -38,7 +38,7 @@ codeunit 4999 "Return Shpt. PDF Doc.Handler" implements IPdfDocumentHandler
         ReturnShipment.SetRange("No.", ReturnShipment."No.");
         ReportUsage := "Report Selection Usage"::"P.Return";
         ReportSelections.GetPdfReportForVend(TempBlob, ReportUsage, ReturnShipment, ReturnShipment."Buy-from Vendor No.");
-        DocumentMailing.GetAttachmentFileName(Name, ReturnShipment."No.", ReturnShipmentTxt, ReportUsage.AsInteger());
+        DocumentMailing.GetAttachmentFileName(Name, ReturnShipment."No.", ReturnShipmentLbl, ReportUsage.AsInteger());
         exit(PDFDocumentManagement.AddToTempAttachmentEntityBuffer(DocumentId, DocumentType, TempBlob, Name, TempAttachmentEntityBuffer));
     end;
 }
