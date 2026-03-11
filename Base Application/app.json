@@ -117,6 +117,11 @@
       "publisher": "Microsoft"
     },
     {
+      "id": "c81764a5-be79-4d50-ba3e-4ade02073780",
+      "name": "Tests-Fixed Asset",
+      "publisher": "Microsoft"
+    },
+    {
       "id": "2a5ff629-58b0-48e8-9414-319055c49e8d",
       "name": "Tests-MOCKSERVICETESTS-Internal",
       "publisher": "Microsoft"
