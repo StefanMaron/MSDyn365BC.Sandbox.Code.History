@@ -13,7 +13,7 @@ using System.Utilities;
 codeunit 5004 "Sales Shipment PDF Doc.Handler" implements IPdfDocumentHandler
 {
     var
-        SalesShipmentTxt: Label 'Sales Shipment';
+        SalesShipmentLbl: Label 'Sales Shipment';
 
     /// <summary>
     /// Generates a PDF blob for Blanket Sales Order
@@ -38,7 +38,7 @@ codeunit 5004 "Sales Shipment PDF Doc.Handler" implements IPdfDocumentHandler
         SalesShptHeader.SetRange("No.", SalesShptHeader."No.");
         ReportUsage := "Report Selection Usage"::"S.Shipment";
         ReportSelections.GetPdfReportForCust(TempBlob, ReportUsage, SalesShptHeader, SalesShptHeader."Bill-to Customer No.");
-        DocumentMailing.GetAttachmentFileName(Name, SalesShptHeader."No.", SalesShipmentTxt, ReportUsage.AsInteger());
+        DocumentMailing.GetAttachmentFileName(Name, SalesShptHeader."No.", SalesShipmentLbl, ReportUsage.AsInteger());
         exit(PDFDocumentManagement.AddToTempAttachmentEntityBuffer(DocumentId, DocumentType, TempBlob, Name, TempAttachmentEntityBuffer));
     end;
 }
