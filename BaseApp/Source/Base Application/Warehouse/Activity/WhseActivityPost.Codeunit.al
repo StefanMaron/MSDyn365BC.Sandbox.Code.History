@@ -120,6 +120,8 @@ codeunit 7324 "Whse.-Activity-Post"
         WhseActivHeader.Get(WhseActivLine."Activity Type", WhseActivLine."No.");
         GetLocation(WhseActivHeader."Location Code");
 
+        SuppressCommit := WhseActivHeader.PostInboundTransferInOneStep();
+
         if WhseActivHeader.Type = WhseActivHeader.Type::"Invt. Put-away" then
             WhseRequest.Get(
               WhseRequest.Type::Inbound, WhseActivHeader."Location Code",
@@ -175,8 +177,12 @@ codeunit 7324 "Whse.-Activity-Post"
             OnCodeOnAfterCreatePostedWhseActivDocument(WhseActivHeader);
         end;
 
-        if IsPreview then
+        if IsPreview then begin
+            if WhseActivHeader.PostInboundTransferInOneStep() then
+                if TransHeader.Find() then
+                    TransHeader.PostRelatedInboundTransfer(true);
             GenJnlPostPreview.ThrowError();
+        end;
         // Modify/delete activity header and activity lines
         TempWhseActivLine.DeleteAll();
 
@@ -239,6 +245,10 @@ codeunit 7324 "Whse.-Activity-Post"
         if not SuppressCommit then
             Commit();
         OnAfterPostWhseActivHeader(WhseActivHeader, PurchHeader, SalesHeader, TransHeader);
+
+        if WhseActivHeader.PostInboundTransferInOneStep() then
+            if TransHeader.Find() then
+                TransHeader.PostRelatedInboundTransfer(false);
 
         Clear(WhseJnlRegisterLine);
     end;
@@ -642,21 +652,29 @@ codeunit 7324 "Whse.-Activity-Post"
 
     local procedure UpdateUnhandledTransLine(TransHeaderNo: Code[20])
     var
+        LocalTransHeader: Record "Transfer Header";
         TransLine: Record "Transfer Line";
     begin
         TransLine.SetRange("Document No.", TransHeaderNo);
         TransLine.SetRange("Derived From Line No.", 0);
         TransLine.SetRange("Qty. to Ship", 0);
         TransLine.SetRange("Qty. to Receive", 0);
-        if TransLine.FindSet() then
+        if TransLine.FindSet() then begin
+            LocalTransHeader.Get(TransHeaderNo);
             repeat
                 if TransLine."Qty. in Transit" <> 0 then
                     TransLine.Validate(TransLine."Qty. to Receive", TransLine."Qty. in Transit");
-                if TransLine."Outstanding Quantity" <> 0 then
+                if TransLine."Outstanding Quantity" <> 0 then begin
                     TransLine.Validate(TransLine."Qty. to Ship", TransLine."Outstanding Quantity");
+                    if LocalTransHeader."Direct Transfer" then begin
+                        TransLine."Qty. to Receive" := 0;
+                        TransLine."Qty. to Receive (Base)" := 0;
+                    end;
+                end;
                 OnBeforeUnhandledTransLineModify(TransLine);
                 TransLine.Modify();
             until TransLine.Next() = 0;
+        end;
     end;
 
     local procedure PostSourceDocument(WhseActivHeader: Record "Warehouse Activity Header")
@@ -757,13 +775,21 @@ codeunit 7324 "Whse.-Activity-Post"
                                 PostedSourceNo := TransHeader."Last Shipment No.";
                             end else begin
                                 InventorySetup.Get();
-                                InventorySetup.TestField("Direct Transfer Posting", InventorySetup."Direct Transfer Posting"::"Direct Transfer");
-                                if HideDialog then
-                                    TransferPostTransfer.SetHideValidationDialog(HideDialog);
-                                TransferPostTransfer.SetPreviewMode(IsPreview);
-                                TransferPostTransfer.Run(TransHeader);
-                                PostedSourceType := Database::"Direct Trans. Header";
-                                PostedSourceNo := TransHeader."Last Shipment No.";
+                                if InventorySetup."Direct Transfer Posting" = InventorySetup."Direct Transfer Posting"::"Direct Transfer" then begin
+                                    if HideDialog then
+                                        TransferPostTransfer.SetHideValidationDialog(HideDialog);
+                                    TransferPostTransfer.SetPreviewMode(IsPreview);
+                                    TransferPostTransfer.Run(TransHeader);
+                                    PostedSourceType := Database::"Direct Trans. Header";
+                                    PostedSourceNo := TransHeader."Last Shipment No.";
+                                end else begin
+                                    if HideDialog then
+                                        TransferPostShip.SetHideValidationDialog(HideDialog);
+                                    TransferPostShip.SetPreviewMode(IsPreview);
+                                    TransferPostShip.Run(TransHeader);
+                                    PostedSourceType := Database::"Transfer Shipment Header";
+                                    PostedSourceNo := TransHeader."Last Shipment No.";
+                                end;
                             end;
                         end;
                     end;
