@@ -10042,7 +10042,7 @@ table 39 "Purchase Line"
         if (CalledByFieldNo = FieldNo("No.")) and (CurrFieldNo = FieldNo(Description)) and (ShouldExit) then
             ShouldExit := false;
     end;
-    
+
     local procedure OverturnExitConditionForDefaultGLAccountQuantityValidation(var ShouldExit: Boolean)
     begin
         if not ShouldExit then
