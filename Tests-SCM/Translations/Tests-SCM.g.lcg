@@ -1778,6 +1778,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Delete Return Orders - NamedType MsgCorrectedInvoiceNo)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1649186578 - NamedType 2789727144" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Expected empty error from Preview. Actual error: ]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Direct Transfer Warehouse - NamedType WrongPostPreviewErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1260548562 - NamedType 30657023" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Bin Code on Warehouse Activity Line should be equal to Bin Code on Whse Worksheet Line]]></Val>
