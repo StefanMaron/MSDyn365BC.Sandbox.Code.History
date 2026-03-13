@@ -40,11 +40,6 @@ table 22218 "G/L Entry Review Log"
             DataClassification = CustomerContent;
             ToolTip = 'Specifies the G/L account number associated with the G/L entry.';
         }
-        field(7; "Reviewed At"; DateTime)
-        {
-            DataClassification = CustomerContent;
-            ToolTip = 'Specifies the date and time when the G/L entry was reviewed.';
-        }
     }
 
     keys
@@ -55,7 +50,7 @@ table 22218 "G/L Entry Review Log"
         }
         key(GLEntryNo; "G/L Entry No.")
         {
-            IncludedFields = "Reviewed Amount", "Reviewed At";
+            IncludedFields = "Reviewed Amount";
         }
         key(ReviewedAmount; "Reviewed Amount")
         {
