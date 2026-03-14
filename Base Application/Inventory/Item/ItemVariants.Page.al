@@ -34,7 +34,8 @@ page 5401 "Item Variants"
 
                     trigger OnValidate()
                     begin
-                        CurrPage.Update(true);
+                        if (xRec.Code = '') and (Rec.Code <> '') then
+                            CurrPage.Update(true);
                     end;
                 }
                 field(Description; Rec.Description)
