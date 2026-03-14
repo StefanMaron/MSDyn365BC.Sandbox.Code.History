@@ -4,7 +4,7 @@
   "publisher": "Microsoft",
   "brief": "E-Document Core Tests",
   "description": "E-Document Core Tests",
-  "version": "29.0.47534.0",
+  "version": "29.0.47558.0",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
   "EULA": "https://go.microsoft.com/fwlink/?linkid=2009120",
   "help": "https://go.microsoft.com/fwlink/?linkid=2204541",
@@ -75,6 +75,10 @@
     {
       "from": 135575,
       "to": 135575
+    },
+    {
+      "from": 135647,
+      "to": 135649
     }
   ],
   "resourceExposurePolicy": {
