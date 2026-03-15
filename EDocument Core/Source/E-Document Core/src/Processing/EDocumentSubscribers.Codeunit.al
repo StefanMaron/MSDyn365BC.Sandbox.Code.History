@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.eServices.EDocument;
 
+using Microsoft.eServices.EDocument.Format;
 using Microsoft.eServices.EDocument.IO.Peppol;
 using Microsoft.eServices.EDocument.OrderMatch;
 using Microsoft.EServices.EDocument.Processing;
@@ -48,6 +49,14 @@ codeunit 6103 "E-Document Subscribers"
         EDocumentProcessingPhase: Enum "E-Document Processing Phase";
         DeleteDocumentQst: Label 'This document is linked to E-Document %1. Do you want to continue?', Comment = '%1 - E-Document Entry No.';
 
+
+    [EventSubscriber(ObjectType::Page, Page::"Copilot AI Capabilities", OnRegisterCopilotCapability, '', false, false)]
+    local procedure HandleOnRegisterCopilotCapability()
+    var
+        EDocumentMLLMHandler: Codeunit "E-Document MLLM Handler";
+    begin
+        EDocumentMLLMHandler.RegisterCopilotCapabilityIfNeeded();
+    end;
 
     #region Draft page user edits 
 
