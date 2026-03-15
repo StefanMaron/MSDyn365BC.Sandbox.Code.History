@@ -259,13 +259,14 @@ page 46 "Sales Order Subform"
 
                         Rec.RestoreLookupSelection();
                         NoOnAfterValidate();
-
+                        ResetxRecAmountValues();
+                        CalculateTotals();
+                        DeltaUpdateTotals();
                         if Rec."No." = xRec."No." then
                             exit;
 
                         Rec.ShowShortcutDimCode(ShortcutDimCode);
                         UpdateTypeText();
-                        DeltaUpdateTotals();
                         OnAfterValidateDescription(Rec, xRec);
                     end;
 
@@ -2353,6 +2354,16 @@ page 46 "Sales Order Subform"
         AssembleToOrderLink.UpdateAsmDimFromSalesLine(Rec);
 
         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, DimIndex);
+    end;
+
+    local procedure ResetxRecAmountValues()
+    begin
+        xRec."Line Amount" := 0;
+        xRec."Amount Including VAT" := 0;
+        xRec.Amount := 0;
+        xRec."Inv. Discount Amount" := 0;
+        xRec."VAT Base Amount" := 0;
+        xRec."VAT Difference" := 0;
     end;
 
     [IntegrationEvent(true, false)]
