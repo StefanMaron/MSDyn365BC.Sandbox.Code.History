@@ -338,7 +338,6 @@
     }
   ],
   "settings": {
-    "allint.enabled": false,
     "search.exclude": {
       "**.xlf": true
     },
