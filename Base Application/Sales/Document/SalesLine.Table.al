@@ -1897,7 +1897,7 @@ table 37 "Sales Line"
                     FieldError("Prepmt. Line Amount", StrSubstNo(Text045, "Line Amount"));
                 if "System-Created Entry" and not IsServiceChargeLine() then
                     FieldError("Prepmt. Line Amount", StrSubstNo(Text045, 0));
-                Validate("Prepayment %", "Prepmt. Line Amount" * 100 / CalculateOutstandingAmountExclTax());
+                Validate("Prepayment %", "Prepmt. Line Amount" * 100 / Round(CalculateOutstandingAmountExclTax(), Currency."Amount Rounding Precision"));
             end;
         }
         field(111; "Prepmt. Amt. Inv."; Decimal)
@@ -4599,7 +4599,7 @@ table 37 "Sales Line"
         OnAfterUpdateUnitPrice(Rec, xRec, CalledByFieldNo, CurrFieldNo);
     end;
 
-    local procedure BlanketOrderIsRelated(var BlanketOrderSalesLine: Record "Sales Line"): Boolean
+    internal procedure BlanketOrderIsRelated(var BlanketOrderSalesLine: Record "Sales Line"): Boolean
     var
         IsHandled, Result : Boolean;
     begin
@@ -4923,7 +4923,7 @@ table 37 "Sales Line"
         if Rec.Quantity = 0 then
             exit(0);
         QuantityNotInvoiced := (Rec.Quantity - Rec."Quantity Invoiced");
-        OutstandingAmount := round(((Rec."Line Amount" - Rec."Inv. Discount Amount") * QuantityNotInvoiced) / Rec.Quantity, Currency."Amount Rounding Precision");
+        OutstandingAmount := (Rec."Line Amount" - Rec."Inv. Discount Amount") * QuantityNotInvoiced / Rec.Quantity;
         exit(OutstandingAmount);
     end;
 
