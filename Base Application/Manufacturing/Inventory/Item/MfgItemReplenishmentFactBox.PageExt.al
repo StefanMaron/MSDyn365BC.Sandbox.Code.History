@@ -27,7 +27,7 @@ pageextension 99000758 "Mfg. ItemReplenishmentFactBox" extends "Item Replenishme
                     var
                         RoutingHeader: Record "Routing Header";
                     begin
-                        if Rec."Routing No." <> '' then
+                        if RoutingHeader."No." <> '' then
                             RoutingHeader.SetRange("No.", Rec."Routing No.");
                         Page.Run(Page::Routing, RoutingHeader);
                     end;
@@ -42,7 +42,7 @@ pageextension 99000758 "Mfg. ItemReplenishmentFactBox" extends "Item Replenishme
                     var
                         ProductionBOMHeader: Record "Production BOM Header";
                     begin
-                        if Rec."Production BOM No." <> '' then
+                        if ProductionBOMHeader."No." <> '' then
                             ProductionBOMHeader.SetRange("No.", Rec."Production BOM No.");
                         Page.Run(Page::"Production BOM", ProductionBOMHeader);
                     end;
