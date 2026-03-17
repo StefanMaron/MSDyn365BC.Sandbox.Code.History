@@ -244,13 +244,16 @@ codeunit 7324 "Whse.-Activity-Post"
         OnAfterCode(WhseActivLine, SuppressCommit, PrintDoc);
         if not SuppressCommit then
             Commit();
+#if not CLEAN29
         OnAfterPostWhseActivHeader(WhseActivHeader, PurchHeader, SalesHeader, TransHeader);
+#endif
 
         if WhseActivHeader.PostInboundTransferInOneStep() then
             if TransHeader.Find() then
                 TransHeader.PostRelatedInboundTransfer(false);
 
         Clear(WhseJnlRegisterLine);
+        OnAfterPostWhseActivityCompleted(WhseActivHeader, PurchHeader, SalesHeader, TransHeader, SuppressCommit, IsPreview);
     end;
 
     local procedure CheckQuantityInBinContentForTracking(var WarehouseActivityLine: Record "Warehouse Activity Line")
@@ -1524,8 +1527,16 @@ codeunit 7324 "Whse.-Activity-Post"
     begin
     end;
 
+#if not CLEAN29
     [IntegrationEvent(false, false)]
+    [Obsolete('Use OnAfterPostWhseActivityCompleted instead. This event fires before PostRelatedInboundTransfer completes.', '29.0')]
     local procedure OnAfterPostWhseActivHeader(WhseActivHeader: Record "Warehouse Activity Header"; var PurchaseHeader: Record "Purchase Header"; var SalesHeader: Record "Sales Header"; var TransferHeader: Record "Transfer Header")
+    begin
+    end;
+#endif
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterPostWhseActivityCompleted(WhseActivHeader: Record "Warehouse Activity Header"; var PurchaseHeader: Record "Purchase Header"; var SalesHeader: Record "Sales Header"; var TransferHeader: Record "Transfer Header"; SuppressCommit: Boolean; IsPreview: Boolean)
     begin
     end;
 
