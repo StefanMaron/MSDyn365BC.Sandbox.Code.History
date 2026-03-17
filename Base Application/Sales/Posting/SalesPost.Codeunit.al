@@ -294,6 +294,7 @@ codeunit 80 "Sales-Post"
         DisableAggregateTableUpdate: Codeunit "Disable Aggregate Table Update";
         UpdateAnalysisView: Codeunit "Update Analysis View";
         UpdateItemAnalysisView: Codeunit "Update Item Analysis View";
+        SequenceNoMgt: Codeunit "Sequence No. Mgt.";
         EverythingInvoiced: Boolean;
         SavedPreviewMode: Boolean;
         SavedSuppressCommit: Boolean;
@@ -301,6 +302,7 @@ codeunit 80 "Sales-Post"
         SavedHideProgressWindow: Boolean;
         IsHandled: Boolean;
     begin
+        SequenceNoMgt.SetPreviewMode(PreviewMode);
         IsHandled := false;
         OnBeforePostSalesDoc(SalesHeader2, SuppressCommit, PreviewMode, HideProgressWindow, IsHandled, CalledBy);
         if IsHandled then
@@ -1353,7 +1355,7 @@ codeunit 80 "Sales-Post"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeProcessAssocItemJnlLine(SalesLine, IsHandled);
+        OnBeforeProcessAssocItemJnlLine(SalesLine, IsHandled, SalesHeader, TempDropShptPostBuffer);
         if IsHandled then
             exit;
 
@@ -2758,7 +2760,7 @@ codeunit 80 "Sales-Post"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeUpdatePostingNo(SalesHeader, PreviewMode, ModifyHeader, IsHandled);
+        OnBeforeUpdatePostingNo(SalesHeader, PreviewMode, ModifyHeader, IsHandled, DateOrderSeriesUsed);
         if IsHandled then
             exit;
 
@@ -3470,7 +3472,7 @@ codeunit 80 "Sales-Post"
         IsHandled := false;
         OnRoundAmountOnAfterAssignSalesLines(xSalesLine, SalesLineACY, SalesHeader, IsHandled, TotalSalesLine, TotalSalesLineLCY, SalesLine);
         if not IsHandled then
-            if SalesHeader."Currency Code" <> '' then begin
+            if (SalesHeader."Currency Code" <> '') and (SalesLine.Type <> SalesLine.Type::" ") then begin
                 NoVAT := SalesLine.Amount = SalesLine."Amount Including VAT";
                 SalesLine."Amount Including VAT" :=
                   Round(
@@ -8182,7 +8184,7 @@ codeunit 80 "Sales-Post"
         exit(Condition);
     end;
 
-    local procedure PostUpdateOrderLine(SalesHeader: Record "Sales Header")
+    procedure PostUpdateOrderLine(SalesHeader: Record "Sales Header")
     var
         TempSalesLine: Record "Sales Line" temporary;
         SetDefaultQtyBlank: Boolean;
@@ -9307,7 +9309,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeProcessAssocItemJnlLine(var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    local procedure OnBeforeProcessAssocItemJnlLine(var SalesLine: Record "Sales Line"; var IsHandled: Boolean; var SalesHeader: Record "Sales Header"; var TempDropShptPostBuffer: Record "Drop Shpt. Post. Buffer" temporary)
     begin
     end;
 
@@ -9895,7 +9897,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdatePostingNo(var SalesHeader: Record "Sales Header"; PreviewMode: Boolean; var ModifyHeader: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeUpdatePostingNo(var SalesHeader: Record "Sales Header"; PreviewMode: Boolean; var ModifyHeader: Boolean; var IsHandled: Boolean; var DateOrderSeriesUsed: Boolean)
     begin
     end;
 

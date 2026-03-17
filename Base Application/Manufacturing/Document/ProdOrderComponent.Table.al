@@ -567,7 +567,10 @@ table 5407 "Prod. Order Component"
                     exit;
 
                 CalculateQuantity(Quantity);
-                Quantity := UOMMgt.RoundAndValidateQty(Quantity, "Qty. Rounding Precision", FieldCaption(Quantity));
+                if "Qty. Rounding Precision" < 1 then
+                    Quantity := UOMMgt.RoundAndValidateQty(Quantity, "Qty. Rounding Precision", FieldCaption(Quantity))
+                else
+                    Quantity := UOMMgt.RoundToItemRndPrecision(Quantity, "Qty. Rounding Precision");
 
                 OnValidateCalculationFormulaOnAfterSetQuantity(Rec);
                 "Quantity (Base)" := CalcBaseQty(Quantity, FieldCaption(Quantity), FieldCaption("Quantity (Base)"));
@@ -1319,13 +1322,7 @@ table 5407 "Prod. Order Component"
     var
         SourceCodeSetup: Record "Source Code Setup";
         ProdOrderLine: Record "Prod. Order Line";
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeCreateDim(Rec, DefaultDimSource, CurrFieldNo, IsHandled);
-        if IsHandled then
-            exit;
-
         SourceCodeSetup.Get();
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
@@ -2408,11 +2405,6 @@ table 5407 "Prod. Order Component"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateRoutingLinkCodeOnBeforeUpdateDueDateAndTime(var ProdOrderComponent: Record "Prod. Order Component"; var ProdOrderLine: Record "Prod. Order Line"; var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateDim(var ProdOrderComponent: Record "Prod. Order Component"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; CurrentFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
 }
