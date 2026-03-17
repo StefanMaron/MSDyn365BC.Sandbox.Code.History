@@ -158,5 +158,13 @@
     {
       "path": "./AI Test Toolkit/src/TestSuite"
     }
-  ]
+  ],
+  "settings": {
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeAnalysis": false,
+    "al.enableCodeActions": false,
+    "allint.enabled": false
+  }
 }
