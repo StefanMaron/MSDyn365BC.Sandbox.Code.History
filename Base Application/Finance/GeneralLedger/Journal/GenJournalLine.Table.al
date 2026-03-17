@@ -3994,7 +3994,6 @@ table 81 "Gen. Journal Line"
         FADeprBook: Record "FA Depreciation Book";
         FANo: Code[20];
         UseFAAddCurrExchRate: Boolean;
-        IsHandled: Boolean;
     begin
         "FA Add.-Currency Factor" := 0;
         if ("FA Posting Type" <> "FA Posting Type"::" ") and
@@ -4028,12 +4027,6 @@ table 81 "Gen. Journal Line"
                 end;
                 if UseFAAddCurrExchRate then begin
                     FADeprBook.Get(FANo, "Depreciation Book Code");
-
-                    IsHandled := false;
-                    OnGetFAAddCurrExchRateOnBeforeFADeprBookTestField(FADeprBook, IsHandled);
-                    if IsHandled then
-                        exit;
-
                     FADeprBook.TestField("FA Add.-Currency Factor");
                     "FA Add.-Currency Factor" := FADeprBook."FA Add.-Currency Factor";
                 end;
@@ -6775,6 +6768,10 @@ table 81 "Gen. Journal Line"
     begin
     end;
 
+    [IntegrationEvent(true, false)]
+    procedure OnCheckGenJournalLineExportRestrictions()
+    begin
+    end;
 #if not CLEAN24
     [Obsolete('Use SimulateGetNextNo from "No. Series - Batch" instead', '24.0')]
     procedure IncrementDocumentNo(LocGenJnlBatch: Record "Gen. Journal Batch"; var LastDocNumber: Code[20])
@@ -11883,11 +11880,6 @@ table 81 "Gen. Journal Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckOpenApprovalEntryExistForCurrentUser(GenJnlLine: Record "Gen. Journal Line"; CurrFieldNo: Integer; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGetFAAddCurrExchRateOnBeforeFADeprBookTestField(var FADeprBook: Record "FA Depreciation Book"; var IsHandled: Boolean);
     begin
     end;
 }

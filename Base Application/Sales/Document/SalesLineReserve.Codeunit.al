@@ -1297,9 +1297,6 @@ codeunit 99000832 "Sales Line-Reserve"
         if (NewSalesLine.Type <> NewSalesLine.Type::Item) or (NewSalesLine.Quantity = 0) or (NewSalesLine.Reserve <> NewSalesLine.Reserve::Always) then
             exit(false);
 
-        if ShipmentExists(NewSalesLine) then
-            exit(false);
-
         Item.SetLoadFields("Costing Method");
         Item.Get(NewSalesLine."No.");
 
@@ -1307,15 +1304,6 @@ codeunit 99000832 "Sales Line-Reserve"
             exit(false);
 
         exit(NewSalesLine.Quantity < OldSalesLine.Quantity);
-    end;
-
-    local procedure ShipmentExists(SalesLine: Record "Sales Line"): Boolean
-    var
-        SalesShipmentLine: Record "Sales Shipment Line";
-    begin
-        SalesShipmentLine.SetRange("Document No.", SalesLine."Shipment No.");
-        SalesShipmentLine.SetRange("Line No.", SalesLine."Shipment Line No.");
-        exit(not SalesShipmentLine.IsEmpty());
     end;
 
     [IntegrationEvent(false, false)]
