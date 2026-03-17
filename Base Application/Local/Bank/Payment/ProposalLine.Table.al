@@ -819,7 +819,8 @@ table 11000000 "Proposal Line"
     begin
         "Dimension Set ID" :=
           DimManagement.EditDimensionSet(
-            "Dimension Set ID", StrSubstNo('%1 %2', "Our Bank No.", "Line No."));
+            Rec, "Dimension Set ID", StrSubstNo('%1 %2', "Our Bank No.", "Line No."),
+            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
     end;
 
     [Scope('OnPrem')]
@@ -830,7 +831,7 @@ table 11000000 "Proposal Line"
     begin
         "Header Dimension Set ID" :=
           DimManagement.EditDimensionSet(
-            "Header Dimension Set ID", StrSubstNo('%1 %2', "Our Bank No.", "Line No."),
+            Rec, "Header Dimension Set ID", StrSubstNo('%1 %2', "Our Bank No.", "Line No."),
             HeaderGlobalDim1, HeaderGlobalDim2);
     end;
 
