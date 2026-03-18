@@ -187,7 +187,7 @@ codeunit 6135 "E-Document WorkFlow Processing"
         WorkflowManagement: Codeunit "Workflow Management";
         EDocumentWorkflowSetup: Codeunit "E-Document Workflow Setup";
         Telemetry: Codeunit Telemetry;
-        NoEDocumentServiceFoundINPrevResponseLbl: Label 'No E-Document Service found in previous Send or Export response step in workflow.', Locked = true;
+        NoEDocumentServiceFoundINPrevResponseLbl: Label 'No E-Document Service found in previous Send or Export response step in workflow.';
     begin
         PrevWorkflowStepInstance.SetFilter("Function Name", '%1|%2', EDocumentWorkflowSetup.EDocSendEDocResponseCode(), EDocumentWorkflowSetup.ResponseEDocExport());
         while WorkflowManagement.FindResponse(PrevWorkflowStepInstance, WorkflowStepInstance) do begin
@@ -259,7 +259,7 @@ codeunit 6135 "E-Document WorkFlow Processing"
     var
         EDocumentServiceStatus: Record "E-Document Service Status";
         Telemetry: Codeunit Telemetry;
-        WrongWorkflowEventRecordTypeErr: Label 'The record type %1 is not supported in E-Document workflow events.', Comment = '%1 - Table ID', Locked = true;
+        WrongWorkflowEventRecordTypeErr: Label 'The record type %1 is not supported in E-Document workflow events.', Comment = '%1 - Table ID';
     begin
         case RecordRef.Number() of
             Database::"E-Document":
@@ -320,7 +320,7 @@ codeunit 6135 "E-Document WorkFlow Processing"
         WorkflowManagement: Codeunit "Workflow Management";
         EDocumentWorkflowSetup: Codeunit "E-Document Workflow Setup";
         Telemetry: Codeunit Telemetry;
-        EDocTelemetryNoFilterForNextEventLbl: Label 'No filter set on E-Document to execute next workflow step.', Locked = true;
+        EDocTelemetryNoFilterForNextEventLbl: Label 'No filter set on E-Document to execute next workflow step.';
     begin
         // Commit before execute next workflow step
         Commit();
