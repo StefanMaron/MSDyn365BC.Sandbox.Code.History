@@ -69,13 +69,14 @@ codeunit 699 "Exch. Rate Adjmt. Process"
 
         CheckPostingDate();
 
-        Window.Open(
-            AdjustingExchangeRatesTxt +
-            BankAccountProgressBarTxt +
-            CustomerProgressBarTxt +
-            VendorProgressBarTxt +
-            EmployeeProgressBarTxt +
-            AdjustmentProgressBarTxt);
+        if not ExchRateAdjmtParameters."Hide UI" then
+            Window.Open(
+                AdjustingExchangeRatesTxt +
+                BankAccountProgressBarTxt +
+                CustomerProgressBarTxt +
+                VendorProgressBarTxt +
+                EmployeeProgressBarTxt +
+                AdjustmentProgressBarTxt);
 
         if Rec."Adjust G/L Accounts" then
             SetAdditionalReportingCurrency();
@@ -228,7 +229,8 @@ codeunit 699 "Exch. Rate Adjmt. Process"
                     if BankAccount.FindSet() then
                         repeat
                             BankAccNo := BankAccNo + 1;
-                            Window.Update(1, Round(BankAccNo / BankAccNoTotal * 10000, 1));
+                            if not ExchRateAdjmtParameters."Hide UI" then
+                                Window.Update(1, Round(BankAccNo / BankAccNoTotal * 10000, 1));
                             ProcessBankAccount(BankAccount, Currency);
                         until BankAccount.Next() = 0;
                 end;
@@ -248,7 +250,8 @@ codeunit 699 "Exch. Rate Adjmt. Process"
         if Customer.FindSet() then
             repeat
                 CustNo := CustNo + 1;
-                Window.Update(2, Round(CustNo / CustNoTotal * 10000, 1));
+                if not ExchRateAdjmtParameters."Hide UI" then
+                    Window.Update(2, Round(CustNo / CustNoTotal * 10000, 1));
 
                 ProcessCustomerAdjustment(Customer);
             until Customer.Next() = 0;
@@ -270,7 +273,8 @@ codeunit 699 "Exch. Rate Adjmt. Process"
         if Vendor.FindSet() then
             repeat
                 VendNo := VendNo + 1;
-                Window.Update(3, Round(VendNo / VendNoTotal * 10000, 1));
+                if not ExchRateAdjmtParameters."Hide UI" then
+                    Window.Update(3, Round(VendNo / VendNoTotal * 10000, 1));
 
                 ProcessVendorAdjustment(Vendor);
             until Vendor.Next() = 0;
@@ -292,7 +296,8 @@ codeunit 699 "Exch. Rate Adjmt. Process"
         if Employee.FindSet() then
             repeat
                 EmplNo := EmplNo + 1;
-                Window.Update(5, Round(EmplNo / EmplNoTotal * 10000, 1));
+                if not ExchRateAdjmtParameters."Hide UI" then
+                    Window.Update(5, Round(EmplNo / EmplNoTotal * 10000, 1));
 
                 ProcessEmployeeAdjustment(Employee);
 
@@ -320,7 +325,8 @@ codeunit 699 "Exch. Rate Adjmt. Process"
         VATEntry: Record "VAT Entry";
         VATPostingSetup: Record "VAT Posting Setup";
     begin
-        Window.Open(AdjustingVATEntriesTxt + VATEntryProgressBarTxt);
+        if not ExchRateAdjmtParameters."Hide UI" then
+            Window.Open(AdjustingVATEntriesTxt + VATEntryProgressBarTxt);
 
         VATEntryNoTotal := VATEntry.Count();
         if VATEntryNoTotal = 0 then
@@ -328,7 +334,8 @@ codeunit 699 "Exch. Rate Adjmt. Process"
         if VATPostingSetup.FindSet() then
             repeat
                 VATEntryNo := VATEntryNo + 1;
-                Window.Update(1, Round(VATEntryNo / VATEntryNoTotal * 10000, 1));
+                if not ExchRateAdjmtParameters."Hide UI" then
+                    Window.Update(1, Round(VATEntryNo / VATEntryNoTotal * 10000, 1));
 
                 ProcessVATAdjustment(VATPostingSetup);
             until VATPostingSetup.Next() = 0;
@@ -338,7 +345,8 @@ codeunit 699 "Exch. Rate Adjmt. Process"
     var
         GLAccount: Record "G/L Account";
     begin
-        Window.Open(AdjustingGeneralLedgerTxt + GLAccountProgressBarTxt);
+        if not ExchRateAdjmtParameters."Hide UI" then
+            Window.Open(AdjustingGeneralLedgerTxt + GLAccountProgressBarTxt);
 
         GLAccNo := 0;
         GLAccNoTotal := GLAccount.Count();
@@ -346,7 +354,8 @@ codeunit 699 "Exch. Rate Adjmt. Process"
         if GLAccount.FindSet() then
             repeat
                 GLAccNo := GLAccNo + 1;
-                Window.Update(1, Round(GLAccNo / GLAccNoTotal * 10000, 1));
+                if not ExchRateAdjmtParameters."Hide UI" then
+                    Window.Update(1, Round(GLAccNo / GLAccNoTotal * 10000, 1));
                 if GLAccount."Exchange Rate Adjustment" <> GLAccount."Exchange Rate Adjustment"::"No Adjustment" then
                     ProcessGLAccountAdjustment(GLAccount);
             until GLAccount.Next() = 0;
@@ -438,7 +447,8 @@ codeunit 699 "Exch. Rate Adjmt. Process"
             TotalAdjBase := TotalAdjBase + CurrAdjBase;
             TotalAdjBaseLCY := TotalAdjBaseLCY + CurrAdjBaseLCY;
             TotalAdjAmount := TotalAdjAmount + CurrAdjAmount;
-            Window.Update(4, TotalAdjAmount);
+            if not ExchRateAdjmtParameters."Hide UI" then
+                Window.Update(4, TotalAdjAmount);
         end;
 
         NextBankAccount.Copy(BankAccount);
@@ -1793,7 +1803,7 @@ codeunit 699 "Exch. Rate Adjmt. Process"
                 begin
                     GenJournalLine."Shortcut Dimension 1 Code" := GetGlobalDimVal(GLSetup."Global Dimension 1 Code", DimensionSetEntry);
                     GenJournalLine."Shortcut Dimension 2 Code" := GetGlobalDimVal(GLSetup."Global Dimension 2 Code", DimensionSetEntry);
-                    GenJournalLine."Dimension Set ID" := DimMgt.GetDimensionSetID(TempDimSetEntry);
+                    GenJournalLine."Dimension Set ID" := DimMgt.GetDimensionSetID(DimensionSetEntry);
                     OnSetPostingDimensionsOnCaseSourceEntryDimensions(GenJournalLine, DimensionSetEntry);
                 end;
             "Exch. Rate Adjmt. Dimensions"::"G/L Account Dimensions":
