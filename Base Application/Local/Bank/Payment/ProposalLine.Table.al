@@ -778,7 +778,24 @@ table 11000000 "Proposal Line"
     [Scope('OnPrem')]
     procedure ValidateShortcutDimCode(FieldNo: Integer; var ShortcutDimCode: Code[20])
     begin
+        OnBeforeValidateShortcutDimCode(Rec, xRec, FieldNo, ShortcutDimCode);
         DimManagement.ValidateShortcutDimValues(FieldNo, ShortcutDimCode, "Dimension Set ID");
+    end;
+
+    /// <summary>
+    /// Integration event raised before validating a shortcut dimension code for proposal line.
+    /// Enables custom dimension validation logic or preprocessing before standard validation.
+    /// </summary>
+    /// <param name="ProposalLine">Proposal line record being validated</param>
+    /// <param name="xProposalLine">Previous proposal line record state</param>
+    /// <param name="FieldNo">Field number of the dimension being validated</param>
+    /// <param name="ShortcutDimCode">Dimension code being validated</param>
+    /// <remarks>
+    /// Raised from ValidateShortcutDimCode procedure before standard dimension validation.
+    /// </remarks>
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateShortcutDimCode(var ProposalLine: Record "Proposal Line"; var xProposalLine: Record "Proposal Line"; FieldNo: Integer; var ShortcutDimCode: Code[20])
+    begin
     end;
 
     [Scope('OnPrem')]
