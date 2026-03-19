@@ -1835,58 +1835,6 @@ codeunit 144354 "Swiss SEPA CT 09 Export"
 
     [Test]
     [Scope('OnPrem')]
-    procedure XMLExport_BatchBooking_49Payments()
-    var
-        GenJournalLine: Record "Gen. Journal Line";
-        CHMgt: Codeunit CHMgt;
-        FileName: Text;
-        VendorNo: Code[20];
-    begin
-        // [FEATURE] [XML] [Export]
-        // [SCENARIO 253444] Batch Booking is false when xml is exported with payment's quantity less than 'No Of Payments For BatchBooking' value (50)
-        Initialize();
-
-        // [GIVEN] Vendor with bank account of "Payment Form" = "ESR"
-        VendorNo := CreateVendorWithBankAccount_ESR();
-
-        // [GIVEN] Vendor payment journal lines of 49 payments
-        CreateSetOfPaymentJournalLine(GenJournalLine, VendorNo, CHMgt.NoOfPaymentsForBatchBooking() - 1);
-
-        // [WHEN] Export payments to file
-        FileName := GenJournalLine_XMLExport(GenJournalLine);
-
-        // [THEN] XML File has been exported with tags 'NbOfTxs' = 49, 'BtchBookg' = false
-        VerifyXMLFileBatchBooking(FileName, CHMgt.NoOfPaymentsForBatchBooking() - 1, false);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure XMLExport_BatchBooking_50Payments()
-    var
-        GenJournalLine: Record "Gen. Journal Line";
-        CHMgt: Codeunit CHMgt;
-        FileName: Text;
-        VendorNo: Code[20];
-    begin
-        // [FEATURE] [XML] [Export]
-        // [SCENARIO 253444] Batch Booking is true when xml is exported with payment's quantity equals to 'No Of Payments For BatchBooking' value (50)
-        Initialize();
-
-        // [GIVEN] Vendor with bank account of "Payment Form" = "ESR"
-        VendorNo := CreateVendorWithBankAccount_ESR();
-
-        // [GIVEN] Vendor payment journal lines of 50 payments
-        CreateSetOfPaymentJournalLine(GenJournalLine, VendorNo, CHMgt.NoOfPaymentsForBatchBooking());
-
-        // [WHEN] Export payments to file
-        FileName := GenJournalLine_XMLExport(GenJournalLine);
-
-        // [THEN] XML File has been exported with tags 'NbOfTxs' = 50, 'BtchBookg' = true
-        VerifyXMLFileBatchBooking(FileName, CHMgt.NoOfPaymentsForBatchBooking(), true);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
     procedure PaymentExportData_SetCustomerAsRecipient_PaymentType22()
     var
         PaymentExportData: Record "Payment Export Data";
@@ -2887,6 +2835,168 @@ codeunit 144354 "Swiss SEPA CT 09 Export"
         // [WHEN] Run IsSwissSEPACTExport() of codeunit 11503 CHMgt.
         // [THEN] The function returns false.
         Assert.IsFalse(CHMgt.IsSwissSEPACTExport(GenJournalLine), '');
+    end;
+
+    [Test]
+    procedure XMLExport_BatchBooking_Auto_1Payment()
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+        VendorNo: Code[20];
+        FileName: Text;
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 621781] Batch Booking is false when SEPA CT Batch Booking is Auto and payment count is below 50.
+        Initialize();
+
+        // [GIVEN] SEPA CT Batch Booking is set to "Auto" on the Bank Export/Import Setup.
+        UpdateSEPACTBatchBooking(Enum::"SEPA CT Batch Booking"::Auto);
+
+        // [GIVEN] Vendor "V" with bank account of "Payment Form" = "ESR"
+        VendorNo := CreateVendorWithBankAccount_ESR();
+
+        // [GIVEN] Vendor payment journal line of 1 payment
+        CreateSetOfPaymentJournalLine(GenJournalLine, VendorNo, 1);
+
+        // [WHEN] Export payments to file
+        FileName := GenJournalLine_XMLExport(GenJournalLine);
+
+        // [THEN] XML File has been exported with 'BtchBookg' = false
+        VerifyXMLFileBatchBooking(FileName, 1, false);
+    end;
+
+    [Test]
+    procedure XMLExport_BatchBooking_Auto_50Payment()
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+        VendorNo: Code[20];
+        FileName: Text;
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 621781] Batch Booking is true when SEPA CT Batch Booking is Auto and payment count is 50 or more.
+        Initialize();
+
+        // [GIVEN] SEPA CT Batch Booking is set to "Auto" on the Bank Export/Import Setup.
+        UpdateSEPACTBatchBooking(Enum::"SEPA CT Batch Booking"::Auto);
+
+        // [GIVEN] Vendor "V" with bank account of "Payment Form" = "ESR"
+        VendorNo := CreateVendorWithBankAccount_ESR();
+
+        // [GIVEN] Vendor payment journal line of 50 payments
+        CreateSetOfPaymentJournalLine(GenJournalLine, VendorNo, 50);
+
+        // [WHEN] Export payments to file
+        FileName := GenJournalLine_XMLExport(GenJournalLine);
+
+        // [THEN] XML File has been exported with 'BtchBookg' = true
+        VerifyXMLFileBatchBooking(FileName, 50, true);
+    end;
+
+    [Test]
+    procedure XMLExport_BatchBooking_Always_1Payment()
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+        VendorNo: Code[20];
+        FileName: Text;
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 621781] Batch Booking is true when SEPA CT Batch Booking is set to Always, regardless of payment count.
+        Initialize();
+
+        // [GIVEN] SEPA CT Batch Booking is set to "Always" on the Bank Export/Import Setup.
+        UpdateSEPACTBatchBooking(Enum::"SEPA CT Batch Booking"::Always);
+
+        // [GIVEN] Vendor "V" with bank account of "Payment Form" = "ESR"
+        VendorNo := CreateVendorWithBankAccount_ESR();
+
+        // [GIVEN] Vendor payment journal line of 1 payment
+        CreateSetOfPaymentJournalLine(GenJournalLine, VendorNo, 1);
+
+        // [WHEN] Export payments to file
+        FileName := GenJournalLine_XMLExport(GenJournalLine);
+
+        // [THEN] XML File has been exported with 'BtchBookg' = true
+        VerifyXMLFileBatchBooking(FileName, 1, true);
+    end;
+
+    [Test]
+    procedure XMLExport_BatchBooking_Always_50Payments()
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+        VendorNo: Code[20];
+        FileName: Text;
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 621781] Batch Booking is true when SEPA CT Batch Booking is set to Always with 50 payments.
+        Initialize();
+
+        // [GIVEN] SEPA CT Batch Booking is set to "Always" on the Bank Export/Import Setup.
+        UpdateSEPACTBatchBooking(Enum::"SEPA CT Batch Booking"::Always);
+
+        // [GIVEN] Vendor "V" with bank account of "Payment Form" = "ESR"
+        VendorNo := CreateVendorWithBankAccount_ESR();
+
+        // [GIVEN] Vendor payment journal lines of 50 payments
+        CreateSetOfPaymentJournalLine(GenJournalLine, VendorNo, 50);
+
+        // [WHEN] Export payments to file
+        FileName := GenJournalLine_XMLExport(GenJournalLine);
+
+        // [THEN] XML File has been exported with 'BtchBookg' = true
+        VerifyXMLFileBatchBooking(FileName, 50, true);
+    end;
+
+    [Test]
+    procedure XMLExport_BatchBooking_Never_1Payment()
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+        VendorNo: Code[20];
+        FileName: Text;
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 621781] Batch Booking is false when SEPA CT Batch Booking is set to Never, regardless of payment count.
+        Initialize();
+
+        // [GIVEN] SEPA CT Batch Booking is set to "Never" on the Bank Export/Import Setup.
+        UpdateSEPACTBatchBooking(Enum::"SEPA CT Batch Booking"::Never);
+
+        // [GIVEN] Vendor "V" with bank account of "Payment Form" = "ESR"
+        VendorNo := CreateVendorWithBankAccount_ESR();
+
+        // [GIVEN] Vendor payment journal line of 1 payment
+        CreateSetOfPaymentJournalLine(GenJournalLine, VendorNo, 1);
+
+        // [WHEN] Export payments to file
+        FileName := GenJournalLine_XMLExport(GenJournalLine);
+
+        // [THEN] XML File has been exported with 'BtchBookg' = false
+        VerifyXMLFileBatchBooking(FileName, 1, false);
+    end;
+
+    [Test]
+    procedure XMLExport_BatchBooking_Never_50Payments()
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+        VendorNo: Code[20];
+        FileName: Text;
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 621781] Batch Booking is false when SEPA CT Batch Booking is set to Never, even with 50 or more payments.
+        Initialize();
+
+        // [GIVEN] SEPA CT Batch Booking is set to "Never" on the Bank Export/Import Setup.
+        UpdateSEPACTBatchBooking(Enum::"SEPA CT Batch Booking"::Never);
+
+        // [GIVEN] Vendor "V" with bank account of "Payment Form" = "ESR"
+        VendorNo := CreateVendorWithBankAccount_ESR();
+
+        // [GIVEN] Vendor payment journal lines of 50 payments
+        CreateSetOfPaymentJournalLine(GenJournalLine, VendorNo, 50);
+
+        // [WHEN] Export payments to file
+        FileName := GenJournalLine_XMLExport(GenJournalLine);
+
+        // [THEN] XML File has been exported with 'BtchBookg' = false
+        VerifyXMLFileBatchBooking(FileName, 50, false);
     end;
 
     local procedure Initialize()
@@ -3935,6 +4045,15 @@ codeunit 144354 "Swiss SEPA CT 09 Export"
         Assert.AreEqual(ArrayLen(VendorNo) - 1, LibraryXMLRead.GetNodesCount('CdOrPrtry'), '<CdOrPrtry> node count');
         LibraryXMLRead.VerifyNodeValueInSubtree('CdOrPrtry', 'Prtry', 'QRR');
         LibraryXMLRead.VerifyNodeValueInSubtree('CdOrPrtry', 'Cd', 'SCOR');
+    end;
+
+    local procedure UpdateSEPACTBatchBooking(SEPACTBatchBooking: Enum "SEPA CT Batch Booking")
+    var
+        BankExportImportSetup: Record "Bank Export/Import Setup";
+    begin
+        BankExportImportSetup.Get(FindSwissSEPACTBankExpImpCode());
+        BankExportImportSetup.Validate("SEPA CT Batch Booking", SEPACTBatchBooking);
+        BankExportImportSetup.Modify(true);
     end;
 
     [RequestPageHandler]
