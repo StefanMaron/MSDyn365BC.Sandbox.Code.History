@@ -343,7 +343,7 @@ codeunit 80 "Sales-Post"
         FillTempLines(SalesHeader, TempSalesLineGlobal);
 
         // Check that the invoice amount is zero or greater
-        OnRunOnBeforeCheckTotalInvoiceAmount(SalesHeader);
+        OnRunOnBeforeCheckTotalInvoiceAmount(SalesHeader, TempSalesLineGlobal);
         if SalesHeader.Invoice then
             CheckTotalInvoiceAmount(SalesHeader);
 
@@ -2551,7 +2551,7 @@ codeunit 80 "Sales-Post"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCheckItemTrackingQuantity(SalesLine, IsHandled);
+        OnBeforeCheckItemTrackingQuantity(SalesLine, IsHandled, SalesHeader);
         if IsHandled then
             exit;
         SyncSurPlusItemTracking(SalesHeader, SalesLine);
@@ -8989,8 +8989,9 @@ codeunit 80 "Sales-Post"
     /// </summary>
     /// <param name="SalesLine">The sales line to check.</param>
     /// <param name="IsHandled">Set to true to skip the default quantity check.</param>
+    /// <param name="SalesHeader">The sales header of the document being posted.</param>
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCheckItemTrackingQuantity(SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    local procedure OnBeforeCheckItemTrackingQuantity(SalesLine: Record "Sales Line"; var IsHandled: Boolean; SalesHeader: Record "Sales Header")
     begin
     end;
 
@@ -13028,7 +13029,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnRunOnBeforeCheckTotalInvoiceAmount(var SalesHeader: Record "Sales Header")
+    local procedure OnRunOnBeforeCheckTotalInvoiceAmount(var SalesHeader: Record "Sales Header"; var TempSalesLine: Record "Sales Line" temporary)
     begin
     end;
 
