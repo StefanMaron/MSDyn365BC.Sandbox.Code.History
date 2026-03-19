@@ -6965,6 +6965,7 @@ table 36 "Sales Header"
         MinValue: Code[20];
         MaxValue: Code[20];
     begin
+        OnBeforeGetFilterCustNo(Rec);
         if GetFilter("Sell-to Customer No.") <> '' then
             if TryGetFilterCustNoRange(MinValue, MaxValue) then
                 if MinValue = MaxValue then
@@ -8346,6 +8347,11 @@ table 36 "Sales Header"
         InstructionMgt: Codeunit "Instruction Mgt.";
         IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeConfirmCloseUnposted(Rec, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if SalesLinesExist() then begin
             IsHandled := false;
             OnConfirmCloseUnpostedOnSalesLinesExist(Rec, Result, IsHandled);
@@ -13795,6 +13801,26 @@ table 36 "Sales Header"
     /// <param name="TempSalesLine">The temporary sales line record used as source.</param>
     [IntegrationEvent(false, false)]
     local procedure OnRecreateSalesLinesHandleSupplementTypesOnAfterCreateSalesLine(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var TempSalesLine: Record "Sales Line" temporary)
+    begin
+    end;
+
+    /// <summary>
+    /// Raised before confirming close unposted.
+    /// </summary>
+    /// <param name="SalesHeader">The sales header record.</param>
+    /// <param name="Result">The result indicating whether to proceed with closing.</param>
+    /// <param name="IsHandled">Set to true to skip the default confirmation logic.</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeConfirmCloseUnposted(var SalesHeader: Record "Sales Header"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    /// <summary>
+    /// Raised before getting filter customer number.
+    /// </summary>
+    /// <param name="SalesHeader">The sales header record.</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetFilterCustNo(var SalesHeader: Record "Sales Header")
     begin
     end;
 
