@@ -3555,6 +3555,8 @@ table 27 Item
         if Item.FilterGroup = -1 then
             ItemList.SetTempFilteredItemRec(Item);
 
+        OnPickItemOnBeforeFindFirstItem(Item);
+
         RaiseNotification := Item.Count > FindRecordMgt.GetMaxRecordCountToReturn();
 
         if Item.FindFirst() then;
@@ -4160,6 +4162,11 @@ table 27 Item
 
     [IntegrationEvent(false, false)]
     local procedure OnFindItemVendOnAfterSetFilters(var ItemVend: Record "Item Vendor"; Item: Record Item)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPickItemOnBeforeFindFirstItem(var Item: Record Item)
     begin
     end;
 
