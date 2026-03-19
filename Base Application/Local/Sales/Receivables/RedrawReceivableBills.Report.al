@@ -493,6 +493,7 @@ report 7000096 "Redraw Receivable Bills"
 
         trigger OnOpenPage()
         begin
+            OnBeforeOnOpenRequestPagePage(PostingDate, NewDueDate, NewPmtMethod, IncludeDiscCollExpenses, IncludeRejExpenses, IncludeFinanceCharges, TemplName, BatchName);
             PostingDate := WorkDate();
             TemplName := '';
             BatchName := '';
@@ -827,6 +828,11 @@ report 7000096 "Redraw Receivable Bills"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeOnPostDataItemOnBeforeOnPostDataItemCustLedgEntry(var GenJournalLine: Record "Gen. Journal Line"; BatchName: Code[10]; var ShowMessage: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnOpenRequestPagePage(var PostingDate: Date; var NewDueDate: Date; var NewPmtMethod: Code[10]; var IncludeDiscCollExpenses: Boolean; var IncludeRejExpenses: Boolean; var IncludeFinanceCharges: Boolean; var TemplName: Code[10]; var BatchName: Code[10])
     begin
     end;
 }
