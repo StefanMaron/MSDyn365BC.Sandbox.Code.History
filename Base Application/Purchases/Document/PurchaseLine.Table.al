@@ -8284,7 +8284,7 @@ table 39 "Purchase Line"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeUpdatePrepmtAmounts(Rec, PurchHeader, IsHandled);
+        OnBeforeUpdatePrepmtAmounts(Rec, PurchHeader, IsHandled, CurrFieldNo);
         if IsHandled then
             exit;
 
@@ -10889,7 +10889,7 @@ table 39 "Purchase Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdatePrepmtAmounts(var PurchaseLine: Record "Purchase Line"; PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
+    local procedure OnBeforeUpdatePrepmtAmounts(var PurchaseLine: Record "Purchase Line"; PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean; CurrentFieldNo: Integer)
     begin
     end;
 
