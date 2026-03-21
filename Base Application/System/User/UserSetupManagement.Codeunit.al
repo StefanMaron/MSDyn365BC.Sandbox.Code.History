@@ -449,10 +449,10 @@ codeunit 5700 "User Setup Management"
             exit;
 
         if Format(AllowFromDateFormula) <> '' then
-            AllowFrom := CalcDate(AllowFromDateFormula, Today());
+            AllowFrom := CalcDate(AllowFromDateFormula, WorkDate());
 
         if Format(AllowToDateFormula) <> '' then
-            AllowTo := CalcDate(AllowToDateFormula, Today());
+            AllowTo := CalcDate(AllowToDateFormula, WorkDate());
 
         if (AllowFrom <> 0D) and (AllowTo <> 0D) and (AllowFrom > AllowTo) then
             Error(InvalidAllowedDateRangeErr, AllowFrom, AllowTo, Format(SetupRecordID, 0, 1));
