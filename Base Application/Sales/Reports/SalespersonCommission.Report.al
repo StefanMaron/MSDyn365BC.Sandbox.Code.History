@@ -17,11 +17,7 @@ report 115 "Salesperson - Commission"
 {
     ApplicationArea = Suite;
     Caption = 'Salesperson - Commission';
-#if not CLEAN27
-    DefaultRenderingLayout = Word;
-#else
     DefaultRenderingLayout = Excel;
-#endif
     UsageCategory = ReportsAndAnalysis;
 
     dataset
