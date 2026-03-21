@@ -1515,11 +1515,6 @@ codeunit 7324 "Whse.-Activity-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterPostWhseActivityCompleted(WhseActivHeader: Record "Warehouse Activity Header"; var PurchaseHeader: Record "Purchase Header"; var SalesHeader: Record "Sales Header"; var TransferHeader: Record "Transfer Header"; SuppressCommit: Boolean; IsPreview: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
     local procedure OnAfterPostSourceDocument(WarehouseActivityHeader: Record "Warehouse Activity Header"; var PurchaseHeader: Record "Purchase Header"; var SalesHeader: Record "Sales Header"; var TransferHeader: Record "Transfer Header"; PostingReference: Integer; HideDialog: Boolean)
     begin
     end;
