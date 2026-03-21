@@ -177,6 +177,7 @@ page 489 "Column Layout"
                 }
                 field(Show; Rec.Show)
                 {
+                    Caption = 'Show number';
                     ApplicationArea = Basic, Suite;
                 }
                 field("Show Indented Lines"; Rec."Show Indented Lines")
