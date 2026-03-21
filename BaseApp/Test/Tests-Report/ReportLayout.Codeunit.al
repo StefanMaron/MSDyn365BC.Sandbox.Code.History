@@ -832,7 +832,7 @@ codeunit 132600 "Report Layout"
     begin
         CustomerOrdeRSummary.ShwAmtinLCY.SetValue(true);
         CustomerOrdeRSummary.StartingDate.SetValue(WorkDate());
-        CustomerOrdeRSummary.SaveAsPdf(FormatFileName(CustomerOrdeRSummary.Caption));
+        CustomerOrdeRSummary.SaveAsExcel(FormatFileName(CustomerOrdeRSummary.Caption));
     end;
 
     [RequestPageHandler]
