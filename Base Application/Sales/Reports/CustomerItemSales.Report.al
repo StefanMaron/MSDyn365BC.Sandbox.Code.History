@@ -18,7 +18,7 @@ report 113 "Customer/Item Sales"
 {
     ApplicationArea = Basic, Suite;
     Caption = 'Customer/Item Sales';
-    DefaultRenderingLayout = Word;
+    DefaultRenderingLayout = Excel;
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     DataAccessIntent = ReadOnly;
