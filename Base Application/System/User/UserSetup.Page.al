@@ -39,13 +39,13 @@ page 119 "User Setup"
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
-                    ToolTip = 'Specifies a date formula to calculate the earliest date, relative to today''s date, on which posting to the company books is allowed.';
+                    ToolTip = 'Specifies a date formula to calculate the earliest date, relative to the workdate, on which posting to the company books is allowed.';
                 }
                 field("Allow Posting To DateFormula"; Rec."Allow Posting To DateFormula")
                 {
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
-                    ToolTip = 'Specifies a date formula to calculate the latest date, relative to today''s date, on which posting to the company books is allowed.';
+                    ToolTip = 'Specifies a date formula to calculate the latest date on which posting to the company books is allowed.';
                 }
                 field("Allow VAT From"; Rec."Allow VAT Date From")
                 {
