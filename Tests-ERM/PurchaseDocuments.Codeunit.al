@@ -2098,6 +2098,7 @@ codeunit 134099 "Purchase Documents"
         NoSeriesLine: Record "No. Series Line";
         SelfBillingInvoiceNo: Code[20];
     begin
+        // [FEATURE] [AI TEST]
         // [SCENARIO 621679] Vendor Invoice No. - set number series for Posted Self-Billing Invoices
         Initialize();
 
@@ -2139,6 +2140,7 @@ codeunit 134099 "Purchase Documents"
         RequestPageXML: Text;
         SelfBillingInvoiceNo: Code[20];
     begin
+        // [FEATURE] [AI TEST]
         // [SCENARIO 621681] Self-billed invoice report selection
         Initialize();
 
