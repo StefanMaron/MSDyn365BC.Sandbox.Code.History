@@ -3738,6 +3738,7 @@
         VATPostingSetup: Record "VAT Posting Setup";
         PostedInvNo: Code[20];
     begin
+        // [FEATURE] [AI TEST]
         // [SCENARIO 622424] Compressed prepayment invoice line should not have Unit of Measure Code from sales line
         Initialize();
 
