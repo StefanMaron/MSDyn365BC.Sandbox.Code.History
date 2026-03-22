@@ -4577,6 +4577,7 @@ codeunit 134393 "ERM Sales Subform"
         SalesRecoverablesSetup: Record "Sales & Receivables Setup";
         SalesOrder: TestPage "Sales Order";
     begin
+        // [FEATURE] [AI TEST]
         // [SCENARIO 616781] Item Selection by Description Fails to Trigger Correct Calculations and Behaviors in Sales, Purchase, and Extended Text.
         Initialize();
 
