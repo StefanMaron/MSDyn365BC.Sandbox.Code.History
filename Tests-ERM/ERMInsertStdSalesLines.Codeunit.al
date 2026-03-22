@@ -1213,6 +1213,7 @@ codeunit 134563 "ERM Insert Std. Sales Lines"
         CustomerNo: Code[20];
         StandardSalesCode: Code[10];
     begin
+        // [FEATURE] [AI TEST]
         // [SCENARIO 621455s] No error when creating Sales Invoice for Customer with Recurring Sales Lines that have Deferral Code
         Initialize();
 
