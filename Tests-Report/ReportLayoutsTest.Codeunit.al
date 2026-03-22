@@ -523,6 +523,7 @@ codeunit 139595 "Report Layouts Test"
         ReportLayoutsPage: TestPage "Report Layouts";
         EmptyGuid: Guid;
     begin
+        // [FEATURE] [AI TEST]
         // [SCENARIO] A newly created layout should default to Draft status
         // Init
         EnsureNewLayoutsAreCleaned();
@@ -552,6 +553,7 @@ codeunit 139595 "Report Layouts Test"
         ReportLayoutsPage: TestPage "Report Layouts";
         EmptyGuid: Guid;
     begin
+        // [FEATURE] [AI TEST]
         // [SCENARIO] Setting layout status to Approved via page action updates the underlying record
         // Init
         EnsureNewLayoutsAreCleaned();
@@ -587,6 +589,7 @@ codeunit 139595 "Report Layouts Test"
         ReportLayoutsPage: TestPage "Report Layouts";
         EmptyGuid: Guid;
     begin
+        // [FEATURE] [AI TEST]
         // [SCENARIO] Setting layout status to Retired via page action updates the underlying record
         // Init
         EnsureNewLayoutsAreCleaned();
@@ -622,6 +625,7 @@ codeunit 139595 "Report Layouts Test"
         ReportLayoutsPage: TestPage "Report Layouts";
         EmptyGuid: Guid;
     begin
+        // [FEATURE] [AI TEST]
         // [SCENARIO] Layout status can be cycled: Draft -> Approved -> Draft
         // Init
         EnsureNewLayoutsAreCleaned();
