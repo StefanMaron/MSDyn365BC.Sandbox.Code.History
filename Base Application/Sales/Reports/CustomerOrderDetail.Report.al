@@ -18,7 +18,7 @@ report 108 "Customer - Order Detail"
 {
     ApplicationArea = Basic, Suite;
     Caption = 'Customer - Order Detail';
-    DefaultRenderingLayout = Word;
+    DefaultRenderingLayout = Excel;
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
 
