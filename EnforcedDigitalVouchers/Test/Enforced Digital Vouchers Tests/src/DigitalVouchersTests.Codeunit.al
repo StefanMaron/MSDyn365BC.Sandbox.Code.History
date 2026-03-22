@@ -1546,6 +1546,7 @@ codeunit 139515 "Digital Vouchers Tests"
         FirstIncomingDocEntryNo: Integer;
         SecondIncomingDocEntryNo: Integer;
     begin
+        // [FEATURE] [AI TEST]
         // [SCENARIO 623756] Partial purchase order invoicing should preserve incoming documents for each posted invoice
         Initialize();
         EnableDigitalVoucherFeature();
