@@ -1977,6 +1977,7 @@ codeunit 137055 "SCM Warehouse Pick"
         NotificationLifecycleMgt: Codeunit "Notification Lifecycle Mgt.";
         Quantity: Decimal;
     begin
+        // [FEATURE] [AI TEST]
         // [SCENARIO 621155] Create Pick prioritizes reserved sales lines over unreserved lines even after warehouse shipment deletion and item reclassification
         Initialize();
 
