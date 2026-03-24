@@ -1372,7 +1372,7 @@ table 98 "General Ledger Setup"
         }
         field(205; "Allow Posting From DateFormula"; DateFormula)
         {
-            Caption = 'Allow Posting From DateFormula';
+            Caption = 'Allow Posting From Date Formula';
 
             trigger OnValidate()
             begin
@@ -1386,7 +1386,7 @@ table 98 "General Ledger Setup"
         }
         field(206; "Allow Posting To DateFormula"; DateFormula)
         {
-            Caption = 'Allow Posting To DateFormula';
+            Caption = 'Allow Posting To Date Formula';
 
             trigger OnValidate()
             begin
