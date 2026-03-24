@@ -926,6 +926,8 @@ table 81 "Gen. Journal Line"
                 if "Applies-to Doc. No." <> xRec."Applies-to Doc. No." then
                     ClearCustVendApplnEntry();
 
+                OnAppliesToDocNoOnValidateOnBeforeDelPmtTolApllnDocNo(Rec, SuppressCommit);
+
                 if ("Applies-to Doc. No." = '') and (xRec."Applies-to Doc. No." <> '') then begin
                     PaymentToleranceMgt.DelPmtTolApllnDocNo(Rec, xRec."Applies-to Doc. No.");
 
@@ -9054,6 +9056,17 @@ table 81 "Gen. Journal Line"
     /// <param name="TempGenJnlLine">A temporary Gen. Journal Line record used for processing.</param>
     [IntegrationEvent(false, false)]
     local procedure OnAppliesToDocNoOnValidateOnAfterCustLedgEntrySetFilters(var GenJournalLine: Record "Gen. Journal Line"; var CustLedgerEntry: Record "Cust. Ledger Entry"; TempGenJnlLine: Record "Gen. Journal Line" temporary)
+    begin
+    end;
+
+    /// <summary>
+    /// Event triggered before calling PaymentToleranceMgt.DelPmtTolApllnDocNo during the validation of the "Applies-to Doc. No." field.
+    /// This event allows developers to run additional checks and modify the Gen. Journal Line after ClearCustVendApplnEntry and before DelPmtTolApllnDocNo.
+    /// </summary>
+    /// <param name="GenJournalLine">The current Gen. Journal Line being processed.</param>
+    /// <param name="SuppressCommit">Indicates whether commits are suppressed.</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnAppliesToDocNoOnValidateOnBeforeDelPmtTolApllnDocNo(var GenJournalLine: Record "Gen. Journal Line"; SuppressCommit: Boolean)
     begin
     end;
 
