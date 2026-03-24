@@ -27,7 +27,7 @@ tableextension 6788 "Withholding Purch. Header Ext" extends "Purchase Header"
         }
         field(6793; "WHT Actual Vendor No."; Code[20])
         {
-            Caption = 'Actual Vendor No.';
+            Caption = 'Withholding Actual Vendor No.';
             TableRelation = Vendor;
             DataClassification = CustomerContent;
         }
