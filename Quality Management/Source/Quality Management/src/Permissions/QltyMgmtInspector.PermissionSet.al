@@ -10,6 +10,7 @@ using Microsoft.QualityManagement.Configuration.SourceConfiguration;
 using Microsoft.QualityManagement.Configuration.Template;
 using Microsoft.QualityManagement.Configuration.Template.Test;
 using Microsoft.QualityManagement.Document;
+using Microsoft.QualityManagement.Integration.Inventory.Transfer;
 using Microsoft.QualityManagement.RoleCenters;
 using Microsoft.QualityManagement.Setup;
 using Microsoft.QualityManagement.Workflow;
@@ -28,20 +29,21 @@ permissionset 20404 "QltyMgmt - Inspector"
     IncludedPermissionSets = "QltyMgmt - Objects";
 
     Permissions =
-        tabledata "Qlty. Workflow Config. Value" = Rim,
-        tabledata "Qlty. Inspection Gen. Rule" = R,
+        tabledata "Qlty. Workflow Config. Value" = RIMD,
+        tabledata "Qlty. Inspection Gen. Rule" = RIMd,
         tabledata "Qlty. I. Result Condit. Conf." = RIMd,
-        tabledata "Qlty. Inspection Result" = R,
-        tabledata "Qlty. Inspection Template Hdr." = R,
-        tabledata "Qlty. Inspection Template Line" = R,
-        tabledata "Qlty. Test Lookup Value" = R,
-        tabledata "Qlty. Management Setup" = R,
-        tabledata "Qlty. Mgmt. Role Center Cue" = Ri,
-        tabledata "Qlty. Inspect. Src. Fld. Conf." = R,
-        tabledata "Qlty. Inspect. Source Config." = R,
+        tabledata "Qlty. Inspection Result" = RIMd,
+        tabledata "Qlty. Inspection Template Hdr." = RIMd,
+        tabledata "Qlty. Inspection Template Line" = RIMd,
+        tabledata "Qlty. Test Lookup Value" = RIMd,
+        tabledata "Qlty. Management Setup" = RIMd,
+        tabledata "Qlty. Related Transfers Buffer" = RIMD,
+        tabledata "Qlty. Mgmt. Role Center Cue" = RIMd,
+        tabledata "Qlty. Inspect. Src. Fld. Conf." = RIMd,
+        tabledata "Qlty. Inspect. Source Config." = RIMd,
         tabledata "Qlty. Inspection Line" = RIMd,
         tabledata "Qlty. Inspection Header" = RIMd,
-        tabledata "Qlty. Test" = R;
+        tabledata "Qlty. Test" = RIMd;
 }
 #pragma warning restore AS0090
 #pragma warning restore AS0125

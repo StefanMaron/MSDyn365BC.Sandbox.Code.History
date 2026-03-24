@@ -56,7 +56,6 @@ codeunit 6785 "Withholding Tax Mgmt."
         CountryRegionCode: Code[10];
         GenBusPostGrp: Code[20];
         GenProdPostGrp: Code[20];
-        ActualVendorNo: Code[20];
         OnesText: array[20] of Text[30];
         TensText: array[10] of Text[30];
         ExponentText: array[5] of Text[30];
@@ -446,7 +445,6 @@ codeunit 6785 "Withholding Tax Mgmt."
                         GenBusPostGrp := PurchCrMemoLine."Gen. Bus. Posting Group";
                         GenProdPostGrp := PurchCrMemoLine."Gen. Prod. Posting Group";
                         TransType := TransType::Purchase;
-                        ActualVendorNo := PurchCreditHeader."WHT Actual Vendor No.";
                         ExtDocNo := PurchCreditHeader."Vendor Cr. Memo No.";
                         CountryRegionCode := PurchCreditHeader."Pay-to Country/Region Code";
                         PostingDate := PurchCreditHeader."Posting Date";
@@ -2189,7 +2187,6 @@ codeunit 6785 "Withholding Tax Mgmt."
                             PayToAccType := PayToAccType::Vendor;
                             PayToVendCustNo := PurchInvHeader."Pay-to Vendor No.";
                             BuyFromAccType := BuyFromAccType::Vendor;
-                            ActualVendorNo := PurchInvHeader."WHT Actual Vendor No.";
                             GenBusPostGrp := PurchLine."Gen. Bus. Posting Group";
                             GenProdPostGrp := PurchLine."Gen. Prod. Posting Group";
                             TransType := TransType::Purchase;
@@ -2265,7 +2262,6 @@ codeunit 6785 "Withholding Tax Mgmt."
                             PayToAccType := PayToAccType::Vendor;
                             PayToVendCustNo := PurchHeader."Pay-to Vendor No.";
                             BuyFromAccType := BuyFromAccType::Vendor;
-                            ActualVendorNo := PurchHeader."WHT Actual Vendor No.";
                             GenBusPostGrp := PurchLine."Gen. Bus. Posting Group";
                             GenProdPostGrp := PurchLine."Gen. Prod. Posting Group";
                             TransType := TransType::Purchase;
@@ -3603,7 +3599,6 @@ codeunit 6785 "Withholding Tax Mgmt."
         VendorArray: array[1000] of Code[20];
         DocumentArray: array[1000] of Code[20];
         WHTSlipNo: Code[20];
-        ActualVendorExists: Boolean;
     begin
         x := 0;
         GLRegFilter := GLReg.GetFilters();
@@ -3634,12 +3629,7 @@ codeunit 6785 "Withholding Tax Mgmt."
 
             x := x + 1;
 
-            if WithholdingTaxEntry."Actual Vendor No." <> '' then begin
-                VendorArray[x] := WithholdingTaxEntry."Actual Vendor No.";
-                ActualVendorExists := true;
-            end else
-                VendorArray[x] := WithholdingTaxEntry."Bill-to/Pay-to No.";
-
+            VendorArray[x] := WithholdingTaxEntry."Bill-to/Pay-to No.";
             DocumentArray[x] := WithholdingTaxEntry."Original Document No.";
         until WithholdingTaxEntry.Next() = 0;
 
@@ -3676,10 +3666,7 @@ codeunit 6785 "Withholding Tax Mgmt."
 
                 WithholdingTaxEntry.Reset();
                 WithholdingTaxEntry.SetCurrentKey("Bill-to/Pay-to No.", "Original Document No.", "Withholding Tax Revenue Type");
-                if ActualVendorExists then
-                    WithholdingTaxEntry.SetRange("Actual Vendor No.", VendorArray[PrintSlips])
-                else
-                    WithholdingTaxEntry.SetRange("Bill-to/Pay-to No.", VendorArray[PrintSlips]);
+                WithholdingTaxEntry.SetRange("Bill-to/Pay-to No.", VendorArray[PrintSlips]);
                 WithholdingTaxEntry.SetRange("Original Document No.", DocumentArray[PrintSlips]);
                 if WithholdingTaxEntry.FindSet() then
                     repeat
@@ -3699,10 +3686,7 @@ codeunit 6785 "Withholding Tax Mgmt."
 
                 WithholdingTaxEntry.Reset();
                 WithholdingTaxEntry.SetCurrentKey("Bill-to/Pay-to No.", "Original Document No.", "Withholding Tax Revenue Type");
-                if ActualVendorExists then
-                    WithholdingTaxEntry.SetRange("Actual Vendor No.", VendorArray[PrintSlips])
-                else
-                    WithholdingTaxEntry.SetRange("Bill-to/Pay-to No.", VendorArray[PrintSlips]);
+                WithholdingTaxEntry.SetRange("Bill-to/Pay-to No.", VendorArray[PrintSlips]);
                 WithholdingTaxEntry.SetRange("Original Document No.", DocumentArray[PrintSlips]);
                 WithholdingTaxEntry.SetRange("Wthldg. Tax Certificate No.", WHTSlipNo);
                 if WithholdingTaxEntry.FindSet() then

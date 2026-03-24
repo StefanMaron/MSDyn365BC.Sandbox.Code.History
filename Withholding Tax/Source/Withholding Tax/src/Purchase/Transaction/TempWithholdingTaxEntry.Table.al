@@ -300,8 +300,8 @@ table 6790 "Temp Withholding Tax Entry"
         }
         field(44; "Actual Vendor No."; Code[20])
         {
-            Caption = 'Withholding Actual Vendor No.';
-            DataClassification = CustomerContent;
+            Caption = 'Actual Vendor No.';
+            DataClassification = SystemMetadata;
         }
         field(45; "Wthldg. Tax Certificate No."; Code[20])
         {

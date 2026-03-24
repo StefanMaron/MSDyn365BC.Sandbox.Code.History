@@ -48,7 +48,7 @@ tableextension 6798 "Withholding Purch. Inv. Header" extends "Purch. Inv. Header
         }
         field(6793; "WHT Actual Vendor No."; Code[20])
         {
-            Caption = 'Withholding Actual Vendor No.';
+            Caption = 'Actual Vendor No.';
             DataClassification = CustomerContent;
         }
         field(6794; "WHT Printed Tax Document"; Boolean)

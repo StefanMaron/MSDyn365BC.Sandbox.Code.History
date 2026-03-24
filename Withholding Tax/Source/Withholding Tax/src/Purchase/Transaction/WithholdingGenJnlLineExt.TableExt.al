@@ -153,7 +153,7 @@ tableextension 6793 "Withholding Gen. Jnl. Line Ext" extends "Gen. Journal Line"
         }
         field(6803; "WHT Actual Vendor No."; Code[20])
         {
-            Caption = 'Withholding Actual Vendor No.';
+            Caption = 'Actual Vendor No.';
             TableRelation = Vendor;
             DataClassification = CustomerContent;
         }

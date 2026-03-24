@@ -23,8 +23,7 @@ using System.Reflection;
 /// </summary>
 codeunit 20424 "Qlty. Workflow Response"
 {
-    Permissions = tabledata "Workflow Step Instance" = r,
-                  tabledata "Qlty. Workflow Config. Value" = im;
+    Permissions = tabledata "Workflow Step Instance" = r;
 
     var
         QltyWorkflowSetup: Codeunit "Qlty. Workflow Setup";

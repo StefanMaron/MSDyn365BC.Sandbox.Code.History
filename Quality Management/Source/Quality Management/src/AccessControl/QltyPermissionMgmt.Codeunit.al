@@ -64,7 +64,7 @@ codeunit 20406 "Qlty. Permission Mgmt."
     /// <returns>True if the user can change other users' inspections; otherwise, false.</returns>
     internal procedure CanChangeOtherInspections(): Boolean
     begin
-        exit(HasAdminSupervisorRole());
+        exit(HasSupervisorRole());
     end;
 
     /// <summary>
@@ -90,20 +90,8 @@ codeunit 20406 "Qlty. Permission Mgmt."
     /// </summary>
     internal procedure VerifyCanReopenInspection()
     begin
-        if not CanReopenInspection() then
-            Error(UserDoesNotHavePermissionToErr, UserId(), ActionReopenInspectionLbl);
-    end;
-
-    /// <summary>
-    /// Checks if the current user can reopen an inspection.
-    /// </summary>
-    /// <returns>True if the user can reopen an inspection; otherwise, false.</returns>
-    local procedure CanReopenInspection(): Boolean
-    begin
         if not CanModifyTableData(Database::"Qlty. Inspection Header") then
-            exit(false);
-
-        exit(HasAdminSupervisorRole());
+            Error(UserDoesNotHavePermissionToErr, UserId(), ActionReopenInspectionLbl);
     end;
 
     /// <summary>
@@ -133,7 +121,7 @@ codeunit 20406 "Qlty. Permission Mgmt."
         if not CanDeleteTableData(Database::"Qlty. Inspection Header") then
             exit(false);
 
-        exit(HasAdminSupervisorRole());
+        exit(HasSupervisorRole());
     end;
 
     /// <summary>
@@ -172,7 +160,7 @@ codeunit 20406 "Qlty. Permission Mgmt."
         if not CanModifyTableData(Database::"Qlty. Inspection Header") then
             exit(false);
 
-        exit(HasAdminSupervisorRole());
+        exit(HasSupervisorRole());
     end;
 
     /// <summary>
@@ -207,15 +195,15 @@ codeunit 20406 "Qlty. Permission Mgmt."
     end;
 
     #region Verify Permissions
-    local procedure HasAdminSupervisorRole() IsAssigned: Boolean
+    local procedure HasSupervisorRole() IsAssigned: Boolean
     var
         UserPermissions: Codeunit "User Permissions";
         CurrentExtensionModuleInfo: ModuleInfo;
     begin
-        IsAssigned := HasUserPermissionSetDirectlyAssigned(UserSecurityId(), AdminSupervisorRoleIDTxt);
+        IsAssigned := HasUserPermissionSetDirectlyAssigned(UserSecurityId(), SupervisorRoleIDTxt);
         if not IsAssigned then
             if NavApp.GetCurrentModuleInfo(CurrentExtensionModuleInfo) then
-                IsAssigned := UserPermissions.HasUserPermissionSetAssigned(UserSecurityId(), CompanyName(), AdminSupervisorRoleIDTxt, 0, CurrentExtensionModuleInfo.Id());
+                IsAssigned := UserPermissions.HasUserPermissionSetAssigned(UserSecurityId(), CompanyName(), SupervisorRoleIDTxt, 0, CurrentExtensionModuleInfo.Id());
         if not IsAssigned then
             IsAssigned := UserPermissions.IsSuper(UserSecurityId());
     end;

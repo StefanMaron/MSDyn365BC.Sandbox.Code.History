@@ -22,7 +22,6 @@ table 20406 "Qlty. Inspection Line"
     LookupPageId = "Qlty. Inspection Lines";
     DrillDownPageId = "Qlty. Inspection Lines";
     DataClassification = CustomerContent;
-    Permissions = tabledata "Qlty. I. Result Condit. Conf." = d;
 
     fields
     {

@@ -62,7 +62,7 @@ codeunit 139940 "Qlty. Inspection Utility"
         UserPermissionsLibrary: Codeunit "User Permissions Library";
     begin
         QltyAutoConfigure.EnsureBasicSetupExists(false);
-        UserPermissionsLibrary.AssignPermissionSetToUser(UserSecurityId(), AdminSupervisorRoleIDTok);
+        UserPermissionsLibrary.AssignPermissionSetToUser(UserSecurityId(), SupervisorRoleIDTok);
     end;
 
     internal procedure CreateABasicTemplateAndInstanceOfAInspection(var OutCreatedQltyInspectionHeader: Record "Qlty. Inspection Header"; var OutQltyInspectionTemplateHdr: Record "Qlty. Inspection Template Hdr.")
