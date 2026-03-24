@@ -266,7 +266,8 @@ table 6788 "Withholding Tax Entry"
         }
         field(44; "Actual Vendor No."; Code[20])
         {
-            Caption = 'Actual Vendor No.';
+            Caption = 'Withholding Actual Vendor No.';
+            DataClassification = CustomerContent;
         }
         field(45; "Wthldg. Tax Certificate No."; Code[20])
         {

@@ -48,7 +48,7 @@ tableextension 6799 "WHT Purch. Cr. Memo Hdr." extends "Purch. Cr. Memo Hdr."
         }
         field(6793; "WHT Actual Vendor No."; Code[20])
         {
-            Caption = 'Actual Vendor No.';
+            Caption = 'Withholding Actual Vendor No.';
             DataClassification = CustomerContent;
         }
         field(6794; "WHT Printed Tax Document"; Boolean)
