@@ -1,4 +1,3 @@
-#pragma warning disable AS0072
 #if not CLEAN26
 namespace Microsoft.SubscriptionBilling;
 

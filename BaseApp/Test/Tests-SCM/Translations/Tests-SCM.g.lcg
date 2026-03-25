@@ -6728,6 +6728,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Planning - III - NamedType LineExistErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2531980374 - NamedType 293198670" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Not all items were planned. A total of %1 items were not planned.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Number of items not planned]D;]A;(LookupHint=Codeunit SCM Order Planning - III - NamedType NotAllItemsWerePlannedMsg)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2531980374 - NamedType 141300054" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The change will not affect existing entries.]]></Val>
@@ -6735,6 +6744,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Planning - III - NamedType OrderTrackingMessage)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2531980374 - NamedType 2427899679" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Planning Parameters were taken from Item card because %1 is %2 but SKU does not exist for Item %3 at Location %4]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: Field Caption, %2: Missing SKU Policy, %3: Item No., %4: Location Code]D;]A;(LookupHint=Codeunit SCM Order Planning - III - NamedType PlanningParametersTakenFromItemCardTxt)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2531980374 - NamedType 1801751994" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -6789,6 +6807,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Planning - III - NamedType RequisitionLinesShouldBeEmptyErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2531980374 - NamedType 1951422520" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Item %1 at Location %2 was not planned because SKU does not exist and %3 at Location is %4]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: Item No., %2: Location Code, %3: Field Caption, %4: Missing SKU Policy]D;]A;(LookupHint=Codeunit SCM Order Planning - III - NamedType SKUNotPlannedTxt)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2531980374 - NamedType 1063772298" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">

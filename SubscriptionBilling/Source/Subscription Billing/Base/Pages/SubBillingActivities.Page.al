@@ -1,11 +1,9 @@
 namespace Microsoft.SubscriptionBilling;
 
-#pragma warning disable AS0072
 #if not CLEAN26
 using Microsoft.Foundation.Task;
 using Microsoft.Projects.Project.Job;
 #endif
-#pragma warning restore AS0072
 using Microsoft.Purchases.Document;
 using Microsoft.RoleCenters;
 using Microsoft.Sales.Document;
@@ -25,7 +23,6 @@ page 8085 "Sub. Billing Activities"
     {
         area(content)
         {
-#pragma warning disable AS0072
 #if not CLEAN26
             cuegroup("My User Tasks")
             {
@@ -73,7 +70,6 @@ page 8085 "Sub. Billing Activities"
                 }
             }
 #endif
-#pragma warning restore AS0072
 
             cuegroup("Open Posted Documents Customer")
             {
@@ -270,10 +266,8 @@ page 8085 "Sub. Billing Activities"
     var
         SubBillingActivitiesCue: Codeunit "Sub. Billing Activities Cue";
         CuesAndKpisCodeunit: Codeunit "Cues And KPIs";
-#pragma warning disable AS0072
 #if not CLEAN26
         UserTaskManagement: Codeunit "User Task Management";
 #endif
-#pragma warning restore AS0072
         CalcTaskId: Integer;
 }
