@@ -179,7 +179,7 @@ report 1401 Check
                 dataitem(PrintSettledLoop; "Integer")
                 {
                     DataItemTableView = sorting(Number);
-                    MaxIteration = 30;
+                    MaxIteration = 13;
                     column(LineAmt; LineAmount)
                     {
                         AutoFormatExpression = GenJnlLine."Currency Code";
@@ -444,7 +444,7 @@ report 1401 Check
                     column(PrnChkCompanyAddrCheckStyleUS1; PrnChkCompanyAddr[CheckStyle::US, 1])
                     {
                     }
-                    column(TotalLineAmount; TotalLineAmount)
+                    column(TotalLineAmount; StubTotalLineAmount)
                     {
                         AutoFormatExpression = GenJnlLine."Currency Code";
                         AutoFormatType = 1;
@@ -607,10 +607,12 @@ report 1401 Check
                                 if not ChkTransMgt.FormatNoText(DescriptionLine, CheckLedgEntry.Amount, CheckLanguage, BankAcc2."Currency Code") then
                                     Error(DescriptionLine[1]);
                                 VoidText := '';
+                                StubTotalLineAmount := TotalLineAmount;
                             end else begin
                                 Clear(CheckAmountText);
                                 Clear(DescriptionLine);
-                                TotalText := Text065;
+                                TotalText := '';
+                                StubTotalLineAmount := 0;
                                 DescriptionLine[1] := Text021;
                                 DescriptionLine[2] := DescriptionLine[1];
                                 VoidText := Text022;
@@ -632,6 +634,7 @@ report 1401 Check
                             DescriptionLine[1] := Text025;
                             DescriptionLine[2] := DescriptionLine[1];
                             VoidText := Text022;
+                            StubTotalLineAmount := 0;
                         end;
 
                         ChecksPrinted := ChecksPrinted + 1;
@@ -1164,6 +1167,7 @@ report 1401 Check
         LineAmount: Decimal;
         LineDiscount: Decimal;
         TotalLineAmount: Decimal;
+        StubTotalLineAmount: Decimal;
         "TotalLineAmount$": Decimal;
         TotalLineDiscount: Decimal;
         RemainingAmount: Decimal;
@@ -1218,7 +1222,6 @@ report 1401 Check
         Text031: Label ' is already applied to %1 %2 for vendor %3.';
         Text063: Label 'Net Amount %1';
         Text064: Label '%1 must not be %2 for %3 %4.';
-        Text065: Label 'Subtotal';
         USText001: Label 'Warning:  Checks cannot be financially voided when Force Doc. Balance is set to No in the Journal Template.  Do you want to continue anyway?';
         USText002: Label 'Process cancelled at user request.';
         USText004: Label 'Last Check No. must include at least one digit, so that it can be incremented.';
