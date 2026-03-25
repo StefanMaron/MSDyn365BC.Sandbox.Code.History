@@ -258,7 +258,7 @@ table 77 "Report Selections"
         field(32; "Report Layout Caption"; Text[250])
         {
             Caption = 'Report Layout';
-            ToolTip = 'Specifies the Name of the report layout that is used.';
+            ToolTip = 'Specifies the name of the report layout that is used.';
             FieldClass = FlowField;
             CalcFormula = lookup("Report Layout List".Caption where("Report ID" = field("Report ID"), Name = field("Report Layout Name")));
 
@@ -281,7 +281,7 @@ table 77 "Report Selections"
         field(33; "Report Layout Publisher"; Text[250])
         {
             Caption = 'Report Layout Publisher';
-            ToolTip = 'Specifies the publisher of the email Attachment layout that is used.';
+            ToolTip = 'Specifies the publisher of the report layout that is used.';
             FieldClass = FlowField;
             CalcFormula = lookup("Report Layout List"."Layout Publisher" where("Report ID" = field("Report ID"), "Application ID" = field("Report Layout AppID")));
             Editable = false;
