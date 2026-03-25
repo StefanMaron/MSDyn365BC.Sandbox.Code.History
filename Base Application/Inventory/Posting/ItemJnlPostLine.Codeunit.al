@@ -659,6 +659,8 @@ codeunit 22 "Item Jnl.-Post Line"
         ValueEntry."Global Dimension 1 Code" := ItemJournalLine."Shortcut Dimension 1 Code";
         ValueEntry."Global Dimension 2 Code" := ItemJournalLine."Shortcut Dimension 2 Code";
         ValueEntry."Dimension Set ID" := ItemJournalLine."Dimension Set ID";
+        if (ValueEntry.Type = ValueEntry.Type::"Work Center") and (ValueEntry."Order Type" = ValueEntry."Order Type"::Production) then
+            ValueEntry."Location Code" := ItemJournalLine."Location Code";
 
         OnBeforeInsertCapValueEntry(ValueEntry, ItemJournalLine);
 

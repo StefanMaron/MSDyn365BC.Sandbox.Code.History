@@ -59,10 +59,6 @@ page 99000768 "Manufacturing Setup"
                 {
                     ApplicationArea = Manufacturing;
                 }
-                field("Copy Loc. to Cap. Val. Entries"; Rec."Copy Loc. to Cap. Val. Entries")
-                {
-                    ApplicationArea = Manufacturing;
-                }
                 field("Inc. Non. Inv. Cost To Prod"; Rec."Inc. Non. Inv. Cost To Prod")
                 {
                     ApplicationArea = Manufacturing;
