@@ -303,7 +303,12 @@ page 5833 "Item Statistics 2"
         CreateDateFilters();
 
         if not Rec.Get(Item."No.") then
-            Rec.InitAndInsert(Item."No.");
+            Rec.InitAndInsert(Item."No.", Item.Description)
+        else
+            if Rec.Description <> Item.Description then begin
+                Rec.Description := Item.Description;
+                Rec.Modify();
+            end;
 
         Commit();
 
