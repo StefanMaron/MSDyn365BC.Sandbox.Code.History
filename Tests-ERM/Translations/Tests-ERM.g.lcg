@@ -8078,6 +8078,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Sales Subform - NamedType SalesLineDescriptionMustMatchExtendedTextErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3883241108 - NamedType 2146008245" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The total amount incl. vat was not calculated.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Sales Subform - NamedType TotalAmountErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3883241108 - NamedType 1873384929" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Unit of Measure Code should not be editable.]]></Val>
