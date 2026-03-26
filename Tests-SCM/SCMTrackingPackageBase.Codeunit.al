@@ -22,6 +22,7 @@ codeunit 137263 "SCM Tracking Package Base"
         isInitialized: Boolean;
         PostedItemDocumentShowTrackingErr: Label 'Can''t show Posted Item Tracking Page.';
         UnitAmountErr: Label '%1 is should be modifiable in Inventory Receipt with Item Tracking.', Comment = '%1 = Field Name';
+        PostingDateNotUpdatedErr: Label '%1 should be modifiable in Inventory Receipt with Item Tracking.', Comment = '%1 = Field Name';
 
     [Test]
     [Scope('OnPrem')]
@@ -567,7 +568,7 @@ codeunit 137263 "SCM Tracking Package Base"
             PostingDate,
             InvtDocumentHeader."Posting Date",
             StrSubstNo(
-                UnitAmountErr,
+                PostingDateNotUpdatedErr,
                 InvtDocumentHeader.FieldCaption("Posting Date")));
     end;
 
