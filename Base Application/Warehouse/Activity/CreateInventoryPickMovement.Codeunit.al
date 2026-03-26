@@ -821,7 +821,8 @@ codeunit 7322 "Create Inventory Pick/Movement"
                                 UpdateExpirationDate(NewWarehouseActivityLine, EntriesExist);
 
                             if IsInvtMovement and not IsBlankInvtMovement and not TempTrackingSpecification.Correction then
-                                CheckBinContentWithToAssemblyBinCode(ITQtyToPickBase, NewWarehouseActivityLine);
+                                if ShouldCheckToAssemblyBinContent() then
+                                    CheckBinContentWithToAssemblyBinCode(ITQtyToPickBase, NewWarehouseActivityLine);
 
                             OnCreatePickOrMoveLineFromHandlingSpec(NewWarehouseActivityLine, TempTrackingSpecification, EntriesExist);
 
@@ -2346,6 +2347,14 @@ codeunit 7322 "Create Inventory Pick/Movement"
         WareHouseActivityLine.Quantity += (TotalPickedQuantityCalculated - TotalQtyPicked);
         WareHouseActivityLine."Qty. Outstanding" += (TotalQtyOutStandingCalculated - TotalQtyOutstanding);
         WareHouseActivityLine.Modify();
+    end;
+
+    local procedure ShouldCheckToAssemblyBinContent(): Boolean
+    begin
+        if CurrLocation."Require Receive" and CurrLocation."Require Pick" then
+            exit(false);
+
+        exit(true);
     end;
 
     [IntegrationEvent(false, false)]
