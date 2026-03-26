@@ -6,9 +6,7 @@ namespace Microsoft.QualityManagement.Permissions;
 
 using System.Security.AccessControl;
 
-#pragma warning disable AS0090
-permissionsetextension 20402 "Administrator - QltyMgmt" extends "Administrator"
+permissionsetextension 20400 "D365 BASIC - QltyMngmnt" extends "D365 BASIC"
 {
-    IncludedPermissionSets = "QltyMgmt - Admin";
+    IncludedPermissionSets = "QltyMngmnt - Edit";
 }
-#pragma warning restore AS0090

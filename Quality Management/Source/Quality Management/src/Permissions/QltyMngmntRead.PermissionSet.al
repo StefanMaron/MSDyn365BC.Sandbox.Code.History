@@ -16,32 +16,30 @@ using Microsoft.QualityManagement.Setup;
 using Microsoft.QualityManagement.Workflow;
 
 /// <summary>
-/// Used for administering Quality Management and supervising Quality Inspections.
+/// Used for full read-only access to Quality Management.
 /// </summary>
-#pragma warning disable AS0125
-#pragma warning disable AS0090
-permissionset 20405 "QltyMgmt - Admin"
+permissionset 20401 "QltyMngmnt - Read"
 {
-    Caption = 'Quality Admin & Supervisor';
+    Caption = 'Quality Management - Read access';
     Access = Public;
     Assignable = true;
 
-    IncludedPermissionSets = "QltyMgmt - Objects";
+    IncludedPermissionSets = "QltyMngmnt - Objects";
 
     Permissions =
-        tabledata "Qlty. Management Setup" = RIMD,
+        tabledata "Qlty. Management Setup" = R,
         tabledata "Qlty. Mgmt. Role Center Cue" = RIMD,
-        tabledata "Qlty. Workflow Config. Value" = RIMD,
-        tabledata "Qlty. Inspection Gen. Rule" = RIMD,
-        tabledata "Qlty. I. Result Condit. Conf." = RIMD,
-        tabledata "Qlty. Inspect. Source Config." = RIMD,
-        tabledata "Qlty. Inspect. Src. Fld. Conf." = RIMD,
-        tabledata "Qlty. Test Lookup Value" = RIMD,
+        tabledata "Qlty. Workflow Config. Value" = R,
+        tabledata "Qlty. Inspection Gen. Rule" = R,
+        tabledata "Qlty. I. Result Condit. Conf." = R,
+        tabledata "Qlty. Inspect. Source Config." = R,
+        tabledata "Qlty. Inspect. Src. Fld. Conf." = R,
+        tabledata "Qlty. Test Lookup Value" = R,
         tabledata "Qlty. Related Transfers Buffer" = RIMD,
-        tabledata "Qlty. Inspection Template Hdr." = RIMD,
-        tabledata "Qlty. Inspection Template Line" = RIMD,
-        tabledata "Qlty. Test" = RIMD,
-        tabledata "Qlty. Inspection Result" = RIMD,
-        tabledata "Qlty. Inspection Header" = RIMD,
-        tabledata "Qlty. Inspection Line" = RIMD;
+        tabledata "Qlty. Inspection Template Hdr." = R,
+        tabledata "Qlty. Inspection Template Line" = R,
+        tabledata "Qlty. Test" = R,
+        tabledata "Qlty. Inspection Result" = R,
+        tabledata "Qlty. Inspection Header" = R,
+        tabledata "Qlty. Inspection Line" = R;
 }

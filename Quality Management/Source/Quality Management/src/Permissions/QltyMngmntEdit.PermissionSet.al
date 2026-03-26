@@ -18,15 +18,13 @@ using Microsoft.QualityManagement.Workflow;
 /// <summary>
 /// Used for administering Quality Management and supervising Quality Inspections.
 /// </summary>
-#pragma warning disable AS0125
-#pragma warning disable AS0090
-permissionset 20405 "QltyMgmt - Admin"
+permissionset 20405 "QltyMngmnt - Edit"
 {
-    Caption = 'Quality Admin & Supervisor';
+    Caption = 'Quality Management - Full edit access';
     Access = Public;
     Assignable = true;
 
-    IncludedPermissionSets = "QltyMgmt - Objects";
+    IncludedPermissionSets = "QltyMngmnt - Objects";
 
     Permissions =
         tabledata "Qlty. Management Setup" = RIMD,
