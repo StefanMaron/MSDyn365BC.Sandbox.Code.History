@@ -5,18 +5,9 @@
 
 namespace Microsoft.WithholdingTax;
 
-permissionset 6784 "WHT - Admin"
+using System.Security.AccessControl;
+
+permissionsetextension 6786 "D365 Team Member WHT" extends "D365 TEAM MEMBER"
 {
-    Caption = 'Withholding Tax - Admin';
-    Access = Public;
-    Assignable = true;
-
     IncludedPermissionSets = "WHT - Edit";
-
-    Permissions =
-        tabledata "Wthldg. Tax Bus. Post. Group" = IMD,
-        tabledata "Withholding Tax Posting Setup" = IMD,
-        tabledata "Wthldg. Tax Prod. Post. Group" = IMD,
-        tabledata "Withholding Tax Posting Buffer" = IMD,
-        tabledata "Withholding Tax Revenue Types" = IMD;
 }
