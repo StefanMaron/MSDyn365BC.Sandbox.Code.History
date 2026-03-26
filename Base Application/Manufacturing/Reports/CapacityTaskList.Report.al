@@ -10,7 +10,7 @@ using Microsoft.Manufacturing.WorkCenter;
 
 report 99000780 "Capacity Task List"
 {
-    DefaultRenderingLayout = WordLayout;
+    DefaultRenderingLayout = ExcelLayout;
     ApplicationArea = Manufacturing;
     Caption = 'Capacity Task List';
     UsageCategory = ReportsAndAnalysis;
