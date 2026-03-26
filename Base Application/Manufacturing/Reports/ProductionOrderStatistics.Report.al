@@ -15,7 +15,7 @@ report 99000791 "Production Order Statistics"
     ApplicationArea = Manufacturing;
     Caption = 'Production Order Statistics';
     UsageCategory = ReportsAndAnalysis;
-    DefaultRenderingLayout = ProdOrderStatisticsWord;
+    DefaultRenderingLayout = ProdOrderStatisticsExcel;
 
     dataset
     {
