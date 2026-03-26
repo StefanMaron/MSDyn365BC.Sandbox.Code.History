@@ -307,6 +307,7 @@ report 7050 "Item Price List"
                                 ContNo := ContBusRel."Contact No.";
                                 PriceSourceList.Add("Price Source Type"::Contact, ContNo);
                             end;
+                            PriceSourceList.Add("Price Source Type"::"Customer Price Group", CustPriceGrCode);
                             PriceSourceList.Add("Price Source Type"::"All Customers");
                         end;
                     PriceSource."Source Type"::"Customer Price Group":
@@ -419,10 +420,15 @@ report 7050 "Item Price List"
                         TableRelation = Currency;
                         ToolTip = 'Specifies the code for the currency that amounts are shown in.';
                     }
+                    field(HideZeroPricesCtrl; HideZeroPrices)
+                    {
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Hide Zero Prices';
+                        ToolTip = 'Specifies whether to hide items with zero prices on the price list.';
+                    }
                 }
             }
         }
-
         actions
         {
         }
@@ -493,6 +499,7 @@ report 7050 "Item Price List"
         PriceCalcMethod: Enum "Price Calculation Method";
         PriceCalculationHandler: Enum "Price Calculation Handler";
         SalesSourceType: Enum "Sales Price Source Type";
+        HideZeroPrices: Boolean;
         LookupIsComplete: Boolean;
         SalesSourceNo: Code[20];
         VATText: Text[20];
@@ -544,6 +551,7 @@ report 7050 "Item Price List"
         SalesLine."No." := Item."No.";
         SalesLine."Variant Code" := VariantCode;
         SalesLine."Posting Date" := DateReq;
+        SalesLine."Price Calculation Method" := PriceCalcMethod;
         SetCurrencyFactorInHeader(SalesHeader);
         SalesLine.GetLineWithPrice(LineWithPrice);
         LineWithPrice.SetLine(Enum::"Price Type"::Sale, SalesHeader, SalesLine);
@@ -553,11 +561,11 @@ report 7050 "Item Price List"
         PriceCalculation.FindDiscount(TempSalesLineDisc, false);
     end;
 
-    local procedure GetPriceHandler(Method: Enum "Price Calculation Method"): Enum "Price Calculation Handler";
+    local procedure GetPriceHandler(MethodPar: Enum "Price Calculation Method"): Enum "Price Calculation Handler";
     var
         PriceCalculationSetup: Record "Price Calculation Setup";
     begin
-        if PriceCalculationSetup.FindDefault(Method, PriceCalculationSetup.Type::Sale) then
+        if PriceCalculationSetup.FindDefault(MethodPar, PriceCalculationSetup.Type::Sale) then
             exit(PriceCalculationSetup.Implementation);
     end;
 
@@ -619,9 +627,6 @@ report 7050 "Item Price List"
             TempSalesPrice.SetRange("Currency Code");
         end;
 
-        TempSalesPrice.SetRange("Source Type", PriceSource."Source Type");
-        TempSalesPrice.SetRange("Source No.", PriceSource."Source No.");
-
         if IsVariant then begin
             TempSalesPrice.SetRange("Variant Code", '');
             TempSalesPrice.DeleteAll();
@@ -650,6 +655,10 @@ report 7050 "Item Price List"
         end else
             if TempSalesPrice.Next() = 0 then
                 CurrReport.Break();
+
+        if HideZeroPrices then
+            if TempSalesPrice."Unit Price" = 0 then
+                CurrReport.Skip();
 
         if (PriceSource."Source Type" = PriceSource."Source Type"::Campaign) and (TempSalesPrice."Source Type" <> TempSalesPrice."Source Type"::Campaign) then
             CurrReport.Skip();
@@ -721,4 +730,3 @@ report 7050 "Item Price List"
         PriceSource."Currency Code" := Currency.Code;
     end;
 }
-
