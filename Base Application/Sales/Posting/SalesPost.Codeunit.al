@@ -380,6 +380,14 @@ codeunit 80 "Sales-Post"
 
         OnRunWithCheckOnAfterFinalize(SalesHeader);
 
+        // Date-ordered No. Series require that number allocation and the posted document are in the same
+        // transaction to prevent gaps. At this point FinalizePosting has completed, so both the allocated
+        // number and the posted document exist in the current transaction — committing is safe.
+        // Restore SuppressCommit to the caller's original value so that the date-order guard
+        // no longer blocks the final commit.
+        if DateOrderSeriesUsed and SuppressCommit then
+            SuppressCommit := SavedSuppressCommit;
+
         if not (InvtPickPutaway or SuppressCommit or PreviewMode) then begin
             Commit();
             UpdateAnalysisView.UpdateAll(0, true);
