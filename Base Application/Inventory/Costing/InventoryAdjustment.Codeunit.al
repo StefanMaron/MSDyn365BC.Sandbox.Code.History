@@ -1075,7 +1075,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
                 OutbndValueEntry.FindFirst();
                 exit(
                   OutbndValueEntry.EntryNoHasSameSign(InbndValueEntry."Entry No.") and ((OutbndValueEntry."Entry No." > InbndValueEntry."Entry No.")) or
-                  not OutbndValueEntry.EntryNoHasSameSign(InbndValueEntry."Entry No.") and ((OutbndValueEntry.SystemId > InbndValueEntry.SystemId) or (OutbndValueEntry.SystemCreatedAt > InbndValueEntry.SystemCreatedAt)) or
+                  not OutbndValueEntry.EntryNoHasSameSign(InbndValueEntry."Entry No.") and (OutbndValueEntry.SystemCreatedAt > InbndValueEntry.SystemCreatedAt) or
                   (OutbndValueEntry.GetValuationDate() > InbndValueEntry."Valuation Date") or
                   (OutbndValueEntry."Entry No." = 0));
             end;
@@ -2447,7 +2447,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
             repeat
                 InvdQty := InvdQty + ValueEntry."Invoiced Quantity";
                 if ValueEntry.EntryNoHasSameSign(TransValueEntry."Entry No.") and (ValueEntry."Entry No." < TransValueEntry."Entry No.") or
-                   not ValueEntry.EntryNoHasSameSign(TransValueEntry."Entry No.") and ((ValueEntry.SystemId < TransValueEntry.SystemId) or IsNullGuid(TransValueEntry.SystemId)) then
+                   not ValueEntry.EntryNoHasSameSign(TransValueEntry."Entry No.") and ((ValueEntry.SystemCreatedAt < TransValueEntry.SystemCreatedAt) or (TransValueEntry.SystemCreatedAt = 0DT)) then
                     OrigInvdQty := OrigInvdQty + ValueEntry."Invoiced Quantity";
             until ValueEntry.Next() = 0;
 
