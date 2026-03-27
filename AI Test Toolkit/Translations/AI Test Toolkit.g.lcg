@@ -11,7 +11,7 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1 - The name of the agent.]D;]A;(ObjectTarget=PageExtension 1256354187)(Namespace=System.TestLibraries.Agents)(LookupHint=PageExtension Agent Test Suite - NamedType AgentWithNameNotFoundErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1 - The name of the agent]D;]A;(ObjectTarget=PageExtension 1256354187)(Namespace=System.TestLibraries.Agents)(LookupHint=PageExtension Agent Test Suite - NamedType AgentWithNameNotFoundErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Page 3812009960 - Control 3055657091 - Property 1295455071" ItemType=";PageExtension - Control" PsrId="63" InstFlg="true" Leaf="true">
@@ -43,7 +43,7 @@
   </Item>
   <Item ItemId=";Page 3812009960 - Control 4078951737 - Property 2879900210" ItemType=";PageExtension - Control" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Agent tasks]]></Val>
+      <Val><![CDATA[Agent Tasks Executed]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -61,7 +61,7 @@
   </Item>
   <Item ItemId=";Page 3812009960 - Control 1143730296 - Property 2879900210" ItemType=";PageExtension - Control" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Copilot credits]]></Val>
+      <Val><![CDATA[Copilot Credits Consumed]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -1625,6 +1625,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.AITestToolkit)(LookupHint=Table AIT Test Suite - Field Accuracy - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Table 3812009960 - Field 3058980257 - Property 1295455071" ItemType=";Table - Field" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Specifies the base version to compare the current eval run results against.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.AITestToolkit)(LookupHint=Table AIT Test Suite - Field Base Version - Property ToolTip)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Table 3812009960 - Field 3058980257 - Property 2879900210" ItemType=";Table - Field" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Base Version]]></Val>
@@ -1904,6 +1913,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.AITestToolkit)(LookupHint=Table AIT Test Suite - Field Run Language ID - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Table 3812009960 - Field 3027486592 - Property 1295455071" ItemType=";Table - Field" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Specifies the name of the language in which the eval suite should be run.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.AITestToolkit)(LookupHint=Table AIT Test Suite - Field Run Language Name - Property ToolTip)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Table 3812009960 - Field 3027486592 - Property 2879900210" ItemType=";Table - Field" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Language Name]]></Val>
@@ -1911,6 +1929,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.AITestToolkit)(LookupHint=Table AIT Test Suite - Field Run Language Name - Property Caption)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Table 3812009960 - Field 3683459035 - Property 1295455071" ItemType=";Table - Field" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Specifies the language tag for the language in which the eval suite should be run.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.AITestToolkit)(LookupHint=Table AIT Test Suite - Field Run Language Tag - Property ToolTip)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Table 3812009960 - Field 3683459035 - Property 2879900210" ItemType=";Table - Field" PsrId="63" InstFlg="true" Leaf="true">
@@ -1922,9 +1949,18 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.AITestToolkit)(LookupHint=Table AIT Test Suite - Field Run Language Tag - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Table 3812009960 - Field 623112344 - Property 1295455071" ItemType=";Table - Field" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Specifies the unique identifier for the eval run.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.AITestToolkit)(LookupHint=Table AIT Test Suite - Field RunID - Property ToolTip)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Table 3812009960 - Field 623112344 - Property 2879900210" ItemType=";Table - Field" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Unique RunID]]></Val>
+      <Val><![CDATA[Unique Run ID]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -1983,6 +2019,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.AITestToolkit)(LookupHint=Table AIT Test Suite - Field Tag - Property Caption)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Table 3812009960 - Field 4018684269 - Property 1295455071" ItemType=";Table - Field" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Specifies the ID of the test runner to be used by the evals.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.AITestToolkit)(LookupHint=Table AIT Test Suite - Field Test Runner Id - Property ToolTip)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Table 3812009960 - Field 4018684269 - Property 2879900210" ItemType=";Table - Field" PsrId="63" InstFlg="true" Leaf="true">
@@ -3157,7 +3202,7 @@
   </Item>
   <Item ItemId=";Page 2545575774 - Action 1913276151 - Property 2879900210" ItemType=";Page - Action" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Download Eval Output]]></Val>
+      <Val><![CDATA[Download eval output]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -3175,7 +3220,7 @@
   </Item>
   <Item ItemId=";Page 2545575774 - Action 171938570 - Property 2879900210" ItemType=";Page - Action" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Download Eval Summary]]></Val>
+      <Val><![CDATA[Download eval summary]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -3256,7 +3301,7 @@
   </Item>
   <Item ItemId=";Page 2545575774 - Action 2316262341 - Property 1295455071" ItemType=";Page - Action" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[View Eval Data.]]></Val>
+      <Val><![CDATA[View eval data.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -3265,7 +3310,7 @@
   </Item>
   <Item ItemId=";Page 2545575774 - Action 2316262341 - Property 2879900210" ItemType=";Page - Action" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[View Eval Data]]></Val>
+      <Val><![CDATA[View eval data]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -3310,7 +3355,7 @@
   </Item>
   <Item ItemId=";Page 2739397112 - Control 2319842414 - Property 2879900210" ItemType=";Page - Control" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Agent tasks]]></Val>
+      <Val><![CDATA[Agent Tasks Executed]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -3346,7 +3391,7 @@
   </Item>
   <Item ItemId=";Page 2739397112 - Control 3002276816 - Property 2879900210" ItemType=";Page - Control" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Copilot credits]]></Val>
+      <Val><![CDATA[Copilot Credits Consumed]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -4147,7 +4192,7 @@
   </Item>
   <Item ItemId=";Page 1055193460 - Action 3577097913 - Property 2879900210" ItemType=";Page - Action" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[View Runs]]></Val>
+      <Val><![CDATA[View runs]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -4183,7 +4228,7 @@
   </Item>
   <Item ItemId=";Page 1055193460 - Action 502929849 - Property 2879900210" ItemType=";Page - Action" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Run Eval]]></Val>
+      <Val><![CDATA[Run selected]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -4631,6 +4676,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.AITestToolkit)(LookupHint=Page AIT Test Suite - Control General - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Page 3812009960 - Control 2362659622 - Property 2879900210" ItemType=";Page - Control" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Default Input Dataset]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.AITestToolkit)(LookupHint=Page AIT Test Suite - Control Dataset - Property Caption)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Page 3812009960 - Control 228420467 - Property 1295455071" ItemType=";Page - Control" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Specifies column mappings for the evaluation.]]></Val>
@@ -4885,7 +4939,7 @@
   </Item>
   <Item ItemId=";Page 3812009960 - Action 3577097913 - Property 2879900210" ItemType=";Page - Action" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[View Runs]]></Val>
+      <Val><![CDATA[View runs]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -4903,7 +4957,7 @@
   </Item>
   <Item ItemId=";Page 3812009960 - Action 171938570 - Property 2879900210" ItemType=";Page - Action" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Download Eval Summary]]></Val>
+      <Val><![CDATA[Download eval summary]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -4975,7 +5029,7 @@
   </Item>
   <Item ItemId=";Page 3812009960 - Action 620325036 - Property 2879900210" ItemType=";Page - Action" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Start]]></Val>
+      <Val><![CDATA[Run]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -4993,7 +5047,7 @@
   </Item>
   <Item ItemId=";Page 3812009960 - Action 4148811896 - Property 2879900210" ItemType=";Page - Action" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Start Batch]]></Val>
+      <Val><![CDATA[Run batch]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -5533,7 +5587,7 @@
   </Item>
   <Item ItemId=";Page 2545575774 - Control 2861770502 - Property 2879900210" ItemType=";PageExtension - Control" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Agent tasks]]></Val>
+      <Val><![CDATA[Agent Tasks Executed]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -5551,7 +5605,7 @@
   </Item>
   <Item ItemId=";Page 2545575774 - Control 1143730296 - Property 2879900210" ItemType=";PageExtension - Control" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Copilot credits]]></Val>
+      <Val><![CDATA[Copilot Credits Consumed]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -5569,7 +5623,7 @@
   </Item>
   <Item ItemId=";Page 2280826089 - Control 497684901 - Property 2879900210" ItemType=";PageExtension - Control" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Agent tasks]]></Val>
+      <Val><![CDATA[Agent Tasks Executed]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -5587,7 +5641,7 @@
   </Item>
   <Item ItemId=";Page 2280826089 - Control 1639628284 - Property 2879900210" ItemType=";PageExtension - Control" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Copilot credits]]></Val>
+      <Val><![CDATA[Copilot Credits Consumed]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -5605,7 +5659,7 @@
   </Item>
   <Item ItemId=";Page 2280826089 - Control 152449069 - Property 2879900210" ItemType=";PageExtension - Control" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Agent tasks]]></Val>
+      <Val><![CDATA[Agent Tasks Executed]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -5623,7 +5677,7 @@
   </Item>
   <Item ItemId=";Page 2280826089 - Control 2521135508 - Property 2879900210" ItemType=";PageExtension - Control" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Copilot credits]]></Val>
+      <Val><![CDATA[Copilot Credits Consumed]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -5641,7 +5695,7 @@
   </Item>
   <Item ItemId=";Page 1055193460 - Control 4078951737 - Property 2879900210" ItemType=";PageExtension - Control" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Agent tasks]]></Val>
+      <Val><![CDATA[Agent Tasks Executed]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -5659,7 +5713,7 @@
   </Item>
   <Item ItemId=";Page 1055193460 - Control 1143730296 - Property 2879900210" ItemType=";PageExtension - Control" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Copilot credits]]></Val>
+      <Val><![CDATA[Copilot Credits Consumed]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -5992,7 +6046,7 @@
   </Item>
   <Item ItemId=";PermissionSet 1221179756 - Property 2879900210" ItemType=";PermissionSet - PermissionSet" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Business Central AI Eval Toolkit]]></Val>
+      <Val><![CDATA[AI Eval Toolkit]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
