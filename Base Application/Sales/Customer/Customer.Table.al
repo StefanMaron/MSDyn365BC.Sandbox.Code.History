@@ -2547,6 +2547,7 @@ table 18 Customer
         VATRegistrationLogMgt.DeleteCustomerLog(Rec);
 
         DimMgt.DeleteDefaultDim(DATABASE::Customer, "No.");
+        DeleteDimValuePerAccount();
 
         CalendarManagement.DeleteCustomizedBaseCalendarData(CustomizedCalendarChange."Source Type"::Customer, "No.");
     end;
@@ -4532,6 +4533,16 @@ table 18 Customer
                 VATRegistrationNo := CountryRegion."ISO Code" + VATRegistrationNo;
 
         exit(VATRegistrationNo);
+    end;
+
+    local procedure DeleteDimValuePerAccount()
+    var
+        DimValuePerAccount: Record "Dim. Value per Account";
+    begin
+        DimValuePerAccount.SetRange("Table ID", Database::Customer);
+        DimValuePerAccount.SetRange("No.", "No.");
+        if not DimValuePerAccount.IsEmpty() then
+            DimValuePerAccount.DeleteAll(true);
     end;
 
     /// <summary>
