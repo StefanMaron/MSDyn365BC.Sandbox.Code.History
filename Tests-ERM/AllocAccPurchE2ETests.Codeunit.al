@@ -19,6 +19,46 @@ codeunit 134831 "Alloc. Acc. Purch. E2E Tests"
         Initialized: Boolean;
         AmountMisMatchErr: Label 'Amount must be equal.';
 
+    [Test]
+    procedure TestInheritFromParentRoundingDistributesCorrectly()
+    var
+        DestinationGLAccount: Record "G/L Account";
+        AllocationAccount: Record "Allocation Account";
+        PurchaseHeader: Record "Purchase Header";
+        PurchInvHeader: Record "Purch. Inv. Header";
+        PurchInvLine: Record "Purch. Inv. Line";
+        PostedAmount: Decimal;
+    begin
+        // [FEATURE] [AI test]
+        // [SCENARIO 624591] Verify rounding is correctly distributed when using Inherit from Parent with Split Amount
+        Initialize();
+
+        // [GIVEN] Destination G/L Account "G"
+        DestinationGLAccount.Get(LibraryERM.CreateGLAccountWithPurchSetup());
+
+        // [GIVEN] Fixed Allocation Account "AA" with three distribution lines using Inherit from Parent and Split Amount
+        CreateFixedAllocationAccountWithThreeInheritFromParentDistributions(AllocationAccount);
+
+        // [GIVEN] Purchase Invoice "PI" with G/L Account "G" and Selected Allocation Account "AA" with amount that causes rounding
+        CreatePurchInvoiceWithInheritFromParentAllocation(PurchaseHeader, DestinationGLAccount."No.", AllocationAccount."No.", GetLineAmountToForceRounding());
+
+        // [WHEN] Purchase Invoice "PI" is posted
+        PurchInvHeader.Get(LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true));
+
+        // [THEN] The total of all posted line amounts equals the original amount exactly
+        PurchInvLine.SetRange("Document No.", PurchInvHeader."No.");
+        PurchInvLine.SetRange("No.", DestinationGLAccount."No.");
+        PurchInvLine.SetRange(Type, PurchInvLine.Type::"G/L Account");
+        Assert.AreEqual(3, PurchInvLine.Count(), 'Three Purchase Invoice Lines should be created');
+
+        PurchInvLine.FindSet();
+        repeat
+            PostedAmount += PurchInvLine."Line Amount";
+        until PurchInvLine.Next() = 0;
+
+        Assert.AreEqual(GetLineAmountToForceRounding(), PostedAmount, 'Total posted amount must equal original amount');
+    end;
+
     local procedure Initialize()
     var
         AllocationAccount: Record "Allocation Account";
@@ -1962,6 +2002,55 @@ codeunit 134831 "Alloc. Acc. Purch. E2E Tests"
         // Verify VAT-inclusive amount
         Assert.AreNearlyEqual(ExpectedAmountIncludingVAT, PurchaseLine."Amount Including VAT", 0.01,
             StrSubstNo('Amount Including VAT should be %1 but was %2 for account %3', ExpectedAmountIncludingVAT, PurchaseLine."Amount Including VAT", AccountNo));
+    end;
+
+    local procedure CreateFixedAllocationAccountWithThreeInheritFromParentDistributions(var AllocationAccount: Record "Allocation Account")
+    var
+        AllocAccountDistribution: Record "Alloc. Account Distribution";
+    begin
+        AllocationAccount."No." := Format(LibraryRandom.RandText(5));
+        AllocationAccount."Account Type" := AllocationAccount."Account Type"::Fixed;
+        AllocationAccount."Document Lines Split" := AllocationAccount."Document Lines Split"::"Split Amount";
+        AllocationAccount.Name := Any.AlphabeticText(MaxStrLen(AllocationAccount.Name));
+        AllocationAccount.Insert(true);
+
+        AllocAccountDistribution."Allocation Account No." := AllocationAccount."No.";
+        AllocAccountDistribution."Line No." := 10000;
+        AllocAccountDistribution."Destination Account Type" := AllocAccountDistribution."Destination Account Type"::"Inherit from Parent";
+        AllocAccountDistribution.Share := 33;
+        AllocAccountDistribution.Insert(true);
+
+        Clear(AllocAccountDistribution);
+        AllocAccountDistribution."Allocation Account No." := AllocationAccount."No.";
+        AllocAccountDistribution."Line No." := 20000;
+        AllocAccountDistribution."Destination Account Type" := AllocAccountDistribution."Destination Account Type"::"Inherit from Parent";
+        AllocAccountDistribution.Share := 33;
+        AllocAccountDistribution.Insert(true);
+
+        Clear(AllocAccountDistribution);
+        AllocAccountDistribution."Allocation Account No." := AllocationAccount."No.";
+        AllocAccountDistribution."Line No." := 30000;
+        AllocAccountDistribution."Destination Account Type" := AllocAccountDistribution."Destination Account Type"::"Inherit from Parent";
+        AllocAccountDistribution.Share := 34;
+        AllocAccountDistribution.Insert(true);
+    end;
+
+    local procedure CreatePurchInvoiceWithInheritFromParentAllocation(var PurchaseHeader: Record "Purchase Header"; GLAccountNo: Code[20]; AllocationAccountNo: Code[20]; LineAmount: Decimal)
+    var
+        PurchaseLine: Record "Purchase Line";
+    begin
+        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Invoice, LibraryPurchase.CreateVendorNo());
+        PurchaseHeader.Validate("Vendor Invoice No.", LibraryUtility.GenerateGUID());
+        PurchaseHeader.Modify(true);
+
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::"G/L Account", GLAccountNo, 1);
+        PurchaseLine.Validate("Direct Unit Cost", LineAmount);
+        PurchaseLine.Validate("Selected Alloc. Account No.", AllocationAccountNo);
+        PurchaseLine.Modify(true);
+        PurchaseHeader.CalcFields(Amount, "Amount Including VAT");
+        PurchaseHeader."Doc. Amount Incl. VAT" := PurchaseHeader."Amount Including VAT";
+        PurchaseHeader."Doc. Amount VAT" := PurchaseHeader."Amount Including VAT" - PurchaseHeader.Amount;
+        PurchaseHeader.Modify(true);
     end;
 }
 #pragma warning restore AA0210
