@@ -686,8 +686,12 @@ codeunit 2679 "Purchase Alloc. Acc. Mgt."
 
     procedure VerifySelectedAllocationAccountNo(var PurchaseLine: Record "Purchase Line")
     var
+        PurchaseHeader: Record "Purchase Header";
         AllocationAccount: Record "Allocation Account";
     begin
+        PurchaseHeader.Get(PurchaseLine."Document Type", PurchaseLine."Document No.");
+        PurchaseHeader.TestField(Status, PurchaseHeader.Status::Open);
+
         if PurchaseLine."Selected Alloc. Account No." = '' then
             exit;
 
