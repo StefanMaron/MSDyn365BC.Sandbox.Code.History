@@ -1324,6 +1324,39 @@ codeunit 134831 "Alloc. Acc. Purch. E2E Tests"
             ExpectedVATExclusiveAmount2, ExpectedVATAmount2);
     end;
 
+    [Test]
+    procedure AllocationAccountNoCannotBeModifiedWhenStatusIsPendingApproval()
+    var
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        AllocationAccount: Record "Allocation Account";
+        PurchaseAllocAccMgt: Codeunit "Purchase Alloc. Acc. Mgt.";
+    begin
+        // [FEATURE] [AI test]
+        // [SCENARIO 625938] User cannot modify Allocation Account No. when Purchase Header Status is Pending Approval
+        Initialize();
+
+        // [GIVEN] Allocation account "AA"
+        AllocationAccount."No." := Format(LibraryRandom.RandText(5));
+        AllocationAccount."Account Type" := AllocationAccount."Account Type"::Fixed;
+        AllocationAccount.Name := Any.AlphabeticText(MaxStrLen(AllocationAccount.Name));
+        AllocationAccount.Insert(true);
+
+        // [GIVEN] Purchase Invoice "PI" with G/L account line and Status = Pending Approval
+        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Invoice, LibraryPurchase.CreateVendorNo());
+        CreatePurchaseLineWithGLAccount(PurchaseLine, PurchaseHeader);
+        PurchaseHeader.Validate(Status, PurchaseHeader.Status::"Pending Approval");
+        PurchaseHeader.Modify(true);
+
+        // [WHEN] Setting Allocation Account No. on the purchase line
+        PurchaseLine.Get(PurchaseLine."Document Type", PurchaseLine."Document No.", PurchaseLine."Line No.");
+        PurchaseLine."Selected Alloc. Account No." := AllocationAccount."No.";
+        asserterror PurchaseAllocAccMgt.VerifySelectedAllocationAccountNo(PurchaseLine);
+
+        // [THEN] Error is raised: Status must be Open
+        Assert.ExpectedTestFieldError(PurchaseHeader.FieldCaption(Status), Format(PurchaseHeader.Status::Open));
+    end;
+
     local procedure CreateAllocationAccountwithVariableGLDistributionsAndInheritFromParent(
         var AllocationAccount: Record "Allocation Account";
         FirstDimensionValue: Record "Dimension Value";
@@ -1744,6 +1777,16 @@ codeunit 134831 "Alloc. Acc. Purch. E2E Tests"
     begin
         PurchaseHeader.Validate("Vendor Invoice No.", LibraryUtility.GenerateGUID());
         PurchaseHeader.Modify(true);
+    end;
+
+    local procedure CreatePurchaseLineWithGLAccount(var PurchaseLine: Record "Purchase Line"; var PurchaseHeader: Record "Purchase Header")
+    var
+        GLAccount: Record "G/L Account";
+    begin
+        GLAccount.Get(LibraryERM.CreateGLAccountWithPurchSetup());
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::"G/L Account", GLAccount."No.", 1);
+        PurchaseLine.Validate("Direct Unit Cost", LibraryRandom.RandDecInRange(100, 500, 2));
+        PurchaseLine.Modify(true);
     end;
 
     [ModalPageHandler]
