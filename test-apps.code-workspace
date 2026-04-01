@@ -178,6 +178,12 @@
       "path": "./VATGroupManagement/Test/VAT Group Management Tests"
     },
     {
+      "path": "./Subcontracting/Test/Subcontracting-Tests/DisabledTests"
+    },
+    {
+      "path": "./Subcontracting/Test/Subcontracting-Tests/src/Codeunits/Tests"
+    },
+    {
       "path": "./ReportLayouts/Test/Report Layouts Tests"
     },
     {
