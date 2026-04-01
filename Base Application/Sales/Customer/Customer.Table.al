@@ -3311,10 +3311,10 @@ table 18 Customer
         Currency: Record Currency;
     begin
         Currency.SetLoadFields(Code);
-        if not IsNullGuid("Currency Id") then
+        if not IsNullGuid("Currency Id") then begin
             Currency.GetBySystemId("Currency Id");
-
-        Validate("Currency Code", Currency.Code);
+            Validate("Currency Code", Currency.Code);
+        end;
     end;
 
     local procedure UpdatePaymentTermsCode()
