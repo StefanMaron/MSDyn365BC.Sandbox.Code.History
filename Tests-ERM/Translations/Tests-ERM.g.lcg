@@ -293,6 +293,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Currency UT - NamedType ASCIILetterErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1713330930 - NamedType 2910590128" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Currency Code should not be cleared when Currency Id is blank]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Currency UT - NamedType CurrencyCodeShouldNotBeClearedErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1713330930 - NamedType 1709501306" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[must contain numbers only]]></Val>
