@@ -9923,6 +9923,15 @@
       <Cmt Name="Dev"><![CDATA[%1 - Item No.]D;]A;(LookupHint=Codeunit SCM RTAM Item Tracking-II - NamedType SerialNumberRequiredError)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 365425676 - NamedType 609907600" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[This shipment has already been invoiced. Undo Shipment can be applied only to posted, but not invoiced shipments.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM RTAM Item Tracking-II - NamedType ShipmentIsAlreadyInvoicedErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 365425676 - NamedType 2275299843" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Synchronization cancel]]></Val>
