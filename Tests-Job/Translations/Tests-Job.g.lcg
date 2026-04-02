@@ -2426,6 +2426,15 @@
       <Cmt Name="Dev"><![CDATA[%1 = Table 1 caption, %2 = Table 2 caption]D;]A;(LookupHint=Codeunit Whse. Pick On Job Planning - NamedType FieldMustNotBeChangedErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3594567583 - NamedType 4268657593" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Related Job Journal Line not found]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[Error message when job journal line cannot be found]D;]A;(LookupHint=Codeunit Whse. Pick On Job Planning - NamedType JobJnlLineNotFoundErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3594567583 - NamedType 129610050" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Only one warehouse activity header created.]]></Val>
@@ -2433,6 +2442,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Whse. Pick On Job Planning - NamedType OneWhsePickHeaderCreatedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3594567583 - NamedType 978270861" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Project Planning Line No. must have a value in Project Journal Line: Journal Template Name=%1, Journal Batch Name=%2, Line No.=%3. It cannot be zero or empty.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Journal Template Name, %2 = Journal Batch Name, %3 = Line No.]D;]A;(LookupHint=Codeunit Whse. Pick On Job Planning - NamedType ProjectPlanningLineErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3594567583 - NamedType 2909043470" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
