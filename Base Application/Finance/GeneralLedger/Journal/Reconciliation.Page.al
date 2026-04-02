@@ -163,9 +163,9 @@ page 345 Reconciliation
     /// <param name="GLAccountNetChange">The G/L Account Net Change record to populate with reconciliation results.</param>
     procedure ReturnGLAccountNetChange(var GLAccountNetChange: Record "G/L Account Net Change")
     var
-        OldGLAccountNetChange: Record "G/L Account Net Change";
+        TempOldGLAccountNetChange: Record "G/L Account Net Change";
     begin
-        OldGLAccountNetChange := Rec;
+        TempOldGLAccountNetChange := Rec;
         Rec.FindSet();
         repeat
             GLAccountNetChange.Init();
@@ -173,7 +173,7 @@ page 345 Reconciliation
             GLAccountNetChange.Insert();
         until Rec.Next() = 0;
 
-        Rec := OldGLAccountNetChange;
+        Rec := TempOldGLAccountNetChange;
     end;
 
     /// <summary>
