@@ -1,24 +1,19 @@
-#if not CLEAN28
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.QualityManagement.RoleCenters;
 
-using Microsoft.Finance.RoleCenters;
 using Microsoft.QualityManagement.Configuration.GenerationRule;
 using Microsoft.QualityManagement.Configuration.Template;
 using Microsoft.QualityManagement.Configuration.Template.Test;
 using Microsoft.QualityManagement.Document;
 using Microsoft.QualityManagement.Reports;
 using Microsoft.QualityManagement.Setup;
+using Microsoft.Warehouse.RoleCenters;
 
-pageextension 20404 "Qlty. Business Manager RC" extends "Business Manager Role Center"
+pageextension 20421 "Qlty. Whse. Basic RC" extends "Whse. Basic Role Center"
 {
-    ObsoleteReason = 'Quality Management references not needed in Business Manager Role Center.';
-    ObsoleteState = Pending;
-    ObsoleteTag = '28.0';
-
     actions
     {
         addlast(processing)
@@ -28,7 +23,6 @@ pageextension 20404 "Qlty. Business Manager RC" extends "Business Manager Role C
                 Image = CheckList;
                 Caption = 'Quality Management';
                 ToolTip = 'Work with Quality Inspections.';
-                Visible = false;
 
                 action(Qlty_ShowQualityInspections)
                 {
@@ -109,8 +103,7 @@ pageextension 20404 "Qlty. Business Manager RC" extends "Business Manager Role C
         {
             group(Qlty_QualityManagement_Sections_Group)
             {
-                Caption = 'Quality Management';
-                Visible = false;
+                Caption = 'Quality Inspection';
 
                 action(Qlty_Sections_ShowQualityInspections)
                 {
@@ -132,4 +125,3 @@ pageextension 20404 "Qlty. Business Manager RC" extends "Business Manager Role C
         }
     }
 }
-#endif
