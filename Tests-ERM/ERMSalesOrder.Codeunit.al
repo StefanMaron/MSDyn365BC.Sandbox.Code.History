@@ -7864,6 +7864,39 @@
         until SalesLine.Next() = 0;
     end;
 
+    local procedure GetPostedDocumentLines(No: Code[20]; OptionString: Option)
+    var
+        SalesCreditMemo: TestPage "Sales Credit Memo";
+    begin
+        LibraryVariableStorage.Enqueue(OptionString);
+        SalesCreditMemo.OpenEdit();
+        SalesCreditMemo.FILTER.SetFilter("No.", No);
+        SalesCreditMemo.GetPostedDocumentLinesToReverse.Invoke();
+    end;
+
+    local procedure FindSalesLine(var SalesLine: Record "Sales Line"; DocumentType: Enum "Sales Document Type"; DocumentNo: Code[20]; Type: Enum "Sales Line Type")
+    begin
+        SalesLine.SetRange("Document Type", DocumentType);
+        SalesLine.SetRange("Document No.", DocumentNo);
+        SalesLine.SetRange(Type, Type);
+        SalesLine.FindFirst();
+    end;
+
+    local procedure VerifySalesOrderQuantityforManualSalesCreditMemo(SalesHeaderNo: Code[20]; ExpectedQuantity: Decimal)
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        SalesLine.SetRange("Document No.", SalesHeaderNo);
+        SalesLine.SetRange("Document Type", SalesLine."Document Type"::Order);
+        SalesLine.FindSet();
+        repeat
+            Assert.AreEqual(ExpectedQuantity, SalesLine."Qty. to Ship", StrSubstNo(
+                SalesLineQtyErr, SalesLine.FieldName("Qty. to Ship"), ExpectedQuantity));
+            Assert.AreEqual(ExpectedQuantity, SalesLine."Qty. to Invoice", StrSubstNo(
+                SalesLineQtyErr, SalesLine.FieldName("Qty. to Invoice"), ExpectedQuantity));
+        until SalesLine.Next() = 0;
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales-Post", 'OnBeforePostUpdateOrderLineModifyTempLine', '', false, false)]
     local procedure OnBeforePostUpdateOrderLineModifyTempLineHandler(var TempSalesLine: Record "Sales Line" temporary; WhseShip: Boolean; WhseReceive: Boolean; CommitIsSuppressed: Boolean)
     var
@@ -8040,5 +8073,23 @@
     procedure ItemSubstitutionEntriesOKModalPageHandler(var ItemSubstitution: TestPage "Item Substitution Entries")
     begin
         ItemSubstitution.OK().Invoke();
+    end;
+
+    [ModalPageHandler]
+    procedure PostedSalesDocumentLinesHandler(var PostedSalesDocumentLines: TestPage "Posted Sales Document Lines")
+    var
+        DocumentType: Option "Posted Shipments","Posted Invoices","Posted Return Receipts","Posted Cr. Memos";
+    begin
+        case LibraryVariableStorage.DequeueInteger() of
+            OptionString::PostedReturnReceipt:
+                PostedSalesDocumentLines.PostedShipmentsBtn.SetValue(Format(DocumentType::"Posted Return Receipts"));
+            OptionString::PostedInvoices:
+                PostedSalesDocumentLines.PostedShipmentsBtn.SetValue(Format(DocumentType::"Posted Invoices"));
+            OptionString::PostedShipments:
+                PostedSalesDocumentLines.PostedShipmentsBtn.SetValue(Format(DocumentType::"Posted Shipments"));
+            OptionString::PostedCrMemo:
+                PostedSalesDocumentLines.PostedShipmentsBtn.SetValue(Format(DocumentType::"Posted Cr. Memos"));
+        end;
+        PostedSalesDocumentLines.OK().Invoke();
     end;
 }

@@ -293,7 +293,7 @@ codeunit 442 "Sales-Post Prepayments"
           SalesHeader, TotalPrepmtInvLineBuffer, TotalPrepmtInvLineBufferLCY, DocumentType, PostingDescription,
           GenJnlLineDocType, GenJnlLineDocNo, GenJnlLineExtDocNo, SrcCode, PostingNoSeriesCode, CalcPmtDiscOnCrMemos);
 
-        UpdatePostedSalesDocument(DocumentType, GenJnlLineDocNo);
+        UpdatePostedSalesDocument(DocumentType, GenJnlLineDocNo, CustLedgEntry);
 
         SalesAssertPrepmtAmountNotMoreThanDocAmount(CustLedgEntry, SalesHeader, SalesLine);
         // Balancing account
@@ -369,7 +369,9 @@ codeunit 442 "Sales-Post Prepayments"
         if IsHandled then
             exit;
 
-        CustLedgEntry.FindLast();
+        if CustLedgEntry."Entry No." = 0 then // Fallback if the Customer Ledger Entry was not provided from UpdatePostedSalesDocument or the event
+            CustLedgEntry.FindLast();
+
         CustLedgEntry.CalcFields(Amount);
         if SalesHeader."Document Type" = SalesHeader."Document Type"::Order then begin
             SalesLine.CalcSums("Amount Including VAT");
@@ -1551,9 +1553,8 @@ codeunit 442 "Sales-Post Prepayments"
         end;
     end;
 
-    local procedure UpdatePostedSalesDocument(DocumentType: Option Invoice,"Credit Memo"; DocumentNo: Code[20])
+    local procedure UpdatePostedSalesDocument(DocumentType: Option Invoice,"Credit Memo"; DocumentNo: Code[20]; var CustLedgerEntry: Record "Cust. Ledger Entry")
     var
-        CustLedgerEntry: Record "Cust. Ledger Entry";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         IsHandled: Boolean;
@@ -1631,6 +1632,10 @@ codeunit 442 "Sales-Post Prepayments"
         if not SalesHeader."Compress Prepayment" then
             if SalesLine.Get(SalesHeader."Document Type", SalesHeader."No.", PrepmtInvLineBuffer."Line No.") then
                 SalesInvLine."Description 2" := SalesLine."Description 2";
+
+        if SalesHeader."Compress Prepayment" then
+            if SalesLine.Get(SalesHeader."Document Type", SalesHeader."No.", LineNo) then
+                SalesInvLine."Unit of Measure Code" := SalesLine."Unit of Measure Code";
 
         SalesInvLine.Quantity := 1;
         if SalesInvHeader."Prices Including VAT" then begin
@@ -2147,7 +2152,7 @@ codeunit 442 "Sales-Post Prepayments"
     local procedure OnCodeOnBeforeCheckPrepmtDoc(var SalesHeader: Record "Sales Header"; var DocumentType: Option Invoice,"Credit Memo")
     begin
     end;
-    
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetPrepmtAccNo(GenPostingSetup: Record "General Posting Setup"; var PrepmtAccNo: Code[20])
     begin
