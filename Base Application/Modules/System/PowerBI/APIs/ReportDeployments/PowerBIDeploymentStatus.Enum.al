@@ -7,7 +7,7 @@ namespace System.Integration.PowerBI;
 enum 6317 "Power BI Deployment Status"
 {
     Extensible = false;
-    Access = Internal;
+    Access = Public;
 
     value(0; "Not Installed")
     {

@@ -9,7 +9,7 @@ table 6318 "Power BI Deployment Buffer"
 {
     Caption = 'Power BI Deployment Buffer';
     TableType = Temporary;
-    Access = Internal;
+    Access = Public;
     DataClassification = SystemMetadata;
 
     fields
