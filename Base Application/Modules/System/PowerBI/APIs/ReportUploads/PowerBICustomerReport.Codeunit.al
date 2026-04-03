@@ -45,7 +45,7 @@ codeunit 6326 "Power BI Customer Report" implements "Power BI Uploadable Report"
         UploadTracker := SystemTracker;
     end;
 
-    procedure FinalizeUpload(var UploadTracker: Interface "Power BI Upload Tracker"; Context: Text[50]; UploadReportName: Text)
+    procedure FinalizeUpload(var UploadTracker: Interface "Power BI Upload Tracker"; Context: Text[50])
     begin
     end;
 

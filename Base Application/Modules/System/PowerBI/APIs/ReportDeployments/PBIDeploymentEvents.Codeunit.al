@@ -7,7 +7,7 @@ namespace System.Integration.PowerBI;
 codeunit 6351 "PBI Deployment Events"
 {
     [IntegrationEvent(false, false)]
-    procedure OnReportDeployed(var Report: Interface "Power BI Uploadable Report"; DeployableReportType: Enum "Power BI Deployable Report"; UploadedReportId: Guid)
+    procedure OnReportDeployed(var Report: Interface "Power BI Uploadable Report"; DeployableReportType: Enum "Power BI Deployable Report")
     begin
     end;
 }
