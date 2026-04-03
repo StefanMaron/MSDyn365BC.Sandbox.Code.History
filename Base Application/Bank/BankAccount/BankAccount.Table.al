@@ -1097,7 +1097,14 @@ table 270 "Bank Account"
     procedure IsInLocalCurrency(): Boolean
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
+        Result: Boolean;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeIsInLocalCurrency(Rec, Result, IsHandled);
+        if IsHandled then
+            exit(Result);
+
         if "Currency Code" = '' then
             exit(true);
 
