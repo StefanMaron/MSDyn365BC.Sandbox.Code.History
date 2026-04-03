@@ -9,7 +9,6 @@ interface "Power BI Upload Tracker"
 
     /// <summary>
     /// Clears retry timestamps and resets completed/failed state for a new upload cycle.
-    /// Must be called after Load.
     /// </summary>
     procedure Reset();
 
@@ -37,6 +36,16 @@ interface "Power BI Upload Tracker"
     /// Stores the result of a completed import: report ID, embed URL, and dataset ID.
     /// </summary>
     procedure SetImportResult(UploadedReportId: Guid; EmbedUrl: Text[2048]; DatasetId: Text);
+
+    /// <summary>
+    /// Stores the name of the report as it was uploaded to Power BI.
+    /// </summary>
+    procedure SetUploadedReportName(ReportName: Text);
+
+    /// <summary>
+    /// Returns the name of the report as it was uploaded to Power BI.
+    /// </summary>
+    procedure GetUploadedReportName(): Text;
 
     /// <summary>
     /// Returns the Power BI report ID after import.
