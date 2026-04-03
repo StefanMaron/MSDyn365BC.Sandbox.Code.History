@@ -21,6 +21,7 @@ codeunit 6334 "Power BI Upload Step Runner"
         GlobalReport: Interface "Power BI Uploadable Report";
         GlobalUploadTracker: Interface "Power BI Upload Tracker";
         GlobalContext: Text[50];
+        FinalReportName: Text;
         IsConfigured: Boolean;
         ReportEnvNameTxt: Label '%1 (%2 - %3)', Locked = true;
         StartingImportTelemetryMsg: Label 'Starting actual import for internal blob ID: %1.', Locked = true;
@@ -39,7 +40,6 @@ codeunit 6334 "Power BI Upload Step Runner"
     var
         PowerBIServiceProvider: Interface "Power BI Service Provider";
         BlobInStream: InStream;
-        FinalReportName: Text;
     begin
         // Configure() must always be called before OnRun(). If this error fires, the caller has a bug.
         if not IsConfigured then
@@ -62,7 +62,7 @@ codeunit 6334 "Power BI Upload Step Runner"
                 RefreshDataset(PowerBIServiceProvider);
             Enum::"Power BI Upload Status"::DataRefreshed:
                 begin
-                    GlobalReport.FinalizeUpload(GlobalUploadTracker, GlobalContext, FinalReportName);
+                    GlobalReport.FinalizeUpload(GlobalUploadTracker, GlobalContext);
                     GlobalUploadTracker.TransitionTo(Enum::"Power BI Upload Status"::Completed);
                 end;
         end;
@@ -121,6 +121,7 @@ codeunit 6334 "Power BI Upload Step Runner"
         if OperationResult.Successful then begin
             GlobalUploadTracker.TransitionTo(Enum::"Power BI Upload Status"::ImportFinished);
             GlobalUploadTracker.SetImportResult(ReturnedReport.ReportId, ReturnedReport.EmbedUrl, ReturnedReport.DatasetId);
+            GlobalUploadTracker.SetUploadedReportName(FinalReportName);
         end else
             if OperationResult.ShouldRetry then
                 GlobalUploadTracker.ScheduleRetry(GetRetryAfterOrDefault(OperationResult.RetryAfter))
