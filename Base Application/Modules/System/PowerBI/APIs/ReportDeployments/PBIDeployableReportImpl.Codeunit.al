@@ -45,13 +45,13 @@ codeunit 6350 "PBI Deployable Report Impl." implements "Power BI Uploadable Repo
         UploadTracker := DeployUploadTracker;
     end;
 
-    procedure FinalizeUpload(var UploadTracker: Interface "Power BI Upload Tracker"; Context: Text[50]; UploadReportName: Text)
+    procedure FinalizeUpload(var UploadTracker: Interface "Power BI Upload Tracker"; Context: Text[50])
     var
         PBIDeploymentEvents: Codeunit "PBI Deployment Events";
         UploadableReport: Interface "Power BI Uploadable Report";
     begin
         UploadableReport := this;
-        PBIDeploymentEvents.OnReportDeployed(UploadableReport, CurrentReportId, UploadTracker.GetUploadedReportId());
+        PBIDeploymentEvents.OnReportDeployed(UploadableReport, CurrentReportId);
     end;
 
     procedure GetDatasetParameters() Parameters: Dictionary of [Text, Text]
