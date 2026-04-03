@@ -11,6 +11,7 @@ codeunit 6322 "Power BI System Upload Tracker" implements "Power BI Upload Track
     var
         PowerBIReportUploads: Record "Power BI Report Uploads";
         CurrentDatasetId: Text;
+        CurrentUploadedReportName: Text;
         GPEnabled: Boolean;
         NoProgressOnUploadTelemetryMsg: Label 'Upload was not modified.', Locked = true;
 
@@ -72,6 +73,16 @@ codeunit 6322 "Power BI System Upload Tracker" implements "Power BI Upload Track
         PowerBIReportUploads."Uploaded Report ID" := UploadedReportId;
         PowerBIReportUploads."Report Embed Url" := EmbedUrl;
         CurrentDatasetId := DatasetId;
+    end;
+
+    procedure SetUploadedReportName(ReportName: Text)
+    begin
+        CurrentUploadedReportName := ReportName;
+    end;
+
+    procedure GetUploadedReportName(): Text
+    begin
+        exit(CurrentUploadedReportName);
     end;
 
     procedure GetUploadedReportId(): Guid

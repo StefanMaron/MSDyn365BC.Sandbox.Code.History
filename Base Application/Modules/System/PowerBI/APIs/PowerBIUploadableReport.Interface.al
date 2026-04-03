@@ -32,7 +32,7 @@ interface "Power BI Uploadable Report"
     /// Perform any post-upload actions here (e.g. selecting the report for display in a context).
     /// The step runner transitions to Completed after this returns.
     /// </summary>
-    procedure FinalizeUpload(var UploadTracker: Interface "Power BI Upload Tracker"; Context: Text[50]; ReportName: Text);
+    procedure FinalizeUpload(var UploadTracker: Interface "Power BI Upload Tracker"; Context: Text[50]);
 
     /// <summary>
     /// Returns the Power BI dataset parameters (name → value) that this report expects to be updated after import.

@@ -9,7 +9,7 @@ table 6316 "Power BI Deployment"
 {
     Caption = 'Power BI Deployment';
     ReplicateData = false;
-    Access = Internal;
+    Access = Public;
     DataClassification = SystemMetadata;
 
     fields
@@ -47,6 +47,11 @@ table 6316 "Power BI Deployment"
         field(7; "Retry After"; DateTime)
         {
             Caption = 'Retry After';
+            DataClassification = SystemMetadata;
+        }
+        field(8; "Uploaded Report Name"; Text[200])
+        {
+            Caption = 'Uploaded Report Name';
             DataClassification = SystemMetadata;
         }
     }
