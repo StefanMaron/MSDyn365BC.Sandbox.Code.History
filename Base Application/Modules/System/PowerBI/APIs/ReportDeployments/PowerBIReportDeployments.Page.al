@@ -1,7 +1,9 @@
 namespace System.Integration.PowerBI;
+using System.Environment;
 
 page 6347 "Power BI Report Deployments"
 {
+    ApplicationArea = All;
     Caption = 'Power BI Report Deployments';
     PageType = List;
     SourceTable = "Power BI Deployment Buffer";
@@ -259,7 +261,12 @@ page 6347 "Power BI Report Deployments"
     }
 
     trigger OnOpenPage()
+    var
+        Company: Record Company;
     begin
+        Company.Get(CompanyName());
+        if not Company."Evaluation Company" then
+            Error('');
         Rec.LoadReports();
     end;
 
