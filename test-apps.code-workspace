@@ -1,4 +1,315 @@
 {
+  "folders": [
+    {
+      "path": "./_Exclude_APIV1_ Tests"
+    },
+    {
+      "path": "./_Exclude_APIV2_ Tests"
+    },
+    {
+      "path": "./_Exclude_Bank Deposits Tests"
+    },
+    {
+      "path": "./_Exclude_Business_Events_Test"
+    },
+    {
+      "path": "./_Exclude_Email Logging Using Graph API Tests"
+    },
+    {
+      "path": "./_Exclude_Master_Data_Management_Test_Library"
+    },
+    {
+      "path": "./_Exclude_Master_Data_Management_Tests"
+    },
+    {
+      "path": "./_Exclude_PlanConfiguration_ Tests"
+    },
+    {
+      "path": "./_Exclude_Review_General_Ledger_Entries_Tests"
+    },
+    {
+      "path": "./AI Test Toolkit"
+    },
+    {
+      "path": "./Audit File Export Tests"
+    },
+    {
+      "path": "./Bank Account Reconciliation With AI Tests"
+    },
+    {
+      "path": "./Business Foundation Test Libraries"
+    },
+    {
+      "path": "./Contoso Coffee Demo Dataset Tests"
+    },
+    {
+      "path": "./Data Archive Tests"
+    },
+    {
+      "path": "./Data Search Tests"
+    },
+    {
+      "path": "./Dynamics BC Excel Reports Tests"
+    },
+    {
+      "path": "./E-Document Connector - Avalara Tests"
+    },
+    {
+      "path": "./E-Document Connector - Logiq Tests"
+    },
+    {
+      "path": "./E-Document Connector - SignUp Tests"
+    },
+    {
+      "path": "./E-Document Core Tests"
+    },
+    {
+      "path": "./E-Documents Connector Tests"
+    },
+    {
+      "path": "./Email - Current User Connector Tests"
+    },
+    {
+      "path": "./Email - Microsoft 365 Connector Tests"
+    },
+    {
+      "path": "./Email - SMTP API Test Library"
+    },
+    {
+      "path": "./Email - SMTP API Tests"
+    },
+    {
+      "path": "./Email - SMTP Connector Tests"
+    },
+    {
+      "path": "./Enforced Digital Vouchers Test Library"
+    },
+    {
+      "path": "./Enforced Digital Vouchers Tests"
+    },
+    {
+      "path": "./Error Messages with Recommendations Tests"
+    },
+    {
+      "path": "./Essential Business Headlines Test"
+    },
+    {
+      "path": "./EU 3-Party Trade Purchase Tests"
+    },
+    {
+      "path": "./Field Service Integration Test"
+    },
+    {
+      "path": "./Field Service Integration Test Library"
+    },
+    {
+      "path": "./Intrastat Core Tests"
+    },
+    {
+      "path": "./Late Payment Prediction Tests"
+    },
+    {
+      "path": "./OnPrem Permissions Tests"
+    },
+    {
+      "path": "./Payment Practices Tests"
+    },
+    {
+      "path": "./PayPal Payments Standard Tests"
+    },
+    {
+      "path": "./Performance Toolkit Tests"
+    },
+    {
+      "path": "./PowerBI Reports Test Library"
+    },
+    {
+      "path": "./PowerBI Reports Tests"
+    },
+    {
+      "path": "./Recommended Apps Tests"
+    },
+    {
+      "path": "./Report Layouts Tests"
+    },
+    {
+      "path": "./SAF-T Tests"
+    },
+    {
+      "path": "./Sales and Inventory Forecast Tests"
+    },
+    {
+      "path": "./Service Declaration Tests"
+    },
+    {
+      "path": "./Shopify Connector Test"
+    },
+    {
+      "path": "./Simplified Bank Statement Import Test"
+    },
+    {
+      "path": "./Statistical Accounts Tests"
+    },
+    {
+      "path": "./Subscription Billing Tests"
+    },
+    {
+      "path": "./Sustainability Tests"
+    },
+    {
+      "path": "./System Application Test Library"
+    },
+    {
+      "path": "./Test Runner"
+    },
+    {
+      "path": "./Tests-Bank"
+    },
+    {
+      "path": "./Tests-Cash Flow"
+    },
+    {
+      "path": "./Tests-Cost Accounting"
+    },
+    {
+      "path": "./Tests-CRM integration"
+    },
+    {
+      "path": "./Tests-Data Exchange"
+    },
+    {
+      "path": "./Tests-Dimension"
+    },
+    {
+      "path": "./Tests-ERM"
+    },
+    {
+      "path": "./Tests-Fixed Asset"
+    },
+    {
+      "path": "./Tests-General Journal"
+    },
+    {
+      "path": "./Tests-Graph"
+    },
+    {
+      "path": "./Tests-Integration"
+    },
+    {
+      "path": "./Tests-Invoicing"
+    },
+    {
+      "path": "./Tests-Job"
+    },
+    {
+      "path": "./Tests-Local"
+    },
+    {
+      "path": "./Tests-Marketing"
+    },
+    {
+      "path": "./Tests-Misc"
+    },
+    {
+      "path": "./Tests-Monitor Sensitive Fields"
+    },
+    {
+      "path": "./Tests-Permissions"
+    },
+    {
+      "path": "./Tests-Physical Inventory"
+    },
+    {
+      "path": "./Tests-Prepayment"
+    },
+    {
+      "path": "./Tests-Rapid Start"
+    },
+    {
+      "path": "./Tests-Report"
+    },
+    {
+      "path": "./Tests-Resource"
+    },
+    {
+      "path": "./Tests-Reverse"
+    },
+    {
+      "path": "./Tests-SCM"
+    },
+    {
+      "path": "./Tests-SCM-Assembly"
+    },
+    {
+      "path": "./Tests-SCM-Manufacturing"
+    },
+    {
+      "path": "./Tests-SCM-Service"
+    },
+    {
+      "path": "./Tests-SINGLESERVER"
+    },
+    {
+      "path": "./Tests-SMB"
+    },
+    {
+      "path": "./Tests-TestLibraries"
+    },
+    {
+      "path": "./Tests-Upgrade"
+    },
+    {
+      "path": "./Tests-User"
+    },
+    {
+      "path": "./Tests-VAT"
+    },
+    {
+      "path": "./Tests-Workflow"
+    },
+    {
+      "path": "./VAT Group Management Tests"
+    },
+    {
+      "path": "./System Application/Email/src/Test Email"
+    },
+    {
+      "path": "./Test Runner/src/DataDrivenTest"
+    },
+    {
+      "path": "./Base Application/System/DevTools/CALTest"
+    },
+    {
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
+    },
+    {
+      "path": "./System Application Test/DisabledTests"
+    },
+    {
+      "path": "./System Application Test/Extension Management/testArtifacts"
+    },
+    {
+      "path": "./Sales Lines Suggestions Tests/AI Tests"
+    },
+    {
+      "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
+    },
+    {
+      "path": "./AI Test Toolkit/src/TestSuite"
+    },
+    {
+      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
+    },
+    {
+      "path": "./Business Foundation Tests/DisabledTests"
+    },
+    {
+      "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
+    },
+    {
+      "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
+    }
+  ],
   "settings": {
     "al.enableCodeAnalysis": false,
     "allint.enabled": false,
