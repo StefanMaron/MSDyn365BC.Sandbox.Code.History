@@ -4,21 +4,21 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.QualityManagement.RoleCenters;
 
-using Microsoft.Purchases.RoleCenters;
 using Microsoft.QualityManagement.Configuration.GenerationRule;
 using Microsoft.QualityManagement.Configuration.Template;
 using Microsoft.QualityManagement.Configuration.Template.Test;
 using Microsoft.QualityManagement.Document;
 using Microsoft.QualityManagement.Reports;
 using Microsoft.QualityManagement.Setup;
+using Microsoft.Warehouse.RoleCenters;
 
-pageextension 20415 "Qlty. Purchasing Agent RC" extends "Purchasing Agent Role Center"
+pageextension 20421 "Qlty. Whse. Basic RC" extends "Whse. Basic Role Center"
 {
     actions
     {
         addlast(processing)
         {
-            group(Qlty_QualityManagement)
+            group(Qlty_QualityManagement_Processing_Group)
             {
                 Image = CheckList;
                 Caption = 'Quality Management';
