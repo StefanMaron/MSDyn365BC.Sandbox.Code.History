@@ -228,7 +228,7 @@ table 36 "Sales Header"
                     Rec.RecallModifyAddressNotification(GetModifyCustomerAddressNotificationId());
 
                 if xRec."Sell-to Customer No." <> "Sell-to Customer No." then
-                    SalesCalcDiscountByType.ApplyDefaultInvoiceDiscount(0, Rec, true);
+                    SalesCalcDiscountByType.ApplyDefaultInvoiceDiscount(0, Rec, not IsNullGuid(Rec.SystemId));
             end;
         }
         field(3; "No."; Code[20])
@@ -329,7 +329,7 @@ table 36 "Sales Header"
                     Rec.RecallModifyAddressNotification(Rec.GetModifyBillToCustomerAddressNotificationId());
 
                 if xRec."Bill-to Customer No." <> "Bill-to Customer No." then
-                    SalesCalcDiscountByType.ApplyDefaultInvoiceDiscount(0, Rec, true);
+                    SalesCalcDiscountByType.ApplyDefaultInvoiceDiscount(0, Rec, not IsNullGuid(Rec.SystemId));
             end;
         }
         field(5; "Bill-to Name"; Text[100])
@@ -840,7 +840,7 @@ table 36 "Sales Header"
                     StandardCodesMgt.CheckShowSalesRecurringLinesNotification(Rec);
 
                 if "Currency Code" <> xRec."Currency Code" then
-                    SalesCalcDiscountByType.ApplyDefaultInvoiceDiscount(0, Rec, true);
+                    SalesCalcDiscountByType.ApplyDefaultInvoiceDiscount(0, Rec, not IsNullGuid(Rec.SystemId));
 
                 if Status = Status::Open then
                     SetCompanyBankAccount();
@@ -1899,7 +1899,7 @@ table 36 "Sales Header"
                 TestStatusOpen();
                 if xRec."VAT Bus. Posting Group" <> "VAT Bus. Posting Group" then begin
                     RecreateSalesLines(FieldCaption("VAT Bus. Posting Group"));
-                    SalesCalcDiscountByType.ApplyDefaultInvoiceDiscount(0, Rec, true);
+                    SalesCalcDiscountByType.ApplyDefaultInvoiceDiscount(0, Rec, not IsNullGuid(Rec.SystemId));
                 end;
             end;
         }
@@ -2760,6 +2760,8 @@ table 36 "Sales Header"
                 UpdateShipToAddress();
 
                 CreateDimFromDefaultDim(Rec.FieldNo("Responsibility Center"));
+
+                OnValidateResponsibilityCenterOnBeforeRecreateSalesLines(Rec, CurrFieldNo);
 
                 if xRec."Responsibility Center" <> "Responsibility Center" then begin
                     RecreateSalesLines(FieldCaption("Responsibility Center"));
@@ -5483,7 +5485,7 @@ table 36 "Sales Header"
                 "Ship-to Contact" := CompanyInfo."Ship-to Contact";
             end;
 
-        OnAfterUpdateShipToAddress(Rec, xRec, CurrFieldNo);
+        OnAfterUpdateShipToAddress(Rec, xRec, CurrFieldNo, Location, CompanyInfo);
     end;
 
     local procedure SetRcvdFromCountry(RcvdFromCountryRegionCode: Code[10])
@@ -9439,7 +9441,7 @@ table 36 "Sales Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateShipToAddress(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; CurrentFieldNo: Integer)
+    local procedure OnAfterUpdateShipToAddress(var SalesHeader: Record "Sales Header"; xSalesHeader: Record "Sales Header"; CurrentFieldNo: Integer; Location: Record Location; CompanyInformation: Record "Company Information")
     begin
     end;
 
@@ -10272,6 +10274,11 @@ table 36 "Sales Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateBilltoCustomerTemplCodeOnBeforeRecreateSalesLines(var SalesHeader: Record "Sales Header"; CallingFieldNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateResponsibilityCenterOnBeforeRecreateSalesLines(var SalesHeader: Record "Sales Header"; CallingFieldNo: Integer)
     begin
     end;
 
