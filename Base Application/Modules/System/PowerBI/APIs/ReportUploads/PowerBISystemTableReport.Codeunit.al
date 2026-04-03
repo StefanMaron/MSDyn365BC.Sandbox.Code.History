@@ -50,7 +50,7 @@ codeunit 6323 "Power BI System Table Report" implements "Power BI Uploadable Rep
         UploadTracker := SystemTracker;
     end;
 
-    procedure FinalizeUpload(var UploadTracker: Interface "Power BI Upload Tracker"; Context: Text[50]; UploadReportName: Text)
+    procedure FinalizeUpload(var UploadTracker: Interface "Power BI Upload Tracker"; Context: Text[50])
     var
         PowerBIDefaultSelection: Record "Power BI Default Selection";
         PowerBIDisplayedElement: Record "Power BI Displayed Element";
@@ -68,7 +68,7 @@ codeunit 6323 "Power BI System Table Report" implements "Power BI Uploadable Rep
                 PowerBIDisplayedElement.UserSID := UserSecurityId();
                 PowerBIDisplayedElement.ElementType := PowerBIDisplayedElement.ElementType::Report;
                 PowerBIDisplayedElement.ElementEmbedUrl := UploadTracker.GetEmbedUrl();
-                PowerBIDisplayedElement.ElementName := CopyStr(UploadReportName, 1, MaxStrLen(PowerBIDisplayedElement.ElementName));
+                PowerBIDisplayedElement.ElementName := CopyStr(UploadTracker.GetUploadedReportName(), 1, MaxStrLen(PowerBIDisplayedElement.ElementName));
                 PowerBIDisplayedElement.WorkspaceName := PowerBIWorkspaceMgt.GetMyWorkspaceLabel();
                 PowerBIDisplayedElement.Context := PowerBIDefaultSelection.Context;
                 PowerBIDisplayedElement.ShowPanesInExpandedMode := true;

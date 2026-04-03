@@ -9,7 +9,6 @@ table 6317 "Power BI Deployment State"
 {
     Caption = 'Power BI Deployment State';
     ReplicateData = false;
-    Access = Internal;
     DataClassification = SystemMetadata;
 
     fields
