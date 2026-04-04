@@ -5333,7 +5333,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPlanItemOnBeforePlanThisSKULoopIteration(var StockkeepingUnit: Record "Stockkeeping Unit"; NextState: Option; var DemandInventoryProfile: Record "Inventory Profile"; var SupplyInventoryProfile: Record "Inventory Profile"; var SupplyExists: Boolean; var DemandExists: Boolean; var LotAccumulationPeriodStartDate: Date)
+    local procedure OnPlanItemOnBeforePlanThisSKULoopIteration(var StockkeepingUnit: Record "Stockkeeping Unit"; var NextState: Option; var DemandInventoryProfile: Record "Inventory Profile"; var SupplyInventoryProfile: Record "Inventory Profile"; var SupplyExists: Boolean; var DemandExists: Boolean; var LotAccumulationPeriodStartDate: Date)
     begin
     end;
 

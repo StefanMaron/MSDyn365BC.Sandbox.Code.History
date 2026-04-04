@@ -229,20 +229,22 @@ report 5065 "Segment - Labels"
     end;
 
     var
-        Cont: Record Contact;
         SegLine: Record "Segment Line";
         FormatAddr: Codeunit "Format Address";
         LabelFormat: Option "36 x 70 mm (3 columns)","37 x 70 mm (3 columns)","36 x 105 mm (2 columns)","37 x 105 mm (2 columns)","48 x 105 mm (2 columns - Bar Code)";
-        ContAddr: array[3, 8] of Text[100];
         NoOfRecords: Integer;
         RecordNo: Integer;
         NoOfColumns: Integer;
-        ColumnNo: Integer;
         i: Integer;
         ContBarCode: array[3] of Text[100];
         GroupNo: Integer;
         Counter: Integer;
         RecPerPageNum: Integer;
+
+    protected var
+        Cont: Record Contact;
+        ContAddr: array[3, 8] of Text[100];
+        ColumnNo: Integer;
 
     procedure InitializeRequest(LabelFormatFrom: Option)
     begin
