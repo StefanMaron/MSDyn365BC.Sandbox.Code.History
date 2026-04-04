@@ -12277,6 +12277,7 @@ codeunit 80 "Sales-Post"
         WarehouseAvailabilityMgt: Codeunit "Warehouse Availability Mgt.";
         QtyReservedForCurrLine: Decimal;
         SurplusQtyToHandle: Decimal;
+        IsHandled: Boolean;
     begin
         if not SalesHeader.Ship then
             exit;
@@ -12308,6 +12309,11 @@ codeunit 80 "Sales-Post"
         ReservEntry.CalcSums("Qty. to Handle (Base)");
         SurplusQtyToHandle := Abs(ReservEntry."Qty. to Handle (Base)");
         if (QtyReservedForCurrLine + SurplusQtyToHandle) < SalesLine."Qty. to Ship (Base)" then
+            exit;
+
+        IsHandled := false;
+        OnSyncSurPlusItemTrackingOnBeforeModifyQtyToHandleInvoice(SalesLine, SalesHeader, IsHandled, ReservEntry);
+        if IsHandled then
             exit;
 
         ReservEntry.ModifyAll("Qty. to Handle (Base)", 0);
@@ -14289,6 +14295,11 @@ codeunit 80 "Sales-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeArchiveRelatedJob(SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSyncSurPlusItemTrackingOnBeforeModifyQtyToHandleInvoice(var SalesLine: Record "Sales Line"; var SalesHeader: Record "Sales Header"; var IsHandled: Boolean; var ReservationEntry: Record "Reservation Entry")
     begin
     end;
 }
