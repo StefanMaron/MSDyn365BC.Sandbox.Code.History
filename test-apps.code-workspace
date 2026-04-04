@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "allint.enabled": false,
+    "al.enableCodeAnalysis": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeActions": false
+  },
   "folders": [
     {
       "path": "./_Exclude_APIV1_ Tests"
@@ -324,13 +332,5 @@
     {
       "path": "./Subscription Billing Tests/DisabledTests"
     }
-  ],
-  "settings": {
-    "al.enableCodeActions": false,
-    "allint.enabled": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeAnalysis": false
-  }
+  ]
 }
