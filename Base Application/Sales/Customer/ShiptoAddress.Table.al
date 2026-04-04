@@ -372,8 +372,10 @@ table 222 "Ship-to Address"
 
     var
         Cust: Record Customer;
-        PostCode: Record "Post Code";
         AltCustVATRegFacade: Codeunit "Alt. Cust. VAT. Reg. Facade";
+
+    protected var
+        PostCode: Record "Post Code";
 
 #pragma warning disable AA0074
         Text000: Label 'untitled';
