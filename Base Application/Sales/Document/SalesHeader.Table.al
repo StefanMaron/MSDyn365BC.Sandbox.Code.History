@@ -8056,12 +8056,13 @@ table 36 "Sales Header"
                 "Responsibility Center" := UserSetupMgt.GetRespCenter(0, SellToCustomer."Responsibility Center");
                 OnCopySelltoCustomerAddressFieldsFromCustomerOnAfterAssignRespCenter(Rec, SellToCustomer, CurrFieldNo);
             end;
-            UpdateLocationCode(SellToCustomer."Location Code");
-            UpdateTaxAreaCode();
+
             IsHandled := false;
             OnCopySellToCustomerAddressFieldsFromCustomerOnBeforeUpdateLocation(Rec, SellToCustomer, IsHandled);
             if not IsHandled then
                 UpdateLocationCode(SellToCustomer."Location Code");
+
+            UpdateTaxAreaCode();
         end;
 
         OnAfterCopySellToCustomerAddressFieldsFromCustomer(Rec, SellToCustomer, CurrFieldNo, SkipBillToContact, SkipSellToContact);
