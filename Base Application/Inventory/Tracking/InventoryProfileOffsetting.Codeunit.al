@@ -536,6 +536,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
                             DemandInvtProfile.SetRange("Item No.", ForecastEntry."Item No.");
                             DemandInvtProfile.SetRange(
                               "Due Date", ForecastEntry."Forecast Date", NextForecast."Forecast Date" - 1);
+                            DemandInvtProfile.SetRange("Source Type");
                             if ComponentForecast then begin
                                 DemandInvtProfile.SetSourceTypeFilter(5407); // Database::"Prod. Order Component"
                                 DemandInvtProfile.SetSourceTypeFilter(Database::"Planning Component");
