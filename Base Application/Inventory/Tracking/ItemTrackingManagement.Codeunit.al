@@ -576,16 +576,25 @@ codeunit 6500 "Item Tracking Management"
         CopyItemTracking(FromRowID, ToRowID, SwapSign, false);
     end;
 
+    procedure CopyItemTracking(FromRowID: Text[250]; ToRowID: Text[250]; SwapSign: Boolean; SkipReservation: Boolean; NewReservationStatus: Enum "Reservation Status")
+    var
+        ReservEntry: Record "Reservation Entry";
+    begin
+        ReservEntry.SetPointer(FromRowID);
+        ReservEntry.SetPointerFilter();
+        CopyItemTracking3(ReservEntry, ToRowID, SwapSign, SkipReservation, NewReservationStatus);
+    end;
+
     procedure CopyItemTracking(FromRowID: Text[250]; ToRowID: Text[250]; SwapSign: Boolean; SkipReservation: Boolean)
     var
         ReservEntry: Record "Reservation Entry";
     begin
         ReservEntry.SetPointer(FromRowID);
         ReservEntry.SetPointerFilter();
-        CopyItemTracking3(ReservEntry, ToRowID, SwapSign, SkipReservation);
+        CopyItemTracking3(ReservEntry, ToRowID, SwapSign, SkipReservation, ReservEntry."Reservation Status"::Prospect);
     end;
 
-    local procedure CopyItemTracking3(var ReservEntry: Record "Reservation Entry"; ToRowID: Text[250]; SwapSign: Boolean; SkipReservation: Boolean)
+    local procedure CopyItemTracking3(var ReservEntry: Record "Reservation Entry"; ToRowID: Text[250]; SwapSign: Boolean; SkipReservation: Boolean; NewReservationStatus: Enum "Reservation Status")
     var
         ReservEntry1: Record "Reservation Entry";
         TempReservEntry: Record "Reservation Entry" temporary;
@@ -603,7 +612,7 @@ codeunit 6500 "Item Tracking Management"
             repeat
                 if ReservEntry.TrackingExists() then begin
                     TempReservEntry := ReservEntry;
-                    TempReservEntry."Reservation Status" := TempReservEntry."Reservation Status"::Prospect;
+                    TempReservEntry."Reservation Status" := NewReservationStatus;
                     TempReservEntry.SetPointer(ToRowID);
                     if SwapSign then begin
                         TempReservEntry."Quantity (Base)" := -TempReservEntry."Quantity (Base)";
@@ -1797,7 +1806,7 @@ codeunit 6500 "Item Tracking Management"
                     Message(Text006);
                     exit;
                 end;
-            CopyItemTracking3(FromReservEntry, ToRowID, SignFactor1 <> SignFactor2, false);
+            CopyItemTracking3(FromReservEntry, ToRowID, SignFactor1 <> SignFactor2, false, FromReservEntry."Reservation Status"::Prospect);
 
             // Copy to inbound part of transfer.
             if IsReservedFromTransferShipment(FromReservEntry) then begin
