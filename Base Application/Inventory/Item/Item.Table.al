@@ -2574,10 +2574,10 @@ table 27 Item
         CheckJournalsAndWorksheets(0);
         CheckDocuments(0);
 
+        MoveEntries.MoveItemEntries(Rec);
+
         if not "Cost is Adjusted" then
             RunCostAdjustment(Rec);
-
-        MoveEntries.MoveItemEntries(Rec);
 
         DeleteRelatedData();
 
