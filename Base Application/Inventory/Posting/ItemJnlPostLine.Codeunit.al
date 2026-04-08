@@ -413,7 +413,7 @@ codeunit 22 "Item Jnl.-Post Line"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforePostItem(ItemJnlLine, IsHandled, CalledFromAdjustment);
+        OnBeforePostItem(ItemJnlLine, IsHandled, CalledFromAdjustment, ItemReg);
         if IsHandled then
             exit;
 
@@ -6150,7 +6150,7 @@ codeunit 22 "Item Jnl.-Post Line"
 #endif
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforePostItem(var ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean; CalledFromAdjustment: Boolean)
+    local procedure OnBeforePostItem(var ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean; CalledFromAdjustment: Boolean; ItemRegister: Record "Item Register")
     begin
     end;
 
