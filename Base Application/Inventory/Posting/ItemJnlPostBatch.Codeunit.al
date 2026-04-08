@@ -301,8 +301,11 @@ codeunit 23 "Item Jnl.-Post Batch"
         ItemJnlLineLoop.FindSet();
         repeat
             ItemJnlLine := ItemJnlLineLoop;
-            if not ItemJnlLine.EmptyLine() and (ItemJnlBatch."No. Series" <> '') and (ItemJnlLine."Document No." <> LastDocNo2) then
-                ItemJnlLine.TestField("Document No.", NoSeriesBatch.GetNextNo(ItemJnlBatch."No. Series", ItemJnlLine."Posting Date"));
+            IsHandled := false;
+            OnBeforeValidateDocumentNo(ItemJnlLine, ItemJnlBatch, LastDocNo2, IsHandled);
+            if not IsHandled then
+                if not ItemJnlLine.EmptyLine() and (ItemJnlBatch."No. Series" <> '') and (ItemJnlLine."Document No." <> LastDocNo2) then
+                    ItemJnlLine.TestField("Document No.", NoSeriesBatch.GetNextNo(ItemJnlBatch."No. Series", ItemJnlLine."Posting Date"));
             if not ItemJnlLine.EmptyLine() then
                 LastDocNo2 := ItemJnlLine."Document No.";
 
@@ -1081,6 +1084,11 @@ codeunit 23 "Item Jnl.-Post Batch"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforePostLines(var ItemJournalLine: Record "Item Journal Line"; var ItemRegNo: Integer; var WhseRegNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateDocumentNo(var ItemJournalLine: Record "Item Journal Line"; var ItemJournalBatch: Record "Item Journal Batch"; LastDocNo2: Code[20]; var IsHandled: Boolean)
     begin
     end;
 
