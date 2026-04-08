@@ -192,9 +192,11 @@ report 116 Statement
                 column(CurrReportPageNoCaption; CurrReportPageNoCaptionLbl)
                 {
                 }
+#if not CLEAN29
                 column(EnterpriseClassification; CompanyInfo.GetEnterpriseClassification())
                 {
                 }
+#endif
                 dataitem(CurrencyLoop; "Integer")
                 {
                     DataItemTableView = sorting(Number) where(Number = filter(1 ..));

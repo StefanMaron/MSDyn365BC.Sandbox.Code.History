@@ -230,9 +230,11 @@ report 118 "Finance Charge Memo"
                 column(CompanyVATRegistrationNoCaption; CompanyInfo.GetVATRegistrationNumberLbl())
                 {
                 }
+#if not CLEAN29
                 column(EnterpriseClassification; CompanyInfo.GetEnterpriseClassification())
                 {
                 }
+#endif
                 column(KundeIDCaption; KundeTxt)
                 {
                 }

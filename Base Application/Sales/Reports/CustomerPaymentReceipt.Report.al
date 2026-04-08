@@ -158,9 +158,11 @@ report 211 "Customer - Payment Receipt"
                 column(CompanyInfoHomePageCptn; CompanyInfoHomePageCptnLbl)
                 {
                 }
+#if not CLEAN29
                 column(EnterpriseRegister; CompanyInfo.GetEnterpriseClassification())
                 {
                 }
+#endif
                 dataitem(DetailedCustLedgEntry1; "Detailed Cust. Ledg. Entry")
                 {
                     DataItemLink = "Applied Cust. Ledger Entry No." = field("Entry No.");

@@ -108,7 +108,9 @@ page 43 "Sales Invoice"
                             if Rec."Sell-to Customer No." <> Customer."No." then
                                 error('');
                             IsSalesLinesEditable := Rec.SalesLinesEditable();
+#if not CLEAN29
                             SellToCustomerUsesEInvoicing := CustomerUsesEInvoicing(Rec."Sell-to Customer No.");
+#endif
                             CurrPage.Update();
                         end;
                     end;
@@ -936,15 +938,22 @@ page 43 "Sales Invoice"
                         }
                     }
                 }
+#if not CLEAN29
                 field(GLN; Rec.GLN)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the global location number of the customer.';
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '29.0';
                 }
                 field("Account Code"; Rec."Account Code")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the account code of the customer.';
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '29.0';
 
                     trigger OnValidate()
                     begin
@@ -955,7 +964,11 @@ page 43 "Sales Invoice"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the customer is part of the EHF system and requires an electronic sales order.';
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '29.0';
                 }
+#endif
             }
             group("Foreign Trade")
             {
@@ -1837,7 +1850,9 @@ page 43 "Sales Invoice"
 
     trigger OnAfterGetCurrRecord()
     begin
+#if not CLEAN29
         SellToCustomerUsesEInvoicing := CustomerUsesEInvoicing(Rec."Sell-to Customer No.");
+#endif
         CurrPage.IncomingDocAttachFactBox.PAGE.LoadDataFromRecord(Rec);
         CurrPage.ApprovalFactBox.PAGE.UpdateApprovalEntriesFromSourceRecord(Rec.RecordId);
         ShowWorkflowStatus := CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(Rec.RecordId);
@@ -1878,8 +1893,9 @@ page 43 "Sales Invoice"
     begin
         JobQueuesUsed := SalesSetup.JobQueueActive();
         SetExtDocNoMandatoryCondition();
+#if not CLEAN29
         SellToCustomerUsesEInvoicing := CustomerUsesEInvoicing(Rec."Sell-to Customer No.");
-
+#endif
         IsPowerAutomatePrivacyNoticeApproved := PrivacyNotice.GetPrivacyNoticeApprovalState(FlowServiceManagement.GetPowerAutomatePrivacyNoticeId()) = "Privacy Notice Approval State"::Agreed;
     end;
 
@@ -2134,6 +2150,8 @@ page 43 "Sales Invoice"
         DocNoVisible := DocumentNoVisibility.SalesDocumentNoIsVisible(DocType::Invoice, Rec."No.");
     end;
 
+#if not CLEAN29
+    [Obsolete('The procedure will be removed in a future release.', '29.0')]
     local procedure CustomerUsesEInvoicing(CustomerNo: Code[20]): Boolean
     var
         Customer: Record Customer;
@@ -2142,6 +2160,7 @@ page 43 "Sales Invoice"
             exit(Customer."E-Invoice");
         exit(false)
     end;
+#endif
 
     local procedure SetExtDocNoMandatoryCondition()
     begin

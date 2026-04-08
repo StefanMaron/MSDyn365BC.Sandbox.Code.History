@@ -136,9 +136,11 @@ report 715 "Price List"
             column(VATTextCaption; VATTextCaptionLbl)
             {
             }
+#if not CLEAN29
             column(EnterpriseRegister; CompanyInfo.GetEnterpriseClassification())
             {
             }
+#endif
             dataitem(SalesPrices; "Integer")
             {
                 DataItemTableView = sorting(Number) where(Number = filter(1 ..));

@@ -47,10 +47,20 @@ table 324 "VAT Product Posting Group"
         {
             Caption = 'Last Modified DateTime';
         }
+#if not CLEANSCHEMA32
         field(10600; "Outside Tax Area"; Boolean)
         {
             Caption = 'Outside Tax Area';
+            ObsoleteReason = 'This field is obsolete and should not be used.';
+#if CLEAN29
+            ObsoleteState = Removed;
+            ObsoleteTag = '32.0';
+#else
+            ObsoleteState = Pending;
+            ObsoleteTag = '29.0';
+#endif
         }
+#endif
     }
 
     keys

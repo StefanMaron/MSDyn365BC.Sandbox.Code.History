@@ -793,15 +793,22 @@ page 507 "Blanket Sales Order"
                         }
                     }
                 }
+#if not CLEAN29
                 field(GLN; Rec.GLN)
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the global location number of the customer.';
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '29.0';
                 }
                 field("Account Code"; Rec."Account Code")
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies the account code of the customer.';
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '29.0';
 
                     trigger OnValidate()
                     begin
@@ -812,7 +819,11 @@ page 507 "Blanket Sales Order"
                 {
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies whether the customer is part of the EHF system and requires an electronic sales order.';
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '29.0';
                 }
+#endif
             }
             group("Foreign Trade")
             {
@@ -1486,10 +1497,12 @@ page 507 "Blanket Sales Order"
         CurrPage.Update();
     end;
 
+#if not CLEAN29
     local procedure AccountCodeOnAfterValidate()
     begin
         CurrPage.SalesLines.PAGE.UpdateForm(true);
     end;
+#endif
 
     local procedure SetDocNoVisible()
     var

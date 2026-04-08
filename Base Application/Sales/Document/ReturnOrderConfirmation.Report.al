@@ -300,9 +300,11 @@ report 6631 "Return Order Confirmation"
                     column(SelltoCustNo_SalesHdrCaption; "Sales Header".FieldCaption("Sell-to Customer No."))
                     {
                     }
+#if not CLEAN29
                     column(EnterpriseRegister; CompanyInfo.GetEnterpriseClassification())
                     {
                     }
+#endif
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Sales Header";

@@ -309,8 +309,10 @@ table 36 "Sales Header"
                 if Customer."No." <> '' then
                     Customer.TestField("Customer Posting Group");
                 PostingSetupMgt.CheckCustPostingGroupReceivablesAccount("Customer Posting Group");
+#if not CLEAN29
                 GLN := Customer.GLN;
                 "E-Invoice" := Customer."E-Invoice";
+#endif
                 CheckCreditLimit();
                 OnAfterCheckBillToCust(Rec, xRec, Customer);
 
@@ -3644,30 +3646,60 @@ table 36 "Sales Header"
                       RespCenter.TableCaption(), UserSetupMgt.GetSalesFilter("Assigned User ID"));
             end;
         }
+#if not CLEANSCHEMA32
         field(10605; GLN; Code[13])
         {
             Caption = 'GLN';
+            ObsoleteReason = 'This field is obsolete and should not be used.';
+#if CLEAN29
+            ObsoleteState = Removed;
+            ObsoleteTag = '32.0';
+#else
+            ObsoleteState = Pending;
+            ObsoleteTag = '29.0';
+#endif
 
+#if not CLEAN29
             trigger OnValidate()
             begin
                 if not EInvoiceDocumentEncode.IsValidEANNo(GLN, true) then
                     FieldError(GLN, Text10606);
             end;
+#endif
         }
         field(10606; "Account Code"; Text[30])
         {
             Caption = 'Account Code';
+            ObsoleteReason = 'This field is obsolete and should not be used.';
+#if CLEAN29
+            ObsoleteState = Removed;
+            ObsoleteTag = '32.0';
+#else
+            ObsoleteState = Pending;
+            ObsoleteTag = '29.0';
+#endif
 
+#if not CLEAN29
             trigger OnValidate()
             begin
                 if "Account Code" <> xRec."Account Code" then
                     UpdateSalesLinesByFieldNo(FieldNo("Account Code"), false);
             end;
+#endif
         }
         field(10613; "E-Invoice"; Boolean)
         {
             Caption = 'E-Invoice';
+            ObsoleteReason = 'This field is obsolete and should not be used.';
+#if CLEAN29
+            ObsoleteState = Removed;
+            ObsoleteTag = '32.0';
+#else
+            ObsoleteState = Pending;
+            ObsoleteTag = '29.0';
+#endif
         }
+#endif
         field(15000300; "Recurring Group Code"; Code[10])
         {
             Caption = 'Recurring Group Code';
@@ -3899,7 +3931,9 @@ table 36 "Sales Header"
         PostingSetupMgt: Codeunit PostingSetupManagement;
         ApplicationAreaMgmt: Codeunit "Application Area Mgmt.";
         StandardCodesMgtGlobal: Codeunit "Standard Codes Mgt.";
+#if not CLEAN29
         EInvoiceDocumentEncode: Codeunit "E-Invoice Document Encode";
+#endif
         SalesCalcDiscountByType: Codeunit "Sales - Calc Discount By Type";
         AltCustVATRegFacade: Codeunit "Alt. Cust. VAT. Reg. Facade";
         CurrencyDate: Date;
@@ -3944,7 +3978,9 @@ table 36 "Sales Header"
 #pragma warning disable AA0074
 #pragma warning disable AA0470
         Text072: Label 'There are unpaid prepayment invoices related to the document of type %1 with the number %2.';
+#if not CLEAN29
         Text10606: Label 'The GLN No. field does not contain a valid, 13-digit GLN  number';
+#endif
         DifferentDatesQst: Label 'Posting Date %1 is different from Work Date %2.\\Do you want to continue?', Comment = '%1 - Posting Date, %2 - work date';
         DifferentDatesErr: Label 'Posting Date %1 is different from Work Date %2.\\Batch posting cannot be used.', Comment = '%1 - Posting Date, %2 - work date';
 #pragma warning restore AA0470
@@ -5110,9 +5146,11 @@ table 36 "Sales Header"
                         SalesLine.FieldNo("Deferral Code"):
                             if SalesLine."No." <> '' then
                                 SalesLine.Validate("Deferral Code");
+#if not CLEAN29
                         FieldNo("Account Code"):
                             if SalesLine."No." <> '' then
                                 SalesLine.Validate("Account Code", "Account Code");
+#endif
                         FieldNo("Campaign No."):
                             if SalesLine."No." <> '' then begin
                                 if SalesLine."Job No." <> '' then
@@ -6489,7 +6527,8 @@ table 36 "Sales Header"
     /// <param name="DocNo">The number of the sales document.</param>
     /// <param name="ShippingAdvice">The shipping advice for the sales document.</param>
     /// <returns>True if there is a conflict, otherwise false.</returns>
-    procedure InventoryPickConflict(DocType: Enum "Sales Document Type"; DocNo: Code[20]; ShippingAdvice: Enum "Sales Header Shipping Advice"): Boolean
+    procedure InventoryPickConflict(DocType: Enum "Sales Document Type"; DocNo: Code[20];
+                                                 ShippingAdvice: Enum "Sales Header Shipping Advice"): Boolean
     var
         WarehouseActivityLine: Record "Warehouse Activity Line";
         SalesLine2: Record "Sales Line";
@@ -6517,7 +6556,8 @@ table 36 "Sales Header"
     /// <param name="DocNo">The number of the sales document.</param>
     /// <param name="ShippingAdvice">The shipping advice for the sales document.</param>
     /// <returns>True if there is a conflict, otherwise false.</returns>
-    procedure WhseShipmentConflict(DocType: Enum "Sales Document Type"; DocNo: Code[20]; ShippingAdvice: Enum "Sales Header Shipping Advice"): Boolean
+    procedure WhseShipmentConflict(DocType: Enum "Sales Document Type"; DocNo: Code[20];
+                                                ShippingAdvice: Enum "Sales Header Shipping Advice"): Boolean
     var
         WarehouseShipmentLine: Record "Warehouse Shipment Line";
     begin
@@ -7828,7 +7868,9 @@ table 36 "Sales Header"
             "VAT Country/Region Code" := SellToCustomer."Country/Region Code";
             "VAT Registration No." := SellToCustomer.GetVATRegistrationNo();
             "Shipping Advice" := SellToCustomer."Shipping Advice";
+#if not CLEAN29
             "Account Code" := SellToCustomer."Account Code";
+#endif
             "Salesperson Code" := SellToCustomer."Salesperson Code";
             IsHandled := false;
             OnCopySelltoCustomerAddressFieldsFromCustomerOnBeforeAssignRespCenter(Rec, SellToCustomer, IsHandled);

@@ -117,9 +117,11 @@ report 1115 "Resource - Price List"
             column(WorkTypeDescriptionCaption; WorkTypeDescriptionCaptionLbl)
             {
             }
+#if not CLEAN29
             column(EnterpriseClassification; CompanyInfo.GetEnterpriseClassification())
             {
             }
+#endif
             dataitem("Integer"; "Integer")
             {
                 DataItemTableView = sorting(Number) where(Number = filter(1 ..));

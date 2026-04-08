@@ -277,9 +277,11 @@ report 210 "Blanket Sales Order"
                     column(PricesIncVAT_SalesHeaderCaption; "Sales Header".FieldCaption("Prices Including VAT"))
                     {
                     }
+#if not CLEAN29
                     column(EnterpriseRegister; CompanyInfo.GetEnterpriseClassification())
                     {
                     }
+#endif
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Sales Header";

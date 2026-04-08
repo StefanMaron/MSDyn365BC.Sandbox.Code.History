@@ -183,9 +183,11 @@ report 5064 "Segment - Cover Sheet"
                     column(Best_regards_Caption; Best_regards_CaptionLbl)
                     {
                     }
+#if not CLEAN29
                     column(EnterpriseRegister; CompanyInfo.GetEnterpriseClassification())
                     {
                     }
+#endif
 
                     trigger OnAfterGetRecord()
                     begin

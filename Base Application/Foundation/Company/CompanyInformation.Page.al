@@ -132,11 +132,16 @@ page 1 "Company Information"
                     ApplicationArea = Basic, Suite;
                     Importance = Additional;
                 }
+#if not CLEAN29
                 field(Enterpriseregister; Rec.Enterpriseregister)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies whether the company is a registered business enterprise.';
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '29.0';
                 }
+#endif
                 field(Picture; Rec.Picture)
                 {
                     ApplicationArea = Basic, Suite;

@@ -127,9 +127,11 @@ report 130 "EC Sales List"
             column(CompanyInfoEMailCaption; CompanyInfoEMailCaptionLbl)
             {
             }
+#if not CLEAN29
             column(EnterpriseClassification; CompanyInfo.GetEnterpriseClassification())
             {
             }
+#endif
             dataitem("VAT Entry"; "VAT Entry")
             {
                 DataItemLink = "Country/Region Code" = field(Code);

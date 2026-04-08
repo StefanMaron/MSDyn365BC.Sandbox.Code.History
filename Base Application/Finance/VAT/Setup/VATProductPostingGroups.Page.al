@@ -38,11 +38,16 @@ page 471 "VAT Product Posting Groups"
                 {
                     ApplicationArea = Basic, Suite;
                 }
+                #if not CLEAN29
                 field("Outside Tax Area"; Rec."Outside Tax Area")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies what kind of VAT posting that has to be done when you use this VAT Posting Group.';
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '29.0';
                 }
+                #endif
             }
         }
         area(factboxes)
