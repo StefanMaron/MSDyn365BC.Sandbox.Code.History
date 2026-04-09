@@ -16,6 +16,7 @@ codeunit 134159 "Test Price Calculation - V16"
         LibraryJob: Codeunit "Library - Job";
         LibraryMarketing: Codeunit "Library - Marketing";
         LibraryNotificationMgt: Codeunit "Library - Notification Mgt.";
+        LibraryPlanning: Codeunit "Library - Planning";
         LibraryPriceCalculation: Codeunit "Library - Price Calculation";
         LibraryPurchase: Codeunit "Library - Purchase";
         LibraryRandom: Codeunit "Library - Random";
@@ -23,7 +24,6 @@ codeunit 134159 "Test Price Calculation - V16"
         LibraryResource: Codeunit "Library - Resource";
         LibrarySales: Codeunit "Library - Sales";
         LibraryService: Codeunit "Library - Service";
-        LibraryPlanning: Codeunit "Library - Planning";
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         LibraryWarehouse: Codeunit "Library - Warehouse";
@@ -5845,7 +5845,7 @@ codeunit 134159 "Test Price Calculation - V16"
 
         // [GIVEN] Active Price List for 'All Customers'
         LibraryPriceCalculation.CreatePriceHeader(PriceListHeader, "Price Type"::Sale, "Price Source Type"::"All Customers", '');
-        
+
         // [GIVEN] Price Line for customer discount group 'D' and Item Discount Group = X
         LibraryPriceCalculation.CreatePriceListLine(
             PriceListLine, PriceListHeader.Code, "Price Type"::Sale, PriceListLine."Source Type"::"Customer Disc. Group", CustomerDiscountGroup.Code, "Price Amount Type"::Discount, "Price Asset Type"::"Item Discount Group", ItemDiscountGroup.Code);
@@ -5899,6 +5899,110 @@ codeunit 134159 "Test Price Calculation - V16"
             StrSubstNo(ErrorMessage, SalesLine.FieldCaption("Line Discount %"), DiscountPct, SalesLine.TableCaption()));
 
         // Cleanup: Restore default handler
+        LibraryPriceCalculation.SetupDefaultHandler(OldHandler);
+    end;
+
+    [Test]
+    procedure ServiceLineUnitCostFromPurchasePriceList()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        PriceListLine: Record "Price List Line";
+        ServiceHeader: Record "Service Header";
+        ServiceLine: Record "Service Line";
+        OldHandler: Enum "Price Calculation Handler";
+        ExpectedDirectUnitCost: Decimal;
+    begin
+        // [FEATURE] [AI test 0.3] [Service] [Item] [Purchase Price]
+        // [SCENARIO 625254] Unit Cost on Service Line is set from Direct Unit Cost in Purchase Price List when item is added
+        Initialize();
+        PriceListLine.DeleteAll();
+
+        // [GIVEN] Default price calculation is 'V16'
+        OldHandler := LibraryPriceCalculation.SetupDefaultHandler("Price Calculation Handler"::"Business Central (Version 16.0)");
+
+        // [GIVEN] Create a new Customer.
+        LibrarySales.CreateCustomer(Customer);
+
+        // [GIVEN] Create a new Item with Unit cost and Unit price.
+        //LibraryInventory.CreateItem(Item);
+        LibraryInventory.CreateItemWithUnitPriceAndUnitCost(Item, 0, LibraryRandom.RandDecInRange(10, 50, 2));
+        // Item.Validate("Unit Cost", LibraryRandom.RandDecInRange(10, 50, 2));
+        // Item.Modify(true);
+
+        // [GIVEN] Create a new Purchase Price List Line for "All Vendors" for Item with "Direct Unit Cost".
+        ExpectedDirectUnitCost := LibraryRandom.RandDecInRange(100, 200, 2);
+        LibraryPriceCalculation.CreatePurchPriceLine(
+            PriceListLine, '', "Price Source Type"::"All Vendors", '', "Price Asset Type"::Item, Item."No.");
+        PriceListLine.Validate("Direct Unit Cost", ExpectedDirectUnitCost);
+        PriceListLine.Validate("Status", PriceListLine.Status::Active);
+        PriceListLine.Modify(true);
+
+        // [GIVEN] Create a new Service Order for Customer with one line for Item.
+        LibraryService.CreateServiceHeader(ServiceHeader, ServiceHeader."Document Type"::Order, Customer."No.");
+        LibraryService.CreateServiceLine(ServiceLine, ServiceHeader, ServiceLine.Type::Item, Item."No.");
+
+        // [WHEN] Validate Quantity on Service Line
+        ServiceLine.Validate(Quantity, LibraryRandom.RandIntInRange(1, 10));
+
+        // [THEN] The "Unit Cost (LCY)" is set to "Direct Unit Cost" from Purchase Price List Line.
+        Assert.AreEqual(
+            ExpectedDirectUnitCost, ServiceLine."Unit Cost (LCY)",
+            StrSubstNo(
+                ValueMustBeEqualErr, ServiceLine.FieldCaption("Unit Cost (LCY)"), ExpectedDirectUnitCost, ServiceLine.TableCaption()));
+
+        LibraryPriceCalculation.SetupDefaultHandler(OldHandler);
+    end;
+
+    [Test]
+    procedure ServiceLineUnitCostNotResetOnQuantityValidate()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        PriceListLine: Record "Price List Line";
+        ServiceHeader: Record "Service Header";
+        ServiceLine: Record "Service Line";
+        OldHandler: Enum "Price Calculation Handler";
+        ExpectedDirectUnitCost: Decimal;
+        MinQty: Decimal;
+    begin
+        // [FEATURE] [AI test 0.3] [Service] [Item] [Purchase Price]
+        // [SCENARIO 625254] Unit Cost on Service Line is not reset to 0 when Quantity is validated with a Purchase Price List.
+        Initialize();
+        PriceListLine.DeleteAll();
+
+        // [GIVEN] Default price calculation is 'V16'
+        OldHandler := LibraryPriceCalculation.SetupDefaultHandler("Price Calculation Handler"::"Business Central (Version 16.0)");
+
+        // [GIVEN] Create a new Customer.
+        LibrarySales.CreateCustomer(Customer);
+
+        // [GIVEN] Create a new Item.
+        LibraryInventory.CreateItem(Item);
+
+        // [GIVEN] Create a new Purchase Price List Line for "All Vendors" for Item with Direct Unit Cost and Minimum Quantity.
+        ExpectedDirectUnitCost := LibraryRandom.RandDecInRange(100, 200, 2);
+        MinQty := LibraryRandom.RandIntInRange(5, 10);
+        LibraryPriceCalculation.CreatePurchPriceLine(
+            PriceListLine, '', "Price Source Type"::"All Vendors", '', "Price Asset Type"::Item, Item."No.");
+        PriceListLine.Validate("Direct Unit Cost", ExpectedDirectUnitCost);
+        PriceListLine.Validate("Minimum Quantity", MinQty);
+        PriceListLine.Validate("Status", PriceListLine.Status::Active);
+        PriceListLine.Modify(true);
+
+        // [GIVEN] Create a new Service Order for Customer with one line for Item.
+        LibraryService.CreateServiceHeader(ServiceHeader, ServiceHeader."Document Type"::Order, Customer."No.");
+        LibraryService.CreateServiceLine(ServiceLine, ServiceHeader, ServiceLine.Type::Item, Item."No.");
+
+        // [WHEN] Validate Quantity to match Minimum Quantity.
+        ServiceLine.Validate(Quantity, MinQty);
+
+        // [THEN] The "Unit Cost (LCY)" is set to "Direct Unit Cost" from Purchase Price List Line.
+        Assert.AreEqual(
+            ExpectedDirectUnitCost, ServiceLine."Unit Cost (LCY)",
+            StrSubstNo(
+                ValueMustBeEqualErr, ServiceLine.FieldCaption("Unit Cost (LCY)"), ExpectedDirectUnitCost, ServiceLine.TableCaption()));
+
         LibraryPriceCalculation.SetupDefaultHandler(OldHandler);
     end;
 
