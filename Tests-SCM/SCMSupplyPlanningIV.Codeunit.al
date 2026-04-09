@@ -54,6 +54,7 @@ codeunit 137077 "SCM Supply Planning -IV"
         AppliesToEntryMissingErr: Label 'Applies-to Entry must have a value';
         ItemNoErr: Label 'Item No. must be equal';
         AmountErr: Label '%1 must be equal to %2', Comment = '%1 = Cost Amount, %2 = Expected Amount';
+        DimSetIDErr: Label 'Dimension set id on Requisition Line does not match the updated dimension set id on production order line.';
 
     [Test]
     [Scope('OnPrem')]
