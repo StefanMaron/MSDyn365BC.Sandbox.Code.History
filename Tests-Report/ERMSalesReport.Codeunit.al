@@ -4063,6 +4063,40 @@ codeunit 134976 "ERM Sales Report"
         VerifyCustomerBalanceToDateTwoEntriesExist(Customer."No.", InvoiceAmount[1], InvoiceAmount[1], InvoiceAmount[1] + InvoiceAmount[2]);
     end;
 
+    [Test]
+    [HandlerFunctions('CustomerOrderDetailRequestPageHandler')]
+    procedure OrderDetailShowsSalesLineWithDiffShortcutDim1Code()
+    var
+        Customer: Record Customer;
+        DimensionValue: Record "Dimension Value";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO 625992] Report shows sales line when Shortcut Dimension 1 Code differs from customer Global Dimension 1 Code.
+        Initialize();
+
+        // [GIVEN] Create customer with Global Dimension 1 Code.
+        GeneralLedgerSetup.Get();
+        LibrarySales.CreateCustomer(Customer);
+        LibraryDimension.CreateDimensionValue(DimensionValue, GeneralLedgerSetup."Global Dimension 1 Code");
+        Customer.Validate("Global Dimension 1 Code", DimensionValue.Code);
+        Customer.Modify(true);
+
+        // [GIVEN] Create Sales Order with Sales Line with different Shortcut Dimension 1 Code.
+        CreateSalesDocumentWithLine(SalesHeader, SalesLine, SalesHeader."Document Type"::Order, Customer."No.");
+        LibraryDimension.CreateDimensionValue(DimensionValue, GeneralLedgerSetup."Global Dimension 1 Code");
+        SalesLine.Validate("Shortcut Dimension 1 Code", DimensionValue.Code);
+        SalesLine.Modify(true);
+
+        // [WHEN] Run Customer - Order Detail report for the customer.
+        RunCustomerOrderDetailReport(Customer."No.", false);
+
+        // [THEN] Verify Sales Line amount is shown in the report.
+        VerifyLineAmtCustomerOrderDetailReport(SalesLine."No.", SalesLine."Line Amount");
+    end;
+
     local procedure Initialize()
     begin
         LibraryApplicationArea.DisableApplicationAreaSetup();
