@@ -88,7 +88,7 @@
   </Item>
   <Item ItemId=";Codeunit 4167973299 - NamedType 2160580852" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Bonus depreciation is not set up correctly in the Fixed Asset Setup.]]></Val>
+      <Val><![CDATA[You must open Fixed Asset Setup and set up the effective date and percentage for bonus depreciation.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -102,6 +102,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM FA Bonus Depreciation - NamedType BonusDepreciationTurnedOnErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4167973299 - NamedType 877125979" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The bonus depreciation percentage cannot exceed the applicable maximum of %1%.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = maximum percentage]D;]A;(LookupHint=Codeunit ERM FA Bonus Depreciation - NamedType BonusDeprPctExceedsMaxErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 4167973299 - NamedType 919807995" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
