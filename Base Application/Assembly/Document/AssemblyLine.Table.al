@@ -2222,10 +2222,11 @@ table 901 "Assembly Line"
             Rec."Qty. Rounding Precision" := UOMQtyRoundPrecision;
             Rec."Qty. Rounding Precision (Base)" := Item2."Rounding Precision";
             exit;
+        end else begin
+            Rec."Qty. Rounding Precision" := UOMQtyRoundPrecision;
+            Rec."Qty. Rounding Precision (Base)" := Item2."Rounding Precision";
         end;
 
-        Rec."Qty. Rounding Precision" := Item2."Rounding Precision";
-        Rec."Qty. Rounding Precision (Base)" := Item2."Rounding Precision";
     end;
 
     procedure UpdateAndPersistAvailWarning()
