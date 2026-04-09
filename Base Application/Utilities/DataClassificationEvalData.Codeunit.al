@@ -763,6 +763,7 @@ codeunit 1751 "Data Classification Eval. Data"
         SetTableFieldsToNormal(DATABASE::"Aged Report Entity");
         SetTableFieldsToNormal(DATABASE::"Acc. Schedule Line Entity");
         SetTableFieldsToNormal(DATABASE::"Fixed Asset");
+        SetTableFieldsToNormal(DATABASE::"Adv. Bonus Depreciation Setup");
         SetTableFieldsToNormal(DATABASE::"FA Setup");
         SetTableFieldsToNormal(DATABASE::"FA Posting Type Setup");
         SetTableFieldsToNormal(DATABASE::"FA Posting Group");
