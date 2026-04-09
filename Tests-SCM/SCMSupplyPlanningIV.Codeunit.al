@@ -53,6 +53,7 @@ codeunit 137077 "SCM Supply Planning -IV"
         AmountType: Option "Net Change","Balance at Date";
         AppliesToEntryMissingErr: Label 'Applies-to Entry must have a value';
         ItemNoErr: Label 'Item No. must be equal';
+        DimSetIDErr: Label 'Dimension set id on Requisition Line does not match the updated dimension set id on production order line.';
 
     [Test]
     [Scope('OnPrem')]
@@ -4319,6 +4320,40 @@ codeunit 137077 "SCM Supply Planning -IV"
         Assert.RecordIsNotEmpty(PurchRcptLine[2]);
     end;
 
+    [Test]
+    procedure VerifyDimensionCalcSubcontractOrderForReleasedProdOrder()
+    var
+        Item: Record Item;
+        ProductionOrder: Record "Production Order";
+        RequisitionLine: Record "Requisition Line";
+        RoutingHeader: Record "Routing Header";
+        WorkCenter: Record "Work Center";
+        NewDimSetID: Integer;
+    begin
+        // [SCENARIO 620065] Missing Dimension in Subcontracting Worksheet.
+        Initialize();
+
+        // [GIVEN] Create Item with Routing with Subcontractor and Workcenter.
+        CreateItem(Item);
+        CreateRoutingSetup(WorkCenter, RoutingHeader);
+        UpdateItemRoutingNo(Item, RoutingHeader."No.");
+
+        // [GIVEN] Create and refresh Released Production Order without Location and Bin.
+        CreateAndRefreshReleasedProductionOrderWithLocationAndBin(ProductionOrder, Item."No.", '', '');
+
+        // [GIVEN] Update Dimension on Production Order Line.
+        NewDimSetID := UpdateProductionOrderDimension(ProductionOrder."No.");
+
+        // [WHEN] Calculate Subcontracting Worksheet for Work Center.
+        CalculateSubcontractOrder(WorkCenter);
+
+        // [THEN] Verify Dimension Set ID on Requisition Line matches updated Dimension Set ID on Production Order Line.
+        RequisitionLine.SetRange(Type, RequisitionLine.Type::Item);
+        RequisitionLine.SetRange("Prod. Order No.", ProductionOrder."No.");
+        RequisitionLine.FindFirst();
+        Assert.AreEqual(NewDimSetID, RequisitionLine."Dimension Set ID", DimSetIDErr);
+    end;
+
     local procedure Initialize()
     var
         RequisitionLine: Record "Requisition Line";
@@ -5792,6 +5827,31 @@ codeunit 137077 "SCM Supply Planning -IV"
     begin
         WarehouseEntry.FindLast();
         Assert.AreEqual(WarehouseEntry."Item No.", ItemNo, ItemNoErr);
+    end;
+
+    local procedure UpdateProductionOrderDimension(ProductionOrderNo: Code[20]) DimensionSetID: Integer
+    var
+        ProductionOrder: Record "Production Order";
+        ProductionOrderLine: Record "Prod. Order Line";
+    begin
+        ProductionOrder.Get(ProductionOrder.Status::Released, ProductionOrderNo);
+        ProductionOrderLine.SetRange("Prod. Order No.", ProductionOrder."No.");
+        ProductionOrderLine.FindFirst();
+        DimensionSetID := SelectNewDimSetID(ProductionOrderLine."Dimension Set ID");
+
+        ProductionOrderLine.Validate("Dimension Set ID", DimensionSetID);
+        ProductionOrderLine.Modify(true);
+    end;
+
+    local procedure SelectNewDimSetID(OldDimSetID: Integer): Integer
+    var
+        Dimension: Record Dimension;
+        DimensionValue: Record "Dimension Value";
+    begin
+        LibraryDimension.FindDimension(Dimension);
+        Dimension.Next();
+        LibraryDimension.FindDimensionValue(DimensionValue, Dimension.Code);
+        exit(LibraryDimension.CreateDimSet(OldDimSetID, Dimension.Code, DimensionValue.Code));
     end;
 
     [RequestPageHandler]
