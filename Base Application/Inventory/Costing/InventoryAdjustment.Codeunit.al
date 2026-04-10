@@ -254,6 +254,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
     var
         IsFirstTime: Boolean;
         IsHandled: Boolean;
+        AnyLevelExceeded: Boolean;
     begin
         IsHandled := false;
         OnBeforeMakeSingleLevelAdjmt(TheItem, TempAvgCostAdjmtEntryPoint, IsHandled);
@@ -312,7 +313,12 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
                 CheckAndCommit();
 
                 OnAfterAdjustItem(TheItem);
-            until (TheItem.Next() = 0) or LevelExceeded;
+                if LevelExceeded then
+                    AnyLevelExceeded := true;
+                LevelExceeded := false;
+            until TheItem.Next() = 0;
+
+        LevelExceeded := AnyLevelExceeded;
     end;
 
     local procedure AdjustItemAppliedCost()
@@ -426,7 +432,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
                         ValueEntry.CalcItemLedgEntryCost(ItemApplicationEntriesOutb.Item_Ledger_Entry_No, false);
                         ValueEntry.AddCost(TempInvtAdjmtBuf);
                         AppliedCostAmt -= ValueEntry."Cost Amount (Actual)";
-                        AppliedCostAmtACY -= ValueEntry."Cost Amount (Actual)";
+                        AppliedCostAmtACY -= ValueEntry."Cost Amount (Actual) (ACY)";
                     until not ItemApplicationEntriesOutb.Read();
 
                     if (Abs(CostAmt - AppliedCostAmt) = GLSetup."Amount Rounding Precision") or
@@ -1075,7 +1081,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
                 OutbndValueEntry.FindFirst();
                 exit(
                   OutbndValueEntry.EntryNoHasSameSign(InbndValueEntry."Entry No.") and ((OutbndValueEntry."Entry No." > InbndValueEntry."Entry No.")) or
-                  not OutbndValueEntry.EntryNoHasSameSign(InbndValueEntry."Entry No.") and ((OutbndValueEntry.SystemId > InbndValueEntry.SystemId) or (OutbndValueEntry.SystemCreatedAt > InbndValueEntry.SystemCreatedAt)) or
+                  not OutbndValueEntry.EntryNoHasSameSign(InbndValueEntry."Entry No.") and (OutbndValueEntry.SystemCreatedAt > InbndValueEntry.SystemCreatedAt) or
                   (OutbndValueEntry.GetValuationDate() > InbndValueEntry."Valuation Date") or
                   (OutbndValueEntry."Entry No." = 0));
             end;
@@ -2423,11 +2429,11 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
     local procedure GetOrigPosItemLedgEntryNo(var ItemApplnEntry: Record "Item Application Entry")
     begin
         ItemApplnEntry.SetCurrentKey("Inbound Item Entry No.", "Item Ledger Entry No.");
-        ItemApplnEntry.SetRange("Item Ledger Entry No.", ItemApplnEntry."Transferred-from Entry No.");
-        ItemApplnEntry.SetRange("Inbound Item Entry No.", ItemApplnEntry."Transferred-from Entry No.");
-        ItemApplnEntry.FindFirst();
-        if ItemApplnEntry."Transferred-from Entry No." <> 0 then
-            GetOrigPosItemLedgEntryNo(ItemApplnEntry);
+        while ItemApplnEntry."Transferred-from Entry No." <> 0 do begin
+            ItemApplnEntry.SetRange("Item Ledger Entry No.", ItemApplnEntry."Transferred-from Entry No.");
+            ItemApplnEntry.SetRange("Inbound Item Entry No.", ItemApplnEntry."Transferred-from Entry No.");
+            ItemApplnEntry.FindFirst();
+        end;
     end;
 
     local procedure CalcTransEntryNewRevAmt(ItemLedgEntry: Record "Item Ledger Entry"; TransValueEntry: Record "Value Entry"; var AdjustedCostElementBuf: Record "Cost Element Buffer")
@@ -2447,7 +2453,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
             repeat
                 InvdQty := InvdQty + ValueEntry."Invoiced Quantity";
                 if ValueEntry.EntryNoHasSameSign(TransValueEntry."Entry No.") and (ValueEntry."Entry No." < TransValueEntry."Entry No.") or
-                   not ValueEntry.EntryNoHasSameSign(TransValueEntry."Entry No.") and ((ValueEntry.SystemId < TransValueEntry.SystemId) or IsNullGuid(TransValueEntry.SystemId)) then
+                   not ValueEntry.EntryNoHasSameSign(TransValueEntry."Entry No.") and ((ValueEntry.SystemCreatedAt < TransValueEntry.SystemCreatedAt) or (TransValueEntry.SystemCreatedAt = 0DT)) then
                     OrigInvdQty := OrigInvdQty + ValueEntry."Invoiced Quantity";
             until ValueEntry.Next() = 0;
 
