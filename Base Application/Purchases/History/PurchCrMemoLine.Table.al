@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Purchases.History;
+namespace Microsoft.Sales.History;
 
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Deferral;
@@ -11,12 +11,10 @@ using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.SalesTax;
 using Microsoft.Finance.VAT.Calculation;
+using Microsoft.Finance.VAT.Clause;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
-using Microsoft.FixedAssets.Insurance;
-using Microsoft.FixedAssets.Maintenance;
-using Microsoft.FixedAssets.Posting;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.UOM;
@@ -30,38 +28,42 @@ using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Resources.Resource;
-using Microsoft.Purchases.Comment;
-using Microsoft.Purchases.Document;
-using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Comment;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.Pricing;
+using Microsoft.Utilities;
 using Microsoft.Warehouse.Structure;
 using System.Reflection;
 using System.Security.User;
 
-table 125 "Purch. Cr. Memo Line"
+table 113 "Sales Invoice Line"
 {
-    Caption = 'Purch. Cr. Memo Line';
-    DrillDownPageID = "Posted Purchase Cr. Memo Lines";
-    LookupPageID = "Posted Purchase Cr. Memo Lines";
+    Caption = 'Sales Invoice Line';
+    DrillDownPageID = "Posted Sales Invoice Lines";
+    LookupPageID = "Posted Sales Invoice Lines";
+    Permissions = TableData "Item Ledger Entry" = r,
+                  TableData "Value Entry" = r;
     DataClassification = CustomerContent;
 
     fields
     {
-        field(2; "Buy-from Vendor No."; Code[20])
+        field(2; "Sell-to Customer No."; Code[20])
         {
-            Caption = 'Buy-from Vendor No.';
+            Caption = 'Sell-to Customer No.';
             Editable = false;
-            TableRelation = Vendor;
+            TableRelation = Customer;
         }
         field(3; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = "Purch. Cr. Memo Hdr.";
+            TableRelation = "Sales Invoice Header";
         }
         field(4; "Line No."; Integer)
         {
             Caption = 'Line No.';
         }
-        field(5; Type; Enum "Purchase Line Type")
+        field(5; Type; Enum "Sales Line Type")
         {
             Caption = 'Type';
         }
@@ -73,11 +75,11 @@ table 125 "Purch. Cr. Memo Line"
             else
             if (Type = const(Item)) Item
             else
+            if (Type = const(Resource)) Resource
+            else
             if (Type = const("Fixed Asset")) "Fixed Asset"
             else
-            if (Type = const("Charge (Item)")) "Item Charge"
-            else
-            if (Type = const(Resource)) Resource;
+            if (Type = const("Charge (Item)")) "Item Charge";
         }
         field(7; "Location Code"; Code[10])
         {
@@ -92,9 +94,9 @@ table 125 "Purch. Cr. Memo Line"
             else
             if (Type = const("Fixed Asset")) "FA Posting Group";
         }
-        field(10; "Expected Receipt Date"; Date)
+        field(10; "Shipment Date"; Date)
         {
-            Caption = 'Expected Receipt Date';
+            Caption = 'Shipment Date';
         }
         field(11; Description; Text[100])
         {
@@ -113,12 +115,12 @@ table 125 "Purch. Cr. Memo Line"
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
         }
-        field(22; "Direct Unit Cost"; Decimal)
+        field(22; "Unit Price"; Decimal)
         {
             AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 2;
-            CaptionClass = GetCaptionClass(FieldNo("Direct Unit Cost"));
-            Caption = 'Direct Unit Cost';
+            CaptionClass = GetCaptionClass(FieldNo("Unit Price"));
+            Caption = 'Unit Price';
         }
         field(23; "Unit Cost (LCY)"; Decimal)
         {
@@ -155,11 +157,6 @@ table 125 "Purch. Cr. Memo Line"
             AutoFormatExpression = GetCurrencyCode();
             AutoFormatType = 1;
             Caption = 'Amount Including VAT';
-        }
-        field(31; "Unit Price (LCY)"; Decimal)
-        {
-            AutoFormatType = 2;
-            Caption = 'Unit Price (LCY)';
         }
         field(32; "Allow Invoice Disc."; Boolean)
         {
@@ -203,16 +200,30 @@ table 125 "Purch. Cr. Memo Line"
             Caption = 'Shortcut Dimension 2 Code';
             TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
+        field(42; "Customer Price Group"; Code[10])
+        {
+            Caption = 'Customer Price Group';
+            TableRelation = "Customer Price Group";
+        }
         field(45; "Job No."; Code[20])
         {
             Caption = 'Project No.';
             TableRelation = Job;
         }
-        field(54; "Indirect Cost %"; Decimal)
+        field(52; "Work Type Code"; Code[10])
         {
-            Caption = 'Indirect Cost %';
-            DecimalPlaces = 0 : 5;
-            MinValue = 0;
+            Caption = 'Work Type Code';
+            TableRelation = "Work Type";
+        }
+        field(63; "Shipment No."; Code[20])
+        {
+            Caption = 'Shipment No.';
+            Editable = false;
+        }
+        field(64; "Shipment Line No."; Integer)
+        {
+            Caption = 'Shipment Line No.';
+            Editable = false;
         }
         field(65; "Order No."; Code[20])
         {
@@ -222,11 +233,11 @@ table 125 "Purch. Cr. Memo Line"
         {
             Caption = 'Order Line No.';
         }
-        field(68; "Pay-to Vendor No."; Code[20])
+        field(68; "Bill-to Customer No."; Code[20])
         {
-            Caption = 'Pay-to Vendor No.';
+            Caption = 'Bill-to Customer No.';
             Editable = false;
-            TableRelation = Vendor;
+            TableRelation = Customer;
         }
         field(69; "Inv. Discount Amount"; Decimal)
         {
@@ -234,9 +245,10 @@ table 125 "Purch. Cr. Memo Line"
             AutoFormatType = 1;
             Caption = 'Inv. Discount Amount';
         }
-        field(70; "Vendor Item No."; Text[50])
+        field(73; "Drop Shipment"; Boolean)
         {
-            Caption = 'Vendor Item No.';
+            AccessByPermission = TableData "Drop Shpt. Post. Buffer" = R;
+            Caption = 'Drop Shipment';
         }
         field(74; "Gen. Bus. Posting Group"; Code[20])
         {
@@ -265,11 +277,11 @@ table 125 "Purch. Cr. Memo Line"
         field(80; "Attached to Line No."; Integer)
         {
             Caption = 'Attached to Line No.';
-            TableRelation = "Purch. Cr. Memo Line"."Line No." where("Document No." = field("Document No."));
+            TableRelation = "Sales Invoice Line"."Line No." where("Document No." = field("Document No."));
         }
-        field(81; "Entry Point"; Code[10])
+        field(81; "Exit Point"; Code[10])
         {
-            Caption = 'Entry Point';
+            Caption = 'Exit Point';
             TableRelation = "Entry/Exit Point";
         }
         field(82; "Area"; Code[10])
@@ -281,6 +293,10 @@ table 125 "Purch. Cr. Memo Line"
         {
             Caption = 'Transaction Specification';
             TableRelation = "Transaction Specification";
+        }
+        field(84; "Tax Category"; Code[10])
+        {
+            Caption = 'Tax Category';
         }
         field(85; "Tax Area Code"; Code[20])
         {
@@ -296,9 +312,10 @@ table 125 "Purch. Cr. Memo Line"
             Caption = 'Tax Group Code';
             TableRelation = "Tax Group";
         }
-        field(88; "Use Tax"; Boolean)
+        field(88; "VAT Clause Code"; Code[20])
         {
-            Caption = 'Use Tax';
+            Caption = 'VAT Clause Code';
+            TableRelation = "VAT Clause";
         }
         field(89; "VAT Bus. Posting Group"; Code[20])
         {
@@ -313,13 +330,13 @@ table 125 "Purch. Cr. Memo Line"
         field(97; "Blanket Order No."; Code[20])
         {
             Caption = 'Blanket Order No.';
-            TableRelation = "Purchase Header"."No." where("Document Type" = const("Blanket Order"));
+            TableRelation = "Sales Header"."No." where("Document Type" = const("Blanket Order"));
         }
         field(98; "Blanket Order Line No."; Integer)
         {
             Caption = 'Blanket Order Line No.';
-            TableRelation = "Purchase Line"."Line No." where("Document Type" = const("Blanket Order"),
-                                                              "Document No." = field("Blanket Order No."));
+            TableRelation = "Sales Line"."Line No." where("Document Type" = const("Blanket Order"),
+                                                           "Document No." = field("Blanket Order No."));
         }
         field(99; "VAT Base Amount"; Decimal)
         {
@@ -391,6 +408,12 @@ table 125 "Purch. Cr. Memo Line"
             AutoFormatType = 1;
             Caption = 'Pmt. Discount Amount';
         }
+        field(180; "Line Discount Calculation"; Option)
+        {
+            Caption = 'Line Discount Calculation';
+            OptionCaption = 'None,%,Amount';
+            OptionMembers = "None","%",Amount;
+        }
         field(480; "Dimension Set ID"; Integer)
         {
             Caption = 'Dimension Set ID';
@@ -405,87 +428,28 @@ table 125 "Purch. Cr. Memo Line"
         field(1001; "Job Task No."; Code[20])
         {
             Caption = 'Project Task No.';
+            Editable = false;
             TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
-        field(1002; "Job Line Type"; Enum "Job Line Type")
+        field(1002; "Job Contract Entry No."; Integer)
         {
-            Caption = 'Project Line Type';
-        }
-        field(1003; "Job Unit Price"; Decimal)
-        {
-            BlankZero = true;
-            Caption = 'Project Unit Price';
-        }
-        field(1004; "Job Total Price"; Decimal)
-        {
-            BlankZero = true;
-            Caption = 'Project Total Price';
-        }
-        field(1005; "Job Line Amount"; Decimal)
-        {
-            AutoFormatExpression = "Job Currency Code";
-            AutoFormatType = 1;
-            BlankZero = true;
-            Caption = 'Project Line Amount';
-        }
-        field(1006; "Job Line Discount Amount"; Decimal)
-        {
-            AutoFormatExpression = "Job Currency Code";
-            AutoFormatType = 1;
-            BlankZero = true;
-            Caption = 'Project Line Discount Amount';
-        }
-        field(1007; "Job Line Discount %"; Decimal)
-        {
-            BlankZero = true;
-            Caption = 'Project Line Discount %';
-            DecimalPlaces = 0 : 5;
-            MaxValue = 100;
-            MinValue = 0;
-        }
-        field(1008; "Job Unit Price (LCY)"; Decimal)
-        {
-            BlankZero = true;
-            Caption = 'Project Unit Price (LCY)';
-            AutoFormatType = 2;
-        }
-        field(1009; "Job Total Price (LCY)"; Decimal)
-        {
-            BlankZero = true;
-            Caption = 'Project Total Price (LCY)';
-            AutoFormatType = 1;
-        }
-        field(1010; "Job Line Amount (LCY)"; Decimal)
-        {
-            AutoFormatType = 1;
-            BlankZero = true;
-            Caption = 'Project Line Amount (LCY)';
-        }
-        field(1011; "Job Line Disc. Amount (LCY)"; Decimal)
-        {
-            AutoFormatType = 1;
-            BlankZero = true;
-            Caption = 'Project Line Disc. Amount (LCY)';
-        }
-        field(1012; "Job Currency Factor"; Decimal)
-        {
-            BlankZero = true;
-            Caption = 'Project Currency Factor';
-        }
-        field(1013; "Job Currency Code"; Code[20])
-        {
-            Caption = 'Project Currency Code';
-        }
-        field(1019; "Job Planning Line No."; Integer)
-        {
-            AccessByPermission = TableData Job = R;
-            BlankZero = true;
-            Caption = 'Project Planning Line No.';
+            Caption = 'Project Contract Entry No.';
+            Editable = false;
         }
         field(1700; "Deferral Code"; Code[10])
         {
             Caption = 'Deferral Code';
             TableRelation = "Deferral Template"."Deferral Code";
+        }
+        field(2678; "Allocation Account No."; Code[20])
+        {
+            Caption = 'Allocation Account No.';
+            DataClassification = CustomerContent;
+        }
+        field(2679; "Alloc. Sales Line SystemId"; Guid)
+        {
+            Caption = 'Allocation Sales Line SystemId';
+            DataClassification = SystemMetadata;
         }
         field(5402; "Variant Code"; Code[10])
         {
@@ -521,42 +485,14 @@ table 125 "Purch. Cr. Memo Line"
         {
             Caption = 'FA Posting Date';
         }
-        field(5601; "FA Posting Type"; Enum "Purchase FA Posting Type")
-        {
-            Caption = 'FA Posting Type';
-        }
         field(5602; "Depreciation Book Code"; Code[10])
         {
             Caption = 'Depreciation Book Code';
             TableRelation = "Depreciation Book";
         }
-        field(5603; "Salvage Value"; Decimal)
-        {
-            AutoFormatType = 1;
-            Caption = 'Salvage Value';
-        }
         field(5605; "Depr. until FA Posting Date"; Boolean)
         {
             Caption = 'Depr. until FA Posting Date';
-        }
-        field(5606; "Depr. Acquisition Cost"; Boolean)
-        {
-            Caption = 'Depr. Acquisition Cost';
-        }
-        field(5609; "Maintenance Code"; Code[10])
-        {
-            Caption = 'Maintenance Code';
-            TableRelation = Maintenance;
-        }
-        field(5610; "Insurance No."; Code[20])
-        {
-            Caption = 'Insurance No.';
-            TableRelation = Insurance;
-        }
-        field(5611; "Budgeted FA No."; Code[20])
-        {
-            Caption = 'Budgeted FA No.';
-            TableRelation = "Fixed Asset";
         }
         field(5612; "Duplicate in Depreciation Book"; Code[10])
         {
@@ -604,33 +540,11 @@ table 125 "Purch. Cr. Memo Line"
         {
             Caption = 'Item Reference Type No.';
         }
-        field(6200; "Non-Deductible VAT %"; Decimal)
+        field(5811; "Appl.-from Item Entry"; Integer)
         {
-            Caption = 'Non-Deductible VAT %';
-            DecimalPlaces = 0 : 5;
-        }
-        field(6201; "Non-Deductible VAT Base"; Decimal)
-        {
-            Caption = 'Non-Deductible VAT Base';
-        }
-        field(6202; "Non-Deductible VAT Amount"; Decimal)
-        {
-            Caption = 'Non-Deductible VAT Amount';
-        }
-        field(6203; "Non-Deductible VAT Diff."; Decimal)
-        {
-            Caption = 'Non-Deductible VAT Difference';
-            Editable = false;
-        }
-        field(6600; "Return Shipment No."; Code[20])
-        {
-            Caption = 'Return Shipment No.';
-            Editable = false;
-        }
-        field(6601; "Return Shipment Line No."; Integer)
-        {
-            Caption = 'Return Shipment Line No.';
-            Editable = false;
+            AccessByPermission = TableData Item = R;
+            Caption = 'Appl.-from Item Entry';
+            MinValue = 0;
         }
         field(6608; "Return Reason Code"; Code[10])
         {
@@ -641,10 +555,24 @@ table 125 "Purch. Cr. Memo Line"
         {
             Caption = 'Price Calculation Method';
         }
-        field(8512; "Buy-from Vendor Name"; Text[100])
+        field(7001; "Allow Line Disc."; Boolean)
         {
-            CalcFormula = lookup(Vendor.Name where("No." = field("Buy-from Vendor No.")));
-            Caption = 'Buy-from Vendor Name';
+            Caption = 'Allow Line Disc.';
+            InitValue = true;
+        }
+        field(7002; "Customer Disc. Group"; Code[20])
+        {
+            Caption = 'Customer Disc. Group';
+            TableRelation = "Customer Discount Group";
+        }
+        field(7004; "Price description"; Text[80])
+        {
+            Caption = 'Price description';
+        }
+        field(7012; "Sell-to Customer Name"; Text[100])
+        {
+            CalcFormula = lookup(Customer.Name where("No." = field("Sell-to Customer No.")));
+            Caption = 'Sell-to Customer Name';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -655,54 +583,74 @@ table 125 "Purch. Cr. Memo Line"
         key(Key1; "Document No.", "Line No.")
         {
             Clustered = true;
-            MaintainSIFTIndex = false;
         }
         key(Key2; "Blanket Order No.", "Blanket Order Line No.")
         {
         }
-        key(Key3; "Buy-from Vendor No.")
+        key(Key3; "Sell-to Customer No.")
         {
         }
-        key(Key4; "Order No.", "Order Line No.", "Posting Date")
+        key(Key5; "Shipment No.", "Shipment Line No.")
         {
         }
-        key(Key5; "Document No.", "Location Code")
+        key(Key6; "Job Contract Entry No.")
         {
-            MaintainSQLIndex = false;
-            SumIndexFields = Amount, "Amount Including VAT";
+        }
+        key(Key7; "Bill-to Customer No.")
+        {
+        }
+        key(Key8; "Order No.", "Order Line No.", "Posting Date")
+        {
+        }
+        key(Key9; "Document No.", "Location Code")
+        {
+            IncludedFields = Amount, "Amount Including VAT", "Inv. Discount Amount";
+        }
+        key(Key10; Type, "No.")
+        {
+            IncludedFields = "Quantity (Base)";
+        }
+        key(Key11; "Job No.", "Job Task No.")
+        {
         }
     }
 
     fieldgroups
     {
+        fieldgroup(Brick; "No.", Description, "Line Amount", "Price description", Quantity, "Unit of Measure Code")
+        {
+        }
     }
 
     trigger OnDelete()
     var
-        PurchDocLineComments: Record "Purch. Comment Line";
+        SalesDocLineComments: Record "Sales Comment Line";
         PostedDeferralHeader: Record "Posted Deferral Header";
     begin
-        PurchDocLineComments.SetRange("Document Type", PurchDocLineComments."Document Type"::"Posted Credit Memo");
-        PurchDocLineComments.SetRange("No.", "Document No.");
-        PurchDocLineComments.SetRange("Document Line No.", "Line No.");
-        if not PurchDocLineComments.IsEmpty() then
-            PurchDocLineComments.DeleteAll();
+        SalesDocLineComments.SetRange("Document Type", SalesDocLineComments."Document Type"::"Posted Invoice");
+        SalesDocLineComments.SetRange("No.", "Document No.");
+        SalesDocLineComments.SetRange("Document Line No.", "Line No.");
+        if not SalesDocLineComments.IsEmpty() then
+            SalesDocLineComments.DeleteAll();
 
         PostedDeferralHeader.DeleteHeader(
-            "Deferral Document Type"::Purchase.AsInteger(), '', '',
-            PurchDocLineComments."Document Type"::"Posted Credit Memo".AsInteger(), "Document No.", "Line No.");
+            "Deferral Document Type"::Sales.AsInteger(), '', '',
+            SalesDocLineComments."Document Type"::"Posted Invoice".AsInteger(), "Document No.", "Line No.");
     end;
 
     var
-        PurchCrMemoHeader: Record "Purch. Cr. Memo Hdr.";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
         Currency: Record Currency;
         DimMgt: Codeunit DimensionManagement;
+        UOMMgt: Codeunit "Unit of Measure Management";
         DeferralUtilities: Codeunit "Deferral Utilities";
+        PriceDescriptionTxt: Label 'x%1 (%2%3/%4)', Locked = true;
+        PriceDescriptionWithLineDiscountTxt: Label 'x%1 (%2%3/%4) - %5%', Locked = true;
 
     procedure GetCurrencyCode(): Code[10]
     begin
         GetHeader();
-        exit(PurchCrMemoHeader."Currency Code");
+        exit(SalesInvoiceHeader."Currency Code");
     end;
 
     procedure ShowDimensions()
@@ -717,23 +665,68 @@ table 125 "Purch. Cr. Memo Line"
         ItemTrackingDocMgt.ShowItemTrackingForInvoiceLine(RowID1());
     end;
 
-    procedure CalcVATAmountLines(PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; var TempVATAmountLine: Record "VAT Amount Line" temporary)
+    procedure CalcVATAmountLines(SalesInvHeader: Record "Sales Invoice Header"; var TempVATAmountLine: Record "VAT Amount Line" temporary)
+    var
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCalcVATAmountLines(Rec, SalesInvHeader, TempVATAmountLine, IsHandled);
+        if IsHandled then
+            exit;
+
         TempVATAmountLine.DeleteAll();
-        SetRange("Document No.", PurchCrMemoHdr."No.");
+        SetRange("Document No.", SalesInvHeader."No.");
         if Find('-') then
             repeat
                 TempVATAmountLine.Init();
-                TempVATAmountLine.CopyFromPurchCrMemoLine(Rec);
+                TempVATAmountLine.CopyFromSalesInvLine(Rec);
                 TempVATAmountLine.InsertLine();
             until Next() = 0;
+    end;
+
+    procedure GetLineAmountExclVAT(): Decimal
+    begin
+        GetHeader();
+        if not SalesInvoiceHeader."Prices Including VAT" then
+            exit("Line Amount");
+
+        exit(Round("Line Amount" / (1 + "VAT %" / 100), Currency."Amount Rounding Precision"));
+    end;
+
+    procedure GetLineAmountInclVAT(): Decimal
+    begin
+        GetHeader();
+        if SalesInvoiceHeader."Prices Including VAT" then
+            exit("Line Amount");
+
+        exit(Round("Line Amount" * (1 + "VAT %" / 100), Currency."Amount Rounding Precision"));
+    end;
+
+    procedure GetInvoiceHeader(): Record "Sales Invoice Header"
+    begin
+        GetHeader();
+        exit(SalesInvoiceHeader);
+    end;
+
+    local procedure GetHeader()
+    begin
+        if SalesInvoiceHeader."No." = "Document No." then
+            exit;
+        if not SalesInvoiceHeader.Get("Document No.") then
+            SalesInvoiceHeader.Init();
+
+        if SalesInvoiceHeader."Currency Code" = '' then
+            Currency.InitRoundingPrecision()
+        else
+            if not Currency.Get(SalesInvoiceHeader."Currency Code") then
+                Currency.InitRoundingPrecision();
     end;
 
     local procedure GetFieldCaption(FieldNumber: Integer): Text[100]
     var
         "Field": Record "Field";
     begin
-        Field.Get(DATABASE::"Purch. Cr. Memo Line", FieldNumber);
+        Field.Get(DATABASE::"Sales Invoice Line", FieldNumber);
         exit(Field."Field Caption");
     end;
 
@@ -744,7 +737,7 @@ table 125 "Purch. Cr. Memo Line"
             FieldNo("No."):
                 exit(StrSubstNo('3,%1', GetFieldCaption(FieldNumber)));
             else begin
-                if PurchCrMemoHeader."Prices Including VAT" then
+                if SalesInvoiceHeader."Prices Including VAT" then
                     exit('2,1,' + GetFieldCaption(FieldNumber));
                 exit('2,0,' + GetFieldCaption(FieldNumber));
             end
@@ -755,40 +748,91 @@ table 125 "Purch. Cr. Memo Line"
     var
         ItemTrackingMgt: Codeunit "Item Tracking Management";
     begin
-        exit(ItemTrackingMgt.ComposeRowID(DATABASE::"Purch. Cr. Memo Line",
+        exit(ItemTrackingMgt.ComposeRowID(DATABASE::"Sales Invoice Line",
             0, "Document No.", '', 0, "Line No."));
     end;
 
-    procedure GetReturnShptLines(var TempReturnShipmentLine: Record "Return Shipment Line" temporary)
+    procedure GetSalesShptLines(var TempSalesShipmentLine: Record "Sales Shipment Line" temporary)
     var
-        ReturnShipmentLine: Record "Return Shipment Line";
+        SalesShipmentLine: Record "Sales Shipment Line";
         ValueItemLedgerEntries: Query "Value Item Ledger Entries";
     begin
-        TempReturnShipmentLine.Reset();
-        TempReturnShipmentLine.DeleteAll();
+        TempSalesShipmentLine.Reset();
+        TempSalesShipmentLine.DeleteAll();
 
         if Type <> Type::Item then
             exit;
 
         ValueItemLedgerEntries.SetRange(Value_Entry_Doc_No, "Document No.");
-        ValueItemLedgerEntries.SetRange(Value_Entry_Doc_Type, Enum::"Item Ledger Document Type"::"Purchase Credit Memo");
+        ValueItemLedgerEntries.SetRange(Value_Entry_Doc_Type, Enum::"Item Ledger Document Type"::"Sales Invoice");
         ValueItemLedgerEntries.SetRange(Value_Entry_Doc_Line_No, "Line No.");
-        ValueItemLedgerEntries.SetFilter(Value_Entry_Invoiced_Qty, '<>0');
-        ValueItemLedgerEntries.SetRange(Item_Ledg_Document_Type, Enum::"Item Ledger Document Type"::"Purchase Return Shipment");
+        ValueItemLedgerEntries.SetRange(Item_Ledg_Document_Type, Enum::"Item Ledger Document Type"::"Sales Shipment");
         ValueItemLedgerEntries.Open();
         while ValueItemLedgerEntries.Read() do
-            if ReturnShipmentLine.Get(ValueItemLedgerEntries.Item_Ledg_Document_No, ValueItemLedgerEntries.Item_Ledg_Document_Line_No) then begin
-                TempReturnShipmentLine.Init();
-                TempReturnShipmentLine := ReturnShipmentLine;
-                if TempReturnShipmentLine.Insert() then;
+            if SalesShipmentLine.Get(ValueItemLedgerEntries.Item_Ledg_Document_No, ValueItemLedgerEntries.Item_Ledg_Document_Line_No) then begin
+                TempSalesShipmentLine.Init();
+                TempSalesShipmentLine := SalesShipmentLine;
+                if TempSalesShipmentLine.Insert() then;
             end;
+    end;
+
+    procedure CalcShippedSaleNotReturned(var ShippedQtyNotReturned: Decimal; var RevUnitCostLCY: Decimal; ExactCostReverse: Boolean)
+    var
+        TempItemLedgEntry: Record "Item Ledger Entry" temporary;
+        TotalCostLCY: Decimal;
+        TotalQtyBase: Decimal;
+    begin
+        ShippedQtyNotReturned := 0;
+        if (Type <> Type::Item) or (Quantity <= 0) then begin
+            RevUnitCostLCY := "Unit Cost (LCY)";
+            exit;
+        end;
+
+        RevUnitCostLCY := 0;
+        GetItemLedgEntries(TempItemLedgEntry, false);
+        if TempItemLedgEntry.FindSet() then
+            repeat
+                ShippedQtyNotReturned := ShippedQtyNotReturned - TempItemLedgEntry."Shipped Qty. Not Returned";
+                if ExactCostReverse then begin
+                    TempItemLedgEntry.CalcFields("Cost Amount (Expected)", "Cost Amount (Actual)");
+                    TotalCostLCY :=
+                      TotalCostLCY + TempItemLedgEntry."Cost Amount (Expected)" + TempItemLedgEntry."Cost Amount (Actual)";
+                    TotalQtyBase := TotalQtyBase + TempItemLedgEntry.Quantity;
+                end;
+            until TempItemLedgEntry.Next() = 0;
+
+        if ExactCostReverse and (ShippedQtyNotReturned <> 0) and (TotalQtyBase <> 0) then
+            RevUnitCostLCY := Abs(TotalCostLCY / TotalQtyBase) * "Qty. per Unit of Measure"
+        else
+            RevUnitCostLCY := "Unit Cost (LCY)";
+        ShippedQtyNotReturned := CalcQty(ShippedQtyNotReturned);
+
+        if ShippedQtyNotReturned > Quantity then
+            ShippedQtyNotReturned := Quantity;
+
+        OnAfterCalcShippedSaleNotReturned(Rec, ShippedQtyNotReturned, RevUnitCostLCY, ExactCostReverse);
+    end;
+
+    local procedure CalcQty(QtyBase: Decimal) Result: Decimal
+    begin
+        if "Qty. per Unit of Measure" = 0 then
+            Result := QtyBase
+        else
+            Result := Round(QtyBase / "Qty. per Unit of Measure", UOMMgt.QtyRndPrecision());
+        OnAfterCalcQty(Rec, QtyBase, Result);
     end;
 
     procedure GetItemLedgEntries(var TempItemLedgEntry: Record "Item Ledger Entry" temporary; SetQuantity: Boolean)
     var
         ItemLedgEntry: Record "Item Ledger Entry";
         ValueEntry: Record "Value Entry";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeGetItemLedgEntries(Rec, TempItemLedgEntry, SetQuantity, IsHandled);
+        if IsHandled then
+            exit;
+
         if SetQuantity then begin
             TempItemLedgEntry.Reset();
             TempItemLedgEntry.DeleteAll();
@@ -805,8 +849,8 @@ table 125 "Purch. Cr. Memo Line"
                 TempItemLedgEntry := ItemLedgEntry;
                 if SetQuantity then begin
                     TempItemLedgEntry.Quantity := ValueEntry."Invoiced Quantity";
-                    if Abs(TempItemLedgEntry."Remaining Quantity") > Abs(TempItemLedgEntry.Quantity) then
-                        TempItemLedgEntry."Remaining Quantity" := Abs(TempItemLedgEntry.Quantity);
+                    if Abs(TempItemLedgEntry."Shipped Qty. Not Returned") > Abs(TempItemLedgEntry.Quantity) then
+                        TempItemLedgEntry."Shipped Qty. Not Returned" := TempItemLedgEntry.Quantity;
                 end;
                 OnGetItemLedgEntriesOnBeforeTempItemLedgEntryInsert(TempItemLedgEntry, ValueEntry, SetQuantity);
                 if TempItemLedgEntry.Insert() then;
@@ -818,25 +862,25 @@ table 125 "Purch. Cr. Memo Line"
         ValueEntry.Reset();
         ValueEntry.SetCurrentKey("Document No.");
         ValueEntry.SetRange("Document No.", "Document No.");
-        ValueEntry.SetRange("Document Type", ValueEntry."Document Type"::"Purchase Credit Memo");
+        ValueEntry.SetRange("Document Type", ValueEntry."Document Type"::"Sales Invoice");
         ValueEntry.SetRange("Document Line No.", "Line No.");
     end;
 
-    procedure ShowItemReturnShptLines()
+    procedure ShowItemShipmentLines()
     var
-        TempReturnShptLine: Record "Return Shipment Line" temporary;
+        TempSalesShptLine: Record "Sales Shipment Line" temporary;
     begin
         if Type = Type::Item then begin
-            GetReturnShptLines(TempReturnShptLine);
-            PAGE.RunModal(0, TempReturnShptLine);
+            GetSalesShptLines(TempSalesShptLine);
+            PAGE.RunModal(0, TempSalesShptLine);
         end;
     end;
 
     procedure ShowLineComments()
     var
-        PurchCommentLine: Record "Purch. Comment Line";
+        SalesCommentLine: Record "Sales Comment Line";
     begin
-        PurchCommentLine.ShowComments(PurchCommentLine."Document Type"::"Posted Credit Memo".AsInteger(), "Document No.", "Line No.");
+        SalesCommentLine.ShowComments(SalesCommentLine."Document Type"::"Posted Invoice".AsInteger(), "Document No.", "Line No.");
     end;
 
     procedure ShowShortcutDimCode(var ShortcutDimCode: array[8] of Code[20])
@@ -844,18 +888,18 @@ table 125 "Purch. Cr. Memo Line"
         DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
     end;
 
-    procedure InitFromPurchLine(PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; PurchLine: Record "Purchase Line")
+    procedure InitFromSalesLine(SalesInvHeader: Record "Sales Invoice Header"; SalesLine: Record "Sales Line")
     begin
         Init();
-        TransferFields(PurchLine);
+        TransferFields(SalesLine);
         if ("No." = '') and HasTypeToFillMandatoryFields() then
             Type := Type::" ";
-        "Posting Date" := PurchCrMemoHdr."Posting Date";
-        "Document No." := PurchCrMemoHdr."No.";
-        Quantity := PurchLine."Qty. to Invoice";
-        "Quantity (Base)" := PurchLine."Qty. to Invoice (Base)";
+        "Posting Date" := SalesInvHeader."Posting Date";
+        "Document No." := SalesInvHeader."No.";
+        Quantity := SalesLine."Qty. to Invoice";
+        "Quantity (Base)" := SalesLine."Qty. to Invoice (Base)";
 
-        OnAfterInitFromPurchLine(PurchCrMemoHdr, PurchLine, Rec);
+        OnAfterInitFromSalesLine(Rec, SalesInvHeader, SalesLine);
     end;
 
     procedure ShowDeferrals()
@@ -868,15 +912,41 @@ table 125 "Purch. Cr. Memo Line"
             exit;
 
         DeferralUtilities.OpenLineScheduleView(
-            "Deferral Code", "Deferral Document Type"::Purchase.AsInteger(), '', '',
+            "Deferral Code", "Deferral Document Type"::Sales.AsInteger(), '', '',
             GetDocumentType(), "Document No.", "Line No.");
+    end;
+
+    procedure UpdatePriceDescription()
+    var
+        Currency: Record Currency;
+    begin
+        "Price description" := '';
+        if Type in [Type::"Charge (Item)", Type::"Fixed Asset", Type::Item, Type::Resource] then
+            if "Line Discount %" = 0 then
+                "Price description" := StrSubstNo(
+                    PriceDescriptionTxt, Quantity, Currency.ResolveGLCurrencySymbol(GetCurrencyCode()),
+                    "Unit Price", "Unit of Measure")
+            else
+                "Price description" := StrSubstNo(
+                    PriceDescriptionWithLineDiscountTxt, Quantity, Currency.ResolveGLCurrencySymbol(GetCurrencyCode()),
+                    "Unit Price", "Unit of Measure", "Line Discount %");
+    end;
+
+    procedure FormatType(): Text
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        if Type = Type::" " then
+            exit(SalesLine.FormatType());
+
+        exit(Format(Type));
     end;
 
     procedure GetDocumentType(): Integer
     var
-        PurchCommentLine: Record "Purch. Comment Line";
+        SalesCommentLine: Record "Sales Comment Line";
     begin
-        exit(PurchCommentLine."Document Type"::"Posted Credit Memo".AsInteger());
+        exit(SalesCommentLine."Document Type"::"Posted Invoice".AsInteger())
     end;
 
     procedure HasTypeToFillMandatoryFields(): Boolean
@@ -884,19 +954,14 @@ table 125 "Purch. Cr. Memo Line"
         exit(Type <> Type::" ");
     end;
 
-    procedure FormatType(): Text
-    var
-        PurchaseLine: Record "Purchase Line";
+    procedure IsCancellationSupported(): Boolean
     begin
-        if Type = Type::" " then
-            exit(PurchaseLine.FormatType());
-
-        exit(Format(Type));
+        exit(Type in [Type::" ", Type::Item, Type::"G/L Account", Type::"Charge (Item)", Type::Resource]);
     end;
 
     procedure SetSecurityFilterOnRespCenter()
     var
-        UserSetupMgt: Codeunit "User Setup Management";
+        UserSetupManagement: Codeunit "User Setup Management";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -904,43 +969,18 @@ table 125 "Purch. Cr. Memo Line"
         if IsHandled then
             exit;
 
-        if UserSetupMgt.GetPurchasesFilter() <> '' then begin
+        if UserSetupManagement.GetSalesFilter() <> '' then begin
             FilterGroup(2);
-            SetRange("Responsibility Center", UserSetupMgt.GetPurchasesFilter());
+            SetRange("Responsibility Center", UserSetupManagement.GetSalesFilter());
             FilterGroup(0);
         end;
     end;
 
-    procedure GetLineAmountExclVAT(): Decimal
+    procedure GetDateForCalculations() CalculationDate: Date;
     begin
-        GetHeader();
-        if not PurchCrMemoHeader."Prices Including VAT" then
-            exit("Line Amount");
-
-        exit(Round("Line Amount" / (1 + "VAT %" / 100), Currency."Amount Rounding Precision"));
-    end;
-
-    procedure GetLineAmountInclVAT(): Decimal
-    begin
-        GetHeader();
-        if PurchCrMemoHeader."Prices Including VAT" then
-            exit("Line Amount");
-
-        exit(Round("Line Amount" * (1 + "VAT %" / 100), Currency."Amount Rounding Precision"));
-    end;
-
-    local procedure GetHeader()
-    begin
-        if PurchCrMemoHeader."No." = "Document No." then
-            exit;
-        if not PurchCrMemoHeader.Get("Document No.") then
-            PurchCrMemoHeader.Init();
-
-        if PurchCrMemoHeader."Currency Code" = '' then
-            Currency.InitRoundingPrecision()
-        else
-            if not Currency.Get(PurchCrMemoHeader."Currency Code") then
-                Currency.InitRoundingPrecision();
+        CalculationDate := Rec."Posting Date";
+        if CalculationDate = 0D then
+            CalculationDate := WorkDate();
     end;
 
     internal procedure GetVATPct() VATPct: Decimal
@@ -949,60 +989,23 @@ table 125 "Purch. Cr. Memo Line"
         OnAfterGetVATPct(Rec, VATPct);
     end;
 
-    internal procedure GetPurchaseInvoiceLine(var PurchInvLine: Record "Purch. Inv. Line")
-    var
-        ItemLedgerEntry: Record "Item Ledger Entry";
-        ValueEntry: Record "Value Entry";
-    begin
-        CheckApplFromItemLedgEntry(ItemLedgerEntry);
-
-        if ItemLedgerEntry."Entry No." = 0 then
-            FindItemLedgerEntryFromItemApplicationEntry(ItemLedgerEntry);
-
-        ValueEntry.SetLoadFields("Item Ledger Entry No.", "Item Ledger Entry Type", "Document Type", "Document No.", "Document Line No.");
-        ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntry."Entry No.");
-        ValueEntry.SetRange("Item Ledger Entry Type", ItemLedgerEntry."Entry Type");
-        ValueEntry.SetRange("Document Type", ValueEntry."Document Type"::"Purchase Invoice");
-        if ValueEntry.FindFirst() then
-            PurchInvLine.Get(ValueEntry."Document No.", ValueEntry."Document Line No.");
-    end;
-
-    local procedure CheckApplFromItemLedgEntry(var ItemLedgerEntry: Record "Item Ledger Entry")
-    begin
-        if "Appl.-to Item Entry" = 0 then
-            exit;
-
-        TestField(Type, Type::Item);
-        TestField(Quantity);
-        ItemLedgerEntry.Get("Appl.-to Item Entry");
-        ItemLedgerEntry.TestField(Positive, true);
-        ItemLedgerEntry.TestField("Item No.", "No.");
-        ItemLedgerEntry.TestField("Variant Code", "Variant Code");
-        ItemLedgerEntry.CheckTrackingDoesNotExist(RecordId, FieldCaption("Appl.-to Item Entry"));
-    end;
-
-    local procedure FindItemLedgerEntryFromItemApplicationEntry(var ItemLedgerEntry: Record "Item Ledger Entry")
-    var
-        ItemApplicationEntry: Record "Item Application Entry";
-        TempItemLedEntry: Record "Item Ledger Entry" temporary;
-        ItemTrackingDocMgmt: Codeunit "Item Tracking Doc. Management";
-    begin
-        ItemTrackingDocMgmt.RetrieveEntriesFromPostedInvoice(TempItemLedEntry, RowID1());
-        if TempItemLedEntry.IsEmpty then
-            exit;
-
-        TempItemLedEntry.FindFirst();
-        if ItemApplicationEntry.AppliedFromEntryExists(TempItemLedEntry."Entry No.") then
-            ItemLedgerEntry.Get(ItemApplicationEntry."Outbound Item Entry No.");
-    end;
-
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInitFromPurchLine(PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; PurchLine: Record "Purchase Line"; var PurchCrMemoLine: Record "Purch. Cr. Memo Line")
+    local procedure OnAfterCalcQty(var SalesInvoiceLine: Record "Sales Invoice Line"; QtyBase: Decimal; var Result: Decimal)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeShowDeferrals(var PurchCrMemoLine: Record "Purch. Cr. Memo Line"; var IsHandled: Boolean)
+    local procedure OnAfterInitFromSalesLine(var SalesInvLine: Record "Sales Invoice Line"; SalesInvHeader: Record "Sales Invoice Header"; SalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetItemLedgEntries(var SalesInvLine: Record "Sales Invoice Line"; var TempItemLedgEntry: Record "Item Ledger Entry" temporary; SetQuantity: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalcVATAmountLines(SalesInvLine: Record "Sales Invoice Line"; SalesInvHeader: Record "Sales Invoice Header"; var TempVATAmountLine: Record "VAT Amount Line" temporary; var IsHandled: Boolean)
     begin
     end;
 
@@ -1012,12 +1015,22 @@ table 125 "Purch. Cr. Memo Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetSecurityFilterOnRespCenter(var PurchCrMemoLine: Record "Purch. Cr. Memo Line"; var IsHandled: Boolean)
+    local procedure OnBeforeShowDeferrals(SalesInvoiceLine: Record "Sales Invoice Line"; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterGetVATPct(var PurchCrMemoLine: Record "Purch. Cr. Memo Line"; var VATPct: Decimal)
+    local procedure OnBeforeSetSecurityFilterOnRespCenter(var SalesInvoiceLine: Record "Sales Invoice Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetVATPct(var SalesInvoiceLine: Record "Sales Invoice Line"; var VATPct: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCalcShippedSaleNotReturned(var SalesInvoiceLine: Record "Sales Invoice Line"; var ShippedQtyNotReturned: Decimal; var RevUnitCostLCY: Decimal; ExactCostReverse: Boolean)
     begin
     end;
 }
