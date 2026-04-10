@@ -2,18 +2,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.HumanResources.Employee;
+namespace Microsoft.Warehouse.Setup;
 
-table 5226 "Nationality"
+table 7304 "Warehouse Class"
 {
+    Caption = 'Warehouse Class';
+    LookupPageID = "Warehouse Classes";
     DataClassification = CustomerContent;
-    Caption = 'Nationality';
-    LookupPageId = "Nationalities";
-    DrillDownPageId = "Nationalities";
 
     fields
     {
-        field(1; "Code"; Code[20])
+        field(1; "Code"; Code[10])
         {
             Caption = 'Code';
             NotBlank = true;
@@ -31,4 +30,9 @@ table 5226 "Nationality"
             Clustered = true;
         }
     }
+
+    fieldgroups
+    {
+    }
 }
+

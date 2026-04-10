@@ -2,14 +2,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.HumanResources.Employee;
+namespace Microsoft.Inventory.Item.Substitution;
 
-page 937 "Alt. Employee Posting Groups"
+page 5717 "Condition Entry"
 {
-    Caption = 'Alternative Employee Posting Groups';
-    DataCaptionFields = "Employee Posting Group";
+    AutoSplitKey = true;
+    Caption = 'Condition';
     PageType = List;
-    SourceTable = "Alt. Employee Posting Group";
+    SourceTable = "Substitution Condition";
 
     layout
     {
@@ -18,20 +18,21 @@ page 937 "Alt. Employee Posting Groups"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Alt. Employee Posting Group"; Rec."Alt. Employee Posting Group")
+                field(Condition; Rec.Condition)
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the condition for item substitution.';
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control2; Links)
+            systempart(Control1900383207; Links)
             {
                 ApplicationArea = RecordLinks;
                 Visible = false;
             }
-            systempart(Control3; Notes)
+            systempart(Control1905767507; Notes)
             {
                 ApplicationArea = Notes;
                 Visible = false;
@@ -43,3 +44,4 @@ page 937 "Alt. Employee Posting Groups"
     {
     }
 }
+
