@@ -22,7 +22,6 @@ using Microsoft.Sales.Customer;
 using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
-using System.Environment;
 
 table 7001 "Price List Line"
 {
@@ -718,12 +717,7 @@ table 7001 "Price List Line"
     end;
 
     procedure IsAmountMandatory(AmountType: enum "Price Amount Type"): Boolean;
-    var
-        ClientTypeManagement: Codeunit "Client Type Management";
     begin
-        if ClientTypeManagement.GetCurrentClientType() in [CLIENTTYPE::OData, CLIENTTYPE::ODataV4] then
-            exit(true);
-
         case "Amount Type" of
             "Amount Type"::Any:
                 exit(true)
