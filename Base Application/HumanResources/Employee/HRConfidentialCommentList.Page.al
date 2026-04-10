@@ -2,16 +2,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.HumanResources.Employee;
+namespace Microsoft.Sales.FinanceCharge;
 
-page 5235 "HR Confidential Comment List"
+page 455 "Fin. Charge Comment List"
 {
+    AutoSplitKey = true;
     Caption = 'Comment List';
     DataCaptionExpression = Caption(Rec);
+    DelayedInsert = true;
     Editable = false;
     LinksAllowed = false;
     PageType = List;
-    SourceTable = "HR Confidential Comment Line";
+    SourceTable = "Fin. Charge Comment Line";
 
     layout
     {
@@ -20,26 +22,25 @@ page 5235 "HR Confidential Comment List"
             repeater(Control1)
             {
                 ShowCaption = false;
+                field(Type; Rec.Type)
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the type of document the comment is attached to: either Finance Charge Memo or Issued Finance Charge Memo.';
+                }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = BasicHR;
+                    ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
                 field(Date; Rec.Date)
                 {
-                    ApplicationArea = BasicHR;
-                    ToolTip = 'Specifies the date when the comment was created.';
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the date the comment was created.';
                 }
                 field(Comment; Rec.Comment)
                 {
-                    ApplicationArea = Comments;
+                    ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the comment itself.';
-                }
-                field("Code"; Rec.Code)
-                {
-                    ApplicationArea = BasicHR;
-                    ToolTip = 'Specifies a code for the comment.';
-                    Visible = false;
                 }
             }
         }
@@ -50,20 +51,16 @@ page 5235 "HR Confidential Comment List"
     }
 
     var
-        Employee: Record Employee;
-        ConfidentialInfo: Record "Confidential Information";
 #pragma warning disable AA0074
         Text000: Label 'untitled', Comment = 'it is a caption for empty page';
+        Text001: Label 'Fin. Charge Memo';
 #pragma warning restore AA0074
 
-    procedure Caption(HRCommentLine: Record "HR Confidential Comment Line"): Text
+    procedure Caption(FinChrgCommentLine: Record "Fin. Charge Comment Line"): Text
     begin
-        if ConfidentialInfo.Get(HRCommentLine."No.", HRCommentLine.Code, HRCommentLine."Table Line No.") and
-           Employee.Get(HRCommentLine."No.")
-        then
-            exit(HRCommentLine."No." + ' ' + Employee.FullName() + ' ' +
-              ConfidentialInfo."Confidential Code");
-        exit(Text000);
+        if FinChrgCommentLine."No." = '' then
+            exit(Text000);
+        exit(Text001 + ' ' + FinChrgCommentLine."No." + ' ');
     end;
 }
 

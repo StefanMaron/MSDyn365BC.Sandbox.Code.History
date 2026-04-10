@@ -4,12 +4,10 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.History;
 
-using Microsoft.Assembly.History;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Setup;
-using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Finance.SalesTax;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Depreciation;
@@ -17,9 +15,7 @@ using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.ExtendedText;
-using Microsoft.Foundation.Shipping;
 using Microsoft.Foundation.UOM;
-using Microsoft.Intercompany.Partner;
 using Microsoft.Inventory.Costing;
 using Microsoft.Inventory.Intrastat;
 using Microsoft.Inventory.Item;
@@ -34,17 +30,16 @@ using Microsoft.Sales.Comment;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Pricing;
+using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
 using Microsoft.Warehouse.Structure;
 using System.IO;
-using System.Reflection;
 using System.Security.User;
 
-table 111 "Sales Shipment Line"
+table 6661 "Return Receipt Line"
 {
-    Caption = 'Sales Shipment Line';
-    DrillDownPageID = "Posted Sales Shipment Lines";
-    LookupPageID = "Posted Sales Shipment Lines";
+    Caption = 'Return Receipt Line';
+    LookupPageID = "Posted Return Receipt Lines";
     Permissions = TableData "Item Ledger Entry" = r,
                   TableData "Value Entry" = r;
     DataClassification = CustomerContent;
@@ -60,12 +55,7 @@ table 111 "Sales Shipment Line"
         field(3; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = "Sales Shipment Header";
-
-            trigger OnValidate()
-            begin
-                UpdateDocumentId();
-            end;
+            TableRelation = "Return Receipt Header";
         }
         field(4; "Line No."; Integer)
         {
@@ -77,7 +67,6 @@ table 111 "Sales Shipment Line"
         }
         field(6; "No."; Code[20])
         {
-            CaptionClass = GetCaptionClass(FieldNo("No."));
             Caption = 'No.';
             TableRelation = if (Type = const("G/L Account")) "G/L Account"
             else
@@ -177,9 +166,9 @@ table 111 "Sales Shipment Line"
             AccessByPermission = TableData Item = R;
             Caption = 'Appl.-to Item Entry';
         }
-        field(39; "Item Shpt. Entry No."; Integer)
+        field(39; "Item Rcpt. Entry No."; Integer)
         {
-            Caption = 'Item Shpt. Entry No.';
+            Caption = 'Item Rcpt. Entry No.';
         }
         field(40; "Shortcut Dimension 1 Code"; Code[20])
         {
@@ -208,45 +197,17 @@ table 111 "Sales Shipment Line"
             Caption = 'Work Type Code';
             TableRelation = "Work Type";
         }
-        field(58; "Qty. Shipped Not Invoiced"; Decimal)
-        {
-            AccessByPermission = TableData "Sales Shipment Header" = R;
-            Caption = 'Qty. Shipped Not Invoiced';
-            DecimalPlaces = 0 : 5;
-            Editable = false;
-        }
         field(61; "Quantity Invoiced"; Decimal)
         {
             Caption = 'Quantity Invoiced';
             DecimalPlaces = 0 : 5;
             Editable = false;
         }
-        field(65; "Order No."; Code[20])
-        {
-            Caption = 'Order No.';
-        }
-        field(66; "Order Line No."; Integer)
-        {
-            Caption = 'Order Line No.';
-        }
         field(68; "Bill-to Customer No."; Code[20])
         {
             Caption = 'Bill-to Customer No.';
             Editable = false;
             TableRelation = Customer;
-        }
-        field(71; "Purchase Order No."; Code[20])
-        {
-            Caption = 'Purchase Order No.';
-        }
-        field(72; "Purch. Order Line No."; Integer)
-        {
-            Caption = 'Purch. Order Line No.';
-        }
-        field(73; "Drop Shipment"; Boolean)
-        {
-            AccessByPermission = TableData "Drop Shpt. Post. Buffer" = R;
-            Caption = 'Drop Shipment';
         }
         field(74; "Gen. Bus. Posting Group"; Code[20])
         {
@@ -275,7 +236,7 @@ table 111 "Sales Shipment Line"
         field(80; "Attached to Line No."; Integer)
         {
             Caption = 'Attached to Line No.';
-            TableRelation = "Sales Shipment Line"."Line No." where("Document No." = field("Document No."));
+            TableRelation = "Return Receipt Line"."Line No." where("Document No." = field("Document No."));
         }
         field(81; "Exit Point"; Code[10])
         {
@@ -318,18 +279,20 @@ table 111 "Sales Shipment Line"
         }
         field(91; "Currency Code"; Code[10])
         {
-            CalcFormula = lookup("Sales Shipment Header"."Currency Code" where("No." = field("Document No.")));
+            CalcFormula = lookup("Return Receipt Header"."Currency Code" where("No." = field("Document No.")));
             Caption = 'Currency Code';
             Editable = false;
             FieldClass = FlowField;
         }
         field(97; "Blanket Order No."; Code[20])
         {
+            AccessByPermission = TableData "Return Receipt Header" = R;
             Caption = 'Blanket Order No.';
             TableRelation = "Sales Header"."No." where("Document Type" = const("Blanket Order"));
         }
         field(98; "Blanket Order Line No."; Integer)
         {
+            AccessByPermission = TableData "Return Receipt Header" = R;
             Caption = 'Blanket Order Line No.';
             TableRelation = "Sales Line"."Line No." where("Document Type" = const("Blanket Order"),
                                                            "Document No." = field("Blanket Order No."));
@@ -347,16 +310,6 @@ table 111 "Sales Shipment Line"
             AutoFormatType = 2;
             Caption = 'Unit Cost';
             Editable = false;
-        }
-        field(107; "IC Partner Ref. Type"; Enum "IC Partner Reference Type")
-        {
-            Caption = 'IC Partner Ref. Type';
-            DataClassification = CustomerContent;
-        }
-        field(108; "IC Partner Reference"; Code[20])
-        {
-            Caption = 'IC Partner Reference';
-            DataClassification = CustomerContent;
         }
         field(131; "Posting Date"; Date)
         {
@@ -378,20 +331,15 @@ table 111 "Sales Shipment Line"
                 Rec.ShowDimensions();
             end;
         }
-        field(826; "Authorized for Credit Card"; Boolean)
-        {
-            Caption = 'Authorized for Credit Card';
-        }
         field(1001; "Job Task No."; Code[20])
         {
             Caption = 'Project Task No.';
-            Editable = false;
             TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
         field(1002; "Job Contract Entry No."; Integer)
         {
+            BlankZero = true;
             Caption = 'Project Contract Entry No.';
-            Editable = false;
         }
         field(5402; "Variant Code"; Code[10])
         {
@@ -455,6 +403,7 @@ table 111 "Sales Shipment Line"
         {
             Caption = 'Responsibility Center';
             TableRelation = "Responsibility Center";
+            ValidateTableRelation = true;
         }
         field(5709; "Item Category Code"; Code[20])
         {
@@ -488,34 +437,10 @@ table 111 "Sales Shipment Line"
         {
             Caption = 'Item Reference Type No.';
         }
-        field(5790; "Requested Delivery Date"; Date)
+        field(5805; "Return Qty. Rcd. Not Invd."; Decimal)
         {
-            Caption = 'Requested Delivery Date';
-            Editable = false;
-        }
-        field(5791; "Promised Delivery Date"; Date)
-        {
-            Caption = 'Promised Delivery Date';
-            Editable = false;
-        }
-        field(5792; "Shipping Time"; DateFormula)
-        {
-            AccessByPermission = TableData "Shipping Agent Services" = R;
-            Caption = 'Shipping Time';
-        }
-        field(5793; "Outbound Whse. Handling Time"; DateFormula)
-        {
-            AccessByPermission = TableData Location = R;
-            Caption = 'Outbound Whse. Handling Time';
-        }
-        field(5794; "Planned Delivery Date"; Date)
-        {
-            Caption = 'Planned Delivery Date';
-            Editable = false;
-        }
-        field(5795; "Planned Shipment Date"; Date)
-        {
-            Caption = 'Planned Shipment Date';
+            Caption = 'Return Qty. Rcd. Not Invd.';
+            DecimalPlaces = 0 : 5;
             Editable = false;
         }
         field(5811; "Appl.-from Item Entry"; Integer)
@@ -533,6 +458,16 @@ table 111 "Sales Shipment Line"
         field(5817; Correction; Boolean)
         {
             Caption = 'Correction';
+            Editable = false;
+        }
+        field(6602; "Return Order No."; Code[20])
+        {
+            Caption = 'Return Order No.';
+            Editable = false;
+        }
+        field(6603; "Return Order Line No."; Integer)
+        {
+            Caption = 'Return Order Line No.';
             Editable = false;
         }
         field(6608; "Return Reason Code"; Code[10])
@@ -554,13 +489,12 @@ table 111 "Sales Shipment Line"
             Caption = 'Customer Disc. Group';
             TableRelation = "Customer Discount Group";
         }
-        field(8000; "Document Id"; Guid)
+        field(7012; "Sell-to Customer Name"; Text[100])
         {
-            Caption = 'Document Id';
-            trigger OnValidate()
-            begin
-                UpdateDocumentNo();
-            end;
+            CalcFormula = lookup(Customer.Name where("No." = field("Sell-to Customer No.")));
+            Caption = 'Sell-to Customer Name';
+            Editable = false;
+            FieldClass = FlowField;
         }
     }
 
@@ -570,76 +504,66 @@ table 111 "Sales Shipment Line"
         {
             Clustered = true;
         }
-        key(Key2; "Order No.", "Order Line No.", "Posting Date")
+        key(Key2; "Return Order No.", "Return Order Line No.")
         {
         }
         key(Key3; "Blanket Order No.", "Blanket Order Line No.")
         {
         }
-        key(Key4; "Item Shpt. Entry No.")
+        key(Key4; "Item Rcpt. Entry No.")
         {
         }
-        key(Key5; "Sell-to Customer No.")
+        key(Key5; "Bill-to Customer No.")
         {
         }
-        key(Key6; "Bill-to Customer No.")
+        key(Key6; "Sell-to Customer No.")
         {
         }
-        key(Key7; "Document Id")
+        key(Key7; "Appl.-from Item Entry")
         {
         }
     }
 
     fieldgroups
     {
-        fieldgroup(DropDown; "Document No.", "Line No.", "Sell-to Customer No.", Type, "No.", "Shipment Date")
-        {
-        }
     }
-
-    trigger OnInsert()
-    begin
-        UpdateDocumentId();
-    end;
 
     trigger OnDelete()
     var
         SalesDocLineComments: Record "Sales Comment Line";
     begin
-        SalesDocLineComments.SetRange("Document Type", SalesDocLineComments."Document Type"::Shipment);
+        SalesDocLineComments.SetRange("Document Type", SalesDocLineComments."Document Type"::"Posted Return Receipt");
         SalesDocLineComments.SetRange("No.", "Document No.");
         SalesDocLineComments.SetRange("Document Line No.", "Line No.");
         if not SalesDocLineComments.IsEmpty() then
             SalesDocLineComments.DeleteAll();
-
-        PostedATOLink.DeleteAsmFromSalesShptLine(Rec);
     end;
 
     var
         Currency: Record Currency;
-        SalesShptHeader: Record "Sales Shipment Header";
-        PostedATOLink: Record "Posted Assemble-to-Order Link";
-        DimMgt: Codeunit DimensionManagement;
-        UOMMgt: Codeunit "Unit of Measure Management";
+        ReturnRcptHeader: Record "Return Receipt Header";
+        TranslationHelper: Codeunit "Translation Helper";
         CurrencyRead: Boolean;
 
 #pragma warning disable AA0074
 #pragma warning disable AA0470
-        Text000: Label 'Shipment No. %1:';
+        Text000: Label 'Return Receipt No. %1:';
 #pragma warning restore AA0470
-        Text001: Label 'The program cannot find this Sales line.';
+        Text001: Label 'The program cannot find this purchase line.';
 #pragma warning restore AA0074
 
     procedure GetCurrencyCode(): Code[10]
     begin
-        if "Document No." = SalesShptHeader."No." then
-            exit(SalesShptHeader."Currency Code");
-        if SalesShptHeader.Get("Document No.") then
-            exit(SalesShptHeader."Currency Code");
+        if "Document No." = ReturnRcptHeader."No." then
+            exit(ReturnRcptHeader."Currency Code");
+        if ReturnRcptHeader.Get("Document No.") then
+            exit(ReturnRcptHeader."Currency Code");
         exit('');
     end;
 
     procedure ShowDimensions()
+    var
+        DimMgt: Codeunit DimensionManagement;
     begin
         DimMgt.ShowDimensionSet("Dimension Set ID", StrSubstNo('%1 %2 %3', TableCaption(), "Document No.", "Line No."));
     end;
@@ -654,25 +578,25 @@ table 111 "Sales Shipment Line"
         if IsHandled then
             exit;
 
-        ItemTrackingDocMgt.ShowItemTrackingForShptRcptLine(DATABASE::"Sales Shipment Line", 0, "Document No.", '', 0, "Line No.");
+        ItemTrackingDocMgt.ShowItemTrackingForShptRcptLine(DATABASE::"Return Receipt Line", 0, "Document No.", '', 0, "Line No.");
     end;
 
-    procedure InsertInvLineFromShptLine(var SalesLine: Record "Sales Line")
+    procedure InsertInvLineFromRetRcptLine(var SalesLine: Record "Sales Line")
     var
-        SalesInvHeader: Record "Sales Header";
+        SalesHeader: Record "Sales Header";
+        SalesHeader2: Record "Sales Header";
         SalesOrderHeader: Record "Sales Header";
         SalesOrderLine: Record "Sales Line";
         TempSalesLine: Record "Sales Line" temporary;
+        SalesSetup: Record "Sales & Receivables Setup";
         TransferOldExtLines: Codeunit "Transfer Old Ext. Text Lines";
         ItemTrackingMgt: Codeunit "Item Tracking Management";
-        TranslationHelper: Codeunit "Translation Helper";
-        PrepaymentMgt: Codeunit "Prepayment Mgt.";
         ExtTextLine: Boolean;
         NextLineNo: Integer;
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCodeInsertInvLineFromShptLine(Rec, SalesLine, IsHandled);
+        OnInsertInvLineFromRetRcptLine(Rec, SalesLine, IsHandled);
         if IsHandled then
             exit;
 
@@ -685,25 +609,24 @@ table 111 "Sales Shipment Line"
             NextLineNo := 10000;
 
         IsHandled := false;
-        OnInsertInvLineFromShptLineOnBeforeSalesHeaderGet(SalesInvHeader, Rec, TempSalesLine, IsHandled);
+        OnInsertInvLineFromRetRcptLineOnBeforeSalesHeaderGet(SalesHeader, Rec, TempSalesLine, IsHandled);
         if not IsHandled then
-            if SalesInvHeader."No." <> TempSalesLine."Document No." then
-                SalesInvHeader.Get(TempSalesLine."Document Type", TempSalesLine."Document No.");
+            if SalesHeader."No." <> TempSalesLine."Document No." then
+                SalesHeader.Get(TempSalesLine."Document Type", TempSalesLine."Document No.");
 
-        if SalesLine."Shipment No." <> "Document No." then begin
+        OnInsertInvLineFromRetRcptLineOnAfterSalesHeaderGet(Rec, SalesHeader, SalesLine);
 
-            OnInsertInvLineFromShptLineOnBeforeInsertDescriptionLine(
-                Rec, SalesLine, TempSalesLine, SalesInvHeader, NextLineNo);
-
+        if SalesLine."Return Receipt No." <> "Document No." then begin
+            OnInsertInvLineFromRetRcptLineOnBeforeInitSalesLine(Rec, SalesLine);
             SalesLine.Init();
             SalesLine."Line No." := NextLineNo;
             SalesLine."Document Type" := TempSalesLine."Document Type";
             SalesLine."Document No." := TempSalesLine."Document No.";
-            TranslationHelper.SetGlobalLanguageByCode(SalesInvHeader."Language Code");
+            TranslationHelper.SetGlobalLanguageByCode(SalesHeader."Language Code");
             SalesLine.Description := StrSubstNo(Text000, "Document No.");
             TranslationHelper.RestoreGlobalLanguage();
             IsHandled := false;
-            OnBeforeInsertInvLineFromShptLineBeforeInsertTextLine(Rec, SalesLine, NextLineNo, IsHandled, TempSalesLine, SalesInvHeader);
+            OnBeforeInsertInvLineFromRetRcptLineBeforeInsertTextLine(Rec, SalesLine, NextLineNo, IsHandled);
             if not IsHandled then begin
                 SalesLine.Insert();
                 OnAfterDescriptionSalesLineInsert(SalesLine, Rec, NextLineNo);
@@ -712,7 +635,7 @@ table 111 "Sales Shipment Line"
         end;
 
         TransferOldExtLines.ClearLineNumbers();
-
+        SalesSetup.Get();
         repeat
             ExtTextLine := (Type = Type::" ") and ("Attached to Line No." <> 0) and (Quantity = 0);
             if ExtTextLine then
@@ -720,42 +643,40 @@ table 111 "Sales Shipment Line"
             else
                 "Attached to Line No." := 0;
 
-            if (Type <> Type::" ") and SalesOrderLine.Get(SalesOrderLine."Document Type"::Order, "Order No.", "Order Line No.")
+            if not SalesOrderLine.Get(
+                 SalesOrderLine."Document Type"::"Return Order", "Return Order No.", "Return Order Line No.")
             then begin
-                if (SalesOrderHeader."Document Type" <> SalesOrderLine."Document Type"::Order) or
-                   (SalesOrderHeader."No." <> SalesOrderLine."Document No.")
+                if ExtTextLine then begin
+                    SalesOrderLine.Init();
+                    SalesOrderLine."Line No." := "Return Order Line No.";
+                    SalesOrderLine.Description := Description;
+                    SalesOrderLine."Description 2" := "Description 2";
+                end else begin
+                    OnInsertInvLineFromRetRcptLineOnBeforeNoExtTextLineError(Rec);
+                    Error(Text001);
+                end
+            end else begin
+                if (SalesHeader2."Document Type" <> SalesOrderLine."Document Type"::"Return Order") or
+                   (SalesHeader2."No." <> SalesOrderLine."Document No.")
                 then
-                    SalesOrderHeader.Get(SalesOrderLine."Document Type"::Order, "Order No.");
-                OnInsertInvLineFromShptLineOnAfterSalesOrderHeaderGet(SalesOrderHeader, SalesInvHeader, SalesOrderLine);
+                    SalesHeader2.Get(SalesOrderLine."Document Type"::"Return Order", "Return Order No.");
 
-                PrepaymentMgt.TestSalesOrderLineForGetShptLines(SalesOrderLine);
                 InitCurrency("Currency Code");
 
-                if SalesInvHeader."Prices Including VAT" then begin
-                    if not SalesOrderHeader."Prices Including VAT" then
+                if SalesHeader."Prices Including VAT" then begin
+                    if not SalesHeader2."Prices Including VAT" then
                         SalesOrderLine."Unit Price" :=
                           Round(
                             SalesOrderLine."Unit Price" * (1 + SalesOrderLine."VAT %" / 100),
                             Currency."Unit-Amount Rounding Precision");
                 end else
-                    if SalesOrderHeader."Prices Including VAT" then
+                    if SalesHeader2."Prices Including VAT" then
                         SalesOrderLine."Unit Price" :=
                           Round(
                             SalesOrderLine."Unit Price" / (1 + SalesOrderLine."VAT %" / 100),
                             Currency."Unit-Amount Rounding Precision");
-            end else begin
-                SalesOrderHeader.Init();
-                if ExtTextLine or (Type = Type::" ") then begin
-                    SalesOrderLine.Init();
-                    SalesOrderLine."Line No." := "Order Line No.";
-                    SalesOrderLine.Description := Description;
-                    SalesOrderLine."Description 2" := "Description 2";
-                    OnInsertInvLineFromShptLineOnAfterAssignDescription(Rec, SalesOrderLine);
-                end else
-                    Error(Text001);
             end;
-
-            OnInsertInvLineFromShptLineOnBeforeAssigneSalesLine(Rec, SalesInvHeader, SalesOrderHeader, SalesLine, SalesOrderLine, Currency);
+            OnInsertInvLineFromRetRcptLineOnAfterCalcUnitPrice(Rec, SalesHeader, SalesHeader2, SalesLine, SalesOrderLine, Currency);
 
             SalesLine := SalesOrderLine;
             SalesLine."Line No." := NextLineNo;
@@ -763,170 +684,117 @@ table 111 "Sales Shipment Line"
             SalesLine."Document No." := TempSalesLine."Document No.";
             SalesLine."Variant Code" := "Variant Code";
             SalesLine."Location Code" := "Location Code";
-            SalesLine."Drop Shipment" := "Drop Shipment";
-            SalesLine."Shipment No." := "Document No.";
-            SalesLine."Shipment Line No." := "Line No.";
-            ClearSalesLineValues(SalesLine);
-            if not ExtTextLine and (SalesLine.Type <> SalesLine.Type::" ") then begin
+            SalesLine."Return Reason Code" := "Return Reason Code";
+            SalesLine."Quantity (Base)" := 0;
+            SalesLine.Quantity := 0;
+            SalesLine."Outstanding Qty. (Base)" := 0;
+            SalesLine."Outstanding Quantity" := 0;
+            SalesLine."Return Qty. Received" := 0;
+            SalesLine."Return Qty. Received (Base)" := 0;
+            SalesLine."Quantity Invoiced" := 0;
+            SalesLine."Qty. Invoiced (Base)" := 0;
+            SalesLine."Drop Shipment" := false;
+            SalesLine."Return Receipt No." := "Document No.";
+            SalesLine."Return Receipt Line No." := "Line No.";
+            SalesLine."Appl.-to Item Entry" := 0;
+            SalesLine."Appl.-from Item Entry" := 0;
+            OnAfterCopyFieldsFromReturnReceiptLine(Rec, SalesLine);
+
+            if not ExtTextLine then begin
                 IsHandled := false;
-                OnInsertInvLineFromShptLineOnBeforeValidateQuantity(Rec, SalesLine, IsHandled, SalesInvHeader);
-                if SalesLine."Deferral Code" <> '' then
-                    SalesLine.Validate("Deferral Code");
+                OnInsertInvLineFromRetRcptLineOnBeforeValidateSalesLineQuantity(Rec, SalesLine, IsHandled, SalesHeader);
                 if not IsHandled then
                     SalesLine.Validate(Quantity, Quantity - "Quantity Invoiced");
-                CalcBaseQuantities(SalesLine, "Quantity (Base)" / Quantity);
 
-                OnInsertInvLineFromShptLineOnAfterCalcQuantities(SalesLine, SalesOrderLine);
-
-                SalesLine.Validate("Unit Price", SalesOrderLine."Unit Price");
-                SalesLine."Allow Line Disc." := SalesOrderLine."Allow Line Disc.";
-                SalesLine."Allow Invoice Disc." := SalesOrderLine."Allow Invoice Disc.";
-                SalesOrderLine."Line Discount Amount" :=
-                  Round(
-                    SalesOrderLine."Line Discount Amount" * SalesLine.Quantity / SalesOrderLine.Quantity,
-                    Currency."Amount Rounding Precision");
-                if SalesInvHeader."Prices Including VAT" then begin
-                    if not SalesOrderHeader."Prices Including VAT" then
-                        SalesOrderLine."Line Discount Amount" :=
-                          Round(
-                            SalesOrderLine."Line Discount Amount" *
-                            (1 + SalesOrderLine."VAT %" / 100), Currency."Amount Rounding Precision");
-                end else
-                    if SalesOrderHeader."Prices Including VAT" then
-                        SalesOrderLine."Line Discount Amount" :=
-                          Round(
-                            SalesOrderLine."Line Discount Amount" /
-                            (1 + SalesOrderLine."VAT %" / 100), Currency."Amount Rounding Precision");
-                SalesLine.Validate("Line Discount Amount", SalesOrderLine."Line Discount Amount");
-                SalesLine."Line Discount %" := SalesOrderLine."Line Discount %";
-                SalesLine.UpdatePrePaymentAmounts();
-                OnInsertInvLineFromShptLineOnAfterUpdatePrepaymentsAmounts(SalesLine, SalesOrderLine, Rec);
-
-                if SalesOrderLine.Quantity = 0 then
-                    SalesLine.Validate("Inv. Discount Amount", 0)
-                else begin
-                    if not SalesLine."Allow Invoice Disc." then
-                        if SalesLine."VAT Calculation Type" <> SalesLine."VAT Calculation Type"::"Full VAT" then
-                            SalesLine."Allow Invoice Disc." := SalesOrderLine."Allow Invoice Disc.";
-                    if SalesLine."Allow Invoice Disc." then
-                        SalesLine.Validate(
-                          "Inv. Discount Amount",
-                          Round(
-                            SalesOrderLine."Inv. Discount Amount" * SalesLine.Quantity / SalesOrderLine.Quantity,
-                            Currency."Amount Rounding Precision"))
-                    else
-                        SalesLine.Validate("Inv. Discount Amount", 0);
-                end;
-
-                OnInsertInvLineFromShptLineOnAfterValidateInvDiscountAmount(SalesLine, SalesOrderLine, Rec, SalesInvHeader);
+                CopySalesLinePriceAndDiscountFromSalesOrderLine(SalesLine, SalesOrderLine);
+                OnOnInsertInvLineFromRetRcptLineOnAfterCopySalesLinePriceAndDiscount(SalesLine, SalesOrderLine, Rec, SalesHeader);
             end;
-
             SalesLine."Attached to Line No." :=
               TransferOldExtLines.TransferExtendedText(
                 SalesOrderLine."Line No.",
                 NextLineNo,
                 "Attached to Line No.");
-            SalesLine."Bin Code" := "Bin Code";
-            SalesLine."Shortcut Dimension 1 Code" := "Shortcut Dimension 1 Code";
-            SalesLine."Shortcut Dimension 2 Code" := "Shortcut Dimension 2 Code";
-            SalesLine."Dimension Set ID" := "Dimension Set ID";
+            SalesLine."Shortcut Dimension 1 Code" := SalesOrderLine."Shortcut Dimension 1 Code";
+            SalesLine."Shortcut Dimension 2 Code" := SalesOrderLine."Shortcut Dimension 2 Code";
+            SalesLine."Dimension Set ID" := SalesOrderLine."Dimension Set ID";
+
             IsHandled := false;
-            OnBeforeInsertInvLineFromShptLine(Rec, SalesLine, SalesOrderLine, IsHandled, TransferOldExtLines);
+            OnBeforeInsertInvLineFromRetRcptLine(SalesLine, SalesOrderLine, Rec, IsHandled, NextLineNo);
             if not IsHandled then
                 SalesLine.Insert();
-            OnAfterInsertInvLineFromShptLine(SalesLine, SalesOrderLine, NextLineNo, Rec);
-
-            ItemTrackingMgt.CopyHandledItemTrkgToInvLine(SalesOrderLine, SalesLine);
+            IsHandled := false;
+            OnAftertInsertInvLineFromRetRcptLine(SalesLine, SalesOrderLine, Rec, IsHandled);
+            if not IsHandled then
+                ItemTrackingMgt.CopyHandledItemTrkgToInvLine(SalesOrderLine, SalesLine);
 
             NextLineNo := NextLineNo + 10000;
             if "Attached to Line No." = 0 then begin
                 SetRange("Attached to Line No.", "Line No.");
                 SetRange(Type, Type::" ");
             end;
+
         until (Next() = 0) or ("Attached to Line No." = 0);
+
         IsHandled := false;
-        OnInsertInvLineFromShptLineOnAfterInsertAllLines(Rec, SalesLine, IsHandled);
-        if not IsHandled then
-            if SalesOrderHeader.Get(SalesOrderHeader."Document Type"::Order, "Order No.") then
-                if not SalesOrderHeader."Get Shipment Used" then begin
-                    SalesOrderHeader."Get Shipment Used" := true;
-                    SalesOrderHeader.Modify();
-                end;
+        OnInsertInvLineFromRetRcptLineOnAfterInsertAllLines(Rec, SalesLine, IsHandled);
+        if IsHandled then
+            exit;
+
+        if SalesOrderHeader.Get(SalesOrderHeader."Document Type"::Order, "Return Order No.") then
+            if not SalesOrderHeader."Get Shipment Used" then begin
+                SalesOrderHeader."Get Shipment Used" := true;
+                SalesOrderHeader.Modify();
+            end;
     end;
 
-    procedure GetSalesInvLines(var TempSalesInvoiceLine: Record "Sales Invoice Line" temporary)
+    local procedure CopySalesLinePriceAndDiscountFromSalesOrderLine(var SalesLine: Record "Sales Line"; SalesOrderLine: Record "Sales Line")
     var
-        SalesInvoiceLine: Record "Sales Invoice Line";
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeCopySalesLinePriceAndDiscountFromSalesOrderLine(SalesLine, SalesOrderLine, IsHandled);
+        if IsHandled then
+            exit;
+
+        SalesLine.Validate("Unit Price", SalesOrderLine."Unit Price");
+        SalesLine."Allow Line Disc." := SalesOrderLine."Allow Line Disc.";
+        SalesLine."Allow Invoice Disc." := SalesOrderLine."Allow Invoice Disc.";
+        SalesLine.Validate("Line Discount %", SalesOrderLine."Line Discount %");
+        if SalesOrderLine.Quantity = 0 then
+            SalesLine.Validate("Inv. Discount Amount", 0)
+        else
+            SalesLine.Validate(
+              "Inv. Discount Amount",
+              Round(
+                SalesOrderLine."Inv. Discount Amount" * SalesLine.Quantity / SalesOrderLine.Quantity,
+                Currency."Amount Rounding Precision"));
+    end;
+
+    procedure GetSalesCrMemoLines(var TempSalesCrMemoLine: Record "Sales Cr.Memo Line" temporary)
+    var
+        SalesCrMemoLine: Record "Sales Cr.Memo Line";
         ValueItemLedgerEntries: Query "Value Item Ledger Entries";
     begin
-        TempSalesInvoiceLine.Reset();
-        TempSalesInvoiceLine.DeleteAll();
+        TempSalesCrMemoLine.Reset();
+        TempSalesCrMemoLine.DeleteAll();
 
         if Type <> Type::Item then
             exit;
 
         ValueItemLedgerEntries.SetRange(Item_Ledg_Document_No, "Document No.");
-        ValueItemLedgerEntries.SetRange(Item_Ledg_Document_Type, Enum::"Item Ledger Document Type"::"Sales Shipment");
+        ValueItemLedgerEntries.SetRange(Item_Ledg_Document_Type, Enum::"Item Ledger Document Type"::"Sales Return Receipt");
         ValueItemLedgerEntries.SetRange(Item_Ledg_Document_Line_No, "Line No.");
         ValueItemLedgerEntries.SetFilter(Item_Ledg_Invoice_Quantity, '<>0');
         ValueItemLedgerEntries.SetRange(Value_Entry_Type, Enum::"Cost Entry Type"::"Direct Cost");
         ValueItemLedgerEntries.SetFilter(Value_Entry_Invoiced_Qty, '<>0');
-        ValueItemLedgerEntries.SetRange(Value_Entry_Doc_Type, Enum::"Item Ledger Document Type"::"Sales Invoice");
+        ValueItemLedgerEntries.SetRange(Value_Entry_Doc_Type, Enum::"Item Ledger Document Type"::"Sales Credit Memo");
         ValueItemLedgerEntries.Open();
-        while ValueItemLedgerEntries.Read() do begin
-            OnGetSalesInvLinesOnBeforeGetSalesInvoiceLine(SalesInvoiceLine);
-            if SalesInvoiceLine.Get(ValueItemLedgerEntries.Value_Entry_Doc_No, ValueItemLedgerEntries.Value_Entry_Doc_Line_No) then begin
-                TempSalesInvoiceLine.Init();
-                TempSalesInvoiceLine := SalesInvoiceLine;
-                if TempSalesInvoiceLine.Insert() then;
+        while ValueItemLedgerEntries.Read() do
+            if SalesCrMemoLine.Get(ValueItemLedgerEntries.Value_Entry_Doc_No, ValueItemLedgerEntries.Value_Entry_Doc_Line_No) then begin
+                TempSalesCrMemoLine.Init();
+                TempSalesCrMemoLine := SalesCrMemoLine;
+                if TempSalesCrMemoLine.Insert() then;
             end;
-        end;
-    end;
-
-    procedure CalcShippedSaleNotReturned(var ShippedQtyNotReturned: Decimal; var RevUnitCostLCY: Decimal; ExactCostReverse: Boolean)
-    var
-        ItemLedgEntry: Record "Item Ledger Entry";
-        TotalCostLCY: Decimal;
-        TotalQtyBase: Decimal;
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeCalcShippedSaleNotReturned(Rec, ShippedQtyNotReturned, RevUnitCostLCY, ExactCostReverse, IsHandled);
-        if IsHandled then
-            exit;
-
-        ShippedQtyNotReturned := 0;
-        if (Type <> Type::Item) or (Quantity <= 0) then begin
-            RevUnitCostLCY := "Unit Cost (LCY)";
-            exit;
-        end;
-
-        RevUnitCostLCY := 0;
-        FilterPstdDocLnItemLedgEntries(ItemLedgEntry);
-        if ItemLedgEntry.FindSet() then
-            repeat
-                ShippedQtyNotReturned := ShippedQtyNotReturned - ItemLedgEntry."Shipped Qty. Not Returned";
-                if ExactCostReverse then begin
-                    ItemLedgEntry.CalcFields("Cost Amount (Expected)", "Cost Amount (Actual)");
-                    TotalCostLCY :=
-                      TotalCostLCY + ItemLedgEntry."Cost Amount (Expected)" + ItemLedgEntry."Cost Amount (Actual)";
-                    TotalQtyBase := TotalQtyBase + ItemLedgEntry.Quantity;
-                end;
-            until ItemLedgEntry.Next() = 0;
-
-        if ExactCostReverse and (ShippedQtyNotReturned <> 0) and (TotalQtyBase <> 0) then
-            RevUnitCostLCY := Abs(TotalCostLCY / TotalQtyBase) * "Qty. per Unit of Measure"
-        else
-            RevUnitCostLCY := "Unit Cost (LCY)";
-
-        ShippedQtyNotReturned := CalcQty(ShippedQtyNotReturned);
-    end;
-
-    local procedure CalcQty(QtyBase: Decimal): Decimal
-    begin
-        if "Qty. per Unit of Measure" = 0 then
-            exit(QtyBase);
-        exit(Round(QtyBase / "Qty. per Unit of Measure", UOMMgt.QtyRndPrecision()));
     end;
 
     procedure FilterPstdDocLnItemLedgEntries(var ItemLedgEntry: Record "Item Ledger Entry")
@@ -934,17 +802,17 @@ table 111 "Sales Shipment Line"
         ItemLedgEntry.Reset();
         ItemLedgEntry.SetCurrentKey("Document No.");
         ItemLedgEntry.SetRange("Document No.", "Document No.");
-        ItemLedgEntry.SetRange("Document Type", ItemLedgEntry."Document Type"::"Sales Shipment");
+        ItemLedgEntry.SetRange("Document Type", ItemLedgEntry."Document Type"::"Sales Return Receipt");
         ItemLedgEntry.SetRange("Document Line No.", "Line No.");
     end;
 
-    procedure ShowItemSalesInvLines()
+    procedure ShowItemSalesCrMemoLines()
     var
-        TempSalesInvLine: Record "Sales Invoice Line" temporary;
+        TempSalesCrMemoLine: Record "Sales Cr.Memo Line" temporary;
     begin
         if Type = Type::Item then begin
-            GetSalesInvLines(TempSalesInvLine);
-            PAGE.RunModal(PAGE::"Posted Sales Invoice Lines", TempSalesInvLine);
+            GetSalesCrMemoLines(TempSalesCrMemoLine);
+            PAGE.RunModal(0, TempSalesCrMemoLine);
         end;
     end;
 
@@ -964,170 +832,40 @@ table 111 "Sales Shipment Line"
     var
         SalesCommentLine: Record "Sales Comment Line";
     begin
-        SalesCommentLine.ShowComments(SalesCommentLine."Document Type"::Shipment.AsInteger(), "Document No.", "Line No.");
+        SalesCommentLine.ShowComments(
+            SalesCommentLine."Document Type"::"Posted Return Receipt".AsInteger(), "Document No.", "Line No.");
     end;
 
-    procedure ShowAsmToOrder()
-    begin
-        PostedATOLink.ShowPostedAsm(Rec);
-    end;
-
-    procedure ShowShortcutDimCode(var ShortcutDimCode: array[8] of Code[20])
-    begin
-        DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
-    end;
-
-    procedure AsmToShipmentExists(var PostedAsmHeader: Record "Posted Assembly Header"): Boolean
-    var
-        PostedAssembleToOrderLink: Record "Posted Assemble-to-Order Link";
-    begin
-        if not PostedAssembleToOrderLink.AsmExistsForPostedShipmentLine(Rec) then
-            exit(false);
-        exit(PostedAsmHeader.Get(PostedAssembleToOrderLink."Assembly Document No."));
-    end;
-
-    procedure InitFromSalesLine(SalesShptHeader: Record "Sales Shipment Header"; SalesLine: Record "Sales Line")
+    procedure InitFromSalesLine(ReturnRcptHeader: Record "Return Receipt Header"; SalesLine: Record "Sales Line")
     begin
         Init();
         TransferFields(SalesLine);
         if ("No." = '') and HasTypeToFillMandatoryFields() then
             Type := Type::" ";
-        "Posting Date" := SalesShptHeader."Posting Date";
-        "Document No." := SalesShptHeader."No.";
-        Quantity := SalesLine."Qty. to Ship";
-        "Quantity (Base)" := SalesLine."Qty. to Ship (Base)";
-        if Abs(SalesLine."Qty. to Invoice") > Abs(SalesLine."Qty. to Ship") then begin
-            "Quantity Invoiced" := SalesLine."Qty. to Ship";
-            "Qty. Invoiced (Base)" := SalesLine."Qty. to Ship (Base)";
+        "Posting Date" := ReturnRcptHeader."Posting Date";
+        "Document No." := ReturnRcptHeader."No.";
+        Quantity := SalesLine."Return Qty. to Receive";
+        "Quantity (Base)" := SalesLine."Return Qty. to Receive (Base)";
+        if Abs(SalesLine."Qty. to Invoice") > Abs(SalesLine."Return Qty. to Receive") then begin
+            "Quantity Invoiced" := SalesLine."Return Qty. to Receive";
+            "Qty. Invoiced (Base)" := SalesLine."Return Qty. to Receive (Base)";
         end else begin
             "Quantity Invoiced" := SalesLine."Qty. to Invoice";
             "Qty. Invoiced (Base)" := SalesLine."Qty. to Invoice (Base)";
         end;
-        "Qty. Shipped Not Invoiced" := Quantity - "Quantity Invoiced";
-        if SalesLine."Document Type" = SalesLine."Document Type"::Order then begin
-            "Order No." := SalesLine."Document No.";
-            "Order Line No." := SalesLine."Line No.";
+        "Return Qty. Rcd. Not Invd." :=
+          Quantity - "Quantity Invoiced";
+        if SalesLine."Document Type" = SalesLine."Document Type"::"Return Order" then begin
+            "Return Order No." := SalesLine."Document No.";
+            "Return Order Line No." := SalesLine."Line No.";
         end;
 
-        OnAfterInitFromSalesLine(SalesShptHeader, SalesLine, Rec);
-    end;
-
-    procedure ClearSalesLineValues(var SalesLine: Record "Sales Line")
-    begin
-        SalesLine."Quantity (Base)" := 0;
-        SalesLine.Quantity := 0;
-        SalesLine."Outstanding Qty. (Base)" := 0;
-        SalesLine."Outstanding Quantity" := 0;
-        SalesLine."Quantity Shipped" := 0;
-        SalesLine."Qty. Shipped (Base)" := 0;
-        SalesLine."Quantity Invoiced" := 0;
-        SalesLine."Qty. Invoiced (Base)" := 0;
-        SalesLine.Amount := 0;
-        SalesLine."Amount Including VAT" := 0;
-        SalesLine."Purchase Order No." := '';
-        SalesLine."Purch. Order Line No." := 0;
-        SalesLine."Special Order Purchase No." := '';
-        SalesLine."Special Order Purch. Line No." := 0;
-        SalesLine."Special Order" := false;
-        SalesLine."Appl.-to Item Entry" := 0;
-        SalesLine."Appl.-from Item Entry" := 0;
-
-        OnAfterClearSalesLineValues(Rec, SalesLine);
-    end;
-
-    procedure FormatType(): Text
-    var
-        SalesLine: Record "Sales Line";
-    begin
-        if Type = Type::" " then
-            exit(SalesLine.FormatType());
-
-        exit(Format(Type));
-    end;
-
-    procedure CalcBaseQuantities(var SalesLine: Record "Sales Line"; QtyFactor: Decimal)
-    begin
-        SalesLine."Quantity (Base)" :=
-          Round(SalesLine.Quantity * QtyFactor, UOMMgt.QtyRndPrecision());
-        SalesLine."Qty. to Asm. to Order (Base)" :=
-          Round(SalesLine."Qty. to Assemble to Order" * QtyFactor, UOMMgt.QtyRndPrecision());
-        SalesLine."Outstanding Qty. (Base)" :=
-          Round(SalesLine."Outstanding Quantity" * QtyFactor, UOMMgt.QtyRndPrecision());
-        SalesLine."Qty. to Ship (Base)" :=
-          Round(SalesLine."Qty. to Ship" * QtyFactor, UOMMgt.QtyRndPrecision());
-        SalesLine."Qty. Shipped (Base)" :=
-          Round(SalesLine."Quantity Shipped" * QtyFactor, UOMMgt.QtyRndPrecision());
-        SalesLine."Qty. Shipped Not Invd. (Base)" :=
-          Round(SalesLine."Qty. Shipped Not Invoiced" * QtyFactor, UOMMgt.QtyRndPrecision());
-        SalesLine."Qty. to Invoice (Base)" :=
-          Round(SalesLine."Qty. to Invoice" * QtyFactor, UOMMgt.QtyRndPrecision());
-        SalesLine."Qty. Invoiced (Base)" :=
-          Round(SalesLine."Quantity Invoiced" * QtyFactor, UOMMgt.QtyRndPrecision());
-        SalesLine."Return Qty. to Receive (Base)" :=
-          Round(SalesLine."Return Qty. to Receive" * QtyFactor, UOMMgt.QtyRndPrecision());
-        SalesLine."Return Qty. Received (Base)" :=
-          Round(SalesLine."Return Qty. Received" * QtyFactor, UOMMgt.QtyRndPrecision());
-        SalesLine."Ret. Qty. Rcd. Not Invd.(Base)" :=
-          Round(SalesLine."Return Qty. Rcd. Not Invd." * QtyFactor, UOMMgt.QtyRndPrecision());
-    end;
-
-    local procedure GetFieldCaption(FieldNumber: Integer): Text[100]
-    var
-        "Field": Record "Field";
-    begin
-        Field.Get(DATABASE::"Sales Shipment Line", FieldNumber);
-        exit(Field."Field Caption");
-    end;
-
-    procedure GetCaptionClass(FieldNumber: Integer): Text[80]
-    begin
-        case FieldNumber of
-            FieldNo("No."):
-                exit(StrSubstNo('3,%1', GetFieldCaption(FieldNumber)));
-        end;
+        OnAfterInitFromSalesLine(ReturnRcptHeader, SalesLine, Rec);
     end;
 
     procedure HasTypeToFillMandatoryFields(): Boolean
     begin
         exit(Type <> Type::" ");
-    end;
-
-    local procedure UpdateDocumentId()
-    var
-        SalesShipmentHeader: Record "Sales Shipment Header";
-    begin
-        if "Document No." = '' then begin
-            Clear("Document Id");
-            exit;
-        end;
-
-        SalesShipmentHeader.SetLoadFields("No.", SystemId);
-        if not SalesShipmentHeader.Get("Document No.") then
-            exit;
-
-        "Document Id" := SalesShipmentHeader.SystemId;
-    end;
-
-
-    local procedure UpdateDocumentNo()
-    var
-        SalesShipmentHeader: Record "Sales Shipment Header";
-    begin
-        if IsNullGuid(Rec."Document Id") then begin
-            Clear(Rec."Document No.");
-            exit;
-        end;
-
-        SalesShipmentHeader.SetLoadFields("No.", SystemId);
-        if not SalesShipmentHeader.GetBySystemId(Rec."Document Id") then
-            exit;
-
-        "Document No." := SalesShipmentHeader."No.";
-    end;
-
-    procedure UpdateReferencedIds()
-    begin
-        UpdateDocumentId();
     end;
 
     procedure SetSecurityFilterOnRespCenter()
@@ -1148,17 +886,17 @@ table 111 "Sales Shipment Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterClearSalesLineValues(var SalesShipmentLine: Record "Sales Shipment Line"; var SalesLine: Record "Sales Line")
+    local procedure OnAfterCopyFieldsFromReturnReceiptLine(var ReturnReceiptLine: Record "Return Receipt Line"; var SalesLine: Record "Sales Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterDescriptionSalesLineInsert(var SalesLine: Record "Sales Line"; SalesShipmentLine: Record "Sales Shipment Line"; var NextLineNo: Integer)
+    local procedure OnAfterInitFromSalesLine(ReturnRcptHeader: Record "Return Receipt Header"; SalesLine: Record "Sales Line"; var ReturnRcptLine: Record "Return Receipt Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInitFromSalesLine(SalesShptHeader: Record "Sales Shipment Header"; SalesLine: Record "Sales Line"; var SalesShptLine: Record "Sales Shipment Line")
+    local procedure OnAftertInsertInvLineFromRetRcptLine(var SalesLine: Record "Sales Line"; var SalesOrderLine: Record "Sales Line"; var ReturnReceiptLine: Record "Return Receipt Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -1168,42 +906,42 @@ table 111 "Sales Shipment Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcShippedSaleNotReturned(var SalesShipmentLine: Record "Sales Shipment Line"; var ShippedQtyNotReturned: Decimal; var RevUnitCostLCY: Decimal; ExactCostReverse: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeInsertInvLineFromRetRcptLine(var SalesLine: Record "Sales Line"; SalesOrderLine: Record "Sales Line"; var ReturnReceiptLine: Record "Return Receipt Line"; var IsHandled: Boolean; NextLineNo: Integer)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertInvLineFromShptLine(var SalesShptLine: Record "Sales Shipment Line"; var SalesLine: Record "Sales Line"; SalesOrderLine: Record "Sales Line"; var IsHandled: Boolean; var TransferOldExtTextLines: Codeunit "Transfer Old Ext. Text Lines")
+    local procedure OnBeforeInsertInvLineFromRetRcptLineBeforeInsertTextLine(var ReturnReceiptLine: Record "Return Receipt Line"; var SalesLine: Record "Sales Line"; var NextLineNo: Integer; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertInvLineFromShptLineBeforeInsertTextLine(var SalesShptLine: Record "Sales Shipment Line"; var SalesLine: Record "Sales Line"; var NextLineNo: Integer; var Handled: Boolean; TempSalesLine: Record "Sales Line" temporary; SalesInvHeader: Record "Sales Header")
+    local procedure OnInsertInvLineFromRetRcptLineOnBeforeInitSalesLine(var ReturnReceiptLine: Record "Return Receipt Line"; SalesLine: Record "Sales Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCodeInsertInvLineFromShptLine(var SalesShipmentLine: Record "Sales Shipment Line"; var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    local procedure OnInsertInvLineFromRetRcptLineOnAfterInsertAllLines(ReturnReceiptLine: Record "Return Receipt Line"; var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertInvLineFromShptLineOnAfterSalesOrderHeaderGet(var SalesOrderHeader: Record "Sales Header"; var SalesInvHeader: Record "Sales Header"; var SalesOrderLine: Record "Sales Line")
+    local procedure OnInsertInvLineFromRetRcptLineOnBeforeValidateSalesLineQuantity(var ReturnReceiptLine: Record "Return Receipt Line"; var SalesLine: Record "Sales Line"; var IsHandled: Boolean; var SalesHeader: Record "Sales Header")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertInvLineFromShptLineOnAfterAssignDescription(var SalesShipmentLine: Record "Sales Shipment Line"; var SalesOrderLine: Record "Sales Line")
+    local procedure OnAfterDescriptionSalesLineInsert(var SalesLine: Record "Sales Line"; ReturnReceiptLine: Record "Return Receipt Line"; var NextLineNo: Integer)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertInvLineFromShptLineOnAfterCalcQuantities(var SalesLine: Record "Sales Line"; var SalesOrderLine: Record "Sales Line")
+    local procedure OnInsertInvLineFromRetRcptLine(var ReturnReceiptLine: Record "Return Receipt Line"; var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertInvLineFromShptLineOnAfterUpdatePrepaymentsAmounts(var SalesLine: Record "Sales Line"; var SalesOrderLine: Record "Sales Line"; var SalesShipmentLine: Record "Sales Shipment Line")
+    local procedure OnOnInsertInvLineFromRetRcptLineOnAfterCopySalesLinePriceAndDiscount(var SalesLine: Record "Sales Line"; SalesOrderLine: Record "Sales Line"; ReturnReceiptLine: Record "Return Receipt Line"; SalesHeader: Record "Sales Header")
     begin
     end;
 
@@ -1213,12 +951,12 @@ table 111 "Sales Shipment Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertInvLineFromShptLineOnBeforeInsertDescriptionLine(SalesShipmentLine: Record "Sales Shipment Line"; var SalesLine: Record "Sales Line"; TempSalesLine: Record "Sales Line" temporary; var SalesInvHeader: Record "Sales Header"; var NextLineNo: integer)
+    local procedure OnInsertInvLineFromRetRcptLineOnBeforeNoExtTextLineError(var ReturnReceiptLine: Record "Return Receipt Line")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertInvLineFromShptLineOnAfterValidateInvDiscountAmount(var SalesLine: Record "Sales Line"; SalesOrderLine: Record "Sales Line"; SalesShipmentLine: Record "Sales Shipment Line"; SalesInvHeader: Record "Sales Header")
+    local procedure OnInsertInvLineFromRetRcptLineOnAfterCalcUnitPrice(var ReturnReceiptLine: Record "Return Receipt Line"; SalesHeader: Record "Sales Header"; SalesHeader2: Record "Sales Header"; var SalesLine: Record "Sales Line"; var SalesOrderLine: Record "Sales Line"; Currency: Record Currency)
     begin
     end;
 
@@ -1228,27 +966,12 @@ table 111 "Sales Shipment Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetSecurityFilterOnRespCenter(var SalesShipmentLine: Record "Sales Shipment Line"; var IsHandled: Boolean)
+    local procedure OnInsertInvLineFromRetRcptLineOnBeforeSalesHeaderGet(var SalesHeader: Record "Sales Header"; ReturnReceiptLine: Record "Return Receipt Line"; var TempSalesLine: Record "Sales Line" temporary; var IsHandled: boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertInvLineFromShptLineOnBeforeAssigneSalesLine(var SalesShipmentLine: Record "Sales Shipment Line"; SalesHeaderInv: Record "Sales Header"; SalesHeaderOrder: Record "Sales Header"; var SalesLine: Record "Sales Line"; var SalesOrderLine: Record "Sales Line"; Currency: Record Currency)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnInsertInvLineFromShptLineOnBeforeSalesHeaderGet(var SalesHeader: Record "Sales Header"; SalesShipmentLine: Record "Sales Shipment Line"; var TempSalesLine: Record "Sales Line" temporary; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnGetSalesInvLinesOnBeforeGetSalesInvoiceLine(var SalesInvoiceLine: Record "Sales Invoice Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeShowItemTrackingLines(var SalesShipmentLine: Record "Sales Shipment Line"; var IsHandled: Boolean)
+    local procedure OnBeforeShowItemTrackingLines(var ReturnReceiptLine: Record "Return Receipt Line"; var IsHandled: Boolean)
     begin
     end;
 }

@@ -2,18 +2,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.HumanResources.Employee;
+namespace Microsoft.Sales.FinanceCharge;
 
-page 5234 "HR Confidential Comment Sheet"
+page 454 "Fin. Charge Comment Sheet"
 {
     AutoSplitKey = true;
-    Caption = 'Confidential Comment Sheet';
+    Caption = 'Comment Sheet';
     DataCaptionExpression = Caption(Rec);
     DelayedInsert = true;
     LinksAllowed = false;
     MultipleNewLines = true;
     PageType = List;
-    SourceTable = "HR Confidential Comment Line";
+    SourceTable = "Fin. Charge Comment Line";
 
     layout
     {
@@ -24,17 +24,17 @@ page 5234 "HR Confidential Comment Sheet"
                 ShowCaption = false;
                 field(Date; Rec.Date)
                 {
-                    ApplicationArea = Comments;
-                    ToolTip = 'Specifies the date when the comment was created.';
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the date the comment was created.';
                 }
                 field(Comment; Rec.Comment)
                 {
-                    ApplicationArea = Comments;
+                    ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the comment itself.';
                 }
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = BasicHR;
+                    ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies a code for the comment.';
                     Visible = false;
                 }
@@ -52,21 +52,16 @@ page 5234 "HR Confidential Comment Sheet"
     end;
 
     var
-        Employee: Record Employee;
-        ConfidentialInfo: Record "Confidential Information";
-
 #pragma warning disable AA0074
         Text000: Label 'untitled';
+        Text001: Label 'Fin. Charge Memo';
 #pragma warning restore AA0074
 
-    procedure Caption(HRCommentLine: Record "HR Confidential Comment Line"): Text
+    procedure Caption(FinChrgCommentLine: Record "Fin. Charge Comment Line"): Text
     begin
-        if ConfidentialInfo.Get(HRCommentLine."No.", HRCommentLine.Code, HRCommentLine."Table Line No.") and
-           Employee.Get(HRCommentLine."No.")
-        then
-            exit(HRCommentLine."No." + ' ' + Employee.FullName() + ' ' +
-              ConfidentialInfo."Confidential Code");
-        exit(Text000);
+        if FinChrgCommentLine."No." = '' then
+            exit(Text000);
+        exit(Text001 + ' ' + FinChrgCommentLine."No." + ' ');
     end;
 }
 

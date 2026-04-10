@@ -2,9 +2,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.HumanResources.Employee;
+namespace Microsoft.Projects.Project.Planning;
 
-enum 5224 "Employee Gender"
+#pragma warning disable AL0659
+enum 1022 "Job Planning Line Invoice Document Type"
+#pragma warning restore AL0659
 {
     Extensible = true;
     AssignmentCompatibility = true;
@@ -12,24 +14,20 @@ enum 5224 "Employee Gender"
     value(0; " ")
     {
     }
-    value(1; Female)
+    value(1; Invoice)
     {
-        Caption = 'Female';
+        Caption = 'Invoice';
     }
-    value(2; Male)
+    value(2; "Credit Memo")
     {
-        Caption = 'Male';
+        Caption = 'Credit Memo';
     }
-    value(3; "Non-binary")
+    value(3; "Posted Invoice")
     {
-        Caption = 'Non-binary/gender diverse';
+        Caption = 'Posted Invoice';
     }
-    value(4; "Self-Described")
+    value(4; "Posted Credit Memo")
     {
-        Caption = 'Self-Described';
-    }
-    value(5; "I don’t wish to answer")
-    {
-        Caption = 'I don''t wish to answer';
+        Caption = 'Posted Credit Memo';
     }
 }
