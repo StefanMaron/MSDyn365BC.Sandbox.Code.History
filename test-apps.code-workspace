@@ -142,10 +142,10 @@
       "path": "./Test Runner/src/DataDrivenTest"
     },
     {
-      "path": "./Base Application/System/DevTools/CALTest"
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
     },
     {
-      "path": "./Performance Toolkit Tests/src/Mock Tests"
+      "path": "./Base Application/System/DevTools/CALTest"
     },
     {
       "path": "./AI Test Toolkit/src/TestSuite"
@@ -153,10 +153,10 @@
   ],
   "settings": {
     "al.enableCodeActions": false,
-    "allint.enabled": false,
-    "al.enableCodeAnalysis": false,
     "search.exclude": {
       "**.xlf": true
-    }
+    },
+    "allint.enabled": false,
+    "al.enableCodeAnalysis": false
   }
 }
