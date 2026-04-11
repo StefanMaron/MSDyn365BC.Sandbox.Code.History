@@ -2,19 +2,20 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Projects.Resources.Resource;
+namespace Microsoft.Purchases.Vendor;
 
+using Microsoft.Integration.Entity;
 using System.Device;
 using System.IO;
 
-page 407 "Resource Picture"
+page 786 "Vendor Picture"
 {
-    Caption = 'Resource Picture';
+    Caption = 'Vendor Picture';
     DeleteAllowed = false;
     InsertAllowed = false;
     LinksAllowed = false;
     PageType = CardPart;
-    SourceTable = Resource;
+    SourceTable = Vendor;
 
     layout
     {
@@ -22,9 +23,9 @@ page 407 "Resource Picture"
         {
             field(Image; Rec.Image)
             {
-                ApplicationArea = Jobs;
+                ApplicationArea = All;
                 ShowCaption = false;
-                ToolTip = 'Specifies the picture that has been inserted for the resource.';
+                ToolTip = 'Specifies the picture of the vendor, for example, a logo.';
             }
         }
     }
@@ -35,7 +36,7 @@ page 407 "Resource Picture"
         {
             action(TakePicture)
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = All;
                 Caption = 'Take';
                 Image = Camera;
                 ToolTip = 'Activate the camera on the device.';
@@ -48,7 +49,7 @@ page 407 "Resource Picture"
             }
             action(ImportPicture)
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = All;
                 Caption = 'Import';
                 Image = Import;
                 ToolTip = 'Import a picture file.';
@@ -70,17 +71,17 @@ page 407 "Resource Picture"
                     if FileName = '' then
                         exit;
 
-                    OnImportPictureBeforeImportFile(Rec, FileName);
                     Clear(Rec.Image);
                     Rec.Image.ImportFile(FileName, ClientFileName);
-                    Rec.Modify(true);
+                    if not Rec.Modify(true) then
+                        Rec.Insert(true);
 
                     if FileManagement.DeleteServerFile(FileName) then;
                 end;
             }
             action(ExportFile)
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = All;
                 Caption = 'Export';
                 Enabled = DeleteExportEnabled;
                 Image = Export;
@@ -88,6 +89,7 @@ page 407 "Resource Picture"
 
                 trigger OnAction()
                 var
+                    DummyPictureEntity: Record "Picture Entity";
                     FileManagement: Codeunit "File Management";
                     ToFile: Text;
                     ExportPath: Text;
@@ -95,7 +97,7 @@ page 407 "Resource Picture"
                     Rec.TestField("No.");
                     Rec.TestField(Name);
 
-                    ToFile := StrSubstNo('%1 %2.jpg', Rec."No.", Rec.Name);
+                    ToFile := DummyPictureEntity.GetDefaultMediaDescription(Rec);
                     ExportPath := TemporaryPath + Rec."No." + Format(Rec.Image.MediaId);
                     Rec.Image.ExportFile(ExportPath);
 
@@ -104,7 +106,7 @@ page 407 "Resource Picture"
             }
             action(DeletePicture)
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = All;
                 Caption = 'Delete';
                 Enabled = DeleteExportEnabled;
                 Image = Delete;
@@ -148,8 +150,7 @@ page 407 "Resource Picture"
         PictureInstream: InStream;
         PictureDescription: Text;
     begin
-        OnBeforeTakePicture(Rec);
-        Rec.TestField(Rec."No.");
+        Rec.TestField("No.");
         Rec.TestField(Name);
 
         if Rec.Image.HasValue() then
@@ -166,16 +167,6 @@ page 407 "Resource Picture"
     local procedure SetEditableOnPictureActions()
     begin
         DeleteExportEnabled := Rec.Image.HasValue;
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeTakePicture(var Resource: Record Resource)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnImportPictureBeforeImportFile(var Resource: Record Resource; FileName: Text)
-    begin
     end;
 }
 

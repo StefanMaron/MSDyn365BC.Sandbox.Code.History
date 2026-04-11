@@ -1,17 +1,21 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Analysis;
+namespace Microsoft.Purchases.Analysis;
 
 using Microsoft.Finance.FinancialReports;
 using System.Visualization;
 
-table 1319 "Sales by Cust. Grp.Chart Setup"
+table 9089 "Purch. by Vend.Grp.Chart Setup"
 {
-    Caption = 'Sales by Cust. Grp.Chart Setup';
+    Caption = 'Purch. by Vend. Grp. Chart Setup';
     LookupPageID = "Account Schedule Chart List";
     DataClassification = CustomerContent;
+    ReplicateData = false;
+
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     fields
     {
@@ -27,7 +31,7 @@ table 1319 "Sales by Cust. Grp.Chart Setup"
 
             trigger OnValidate()
             begin
-                TestField("Start Date");
+                Rec.TestField("Start Date");
             end;
         }
         field(41; "Period Length"; Option)
@@ -40,14 +44,10 @@ table 1319 "Sales by Cust. Grp.Chart Setup"
 
     keys
     {
-        key(Key1; "User ID")
+        key(PK; "User ID")
         {
             Clustered = true;
         }
-    }
-
-    fieldgroups
-    {
     }
 
     procedure SetPeriod(Which: Option " ",Next,Previous)
@@ -57,7 +57,7 @@ table 1319 "Sales by Cust. Grp.Chart Setup"
         if Which = Which::" " then
             exit;
 
-        Get(UserId);
+        Rec.Get(UserId);
         BusinessChartBuffer."Period Length" := "Period Length";
         case Which of
             Which::Previous:
@@ -65,14 +65,13 @@ table 1319 "Sales by Cust. Grp.Chart Setup"
             Which::Next:
                 "Start Date" := CalcDate('<1D>', BusinessChartBuffer.CalcToDate("Start Date"));
         end;
-        Modify();
+        Rec.Modify();
     end;
 
     procedure SetPeriodLength(PeriodLength: Option)
     begin
-        Get(UserId);
+        Rec.Get(UserId);
         "Period Length" := PeriodLength;
-        Modify(true);
+        Rec.Modify(true);
     end;
 }
-

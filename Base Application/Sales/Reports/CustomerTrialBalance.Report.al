@@ -2,50 +2,45 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Reports;
+namespace Microsoft.Purchases.Reports;
 
 using Microsoft.Foundation.Period;
-using Microsoft.Sales.Customer;
+using Microsoft.Purchases.Vendor;
 
-report 129 "Customer - Trial Balance"
+report 329 "Vendor - Trial Balance"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Sales/Reports/CustomerTrialBalance.rdlc';
-    AdditionalSearchTerms = 'payment due,order status';
+    RDLCLayout = './Purchases/Reports/VendorTrialBalance.rdlc';
     ApplicationArea = Basic, Suite;
-    Caption = 'Customer - Trial Balance';
+    Caption = 'Vendor - Trial Balance';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
-    DataAccessIntent = ReadOnly;
 
     dataset
     {
-        dataitem(Customer; Customer)
+        dataitem(Vendor; Vendor)
         {
-            DataItemTableView = sorting("Customer Posting Group");
-            RequestFilterFields = "No.", "Date Filter", "Customer Posting Group";
+            DataItemTableView = sorting("Vendor Posting Group");
+            RequestFilterFields = "No.", "Date Filter", "Vendor Posting Group";
             column(CompanyName; COMPANYPROPERTY.DisplayName())
             {
             }
-            column(PeriodFilter; StrSubstNo(Text003, PeriodFilter))
+            column(PeriodPeriodFilter; StrSubstNo(Text003, PeriodFilter))
             {
             }
-            column(CustFieldCaptPostingGroup; StrSubstNo(Text005, FieldCaption("Customer Posting Group")))
+            column(VendPostGrpGroupTotal; StrSubstNo(Text005, FieldCaption("Vendor Posting Group")))
             {
             }
-            column(CustTableCaptioncustFilter; TableCaption + ': ' + CustFilter)
+            column(VendTblCapVendFilter; TableCaption + ': ' + VendFilter)
             {
             }
-            column(CustFilter; CustFilter)
-            {
-            }
-            column(EmptyString; '')
+            column(VendFilter; VendFilter)
             {
             }
             column(PeriodStartDate; Format(PeriodStartDate))
             {
             }
-            column(PeriodFilter1; PeriodFilter)
+            column(PeriodFilter; PeriodFilter)
             {
             }
             column(FiscalYearStartDate; Format(FiscalYearStartDate))
@@ -57,7 +52,7 @@ report 129 "Customer - Trial Balance"
             column(PeriodEndDate; Format(PeriodEndDate))
             {
             }
-            column(PostingGroup_Customer; "Customer Posting Group")
+            column(VendorPostingGroup_Vendor; "Vendor Posting Group")
             {
             }
             column(YTDTotal; YTDTotal)
@@ -84,27 +79,36 @@ report 129 "Customer - Trial Balance"
             column(PeriodBeginBalance; PeriodBeginBalance)
             {
             }
-            column(Name_Customer; Name)
+            column(Name_Vendor; Name)
             {
                 IncludeCaption = true;
             }
-            column(No_Customer; "No.")
+            column(No_Vendor; "No.")
             {
                 IncludeCaption = true;
             }
-            column(TotalPostGroup_Customer; Text004 + Format(' ') + "Customer Posting Group")
+            column(TotForFrmtVendPostGrp; Text004 + Format(' ') + "Vendor Posting Group")
             {
             }
-            column(CustTrialBalanceCaption; CustTrialBalanceCaptionLbl)
+            column(VendTrialBalanceCap; VendTrialBalanceCapLbl)
             {
             }
             column(CurrReportPageNoCaption; CurrReportPageNoCaptionLbl)
             {
             }
-            column(AmtsinLCYCaption; AmtsinLCYCaptionLbl)
+            column(AmountsinLCYCaption; AmountsinLCYCaptionLbl)
             {
             }
-            column(inclcustentriesinperiodCaption; inclcustentriesinperiodCaptionLbl)
+            column(VendWithEntryPeriodCapt; VendWithEntryPeriodCaptLbl)
+            {
+            }
+            column(PeriodBeginBalCap; PeriodBeginBalCapLbl)
+            {
+            }
+            column(PeriodDebitAmtCaption; PeriodDebitAmtCaptionLbl)
+            {
+            }
+            column(PeriodCreditAmtCaption; PeriodCreditAmtCaptionLbl)
             {
             }
             column(YTDTotalCaption; YTDTotalCaptionLbl)
@@ -138,8 +142,8 @@ report 129 "Customer - Trial Balance"
 
     requestpage
     {
-        AboutTitle = 'About Customer - Trial Balance';
-        AboutText = 'View the closing balances of customers at the end of a period to reconcile the customer subledger against receivables accounts in the general ledger. View beginning balances and net changes by customer for the period and fiscal year to date.';
+        AboutTitle = 'About Vendor - Trial Balance';
+        AboutText = 'View the closing balances of vendors at the end of a period to reconcile the vendor subledger against payables accounts in the general ledger. View beginning balances and net changes by vendor for the period and fiscal year to date.';
 
         layout
         {
@@ -152,19 +156,16 @@ report 129 "Customer - Trial Balance"
 
     labels
     {
-        PeriodBeginBalanceCaption = 'Beginning Balance';
-        PeriodDebitAmtCaption = 'Debit';
-        PeriodCreditAmtCaption = 'Credit';
     }
 
     trigger OnPreReport()
     begin
-        PeriodFilter := Customer.GetFilter("Date Filter");
-        PeriodStartDate := Customer.GetRangeMin("Date Filter");
-        PeriodEndDate := Customer.GetRangeMax("Date Filter");
-        Customer.SetRange("Date Filter");
-        CustFilter := Customer.GetFilters();
-        Customer.SetRange("Date Filter", PeriodStartDate, PeriodEndDate);
+        PeriodFilter := Vendor.GetFilter("Date Filter");
+        PeriodStartDate := Vendor.GetRangeMin("Date Filter");
+        PeriodEndDate := Vendor.GetRangeMax("Date Filter");
+        Vendor.SetRange("Date Filter");
+        VendFilter := Vendor.GetFilters();
+        Vendor.SetRange("Date Filter", PeriodStartDate, PeriodEndDate);
         AccountingPeriod.SetRange("Starting Date", 0D, PeriodEndDate);
         AccountingPeriod.SetRange("New Fiscal Year", true);
         if AccountingPeriod.FindLast() then
@@ -185,10 +186,22 @@ report 129 "Customer - Trial Balance"
         YTDTotal: Decimal;
         PeriodFilter: Text;
         FiscalYearFilter: Text;
-        CustFilter: Text;
+        VendFilter: Text;
         PeriodStartDate: Date;
         PeriodEndDate: Date;
         FiscalYearStartDate: Date;
+        VendTrialBalanceCapLbl: Label 'Vendor - Trial Balance';
+        CurrReportPageNoCaptionLbl: Label 'Page';
+        AmountsinLCYCaptionLbl: Label 'Amounts in LCY';
+        VendWithEntryPeriodCaptLbl: Label 'Only includes vendors with entries in the period';
+        PeriodBeginBalCapLbl: Label 'Beginning Balance';
+        PeriodDebitAmtCaptionLbl: Label 'Debit';
+        PeriodCreditAmtCaptionLbl: Label 'Credit';
+        YTDTotalCaptionLbl: Label 'Ending Balance';
+        PeriodCaptionLbl: Label 'Period';
+        FiscalYearToDateCaptionLbl: Label 'Fiscal Year-To-Date';
+        NetChangeCaptionLbl: Label 'Net Change';
+        TotalinLCYCaptionLbl: Label 'Total in LCY';
 
 #pragma warning disable AA0074
 #pragma warning disable AA0470
@@ -200,30 +213,20 @@ report 129 "Customer - Trial Balance"
         Text005: Label 'Group Totals: %1';
 #pragma warning restore AA0470
 #pragma warning restore AA0074
-        CustTrialBalanceCaptionLbl: Label 'Customer - Trial Balance';
-        CurrReportPageNoCaptionLbl: Label 'Page';
-        AmtsinLCYCaptionLbl: Label 'Amounts in LCY';
-        inclcustentriesinperiodCaptionLbl: Label 'Only includes customers with entries in the period';
-        YTDTotalCaptionLbl: Label 'Ending Balance';
-        PeriodCaptionLbl: Label 'Period';
-        FiscalYearToDateCaptionLbl: Label 'Fiscal Year-To-Date';
-        NetChangeCaptionLbl: Label 'Net Change';
-        TotalinLCYCaptionLbl: Label 'Total in LCY';
 
     local procedure CalcAmounts(DateFrom: Date; DateTo: Date; var BeginBalance: Decimal; var DebitAmt: Decimal; var CreditAmt: Decimal; var TotalBalance: Decimal)
     var
-        CustomerCopy: Record Customer;
+        VendorCopy: Record Vendor;
     begin
-        CustomerCopy.Copy(Customer);
+        VendorCopy.Copy(Vendor);
+        VendorCopy.SetRange("Date Filter", 0D, DateFrom - 1);
+        VendorCopy.CalcFields("Net Change (LCY)");
+        BeginBalance := -VendorCopy."Net Change (LCY)";
 
-        CustomerCopy.SetRange("Date Filter", 0D, DateFrom - 1);
-        CustomerCopy.CalcFields("Net Change (LCY)");
-        BeginBalance := CustomerCopy."Net Change (LCY)";
-
-        CustomerCopy.SetRange("Date Filter", DateFrom, DateTo);
-        CustomerCopy.CalcFields("Debit Amount (LCY)", "Credit Amount (LCY)");
-        DebitAmt := CustomerCopy."Debit Amount (LCY)";
-        CreditAmt := CustomerCopy."Credit Amount (LCY)";
+        VendorCopy.SetRange("Date Filter", DateFrom, DateTo);
+        VendorCopy.CalcFields("Debit Amount (LCY)", "Credit Amount (LCY)");
+        DebitAmt := VendorCopy."Debit Amount (LCY)";
+        CreditAmt := VendorCopy."Credit Amount (LCY)";
 
         TotalBalance := BeginBalance + DebitAmt - CreditAmt;
     end;

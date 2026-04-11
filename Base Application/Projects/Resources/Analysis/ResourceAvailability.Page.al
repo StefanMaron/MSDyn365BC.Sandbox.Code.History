@@ -2,20 +2,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Projects.Resources.Analysis;
+namespace Microsoft.Purchases.Vendor;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.Projects.Resources.Resource;
 
-page 225 "Resource Availability"
+page 156 "Vendor Purchases"
 {
-    Caption = 'Resource Availability';
+    Caption = 'Vendor Purchases';
     DeleteAllowed = false;
     InsertAllowed = false;
     LinksAllowed = false;
     PageType = ListPlus;
     SaveValues = true;
-    SourceTable = Resource;
+    SourceTable = Vendor;
 
     layout
     {
@@ -26,7 +25,7 @@ page 225 "Resource Availability"
                 Caption = 'Options';
                 field(PeriodType; PeriodType)
                 {
-                    ApplicationArea = Jobs;
+                    ApplicationArea = Basic, Suite;
                     Caption = 'View by';
                     ToolTip = 'Specifies by which period amounts are displayed.';
 
@@ -48,7 +47,7 @@ page 225 "Resource Availability"
                 }
                 field(AmountType; AmountType)
                 {
-                    ApplicationArea = Jobs;
+                    ApplicationArea = Basic, Suite;
                     Caption = 'View as';
                     ToolTip = 'Specifies how amounts are displayed. Net Change: The net change in the balance for the selected period. Balance at Date: The balance as of the last day in the selected period.';
 
@@ -61,9 +60,9 @@ page 225 "Resource Availability"
                     end;
                 }
             }
-            part(ResAvailLines; "Res. Availability Lines")
+            part(VendPurchLines; "Vendor Purchase Lines")
             {
-                ApplicationArea = Jobs;
+                ApplicationArea = Basic, Suite;
             }
         }
     }
@@ -83,7 +82,7 @@ page 225 "Resource Availability"
 
     local procedure UpdateSubForm()
     begin
-        CurrPage.ResAvailLines.PAGE.SetLines(Rec, PeriodType, AmountType);
+        CurrPage.VendPurchLines.PAGE.SetLines(Rec, PeriodType, AmountType);
     end;
 
     local procedure DayPeriodTypeOnPush()
@@ -116,12 +115,12 @@ page 225 "Resource Availability"
         UpdateSubForm();
     end;
 
-    local procedure BalanceatDateAmountTypeOnPush()
+    local procedure NetChangeAmountTypeOnPush()
     begin
         UpdateSubForm();
     end;
 
-    local procedure NetChangeAmountTypeOnPush()
+    local procedure BalanceatDateAmountTypeOnPush()
     begin
         UpdateSubForm();
     end;

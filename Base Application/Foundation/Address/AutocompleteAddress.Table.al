@@ -2,12 +2,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Foundation.Address;
+namespace Microsoft.Purchases.Remittance;
 
-table 9090 "Autocomplete Address"
+table 2225 "Remit Address Buffer"
 {
-    Caption = 'Autocomplete Address';
-    DataClassification = CustomerContent;
+    Caption = 'Remit Address Buffer';
+    ReplicateData = false;
+    TableType = Temporary;
+    DataClassification = SystemMetadata;
 
     fields
     {
@@ -27,37 +29,30 @@ table 9090 "Autocomplete Address"
         {
             Caption = 'City';
         }
-        field(5; Postcode; Text[20])
+        field(5; County; Text[30])
         {
-            Caption = 'Postcode';
-            TableRelation = "Post Code" where("Country/Region Code" = field("Country / Region"));
-            ValidateTableRelation = false;
-        }
-        field(6; "Country / Region"; Text[10])
-        {
-            Caption = 'Country / Region';
-        }
-        field(7; County; Text[30])
-        {
-            CaptionClass = '5,1,' + "Country / Region";
             Caption = 'County';
         }
-        field(8; Id; Integer)
+        field(6; "Post Code"; Code[20])
         {
-            Caption = 'Id';
+            Caption = 'Post Code';
+        }
+        field(7; "Country/Region Code"; Code[10])
+        {
+            Caption = 'Country/Region Code';
+        }
+        field(8; Contact; Text[100])
+        {
+            Caption = 'Contact';
         }
     }
 
     keys
     {
-        key(Key1; Id)
+        key(Key1; Name, Address, "Post Code")
         {
             Clustered = true;
         }
-    }
-
-    fieldgroups
-    {
     }
 }
 

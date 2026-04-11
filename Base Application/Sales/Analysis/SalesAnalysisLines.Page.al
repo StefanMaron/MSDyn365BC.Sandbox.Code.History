@@ -2,16 +2,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Analysis;
+namespace Microsoft.Purchases.Analysis;
 
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
 using Microsoft.Inventory.Analysis;
 
-page 7120 "Sales Analysis Lines"
+page 7121 "Purchase Analysis Lines"
 {
     AutoSplitKey = true;
-    Caption = 'Sales Analysis Lines';
+    Caption = 'Purchase Analysis Lines';
     DelayedInsert = true;
     MultipleNewLines = true;
     PageType = Worksheet;
@@ -23,7 +23,7 @@ page 7120 "Sales Analysis Lines"
         {
             field(CurrentAnalysisLineTempl; CurrentAnalysisLineTempl)
             {
-                ApplicationArea = SalesAnalysis;
+                ApplicationArea = PurchaseAnalysis;
                 Caption = 'Name';
                 Lookup = true;
                 ToolTip = 'Specifies the name of the record.';
@@ -48,7 +48,7 @@ page 7120 "Sales Analysis Lines"
                 ShowCaption = false;
                 field("Row Ref. No."; Rec."Row Ref. No.")
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies a row reference number for the analysis line.';
 
@@ -59,24 +59,24 @@ page 7120 "Sales Analysis Lines"
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     StyleExpr = 'Strong';
                     ToolTip = 'Specifies a description for the analysis line.';
                 }
                 field(Type; Rec.Type)
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies the type of totaling for the analysis line. The type determines which items within the totaling range that you specify in the Range field will be totaled.';
 
                     trigger OnValidate()
                     begin
-                        if Rec.Type = Rec.Type::Vendor then
+                        if Rec.Type in [Rec.Type::Customer, Rec.Type::"Customer Group"] then
                             Rec.FieldError(Type);
                     end;
                 }
                 field(Range; Rec.Range)
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies the number or formula of the type to use to calculate the total for this line.';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -116,38 +116,38 @@ page 7120 "Sales Analysis Lines"
                 }
                 field("New Page"; Rec."New Page")
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies if you want a page break after the current line when you print the analysis report.';
                 }
                 field(Show; Rec.Show)
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies whether you want the analysis line to be included when you print the report.';
                 }
                 field(Bold; Rec.Bold)
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies if you want the amounts on this line to be printed in bold.';
                 }
                 field(Indentation; Rec.Indentation)
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies the indentation of the line.';
                     Visible = false;
                 }
                 field(Italic; Rec.Italic)
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies if you want the amounts in this line to be printed in italics.';
                 }
                 field(Underline; Rec.Underline)
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies if you want the amounts in this line to be underlined when printed.';
                 }
                 field("Show Opposite Sign"; Rec."Show Opposite Sign")
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies if you want sales and negative adjustments to be shown as positive amounts and purchases and positive adjustments to be shown as negative amounts.';
                 }
             }
@@ -175,29 +175,30 @@ page 7120 "Sales Analysis Lines"
             {
                 Caption = 'F&unctions';
                 Image = "Action";
-                action("Insert &Item")
+                action("Insert &Items")
                 {
-                    ApplicationArea = SalesAnalysis;
-                    Caption = 'Insert &Item';
+                    ApplicationArea = PurchaseAnalysis;
+                    Caption = 'Insert &Items';
+                    Ellipsis = true;
                     Image = Item;
-                    ToolTip = 'Insert one or more items that you want to include in the sales analysis report.';
+                    ToolTip = 'Insert one or more items that you want to include in the purchase analysis report.';
 
                     trigger OnAction()
                     begin
                         InsertLine("Analysis Line Type"::Item);
                     end;
                 }
-                action("Insert &Customers")
+                action("Insert &Vendors")
                 {
-                    ApplicationArea = SalesAnalysis;
-                    Caption = 'Insert &Customers';
+                    ApplicationArea = PurchaseAnalysis;
+                    Caption = 'Insert &Vendors';
                     Ellipsis = true;
-                    Image = Customer;
-                    ToolTip = 'Insert one or more customers that you want to include in the sales analysis report.';
+                    Image = Vendor;
+                    ToolTip = 'Insert one or more vendors that you want to include in the purchase analysis report.';
 
                     trigger OnAction()
                     begin
-                        InsertLine("Analysis Line Type"::Customer);
+                        InsertLine("Analysis Line Type"::Vendor);
                     end;
                 }
                 separator(Action36)
@@ -205,36 +206,24 @@ page 7120 "Sales Analysis Lines"
                 }
                 action("Insert Ite&m Groups")
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     Caption = 'Insert Ite&m Groups';
+                    Ellipsis = true;
                     Image = ItemGroup;
-                    ToolTip = 'Insert one or more item groups that you want to include in the sales analysis report.';
+                    ToolTip = 'Insert one or more item groups that you want to include in the purchase analysis report.';
 
                     trigger OnAction()
                     begin
                         InsertLine("Analysis Line Type"::"Item Group");
                     end;
                 }
-                action("Insert Customer &Groups")
-                {
-                    ApplicationArea = SalesAnalysis;
-                    Caption = 'Insert Customer &Groups';
-                    Ellipsis = true;
-                    Image = CustomerGroup;
-                    ToolTip = 'Insert one or more customer groups that you want to include in the sales analysis report.';
-
-                    trigger OnAction()
-                    begin
-                        InsertLine("Analysis Line Type"::"Customer Group");
-                    end;
-                }
                 action("Insert &Sales/Purchase Persons")
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     Caption = 'Add &Salespeople/Purchasers';
                     Ellipsis = true;
                     Image = SalesPurchaseTeam;
-                    ToolTip = 'Add one or more salespeople or purchasers that you want to include in the sales analysis report.';
+                    ToolTip = 'Add one or more salespeople of purchasers that you want to include in the purchase analysis report.';
 
                     trigger OnAction()
                     begin
@@ -246,7 +235,7 @@ page 7120 "Sales Analysis Lines"
                 }
                 action("Renumber Lines")
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     Caption = 'Renumber Lines';
                     Image = Refresh;
                     ToolTip = 'Renumber lines in the analysis report sequentially from a number that you specify.';

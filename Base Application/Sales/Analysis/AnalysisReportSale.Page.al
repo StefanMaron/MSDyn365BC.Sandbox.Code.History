@@ -2,17 +2,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Analysis;
+namespace Microsoft.Purchases.Analysis;
 
 using Microsoft.Inventory.Analysis;
 
-page 9376 "Analysis Report Sale"
+page 9375 "Analysis Report Purchase"
 {
-    ApplicationArea = SalesAnalysis;
-    Caption = 'Sales Analysis Reports';
+    ApplicationArea = PurchaseAnalysis;
+    Caption = 'Purchase Analysis Reports';
     PageType = List;
     SourceTable = "Analysis Report Name";
-    SourceTableView = where("Analysis Area" = const(Sales));
+    SourceTableView = where("Analysis Area" = const(Purchase));
     UsageCategory = ReportsAndAnalysis;
 
     layout
@@ -24,22 +24,22 @@ page 9376 "Analysis Report Sale"
                 ShowCaption = false;
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies the analysis report name.';
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies the analysis report description.';
                 }
                 field("Analysis Line Template Name"; Rec."Analysis Line Template Name")
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies the analysis line template name for this analysis report.';
                 }
                 field("Analysis Column Template Name"; Rec."Analysis Column Template Name")
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies the column template name for this analysis report.';
                 }
             }
@@ -65,7 +65,7 @@ page 9376 "Analysis Report Sale"
         {
             action(EditAnalysisReport)
             {
-                ApplicationArea = SalesAnalysis;
+                ApplicationArea = PurchaseAnalysis;
                 Caption = 'Edit Analysis Report';
                 Image = Edit;
                 ShortCutKey = 'Return';
@@ -73,10 +73,10 @@ page 9376 "Analysis Report Sale"
 
                 trigger OnAction()
                 var
-                    SalesAnalysisReport: Page "Sales Analysis Report";
+                    PurchaseAnalysisReport: Page "Purchase Analysis Report";
                 begin
-                    SalesAnalysisReport.SetReportName(Rec.Name);
-                    SalesAnalysisReport.Run();
+                    PurchaseAnalysisReport.SetReportName(Rec.Name);
+                    PurchaseAnalysisReport.Run();
                 end;
             }
         }

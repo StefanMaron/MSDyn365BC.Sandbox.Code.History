@@ -2,20 +2,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Projects.Project.Setup;
+namespace Microsoft.Purchases.Setup;
 
 using Microsoft.Foundation.Reporting;
 using System.Reflection;
 
-page 307 "Report Selection - Job"
+page 347 "Report Selection - Purchase"
 {
-    AdditionalSearchTerms = 'Report Selection - Job';
-    Caption = 'Report Selection - Project';
+    ApplicationArea = Basic, Suite;
+    Caption = 'Report Selection - Purchase';
     PageType = Worksheet;
     SaveValues = true;
     SourceTable = "Report Selections";
     UsageCategory = Administration;
-    ApplicationArea = Jobs;
 
     layout
     {
@@ -23,9 +22,9 @@ page 307 "Report Selection - Job"
         {
             field(ReportUsage2; ReportUsage2)
             {
+                ApplicationArea = Basic, Suite;
                 Caption = 'Usage';
                 ToolTip = 'Specifies which type of document the report is used for.';
-                ApplicationArea = Jobs;
 
                 trigger OnValidate()
                 begin
@@ -38,18 +37,18 @@ page 307 "Report Selection - Job"
                 ShowCaption = false;
                 field(Sequence; Rec.Sequence)
                 {
-                    ApplicationArea = Jobs;
+                    ApplicationArea = Basic, Suite;
                 }
                 field("Report ID"; Rec."Report ID")
                 {
+                    ApplicationArea = Basic, Suite;
                     LookupPageID = Objects;
-                    ApplicationArea = Jobs;
                 }
                 field("Report Caption"; Rec."Report Caption")
                 {
+                    ApplicationArea = Basic, Suite;
                     DrillDown = false;
                     LookupPageID = Objects;
-                    ApplicationArea = Jobs;
                 }
                 field("Use for Email Body"; Rec."Use for Email Body")
                 {
@@ -150,7 +149,7 @@ page 307 "Report Selection - Job"
     end;
 
     var
-        ReportUsage2: Enum "Report Selection Usage Job";
+        ReportUsage2: Enum "Report Selection Usage Purchase";
 
     local procedure SetUsageFilter(ModifyRec: Boolean)
     begin
@@ -159,9 +158,37 @@ page 307 "Report Selection - Job"
         Rec.FilterGroup(2);
         case ReportUsage2 of
             ReportUsage2::Quote:
-                Rec.SetRange(Usage, Rec.Usage::JQ);
-            ReportUsage2::"Task Quote":
-                Rec.SetRange(Usage, Rec.Usage::"Job Task Quote");
+                Rec.SetRange(Usage, Rec.Usage::"P.Quote");
+            ReportUsage2::"Blanket Order":
+                Rec.SetRange(Usage, Rec.Usage::"P.Blanket");
+            ReportUsage2::Order:
+                Rec.SetRange(Usage, Rec.Usage::"P.Order");
+            ReportUsage2::Invoice:
+                Rec.SetRange(Usage, Rec.Usage::"P.Invoice");
+            ReportUsage2::"Return Order":
+                Rec.SetRange(Usage, Rec.Usage::"P.Return");
+            ReportUsage2::"Credit Memo":
+                Rec.SetRange(Usage, Rec.Usage::"P.Cr.Memo");
+            ReportUsage2::Receipt:
+                Rec.SetRange(Usage, Rec.Usage::"P.Receipt");
+            ReportUsage2::"Return Shipment":
+                Rec.SetRange(Usage, Rec.Usage::"P.Ret.Shpt.");
+            ReportUsage2::"Purchase Document - Test":
+                Rec.SetRange(Usage, Rec.Usage::"P.Test");
+            ReportUsage2::"Prepayment Document - Test":
+                Rec.SetRange(Usage, Rec.Usage::"P.Test Prepmt.");
+            ReportUsage2::"Archived Quote":
+                Rec.SetRange(Usage, Rec.Usage::"P.Arch.Quote");
+            ReportUsage2::"Archived Order":
+                Rec.SetRange(Usage, Rec.Usage::"P.Arch.Order");
+            ReportUsage2::"Archived Return Order":
+                Rec.SetRange(Usage, Rec.Usage::"P.Arch.Return");
+            ReportUsage2::"Archived Blanket Order":
+                Rec.SetRange(Usage, Rec.Usage::"P.Arch.Blanket");
+            ReportUsage2::"Vendor Remittance":
+                Rec.SetRange(Usage, Rec.Usage::"V.Remittance");
+            ReportUsage2::"Vendor Remittance - Posted Entries":
+                Rec.SetRange(Usage, Rec.Usage::"P.V.Remit.");
         end;
         OnSetUsageFilterOnAfterSetFiltersByReportUsage(Rec, ReportUsage2);
         Rec.FilterGroup(0);
@@ -170,29 +197,59 @@ page 307 "Report Selection - Job"
 
     local procedure InitUsageFilter()
     var
-        ReportUsage: Enum "Report Selection Usage";
+        NewReportUsage: Enum "Report Selection Usage";
     begin
         if Rec.GetFilter(Usage) <> '' then begin
-            if Evaluate(ReportUsage, Rec.GetFilter(Usage)) then
-                case ReportUsage of
-                    ReportUsage::JQ:
+            if Evaluate(NewReportUsage, Rec.GetFilter(Usage)) then
+                case NewReportUsage of
+                    NewReportUsage::"P.Quote":
                         ReportUsage2 := ReportUsage2::Quote;
-                    ReportUsage::"Job Task Quote":
-                        ReportUsage2 := ReportUsage2::"Task Quote";
+                    NewReportUsage::"P.Blanket":
+                        ReportUsage2 := ReportUsage2::"Blanket Order";
+                    NewReportUsage::"P.Order":
+                        ReportUsage2 := ReportUsage2::Order;
+                    NewReportUsage::"P.Invoice":
+                        ReportUsage2 := ReportUsage2::Invoice;
+                    NewReportUsage::"P.Return":
+                        ReportUsage2 := ReportUsage2::"Return Order";
+                    NewReportUsage::"P.Cr.Memo":
+                        ReportUsage2 := ReportUsage2::"Credit Memo";
+                    NewReportUsage::"P.Receipt":
+                        ReportUsage2 := ReportUsage2::Receipt;
+                    NewReportUsage::"P.Ret.Shpt.":
+                        ReportUsage2 := ReportUsage2::"Return Shipment";
+                    NewReportUsage::"P.Test":
+                        ReportUsage2 := ReportUsage2::"Purchase Document - Test";
+                    NewReportUsage::"P.Test Prepmt.":
+                        ReportUsage2 := ReportUsage2::"Prepayment Document - Test";
+                    NewReportUsage::"P.Arch.Quote":
+                        ReportUsage2 := ReportUsage2::"Archived Quote";
+                    NewReportUsage::"P.Arch.Order":
+                        ReportUsage2 := ReportUsage2::"Archived Order";
+                    NewReportUsage::"P.Arch.Return":
+                        ReportUsage2 := ReportUsage2::"Archived Return Order";
+                    NewReportUsage::"P.Arch.Blanket",
+                    NewReportUsage::"S.Arch.Blanket": // Wrong enum case kept here to avoid semantically breaking change (BUG 448278)
+                        ReportUsage2 := ReportUsage2::"Archived Blanket Order";
+                    NewReportUsage::"V.Remittance":
+                        ReportUsage2 := ReportUsage2::"Vendor Remittance";
+                    NewReportUsage::"P.V.Remit.":
+                        ReportUsage2 := ReportUsage2::"Vendor Remittance";
                     else
-                        OnInitUsageFilterOnElseCase(ReportUsage, ReportUsage2);
+                        OnInitUsageFilterOnElseCase(NewReportUsage, ReportUsage2);
                 end;
             Rec.SetRange(Usage);
         end;
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnSetUsageFilterOnAfterSetFiltersByReportUsage(var Rec: Record "Report Selections"; ReportUsage2: Enum "Report Selection Usage Job")
+    local procedure OnSetUsageFilterOnAfterSetFiltersByReportUsage(var Rec: Record "Report Selections"; ReportUsage2: Enum "Report Selection Usage Purchase")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInitUsageFilterOnElseCase(ReportUsage: Enum "Report Selection Usage"; var ReportUsage2: Enum "Report Selection Usage Job")
+    local procedure OnInitUsageFilterOnElseCase(ReportUsage: Enum "Report Selection Usage"; var ReportUsage2: Enum "Report Selection Usage Purchase")
     begin
     end;
 }
+

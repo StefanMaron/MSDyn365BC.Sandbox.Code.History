@@ -2,20 +2,20 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Analysis;
+namespace Microsoft.Purchases.Analysis;
 
 using Microsoft.Inventory.Analysis;
 
-page 9371 "Analysis View List Sales"
+page 9370 "Analysis View List Purchase"
 {
-    ApplicationArea = Dimensions, SalesAnalysis;
-    Caption = 'Sales Analysis Views';
-    CardPageID = "Sales Analysis View Card";
+    ApplicationArea = Dimensions, PurchaseAnalysis;
+    Caption = 'Purchase Analysis Views';
+    CardPageID = "Purchase Analysis View Card";
     DataCaptionFields = "Analysis Area";
     Editable = false;
     PageType = List;
     SourceTable = "Item Analysis View";
-    SourceTableView = where("Analysis Area" = const(Sales));
+    SourceTableView = where("Analysis Area" = const(Purchase));
     UsageCategory = ReportsAndAnalysis;
 
     layout
@@ -27,22 +27,22 @@ page 9371 "Analysis View List Sales"
                 ShowCaption = false;
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies a code for the analysis view.';
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies the name of the analysis view.';
                 }
                 field("Include Budgets"; Rec."Include Budgets")
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     ToolTip = 'Specifies whether to include an update of analysis view budget entries, when updating an analysis view.';
                 }
                 field("Last Date Updated"; Rec."Last Date Updated")
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     Editable = false;
                     ToolTip = 'Specifies the date on which the analysis view was last updated.';
                 }
@@ -88,7 +88,7 @@ page 9371 "Analysis View List Sales"
                 Image = AnalysisView;
                 action(PageItemAnalysisViewFilter)
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     Caption = 'Filter';
                     Image = "Filter";
                     RunObject = Page "Item Analysis View Filter";
@@ -102,22 +102,22 @@ page 9371 "Analysis View List Sales"
         {
             action(EditAnalysisView)
             {
-                ApplicationArea = SalesAnalysis;
+                ApplicationArea = PurchaseAnalysis;
                 Caption = 'Edit Analysis View';
                 Image = Edit;
                 ToolTip = 'Edit the settings for the analysis view such as a column or line.';
 
                 trigger OnAction()
                 var
-                    SalesAnalysisbyDim: Page "Sales Analysis by Dimensions";
+                    PurchAnalysisbyDim: Page "Purch. Analysis by Dimensions";
                 begin
-                    SalesAnalysisbyDim.SetCurrentAnalysisViewCode(Rec.Code);
-                    SalesAnalysisbyDim.Run();
+                    PurchAnalysisbyDim.SetCurrentAnalysisViewCode(Rec.Code);
+                    PurchAnalysisbyDim.Run();
                 end;
             }
             action("&Update")
             {
-                ApplicationArea = SalesAnalysis;
+                ApplicationArea = PurchaseAnalysis;
                 Caption = '&Update';
                 Image = Refresh;
                 RunObject = Codeunit "Update Item Analysis View";

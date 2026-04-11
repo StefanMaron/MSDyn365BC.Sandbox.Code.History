@@ -2,92 +2,90 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Receivables;
+namespace Microsoft.Purchases.Payables;
 
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Period;
-using Microsoft.Sales.FinanceCharge;
 using System.DataAdministration;
 using System.Utilities;
 
-report 198 "Date Compress Customer Ledger"
+report 398 "Date Compress Vendor Ledger"
 {
-    Caption = 'Date Compress Customer Ledger';
+    ApplicationArea = Suite;
+    Caption = 'Date Compress Vendor Ledger';
     Permissions = TableData "G/L Entry" = rimd,
-                  TableData "Cust. Ledger Entry" = rimd,
+                  TableData "Vendor Ledger Entry" = rimd,
                   TableData "G/L Register" = rimd,
                   TableData "Date Compr. Register" = rimd,
-                  TableData "Reminder/Fin. Charge Entry" = rimd,
                   TableData "Dimension Set ID Filter Line" = rimd,
-                  TableData "Detailed Cust. Ledg. Entry" = rimd;
+                  TableData "Detailed Vendor Ledg. Entry" = rimd;
     ProcessingOnly = true;
+    UsageCategory = Tasks;
 
     dataset
     {
-        dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
+        dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
         {
-            DataItemTableView = sorting("Customer No.", "Posting Date") where(Open = const(false));
-            RequestFilterFields = "Customer No.", "Customer Posting Group", "Currency Code";
+            DataItemTableView = sorting("Vendor No.", "Posting Date") where(Open = const(false));
+            RequestFilterFields = "Vendor No.", "Vendor Posting Group", "Currency Code";
 
             trigger OnAfterGetRecord()
             begin
-                if not CompressDetails("Cust. Ledger Entry") then
+                VendLedgEntry2 := "Vendor Ledger Entry";
+                if not CompressDetails("Vendor Ledger Entry") then
                     CurrReport.Skip();
-                ReminderEntry.SetCurrentKey("Customer Entry No.");
-                CustLedgEntry2 := "Cust. Ledger Entry";
-                CustLedgEntry2.SetCurrentKey("Customer No.", "Posting Date");
-                CustLedgEntry2.CopyFilters("Cust. Ledger Entry");
-                CustLedgEntry2.SetRange("Customer No.", CustLedgEntry2."Customer No.");
-                CustLedgEntry2.SetFilter("Posting Date", DateComprMgt.GetDateFilter(CustLedgEntry2."Posting Date", EntrdDateComprReg, true));
-                CustLedgEntry2.SetRange("Customer Posting Group", CustLedgEntry2."Customer Posting Group");
-                CustLedgEntry2.SetRange("Currency Code", CustLedgEntry2."Currency Code");
-                CustLedgEntry2.SetRange("Document Type", CustLedgEntry2."Document Type");
-                OnAfterCustLedgEntry2SetFilters(CustLedgEntry2, "Cust. Ledger Entry");
+                VendLedgEntry2.SetCurrentKey("Vendor No.", "Posting Date");
+                VendLedgEntry2.CopyFilters("Vendor Ledger Entry");
+                VendLedgEntry2.SetRange("Vendor No.", VendLedgEntry2."Vendor No.");
+                VendLedgEntry2.SetFilter("Posting Date", DateComprMgt.GetDateFilter(VendLedgEntry2."Posting Date", EntrdDateComprReg, true));
+                VendLedgEntry2.SetRange("Vendor Posting Group", VendLedgEntry2."Vendor Posting Group");
+                VendLedgEntry2.SetRange("Currency Code", VendLedgEntry2."Currency Code");
+                VendLedgEntry2.SetRange("Document Type", VendLedgEntry2."Document Type");
 
                 if DateComprRetainFields."Retain Document No." then
-                    CustLedgEntry2.SetRange("Document No.", CustLedgEntry2."Document No.");
-                if DateComprRetainFields."Retain Sell-to Customer No." then
-                    CustLedgEntry2.SetRange("Sell-to Customer No.", CustLedgEntry2."Sell-to Customer No.");
-                if DateComprRetainFields."Retain Salesperson Code" then
-                    CustLedgEntry2.SetRange("Salesperson Code", CustLedgEntry2."Salesperson Code");
+                    VendLedgEntry2.SetRange("Document No.", VendLedgEntry2."Document No.");
+                if DateComprRetainFields."Retain Buy-from Vendor No." then
+                    VendLedgEntry2.SetRange("Buy-from Vendor No.", VendLedgEntry2."Buy-from Vendor No.");
+                if DateComprRetainFields."Retain Purchaser Code" then
+                    VendLedgEntry2.SetRange("Purchaser Code", VendLedgEntry2."Purchaser Code");
                 if DateComprRetainFields."Retain Global Dimension 1" then
-                    CustLedgEntry2.SetRange("Global Dimension 1 Code", CustLedgEntry2."Global Dimension 1 Code");
+                    VendLedgEntry2.SetRange("Global Dimension 1 Code", VendLedgEntry2."Global Dimension 1 Code");
                 if DateComprRetainFields."Retain Global Dimension 2" then
-                    CustLedgEntry2.SetRange("Global Dimension 2 Code", CustLedgEntry2."Global Dimension 2 Code");
+                    VendLedgEntry2.SetRange("Global Dimension 2 Code", VendLedgEntry2."Global Dimension 2 Code");
                 if DateComprRetainFields."Retain Journal Template Name" then
-                    CustLedgEntry2.SetRange("Journal Templ. Name", CustLedgEntry2."Journal Templ. Name");
-                CustLedgEntry2.CalcFields(Amount);
-                if CustLedgEntry2.Amount >= 0 then
+                    VendLedgEntry2.SetRange("Journal Templ. Name", VendLedgEntry2."Journal Templ. Name");
+
+                VendLedgEntry2.CalcFields(Amount);
+                if VendLedgEntry2.Amount >= 0 then
                     SummarizePositive := true
                 else
                     SummarizePositive := false;
 
-                InitNewEntry(NewCustLedgEntry);
+                InitNewEntry(NewVendLedgEntry);
 
                 DimBufMgt.CollectDimEntryNo(
-                  TempSelectedDim, CustLedgEntry2."Dimension Set ID", CustLedgEntry2."Entry No.",
+                  TempSelectedDim, VendLedgEntry2."Dimension Set ID", VendLedgEntry2."Entry No.",
                   0, false, DimEntryNo);
                 ComprDimEntryNo := DimEntryNo;
-                SummarizeEntry(NewCustLedgEntry, CustLedgEntry2);
-
-                while CustLedgEntry2.Next() <> 0 do begin
-                    CustLedgEntry2.CalcFields(Amount);
-                    if ((CustLedgEntry2.Amount >= 0) and SummarizePositive) or
-                       ((CustLedgEntry2.Amount < 0) and (not SummarizePositive))
+                SummarizeEntry(NewVendLedgEntry, VendLedgEntry2);
+                while VendLedgEntry2.Next() <> 0 do begin
+                    VendLedgEntry2.CalcFields(Amount);
+                    if ((VendLedgEntry2.Amount >= 0) and SummarizePositive) or
+                       ((VendLedgEntry2.Amount < 0) and (not SummarizePositive))
                     then
-                        if CompressDetails(CustLedgEntry2) then begin
+                        if CompressDetails(VendLedgEntry2) then begin
                             DimBufMgt.CollectDimEntryNo(
-                              TempSelectedDim, CustLedgEntry2."Dimension Set ID", CustLedgEntry2."Entry No.",
+                              TempSelectedDim, VendLedgEntry2."Dimension Set ID", VendLedgEntry2."Entry No.",
                               ComprDimEntryNo, true, DimEntryNo);
                             if DimEntryNo = ComprDimEntryNo then
-                                SummarizeEntry(NewCustLedgEntry, CustLedgEntry2);
+                                SummarizeEntry(NewVendLedgEntry, VendLedgEntry2);
                         end;
                 end;
 
-                InsertNewEntry(NewCustLedgEntry, ComprDimEntryNo);
+                InsertNewEntry(NewVendLedgEntry, ComprDimEntryNo);
 
                 ComprCollectedEntries();
 
@@ -121,35 +119,34 @@ report 198 "Date Compress Customer Ledger"
                   Text008);
 
                 SourceCodeSetup.Get();
-                SourceCodeSetup.TestField("Compress Cust. Ledger");
+                SourceCodeSetup.TestField("Compress Vend. Ledger");
 
                 SelectedDim.GetSelectedDim(
-                  UserId, 3, REPORT::"Date Compress Customer Ledger", '', TempSelectedDim);
+                  UserId, 3, REPORT::"Date Compress Vendor Ledger", '', TempSelectedDim);
                 GLSetup.Get();
                 DateComprRetainFields."Retain Global Dimension 1" :=
                   TempSelectedDim.Get(
-                    UserId, 3, REPORT::"Date Compress Customer Ledger", '', GLSetup."Global Dimension 1 Code");
+                    UserId, 3, REPORT::"Date Compress Vendor Ledger", '', GLSetup."Global Dimension 1 Code");
                 DateComprRetainFields."Retain Global Dimension 2" :=
                   TempSelectedDim.Get(
-                    UserId, 3, REPORT::"Date Compress Customer Ledger", '', GLSetup."Global Dimension 2 Code");
+                    UserId, 3, REPORT::"Date Compress Vendor Ledger", '', GLSetup."Global Dimension 2 Code");
 
-                GLEntry.LockTable();
-                ReminderEntry.LockTable();
-                NewDtldCustLedgEntry.LockTable();
-                NewCustLedgEntry.LockTable();
+                GLentry.LockTable();
+                NewDtldVendLedgEntry.LockTable();
+                NewVendLedgEntry.LockTable();
                 GLReg.LockTable();
                 DateComprReg.LockTable();
 
-                GLEntry.GetLastEntry(LastEntryNo, LastTransactionNo);
+                GLentry.GetLastEntry(LastEntryNo, LastTransactionNo);
                 NextTransactionNo := LastTransactionNo + 1;
-                LastDtldEntryNo := NewDtldCustLedgEntry.GetLastEntryNo();
+                LastDtldEntryNo := NewDtldVendLedgEntry.GetLastEntryNo();
                 SetRange("Entry No.", 0, LastEntryNo);
                 SetRange("Posting Date", EntrdDateComprReg."Starting Date", EntrdDateComprReg."Ending Date");
 
                 InitRegisters();
 
                 if UseDataArchive then
-                    DataArchive.Create(DateComprMgt.GetReportName(Report::"Date Compress Customer Ledger"));
+                    DataArchive.Create(DateComprMgt.GetReportName(Report::"Date Compress Vendor Ledger"));
             end;
         }
     }
@@ -197,7 +194,7 @@ report 198 "Date Compress Customer Ledger"
                         OptionCaption = 'Day,Week,Month,Quarter,Year,Period';
                         ToolTip = 'Specifies the period for which data is shown in the report. For example, enter "1M" for one month, "30D" for thirty days, "3Q" for three quarters, or "5Y" for five years.';
                     }
-                    field("EntrdCustLedgEntry.Description"; EntrdCustLedgEntry.Description)
+                    field("EntrdVendLedgEntry.Description"; EntrdVendLedgEntry.Description)
                     {
                         ApplicationArea = Suite;
                         Caption = 'Posting Description';
@@ -212,17 +209,17 @@ report 198 "Date Compress Customer Ledger"
                             Caption = 'Document No.';
                             ToolTip = 'Specifies the number of the document that is processed by the report or batch job.';
                         }
-                        field("Retain[2]"; DateComprRetainFields."Retain Sell-to Customer No.")
+                        field("Retain[2]"; DateComprRetainFields."Retain Buy-from Vendor No.")
                         {
                             ApplicationArea = Suite;
-                            Caption = 'Sell-to Customer No.';
-                            ToolTip = 'Specifies the customer for whom ledger entries are date compressed.';
+                            Caption = 'Buy-from Vendor No.';
+                            ToolTip = 'Specifies a filter for the vendor or vendors that you want to compress entries for.';
                         }
-                        field("Retain[3]"; DateComprRetainFields."Retain Salesperson Code")
+                        field("Retain[3]"; DateComprRetainFields."Retain Purchaser Code")
                         {
                             ApplicationArea = Suite;
-                            Caption = 'Salesperson Code';
-                            ToolTip = 'Specifies the salesperson for whom customer ledger entries are date compressed';
+                            Caption = 'Purchaser Code';
+                            ToolTip = 'Specifies the purchaser for whom vendor ledger entries are date compressed';
                         }
                         field("Retain[6]"; DateComprRetainFields."Retain Journal Template Name")
                         {
@@ -240,7 +237,7 @@ report 198 "Date Compress Customer Ledger"
 
                         trigger OnAssistEdit()
                         begin
-                            DimSelectionBuf.SetDimSelectionMultiple(3, REPORT::"Date Compress Customer Ledger", RetainDimText);
+                            DimSelectionBuf.SetDimSelectionMultiple(3, REPORT::"Date Compress Vendor Ledger", RetainDimText);
                         end;
                     }
                     field(UseDataArchiveCtrl; UseDataArchive)
@@ -288,8 +285,8 @@ report 198 "Date Compress Customer Ledger"
         DateCompression: Codeunit "Date Compression";
     begin
         DimSelectionBuf.CompareDimText(
-          3, REPORT::"Date Compress Customer Ledger", '', RetainDimText, Text010);
-        CustLedgEntryFilter := CopyStr("Cust. Ledger Entry".GetFilters, 1, MaxStrLen(DateComprReg.Filter));
+          3, REPORT::"Date Compress Vendor Ledger", '', RetainDimText, Text010);
+        VendLedgEntryFilter := CopyStr("Vendor Ledger Entry".GetFilters, 1, MaxStrLen(DateComprReg.Filter));
 
         DateCompression.VerifyDateCompressionDates(EntrdDateComprReg."Starting Date", EntrdDateComprReg."Ending Date");
         LogStartTelemetryMessage();
@@ -305,13 +302,12 @@ report 198 "Date Compress Customer Ledger"
         DateComprReg: Record "Date Compr. Register";
         EntrdDateComprReg: Record "Date Compr. Register";
         GLReg: Record "G/L Register";
-        EntrdCustLedgEntry: Record "Cust. Ledger Entry";
-        NewCustLedgEntry: Record "Cust. Ledger Entry";
-        CustLedgEntry2: Record "Cust. Ledger Entry";
-        NewDtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
-        TempDetailedCustLedgEntryBuffer: Record "Detailed Cust. Ledg. Entry" temporary;
-        GLEntry: Record "G/L Entry";
-        ReminderEntry: Record "Reminder/Fin. Charge Entry";
+        EntrdVendLedgEntry: Record "Vendor Ledger Entry";
+        NewVendLedgEntry: Record "Vendor Ledger Entry";
+        VendLedgEntry2: Record "Vendor Ledger Entry";
+        NewDtldVendLedgEntry: Record "Detailed Vendor Ledg. Entry";
+        TempDetailedVendorLedgEntry: Record "Detailed Vendor Ledg. Entry" temporary;
+        GLentry: Record "G/L Entry";
         SelectedDim: Record "Selected Dimension";
         TempSelectedDim: Record "Selected Dimension" temporary;
         DimSelectionBuf: Record "Dimension Selection Buffer";
@@ -321,18 +317,18 @@ report 198 "Date Compress Customer Ledger"
         DimMgt: Codeunit DimensionManagement;
         DataArchive: Codeunit "Data Archive";
         Window: Dialog;
-        CustLedgEntryFilter: Text[250];
+        VendLedgEntryFilter: Text[250];
         LastEntryNo: Integer;
         NextTransactionNo: Integer;
         NoOfDeleted: Integer;
         LastDtldEntryNo: Integer;
         LastTmpDtldEntryNo: Integer;
         GLRegExists: Boolean;
+        UseDataArchive: Boolean;
+        DataArchiveProviderExists: Boolean;
         ComprDimEntryNo: Integer;
         DimEntryNo: Integer;
         RetainDimText: Text[250];
-        UseDataArchive: Boolean;
-        DataArchiveProviderExists: Boolean;
         SummarizePositive: Boolean;
 
         CompressEntriesQst: Label 'This batch job deletes entries. We recommend that you create a backup of the database before you run the batch job.\\Do you want to continue?';
@@ -340,9 +336,9 @@ report 198 "Date Compress Customer Ledger"
 #pragma warning disable AA0470
         Text003: Label '%1 must be specified.';
 #pragma warning restore AA0470
-        Text004: Label 'Date compressing customer ledger entries...\\';
+        Text004: Label 'Date compressing vendor ledger entries...\\';
 #pragma warning disable AA0470
-        Text005: Label 'Customer No.         #1##########\';
+        Text005: Label 'Vendor No.           #1##########\';
         Text006: Label 'Date                 #2######\\';
         Text007: Label 'No. of new entries   #3######\';
         Text008: Label 'No. of entries del.  #4######';
@@ -357,26 +353,26 @@ report 198 "Date Compress Customer Ledger"
     var
         NextRegNo: Integer;
     begin
-        GLReg.Initialize(GLReg.GetLastEntryNo() + 1, LastEntryNo + 1, 0, SourceCodeSetup."Compress Cust. Ledger", '', '');
+        GLReg.Initialize(GLReg.GetLastEntryNo() + 1, LastEntryNo + 1, 0, SourceCodeSetup."Compress Vend. Ledger", '', '');
         NextRegNo := DateComprReg.GetLastEntryNo() + 1;
 
         DateComprReg.InitRegister(
-          DATABASE::"Cust. Ledger Entry", NextRegNo,
+          DATABASE::"Vendor Ledger Entry", NextRegNo,
           EntrdDateComprReg."Starting Date", EntrdDateComprReg."Ending Date", EntrdDateComprReg."Period Length",
-          CustLedgEntryFilter, GLReg."No.", SourceCodeSetup."Compress Cust. Ledger");
+          VendLedgEntryFilter, GLReg."No.", SourceCodeSetup."Compress Vend. Ledger");
 
         if DateComprRetainFields."Retain Document No." then
-            AddFieldContent(NewCustLedgEntry.FieldName("Document No."));
-        if DateComprRetainFields."Retain Sell-to Customer No." then
-            AddFieldContent(NewCustLedgEntry.FieldName("Sell-to Customer No."));
-        if DateComprRetainFields."Retain Salesperson Code" then
-            AddFieldContent(NewCustLedgEntry.FieldName("Salesperson Code"));
+            AddFieldContent(NewVendLedgEntry.FieldName("Document No."));
+        if DateComprRetainFields."Retain Buy-from Vendor No." then
+            AddFieldContent(NewVendLedgEntry.FieldName("Buy-from Vendor No."));
+        if DateComprRetainFields."Retain Purchaser Code" then
+            AddFieldContent(NewVendLedgEntry.FieldName("Purchaser Code"));
         if DateComprRetainFields."Retain Global Dimension 1" then
-            AddFieldContent(NewCustLedgEntry.FieldName("Global Dimension 1 Code"));
+            AddFieldContent(NewVendLedgEntry.FieldName("Global Dimension 1 Code"));
         if DateComprRetainFields."Retain Global Dimension 2" then
-            AddFieldContent(NewCustLedgEntry.FieldName("Global Dimension 2 Code"));
+            AddFieldContent(NewVendLedgEntry.FieldName("Global Dimension 2 Code"));
         if DateComprRetainFields."Retain Journal Template Name" then
-            AddFieldContent(NewCustLedgEntry.FieldName("Journal Templ. Name"));
+            AddFieldContent(NewVendLedgEntry.FieldName("Journal Templ. Name"));
 
         DateComprReg."Retain Field Contents" := CopyStr(DateComprReg."Retain Field Contents", 2);
 
@@ -397,17 +393,18 @@ report 198 "Date Compress Customer Ledger"
         FoundLastLedgEntryNo: Integer;
         LastTransactionNo: Integer;
     begin
-        GLEntry.Init();
+        GLentry.Init();
         LastEntryNo := LastEntryNo + 1;
-        GLEntry."Entry No." := LastEntryNo;
-        GLEntry."Posting Date" := Today;
-        GLEntry.Description := EntrdCustLedgEntry.Description;
-        GLEntry."Source Code" := SourceCodeSetup."Compress Cust. Ledger";
-        GLEntry."System-Created Entry" := true;
-        GLEntry."User ID" := CopyStr(UserId(), 1, MaxStrLen(GLEntry."User ID"));
-        GLEntry."Transaction No." := NextTransactionNo;
-        GLEntry.Insert();
-        GLEntry.Consistent(GLEntry.Amount = 0);
+        GLentry."Entry No." := LastEntryNo;
+        GLentry."Posting Date" := Today;
+        GLentry.Description := EntrdVendLedgEntry.Description;
+        GLentry."Source Code" := SourceCodeSetup."Compress Vend. Ledger";
+        GLentry."System-Created Entry" := true;
+        GLentry."User ID" := CopyStr(UserId(), 1, MaxStrLen(GLentry."User ID"));
+        GLentry."Transaction No." := NextTransactionNo;
+        OnInsertRegistersOnBeforeGLentryInsert(GlEntry);
+        GLentry.Insert();
+        GLentry.Consistent(GLentry.Amount = 0);
         GLReg."To Entry No." := LastEntryNo;
 
         if GLRegExists then begin
@@ -420,15 +417,14 @@ report 198 "Date Compress Customer Ledger"
         end;
         Commit();
 
-        GLEntry.LockTable();
-        ReminderEntry.LockTable();
-        NewDtldCustLedgEntry.LockTable();
-        NewCustLedgEntry.LockTable();
+        GLentry.LockTable();
+        NewDtldVendLedgEntry.LockTable();
+        NewVendLedgEntry.LockTable();
         GLReg.LockTable();
         DateComprReg.LockTable();
 
-        GLEntry.GetLastEntry(FoundLastEntryNo, LastTransactionNo);
-        FoundLastLedgEntryNo := NewCustLedgEntry.GetLastEntryNo();
+        GLentry.GetLastEntry(FoundLastEntryNo, LastTransactionNo);
+        FoundLastLedgEntryNo := NewVendLedgEntry.GetLastEntryNo();
         if (LastEntryNo <> FoundLastEntryNo) or
            (LastEntryNo <> FoundLastLedgEntryNo + 1)
         then begin
@@ -436,60 +432,57 @@ report 198 "Date Compress Customer Ledger"
             NextTransactionNo := LastTransactionNo + 1;
             InitRegisters();
         end;
-        LastDtldEntryNo := NewDtldCustLedgEntry.GetLastEntryNo();
+        LastDtldEntryNo := NewDtldVendLedgEntry.GetLastEntryNo();
     end;
 
-    local procedure SummarizeEntry(var NewCustLedgEntry: Record "Cust. Ledger Entry"; CustLedgEntry: Record "Cust. Ledger Entry")
+    local procedure SummarizeEntry(var NewVendLedgEntry: Record "Vendor Ledger Entry"; VendLedgEntry: Record "Vendor Ledger Entry")
     var
-        DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
+        DtldVendLedgEntry: Record "Detailed Vendor Ledg. Entry";
     begin
-        NewCustLedgEntry."Sales (LCY)" := NewCustLedgEntry."Sales (LCY)" + CustLedgEntry."Sales (LCY)";
-        NewCustLedgEntry."Profit (LCY)" := NewCustLedgEntry."Profit (LCY)" + CustLedgEntry."Profit (LCY)";
-        NewCustLedgEntry."Inv. Discount (LCY)" := NewCustLedgEntry."Inv. Discount (LCY)" + CustLedgEntry."Inv. Discount (LCY)";
-        NewCustLedgEntry."Original Pmt. Disc. Possible" :=
-          NewCustLedgEntry."Original Pmt. Disc. Possible" + CustLedgEntry."Original Pmt. Disc. Possible";
-        NewCustLedgEntry."Remaining Pmt. Disc. Possible" :=
-          NewCustLedgEntry."Remaining Pmt. Disc. Possible" + CustLedgEntry."Remaining Pmt. Disc. Possible";
-        NewCustLedgEntry."Closed by Amount (LCY)" :=
-          NewCustLedgEntry."Closed by Amount (LCY)" + CustLedgEntry."Closed by Amount (LCY)";
+        NewVendLedgEntry."Purchase (LCY)" := NewVendLedgEntry."Purchase (LCY)" + VendLedgEntry."Purchase (LCY)";
+        NewVendLedgEntry."Inv. Discount (LCY)" := NewVendLedgEntry."Inv. Discount (LCY)" + VendLedgEntry."Inv. Discount (LCY)";
+        NewVendLedgEntry."Original Pmt. Disc. Possible" :=
+          NewVendLedgEntry."Original Pmt. Disc. Possible" + VendLedgEntry."Original Pmt. Disc. Possible";
+        NewVendLedgEntry."Remaining Pmt. Disc. Possible" :=
+          NewVendLedgEntry."Remaining Pmt. Disc. Possible" + VendLedgEntry."Remaining Pmt. Disc. Possible";
+        NewVendLedgEntry."Closed by Amount (LCY)" :=
+          NewVendLedgEntry."Closed by Amount (LCY)" + VendLedgEntry."Closed by Amount (LCY)";
 
-        DtldCustLedgEntry.SetCurrentKey("Cust. Ledger Entry No.");
-        DtldCustLedgEntry.SetRange("Cust. Ledger Entry No.", CustLedgEntry."Entry No.");
-        if DtldCustLedgEntry.Find('-') then begin
+        DtldVendLedgEntry.SetCurrentKey("Vendor Ledger Entry No.");
+        DtldVendLedgEntry.SetRange("Vendor Ledger Entry No.", VendLedgEntry."Entry No.");
+        if DtldVendLedgEntry.Find('-') then begin
             repeat
-                SummarizeDtldEntry(DtldCustLedgEntry, NewCustLedgEntry);
-            until DtldCustLedgEntry.Next() = 0;
-            DtldCustLedgEntry.DeleteAll();
+                SummarizeDtldEntry(DtldVendLedgEntry, NewVendLedgEntry);
+            until DtldVendLedgEntry.Next() = 0;
+            DtldVendLedgEntry.DeleteAll();
         end;
 
-        ReminderEntry.SetRange("Customer Entry No.", CustLedgEntry."Entry No.");
-        ReminderEntry.DeleteAll();
-        CustLedgEntry.Delete();
+        VendLedgEntry.Delete();
         DateComprReg."No. Records Deleted" := DateComprReg."No. Records Deleted" + 1;
         Window.Update(4, DateComprReg."No. Records Deleted");
         if UseDataArchive then
-            DataArchive.SaveRecord(CustLedgEntry);
+            DataArchive.SaveRecord(VendLedgEntry);
     end;
 
     local procedure ComprCollectedEntries()
     var
-        CustLedgEntry: Record "Cust. Ledger Entry";
+        VendLedgEntry: Record "Vendor Ledger Entry";
         OldDimEntryNo: Integer;
         Found: Boolean;
-        CustLedgEntryNo: Integer;
+        VendLedgEntryNo: Integer;
     begin
         OldDimEntryNo := 0;
-        if DimBufMgt.FindFirstDimEntryNo(DimEntryNo, CustLedgEntryNo) then begin
-            InitNewEntry(NewCustLedgEntry);
+        if DimBufMgt.FindFirstDimEntryNo(DimEntryNo, VendLedgEntryNo) then begin
+            InitNewEntry(NewVendLedgEntry);
             repeat
-                CustLedgEntry.Get(CustLedgEntryNo);
-                SummarizeEntry(NewCustLedgEntry, CustLedgEntry);
+                VendLedgEntry.Get(VendLedgEntryNo);
+                SummarizeEntry(NewVendLedgEntry, VendLedgEntry);
                 OldDimEntryNo := DimEntryNo;
-                Found := DimBufMgt.NextDimEntryNo(DimEntryNo, CustLedgEntryNo);
+                Found := DimBufMgt.NextDimEntryNo(DimEntryNo, VendLedgEntryNo);
                 if (OldDimEntryNo <> DimEntryNo) or not Found then begin
-                    InsertNewEntry(NewCustLedgEntry, OldDimEntryNo);
+                    InsertNewEntry(NewVendLedgEntry, OldDimEntryNo);
                     if Found then
-                        InitNewEntry(NewCustLedgEntry);
+                        InitNewEntry(NewVendLedgEntry);
                 end;
                 OldDimEntryNo := DimEntryNo;
             until not Found;
@@ -497,42 +490,42 @@ report 198 "Date Compress Customer Ledger"
         DimBufMgt.DeleteAllDimEntryNo();
     end;
 
-    procedure InitNewEntry(var NewCustLedgEntry: Record "Cust. Ledger Entry")
+    procedure InitNewEntry(var NewVendLedgEntry: Record "Vendor Ledger Entry")
     begin
         LastEntryNo := LastEntryNo + 1;
 
-        NewCustLedgEntry.Init();
-        NewCustLedgEntry."Entry No." := LastEntryNo;
-        NewCustLedgEntry."Customer No." := CustLedgEntry2."Customer No.";
-        NewCustLedgEntry."Posting Date" := CustLedgEntry2.GetRangeMin("Posting Date");
-        NewCustLedgEntry.Description := EntrdCustLedgEntry.Description;
-        NewCustLedgEntry."Customer Posting Group" := CustLedgEntry2."Customer Posting Group";
-        NewCustLedgEntry."Currency Code" := CustLedgEntry2."Currency Code";
-        NewCustLedgEntry."Document Type" := CustLedgEntry2."Document Type";
-        NewCustLedgEntry."Source Code" := SourceCodeSetup."Compress Cust. Ledger";
-        NewCustLedgEntry."User ID" := CopyStr(UserId(), 1, MaxStrLen(CustLedgEntry2."User ID"));
-        NewCustLedgEntry."Transaction No." := NextTransactionNo;
+        NewVendLedgEntry.Init();
+        NewVendLedgEntry."Entry No." := LastEntryNo;
+        NewVendLedgEntry."Vendor No." := VendLedgEntry2."Vendor No.";
+        NewVendLedgEntry."Posting Date" := VendLedgEntry2.GetRangeMin("Posting Date");
+        NewVendLedgEntry.Description := EntrdVendLedgEntry.Description;
+        NewVendLedgEntry."Vendor Posting Group" := VendLedgEntry2."Vendor Posting Group";
+        NewVendLedgEntry."Currency Code" := VendLedgEntry2."Currency Code";
+        NewVendLedgEntry."Document Type" := VendLedgEntry2."Document Type";
+        NewVendLedgEntry."Source Code" := SourceCodeSetup."Compress Vend. Ledger";
+        NewVendLedgEntry."User ID" := CopyStr(UserId(), 1, MaxStrLen(VendLedgEntry2."User ID"));
+        NewVendLedgEntry."Transaction No." := NextTransactionNo;
 
         if DateComprRetainFields."Retain Document No." then
-            NewCustLedgEntry."Document No." := CustLedgEntry2."Document No.";
-        if DateComprRetainFields."Retain Sell-to Customer No." then
-            NewCustLedgEntry."Sell-to Customer No." := CustLedgEntry2."Sell-to Customer No.";
-        if DateComprRetainFields."Retain Salesperson Code" then
-            NewCustLedgEntry."Salesperson Code" := CustLedgEntry2."Salesperson Code";
+            NewVendLedgEntry."Document No." := VendLedgEntry2."Document No.";
+        if DateComprRetainFields."Retain Buy-from Vendor No." then
+            NewVendLedgEntry."Buy-from Vendor No." := VendLedgEntry2."Buy-from Vendor No.";
+        if DateComprRetainFields."Retain Purchaser Code" then
+            NewVendLedgEntry."Purchaser Code" := VendLedgEntry2."Purchaser Code";
         if DateComprRetainFields."Retain Global Dimension 1" then
-            NewCustLedgEntry."Global Dimension 1 Code" := CustLedgEntry2."Global Dimension 1 Code";
+            NewVendLedgEntry."Global Dimension 1 Code" := VendLedgEntry2."Global Dimension 1 Code";
         if DateComprRetainFields."Retain Global Dimension 2" then
-            NewCustLedgEntry."Global Dimension 2 Code" := CustLedgEntry2."Global Dimension 2 Code";
+            NewVendLedgEntry."Global Dimension 2 Code" := VendLedgEntry2."Global Dimension 2 Code";
         if DateComprRetainFields."Retain Journal Template Name" then
-            NewCustLedgEntry."Journal Templ. Name" := CustLedgEntry2."Journal Templ. Name";
+            NewVendLedgEntry."Journal Templ. Name" := VendLedgEntry2."Journal Templ. Name";
 
-        Window.Update(1, NewCustLedgEntry."Customer No.");
-        Window.Update(2, NewCustLedgEntry."Posting Date");
+        Window.Update(1, NewVendLedgEntry."Vendor No.");
+        Window.Update(2, NewVendLedgEntry."Posting Date");
         DateComprReg."No. of New Records" := DateComprReg."No. of New Records" + 1;
         Window.Update(3, DateComprReg."No. of New Records");
     end;
 
-    local procedure InsertNewEntry(var NewCustLedgEntry: Record "Cust. Ledger Entry"; DimEntryNo: Integer)
+    local procedure InsertNewEntry(var NewVendLedgEntry: Record "Vendor Ledger Entry"; DimEntryNo: Integer)
     var
         TempDimBuf: Record "Dimension Buffer" temporary;
         TempDimSetEntry: Record "Dimension Set Entry" temporary;
@@ -540,123 +533,122 @@ report 198 "Date Compress Customer Ledger"
         TempDimBuf.DeleteAll();
         DimBufMgt.GetDimensions(DimEntryNo, TempDimBuf);
         DimMgt.CopyDimBufToDimSetEntry(TempDimBuf, TempDimSetEntry);
-        NewCustLedgEntry."Dimension Set ID" := DimMgt.GetDimensionSetID(TempDimSetEntry);
-        NewCustLedgEntry.Insert();
+        NewVendLedgEntry."Dimension Set ID" := DimMgt.GetDimensionSetID(TempDimSetEntry);
+        NewVendLedgEntry.Insert();
         InsertDtldEntries();
     end;
 
-    local procedure CompressDetails(CustLedgEntry: Record "Cust. Ledger Entry"): Boolean
+    local procedure CompressDetails(VendLedgEntry: Record "Vendor Ledger Entry"): Boolean
     var
-        DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
+        DtldVendLedgEntry: Record "Detailed Vendor Ledg. Entry";
     begin
-        DtldCustLedgEntry.SetCurrentKey("Cust. Ledger Entry No.", "Entry Type", "Posting Date");
-        DtldCustLedgEntry.SetRange("Cust. Ledger Entry No.", CustLedgEntry."Entry No.");
+        DtldVendLedgEntry.SetCurrentKey("Vendor Ledger Entry No.", "Posting Date");
+        DtldVendLedgEntry.SetRange("Vendor Ledger Entry No.", VendLedgEntry."Entry No.");
         if EntrdDateComprReg."Starting Date" <> 0D then
-            DtldCustLedgEntry.SetFilter(
+            DtldVendLedgEntry.SetFilter(
               "Posting Date",
               StrSubstNo(
                 '..%1|%2..',
                 CalcDate('<-1D>', EntrdDateComprReg."Starting Date"),
                 CalcDate('<+1D>', EntrdDateComprReg."Ending Date")))
         else
-            DtldCustLedgEntry.SetFilter(
+            DtldVendLedgEntry.SetFilter(
               "Posting Date",
               StrSubstNo(
                 '%1..',
                 CalcDate('<+1D>', EntrdDateComprReg."Ending Date")));
 
-        exit(DtldCustLedgEntry.IsEmpty());
+        exit(DtldVendLedgEntry.IsEmpty());
     end;
 
-    local procedure SummarizeDtldEntry(var DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry"; var NewCustLedgEntry: Record "Cust. Ledger Entry")
+    local procedure SummarizeDtldEntry(var DtldVendLedgEntry: Record "Detailed Vendor Ledg. Entry"; var NewVendLedgEntry: Record "Vendor Ledger Entry")
     var
         NewEntry: Boolean;
         PostingDate: Date;
     begin
         if UseDataArchive then
-            DataArchive.SaveRecord(DtldCustLedgEntry);
-        TempDetailedCustLedgEntryBuffer.SetFilter(
+            DataArchive.SaveRecord(DtldVendLedgEntry);
+        TempDetailedVendorLedgEntry.SetFilter(
           "Posting Date",
-          DateComprMgt.GetDateFilter(DtldCustLedgEntry."Posting Date", EntrdDateComprReg, true));
-        PostingDate := TempDetailedCustLedgEntryBuffer.GetRangeMin("Posting Date");
-        TempDetailedCustLedgEntryBuffer.SetRange("Posting Date", PostingDate);
-        TempDetailedCustLedgEntryBuffer.SetRange("Entry Type", DtldCustLedgEntry."Entry Type");
+          DateComprMgt.GetDateFilter(DtldVendLedgEntry."Posting Date", EntrdDateComprReg, true));
+        PostingDate := TempDetailedVendorLedgEntry.GetRangeMin("Posting Date");
+        TempDetailedVendorLedgEntry.SetRange("Posting Date", PostingDate);
+        TempDetailedVendorLedgEntry.SetRange("Entry Type", DtldVendLedgEntry."Entry Type");
         if DateComprRetainFields."Retain Document No." then
-            TempDetailedCustLedgEntryBuffer.SetRange("Document No.", "Cust. Ledger Entry"."Document No.");
-        if DateComprRetainFields."Retain Sell-to Customer No." then
-            TempDetailedCustLedgEntryBuffer.SetRange("Customer No.", "Cust. Ledger Entry"."Sell-to Customer No.");
+            TempDetailedVendorLedgEntry.SetRange("Document No.", "Vendor Ledger Entry"."Document No.");
+        if DateComprRetainFields."Retain Buy-from Vendor No." then
+            TempDetailedVendorLedgEntry.SetRange("Vendor No.", "Vendor Ledger Entry"."Buy-from Vendor No.");
         if DateComprRetainFields."Retain Global Dimension 1" then
-            TempDetailedCustLedgEntryBuffer.SetRange("Initial Entry Global Dim. 1", "Cust. Ledger Entry"."Global Dimension 1 Code");
+            TempDetailedVendorLedgEntry.SetRange("Initial Entry Global Dim. 1", "Vendor Ledger Entry"."Global Dimension 1 Code");
         if DateComprRetainFields."Retain Global Dimension 2" then
-            TempDetailedCustLedgEntryBuffer.SetRange("Initial Entry Global Dim. 2", "Cust. Ledger Entry"."Global Dimension 2 Code");
-        OnSummarizeDtldEntryOnAfterDtldCustLedgEntryBufferSetFilters(TempDetailedCustLedgEntryBuffer, DtldCustLedgEntry, "Cust. Ledger Entry", NewCustLedgEntry);
+            TempDetailedVendorLedgEntry.SetRange("Initial Entry Global Dim. 2", "Vendor Ledger Entry"."Global Dimension 2 Code");
 
-        if not TempDetailedCustLedgEntryBuffer.Find('-') then begin
-            TempDetailedCustLedgEntryBuffer.Reset();
-            Clear(TempDetailedCustLedgEntryBuffer);
+        OnSummarizeDtldEntryOnAfterTempDetailedVendorLedgEntrySetFilters(TempDetailedVendorLedgEntry, DtldVendLedgEntry, NewVendLedgEntry, "Vendor Ledger Entry");
+        if not TempDetailedVendorLedgEntry.Find('-') then begin
+            TempDetailedVendorLedgEntry.Reset();
+            Clear(TempDetailedVendorLedgEntry);
 
             LastTmpDtldEntryNo := LastTmpDtldEntryNo + 1;
-            TempDetailedCustLedgEntryBuffer."Entry No." := LastTmpDtldEntryNo;
-            TempDetailedCustLedgEntryBuffer."Posting Date" := PostingDate;
-            TempDetailedCustLedgEntryBuffer."Document Type" := NewCustLedgEntry."Document Type";
-            TempDetailedCustLedgEntryBuffer."Initial Document Type" := NewCustLedgEntry."Document Type";
-            TempDetailedCustLedgEntryBuffer."Document No." := NewCustLedgEntry."Document No.";
-            TempDetailedCustLedgEntryBuffer."Entry Type" := DtldCustLedgEntry."Entry Type";
-            TempDetailedCustLedgEntryBuffer."Cust. Ledger Entry No." := NewCustLedgEntry."Entry No.";
-            TempDetailedCustLedgEntryBuffer."Customer No." := NewCustLedgEntry."Customer No.";
-            TempDetailedCustLedgEntryBuffer."Currency Code" := NewCustLedgEntry."Currency Code";
-            TempDetailedCustLedgEntryBuffer."User ID" := NewCustLedgEntry."User ID";
-            TempDetailedCustLedgEntryBuffer."Source Code" := NewCustLedgEntry."Source Code";
-            TempDetailedCustLedgEntryBuffer."Transaction No." := NewCustLedgEntry."Transaction No.";
-            TempDetailedCustLedgEntryBuffer."Journal Batch Name" := NewCustLedgEntry."Journal Batch Name";
-            TempDetailedCustLedgEntryBuffer."Reason Code" := NewCustLedgEntry."Reason Code";
-            TempDetailedCustLedgEntryBuffer."Initial Entry Due Date" := NewCustLedgEntry."Due Date";
-            TempDetailedCustLedgEntryBuffer."Initial Entry Global Dim. 1" := NewCustLedgEntry."Global Dimension 1 Code";
-            TempDetailedCustLedgEntryBuffer."Initial Entry Global Dim. 2" := NewCustLedgEntry."Global Dimension 2 Code";
-            OnSummarizeDtldEntryOnAfterInitDtldCustLedgEntryBuffer(TempDetailedCustLedgEntryBuffer, TempDetailedCustLedgEntryBuffer, "Cust. Ledger Entry", NewCustLedgEntry);
+            TempDetailedVendorLedgEntry."Entry No." := LastTmpDtldEntryNo;
+            TempDetailedVendorLedgEntry."Posting Date" := PostingDate;
+            TempDetailedVendorLedgEntry."Document Type" := NewVendLedgEntry."Document Type";
+            TempDetailedVendorLedgEntry."Initial Document Type" := NewVendLedgEntry."Document Type";
+            TempDetailedVendorLedgEntry."Document No." := NewVendLedgEntry."Document No.";
+            TempDetailedVendorLedgEntry."Entry Type" := DtldVendLedgEntry."Entry Type";
+            TempDetailedVendorLedgEntry."Vendor Ledger Entry No." := NewVendLedgEntry."Entry No.";
+            TempDetailedVendorLedgEntry."Vendor No." := NewVendLedgEntry."Vendor No.";
+            TempDetailedVendorLedgEntry."Currency Code" := NewVendLedgEntry."Currency Code";
+            TempDetailedVendorLedgEntry."User ID" := NewVendLedgEntry."User ID";
+            TempDetailedVendorLedgEntry."Source Code" := NewVendLedgEntry."Source Code";
+            TempDetailedVendorLedgEntry."Transaction No." := NewVendLedgEntry."Transaction No.";
+            TempDetailedVendorLedgEntry."Journal Batch Name" := NewVendLedgEntry."Journal Batch Name";
+            TempDetailedVendorLedgEntry."Reason Code" := NewVendLedgEntry."Reason Code";
+            TempDetailedVendorLedgEntry."Initial Entry Due Date" := NewVendLedgEntry."Due Date";
+            TempDetailedVendorLedgEntry."Initial Entry Global Dim. 1" := NewVendLedgEntry."Global Dimension 1 Code";
+            TempDetailedVendorLedgEntry."Initial Entry Global Dim. 2" := NewVendLedgEntry."Global Dimension 2 Code";
 
             NewEntry := true;
         end;
 
-        TempDetailedCustLedgEntryBuffer.Amount :=
-          TempDetailedCustLedgEntryBuffer.Amount + DtldCustLedgEntry.Amount;
-        TempDetailedCustLedgEntryBuffer."Amount (LCY)" :=
-          TempDetailedCustLedgEntryBuffer."Amount (LCY)" + DtldCustLedgEntry."Amount (LCY)";
-        TempDetailedCustLedgEntryBuffer."Debit Amount" :=
-          TempDetailedCustLedgEntryBuffer."Debit Amount" + DtldCustLedgEntry."Debit Amount";
-        TempDetailedCustLedgEntryBuffer."Credit Amount" :=
-          TempDetailedCustLedgEntryBuffer."Credit Amount" + DtldCustLedgEntry."Credit Amount";
-        TempDetailedCustLedgEntryBuffer."Debit Amount (LCY)" :=
-          TempDetailedCustLedgEntryBuffer."Debit Amount (LCY)" + DtldCustLedgEntry."Debit Amount (LCY)";
-        TempDetailedCustLedgEntryBuffer."Credit Amount (LCY)" :=
-          TempDetailedCustLedgEntryBuffer."Credit Amount (LCY)" + DtldCustLedgEntry."Credit Amount (LCY)";
+        TempDetailedVendorLedgEntry.Amount :=
+          TempDetailedVendorLedgEntry.Amount + DtldVendLedgEntry.Amount;
+        TempDetailedVendorLedgEntry."Amount (LCY)" :=
+          TempDetailedVendorLedgEntry."Amount (LCY)" + DtldVendLedgEntry."Amount (LCY)";
+        TempDetailedVendorLedgEntry."Debit Amount" :=
+          TempDetailedVendorLedgEntry."Debit Amount" + DtldVendLedgEntry."Debit Amount";
+        TempDetailedVendorLedgEntry."Credit Amount" :=
+          TempDetailedVendorLedgEntry."Credit Amount" + DtldVendLedgEntry."Credit Amount";
+        TempDetailedVendorLedgEntry."Debit Amount (LCY)" :=
+          TempDetailedVendorLedgEntry."Debit Amount (LCY)" + DtldVendLedgEntry."Debit Amount (LCY)";
+        TempDetailedVendorLedgEntry."Credit Amount (LCY)" :=
+          TempDetailedVendorLedgEntry."Credit Amount (LCY)" + DtldVendLedgEntry."Credit Amount (LCY)";
 
         if NewEntry then
-            TempDetailedCustLedgEntryBuffer.Insert()
+            TempDetailedVendorLedgEntry.Insert()
         else
-            TempDetailedCustLedgEntryBuffer.Modify();
+            TempDetailedVendorLedgEntry.Modify();
     end;
 
     local procedure InsertDtldEntries()
     begin
-        TempDetailedCustLedgEntryBuffer.Reset();
-        if TempDetailedCustLedgEntryBuffer.Find('-') then
+        TempDetailedVendorLedgEntry.Reset();
+        if TempDetailedVendorLedgEntry.Find('-') then
             repeat
-                if ((TempDetailedCustLedgEntryBuffer.Amount <> 0) or
-                    (TempDetailedCustLedgEntryBuffer."Amount (LCY)" <> 0) or
-                    (TempDetailedCustLedgEntryBuffer."Debit Amount" <> 0) or
-                    (TempDetailedCustLedgEntryBuffer."Credit Amount" <> 0) or
-                    (TempDetailedCustLedgEntryBuffer."Debit Amount (LCY)" <> 0) or
-                    (TempDetailedCustLedgEntryBuffer."Credit Amount (LCY)" <> 0))
+                if ((TempDetailedVendorLedgEntry.Amount <> 0) or
+                    (TempDetailedVendorLedgEntry."Amount (LCY)" <> 0) or
+                    (TempDetailedVendorLedgEntry."Debit Amount" <> 0) or
+                    (TempDetailedVendorLedgEntry."Credit Amount" <> 0) or
+                    (TempDetailedVendorLedgEntry."Debit Amount (LCY)" <> 0) or
+                    (TempDetailedVendorLedgEntry."Credit Amount (LCY)" <> 0))
                 then begin
                     LastDtldEntryNo := LastDtldEntryNo + 1;
 
-                    NewDtldCustLedgEntry := TempDetailedCustLedgEntryBuffer;
-                    NewDtldCustLedgEntry."Entry No." := LastDtldEntryNo;
-                    NewDtldCustLedgEntry.Insert(true);
+                    NewDtldVendLedgEntry := TempDetailedVendorLedgEntry;
+                    NewDtldVendLedgEntry."Entry No." := LastDtldEntryNo;
+                    NewDtldVendLedgEntry.Insert(true);
                 end;
-            until TempDetailedCustLedgEntryBuffer.Next() = 0;
-        TempDetailedCustLedgEntryBuffer.DeleteAll();
+            until TempDetailedVendorLedgEntry.Next() = 0;
+        TempDetailedVendorLedgEntry.DeleteAll();
     end;
 
     local procedure InitializeParameter()
@@ -665,13 +657,12 @@ report 198 "Date Compress Customer Ledger"
     begin
         if EntrdDateComprReg."Ending Date" = 0D then
             EntrdDateComprReg."Ending Date" := DateCompression.CalcMaxEndDate();
-        if EntrdCustLedgEntry.Description = '' then
-            EntrdCustLedgEntry.Description := Text009;
+        if EntrdVendLedgEntry.Description = '' then
+            EntrdVendLedgEntry.Description := Text009;
 
+        RetainDimText := DimSelectionBuf.GetDimSelectionText(3, REPORT::"Date Compress Vendor Ledger", '');
         DataArchiveProviderExists := DataArchive.DataArchiveProviderExists();
         UseDataArchive := DataArchiveProviderExists;
-
-        RetainDimText := DimSelectionBuf.GetDimSelectionText(3, REPORT::"Date Compress Customer Ledger", '');
     end;
 
     procedure InitializeRequest(StartingDate: Date; EndingDate: Date; PeriodLength: Option; Description: Text[100]; NewDateComprRetainFields: Record "Date Compr. Retain Fields"; RetainDimensionText: Text[250]; DoUseDataArchive: Boolean)
@@ -680,10 +671,11 @@ report 198 "Date Compress Customer Ledger"
         EntrdDateComprReg."Starting Date" := StartingDate;
         EntrdDateComprReg."Ending Date" := EndingDate;
         EntrdDateComprReg."Period Length" := PeriodLength;
-        EntrdCustLedgEntry.Description := Description;
+        EntrdVendLedgEntry.Description := Description;
         DateComprRetainFields := NewDateComprRetainFields;
         RetainDimText := RetainDimensionText;
-        UseDataArchive := DoUseDataArchive and DataArchiveProviderExists;
+        DataArchiveProviderExists := DataArchive.DataArchiveProviderExists();
+        UseDataArchive := DataArchiveProviderExists and DoUseDataArchive;
     end;
 
     local procedure LogStartTelemetryMessage()
@@ -697,13 +689,13 @@ report 198 "Date Compress Customer Ledger"
         TelemetryDimensions.Add('EndDate', Format(EntrdDateComprReg."Ending Date", 0, 9));
         TelemetryDimensions.Add('PeriodLength', Format(EntrdDateComprReg."Period Length", 0, 9));
         TelemetryDimensions.Add('RetainDocumentNo', Format(DateComprRetainFields."Retain Document No.", 0, 9));
-        TelemetryDimensions.Add('RetainSelltoCustomerNo', Format(DateComprRetainFields."Retain Sell-to Customer No.", 0, 9));
-        TelemetryDimensions.Add('RetainSalespersonCode', Format(DateComprRetainFields."Retain Salesperson Code", 0, 9));
+        TelemetryDimensions.Add('RetainBuyFromVendorNo', Format(DateComprRetainFields."Retain Buy-from Vendor No.", 0, 9));
+        TelemetryDimensions.Add('RetainPurchaserCode', Format(DateComprRetainFields."Retain Purchaser Code", 0, 9));
         TelemetryDimensions.Add('RetainDimensions', RetainDimText);
         TelemetryDimensions.Add('RetainJnlTemplate', Format(DateComprRetainFields."Retain Journal Template Name", 0, 9));
         TelemetryDimensions.Add('UseDataArchive', Format(UseDataArchive));
 
-        Session.LogMessage('0000F4K', StrSubstNo(StartDateCompressionTelemetryMsg, CurrReport.ObjectId(false), CurrReport.ObjectId(true)), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, TelemetryDimensions);
+        Session.LogMessage('0000F4Y', StrSubstNo(StartDateCompressionTelemetryMsg, CurrReport.ObjectId(false), CurrReport.ObjectId(true)), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, TelemetryDimensions);
     end;
 
     local procedure LogEndTelemetryMessage()
@@ -717,21 +709,16 @@ report 198 "Date Compress Customer Ledger"
         TelemetryDimensions.Add('NoRecordsDeleted', Format(DateComprReg."No. Records Deleted", 0, 9));
         TelemetryDimensions.Add('NoofNewRecords', Format(DateComprReg."No. of New Records", 0, 9));
 
-        Session.LogMessage('0000F4L', StrSubstNo(EndDateCompressionTelemetryMsg, CurrReport.ObjectId(false), CurrReport.ObjectId(true)), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, TelemetryDimensions);
+        Session.LogMessage('0000F4Z', StrSubstNo(EndDateCompressionTelemetryMsg, CurrReport.ObjectId(false), CurrReport.ObjectId(true)), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, TelemetryDimensions);
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCustLedgEntry2SetFilters(var ToCustLedgEntry: Record "Cust. Ledger Entry"; FromCustLedgEntry: Record "Cust. Ledger Entry")
+    local procedure OnInsertRegistersOnBeforeGLentryInsert(var GLentry: Record "G/L Entry")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnSummarizeDtldEntryOnAfterDtldCustLedgEntryBufferSetFilters(var DtldCustLedgEntryBuffer: Record "Detailed Cust. Ledg. Entry"; var DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry"; var OriginCustLedgEntry: Record "Cust. Ledger Entry"; var NewCustLedgEntry: Record "Cust. Ledger Entry")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSummarizeDtldEntryOnAfterInitDtldCustLedgEntryBuffer(var DtldCustLedgEntryBuffer: Record "Detailed Cust. Ledg. Entry"; var DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry"; var OriginCustLedgEntry: Record "Cust. Ledger Entry"; var NewCustLedgEntry: Record "Cust. Ledger Entry")
+    local procedure OnSummarizeDtldEntryOnAfterTempDetailedVendorLedgEntrySetFilters(var TempDetailedVendorLedgEntry: Record "Detailed Vendor Ledg. Entry" temporary; var DetailedVendorLedgEntry: Record "Detailed Vendor Ledg. Entry"; var NewVendorLedgerEntry: Record "Vendor Ledger Entry"; var OriginVendorLedgerEntry: Record "Vendor Ledger Entry")
     begin
     end;
 }

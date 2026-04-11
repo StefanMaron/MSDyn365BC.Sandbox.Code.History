@@ -2,12 +2,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.History;
+namespace Microsoft.Purchases.Archive;
 
-codeunit 315 "Sales Inv.-Printed"
+codeunit 321 "Purch.HeaderArch-Printed"
 {
-    Permissions = TableData "Sales Invoice Header" = rimd;
-    TableNo = "Sales Invoice Header";
+    TableNo = "Purchase Header Archive";
 
     trigger OnRun()
     begin
@@ -29,12 +28,12 @@ codeunit 315 "Sales Inv.-Printed"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeModify(var SalesInvoiceHeader: Record "Sales Invoice Header")
+    local procedure OnBeforeModify(var PurchaseHeaderArchive: Record "Purchase Header Archive")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeOnRun(var SalesInvoiceHeader: Record "Sales Invoice Header"; var SuppressCommit: Boolean)
+    local procedure OnBeforeOnRun(var PurchaseHeaderArchive: Record "Purchase Header Archive"; var SuppressCommit: Boolean)
     begin
     end;
 }

@@ -2,15 +2,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Analysis;
+namespace Microsoft.Purchases.Analysis;
 
 using Microsoft.Finance.Analysis;
 using Microsoft.Foundation.Enums;
 using Microsoft.Inventory.Analysis;
 
-page 9207 "Sales Analysis Matrix"
+page 9205 "Purchase Analysis Matrix"
 {
-    Caption = 'Sales Analysis Matrix';
+    Caption = 'Purchase Analysis Matrix';
     Editable = false;
     LinksAllowed = false;
     PageType = List;
@@ -25,21 +25,21 @@ page 9207 "Sales Analysis Matrix"
                 ShowCaption = false;
                 field("Row Ref. No."; Rec."Row Ref. No.")
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     Style = Strong;
                     StyleExpr = Emphasize;
                     ToolTip = 'Specifies a row reference number for the analysis line.';
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     Style = Strong;
                     StyleExpr = Emphasize;
                     ToolTip = 'Specifies a description for the analysis line.';
                 }
                 field(Field1; MatrixData[1])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(1);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -54,7 +54,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field2; MatrixData[2])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(2);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -69,7 +69,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field3; MatrixData[3])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(3);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -84,7 +84,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field4; MatrixData[4])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(4);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -99,7 +99,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field5; MatrixData[5])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(5);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -114,7 +114,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field6; MatrixData[6])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(6);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -129,7 +129,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field7; MatrixData[7])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(7);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -144,7 +144,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field8; MatrixData[8])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(8);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -152,14 +152,14 @@ page 9207 "Sales Analysis Matrix"
                     StyleExpr = Field8Style;
                     Visible = Field8Visible;
 
-                    trigger OnAssistEdit()
+                    trigger OnDrillDown()
                     begin
                         FieldDrillDown(8);
                     end;
                 }
                 field(Field9; MatrixData[9])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(9);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -174,7 +174,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field10; MatrixData[10])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(10);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -189,7 +189,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field11; MatrixData[11])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(11);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -204,7 +204,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field12; MatrixData[12])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(12);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -219,7 +219,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field13; MatrixData[13])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(13);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -234,7 +234,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field14; MatrixData[14])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(14);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -249,7 +249,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field15; MatrixData[15])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(15);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -264,7 +264,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field16; MatrixData[16])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(16);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -279,7 +279,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field17; MatrixData[17])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(17);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -294,7 +294,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field18; MatrixData[18])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(18);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -309,7 +309,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field19; MatrixData[19])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(19);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -324,7 +324,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field20; MatrixData[20])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(20);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -339,7 +339,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field21; MatrixData[21])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(21);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -354,7 +354,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field22; MatrixData[22])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(22);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -369,7 +369,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field23; MatrixData[23])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(23);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -384,7 +384,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field24; MatrixData[24])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(24);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -399,7 +399,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field25; MatrixData[25])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(25);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -414,7 +414,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field26; MatrixData[26])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(26);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -429,7 +429,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field27; MatrixData[27])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(27);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -444,7 +444,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field28; MatrixData[28])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(28);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -459,7 +459,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field29; MatrixData[29])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(29);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -474,7 +474,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field30; MatrixData[30])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(30);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -489,7 +489,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field31; MatrixData[31])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(31);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -504,7 +504,7 @@ page 9207 "Sales Analysis Matrix"
                 }
                 field(Field32; MatrixData[32])
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     AutoFormatExpression = FormatStr(32);
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -587,10 +587,11 @@ page 9207 "Sales Analysis Matrix"
     trigger OnOpenPage()
     begin
         Rec.SetFilter(Show, '<>%1', Rec.Show::No);
-        AnalysisColumn.SetRange("Analysis Area", AnalysisColumn."Analysis Area"::Sales);
+        AnalysisColumn.SetRange("Analysis Area", AnalysisColumn."Analysis Area"::Purchase);
         AnalysisColumn.SetRange("Analysis Column Template", AnalysisColumn."Analysis Column Template");
         AnalysisColumn.SetRange("Line No.", FirstLineNo, LastLineNo);
         AnalysisColumn.SetFilter(Show, '<>%1', AnalysisColumn.Show::Never);
+
         SetVisible();
     end;
 
@@ -755,7 +756,7 @@ page 9207 "Sales Analysis Matrix"
         exit(ArrayLen(MatrixColumnCaptions));
     end;
 
-    local procedure FormatStr(ColumnNo: Integer): Text
+    procedure FormatStr(ColumnNo: Integer): Text
     begin
         exit(MatrixMgt.FormatRoundingFactor(MatrixRounding[ColumnNo], false));
     end;
