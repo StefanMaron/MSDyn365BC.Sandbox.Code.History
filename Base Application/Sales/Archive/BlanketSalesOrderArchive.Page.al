@@ -2,20 +2,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Archive;
+namespace Microsoft.Purchases.Archive;
 
-using Microsoft.CRM.Contact;
 using Microsoft.Foundation.Reporting;
-using Microsoft.Sales.Customer;
-using Microsoft.Utilities;
+using Microsoft.Purchases.Vendor;
 using System.Security.User;
 
-page 6620 "Blanket Sales Order Archive"
+page 6623 "Blanket Purchase Order Archive"
 {
-    Caption = 'Blanket Sales Order Archive';
+    Caption = 'Blanket Purchase Order Archive';
     Editable = false;
     PageType = Document;
-    SourceTable = "Sales Header Archive";
+    SourceTable = "Purchase Header Archive";
     SourceTableView = where("Document Type" = const("Blanket Order"));
 
     layout
@@ -29,121 +27,104 @@ page 6620 "Blanket Sales Order Archive"
                 {
                     ApplicationArea = All;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the number of the archived purchase order.';
                 }
-                field("Sell-to Customer No."; Rec."Sell-to Customer No.")
+                field("Buy-from Vendor No."; Rec."Buy-from Vendor No.")
                 {
                     ApplicationArea = Suite;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the name of the vendor who delivered the items.';
                 }
-                field("Sell-to Contact No."; Rec."Sell-to Contact No.")
+                field("Buy-from Vendor Name"; Rec."Buy-from Vendor Name")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the name of the vendor who delivered the items.';
                 }
-                field("Sell-to Customer Name"; Rec."Sell-to Customer Name")
+                field("Buy-from Vendor Name 2"; Rec."Buy-from Vendor Name 2")
                 {
                     ApplicationArea = Suite;
-                }
-                field("Sell-to Customer Name 2"; Rec."Sell-to Customer Name 2")
-                {
-                    ApplicationArea = Suite;
+                    Importance = Additional;
                     Visible = false;
                 }
-                field("Sell-to Address"; Rec."Sell-to Address")
+                field("Buy-from Address"; Rec."Buy-from Address")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the address of the vendor who delivered the items.';
                 }
-                field("Sell-to Address 2"; Rec."Sell-to Address 2")
+                field("Buy-from Address 2"; Rec."Buy-from Address 2")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies an additional part of the address of the vendor who delivered the items.';
                 }
-                field("Sell-to Post Code"; Rec."Sell-to Post Code")
+                field("Buy-from Post Code"; Rec."Buy-from Post Code")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the post code of the vendor who delivered the items.';
                 }
-                field("Sell-to City"; Rec."Sell-to City")
+                field("Buy-from City"; Rec."Buy-from City")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the city of the vendor who delivered the items.';
                 }
-                field("Sell-to Contact"; Rec."Sell-to Contact")
+                field("Buy-from Contact"; Rec."Buy-from Contact")
                 {
                     ApplicationArea = Suite;
-                }
-                field(SellToPhoneNo; SellToContact."Phone No.")
-                {
-                    ApplicationArea = Suite;
-                    Caption = 'Phone No.';
-                    Importance = Additional;
-                    Editable = false;
-                    ExtendedDatatype = PhoneNo;
-                    ToolTip = 'Specifies the telephone number of the contact person that the sales document will be sent to.';
-                }
-                field(SellToMobilePhoneNo; SellToContact."Mobile Phone No.")
-                {
-                    ApplicationArea = Suite;
-                    Caption = 'Mobile Phone No.';
-                    Importance = Additional;
-                    Editable = false;
-                    ExtendedDatatype = PhoneNo;
-                    ToolTip = 'Specifies the mobile telephone number of the contact person that the sales document will be sent to.';
-                }
-                field(SellToEmail; SellToContact."E-Mail")
-                {
-                    ApplicationArea = Suite;
-                    Caption = 'Email';
-                    Importance = Additional;
-                    Editable = false;
-                    ExtendedDatatype = EMail;
-                    ToolTip = 'Specifies the email address of the contact person that the sales document will be sent to.';
+                    ToolTip = 'Specifies the name of the contact person at the vendor who delivered the items.';
                 }
                 field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = Suite;
-                    Importance = Promoted;
+                    ToolTip = 'Specifies the date when the document was posted.';
                 }
                 field("Order Date"; Rec."Order Date")
                 {
                     ApplicationArea = Suite;
+                    Importance = Promoted;
+                    ToolTip = 'Specifies the date when the order was created.';
                 }
                 field("Document Date"; Rec."Document Date")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the date the document was created.';
                 }
-                field("Requested Delivery Date"; Rec."Requested Delivery Date")
+                field("Vendor Order No."; Rec."Vendor Order No.")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the vendor''s order number.';
                 }
-                field("Promised Delivery Date"; Rec."Promised Delivery Date")
+                field("Vendor Shipment No."; Rec."Vendor Shipment No.")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the vendor''s shipment number. It is inserted in the corresponding field on the source document during posting.';
                 }
-                field("External Document No."; Rec."External Document No.")
+                field("Vendor Invoice No."; Rec."Vendor Invoice No.")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the document number of the original document you received from the vendor. You can require the document number for posting, or let it be optional. By default, it''s required, so that this document references the original. Making document numbers optional removes a step from the posting process. For example, if you attach the original invoice as a PDF, you might not need to enter the document number. To specify whether document numbers are required, in the Purchases & Payables Setup window, select or clear the Ext. Doc. No. Mandatory field.';
                 }
-                field("Your Reference"; Rec."Your Reference")
+                field("Order Address Code"; Rec."Order Address Code")
                 {
                     ApplicationArea = Suite;
-                    Importance = Additional;
+                    ToolTip = 'Specifies the order address of the related vendor.';
                 }
-                field("Salesperson Code"; Rec."Salesperson Code")
+                field("Purchaser Code"; Rec."Purchaser Code")
                 {
                     ApplicationArea = Suite;
-                }
-                field("Campaign No."; Rec."Campaign No.")
-                {
-                    ApplicationArea = RelationshipMgmt;
+                    ToolTip = 'Specifies which purchaser is assigned to the vendor.';
                 }
                 field("Responsibility Center"; Rec."Responsibility Center")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the code of the responsibility center (for example, a distribution center) assigned to the vendor or associated with the order.';
                 }
                 field(Status; Rec.Status)
                 {
                     ApplicationArea = Suite;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the status of the order.';
                 }
             }
-            part(SalesLinesArchive; "Blanket Sales Order Arch. Sub.")
+            part(PurchLinesArchive; "Blanket Purch. Order Arch.Sub.")
             {
                 ApplicationArea = Suite;
                 SubPageLink = "Document No." = field("No."),
@@ -153,192 +134,175 @@ page 6620 "Blanket Sales Order Archive"
             group(Invoicing)
             {
                 Caption = 'Invoicing';
-                field("Bill-to Customer No."; Rec."Bill-to Customer No.")
+                field("Pay-to Vendor No."; Rec."Pay-to Vendor No.")
                 {
                     ApplicationArea = Suite;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the number of the vendor that you received the invoice from.';
                 }
-                field("Bill-to Contact No."; Rec."Bill-to Contact No.")
+                field("Pay-to Name"; Rec."Pay-to Name")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the name of the vendor who you received the invoice from.';
                 }
-                field("Bill-to Name"; Rec."Bill-to Name")
+                field("Pay-to Name 2"; Rec."Pay-to Name 2")
                 {
                     ApplicationArea = Suite;
-                }
-                field("Bill-to Name 2"; Rec."Bill-to Name 2")
-                {
-                    ApplicationArea = Suite;
+                    Importance = Additional;
                     Visible = false;
                 }
-                field("Bill-to Address"; Rec."Bill-to Address")
+                field("Pay-to Address"; Rec."Pay-to Address")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the address of the vendor that you received the invoice from.';
                 }
-                field("Bill-to Address 2"; Rec."Bill-to Address 2")
+                field("Pay-to Address 2"; Rec."Pay-to Address 2")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies an additional part of the address of the vendor that the invoice was received from.';
                 }
-                field("Bill-to Post Code"; Rec."Bill-to Post Code")
+                field("Pay-to Post Code"; Rec."Pay-to Post Code")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the post code of the vendor that you received the invoice from.';
                 }
-                field("Bill-to City"; Rec."Bill-to City")
+                field("Pay-to City"; Rec."Pay-to City")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the city of the vendor that you received the invoice from.';
                 }
-                field("Bill-to Contact"; Rec."Bill-to Contact")
+                field("Pay-to Contact"; Rec."Pay-to Contact")
                 {
                     ApplicationArea = Suite;
-                }
-                field(BillToContactPhoneNo; BillToContact."Phone No.")
-                {
-                    ApplicationArea = Suite;
-                    Caption = 'Phone No.';
-                    Editable = false;
-                    Importance = Additional;
-                    ExtendedDatatype = PhoneNo;
-                    ToolTip = 'Specifies the telephone number of the person you should contact at the customer you are sending the invoice to.';
-                }
-                field(BillToContactMobilePhoneNo; BillToContact."Mobile Phone No.")
-                {
-                    ApplicationArea = Suite;
-                    Caption = 'Mobile Phone No.';
-                    Editable = false;
-                    Importance = Additional;
-                    ExtendedDatatype = PhoneNo;
-                    ToolTip = 'Specifies the mobile telephone number of the person you should contact at the customer you are sending the invoice to.';
-                }
-                field(BillToContactEmail; BillToContact."E-Mail")
-                {
-                    ApplicationArea = Suite;
-                    Caption = 'Email';
-                    Editable = false;
-                    Importance = Additional;
-                    ExtendedDatatype = EMail;
-                    ToolTip = 'Specifies the email address of the person you should contact at the customer you are sending the invoice to.';
+                    ToolTip = 'Specifies the name of the person to contact about an invoice from this vendor.';
                 }
                 field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                 {
                     ApplicationArea = Dimensions;
+                    ToolTip = 'Specifies the code for Shortcut Dimension 1, which is one of two global dimension codes that you set up in the General Ledger Setup window.';
                 }
                 field("Shortcut Dimension 2 Code"; Rec."Shortcut Dimension 2 Code")
                 {
                     ApplicationArea = Dimensions;
+                    ToolTip = 'Specifies the code for Shortcut Dimension 2, which is one of two global dimension codes that you set up in the General Ledger Setup window.';
                 }
                 field("Payment Terms Code"; Rec."Payment Terms Code")
                 {
                     ApplicationArea = Suite;
                     Importance = Promoted;
+                    ToolTip = 'Specifies a formula that calculates the payment due date, payment discount date, and payment discount amount on the purchase document.';
                 }
                 field("Due Date"; Rec."Due Date")
                 {
                     ApplicationArea = Suite;
                     Importance = Promoted;
+                    ToolTip = 'Specifies when the related purchase invoice must be paid.';
                 }
                 field("Payment Discount %"; Rec."Payment Discount %")
                 {
                     ApplicationArea = Suite;
-                }
-                field("Pmt. Discount Date"; Rec."Pmt. Discount Date")
-                {
-                    ApplicationArea = Suite;
+                    ToolTip = 'Specifies the payment discount percentage that is granted if you pay on or before the date entered in the Pmt. Discount Date field. The discount percentage is specified in the Payment Terms Code field.';
                 }
                 field("Payment Method Code"; Rec."Payment Method Code")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the method of payment for payments to vendors.';
+                }
+                field("On Hold"; Rec."On Hold")
+                {
+                    ApplicationArea = Suite;
+                    ToolTip = 'Specifies when an entry for an unpaid invoice has been posted and you create a finance charge memo or reminder.';
                 }
                 field("Prices Including VAT"; Rec."Prices Including VAT")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies if the Unit Price and Line Amount fields on document lines should be shown with or without VAT.';
                 }
             }
             group(Shipping)
             {
                 Caption = 'Shipping';
-                field("Ship-to Code"; Rec."Ship-to Code")
-                {
-                    ApplicationArea = Suite;
-                    Importance = Promoted;
-                }
                 field("Ship-to Name"; Rec."Ship-to Name")
                 {
                     ApplicationArea = Suite;
-                }
-                field("Ship-to Name 2"; Rec."Ship-to Name 2")
-                {
-                    ApplicationArea = Suite;
-                    Caption = 'Name 2';
-                    Importance = Additional;
-                    Visible = false;
+                    ToolTip = 'Specifies the name of the company at the address to which the items were shipped.';
                 }
                 field("Ship-to Address"; Rec."Ship-to Address")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the address that the items are shipped to.';
                 }
                 field("Ship-to Address 2"; Rec."Ship-to Address 2")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies an additional part of the ship-to address, in case it is a long address.';
                 }
                 field("Ship-to Post Code"; Rec."Ship-to Post Code")
                 {
                     ApplicationArea = Suite;
-                    Importance = Promoted;
+                    ToolTip = 'Specifies the postal code of the address.';
                 }
                 field("Ship-to City"; Rec."Ship-to City")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the city of the address that the items are shipped to.';
                 }
                 field("Ship-to Phone No."; Rec."Ship-to Phone No.")
                 {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Phone No.';
+                    ApplicationArea = Suite;
+                    ToolTip = 'Specifies the telephone number of the company''s shipping address.';
                 }
                 field("Ship-to Contact"; Rec."Ship-to Contact")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the name of a contact person at the address that the items were shipped to.';
                 }
                 field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = Location;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the location where the items are to be placed when they are received. This field acts as the default location for new lines. Location code for individual lines can differ from it.';
                 }
-                field("Outbound Whse. Handling Time"; Rec."Outbound Whse. Handling Time")
+                field("Inbound Whse. Handling Time"; Rec."Inbound Whse. Handling Time")
                 {
                     ApplicationArea = Warehouse;
+                    ToolTip = 'Specifies the time it takes to make items part of available inventory, after the items have been posted as received.';
                 }
                 field("Shipment Method Code"; Rec."Shipment Method Code")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the delivery conditions of the related shipment, such as free on board (FOB).';
                 }
-                field("Shipping Agent Code"; Rec."Shipping Agent Code")
+                field("Lead Time Calculation"; Rec."Lead Time Calculation")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies a date formula for the amount of time it takes to replenish the item.';
                 }
-                field("Shipping Agent Service Code"; Rec."Shipping Agent Service Code")
+                field("Requested Receipt Date"; Rec."Requested Receipt Date")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the date that you want the vendor to deliver your order. The field is used to calculate the latest date you can order, as follows: requested receipt date - lead time calculation = order date. If you do not need delivery on a specific date, you can leave the field blank.';
                 }
-                field("Shipping Time"; Rec."Shipping Time")
+                field("Promised Receipt Date"; Rec."Promised Receipt Date")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the date that the vendor has promised to deliver the order.';
                 }
-                field("Late Order Shipping"; Rec."Late Order Shipping")
-                {
-                    ApplicationArea = Suite;
-                }
-                field("Package Tracking No."; Rec."Package Tracking No.")
-                {
-                    ApplicationArea = Suite;
-                }
-                field("Shipment Date"; Rec."Shipment Date")
+                field("Expected Receipt Date"; Rec."Expected Receipt Date")
                 {
                     ApplicationArea = Suite;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the date you expect the items to be available in your warehouse. If you leave the field blank, it will be calculated as follows: Planned Receipt Date + Safety Lead Time + Inbound Warehouse Handling Time = Expected Receipt Date.';
                 }
-                field("Shipping Advice"; Rec."Shipping Advice")
+                field("Sell-to Customer No."; Rec."Sell-to Customer No.")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the number of the customer who will receive the products and be billed by default.';
+                }
+                field("Ship-to Code"; Rec."Ship-to Code")
+                {
+                    ApplicationArea = Suite;
+                    ToolTip = 'Specifies a code for an alternate shipment address if you want to ship to another address than the one that has been entered automatically. This field is also used in case of drop shipment.';
                 }
             }
             group("Foreign Trade")
@@ -348,30 +312,32 @@ page 6620 "Blanket Sales Order Archive"
                 {
                     ApplicationArea = Suite;
                     Importance = Promoted;
-                }
-                field("EU 3-Party Trade"; Rec."EU 3-Party Trade")
-                {
-                    ApplicationArea = BasicEU, BasicNO;
+                    ToolTip = 'Specifies the currency code for the amount on the line.';
                 }
                 field("Transaction Type"; Rec."Transaction Type")
                 {
                     ApplicationArea = BasicEU, BasicNO;
+                    ToolTip = 'Specifies the number for the transaction type, for the purpose of reporting to INTRASTAT.';
                 }
                 field("Transaction Specification"; Rec."Transaction Specification")
                 {
                     ApplicationArea = BasicEU, BasicNO;
+                    ToolTip = 'Specifies a code for the purchase document''s transaction specification, for the purpose of reporting to INTRASTAT.';
                 }
                 field("Transport Method"; Rec."Transport Method")
                 {
                     ApplicationArea = BasicEU, BasicNO;
+                    ToolTip = 'Specifies the transport method, for the purpose of reporting to INTRASTAT.';
                 }
-                field("Exit Point"; Rec."Exit Point")
+                field("Entry Point"; Rec."Entry Point")
                 {
                     ApplicationArea = BasicEU, BasicNO;
+                    ToolTip = 'Specifies the code of the port of entry where the items pass into your country/region, for reporting to Intrastat.';
                 }
                 field("Area"; Rec.Area)
                 {
                     ApplicationArea = BasicEU, BasicNO;
+                    ToolTip = 'Specifies the area in which your company has to pay sales tax.';
                 }
             }
             group(Version)
@@ -381,10 +347,12 @@ page 6620 "Blanket Sales Order Archive"
                 {
                     ApplicationArea = Suite;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the version number of the archived document.';
                 }
                 field("Archived By"; Rec."Archived By")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the user who archived the document.';
 
                     trigger OnDrillDown()
                     var
@@ -397,25 +365,28 @@ page 6620 "Blanket Sales Order Archive"
                 {
                     ApplicationArea = Suite;
                     Importance = Promoted;
+                    ToolTip = 'Specifies the date when the document was archived.';
                 }
                 field("Time Archived"; Rec."Time Archived")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies what time the document was archived.';
                 }
                 field("Interaction Exist"; Rec."Interaction Exist")
                 {
                     ApplicationArea = RelationshipMgmt;
+                    ToolTip = 'Specifies that the archived document is linked to an interaction log entry.';
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control81; Links)
+            systempart(Control74; Links)
             {
                 ApplicationArea = RecordLinks;
                 Visible = false;
             }
-            systempart(Control80; Notes)
+            systempart(Control73; Notes)
             {
                 ApplicationArea = Notes;
             }
@@ -435,10 +406,10 @@ page 6620 "Blanket Sales Order Archive"
                     ApplicationArea = Suite;
                     Caption = 'Card';
                     Image = EditLines;
-                    RunObject = Page "Customer Card";
-                    RunPageLink = "No." = field("Sell-to Customer No.");
+                    RunObject = Page "Vendor Card";
+                    RunPageLink = "No." = field("Buy-from Vendor No.");
                     ShortCutKey = 'Shift+F7';
-                    ToolTip = 'View or edit detailed information about the customer on the sales document.';
+                    ToolTip = 'View or edit detailed information about the vendor on the purchase document.';
                 }
                 action(Dimensions)
                 {
@@ -457,7 +428,7 @@ page 6620 "Blanket Sales Order Archive"
                     ApplicationArea = Comments;
                     Caption = 'Co&mments';
                     Image = ViewComments;
-                    RunObject = Page "Sales Archive Comment Sheet";
+                    RunObject = Page "Purch. Archive Comment Sheet";
                     RunPageLink = "Document Type" = field("Document Type"),
                                   "No." = field("No."),
                                   "Document Line No." = const(0),
@@ -473,30 +444,10 @@ page 6620 "Blanket Sales Order Archive"
                     ToolTip = 'Prepare to print the document. A report request window for the document opens where you can specify what to include on the print-out.';
 
                     trigger OnAction()
-                    var
-                        DocPrint: Codeunit "Document-Print";
                     begin
-                        DocPrint.PrintSalesHeaderArch(Rec);
+                        DocPrint.PrintPurchHeaderArch(Rec);
                     end;
                 }
-            }
-        }
-        area(processing)
-        {
-            action(Restore)
-            {
-                ApplicationArea = Suite;
-                Caption = '&Restore';
-                Ellipsis = true;
-                Image = Restore;
-                ToolTip = 'Transfer the contents of this archived version to the original document. This is only possible if the original is not posted or deleted. ';
-
-                trigger OnAction()
-                var
-                    ArchiveManagement: Codeunit ArchiveManagement;
-                begin
-                    ArchiveManagement.RestoreSalesDocument(Rec);
-                end;
             }
         }
         area(Promoted)
@@ -505,27 +456,20 @@ page 6620 "Blanket Sales Order Archive"
             {
                 Caption = 'Process';
 
-                actionref(Restore_Promoted; Restore)
-                {
-                }
                 actionref(Print_Promoted; Print)
                 {
                 }
                 actionref(Dimensions_Promoted; Dimensions)
                 {
                 }
+                actionref("Co&mments_Promoted"; "Co&mments")
+                {
+                }
             }
         }
     }
 
-    trigger OnAfterGetRecord()
-    begin
-        SellToContact.GetOrClear(Rec."Sell-to Contact No.");
-        BillToContact.GetOrClear(Rec."Bill-to Contact No.");
-    end;
-
     var
-        SellToContact: Record Contact;
-        BillToContact: Record Contact;
+        DocPrint: Codeunit "Document-Print";
 }
 

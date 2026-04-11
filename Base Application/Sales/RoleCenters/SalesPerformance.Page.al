@@ -2,15 +2,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.RoleCenters;
+namespace Microsoft.Purchases.RoleCenters;
 
 using Microsoft.Inventory.Analysis;
 using System.Integration;
 using System.Visualization;
 
-page 770 "Sales Performance"
+page 771 "Purchase Performance"
 {
-    Caption = 'Sales Performance';
+    Caption = 'Purchase Performance';
     PageType = CardPart;
     SourceTable = "Business Chart Buffer";
 
@@ -176,7 +176,7 @@ page 770 "Sales Performance"
     local procedure UpdateChart(Period: Option ,Next,Previous)
     begin
         AnalysisReportChartMgt.UpdateChart(
-          Period, AnalysisReportChartSetup, AnalysisReportChartSetup."Analysis Area"::Sales.AsInteger(), Rec, StatusText);
+          Period, AnalysisReportChartSetup, AnalysisReportChartSetup."Analysis Area"::Purchase.AsInteger(), Rec, StatusText);
         Rec.UpdateChart(CurrPage.BusinessChart);
     end;
 }

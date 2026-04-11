@@ -2,11 +2,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Analysis;
+namespace Microsoft.Purchases.Vendor;
 
 using Microsoft.Finance.Currency;
 
-page 486 "Cust. Stats. by Curr. Lines"
+page 487 "Vend. Stats. by Curr. Lines"
 {
     Caption = 'Lines';
     Editable = false;
@@ -32,15 +32,15 @@ page 486 "Cust. Stats. by Curr. Lines"
                     ApplicationArea = Suite;
                     ToolTip = 'Specifies a text to describe the currency code.';
                 }
-                field("Customer Balance"; Rec."Customer Balance")
+                field("Vendor Balance"; Rec."Vendor Balance")
                 {
                     ApplicationArea = Suite;
                     AutoFormatExpression = Rec.Code;
                     AutoFormatType = 1;
                     Caption = 'Balance';
-                    ToolTip = 'Specifies the payment amount that the customer owes for completed sales.';
+                    ToolTip = 'Specifies the payment amount that you owe the vendor for completed purchases.';
                 }
-                field("Customer Outstanding Orders"; Rec."Customer Outstanding Orders")
+                field("Vendor Outstanding Orders"; Rec."Vendor Outstanding Orders")
                 {
                     ApplicationArea = Suite;
                     AutoFormatExpression = Rec.Code;
@@ -48,7 +48,7 @@ page 486 "Cust. Stats. by Curr. Lines"
                     Caption = 'Outstanding Orders';
                     ToolTip = 'Specifies the number of orders for which payment has not been made.';
                 }
-                field("Customer Shipped Not Invoiced"; Rec."Customer Shipped Not Invoiced")
+                field("Vendor Amt. Rcd. Not Invoiced"; Rec."Vendor Amt. Rcd. Not Invoiced")
                 {
                     ApplicationArea = Suite;
                     AutoFormatExpression = Rec.Code;
@@ -62,15 +62,15 @@ page 486 "Cust. Stats. by Curr. Lines"
                     AutoFormatExpression = Rec.Code;
                     AutoFormatType = 1;
                     Caption = 'Total';
-                    ToolTip = 'Specifies the total amount less any invoice discount amount and excluding VAT for the sales document.';
+                    ToolTip = 'Specifies the total amount less any invoice discount amount and excluding VAT for the purchase document.';
                 }
-                field("Customer Balance Due"; Rec."Customer Balance Due")
+                field("Vendor Balance Due"; Rec."Vendor Balance Due")
                 {
                     ApplicationArea = Suite;
                     AutoFormatExpression = Rec.Code;
                     AutoFormatType = 1;
                     Caption = 'Balance Due';
-                    ToolTip = 'Specifies the payment amount that the customer owes you for completed sales where the payment date is exceeded.';
+                    ToolTip = 'Specifies the payment amount that you owe the vendor for completed purchases where the payment date is exceeded.';
                 }
             }
         }
@@ -83,9 +83,9 @@ page 486 "Cust. Stats. by Curr. Lines"
     trigger OnAfterGetRecord()
     begin
         Rec.CalcFields(
-          "Customer Balance", "Customer Balance Due",
-          "Customer Outstanding Orders", "Customer Shipped Not Invoiced");
-        TotalAmount := Rec."Customer Balance" + Rec."Customer Outstanding Orders" + Rec."Customer Shipped Not Invoiced";
+          "Vendor Balance", "Vendor Balance Due",
+          "Vendor Outstanding Orders", "Vendor Amt. Rcd. Not Invoiced");
+        TotalAmount := Rec."Vendor Balance" + Rec."Vendor Outstanding Orders" + Rec."Vendor Amt. Rcd. Not Invoiced";
     end;
 
     trigger OnOpenPage()
@@ -98,7 +98,7 @@ page 486 "Cust. Stats. by Curr. Lines"
                 Rec.Insert();
             until Currency.Next() = 0;
 
-        Rec.SetRange("Cust. Ledg. Entries in Filter", true);
+        Rec.SetRange("Vendor Ledg. Entries in Filter", true);
     end;
 
     var

@@ -2,9 +2,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Foundation.Navigate;
+namespace Microsoft.Purchases.Document;
 
-enum 265 "Document Entry Document Type"
+enum 38 "Purchase Document Type"
 {
     Extensible = true;
     AssignmentCompatibility = true;
@@ -15,5 +15,4 @@ enum 265 "Document Entry Document Type"
     value(3; "Credit Memo") { Caption = 'Credit Memo'; }
     value(4; "Blanket Order") { Caption = 'Blanket Order'; }
     value(5; "Return Order") { Caption = 'Return Order'; }
-    value(6; " ") { Caption = ' '; }
 }

@@ -2,22 +2,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Utilities;
+namespace Microsoft.Purchases.Document;
 
-codeunit 7354 "BaseApp ID"
+codeunit 4144 "Purchase Manual Reopen"
 {
-    SingleInstance = true;
+    TableNo = "Purchase Header";
 
-    procedure Get(): Guid
+    trigger OnRun()
     var
-        EmptyGuid: Guid;
+        ReleasePurchaseDocument: Codeunit "Release Purchase Document";
     begin
-        if Info.Id() = EmptyGuid then
-            NavApp.GetCurrentModuleInfo(Info);
-
-        exit(Info.Id());
+        ReleasePurchaseDocument.PerformManualReopen(Rec);
     end;
-
-    var
-        Info: ModuleInfo;
 }

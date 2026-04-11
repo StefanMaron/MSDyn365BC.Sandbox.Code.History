@@ -2,14 +2,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Analysis;
+namespace Microsoft.Purchases.Analysis;
 
 using Microsoft.Inventory.Analysis;
 
-report 7114 "Run Sales Analysis Line Templ."
+report 7115 "Run Purch. Analysis Line Temp."
 {
-    ApplicationArea = SalesAnalysis;
-    Caption = 'Sales Analysis Line Templates';
+    ApplicationArea = PurchaseAnalysis;
+    Caption = 'Purchase Analysis Line Templates';
     ProcessingOnly = true;
     UsageCategory = Administration;
     UseRequestPage = false;
@@ -37,7 +37,7 @@ report 7114 "Run Sales Analysis Line Templ."
     trigger OnPreReport()
     begin
         AnalysisLineTemplate.FilterGroup := 2;
-        AnalysisLineTemplate.SetRange("Analysis Area", AnalysisLineTemplate."Analysis Area"::Sales);
+        AnalysisLineTemplate.SetRange("Analysis Area", AnalysisLineTemplate."Analysis Area"::Purchase);
         AnalysisLineTemplate.FilterGroup := 0;
         PAGE.RunModal(0, AnalysisLineTemplate);
     end;
