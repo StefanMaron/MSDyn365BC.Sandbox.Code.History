@@ -2,13 +2,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Finance.GeneralLedger.Account;
+namespace Microsoft.Purchases.Document;
 
-enum 20 "G/L Account Report Type"
+enum 424 "Purchase Order Pay-to Options"
 {
-    AssignmentCompatibility = true;
     Extensible = true;
+    AssignmentCompatibility = true;
 
-    value(0; "Income Statement") { Caption = 'Income Statement'; }
-    value(1; "Balance Sheet") { Caption = 'Balance Sheet'; }
+    value(0; "Default (Vendor)") { Caption = 'Default (Vendor)'; }
+    value(1; "Another Vendor") { Caption = 'Another Vendor'; }
+    value(2; "Custom Address") { Caption = 'Custom Address'; }
 }

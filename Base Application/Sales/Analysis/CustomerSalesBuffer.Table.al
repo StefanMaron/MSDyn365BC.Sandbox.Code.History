@@ -2,9 +2,9 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Analysis;
+namespace Microsoft.Purchases.Vendor;
 
-table 923 "Customer Sales Buffer"
+table 924 "Vendor Purchase Buffer"
 {
     DataClassification = SystemMetadata;
 
@@ -37,15 +37,9 @@ table 923 "Customer Sales Buffer"
             DataClassification = SystemMetadata;
             AutoFormatType = 1;
         }
-        field(11; "Sales (LCY)"; Decimal)
+        field(11; "Purchases (LCY)"; Decimal)
         {
-            Caption = 'Sales (LCY)';
-            DataClassification = SystemMetadata;
-            AutoFormatType = 1;
-        }
-        field(12; "Profit (LCY)"; Decimal)
-        {
-            Caption = 'Profit (LCY)';
+            Caption = 'Purchases (LCY)';
             DataClassification = SystemMetadata;
             AutoFormatType = 1;
         }

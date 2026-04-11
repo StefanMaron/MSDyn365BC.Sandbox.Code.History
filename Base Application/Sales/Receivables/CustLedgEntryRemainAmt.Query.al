@@ -2,16 +2,16 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Receivables;
+namespace Microsoft.Purchases.Payables;
 
-query 21 "Cust. Ledg. Entry Remain. Amt."
+query 25 "Vend. Ledg. Entry Remain. Amt."
 {
-    Caption = 'Cust. Ledg. Entry Remain. Amt.';
+    Caption = 'Vend. Ledg. Entry Remain. Amt.';
     DataAccessIntent = ReadOnly;
 
     elements
     {
-        dataitem(Cust_Ledger_Entry; "Cust. Ledger Entry")
+        dataitem(Vendor_Ledger_Entry; "Vendor Ledger Entry")
         {
             filter(Document_Type; "Document Type")
             {
@@ -22,13 +22,10 @@ query 21 "Cust. Ledg. Entry Remain. Amt."
             filter(Due_Date; "Due Date")
             {
             }
-            filter(Customer_No; "Customer No.")
+            filter(Vendor_No; "Vendor No.")
             {
             }
-            filter(Customer_Posting_Group; "Customer Posting Group")
-            {
-            }
-            filter(Date_Filter; "Date Filter")
+            filter(Vendor_Posting_Group; "Vendor Posting Group")
             {
             }
             column(Sum_Remaining_Amt_LCY; "Remaining Amt. (LCY)")

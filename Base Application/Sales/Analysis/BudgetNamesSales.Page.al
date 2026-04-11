@@ -1,18 +1,18 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Analysis;
+namespace Microsoft.Purchases.Analysis;
 
 using Microsoft.Inventory.Analysis;
 
-page 9374 "Budget Names Sales"
+page 9373 "Budget Names Purchase"
 {
-    ApplicationArea = SalesBudget;
-    Caption = 'Sales Budgets';
+    ApplicationArea = PurchaseBudget;
+    Caption = 'Purchase Budgets';
     PageType = List;
     SourceTable = "Item Budget Name";
-    SourceTableView = where("Analysis Area" = const(Sales));
+    SourceTableView = where("Analysis Area" = const(Purchase));
     UsageCategory = ReportsAndAnalysis;
 
     layout
@@ -24,17 +24,17 @@ page 9374 "Budget Names Sales"
                 ShowCaption = false;
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     ToolTip = 'Specifies the name of the item budget.';
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     ToolTip = 'Specifies a description of the item budget.';
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
                 }
                 field("Budget Dimension 1 Code"; Rec."Budget Dimension 1 Code")
@@ -75,7 +75,7 @@ page 9374 "Budget Names Sales"
         {
             action(EditBudget)
             {
-                ApplicationArea = SalesBudget;
+                ApplicationArea = PurchaseBudget;
                 Caption = 'Edit Budget';
                 Image = EditLines;
                 ShortCutKey = 'Return';
@@ -83,10 +83,10 @@ page 9374 "Budget Names Sales"
 
                 trigger OnAction()
                 var
-                    SalesBudgetOverview: Page "Sales Budget Overview";
+                    PurchBudgetOverview: Page "Purchase Budget Overview";
                 begin
-                    SalesBudgetOverview.SetNewBudgetName(Rec.Name);
-                    SalesBudgetOverview.Run();
+                    PurchBudgetOverview.SetNewBudgetName(Rec.Name);
+                    PurchBudgetOverview.Run();
                 end;
             }
         }

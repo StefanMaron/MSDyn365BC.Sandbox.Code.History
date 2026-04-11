@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Analysis;
+namespace Microsoft.Purchases.Analysis;
 
 using Microsoft.Finance.Analysis;
 using Microsoft.Finance.Dimension;
@@ -17,9 +17,9 @@ using Microsoft.Sales.Customer;
 using System.Text;
 using System.Utilities;
 
-page 7139 "Sales Budget Overview"
+page 7138 "Purchase Budget Overview"
 {
-    Caption = 'Sales Budget Overview';
+    Caption = 'Purchase Budget Overview';
     DeleteAllowed = false;
     InsertAllowed = false;
     LinksAllowed = false;
@@ -35,7 +35,7 @@ page 7139 "Sales Budget Overview"
                 Caption = 'General';
                 field(CurrentBudgetName; CurrentBudgetName)
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     Caption = 'Item Budget Name';
                     ToolTip = 'Specifies the name of the budget to be shown in the window.';
 
@@ -64,7 +64,7 @@ page 7139 "Sales Budget Overview"
                 }
                 field(LineDimCode; LineDimCode)
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     Caption = 'Show as Lines';
                     ToolTip = 'Specifies which values you want to show as lines in the window. This allows you to see the same matrix window from various perspectives, especially when you use both the Show as Lines field and the Show as Columns field.';
 
@@ -95,9 +95,8 @@ page 7139 "Sales Budget Overview"
                 }
                 field(ColumnDimCode; ColumnDimCode)
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     Caption = 'Show as Columns';
-                    ShowMandatory = true;
                     ToolTip = 'Specifies which values you want to show as columns in the window. This allows you to see the same matrix window from various perspectives, especially when you use both the Show as Lines field and the Show as Columns field.';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -129,9 +128,9 @@ page 7139 "Sales Budget Overview"
                 }
                 field(ValueType; ValueType)
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     Caption = 'Show Value as';
-                    ToolTip = 'Specifies if you want to view the item values by sales amount, cost amount, or quantity.';
+                    ToolTip = 'Specifies if you want to view the item values by cost amount or by quantity.';
 
                     trigger OnValidate()
                     begin
@@ -140,7 +139,7 @@ page 7139 "Sales Budget Overview"
                 }
                 field(PeriodType; PeriodType)
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     Caption = 'View by';
                     ToolTip = 'Specifies by which period amounts are displayed.';
 
@@ -152,7 +151,7 @@ page 7139 "Sales Budget Overview"
                 }
                 field(RoundingFactor; RoundingFactor)
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     Caption = 'Rounding Factor';
                     ToolTip = 'Specifies the factor that is used to round the amounts in the columns.';
 
@@ -163,7 +162,7 @@ page 7139 "Sales Budget Overview"
                 }
                 field(ShowColumnName; ShowColumnName)
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     Caption = 'Show Column Name';
                     ToolTip = 'Specifies that the names of columns are shown in the matrix window.';
 
@@ -173,16 +172,16 @@ page 7139 "Sales Budget Overview"
                     end;
                 }
             }
-            part(MATRIX; "Sales Budget Overview Matrix")
+            part(MATRIX; "Purch. Budget Overview Matrix")
             {
-                ApplicationArea = SalesBudget;
+                ApplicationArea = PurchaseBudget;
             }
             group(Filters)
             {
                 Caption = 'Filters';
                 field(DateFilter; DateFilter)
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     Caption = 'Date Filter';
                     ToolTip = 'Specifies a date filter by which budget amounts are displayed.';
 
@@ -199,9 +198,9 @@ page 7139 "Sales Budget Overview"
                 }
                 field(SalesCodeFilterCtrl; SourceNoFilter)
                 {
-                    ApplicationArea = SalesBudget;
-                    Caption = 'Customer Filter';
-                    ToolTip = 'Specifies the filter that applies to the customers to whom items are sold.';
+                    ApplicationArea = PurchaseBudget;
+                    Caption = 'Vendor Filter';
+                    ToolTip = 'Specifies that the budget is delimited by the vendors from whom items are purchased.';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -237,7 +236,7 @@ page 7139 "Sales Budget Overview"
                 }
                 field(ItemFilter; ItemFilter)
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     Caption = 'Item Filter';
                     ToolTip = 'Specifies which items to include in the budget overview.';
 
@@ -359,7 +358,7 @@ page 7139 "Sales Budget Overview"
                 Image = "Action";
                 action("Reverse Lines and Columns")
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     Caption = 'Reverse Lines and Columns';
                     Image = Undo;
                     ToolTip = 'Change the display of the matrix by inverting the values in the Show as Lines and Show as Columns fields.';
@@ -384,9 +383,9 @@ page 7139 "Sales Budget Overview"
                 separator(Action53)
                 {
                 }
-                action(DeleteBudget)
+                action("Delete Budget")
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     Caption = 'Delete Budget';
                     Image = Delete;
                     ToolTip = 'Delete the current budget.';
@@ -405,77 +404,76 @@ page 7139 "Sales Budget Overview"
                 {
                 }
             }
-            group("Export to Excel")
+            group(Excel)
             {
-                Caption = 'Export to Excel';
-                Image = ExportToExcel;
-                action("Create New Document")
+                Caption = 'Excel';
+                group("Export to Excel")
                 {
-                    ApplicationArea = SalesBudget;
-                    Caption = 'Create New Document';
+                    Caption = 'Export to Excel';
                     Image = ExportToExcel;
-                    ToolTip = 'Open the analysis report in a new Excel workbook. This creates an Excel workbook on your device.';
+                    action("Create New Document")
+                    {
+                        ApplicationArea = PurchaseBudget;
+                        Caption = 'Create New Document';
+                        Image = ExportToExcel;
+                        ToolTip = 'Open the analysis report in a new Excel workbook. This creates an Excel workbook on your device.';
+
+                        trigger OnAction()
+                        var
+                            ExportItemBudgetToExcel: Report "Export Item Budget to Excel";
+                        begin
+                            ExportItemBudgetToExcel.SetParameters(
+                              CurrentAnalysisArea, CurrentBudgetName, ValueType,
+                              GlobalDim1Filter, GlobalDim2Filter, BudgetDim1Filter, BudgetDim2Filter, BudgetDim3Filter,
+                              DateFilter, SourceTypeFilter, SourceNoFilter, ItemFilter,
+                              InternalDateFilter, PeriodInitialized, PeriodType,
+                              LineDimType, ColumnDimType, LineDimCode, ColumnDimCode, RoundingFactor);
+                            ExportItemBudgetToExcel.Run();
+                        end;
+                    }
+                    action("Update Existing Document")
+                    {
+                        ApplicationArea = PurchaseBudget;
+                        Caption = 'Update Existing Document';
+                        Image = ExportToExcel;
+                        ToolTip = 'Refresh the data in an existing Excel workbook. You must specify the workbook that you want to update.';
+
+                        trigger OnAction()
+                        var
+                            ExportItemBudgetToExcel: Report "Export Item Budget to Excel";
+                        begin
+                            ExportItemBudgetToExcel.SetParameters(
+                              CurrentAnalysisArea, CurrentBudgetName, ValueType,
+                              GlobalDim1Filter, GlobalDim2Filter, BudgetDim1Filter, BudgetDim2Filter, BudgetDim3Filter,
+                              DateFilter, SourceTypeFilter, SourceNoFilter, ItemFilter,
+                              InternalDateFilter, PeriodInitialized, PeriodType,
+                              LineDimType, ColumnDimType, LineDimCode, ColumnDimCode, RoundingFactor);
+                            ExportItemBudgetToExcel.SetUpdateExistingWorksheet(true);
+                            ExportItemBudgetToExcel.Run();
+                        end;
+                    }
+                }
+                action("Import from Excel")
+                {
+                    ApplicationArea = PurchaseBudget;
+                    Caption = 'Import from Excel';
+                    Ellipsis = true;
+                    Image = ImportExcel;
+                    ToolTip = 'Import a budget that you exported to Excel earlier.';
 
                     trigger OnAction()
                     var
-                        ExportItemBudgetToExcel: Report "Export Item Budget to Excel";
+                        ImportItemBudgetFromExcel: Report "Import Item Budget from Excel";
                     begin
-                        ExportItemBudgetToExcel.SetParameters(
-                          CurrentAnalysisArea,
-                          CurrentBudgetName,
-                          ValueType,
-                          GlobalDim1Filter, GlobalDim2Filter,
-                          BudgetDim1Filter, BudgetDim2Filter, BudgetDim3Filter,
-                          DateFilter,
-                          SourceTypeFilter, SourceNoFilter,
-                          ItemFilter,
-                          InternalDateFilter, PeriodInitialized, PeriodType,
-                          LineDimType, ColumnDimType, LineDimCode, ColumnDimCode, RoundingFactor);
-                        ExportItemBudgetToExcel.Run();
+                        ImportItemBudgetFromExcel.SetParameters(CurrentBudgetName, CurrentAnalysisArea.AsInteger(), ValueType.AsInteger());
+                        ImportItemBudgetFromExcel.RunModal();
+                        Clear(ImportItemBudgetFromExcel);
                     end;
                 }
-                action("Update Existing Document")
-                {
-                    ApplicationArea = SalesBudget;
-                    Caption = 'Update Existing Document';
-                    Image = ExportToExcel;
-                    ToolTip = 'Refresh the data in an existing Excel workbook. You must specify the workbook that you want to update.';
-
-                    trigger OnAction()
-                    var
-                        ExportItemBudgetToExcel: Report "Export Item Budget to Excel";
-                    begin
-                        ExportItemBudgetToExcel.SetParameters(
-                          CurrentAnalysisArea, CurrentBudgetName, ValueType,
-                          GlobalDim1Filter, GlobalDim2Filter, BudgetDim1Filter, BudgetDim2Filter, BudgetDim3Filter,
-                          DateFilter, SourceTypeFilter, SourceNoFilter, ItemFilter,
-                          InternalDateFilter, PeriodInitialized, PeriodType,
-                          LineDimType, ColumnDimType, LineDimCode, ColumnDimCode, RoundingFactor);
-                        ExportItemBudgetToExcel.SetUpdateExistingWorksheet(true);
-                        ExportItemBudgetToExcel.Run();
-                    end;
-                }
-            }
-            action("Import from Excel")
-            {
-                ApplicationArea = SalesBudget;
-                Caption = 'Import from Excel';
-                Ellipsis = true;
-                Image = ImportExcel;
-                ToolTip = 'Import a budget that you exported to Excel earlier.';
-
-                trigger OnAction()
-                var
-                    ImportItemBudgetFromExcel: Report "Import Item Budget from Excel";
-                begin
-                    ImportItemBudgetFromExcel.SetParameters(CurrentBudgetName, CurrentAnalysisArea.AsInteger(), ValueType.AsInteger());
-                    ImportItemBudgetFromExcel.RunModal();
-                    Clear(ImportItemBudgetFromExcel);
-                end;
             }
             action("Next Period")
             {
-                ApplicationArea = SalesBudget;
+                ApplicationArea = PurchaseBudget;
                 Caption = 'Next Period';
                 Image = NextRecord;
                 ToolTip = 'Show the information based on the next period. If you set the View by field to Day, the date filter changes to the day before.';
@@ -491,7 +489,7 @@ page 7139 "Sales Budget Overview"
             }
             action("Previous Period")
             {
-                ApplicationArea = SalesBudget;
+                ApplicationArea = PurchaseBudget;
                 Caption = 'Previous Period';
                 Image = PreviousRecord;
                 ToolTip = 'Show the information based on the previous period. If you set the View by field to Day, the date filter changes to the day before.';
@@ -507,7 +505,7 @@ page 7139 "Sales Budget Overview"
             }
             action("Previous Set")
             {
-                ApplicationArea = SalesBudget;
+                ApplicationArea = PurchaseBudget;
                 Caption = 'Previous Set';
                 Image = PreviousSet;
                 ToolTip = 'Go to the previous set of data.';
@@ -520,7 +518,7 @@ page 7139 "Sales Budget Overview"
             }
             action("Previous Column")
             {
-                ApplicationArea = SalesBudget;
+                ApplicationArea = PurchaseBudget;
                 Caption = 'Previous Column';
                 Image = PreviousRecord;
                 ToolTip = 'Go to the previous column.';
@@ -533,7 +531,7 @@ page 7139 "Sales Budget Overview"
             }
             action("Next Column")
             {
-                ApplicationArea = SalesBudget;
+                ApplicationArea = PurchaseBudget;
                 Caption = 'Next Column';
                 Image = NextRecord;
                 ToolTip = 'Go to the next column.';
@@ -546,7 +544,7 @@ page 7139 "Sales Budget Overview"
             }
             action("Next Set")
             {
-                ApplicationArea = SalesBudget;
+                ApplicationArea = PurchaseBudget;
                 Caption = 'Next Set';
                 Image = NextSet;
                 ToolTip = 'Go to the next set of data.';
@@ -576,10 +574,29 @@ page 7139 "Sales Budget Overview"
                 actionref("Next Set_Promoted"; "Next Set")
                 {
                 }
+                actionref("Previous Period_Promoted"; "Previous Period")
+                {
+                }
                 actionref("Next Period_Promoted"; "Next Period")
                 {
                 }
-                actionref("Previous Period_Promoted"; "Previous Period")
+            }
+            group("Category_Import/Export")
+            {
+                Caption = 'Import/Export';
+
+                group("Category_Export to Excel")
+                {
+                    Caption = 'Export to Excel';
+
+                    actionref("Create New Document_Promoted"; "Create New Document")
+                    {
+                    }
+                    actionref("Update Existing Document_Promoted"; "Update Existing Document")
+                    {
+                    }
+                }
+                actionref("Import from Excel_Promoted"; "Import from Excel")
                 {
                 }
             }
@@ -595,7 +612,9 @@ page 7139 "Sales Budget Overview"
 
     trigger OnOpenPage()
     begin
-        CurrentAnalysisArea := CurrentAnalysisArea::Sales;
+        if ValueType = ValueType::"Sales Amount" then
+            ValueType := ValueType::"Cost Amount";
+        CurrentAnalysisArea := CurrentAnalysisArea::Purchase;
         ItemBudgetManagement.BudgetNameSelection(
           CurrentAnalysisArea.AsInteger(), CurrentBudgetName, ItemBudgetName, ItemStatisticsBuffer,
           BudgetDim1Filter, BudgetDim2Filter, BudgetDim3Filter);
@@ -612,14 +631,12 @@ page 7139 "Sales Budget Overview"
           ItemBudgetName, LineDimCode, LineDimType, ColumnDimCode, ColumnDimType);
 
         GLSetup.Get();
-        SourceTypeFilter := SourceTypeFilter::Customer;
+        SourceTypeFilter := SourceTypeFilter::Vendor;
 
         UpdateDimCtrls();
 
         FindPeriod('');
         GenerateColumnCaptions("Matrix Page Step Type"::Initial);
-
-        OnOpenPageOnBeforeUpdateMatrixSubform(ItemBudgetName, DateFilter, SourceNoFilter, ItemFilter, BudgetDim1Filter, BudgetDim2Filter, BudgetDim3Filter, GlobalDim1Filter, GlobalDim2Filter);
         UpdateMatrixSubForm();
     end;
 
@@ -639,8 +656,6 @@ page 7139 "Sales Budget Overview"
         SourceTypeFilter: Enum "Analysis Source Type";
         SourceNoFilter: Text;
         ItemFilter: Text;
-        ValueType: Enum "Item Analysis Value Type";
-        RoundingFactor: Enum "Analysis Rounding Factor";
         LineDimType: Enum "Item Budget Dimension Type";
         ColumnDimType: Enum "Item Budget Dimension Type";
         GlobalDim1Filter: Text;
@@ -648,12 +663,9 @@ page 7139 "Sales Budget Overview"
         BudgetDim1Filter: Text;
         BudgetDim2Filter: Text;
         BudgetDim3Filter: Text;
-        LineDimCode: Text[30];
-        ColumnDimCode: Text[30];
         DateFilter: Text;
         InternalDateFilter: Text;
         PeriodInitialized: Boolean;
-        ShowColumnName: Boolean;
 #pragma warning disable AA0074
         Text003: Label '1,6,,Budget Dimension 1 Filter';
         Text004: Label '1,6,,Budget Dimension 2 Filter';
@@ -667,15 +679,20 @@ page 7139 "Sales Budget Overview"
 
     protected var
         CurrentBudgetName: Code[10];
+        LineDimCode: Text[30];
+        ColumnDimCode: Text[30];
         PeriodType: Enum "Analysis Period Type";
+        RoundingFactor: Enum "Analysis Rounding Factor";
+        ValueType: Enum "Item Analysis Value Type";
+        ShowColumnName: Boolean;
 
     local procedure GenerateColumnCaptions(StepType: Enum "Matrix Page Step Type")
     var
-        MATRIX_PeriodRecords: array[32] of Record Date;
-        Location: Record Location;
         Item: Record Item;
         Customer: Record Customer;
         Vendor: Record Vendor;
+        Location: Record Location;
+        MATRIX_PeriodRecords: array[32] of Record Date;
         MatrixMgt: Codeunit "Matrix Management";
         RecRef: RecordRef;
         FieldRef: FieldRef;
@@ -743,10 +760,6 @@ page 7139 "Sales Budget Overview"
                     Clear(MATRIX_CaptionSet);
                     RecRef.GetTable(Customer);
                     RecRef.SetTable(Customer);
-                    if SourceNoFilter <> '' then begin
-                        FieldRef := RecRef.Field(Customer.FieldNo("No."));
-                        FieldRef.SetFilter(SourceNoFilter);
-                    end;
                     MatrixMgt.GenerateMatrixData(
                       RecRef, StepType.AsInteger(), 12, 1,
                       MATRIX_PrimKeyFirstCaptionInCu, MATRIX_CaptionSet, MATRIX_CaptionRange, MATRIX_CurrentNoOfColumns);
@@ -762,6 +775,10 @@ page 7139 "Sales Budget Overview"
                     Clear(MATRIX_CaptionSet);
                     RecRef.GetTable(Vendor);
                     RecRef.SetTable(Vendor);
+                    if SourceNoFilter <> '' then begin
+                        FieldRef := RecRef.Field(Vendor.FieldNo("No."));
+                        FieldRef.SetFilter(SourceNoFilter);
+                    end;
                     MatrixMgt.GenerateMatrixData(
                       RecRef, StepType.AsInteger(), 12, 1,
                       MATRIX_PrimKeyFirstCaptionInCu, MATRIX_CaptionSet, MATRIX_CaptionRange, MATRIX_CurrentNoOfColumns);
@@ -967,7 +984,7 @@ page 7139 "Sales Budget Overview"
 
     local procedure SourceNoFilterOnAfterValidate()
     begin
-        if ColumnDimType = ColumnDimType::Customer then
+        if ColumnDimType = ColumnDimType::Vendor then
             GenerateColumnCaptions("Matrix Page Step Type"::Initial);
         UpdateMatrixSubForm();
     end;
@@ -984,11 +1001,6 @@ page 7139 "Sales Budget Overview"
         if ColumnDimType = ColumnDimType::Period then
             GenerateColumnCaptions("Matrix Page Step Type"::Initial);
         UpdateMatrixSubForm();
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnOpenPageOnBeforeUpdateMatrixSubform(ItemBudgetName: Record "Item Budget Name"; var DateFilter: Text; var SourceNoFilter: Text; var ItemFilter: Text; var BudgetDim1Filter: Text; var BudgetDim2Filter: Text; var BudgetDim3Filter: Text; var GlobalDim1Filter: Text; var GlobalDim2Filter: Text)
-    begin
     end;
 }
 

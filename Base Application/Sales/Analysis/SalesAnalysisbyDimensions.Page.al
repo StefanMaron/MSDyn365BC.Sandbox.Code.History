@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Analysis;
+namespace Microsoft.Purchases.Analysis;
 
 using Microsoft.Finance.Analysis;
 using Microsoft.Finance.Dimension;
@@ -15,9 +15,9 @@ using Microsoft.Inventory.Location;
 using System.Text;
 using System.Utilities;
 
-page 7158 "Sales Analysis by Dimensions"
+page 7157 "Purch. Analysis by Dimensions"
 {
-    Caption = 'Sales Analysis by Dimensions';
+    Caption = 'Purch. Analysis by Dimensions';
     DataCaptionExpression = CurrentItemAnalysisViewCode;
     DeleteAllowed = false;
     InsertAllowed = false;
@@ -179,7 +179,7 @@ page 7158 "Sales Analysis by Dimensions"
                 {
                     ApplicationArea = Location;
                     Caption = 'Location Filter';
-                    ToolTip = 'Specifies the filter through which you want to analyze sales entries.';
+                    ToolTip = 'Specifies the filter through which you want to analyze purchase entries.';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -378,7 +378,7 @@ page 7158 "Sales Analysis by Dimensions"
         }
         area(processing)
         {
-            action(ShowMatrix_Process)
+            action(ShowMatrix)
             {
                 ApplicationArea = Dimensions;
                 Caption = '&Show Matrix';
@@ -387,8 +387,8 @@ page 7158 "Sales Analysis by Dimensions"
 
                 trigger OnAction()
                 begin
-                    Clear(SalesAnalysisByDimMatrix);
-                    ShowMatrix();
+                    Clear(PurchAnalysisByDimMatrix);
+                    ShowMatrixPage();
                 end;
             }
             action(PreviousSet)
@@ -425,7 +425,7 @@ page 7158 "Sales Analysis by Dimensions"
                 actionref(PreviousSet_Promoted; PreviousSet)
                 {
                 }
-                actionref(ShowMatrix_Process_Promoted; ShowMatrix_Process)
+                actionref(ShowMatrix_Promoted; ShowMatrix)
                 {
                 }
                 actionref(NextSet_Promoted; NextSet)
@@ -465,7 +465,10 @@ page 7158 "Sales Analysis by Dimensions"
 
     trigger OnOpenPage()
     begin
-        CurrentAnalysisArea := CurrentAnalysisArea::Sales;
+        if ValueType = ValueType::"Sales Amount" then
+            ValueType := ValueType::"Cost Amount";
+
+        CurrentAnalysisArea := CurrentAnalysisArea::Purchase;
 
         GLSetup.Get();
 
@@ -487,7 +490,7 @@ page 7158 "Sales Analysis by Dimensions"
 
         FindPeriod('');
 
-        NoOfColumns := SalesAnalysisByDimMatrix.GetMatrixDimension();
+        NoOfColumns := PurchAnalysisByDimMatrix.GetMatrixDimension();
         GenerateColumnCaptions("Matrix Page Step Type"::Initial);
     end;
 
@@ -495,10 +498,9 @@ page 7158 "Sales Analysis by Dimensions"
         GLSetup: Record "General Ledger Setup";
         ItemAnalysisView: Record "Item Analysis View";
         ItemStatisticsBuffer: Record "Item Statistics Buffer";
-        MATRIX_PeriodRecords: array[32] of Record Date;
         ItemAnalysisMgt: Codeunit "Item Analysis Management";
         MatrixMgt: Codeunit "Matrix Management";
-        SalesAnalysisByDimMatrix: Page "Sales Analysis by Dim Matrix";
+        PurchAnalysisByDimMatrix: Page "Purch. Analysis by Dim Matrix";
         CurrentItemAnalysisViewCode: Code[10];
         CurrentAnalysisArea: Enum "Analysis Area Type";
         ValueType: Enum "Item Analysis Value Type";
@@ -525,9 +527,9 @@ page 7158 "Sales Analysis by Dimensions"
         LastColumnDate: Date;
         NoOfColumns: Integer;
         MATRIX_PKFirstRecInCurrSet: Text;
-        MATRIX_CurrSetLength: Integer;
         MATRIX_CaptionRange: Text;
         MATRIX_CodeRange: Text[250];
+        MATRIX_CurrSetLength: Integer;
         NewItemAnalysisCode: Code[10];
         Dim1FilterEnable: Boolean;
         Dim2FilterEnable: Boolean;
@@ -587,6 +589,8 @@ page 7158 "Sales Analysis by Dimensions"
     end;
 
     local procedure GenerateColumnCaptions(StepType: Enum "Matrix Page Step Type")
+    var
+        MATRIX_PeriodRecords: array[32] of Record Date;
     begin
         case ColumnDimType of
             ColumnDimType::Item:
@@ -632,8 +636,10 @@ page 7158 "Sales Analysis by Dimensions"
         MatrixMgt.GenerateMatrixData(
             RecRef, StepType.AsInteger(), NoOfColumns, CaptionFieldNo, MATRIX_PKFirstRecInCurrSet, MatrixColumnCaptions,
             MATRIX_CaptionRange, MATRIX_CurrSetLength);
-        MATRIX_CodeRange :=
-          MatrixMgt.GetPKRange(RecRef, Item.FieldNo("No."), MATRIX_PKFirstRecInCurrSet, MATRIX_CurrSetLength);
+
+        if ShowColumnName then
+            MATRIX_CodeRange :=
+              MatrixMgt.GetPKRange(RecRef, Item.FieldNo("No."), MATRIX_PKFirstRecInCurrSet, MATRIX_CurrSetLength);
     end;
 
     local procedure SetPointsLocation(StepType: Enum "Matrix Page Step Type")
@@ -655,8 +661,10 @@ page 7158 "Sales Analysis by Dimensions"
         MatrixMgt.GenerateMatrixData(
             RecRef, StepType.AsInteger(), NoOfColumns, CaptionFieldNo, MATRIX_PKFirstRecInCurrSet, MatrixColumnCaptions,
             MATRIX_CaptionRange, MATRIX_CurrSetLength);
-        MATRIX_CodeRange :=
-          MatrixMgt.GetPKRange(RecRef, Location.FieldNo(Code), MATRIX_PKFirstRecInCurrSet, MATRIX_CurrSetLength)
+
+        if ShowColumnName then
+            MATRIX_CodeRange :=
+              MatrixMgt.GetPKRange(RecRef, Location.FieldNo(Code), MATRIX_PKFirstRecInCurrSet, MATRIX_CurrSetLength);
     end;
 
     local procedure SetPointsDim(DimensionCode: Code[20]; DimFilter: Code[250]; StepType: Enum "Matrix Page Step Type")
@@ -681,12 +689,13 @@ page 7158 "Sales Analysis by Dimensions"
         MatrixMgt.GenerateMatrixData(
             RecRef, StepType.AsInteger(), NoOfColumns, CaptionFieldNo, MATRIX_PKFirstRecInCurrSet, MatrixColumnCaptions,
             MATRIX_CaptionRange, MATRIX_CurrSetLength);
-        if DimensionCode <> '' then
+
+        if ShowColumnName then
             MATRIX_CodeRange :=
               MatrixMgt.GetPKRange(RecRef, DimVal.FieldNo(Code), MATRIX_PKFirstRecInCurrSet, MATRIX_CurrSetLength);
     end;
 
-    local procedure ShowMatrix()
+    local procedure ShowMatrixPage()
     var
         CurItemFilter: Text[250];
         CurLocationFilter: Text[250];
@@ -694,7 +703,20 @@ page 7158 "Sales Analysis by Dimensions"
         CurDim2Filter: Text[250];
         CurDim3Filter: Text[250];
     begin
-        PeriodInitialized := ColumnDimType = ColumnDimType::Period;
+        case ColumnDimType of
+            ColumnDimType::Item:
+                CurItemFilter := MATRIX_CodeRange;
+            ColumnDimType::Location:
+                CurLocationFilter := MATRIX_CodeRange;
+            ColumnDimType::"Dimension 1":
+                CurDim1Filter := MATRIX_CodeRange;
+            ColumnDimType::"Dimension 2":
+                CurDim2Filter := MATRIX_CodeRange;
+            ColumnDimType::"Dimension 3":
+                CurDim3Filter := MATRIX_CodeRange;
+            ColumnDimType::Period:
+                PeriodInitialized := true;
+        end;
         if CurItemFilter = '' then
             CurItemFilter := ItemFilter;
         if CurLocationFilter = '' then
@@ -706,16 +728,17 @@ page 7158 "Sales Analysis by Dimensions"
         if CurDim3Filter = '' then
             CurDim3Filter := Dim3Filter;
 
-        SalesAnalysisByDimMatrix.LoadMatrix(ItemAnalysisView,
-          CurrentItemAnalysisViewCode, CurrentAnalysisArea,
-          LineDimType, ColumnDimType, PeriodType, ValueType,
-          RoundingFactor, ShowActualBudget, MatrixColumnCaptions,
-          ShowOppositeSign, PeriodInitialized, ShowColumnName, MATRIX_CurrSetLength);
-        SalesAnalysisByDimMatrix.LoadFilters(CurItemFilter, CurLocationFilter, CurDim1Filter, CurDim2Filter, CurDim3Filter,
-          DateFilter, BudgetFilter, InternalDateFilter);
-        SalesAnalysisByDimMatrix.LoadCodeRange(MATRIX_CodeRange);
+        PurchAnalysisByDimMatrix.LoadMartix(
+            ItemAnalysisView, CurrentItemAnalysisViewCode, CurrentAnalysisArea,
+            LineDimType, ColumnDimType, PeriodType, ValueType,
+            RoundingFactor, ShowActualBudget, MatrixColumnCaptions,
+            ShowOppositeSign, PeriodInitialized, ShowColumnName, MATRIX_CurrSetLength);
 
-        SalesAnalysisByDimMatrix.RunModal();
+        PurchAnalysisByDimMatrix.LoadFilters(
+            CurItemFilter, CurLocationFilter, CurDim1Filter, CurDim2Filter, CurDim3Filter,
+            DateFilter, BudgetFilter, InternalDateFilter);
+
+        PurchAnalysisByDimMatrix.RunModal();
     end;
 
     procedure SetCurrentAnalysisViewCode(NewAnalysisViewCode: Code[10])

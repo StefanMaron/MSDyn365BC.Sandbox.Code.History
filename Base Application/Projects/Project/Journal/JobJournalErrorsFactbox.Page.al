@@ -2,18 +2,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Projects.Project.Journal;
+namespace Microsoft.Purchases.Document;
 
 using Microsoft.Utilities;
 using System.Utilities;
 
-page 9127 "Job Journal Errors Factbox"
+page 9118 "Purch. Doc. Check Factbox"
 {
     PageType = ListPart;
-    Caption = 'Journal Check';
+    Caption = 'Document Check';
     Editable = false;
     LinksAllowed = false;
-    SourceTable = "Job Journal Line";
+    SourceTable = "Purchase Header";
 
     layout
     {
@@ -22,23 +22,11 @@ page 9127 "Job Journal Errors Factbox"
             cuegroup(Control1)
             {
                 ShowCaption = false;
-                field(NumberOfLinesChecked; NumberOfLines)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Lines checked';
-                    ToolTip = 'Specifies the number of journal lines that have been checked for potential issues.';
-                }
-                field(NumberOfLinesWithErrors; NumberOfLinesWithErrors)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Lines with issues';
-                    ToolTip = 'Specifies the number of journal lines that have issues.';
-                }
-                field(NumberOfBatchErrors; NumberOfBatchErrors)
+                field(NumberOfErrors; NumberOfErrors)
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Issues Total';
-                    ToolTip = 'Specifies the number of issues that have been found in the journal.';
+                    ToolTip = 'Specifies the number of issues that have been found in the document.';
                     StyleExpr = TotalErrorsStyleTxt;
 
                     trigger OnDrillDown()
@@ -49,9 +37,21 @@ page 9127 "Job Journal Errors Factbox"
                     end;
                 }
             }
+            field(Refresh; RefreshTxt)
+            {
+                ApplicationArea = Basic, Suite;
+                ShowCaption = false;
+                trigger OnDrillDown()
+                var
+                    DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
+                begin
+                    DocumentErrorsMgt.SetFullDocumentCheck(true);
+                    CheckErrorsInBackground(Rec);
+                end;
+            }
             group(Control2)
             {
-                Caption = 'Current line';
+                Caption = 'Issues';
                 field(Error1; ErrorText[1])
                 {
                     ShowCaption = false;
@@ -68,18 +68,11 @@ page 9127 "Job Journal Errors Factbox"
         }
     }
 
-    trigger OnAfterGetCurrRecord()
-    begin
-        if BackgroundErrorHandlingMgt.BackgroundValidationFeatureEnabled() then
-            CheckErrorsInBackground();
-    end;
-
     trigger OnPageBackgroundTaskCompleted(TaskId: Integer; Results: Dictionary of [Text, Text])
     begin
         if TaskId = TaskIdCountErrors then begin
-            BackgroundErrorHandlingMgt.GetErrorsFromJobJnlCheckResultValues(Results.Values, TempErrorMessage, ErrorHandlingParameters);
+            BackgroundErrorHandlingMgt.GetErrorsFromDocumentCheckResultValues(Results.Values, TempErrorMessage, ErrorHandlingParameters);
             CalcErrors();
-            NumberOfLines := GetNumberOfLines();
         end;
     end;
 
@@ -94,19 +87,17 @@ page 9127 "Job Journal Errors Factbox"
         ErrorHandlingParameters: Record "Error Handling Parameters";
         BackgroundErrorHandlingMgt: Codeunit "Background Error Handling Mgt.";
         TaskIdCountErrors: Integer;
-        NumberOfBatchErrors: Integer;
-        NumberOfLineErrors: Integer;
-        NumberOfLines: Integer;
-        NumberOfLinesWithErrors: Integer;
+        NumberOfErrors: Integer;
         TotalErrorsStyleTxt: Text;
         CurrentLineStyleTxt: Text;
         ErrorText: array[2] of Text;
         OtherIssuesTxt: Label '(+%1 other issues)', comment = '%1 - number of issues';
         NoIssuesFoundTxt: Label 'No issues found.';
+        RefreshTxt: Label 'Refresh';
 
     local procedure GetTotalErrorsStyle(): Text
     begin
-        if NumberOfBatchErrors = 0 then
+        if NumberOfErrors = 0 then
             exit('Favorable')
         else
             exit('Unfavorable');
@@ -114,47 +105,31 @@ page 9127 "Job Journal Errors Factbox"
 
     local procedure GetCurrentLineStyle(): Text
     begin
-        if NumberOfLineErrors = 0 then
+        if NumberOfErrors = 0 then
             exit('Standard')
         else
             exit('Attention');
     end;
 
-    local procedure GetNumberOfLines(): Integer
+    procedure CheckErrorsInBackground(PurchaseHeader: Record "Purchase Header")
     var
-        ResJnlLine: Record "Job Journal Line";
-    begin
-        ResJnlLine.SetRange("Journal Template Name", Rec."Journal Template Name");
-        ResJnlLine.SetRange("Journal Batch Name", Rec."Journal Batch Name");
-        exit(ResJnlLine.Count());
-    end;
-
-    local procedure CheckErrorsInBackground()
-    var
-        JobJournalErrorsMgt: Codeunit "Job Journal Errors Mgt.";
         Args: Dictionary of [Text, Text];
     begin
         BackgroundErrorHandlingMgt.FeatureTelemetryLogUptakeUsed();
         if TaskIdCountErrors <> 0 then
             CurrPage.CancelBackgroundTask(TaskIdCountErrors);
 
-        JobJournalErrorsMgt.CollectJobJnlCheckParameters(Rec, ErrorHandlingParameters);
+        BackgroundErrorHandlingMgt.CollectPurchaseDocCheckParameters(PurchaseHeader, ErrorHandlingParameters);
         ErrorHandlingParameters.ToArgs(Args);
 
-        CurrPage.EnqueueBackgroundTask(TaskIdCountErrors, Codeunit::"Check Job Jnl. Line. Backgr.", Args);
+        CurrPage.EnqueueBackgroundTask(TaskIdCountErrors, Codeunit::"Check Purch. Doc. Backgr.", Args);
     end;
 
     local procedure CalcErrors()
-    var
-        NumberOfErrors: Integer;
     begin
         TempErrorMessage.Reset();
         TempErrorMessage.SetRange(Duplicate, false);
-        BackgroundErrorHandlingMgt.FeatureTelemetryLogUsage(not TempErrorMessage.IsEmpty, Rec.TableName);
-        NumberOfBatchErrors := TempErrorMessage.Count();
-        TempErrorMessage.SetRange(Duplicate);
-        TempErrorMessage.SetRange("Context Record ID", Rec.RecordId);
-        NumberOfLineErrors := TempErrorMessage.Count();
+        BackgroundErrorHandlingMgt.FeatureTelemetryLogUsagePurchase(not TempErrorMessage.IsEmpty, Rec.TableName, Rec."Document Type");
 
         Clear(ErrorText);
         NumberOfErrors := TempErrorMessage.Count();
@@ -171,24 +146,5 @@ page 9127 "Job Journal Errors Factbox"
 
         TotalErrorsStyleTxt := GetTotalErrorsStyle();
         CurrentLineStyleTxt := GetCurrentLineStyle();
-        NumberOfLinesWithErrors := GetNumberOfLinesWithErrors();
-    end;
-
-    local procedure GetNumberOfLinesWithErrors(): Integer
-    var
-        TempLineErrorMessage: Record "Error Message" temporary;
-    begin
-        TempErrorMessage.Reset();
-        if TempErrorMessage.FindSet() then
-            repeat
-                TempLineErrorMessage.SetRange("Context Record ID", TempErrorMessage."Context Record ID");
-                if TempLineErrorMessage.IsEmpty() then begin
-                    TempLineErrorMessage := TempErrorMessage;
-                    TempLineErrorMessage.Insert();
-                end;
-            until TempErrorMessage.Next() = 0;
-
-        TempLineErrorMessage.Reset();
-        exit(TempLineErrorMessage.Count());
     end;
 }

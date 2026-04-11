@@ -2,13 +2,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Assembly.Setup;
+namespace Microsoft.Purchases.Setup;
 
-enum 910 "Assembly Policy"
+enum 9658 "Report Selection Usage Vendor"
 {
     Extensible = true;
     AssignmentCompatibility = true;
 
-    value(0; "Assemble-to-Stock") { Caption = 'Assemble-to-Stock'; }
-    value(1; "Assemble-to-Order") { Caption = 'Assemble-to-Order'; }
+    value(0; "Purchase Order") { Caption = 'Purchase Order'; }
+    value(1; "Vendor Remittance") { Caption = 'Vendor Remittance'; }
+    value(2; "Vendor Remittance - Posted Entries") { Caption = 'Vendor Remittance - Posted Entries'; }
+    value(3; "Posted Return Shipment") { Caption = 'Posted Return Shipment'; }
 }

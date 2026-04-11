@@ -2,34 +2,35 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Receivables;
+namespace Microsoft.Purchases.Vendor;
 
-query 1310 "Cust. Ledg. Entry Sales"
+using Microsoft.Purchases.Payables;
+
+query 9088 "Top 10 Vendor Purchases"
 {
-    Caption = 'Cust. Ledg. Entry Sales';
+    Caption = 'Top 10 Vendor Purchases';
     DataAccessIntent = ReadOnly;
+    OrderBy = ascending(Sum_Purchases_LCY);
+    TopNumberOfRows = 10;
+
+    InherentEntitlements = X;
+    InherentPermissions = X;
 
     elements
     {
-        dataitem(Cust_Ledger_Entry; "Cust. Ledger Entry")
+        dataitem(Vendor_Ledger_Entry; "Vendor Ledger Entry")
         {
-            filter(Document_Type; "Document Type")
-            {
-            }
-            filter(IsOpen; Open)
-            {
-            }
-            filter(Customer_No; "Customer No.")
-            {
-            }
+            DataItemTableFilter = "Purchase (LCY)" = filter(< 0);
             filter(Posting_Date; "Posting Date")
             {
             }
-            column(Sum_Sales_LCY; "Sales (LCY)")
+            column(Vendor_No; "Vendor No.")
+            {
+            }
+            column(Sum_Purchases_LCY; "Purchase (LCY)")
             {
                 Method = Sum;
             }
         }
     }
 }
-

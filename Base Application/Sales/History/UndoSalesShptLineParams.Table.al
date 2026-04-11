@@ -2,29 +2,27 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.History;
+namespace Microsoft.Purchases.Pricing;
 
-table 5825 "Undo Sales Shpt. Line Params"
+/// <summary>
+/// The purpose of the table is to setup access to UX and logic of the purchase price calculation.
+/// TableType is not set to Temporary only because the ReadPermission() method always returns true.
+/// </summary>
+table 7017 "Purchase Price Access"
 {
-    TableType = Temporary;
+    DataClassification = CustomerContent;
 
     fields
     {
-        field(1; "Primary Key"; Code[10])
+        field(1; Code; Code[20])
         {
-            Caption = 'Primary Key';
-            DataClassification = SystemMetadata;
-        }
-        field(2; "Hide Dialog"; Boolean)
-        {
-            Caption = 'Hide Dialog';
             DataClassification = SystemMetadata;
         }
     }
 
     keys
     {
-        key(Key1; "Primary Key")
+        key(Key1; Code)
         {
             Clustered = true;
         }

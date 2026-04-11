@@ -2,21 +2,20 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Receivables;
+namespace Microsoft.Purchases.Payables;
 
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Navigate;
-using Microsoft.Sales.FinanceCharge;
 using System.Security.User;
 
-page 61 "Applied Customer Entries"
+page 62 "Applied Vendor Entries"
 {
-    Caption = 'Applied Customer Entries';
+    Caption = 'Applied Vendor Entries';
     DataCaptionExpression = Heading;
     Editable = false;
     PageType = List;
-    SourceTable = "Cust. Ledger Entry";
+    SourceTable = "Vendor Ledger Entry";
 
     layout
     {
@@ -28,76 +27,96 @@ page 61 "Applied Customer Entries"
                 field("Posting Date"; Rec."Posting Date")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the vendor entry''s posting date.';
                 }
                 field("Document Type"; Rec."Document Type")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the document type that the vendor entry belongs to.';
                 }
                 field("Document No."; Rec."Document No.")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the vendor entry''s document number.';
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies a description of the vendor entry.';
+                }
+                field("External Document No."; Rec."External Document No.")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies a document number that refers to the customer''s or vendor''s numbering system.';
+                    Visible = true;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
                     ApplicationArea = Dimensions;
+                    ToolTip = 'Specifies the code for the global dimension that is linked to the record or entry for analysis purposes. Two global dimensions, typically for the company''s most important activities, are available on all cards, documents, reports, and lists.';
                     Visible = DimVisible1;
                 }
                 field("Global Dimension 2 Code"; Rec."Global Dimension 2 Code")
                 {
                     ApplicationArea = Dimensions;
+                    ToolTip = 'Specifies the code for the global dimension that is linked to the record or entry for analysis purposes. Two global dimensions, typically for the company''s most important activities, are available on all cards, documents, reports, and lists.';
                     Visible = DimVisible2;
                 }
-                field("Salesperson Code"; Rec."Salesperson Code")
+                field("Purchaser Code"; Rec."Purchaser Code")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies which purchaser is assigned to the vendor.';
                     Visible = false;
                 }
                 field("Currency Code"; Rec."Currency Code")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the currency code for the amount on the line.';
                 }
                 field("Original Amount"; Rec."Original Amount")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the amount of the original entry.';
                 }
                 field(Amount; Rec.Amount)
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the amount of the entry.';
                     Visible = AmountVisible;
                 }
                 field("Debit Amount"; Rec."Debit Amount")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the total of the ledger entries that represent debits.';
                     Visible = DebitCreditVisible;
                 }
                 field("Credit Amount"; Rec."Credit Amount")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the total of the ledger entries that represent credits.';
                     Visible = DebitCreditVisible;
                 }
                 field("Closed by Amount"; Rec."Closed by Amount")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the amount that the entry was finally applied to (closed) with.';
                 }
                 field("Closed by Currency Code"; Rec."Closed by Currency Code")
                 {
                     ApplicationArea = Suite;
-                    Visible = false;
+                    ToolTip = 'Specifies the currency code of the entry that was applied to (and closed) this vendor ledger entry.';
                 }
                 field("Closed by Currency Amount"; Rec."Closed by Currency Amount")
                 {
                     ApplicationArea = Suite;
                     AutoFormatExpression = Rec."Closed by Currency Code";
                     AutoFormatType = 1;
-                    Visible = false;
+                    ToolTip = 'Specifies the amount that was finally applied to (and closed) this vendor ledger entry.';
                 }
                 field("User ID"; Rec."User ID")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the ID of the user who posted the entry, to be used, for example, in the change log.';
                     Visible = false;
 
                     trigger OnDrillDown()
@@ -110,26 +129,19 @@ page 61 "Applied Customer Entries"
                 field("Source Code"; Rec."Source Code")
                 {
                     ApplicationArea = Suite;
+                    ToolTip = 'Specifies the source code that specifies where the entry was created.';
                     Visible = false;
                 }
                 field("Reason Code"; Rec."Reason Code")
                 {
                     ApplicationArea = Suite;
-                    Visible = false;
-                }
-                field("External Document No."; Rec."External Document No.")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Visible = false;
-                }
-                field("Your Reference"; Rec."Your Reference")
-                {
-                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
                     Visible = false;
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
                     ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the number of the entry, as assigned from the specified number series when the entry was created.';
                 }
             }
         }
@@ -156,16 +168,6 @@ page 61 "Applied Customer Entries"
             {
                 Caption = 'Ent&ry';
                 Image = Entry;
-                action("Reminder/Fin. Charge Entries")
-                {
-                    ApplicationArea = Suite;
-                    Caption = 'Reminder/Fin. Charge Entries';
-                    Image = Reminder;
-                    RunObject = Page "Reminder/Fin. Charge Entries";
-                    RunPageLink = "Customer Entry No." = field("Entry No.");
-                    RunPageView = sorting("Customer Entry No.");
-                    ToolTip = 'View entries that were created when reminders and finance charge memos were issued.';
-                }
                 action(Dimensions)
                 {
                     AccessByPermission = TableData Dimension = R;
@@ -185,12 +187,12 @@ page 61 "Applied Customer Entries"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Detailed &Ledger Entries';
                     Image = View;
-                    RunObject = Page "Detailed Cust. Ledg. Entries";
-                    RunPageLink = "Cust. Ledger Entry No." = field("Entry No."),
-                                  "Customer No." = field("Customer No.");
-                    RunPageView = sorting("Cust. Ledger Entry No.", "Posting Date");
+                    RunObject = Page "Detailed Vendor Ledg. Entries";
+                    RunPageLink = "Vendor Ledger Entry No." = field("Entry No."),
+                                  "Vendor No." = field("Vendor No.");
+                    RunPageView = sorting("Vendor Ledger Entry No.", "Posting Date");
                     ShortCutKey = 'Ctrl+F7';
-                    ToolTip = 'View a summary of the all posted entries and adjustments related to a specific customer ledger entry.';
+                    ToolTip = 'View a summary of the all posted entries and adjustments related to a specific vendor ledger entry.';
                 }
             }
         }
@@ -265,9 +267,6 @@ page 61 "Applied Customer Entries"
                 actionref(Dimensions_Promoted; Dimensions)
                 {
                 }
-                actionref("Reminder/Fin. Charge Entries_Promoted"; "Reminder/Fin. Charge Entries")
-                {
-                }
                 actionref("Detailed &Ledger Entries_Promoted"; "Detailed &Ledger Entries")
                 {
                 }
@@ -295,24 +294,24 @@ page 61 "Applied Customer Entries"
         SetControlVisibility();
 
         if Rec."Entry No." <> 0 then begin
-            CreateCustLedgEntry := Rec;
-            if CreateCustLedgEntry."Document Type" = CreateCustLedgEntry."Document Type"::" " then
+            CreateVendLedgEntry := Rec;
+            if CreateVendLedgEntry."Document Type" = CreateVendLedgEntry."Document Type"::" " then
                 Heading := Text000
             else
-                Heading := Format(CreateCustLedgEntry."Document Type");
-            Heading := Heading + ' ' + CreateCustLedgEntry."Document No.";
+                Heading := Format(CreateVendLedgEntry."Document Type");
+            Heading := Heading + ' ' + CreateVendLedgEntry."Document No.";
 
             FindApplnEntriesDtldtLedgEntry();
             Rec.SetCurrentKey("Entry No.");
             Rec.SetRange("Entry No.");
 
-            if CreateCustLedgEntry."Closed by Entry No." <> 0 then begin
-                Rec."Entry No." := CreateCustLedgEntry."Closed by Entry No.";
+            if CreateVendLedgEntry."Closed by Entry No." <> 0 then begin
+                Rec."Entry No." := CreateVendLedgEntry."Closed by Entry No.";
                 Rec.Mark(true);
             end;
 
             Rec.SetCurrentKey("Closed by Entry No.");
-            Rec.SetRange("Closed by Entry No.", CreateCustLedgEntry."Entry No.");
+            Rec.SetRange("Closed by Entry No.", CreateVendLedgEntry."Entry No.");
             if Rec.Find('-') then
                 repeat
                     Rec.Mark(true);
@@ -326,7 +325,7 @@ page 61 "Applied Customer Entries"
     end;
 
     var
-        CreateCustLedgEntry: Record "Cust. Ledger Entry";
+        CreateVendLedgEntry: Record "Vendor Ledger Entry";
         Navigate: Page Navigate;
         Heading: Text[50];
         AmountVisible: Boolean;
@@ -341,54 +340,46 @@ page 61 "Applied Customer Entries"
 
     local procedure FindApplnEntriesDtldtLedgEntry()
     var
-        DtldCustLedgEntry1: Record "Detailed Cust. Ledg. Entry";
-        DtldCustLedgEntry2: Record "Detailed Cust. Ledg. Entry";
+        DtldVendLedgEntry1: Record "Detailed Vendor Ledg. Entry";
+        DtldVendLedgEntry2: Record "Detailed Vendor Ledg. Entry";
     begin
-        DtldCustLedgEntry1.SetCurrentKey("Cust. Ledger Entry No.");
-        DtldCustLedgEntry1.SetRange("Cust. Ledger Entry No.", CreateCustLedgEntry."Entry No.");
-        DtldCustLedgEntry1.SetRange(Unapplied, false);
-        if DtldCustLedgEntry1.Find('-') then
+        DtldVendLedgEntry1.SetCurrentKey("Vendor Ledger Entry No.");
+        DtldVendLedgEntry1.SetRange("Vendor Ledger Entry No.", CreateVendLedgEntry."Entry No.");
+        DtldVendLedgEntry1.SetRange(Unapplied, false);
+        if DtldVendLedgEntry1.Find('-') then
             repeat
-                if DtldCustLedgEntry1."Cust. Ledger Entry No." =
-                   DtldCustLedgEntry1."Applied Cust. Ledger Entry No."
+                if DtldVendLedgEntry1."Vendor Ledger Entry No." =
+                   DtldVendLedgEntry1."Applied Vend. Ledger Entry No."
                 then begin
-                    DtldCustLedgEntry2.Init();
-                    DtldCustLedgEntry2.SetCurrentKey("Applied Cust. Ledger Entry No.", "Entry Type");
-                    DtldCustLedgEntry2.SetRange(
-                      "Applied Cust. Ledger Entry No.", DtldCustLedgEntry1."Applied Cust. Ledger Entry No.");
-                    DtldCustLedgEntry2.SetRange("Entry Type", DtldCustLedgEntry2."Entry Type"::Application);
-                    DtldCustLedgEntry2.SetRange(Unapplied, false);
-                    if DtldCustLedgEntry2.Find('-') then
+                    DtldVendLedgEntry2.Init();
+                    DtldVendLedgEntry2.SetCurrentKey("Applied Vend. Ledger Entry No.", "Entry Type");
+                    DtldVendLedgEntry2.SetRange(
+                      "Applied Vend. Ledger Entry No.", DtldVendLedgEntry1."Applied Vend. Ledger Entry No.");
+                    DtldVendLedgEntry2.SetRange("Entry Type", DtldVendLedgEntry2."Entry Type"::Application);
+                    DtldVendLedgEntry2.SetRange(Unapplied, false);
+                    if DtldVendLedgEntry2.Find('-') then
                         repeat
-                            if DtldCustLedgEntry2."Cust. Ledger Entry No." <>
-                               DtldCustLedgEntry2."Applied Cust. Ledger Entry No."
+                            if DtldVendLedgEntry2."Vendor Ledger Entry No." <>
+                               DtldVendLedgEntry2."Applied Vend. Ledger Entry No."
                             then begin
                                 Rec.SetCurrentKey("Entry No.");
-                                Rec.SetRange("Entry No.", DtldCustLedgEntry2."Cust. Ledger Entry No.");
+                                Rec.SetRange("Entry No.", DtldVendLedgEntry2."Vendor Ledger Entry No.");
                                 if Rec.Find('-') then
                                     Rec.Mark(true);
                             end;
-                        until DtldCustLedgEntry2.Next() = 0;
+                        until DtldVendLedgEntry2.Next() = 0;
                 end else begin
                     Rec.SetCurrentKey("Entry No.");
-                    Rec.SetRange("Entry No.", DtldCustLedgEntry1."Applied Cust. Ledger Entry No.");
+                    Rec.SetRange("Entry No.", DtldVendLedgEntry1."Applied Vend. Ledger Entry No.");
                     if Rec.Find('-') then
                         Rec.Mark(true);
                 end;
-            until DtldCustLedgEntry1.Next() = 0;
+            until DtldVendLedgEntry1.Next() = 0;
     end;
 
-    procedure SetTempCustLedgEntry(NewTempCustLedgEntryNo: Integer)
+    procedure GetCreateVendorLedgerEntry(): Record "Vendor Ledger Entry"
     begin
-        if NewTempCustLedgEntryNo <> 0 then begin
-            Rec.SetRange("Entry No.", NewTempCustLedgEntryNo);
-            Rec.Find('-');
-        end;
-    end;
-
-    procedure GetCreateCustLedgerEntry(): Record "Cust. Ledger Entry"
-    begin
-        exit(CreateCustLedgEntry);
+        exit(CreateVendLedgEntry);
     end;
 
     local procedure SetControlVisibility()

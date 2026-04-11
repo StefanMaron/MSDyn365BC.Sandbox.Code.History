@@ -2,11 +2,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Archive;
+namespace Microsoft.Purchases.Document;
 
-codeunit 322 "SalesCount-PrintedArch"
+codeunit 317 "Purch.Header-Printed"
 {
-    TableNo = "Sales Header Archive";
+    TableNo = "Purchase Header";
 
     trigger OnRun()
     begin
@@ -28,12 +28,12 @@ codeunit 322 "SalesCount-PrintedArch"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeModify(var SalesHeaderArchive: Record "Sales Header Archive")
+    local procedure OnBeforeModify(var PurchaseHeader: Record "Purchase Header")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeOnRun(var SalesHeaderArchive: Record "Sales Header Archive"; var SuppressCommit: Boolean)
+    local procedure OnBeforeOnRun(var PurchaseHeader: Record "Purchase Header"; var SuppressCommit: Boolean)
     begin
     end;
 }

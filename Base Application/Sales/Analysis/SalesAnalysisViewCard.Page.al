@@ -2,18 +2,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Analysis;
+namespace Microsoft.Purchases.Analysis;
 
 using Microsoft.Inventory.Analysis;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Location;
 
-page 7155 "Sales Analysis View Card"
+page 7156 "Purchase Analysis View Card"
 {
-    Caption = 'Sales Analysis View Card';
+    Caption = 'Purch. Analysis View Card';
     PageType = Card;
     SourceTable = "Item Analysis View";
-    SourceTableView = where("Analysis Area" = const(Sales));
+    SourceTableView = where("Analysis Area" = const(Purchase));
 
     layout
     {
@@ -24,17 +24,17 @@ page 7155 "Sales Analysis View Card"
                 Caption = 'General';
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies a code for the analysis view.';
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies the name of the analysis view.';
                 }
                 field("Item Filter"; Rec."Item Filter")
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies a filter to specify the items that will be included in an analysis view.';
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -42,7 +42,7 @@ page 7155 "Sales Analysis View Card"
                         ItemList: Page "Item List";
                     begin
                         ItemList.LookupMode(true);
-                        if ItemList.RunModal() = ACTION::LookupOK then begin
+                        if ItemList.RunModal() = Action::LookupOK then begin
                             Text := ItemList.GetSelectionFilter();
                             exit(true);
                         end;
@@ -58,7 +58,7 @@ page 7155 "Sales Analysis View Card"
                         LocList: Page "Location List";
                     begin
                         LocList.LookupMode(true);
-                        if LocList.RunModal() = ACTION::LookupOK then begin
+                        if LocList.RunModal() = Action::LookupOK then begin
                             Text := LocList.GetSelectionFilter();
                             exit(true);
                         end;
@@ -66,42 +66,42 @@ page 7155 "Sales Analysis View Card"
                 }
                 field("Date Compression"; Rec."Date Compression")
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies the period that the program will combine entries for, in order to create a single entry for that time period.';
                 }
                 field("Starting Date"; Rec."Starting Date")
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies the date from which item ledger entries will be included in an analysis view.';
                 }
                 field("Last Date Updated"; Rec."Last Date Updated")
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies the date on which the analysis view was last updated.';
                 }
                 field("Last Entry No."; Rec."Last Entry No.")
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies the number of the last item ledger entry you posted, prior to updating the analysis view.';
                 }
                 field("Last Budget Entry No."; Rec."Last Budget Entry No.")
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     ToolTip = 'Specifies the number of the last item budget entry you entered prior to updating the analysis view.';
                 }
                 field("Update on Posting"; Rec."Update on Posting")
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies if the analysis view is updated every time that you post an item ledger entry, for example from a sales invoice.';
                 }
                 field("Include Budgets"; Rec."Include Budgets")
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     ToolTip = 'Specifies whether to include an update of analysis view budget entries, when updating an analysis view.';
                 }
                 field(Blocked; Rec.Blocked)
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
                 }
             }
@@ -150,7 +150,7 @@ page 7155 "Sales Analysis View Card"
                 Image = AnalysisView;
                 action("Filter")
                 {
-                    ApplicationArea = SalesAnalysis;
+                    ApplicationArea = PurchaseAnalysis;
                     Caption = 'Filter';
                     Image = "Filter";
                     RunObject = Page "Item Analysis View Filter";
@@ -164,7 +164,7 @@ page 7155 "Sales Analysis View Card"
         {
             action("&Update")
             {
-                ApplicationArea = SalesAnalysis;
+                ApplicationArea = PurchaseAnalysis;
                 Caption = '&Update';
                 Image = Refresh;
                 RunObject = Codeunit "Update Item Analysis View";
@@ -172,7 +172,7 @@ page 7155 "Sales Analysis View Card"
             }
             action("Enable Update on Posting")
             {
-                ApplicationArea = SalesAnalysis;
+                ApplicationArea = PurchaseAnalysis;
                 Caption = 'Enable Update on Posting';
                 Image = Apply;
                 ToolTip = 'Ensure that the analysis view is updated when new ledger entries are posted.';
@@ -184,7 +184,7 @@ page 7155 "Sales Analysis View Card"
             }
             action("Disable Update on Posting")
             {
-                ApplicationArea = SalesAnalysis;
+                ApplicationArea = PurchaseAnalysis;
                 Caption = 'Disable Update on Posting';
                 Image = UnApply;
                 ToolTip = 'Ensure that the analysis view is not updated when new ledger entries are posted.';
@@ -202,15 +202,6 @@ page 7155 "Sales Analysis View Card"
                 Caption = 'Process';
 
                 actionref("&Update_Promoted"; "&Update")
-                {
-                }
-                actionref(Filter_Promoted; Filter)
-                {
-                }
-                actionref("Enable Update on Posting_Promoted"; "Enable Update on Posting")
-                {
-                }
-                actionref("Disable Update on Posting_Promoted"; "Disable Update on Posting")
                 {
                 }
             }
