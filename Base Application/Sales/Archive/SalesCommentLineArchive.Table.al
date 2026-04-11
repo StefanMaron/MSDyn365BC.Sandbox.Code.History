@@ -2,25 +2,23 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Archive;
+namespace Microsoft.Purchases.Archive;
 
-using Microsoft.Sales.Comment;
+using Microsoft.Purchases.Comment;
 
-table 5126 "Sales Comment Line Archive"
+table 5125 "Purch. Comment Line Archive"
 {
-    Caption = 'Sales Comment Line Archive';
-    DrillDownPageID = "Sales Archive Comment Sheet";
-    LookupPageID = "Sales Archive Comment Sheet";
+    Caption = 'Purch. Comment Line Archive';
+    DrillDownPageID = "Purch. Archive Comment Sheet";
+    LookupPageID = "Purch. Archive Comment Sheet";
     DataClassification = CustomerContent;
 
     fields
     {
-#pragma warning disable AS0070
-        field(1; "Document Type"; Enum "Sales Comment Document Type")
+        field(1; "Document Type"; Enum "Purchase Comment Document Type")
         {
             Caption = 'Document Type';
         }
-#pragma warning restore AS0070
         field(2; "No."; Code[20])
         {
             Caption = 'No.';
@@ -32,17 +30,14 @@ table 5126 "Sales Comment Line Archive"
         field(4; Date; Date)
         {
             Caption = 'Date';
-            ToolTip = 'Specifies the version number of the archived document.';
         }
         field(5; "Code"; Code[10])
         {
             Caption = 'Code';
-            ToolTip = 'Specifies the document line number of the quote or order to which the comment applies.';
         }
         field(6; Comment; Text[80])
         {
             Caption = 'Comment';
-            ToolTip = 'Specifies the line number for the comment.';
         }
         field(7; "Document Line No."; Integer)
         {
@@ -72,22 +67,16 @@ table 5126 "Sales Comment Line Archive"
 
     procedure SetUpNewLine()
     var
-        SalesCommentLine: Record "Sales Comment Line Archive";
+        PurchCommentLine: Record "Purch. Comment Line Archive";
     begin
-        SalesCommentLine.SetRange("Document Type", "Document Type");
-        SalesCommentLine.SetRange("No.", "No.");
-        SalesCommentLine.SetRange("Doc. No. Occurrence", "Doc. No. Occurrence");
-        SalesCommentLine.SetRange("Version No.", "Version No.");
-        SalesCommentLine.SetRange("Document Line No.", "Line No.");
-        SalesCommentLine.SetRange(Date, WorkDate());
-        OnSetUpNewLineOnAfterSetFilters(SalesCommentLine, Rec);
-        if not SalesCommentLine.FindFirst() then
+        PurchCommentLine.SetRange("Document Type", "Document Type");
+        PurchCommentLine.SetRange("No.", "No.");
+        PurchCommentLine.SetRange("Doc. No. Occurrence", "Doc. No. Occurrence");
+        PurchCommentLine.SetRange("Version No.", "Version No.");
+        PurchCommentLine.SetRange("Document Line No.", "Line No.");
+        PurchCommentLine.SetRange(Date, WorkDate());
+        if not PurchCommentLine.FindFirst() then
             Date := WorkDate();
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnSetUpNewLineOnAfterSetFilters(var SalesCommentLine: Record "Sales Comment Line Archive"; Rec: Record "Sales Comment Line Archive")
-    begin
     end;
 }
 

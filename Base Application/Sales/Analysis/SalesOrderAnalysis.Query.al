@@ -2,40 +2,40 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Analysis;
+namespace Microsoft.Purchases.Analysis;
 
 using Microsoft.CRM.Team;
-using Microsoft.Sales.Document;
+using Microsoft.Purchases.Document;
 
-query 124 "Sales Order Analysis"
+query 488 "Purch. Order Perf. Analysis"
 {
     QueryType = Normal;
     DataAccessIntent = ReadOnly;
     UsageCategory = ReportsAndAnalysis;
-    Caption = 'Sales Order Performance Analysis';
-    AboutTitle = 'Sales Order Performance Analysis';
-    AboutText = 'The Sales Order Performance Analysis is a query that joins data from Sales Header to Sales Lines.';
+    Caption = 'Purchase Order Performance Analysis';
+    AboutTitle = 'About Purchase Order Performance Analysis';
+    AboutText = 'The Purchase Order Performance Analysis is a query that joins data from purchase order lines with vendor master data.';
 
     elements
     {
-        dataitem(Sales_Header; "Sales Header")
+        dataitem(PurchaseHeader; "Purchase Header")
         {
             DataItemTableFilter = "Document Type" = const(Order);
             column(DocumentNo; "No.")
             {
-                Caption = 'Document No.';
+                Caption = 'No.';
             }
             column(Status; Status)
             {
                 Caption = 'Status';
             }
-            column(ExternalDocumentNo; "External Document No.")
+            column(VendorOrderNo; "Vendor Order No.")
             {
-                Caption = 'External Document No.';
+                Caption = 'Vendor Order No.';
             }
-            column(SalespersonCode; "Salesperson Code")
+            column(PurchaserCode; "Purchaser Code")
             {
-                Caption = 'Salesperson Code';
+                Caption = 'Purchaser Code';
             }
             column(OrderDate; "Order Date")
             {
@@ -53,25 +53,25 @@ query 124 "Sales Order Analysis"
             {
                 Caption = 'Posting Date';
             }
-            column(SellToCustomerNo; "Sell-to Customer No.")
+            column(BuyFromVendorNo; "Buy-from Vendor No.")
             {
-                Caption = 'Sell-to Customer No.';
+                Caption = 'Buy-from Vendor No.';
             }
-            column(SellToCustomerName; "Sell-to Customer Name")
+            column(BuyFromVendorName; "Buy-from Vendor Name")
             {
-                Caption = 'Sell-to Customer Name';
+                Caption = 'Buy-from Vendor Name';
             }
-            column(BillToCustomerNo; "Bill-to Customer No.")
+            column(PayToVendorNo; "Pay-to Vendor No.")
             {
-                Caption = 'Bill-to Customer No.';
+                Caption = 'Pay-to Vendor No.';
             }
-            column(BillToCustomerName; "Bill-to Name")
+            column(PayToVendorName; "Pay-to Name")
             {
-                Caption = 'Bill-to Customer Name';
+                Caption = 'Pay-to Vendor Name';
             }
-            dataitem(Sales_Line; "Sales Line")
+            dataitem(PurchaseLine; "Purchase Line")
             {
-                DataItemLink = "Document Type" = Sales_Header."Document Type", "Document No." = Sales_Header."No.";
+                DataItemLink = "Document Type" = PurchaseHeader."Document Type", "Document No." = PurchaseHeader."No.";
                 SqlJoinType = InnerJoin;
                 column(Type; Type)
                 {
@@ -121,57 +121,57 @@ query 124 "Sales Order Analysis"
                 {
                     Caption = 'Currency Code';
                 }
-                column(PlannedDeliveryDate; "Planned Delivery Date")
+                column(RequestedReceiptDate; "Requested Receipt Date")
                 {
-                    Caption = 'Planned Delivery Date';
+                    Caption = 'Requested Receipt Date';
                 }
-                column(PlannedShipmentDate; "Planned Shipment Date")
+                column(PromisedReceiptDate; "Promised Receipt Date")
                 {
-                    Caption = 'Planned Shipment Date';
+                    Caption = 'Promised Receipt Date';
                 }
-                column(ShipmentDate; "Shipment Date")
+                column(ExpectedReceiptDate; "Expected Receipt Date")
                 {
-                    Caption = 'Shipment Date';
+                    Caption = 'Expected Receipt Date';
                 }
-                column(QuantityShipped; "Quantity Shipped")
+                column(QuantityReceived; "Quantity Received")
                 {
-                    Caption = 'Quantity Shipped';
+                    Caption = 'Quantity Received';
                 }
                 column(QuantityInvoiced; "Quantity Invoiced")
                 {
                     Caption = 'Quantity Invoiced';
                 }
-                column(OutstandingQty; "Outstanding Quantity")
+                column(OutstandingQuantity; "Outstanding Quantity")
                 {
-                    Caption = 'Outstanding Qty.';
+                    Caption = 'Outstanding Quantity';
                 }
-                column(QtyShippedNotInvoiced; "Qty. Shipped Not Invoiced")
+                column(QtyRcdNotInvoiced; "Qty. Rcd. Not Invoiced")
                 {
-                    Caption = 'Qty. Shipped Not Invoiced';
+                    Caption = 'Qty. Rcd. Not Invoiced';
                 }
                 column(OutstandingQtyBase; "Outstanding Qty. (Base)")
                 {
                     Caption = 'Outstanding Qty. (Base)';
                 }
-                column(QtyShippedNotInvdBase; "Qty. Shipped Not Invd. (Base)")
+                column(QtyRcdNotInvoicedBase; "Qty. Rcd. Not Invoiced (Base)")
                 {
-                    Caption = 'Qty. Shipped Not Invd. (Base)';
+                    Caption = 'Qty. Rcd. Not Invoiced (Base)';
                 }
                 column(OutstandingAmount; "Outstanding Amount")
                 {
                     Caption = 'Outstanding Amount';
                 }
-                column(ShippedNotInvoiced; "Shipped Not Invoiced")
+                column(AmtRcdNotInvoiced; "Amt. Rcd. Not Invoiced")
                 {
-                    Caption = 'Shipped Not Invoiced';
+                    Caption = 'Amt. Rcd. Not Invoiced';
                 }
                 column(OutstandingAmountLCY; "Outstanding Amount (LCY)")
                 {
                     Caption = 'Outstanding Amount (LCY)';
                 }
-                column(ShippedNotInvoicedLCY; "Shipped Not Invoiced (LCY)")
+                column(AmtRcdNotInvoicedLCY; "Amt. Rcd. Not Invoiced (LCY)")
                 {
-                    Caption = 'Shipped Not Invoiced (LCY)';
+                    Caption = 'Amt. Rcd. Not Invoiced (LCY)';
                 }
                 column(ShortcutDimension1Code; "Shortcut Dimension 1 Code")
                 {
@@ -181,13 +181,13 @@ query 124 "Sales Order Analysis"
                 {
                     Caption = 'Shortcut Dimension 2 Code';
                 }
-                dataitem(Salesperson_Purchaser; "Salesperson/Purchaser")
+                dataitem(SalespersonPurchaser; "Salesperson/Purchaser")
                 {
-                    DataItemLink = Code = Sales_Header."Salesperson Code";
+                    DataItemLink = Code = PurchaseHeader."Purchaser Code";
                     SqlJoinType = InnerJoin;
-                    column(Name; Name)
+                    column(PurchaserName; Name)
                     {
-                        Caption = 'Salesperson Name';
+                        Caption = 'Purchaser Name';
                     }
                 }
             }

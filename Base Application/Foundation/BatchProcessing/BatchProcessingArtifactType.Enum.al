@@ -2,19 +2,22 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Foundation.BatchProcessing;
+namespace Microsoft.Purchases.Document;
 
-enum 58 "Batch Processing Artifact Type"
+enum 8511 "Over-Receipt Approval Status"
 {
     Extensible = true;
     AssignmentCompatibility = true;
 
-    value(1; " ")
+    value(0; " ")
     {
-        Caption = ' ';
     }
-    value(2; "IC Output File")
+    value(1; Pending)
     {
-        Caption = 'Intercompany output file';
+        Caption = 'Pending';
+    }
+    value(2; Approved)
+    {
+        Caption = 'Approved';
     }
 }

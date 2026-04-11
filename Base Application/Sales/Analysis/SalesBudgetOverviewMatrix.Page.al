@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Analysis;
+namespace Microsoft.Purchases.Analysis;
 
 using Microsoft.Finance.Analysis;
 using Microsoft.Finance.Dimension;
@@ -10,9 +10,9 @@ using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.Enums;
 using Microsoft.Inventory.Analysis;
 
-page 9239 "Sales Budget Overview Matrix"
+page 9219 "Purch. Budget Overview Matrix"
 {
-    Caption = 'Sales Budget Overview Matrix';
+    Caption = 'Purch. Budget Overview Matrix';
     DeleteAllowed = false;
     InsertAllowed = false;
     LinksAllowed = false;
@@ -31,27 +31,27 @@ page 9239 "Sales Budget Overview Matrix"
                 ShowCaption = false;
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = Dimensions;
+                    ApplicationArea = PurchaseBudget;
                     Editable = false;
                     StyleExpr = 'Strong';
-                    ToolTip = 'Specifies the dimension value code for the dimension selected in the Show as Lines field.';
+                    ToolTip = 'Specifies the code of the record.';
                 }
                 field(Name; Rec.Name)
                 {
-                    ApplicationArea = Dimensions;
+                    ApplicationArea = PurchaseBudget;
                     Editable = false;
                     StyleExpr = 'Strong';
-                    ToolTip = 'Specifies the name of the dimension value on the line.';
+                    ToolTip = 'Specifies the name of the record.';
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     AutoFormatExpression = FormatStr();
                     AutoFormatType = 11;
                     Caption = 'Budgeted Quantity';
                     Editable = false;
                     StyleExpr = 'Strong';
-                    ToolTip = 'Specifies the total quantity of the sales budget entries.';
+                    ToolTip = 'Specifies the total quantity of the purchase budget entries.';
                     Visible = QuantityVisible;
 
                     trigger OnDrillDown()
@@ -61,27 +61,12 @@ page 9239 "Sales Budget Overview Matrix"
                 }
                 field(Amount; Rec.Amount)
                 {
-                    ApplicationArea = SalesBudget;
-                    AutoFormatExpression = FormatStr();
-                    AutoFormatType = 11;
-                    Caption = 'Budgeted Sales Amount';
-                    StyleExpr = 'Strong';
-                    ToolTip = 'Specifies the total sales amount of the sales budget entries.';
-                    Visible = AmountVisible;
-
-                    trigger OnDrillDown()
-                    begin
-                        DrillDown(true, ValueType::"Sales Amount");
-                    end;
-                }
-                field(CostAmount; +CalcAmt("Item Analysis Value Type"::"Cost Amount", false))
-                {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     AutoFormatExpression = FormatStr();
                     AutoFormatType = 11;
                     Caption = 'Budgeted Cost Amount';
                     StyleExpr = 'Strong';
-                    ToolTip = 'Specifies the total amount of the sales budget entries that represent the cost of goods sold.';
+                    ToolTip = 'Specifies the total cost of the purchase budget entries.';
                     Visible = AmountVisible;
 
                     trigger OnDrillDown()
@@ -91,7 +76,7 @@ page 9239 "Sales Budget Overview Matrix"
                 }
                 field(Field1; MATRIX_CellData[1])
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     AutoFormatExpression = FormatStr();
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -110,7 +95,7 @@ page 9239 "Sales Budget Overview Matrix"
                 }
                 field(Field2; MATRIX_CellData[2])
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     AutoFormatExpression = FormatStr();
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -129,7 +114,7 @@ page 9239 "Sales Budget Overview Matrix"
                 }
                 field(Field3; MATRIX_CellData[3])
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     AutoFormatExpression = FormatStr();
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -148,7 +133,7 @@ page 9239 "Sales Budget Overview Matrix"
                 }
                 field(Field4; MATRIX_CellData[4])
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     AutoFormatExpression = FormatStr();
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -167,7 +152,7 @@ page 9239 "Sales Budget Overview Matrix"
                 }
                 field(Field5; MATRIX_CellData[5])
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     AutoFormatExpression = FormatStr();
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -186,7 +171,7 @@ page 9239 "Sales Budget Overview Matrix"
                 }
                 field(Field6; MATRIX_CellData[6])
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     AutoFormatExpression = FormatStr();
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -205,7 +190,7 @@ page 9239 "Sales Budget Overview Matrix"
                 }
                 field(Field7; MATRIX_CellData[7])
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     AutoFormatExpression = FormatStr();
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -224,7 +209,7 @@ page 9239 "Sales Budget Overview Matrix"
                 }
                 field(Field8; MATRIX_CellData[8])
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     AutoFormatExpression = FormatStr();
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -243,7 +228,7 @@ page 9239 "Sales Budget Overview Matrix"
                 }
                 field(Field9; MATRIX_CellData[9])
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     AutoFormatExpression = FormatStr();
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -262,7 +247,7 @@ page 9239 "Sales Budget Overview Matrix"
                 }
                 field(Field10; MATRIX_CellData[10])
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     AutoFormatExpression = FormatStr();
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -281,7 +266,7 @@ page 9239 "Sales Budget Overview Matrix"
                 }
                 field(Field11; MATRIX_CellData[11])
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     AutoFormatExpression = FormatStr();
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -300,7 +285,7 @@ page 9239 "Sales Budget Overview Matrix"
                 }
                 field(Field12; MATRIX_CellData[12])
                 {
-                    ApplicationArea = SalesBudget;
+                    ApplicationArea = PurchaseBudget;
                     AutoFormatExpression = FormatStr();
                     AutoFormatType = 11;
                     BlankZero = true;
@@ -328,7 +313,7 @@ page 9239 "Sales Budget Overview Matrix"
     trigger OnAfterGetCurrRecord()
     begin
         if AmountVisible then
-            Rec.Amount := CalcAmt("Item Analysis Value Type"::"Sales Amount", false);
+            Rec.Amount := CalcAmt("Item Analysis Value Type"::"Cost Amount", false);
         if QuantityVisible then
             Rec.Quantity := CalcAmt("Item Analysis Value Type"::Quantity, false);
     end;
@@ -339,7 +324,7 @@ page 9239 "Sales Budget Overview Matrix"
     begin
         NameIndent := 0;
         if AmountVisible then
-            Rec.Amount := MatrixMgt.RoundAmount(CalcAmt(ValueType::"Sales Amount", false), RoundingFactor);
+            Rec.Amount := MatrixMgt.RoundAmount(CalcAmt(ValueType::"Cost Amount", false), RoundingFactor);
         if QuantityVisible then
             Rec.Quantity := MatrixMgt.RoundAmount(CalcAmt(ValueType::Quantity, false), RoundingFactor);
 
@@ -379,18 +364,19 @@ page 9239 "Sales Budget Overview Matrix"
 
     trigger OnOpenPage()
     begin
+        CurrentAnalysisArea := CurrentAnalysisArea::Purchase;
         ItemBudgetManagement.BudgetNameSelection(
           CurrentAnalysisArea.AsInteger(), CurrentBudgetName, ItemBudgetName, ItemStatisticsBuffer,
           BudgetDim1Filter, BudgetDim2Filter, BudgetDim3Filter);
 
         GLSetup.Get();
-        SourceTypeFilter := SourceTypeFilter::Customer;
+        SourceTypeFilter := SourceTypeFilter::Vendor;
     end;
 
     var
         GLSetup: Record "General Ledger Setup";
         ItemStatisticsBuffer: Record "Item Statistics Buffer";
-        MatrixRecords: array[12] of Record "Dimension Code Buffer";
+        MatrixRecords: array[32] of Record "Dimension Code Buffer";
         ItemBudgetManagement: Codeunit "Item Budget Management";
         MatrixMgt: Codeunit "Matrix Management";
         CurrentAnalysisArea: Enum "Analysis Area Type";
@@ -406,7 +392,7 @@ page 9239 "Sales Budget Overview Matrix"
 #pragma warning restore AA0470
 #pragma warning restore AA0074
         MATRIX_CurrentNoOfMatrixColumn: Integer;
-        MATRIX_CellData: array[12] of Decimal;
+        MATRIX_CellData: array[32] of Decimal;
         MATRIX_CaptionSet: array[32] of Text[80];
         RoundingFactorFormatString: Text;
         AmountVisible: Boolean;
@@ -416,17 +402,17 @@ page 9239 "Sales Budget Overview Matrix"
     protected var
         ItemBudgetName: Record "Item Budget Name";
         MATRIX_ColumnTempRec: Record "Dimension Code Buffer";
-        ItemFilter: Text;
         SourceTypeFilter: Enum "Analysis Source Type";
+        LineDimType: Enum "Item Budget Dimension Type";
+        ColumnDimType: Enum "Item Budget Dimension Type";
         SourceNoFilter: Text;
-        DateFilter: Text;
+        ItemFilter: Text;
         GlobalDim1Filter: Text;
         GlobalDim2Filter: Text;
         BudgetDim1Filter: Text;
         BudgetDim2Filter: Text;
         BudgetDim3Filter: Text;
-        LineDimType: Enum "Item Budget Dimension Type";
-        ColumnDimType: Enum "Item Budget Dimension Type";
+        DateFilter: Text;
 
     local procedure CalcAmt(ValueType: Enum "Item Analysis Value Type"; SetColFilter: Boolean): Decimal
     begin
@@ -449,24 +435,21 @@ page 9239 "Sales Budget Overview Matrix"
           LineDimType, Rec, ColumnDimType, MATRIX_ColumnTempRec, NewAmount);
     end;
 
-    protected procedure DrillDown(OnlyLines: Boolean; ValueType: Enum "Item Analysis Value Type")
+    local procedure DrillDown(OnlyLines: Boolean; ValueType: Enum "Item Analysis Value Type")
     var
-        ValueTypeInt: Option;
+        ValueTypeOpt: Option;
     begin
-        ValueTypeInt := ValueType.AsInteger();
-        OnBeforeDrillDown(Rec, OnlyLines, ValueTypeInt);
-        ValueType := "Item Analysis Value Type".FromInteger(ValueTypeInt);
+        ValueTypeOpt := ValueType.AsInteger();
+        OnBeforeDrillDown(Rec, OnlyLines, ValueTypeOpt);
+        ValueType := "Item Analysis Value Type".FromInteger(ValueTypeOpt);
 
         ItemBudgetManagement.DrillDownBudgetAmount(
-          ItemBudgetName,
-          ItemFilter, SourceTypeFilter, SourceNoFilter, DateFilter,
+          ItemBudgetName, ItemFilter, SourceTypeFilter, SourceNoFilter, DateFilter,
           GlobalDim1Filter, GlobalDim2Filter, BudgetDim1Filter, BudgetDim2Filter, BudgetDim3Filter,
-          LineDimType, Rec,
-          ColumnDimType, MATRIX_ColumnTempRec,
-          ValueType, OnlyLines);
+          LineDimType, Rec, ColumnDimType, MATRIX_ColumnTempRec, ValueType, OnlyLines);
     end;
 
-    procedure LoadMatrix(NewMatrixColumns: array[32] of Text[80]; var NewMatrixRecords: array[12] of Record "Dimension Code Buffer"; NewCurrentNoOfMatrixColumns: Integer; NewCurrentBudgetName: Code[10]; NewLineDimType: Enum "Item Budget Dimension Type"; NewColumnDimType: Enum "Item Budget Dimension Type"; NewRoundingFactor: Enum "Analysis Rounding Factor"; NewValueType: Enum "Item Analysis Value Type"; NewPeriodType: Enum "Analysis Period Type")
+    procedure LoadMatrix(NewMatrixColumns: array[32] of Text[80]; var NewMatrixRecords: array[32] of Record "Dimension Code Buffer"; NewCurrentNoOfMatrixColumns: Integer; NewCurrentBudgetName: Code[10]; NewLineDimType: Enum "Item Budget Dimension Type"; NewColumnDimType: Enum "Item Budget Dimension Type"; NewRoundingFactor: Enum "Analysis Rounding Factor"; NewValueType: Enum "Item Analysis Value Type"; NewPeriodType: Enum "Analysis Period Type")
     var
         i: Integer;
     begin
@@ -477,7 +460,7 @@ page 9239 "Sales Budget Overview Matrix"
             MatrixRecords[i] := NewMatrixRecords[i];
         end;
         MATRIX_CurrentNoOfMatrixColumn := NewCurrentNoOfMatrixColumns;
-        CurrentAnalysisArea := CurrentAnalysisArea::Sales;
+        CurrentAnalysisArea := CurrentAnalysisArea::Purchase;
         CurrentBudgetName := NewCurrentBudgetName;
         LineDimType := NewLineDimType;
         ColumnDimType := NewColumnDimType;
@@ -525,7 +508,7 @@ page 9239 "Sales Budget Overview Matrix"
 
         NewAmount := FromRoundedValue(MATRIX_CellData[MATRIX_ColumnOrdinal]);
         SetAmt(ValueType, true, NewAmount);
-        Rec.Amount := MatrixMgt.RoundAmount(CalcAmt(ValueType::"Sales Amount", false), RoundingFactor);
+        Rec.Amount := MatrixMgt.RoundAmount(CalcAmt(ValueType::"Cost Amount", false), RoundingFactor);
         Rec.Quantity := MatrixMgt.RoundAmount(CalcAmt(ValueType::Quantity, false), RoundingFactor);
     end;
 

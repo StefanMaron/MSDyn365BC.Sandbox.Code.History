@@ -2,13 +2,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Finance.RoleCenters;
+namespace Microsoft.Purchases.RoleCenters;
 
-profile "FIN"
+profile "PURCH"
 {
     Enabled = true;
-    Caption = 'Finance';
+    Caption = 'Purchasing';
     ProfileDescription = 'Navigation menu only.';
     Promoted = true;
-    RoleCenter = 8901;
+    RoleCenter = 8905;
 }

@@ -2,40 +2,35 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Finance.GeneralLedger.Journal;
+namespace Microsoft.Purchases.Vendor;
 
-table 269 "G/L Account Net Change"
+table 267 "Vendor Amount"
 {
-    Tabletype = temporary;
-    Caption = 'G/L Account Net Change';
-    ReplicateData = false;
+    Caption = 'Vendor Amount';
     DataClassification = CustomerContent;
 
     fields
     {
-        field(1; "No."; Code[20])
+        field(1; "Vendor No."; Code[20])
         {
-            Caption = 'No.';
+            Caption = 'Vendor No.';
+            TableRelation = Vendor;
         }
-        field(2; Name; Text[100])
-        {
-            Caption = 'Name';
-        }
-        field(3; "Net Change in Jnl."; Decimal)
+        field(2; "Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            Caption = 'Net Change in Jnl.';
+            Caption = 'Amount (LCY)';
         }
-        field(4; "Balance after Posting"; Decimal)
+        field(3; "Amount 2 (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            Caption = 'Balance after Posting';
+            Caption = 'Amount 2 (LCY)';
         }
     }
 
     keys
     {
-        key(Key1; "No.")
+        key(Key1; "Amount (LCY)", "Amount 2 (LCY)", "Vendor No.")
         {
             Clustered = true;
         }

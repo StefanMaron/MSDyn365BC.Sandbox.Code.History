@@ -2,30 +2,30 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Reports;
+namespace Microsoft.Purchases.Reports;
 
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Ledger;
-using Microsoft.Sales.Customer;
-using Microsoft.Sales.Receivables;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
 using System.Utilities;
 
-report 2501 "Day Book Cust. Ledger Entry"
+report 2502 "Day Book Vendor Ledger Entry"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Sales/Reports/DayBookCustLedgerEntry.rdlc';
+    RDLCLayout = './Purchases/Reports/DayBookVendorLedgerEntry.rdlc';
     ApplicationArea = Basic, Suite;
-    Caption = 'Day Book Customer Ledger Entry';
+    Caption = 'Day Book Vendor Ledger Entry';
     UsageCategory = ReportsAndAnalysis;
 
     dataset
     {
-        dataitem(ReqCustLedgEntry; "Cust. Ledger Entry")
+        dataitem(ReqVendLedgEntry; "Vendor Ledger Entry")
         {
-            DataItemTableView = sorting("Document Type", "Customer No.", "Posting Date", "Currency Code");
-            RequestFilterFields = "Document Type", "Customer No.", "Posting Date", "Currency Code";
+            DataItemTableView = sorting("Document Type", "Vendor No.", "Posting Date", "Currency Code");
+            RequestFilterFields = "Document Type", "Vendor No.", "Posting Date", "Currency Code";
 
             trigger OnPreDataItem()
             begin
@@ -47,44 +47,23 @@ report 2501 "Day Book Cust. Ledger Entry"
             column(All_amounts_are_in___GLSetup__LCY_Code_; StrSubstNo(AllAmountsAreInLbl, GLSetup."LCY Code"))
             {
             }
-            column(GetAmountLCY; AmountLCY1)
+            column(Vendor_Ledger_Entry__TABLENAME__________VendLedgFilter; "Vendor Ledger Entry".TableCaption + ': ' + VendLedgFilter)
             {
             }
-            column(GetPmtDiscGiven; PmtDiscGiven1)
-            {
-            }
-            column(GetVatBase; VatBase1)
-            {
-            }
-            column(GetVatAmount; VatAmount1)
-            {
-            }
-            column(G_L_Entry___Entry_No__; "G/L Entry"."Entry No.")
-            {
-            }
-            column(CustLedgerEntry___Entry_No__; "Cust. Ledger Entry"."Entry No.")
+            column(VendLedgFilter; VendLedgFilter)
             {
             }
             column(PrintCLDetails; PrintCLDetails)
             {
             }
-            column(GetActualAmount; ActualAmount1)
+            column(Total_for______Vendor_Ledger_Entry__TABLENAME__________VendLedgFilter; StrSubstNo(TotalForVendLedgerEntryLbl, "Vendor Ledger Entry".TableCaption(), VendLedgFilter))
             {
             }
-            column(Cust__Ledger_Entry__TABLENAME__________CustLedgFilter; "Cust. Ledger Entry".TableCaption + ': ' + CustLedgFilter)
-            {
-            }
-            column(CustLedgFilter; CustLedgFilter)
-            {
-            }
-            column(Total_for______Cust__Ledger_Entry__TABLENAME__________CustLedgFilter; StrSubstNo(TotalForCustLedgerEntryLbl, "Cust. Ledger Entry".TableCaption(), CustLedgFilter))
-            {
-            }
-            column(VATAmount; VATAmount)
+            column(Vendor_Ledger_Entry___Amount__LCY__; "Vendor Ledger Entry"."Amount (LCY)")
             {
                 AutoFormatType = 1;
             }
-            column(VATBase; VATBase)
+            column(PmtDiscRcd; PmtDiscRcd)
             {
                 AutoFormatType = 1;
             }
@@ -92,12 +71,25 @@ report 2501 "Day Book Cust. Ledger Entry"
             {
                 AutoFormatType = 1;
             }
-            column(PmtDiscGiven; PmtDiscGiven)
-            {
-            }
-            column(Cust__Ledger_Entry___Amount__LCY__; "Cust. Ledger Entry"."Amount (LCY)")
+            column(VATBase; VATBase)
             {
                 AutoFormatType = 1;
+            }
+            column(VATAmount; VATAmount)
+            {
+                AutoFormatType = 1;
+            }
+            column(PmtDiscRcd4; PmtDiscRcd4)
+            {
+            }
+            column(AmountLCY4; AmountLCY4)
+            {
+            }
+            column(PmtDiscRcd3; PmtDiscRcd3)
+            {
+            }
+            column(AmountLCY3; AmountLCY3)
+            {
             }
             column(Date_Period_Type; "Period Type")
             {
@@ -108,139 +100,148 @@ report 2501 "Day Book Cust. Ledger Entry"
             column(CurrReport_PAGENOCaption; CurrReport_PAGENOCaptionLbl)
             {
             }
-            column(Day_Book_Cust__Ledger_EntryCaption; Day_Book_Cust__Ledger_EntryCaptionLbl)
+            column(Day_Book_Vendor_Ledger_EntryCaption; Day_Book_Vendor_Ledger_EntryCaptionLbl)
             {
             }
-            column(Cust__Ledger_Entry__Amount__LCY__Caption; Cust__Ledger_Entry__Amount__LCY__CaptionLbl)
+            column(VATAmount_Control23Caption; VATAmount_Control23CaptionLbl)
             {
             }
-            column(PmtDiscGiven_Control32Caption; PmtDiscGiven_Control32CaptionLbl)
+            column(PmtDiscRcd_Control32Caption; PmtDiscRcd_Control32CaptionLbl)
             {
             }
-            column(VATAmount_Control26Caption; VATAmount_Control26CaptionLbl)
+            column(Vendor_Ledger_Entry__Amount__LCY__Caption; Vendor_Ledger_Entry__Amount__LCY__CaptionLbl)
             {
             }
-            column(ActualAmount_Control39Caption; ActualAmount_Control39CaptionLbl)
+            column(ActualAmount_Control35Caption; ActualAmount_Control35CaptionLbl)
             {
             }
-            column(VATBase_Control29Caption; VATBase_Control29CaptionLbl)
+            column(VATBase_Control26Caption; VATBase_Control26CaptionLbl)
             {
             }
-            column(PmtDiscGiven_Control32Caption_Control33; PmtDiscGiven_Control32Caption_Control33Lbl)
+            column(VATAmount_Control23Caption_Control24; VATAmount_Control23Caption_Control24Lbl)
             {
             }
-            column(Customer_NameCaption; Customer_NameCaptionLbl)
+            column(PmtDiscRcd_Control32Caption_Control33; PmtDiscRcd_Control32Caption_Control33Lbl)
             {
             }
-            column(Cust__Ledger_Entry__Customer_No__Caption; Cust__Ledger_Entry__Customer_No__CaptionLbl)
+            column(VATBase_Control26Caption_Control27; VATBase_Control26Caption_Control27Lbl)
             {
             }
-            column(Cust__Ledger_Entry__External_Document_No__Caption; "Cust. Ledger Entry".FieldCaption("External Document No."))
+            column(Vendor_Ledger_Entry__Amount__LCY__Caption_Control30; Vendor_Ledger_Entry__Amount__LCY__Caption_Control30Lbl)
             {
             }
-            column(Cust__Ledger_Entry__Document_No__Caption; "Cust. Ledger Entry".FieldCaption("Document No."))
+            column(Vendor_NameCaption; Vendor_NameCaptionLbl)
             {
             }
-            column(Cust__Ledger_Entry__Amount__LCY__Caption_Control24; Cust__Ledger_Entry__Amount__LCY__Caption_Control24Lbl)
+            column(Vendor_Ledger_Entry__Vendor_No__Caption; Vendor_Ledger_Entry__Vendor_No__CaptionLbl)
             {
             }
-            column(VATAmount_Control26Caption_Control27; VATAmount_Control26Caption_Control27Lbl)
+            column(Vendor_Ledger_Entry__External_Document_No__Caption; "Vendor Ledger Entry".FieldCaption("External Document No."))
             {
             }
-            column(VATBase_Control29Caption_Control30; VATBase_Control29Caption_Control30Lbl)
+            column(Vendor_Ledger_Entry__Document_No__Caption; "Vendor Ledger Entry".FieldCaption("Document No."))
             {
             }
-            column(ActualAmount_Control39Caption_Control35; ActualAmount_Control39Caption_Control35Lbl)
+            column(ActualAmount_Control35Caption_Control54; ActualAmount_Control35Caption_Control54Lbl)
             {
             }
-            dataitem("Cust. Ledger Entry"; "Cust. Ledger Entry")
+            dataitem("Vendor Ledger Entry"; "Vendor Ledger Entry")
             {
-                DataItemTableView = sorting("Document Type", "Customer No.", "Posting Date");
-                column(Cust__Ledger_Entry__FIELDNAME__Posting_Date__________FORMAT_Date__Period_Start__0_4_; FieldCaption("Posting Date") + ' ' + Format(Date."Period Start", 0, 4))
+                DataItemTableView = sorting("Document Type", "Vendor No.", "Posting Date", "Currency Code");
+                column(Vendor_Ledger_Entry__FIELDNAME__Posting_Date__________FORMAT_Date__Period_Start__0_4_; FieldCaption("Posting Date") + ' ' + Format(Date."Period Start", 0, 4))
                 {
                 }
-                column(FIELDNAME__Document_Type___________FORMAT__Document_Type__; FieldCaption("Document Type") + ' ' + Format("Document Type"))
+                column(FIELDNAME__Document_Type___________FORMAT___Document_Type__; FieldCaption("Document Type") + ' ' + Format("Document Type"))
                 {
                 }
-                column(Cust__Ledger_Entry__Document_No__; "Document No.")
+                column(Vendor_Ledger_Entry__Document_No__; "Document No.")
                 {
                 }
-                column(Cust__Ledger_Entry__External_Document_No__; "External Document No.")
+                column(Vendor_Ledger_Entry__External_Document_No__; "External Document No.")
                 {
                 }
-                column(Cust__Ledger_Entry__Amount__LCY__; "Amount (LCY)")
+                column(VATAmount_Control23; VATAmount)
                 {
                     AutoFormatType = 1;
                 }
-                column(VATBase_Control29; VATBase)
+                column(Vendor_Ledger_Entry__Amount__LCY__; "Amount (LCY)")
                 {
                     AutoFormatType = 1;
                 }
-                column(PmtDiscGiven_Control32; PmtDiscGiven)
-                {
-                }
-                column(Customer_Name; Customer.Name)
-                {
-                }
-                column(Cust__Ledger_Entry__Customer_No__; "Customer No.")
-                {
-                }
-                column(ActualAmount_Control39; ActualAmount)
+                column(PmtDiscRcd_Control32; PmtDiscRcd)
                 {
                     AutoFormatType = 1;
                 }
-                column(VATAmount_Control26; VATAmount)
+                column(Vendor_Name; Vendor.Name)
+                {
+                }
+                column(Vendor_Ledger_Entry__Vendor_No__; "Vendor No.")
+                {
+                }
+                column(VATBase_Control26; VATBase)
                 {
                     AutoFormatType = 1;
                 }
-                column(Total_for___FIELDNAME__Document_Type_________FORMAT__Document_Type__; StrSubstNo(TotalForCustLedgerEntryLbl, FieldCaption("Document Type"), Format("Document Type")))
-                {
-                }
-                column(VATAmount_Control19; VATAmount)
+                column(ActualAmount_Control35; ActualAmount)
                 {
                     AutoFormatType = 1;
                 }
-                column(VATBase_Control22; VATBase)
+                column(VendorLedgerEntry___EntryNo__; "Entry No.")
+                {
+                }
+                column(Total_for___FIELDNAME__Document_Type_________FORMAT__Document_Type__; StrSubstNo(TotalForVendLedgerEntryLbl, FieldCaption("Document Type"), Format("Document Type")))
+                {
+                }
+                column(Vendor_Ledger_Entry__Amount__LCY___Control46; "Amount (LCY)")
                 {
                     AutoFormatType = 1;
                 }
-                column(ActualAmount_Control25; ActualAmount)
+                column(PmtDiscRcd_Control47; PmtDiscRcd)
                 {
                     AutoFormatType = 1;
                 }
-                column(PmtDiscGiven_Control38; PmtDiscGiven)
-                {
-                }
-                column(Cust__Ledger_Entry__Amount__LCY___Control41; "Amount (LCY)")
+                column(ActualAmount_Control48; ActualAmount)
                 {
                     AutoFormatType = 1;
+                }
+                column(VATBase_Control49; VATBase)
+                {
+                    AutoFormatType = 1;
+                }
+                column(VATAmount_Control50; VATAmount)
+                {
+                    AutoFormatType = 1;
+                }
+                column(AmountLCY2; AmountLCY2)
+                {
+                }
+                column(PmtDiscRcd2; PmtDiscRcd2)
+                {
                 }
                 column(Total_for_____FORMAT_Date__Period_Start__0_4_; StrSubstNo(TotalForDatePeriodStartLbl, Format(Date."Period Start", 0, 4)))
                 {
                 }
-                column(Cust__Ledger_Entry__Amount__LCY___Control57; "Amount (LCY)")
+                column(Vendor_Ledger_Entry__Amount__LCY___Control51; "Amount (LCY)")
                 {
                     AutoFormatType = 1;
                 }
-                column(PmtDiscGiven_Control50; PmtDiscGiven)
-                {
-                }
-                column(ActualAmount_Control49; ActualAmount)
+                column(PmtDiscRcd_Control58; PmtDiscRcd)
                 {
                     AutoFormatType = 1;
                 }
-                column(VATBase_Control48; VATBase)
+                column(ActualAmount_Control59; ActualAmount)
                 {
                     AutoFormatType = 1;
                 }
-                column(VATAmount_Control47; VATAmount)
+                column(VATBase_Control61; VATBase)
                 {
                     AutoFormatType = 1;
                 }
-                column(Cust__Ledger_Entry_Entry_No_; "Entry No.")
+                column(VATAmount_Control62; VATAmount)
                 {
+                    AutoFormatType = 1;
                 }
-                column(Cust__Ledger_Entry_Document_Type; "Document Type")
+                column(Vendor_Ledger_Entry_Document_Type; "Document Type")
                 {
                 }
                 dataitem("G/L Entry"; "G/L Entry")
@@ -249,14 +250,26 @@ report 2501 "Day Book Cust. Ledger Entry"
                     column(G_L_Entry__G_L_Account_No__; "G/L Account No.")
                     {
                     }
-                    column(GLAcc_Name; GLAcc.Name)
-                    {
-                    }
                     column(G_L_Entry_Amount; Amount)
                     {
                         AutoFormatType = 1;
                     }
-                    column(G_L_Entry_Entry_No_; "Entry No.")
+                    column(GLAcc_Name; GLAcc.Name)
+                    {
+                    }
+                    column(G_L_Entry___Entry_No__; "Entry No.")
+                    {
+                    }
+                    column(GetPmtDiscRcd; PmtDiscRcd1)
+                    {
+                    }
+                    column(GetVatBase; VatBase1)
+                    {
+                    }
+                    column(GetVatAmount; VatAmount1)
+                    {
+                    }
+                    column(GetAmountLCY; AmountLCY1)
                     {
                     }
 
@@ -266,39 +279,33 @@ report 2501 "Day Book Cust. Ledger Entry"
                             if not GLAcc.Get("G/L Account No.") then
                                 GLAcc.Init();
 
+                        AmountLCY1 := "Vendor Ledger Entry"."Amount (LCY)";
+                        PmtDiscRcd1 := PmtDiscRcd;
                         if SecondStep then begin
-                            if PrintGLDetails then begin
-                                AmountLCY1 := "Cust. Ledger Entry"."Amount (LCY)";
-                                PmtDiscGiven1 := PmtDiscGiven;
-                                ActualAmount1 := ActualAmount;
-                                VatBase1 := VATBase;
-                                VatAmount1 := VATAmount;
-                            end;
-                            SecondStep := false;
-                        end else begin
-                            AmountLCY1 := 0;
-                            PmtDiscGiven1 := 0;
-                            ActualAmount1 := 0;
                             VatBase1 := 0;
                             VatAmount1 := 0;
+                            SecondStep := false;
+                        end else begin
+                            VatBase1 := VATBase;
+                            VatAmount1 := VATAmount;
                         end;
                     end;
 
                     trigger OnPreDataItem()
                     var
-                        DtldCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
+                        DtldVendLedgEntry: Record "Detailed Vendor Ledg. Entry";
                         TransactionNoFilter: Text[250];
                     begin
                         if not PrintGLDetails then
                             CurrReport.Break();
 
-                        DtldCustLedgEntry.Reset();
-                        DtldCustLedgEntry.SetRange("Cust. Ledger Entry No.", "Cust. Ledger Entry"."Entry No.");
-                        DtldCustLedgEntry.SetFilter("Entry Type", '<>%1', DtldCustLedgEntry."Entry Type"::Application);
-                        if DtldCustLedgEntry.FindSet() then begin
-                            TransactionNoFilter := Format(DtldCustLedgEntry."Transaction No.");
-                            while DtldCustLedgEntry.Next() <> 0 do
-                                TransactionNoFilter := TransactionNoFilter + '|' + Format(DtldCustLedgEntry."Transaction No.");
+                        DtldVendLedgEntry.Reset();
+                        DtldVendLedgEntry.SetRange("Vendor Ledger Entry No.", "Vendor Ledger Entry"."Entry No.");
+                        DtldVendLedgEntry.SetFilter("Entry Type", '<>%1', DtldVendLedgEntry."Entry Type"::Application);
+                        if DtldVendLedgEntry.FindSet() then begin
+                            TransactionNoFilter := Format(DtldVendLedgEntry."Transaction No.");
+                            while DtldVendLedgEntry.Next() <> 0 do
+                                TransactionNoFilter := TransactionNoFilter + '|' + Format(DtldVendLedgEntry."Transaction No.");
                         end;
                         SetFilter("Transaction No.", TransactionNoFilter);
                     end;
@@ -309,10 +316,21 @@ report 2501 "Day Book Cust. Ledger Entry"
                     TempVATEntry: Record "VAT Entry" temporary;
                 begin
                     SecondStep := true;
+                    if "Document Type" <> PreviousVendorLedgerEntry."Document Type" then begin
+                        AmountLCY2 := 0;
+                        PmtDiscRcd2 := 0;
+                    end;
+                    AmountLCY2 := AmountLCY2 + "Amount (LCY)";
+                    AmountLCY3 := AmountLCY3 + "Amount (LCY)";
+                    AmountLCY4 := AmountLCY4 + "Amount (LCY)";
+                    PmtDiscRcd2 := PmtDiscRcd2 + PmtDiscRcd;
+                    PmtDiscRcd3 := PmtDiscRcd3 + PmtDiscRcd;
+                    PmtDiscRcd4 := PmtDiscRcd4 + PmtDiscRcd;
+                    PreviousVendorLedgerEntry := "Vendor Ledger Entry";
 
-                    if "Customer No." <> Customer."No." then
-                        if not Customer.Get("Customer No.") then
-                            Customer.Init();
+                    if "Vendor No." <> Vendor."No." then
+                        if not Vendor.Get("Vendor No.") then
+                            Vendor.Init();
 
                     VATAmount := 0;
                     VATBase := 0;
@@ -342,43 +360,34 @@ report 2501 "Day Book Cust. Ledger Entry"
                             VATBase := -VATEntry.Base;
                         end;
 
-                    PmtDiscGiven := 0;
-                    CustLedgEntry.SetCurrentKey("Closed by Entry No.");
-                    CustLedgEntry.SetRange("Closed by Entry No.", "Entry No.");
-                    if CustLedgEntry.Find('-') then
+                    PmtDiscRcd := 0;
+                    VendLedgEntry.SetCurrentKey("Closed by Entry No.");
+                    VendLedgEntry.SetRange("Closed by Entry No.", "Entry No.");
+                    if VendLedgEntry.Find('-') then
                         repeat
-                            PmtDiscGiven := PmtDiscGiven - CustLedgEntry."Pmt. Disc. Given (LCY)";
-                        until CustLedgEntry.Next() = 0;
+                            PmtDiscRcd := PmtDiscRcd - VendLedgEntry."Pmt. Disc. Rcd.(LCY)"
+                        until VendLedgEntry.Next() = 0;
 
-                    ActualAmount := "Amount (LCY)" - PmtDiscGiven;
-
-                    if not PrintGLDetails then begin
-                        AmountLCY1 := "Amount (LCY)";
-                        PmtDiscGiven1 := PmtDiscGiven;
-                        ActualAmount1 := ActualAmount;
-                        VatBase1 := VATBase;
-                        VatAmount1 := VATAmount;
-                    end;
+                    ActualAmount := "Amount (LCY)" - PmtDiscRcd;
                 end;
 
                 trigger OnPreDataItem()
                 begin
                     Clear(VATAmount);
-                    Clear(PmtDiscGiven);
+                    Clear(PmtDiscRcd);
                     Clear(VATBase);
                     Clear(ActualAmount);
-                    CopyFilters(ReqCustLedgEntry);
+                    CopyFilters(ReqVendLedgEntry);
                     SetRange("Posting Date", Date."Period Start");
                 end;
             }
 
             trigger OnAfterGetRecord()
             begin
-                AmountLCY1 := 0;
-                PmtDiscGiven1 := 0;
-                ActualAmount1 := 0;
-                VatBase1 := 0;
-                VatAmount1 := 0;
+                AmountLCY2 := 0;
+                AmountLCY3 := 0;
+                PmtDiscRcd2 := 0;
+                PmtDiscRcd3 := 0;
             end;
 
             trigger OnPreDataItem()
@@ -387,18 +396,18 @@ report 2501 "Day Book Cust. Ledger Entry"
                 PostingDateEnd: Date;
             begin
                 Clear(VATAmount);
-                Clear(PmtDiscGiven);
+                Clear(PmtDiscRcd);
                 Clear(VATBase);
                 Clear(ActualAmount);
-                ReqCustLedgEntry.CopyFilter("Posting Date", "Period Start");
+                ReqVendLedgEntry.CopyFilter("Posting Date", "Period Start");
 
-                if ReqCustLedgEntry.GetFilter("Posting Date") = '' then
+                if ReqVendLedgEntry.GetFilter("Posting Date") = '' then
                     Error(MissingDateRangeFilterErr);
 
-                PostingDateStart := ReqCustLedgEntry.GetRangeMin("Posting Date");
+                PostingDateStart := ReqVendLedgEntry.GetRangeMin("Posting Date");
                 PostingDateEnd := CalcDate('<+1Y>', PostingDateStart);
 
-                if ReqCustLedgEntry.GetRangeMax("Posting Date") > PostingDateEnd then
+                if ReqVendLedgEntry.GetRangeMax("Posting Date") > PostingDateEnd then
                     Error(MaxPostingDateErr);
             end;
         }
@@ -415,10 +424,10 @@ report 2501 "Day Book Cust. Ledger Entry"
                 group(Options)
                 {
                     Caption = 'Options';
-                    field(PrintCustLedgerDetails; PrintCLDetails)
+                    field(PrintVendLedgerDetails; PrintCLDetails)
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Print Cust. Ledger Details';
+                        Caption = 'Print Vend. Ledger Details';
                         ToolTip = 'Specifies if Cust. Ledger Details is printed';
 
                         trigger OnValidate()
@@ -452,50 +461,56 @@ report 2501 "Day Book Cust. Ledger Entry"
 
     trigger OnPreReport()
     begin
-        CustLedgFilter := ReqCustLedgEntry.GetFilters();
+        VendLedgFilter := ReqVendLedgEntry.GetFilters();
         GLSetup.Get();
     end;
 
     var
         GLSetup: Record "General Ledger Setup";
         GLAcc: Record "G/L Account";
-        Customer: Record Customer;
-        CustLedgEntry: Record "Cust. Ledger Entry";
+        Vendor: Record Vendor;
+        VendLedgEntry: Record "Vendor Ledger Entry";
         VATEntry: Record "VAT Entry";
-        CustLedgFilter: Text;
-        PmtDiscGiven: Decimal;
+        PreviousVendorLedgerEntry: Record "Vendor Ledger Entry";
+        VendLedgFilter: Text;
+        PmtDiscRcd: Decimal;
         VATAmount: Decimal;
         ActualAmount: Decimal;
         VATBase: Decimal;
         AmountLCY1: Decimal;
-        PmtDiscGiven1: Decimal;
-        VatBase1: Decimal;
+        PmtDiscRcd1: Decimal;
         VatAmount1: Decimal;
+        VatBase1: Decimal;
         PrintGLDetails: Boolean;
         PrintCLDetails: Boolean;
         SecondStep: Boolean;
-        ActualAmount1: Decimal;
+        AmountLCY2: Decimal;
+        PmtDiscRcd2: Decimal;
+        AmountLCY3: Decimal;
+        AmountLCY4: Decimal;
+        PmtDiscRcd3: Decimal;
+        PmtDiscRcd4: Decimal;
         CurrReport_PAGENOCaptionLbl: Label 'Page';
-        Day_Book_Cust__Ledger_EntryCaptionLbl: Label 'Day Book Cust. Ledger Entry';
-        Cust__Ledger_Entry__Amount__LCY__CaptionLbl: Label 'Ledger Entry Amount';
-        PmtDiscGiven_Control32CaptionLbl: Label 'Payment Discount Given';
-        VATAmount_Control26CaptionLbl: Label 'VAT Amount';
-        ActualAmount_Control39CaptionLbl: Label 'Actual Amount';
-        VATBase_Control29CaptionLbl: Label 'VAT Base';
-        PmtDiscGiven_Control32Caption_Control33Lbl: Label 'Payment Discount Given';
-        Customer_NameCaptionLbl: Label 'Name';
-        Cust__Ledger_Entry__Customer_No__CaptionLbl: Label 'Account No.';
-        Cust__Ledger_Entry__Amount__LCY__Caption_Control24Lbl: Label 'Ledger Entry Amount';
-        VATAmount_Control26Caption_Control27Lbl: Label 'VAT Amount';
-        VATBase_Control29Caption_Control30Lbl: Label 'VAT Base';
-        ActualAmount_Control39Caption_Control35Lbl: Label 'Actual Amount';
-#pragma warning disable AA0470
-        AllAmountsAreInLbl: Label 'All amounts are in %1.', Comment = 'All amounts are in GBP';
-        TotalForCustLedgerEntryLbl: Label 'Total for  %1 : %2.', Comment = 'Total for Cust. Ledger Entry 3403  ';
-        TotalForDatePeriodStartLbl: Label 'Total for %1.', Comment = 'Total for posting date 12122012';
-#pragma warning restore AA0470
+        Day_Book_Vendor_Ledger_EntryCaptionLbl: Label 'Day Book Vendor Ledger Entry';
+        VATAmount_Control23CaptionLbl: Label 'VAT Amount';
+        PmtDiscRcd_Control32CaptionLbl: Label 'Payment Discount Rcd.';
+        Vendor_Ledger_Entry__Amount__LCY__CaptionLbl: Label 'Ledger Entry Amount';
+        ActualAmount_Control35CaptionLbl: Label 'Actual Amount';
+        VATBase_Control26CaptionLbl: Label 'VAT Base';
+        VATAmount_Control23Caption_Control24Lbl: Label 'VAT Amount';
+        PmtDiscRcd_Control32Caption_Control33Lbl: Label 'Payment Discount Rcd.';
+        VATBase_Control26Caption_Control27Lbl: Label 'VAT Base';
+        Vendor_Ledger_Entry__Amount__LCY__Caption_Control30Lbl: Label 'Ledger Entry Amount';
+        Vendor_NameCaptionLbl: Label 'Name';
+        Vendor_Ledger_Entry__Vendor_No__CaptionLbl: Label 'Account No.';
+        ActualAmount_Control35Caption_Control54Lbl: Label 'Actual Amount';
         MissingDateRangeFilterErr: Label 'Posting Date filter must be set.';
         MaxPostingDateErr: Label 'Posting Date period must not be longer than 1 year.';
+#pragma warning disable AA0470
+        TotalForVendLedgerEntryLbl: Label 'Total for  %1 : %2.', Comment = 'Total for Vend. Ledger Entry 3403  ';
+        TotalForDatePeriodStartLbl: Label 'Total for %1.', Comment = 'Total for posting date 12122012';
+        AllAmountsAreInLbl: Label 'All amounts are in %1.', Comment = 'All amounts are in GBP';
+#pragma warning restore AA0470
 
     local procedure PrintGLDetailsOnAfterValidate()
     begin

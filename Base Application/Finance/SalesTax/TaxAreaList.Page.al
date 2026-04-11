@@ -2,17 +2,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Finance.SalesTax;
+namespace Microsoft.Purchases.Document;
 
-page 469 "Tax Area List"
+page 177 "Standard Purchase Codes"
 {
-    ApplicationArea = SalesTax;
-    Caption = 'Tax Areas';
-    CardPageID = "Tax Area";
+    AdditionalSearchTerms = 'recurring purchase,reorder,repeat purchases';
+    ApplicationArea = Suite;
+    Caption = 'Recurring Purchase Lines';
+    CardPageID = "Standard Purchase Code Card";
     InsertAllowed = false;
+    ModifyAllowed = false;
     PageType = List;
-    SourceTable = "Tax Area";
-    UsageCategory = Lists;
+    SourceTable = "Standard Purchase Code";
+    UsageCategory = Administration;
 
     layout
     {
@@ -23,13 +25,19 @@ page 469 "Tax Area List"
                 ShowCaption = false;
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the code you want to assign to this tax area. You can enter up to 20 characters, both numbers and letters. It is a good idea to enter a code that is easy to remember.';
+                    ApplicationArea = Suite;
+                    ToolTip = 'Specifies a code which identifies this standard purchase code.';
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = SalesTax;
-                    ToolTip = 'Specifies a description of the tax area. If you use a number as the tax code, you might want to describe the tax area in this field.';
+                    ApplicationArea = Suite;
+                    ToolTip = 'Specifies a description of the standard purchase code.';
+                }
+                field("Currency Code"; Rec."Currency Code")
+                {
+                    ApplicationArea = Suite;
+                    ToolTip = 'Specifies the currency code of the amounts on the standard purchase lines.';
+                    Visible = false;
                 }
             }
         }

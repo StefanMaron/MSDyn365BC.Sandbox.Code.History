@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Archive;
+namespace Microsoft.Purchases.Archive;
 
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Deferral;
@@ -10,68 +10,61 @@ using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.SalesTax;
-using Microsoft.Finance.VAT.Clause;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Depreciation;
 using Microsoft.FixedAssets.FixedAsset;
+using Microsoft.FixedAssets.Insurance;
+using Microsoft.FixedAssets.Maintenance;
+using Microsoft.FixedAssets.Posting;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.Enums;
-using Microsoft.Foundation.Shipping;
 using Microsoft.Foundation.UOM;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Inventory.Intrastat;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Item.Catalog;
-using Microsoft.Inventory.Item.Substitution;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Pricing.Calculation;
 using Microsoft.Projects.Project.Job;
-using Microsoft.Projects.Resources.Resource;
 using Microsoft.Purchases.Document;
-using Microsoft.Sales.Customer;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Document;
-using Microsoft.Sales.History;
-using Microsoft.Sales.Pricing;
 using Microsoft.Utilities;
 using Microsoft.Warehouse.Structure;
 using System.Reflection;
 
-table 5108 "Sales Line Archive"
+table 5110 "Purchase Line Archive"
 {
-    Caption = 'Sales Line Archive';
+    Caption = 'Purchase Line Archive';
     PasteIsValid = false;
     DataClassification = CustomerContent;
 
     fields
     {
-        field(1; "Document Type"; Enum "Sales Document Type")
+        field(1; "Document Type"; Enum "Purchase Document Type")
         {
             Caption = 'Document Type';
-            ToolTip = 'Specifies the type of sales document.';
         }
-        field(2; "Sell-to Customer No."; Code[20])
+        field(2; "Buy-from Vendor No."; Code[20])
         {
-            Caption = 'Sell-to Customer No.';
-            TableRelation = Customer;
-            ToolTip = 'Specifies the number of the customer who will receive the products and be billed by default.';
+            Caption = 'Buy-from Vendor No.';
+            TableRelation = Vendor;
         }
         field(3; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = "Sales Header Archive"."No." where("Document Type" = field("Document Type"),
-                                                                "Version No." = field("Version No."));
-            ToolTip = 'Specifies the document number.';
+            TableRelation = "Purchase Header Archive"."No." where("Document Type" = field("Document Type"),
+                                                                   "Version No." = field("Version No."));
         }
         field(4; "Line No."; Integer)
         {
             Caption = 'Line No.';
-            ToolTip = 'Specifies the number of the line.';
         }
-        field(5; Type; Enum "Sales Line Type")
+        field(5; Type; Enum "Purchase Line Type")
         {
             Caption = 'Type';
-            ToolTip = 'Specifies the type of entity that will be posted for this sales line, such as Item, Resource, or G/L Account.';
         }
         field(6; "No."; Code[20])
         {
@@ -82,18 +75,14 @@ table 5108 "Sales Line Archive"
             else
             if (Type = const(Item)) Item
             else
-            if (Type = const(Resource)) Resource
-            else
             if (Type = const("Fixed Asset")) "Fixed Asset"
             else
             if (Type = const("Charge (Item)")) "Item Charge";
-            ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
         }
         field(7; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
             TableRelation = Location where("Use As In-Transit" = const(false));
-            ToolTip = 'Specifies the location from where inventory items to the customer on the sales document are to be shipped by default.';
         }
         field(8; "Posting Group"; Code[20])
         {
@@ -102,35 +91,26 @@ table 5108 "Sales Line Archive"
             else
             if (Type = const("Fixed Asset")) "FA Posting Group";
         }
-        field(9; "Quantity Disc. Code"; Code[20])
+        field(10; "Expected Receipt Date"; Date)
         {
-            Caption = 'Quantity Disc. Code';
-        }
-        field(10; "Shipment Date"; Date)
-        {
-            Caption = 'Shipment Date';
-            ToolTip = 'Specifies when items on the document are shipped or were shipped. A shipment date is usually calculated from a requested delivery date plus lead time.';
+            Caption = 'Expected Receipt Date';
         }
         field(11; Description; Text[100])
         {
             Caption = 'Description';
-            ToolTip = 'Specifies a description of the record.';
         }
         field(12; "Description 2"; Text[50])
         {
             Caption = 'Description 2';
-            ToolTip = 'Specifies information in addition to the description.';
         }
         field(13; "Unit of Measure"; Text[50])
         {
             Caption = 'Unit of Measure';
-            ToolTip = 'Specifies the name of the item or resource''s unit of measure, such as piece or hour.';
         }
         field(15; Quantity; Decimal)
         {
             Caption = 'Quantity';
             DecimalPlaces = 0 : 5;
-            ToolTip = 'Specifies how many units are being sold.';
         }
         field(16; "Outstanding Quantity"; Decimal)
         {
@@ -141,28 +121,24 @@ table 5108 "Sales Line Archive"
         {
             Caption = 'Qty. to Invoice';
             DecimalPlaces = 0 : 5;
-            ToolTip = 'Specifies the quantity that remains to be invoiced. It is calculated as Quantity - Qty. Invoiced.';
         }
-        field(18; "Qty. to Ship"; Decimal)
+        field(18; "Qty. to Receive"; Decimal)
         {
-            AccessByPermission = TableData "Sales Shipment Header" = R;
-            Caption = 'Qty. to Ship';
+            AccessByPermission = TableData "Purch. Rcpt. Header" = R;
+            Caption = 'Qty. to Receive';
             DecimalPlaces = 0 : 5;
-            ToolTip = 'Specifies the quantity of items that remain to be shipped.';
         }
-        field(22; "Unit Price"; Decimal)
+        field(22; "Direct Unit Cost"; Decimal)
         {
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 2;
-            CaptionClass = GetCaptionClass(FieldNo("Unit Price"));
-            Caption = 'Unit Price';
-            ToolTip = 'Specifies the price of one unit of the item or resource. You can enter a price manually or have it entered according to the Price/Profit Calculation field on the related card.';
+            CaptionClass = GetCaptionClass(FieldNo("Direct Unit Cost"));
+            Caption = 'Direct Unit Cost';
         }
         field(23; "Unit Cost (LCY)"; Decimal)
         {
             AutoFormatType = 2;
             Caption = 'Unit Cost (LCY)';
-            ToolTip = 'Specifies the cost, in LCY, of one unit of the item or resource on the line.';
         }
         field(25; "VAT %"; Decimal)
         {
@@ -182,105 +158,81 @@ table 5108 "Sales Line Archive"
             DecimalPlaces = 0 : 5;
             MaxValue = 100;
             MinValue = 0;
-            ToolTip = 'Specifies the discount percentage that is granted for the item on the line.';
         }
         field(28; "Line Discount Amount"; Decimal)
         {
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Line Discount Amount';
-            ToolTip = 'Specifies the discount amount that is granted for the item on the line.';
         }
         field(29; Amount; Decimal)
         {
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
-            ToolTip = 'Specifies the sum of amounts in the Line Amount field on the sales lines.';
         }
         field(30; "Amount Including VAT"; Decimal)
         {
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount Including VAT';
-            ToolTip = 'Specifies the net amount, including VAT, for this line.';
+        }
+        field(31; "Unit Price (LCY)"; Decimal)
+        {
+            AutoFormatType = 2;
+            Caption = 'Unit Price (LCY)';
         }
         field(32; "Allow Invoice Disc."; Boolean)
         {
             Caption = 'Allow Invoice Disc.';
             InitValue = true;
-            ToolTip = 'Specifies if the invoice line is included when the invoice discount is calculated.';
         }
         field(34; "Gross Weight"; Decimal)
         {
             Caption = 'Gross Weight';
             DecimalPlaces = 0 : 5;
-            ToolTip = 'Specifies the gross weight of one unit of the item. In the sales statistics window, the gross weight on the line is included in the total gross weight of all the lines for the particular sales document.';
         }
         field(35; "Net Weight"; Decimal)
         {
             Caption = 'Net Weight';
             DecimalPlaces = 0 : 5;
-            ToolTip = 'Specifies the net weight of one unit of the item. In the sales statistics window, the net weight on the line is included in the total net weight of all the lines for the particular sales document.';
         }
         field(36; "Units per Parcel"; Decimal)
         {
             Caption = 'Units per Parcel';
             DecimalPlaces = 0 : 5;
-            ToolTip = 'Specifies the number of units per parcel of the item. In the sales statistics window, the number of units per parcel on the line helps to determine the total number of units for all the lines for the particular sales document.';
         }
         field(37; "Unit Volume"; Decimal)
         {
             Caption = 'Unit Volume';
             DecimalPlaces = 0 : 5;
-            ToolTip = 'Specifies the volume of one unit of the item. In the sales statistics window, the volume of one unit of the item on the line is included in the total volume of all the lines for the particular sales document.';
         }
         field(38; "Appl.-to Item Entry"; Integer)
         {
             AccessByPermission = TableData Item = R;
             Caption = 'Appl.-to Item Entry';
-            ToolTip = 'Specifies the number of the item ledger entry that the document or journal line is applied to.';
         }
         field(40; "Shortcut Dimension 1 Code"; Code[20])
         {
             CaptionClass = '1,2,1';
             Caption = 'Shortcut Dimension 1 Code';
             TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
-            ToolTip = 'Specifies the code for Shortcut Dimension 1, which is one of two global dimension codes that you set up in the General Ledger Setup window.';
         }
         field(41; "Shortcut Dimension 2 Code"; Code[20])
         {
             CaptionClass = '1,2,2';
             Caption = 'Shortcut Dimension 2 Code';
             TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
-            ToolTip = 'Specifies the code for Shortcut Dimension 2, which is one of two global dimension codes that you set up in the General Ledger Setup window.';
-        }
-        field(42; "Price Group Code"; Code[10])
-        {
-            Caption = 'Price Group Code';
-            TableRelation = "Customer Price Group";
-        }
-        field(43; "Allow Quantity Disc."; Boolean)
-        {
-            Caption = 'Allow Quantity Disc.';
-            InitValue = true;
         }
         field(45; "Job No."; Code[20])
         {
             Caption = 'Project No.';
             TableRelation = Job;
-            ToolTip = 'Specifies the number of the related project.';
         }
-        field(52; "Work Type Code"; Code[10])
+        field(54; "Indirect Cost %"; Decimal)
         {
-            Caption = 'Work Type Code';
-            TableRelation = "Work Type";
-        }
-        field(55; "Cust./Item Disc. %"; Decimal)
-        {
-            Caption = 'Cust./Item Disc. %';
+            Caption = 'Indirect Cost %';
             DecimalPlaces = 0 : 5;
-            MaxValue = 100;
             MinValue = 0;
         }
         field(57; "Outstanding Amount"; Decimal)
@@ -288,85 +240,82 @@ table 5108 "Sales Line Archive"
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Outstanding Amount';
-            Editable = false;
         }
-        field(58; "Qty. Shipped Not Invoiced"; Decimal)
+        field(58; "Qty. Rcd. Not Invoiced"; Decimal)
         {
-            Caption = 'Qty. Shipped Not Invoiced';
+            Caption = 'Qty. Rcd. Not Invoiced';
             DecimalPlaces = 0 : 5;
         }
-        field(59; "Shipped Not Invoiced"; Decimal)
+        field(59; "Amt. Rcd. Not Invoiced"; Decimal)
         {
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            Caption = 'Shipped Not Invoiced';
+            Caption = 'Amt. Rcd. Not Invoiced';
         }
-        field(60; "Quantity Shipped"; Decimal)
+        field(60; "Quantity Received"; Decimal)
         {
-            AccessByPermission = TableData "Sales Shipment Header" = R;
-            Caption = 'Quantity Shipped';
+            AccessByPermission = TableData "Purch. Rcpt. Header" = R;
+            Caption = 'Quantity Received';
             DecimalPlaces = 0 : 5;
-            ToolTip = 'Specifies how many units of the item on the line have been posted as shipped.';
         }
         field(61; "Quantity Invoiced"; Decimal)
         {
             Caption = 'Quantity Invoiced';
             DecimalPlaces = 0 : 5;
-            ToolTip = 'Specifies how many units of the item on the line have been posted as invoiced.';
         }
-        field(63; "Shipment No."; Code[20])
+        field(63; "Receipt No."; Code[20])
         {
-            Caption = 'Shipment No.';
+            Caption = 'Receipt No.';
         }
-        field(64; "Shipment Line No."; Integer)
+        field(64; "Receipt Line No."; Integer)
         {
-            Caption = 'Shipment Line No.';
+            Caption = 'Receipt Line No.';
         }
         field(67; "Profit %"; Decimal)
         {
             Caption = 'Profit %';
             DecimalPlaces = 0 : 5;
         }
-        field(68; "Bill-to Customer No."; Code[20])
+        field(68; "Pay-to Vendor No."; Code[20])
         {
-            Caption = 'Bill-to Customer No.';
-            TableRelation = Customer;
+            Caption = 'Pay-to Vendor No.';
+            TableRelation = Vendor;
         }
         field(69; "Inv. Discount Amount"; Decimal)
         {
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             Caption = 'Inv. Discount Amount';
-            ToolTip = 'Specifies the total calculated invoice discount amount for the line.';
         }
-        field(71; "Purchase Order No."; Code[20])
+        field(70; "Vendor Item No."; Text[50])
         {
-            Caption = 'Purchase Order No.';
-            TableRelation = if ("Drop Shipment" = const(true)) "Purchase Header"."No." where("Document Type" = const(Order));
+            Caption = 'Vendor Item No.';
         }
-        field(72; "Purch. Order Line No."; Integer)
+        field(71; "Sales Order No."; Code[20])
         {
-            Caption = 'Purch. Order Line No.';
-            TableRelation = if ("Drop Shipment" = const(true)) "Purchase Line"."Line No." where("Document Type" = const(Order),
-                                                                                               "Document No." = field("Purchase Order No."));
+            Caption = 'Sales Order No.';
+            TableRelation = if ("Drop Shipment" = const(true)) "Sales Header"."No." where("Document Type" = const(Order));
+        }
+        field(72; "Sales Order Line No."; Integer)
+        {
+            Caption = 'Sales Order Line No.';
+            TableRelation = if ("Drop Shipment" = const(true)) "Sales Line"."Line No." where("Document Type" = const(Order),
+                                                                                            "Document No." = field("Sales Order No."));
         }
         field(73; "Drop Shipment"; Boolean)
         {
             AccessByPermission = TableData "Drop Shpt. Post. Buffer" = R;
             Caption = 'Drop Shipment';
-            ToolTip = 'Specifies if your vendor ships the items directly to your customer.';
         }
         field(74; "Gen. Bus. Posting Group"; Code[20])
         {
             Caption = 'Gen. Bus. Posting Group';
             TableRelation = "Gen. Business Posting Group";
-            ToolTip = 'Specifies the vendor''s or customer''s trade type to link transactions made for this business partner with the appropriate general ledger account according to the general posting setup.';
         }
         field(75; "Gen. Prod. Posting Group"; Code[20])
         {
             Caption = 'Gen. Prod. Posting Group';
             TableRelation = "Gen. Product Posting Group";
-            ToolTip = 'Specifies the item''s product type to link transactions made for this item with the appropriate general ledger account according to the general posting setup.';
         }
         field(77; "VAT Calculation Type"; Enum "Tax Calculation Type")
         {
@@ -385,14 +334,15 @@ table 5108 "Sales Line Archive"
         field(80; "Attached to Line No."; Integer)
         {
             Caption = 'Attached to Line No.';
-            TableRelation = "Sales Line Archive"."Line No." where("Document Type" = field("Document Type"),
-                                                                   "Document No." = field("Document No."),
-                                                                   "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
-                                                                   "Version No." = field("Version No."));
+            Editable = false;
+            TableRelation = "Purchase Line Archive"."Line No." where("Document Type" = field("Document Type"),
+                                                                      "Document No." = field("Document No."),
+                                                                      "Doc. No. Occurrence" = field("Doc. No. Occurrence"),
+                                                                      "Version No." = field("Version No."));
         }
-        field(81; "Exit Point"; Code[10])
+        field(81; "Entry Point"; Code[10])
         {
-            Caption = 'Exit Point';
+            Caption = 'Entry Point';
             TableRelation = "Entry/Exit Point";
         }
         field(82; "Area"; Code[10])
@@ -409,35 +359,29 @@ table 5108 "Sales Line Archive"
         {
             Caption = 'Tax Area Code';
             TableRelation = "Tax Area";
-            ToolTip = 'Specifies the tax area that is used to calculate and post sales tax.';
         }
         field(86; "Tax Liable"; Boolean)
         {
             Caption = 'Tax Liable';
-            ToolTip = 'Specifies if the customer or vendor is liable for sales tax.';
         }
         field(87; "Tax Group Code"; Code[20])
         {
             Caption = 'Tax Group Code';
             TableRelation = "Tax Group";
-            ToolTip = 'Specifies the tax group that is used to calculate and post sales tax.';
         }
-        field(88; "VAT Clause Code"; Code[20])
+        field(88; "Use Tax"; Boolean)
         {
-            Caption = 'VAT Clause Code';
-            TableRelation = "VAT Clause";
+            Caption = 'Use Tax';
         }
         field(89; "VAT Bus. Posting Group"; Code[20])
         {
             Caption = 'VAT Bus. Posting Group';
             TableRelation = "VAT Business Posting Group";
-            ToolTip = 'Specifies the VAT specification of the involved customer or vendor to link transactions made for this record with the appropriate general ledger account according to the VAT posting setup.';
         }
         field(90; "VAT Prod. Posting Group"; Code[20])
         {
             Caption = 'VAT Prod. Posting Group';
             TableRelation = "VAT Product Posting Group";
-            ToolTip = 'Specifies the VAT specification of the involved item or resource to link transactions made for this record with the appropriate general ledger account according to the VAT posting setup.';
         }
         field(91; "Currency Code"; Code[10])
         {
@@ -449,29 +393,21 @@ table 5108 "Sales Line Archive"
             AutoFormatType = 1;
             Caption = 'Outstanding Amount (LCY)';
         }
-        field(93; "Shipped Not Invoiced (LCY)"; Decimal)
+        field(93; "Amt. Rcd. Not Invoiced (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            Caption = 'Shipped Not Invoiced (LCY)';
-        }
-        field(96; Reserve; Enum "Reserve Method")
-        {
-            AccessByPermission = TableData "Sales Shipment Header" = R;
-            Caption = 'Reserve';
-            ToolTip = 'Specifies whether items will never, automatically (Always), or optionally be reserved for this customer. Optional means that you must manually reserve items for this customer.';
+            Caption = 'Amt. Rcd. Not Invoiced (LCY)';
         }
         field(97; "Blanket Order No."; Code[20])
         {
             Caption = 'Blanket Order No.';
-            TableRelation = "Sales Header"."No." where("Document Type" = const("Blanket Order"));
-            ToolTip = 'Specifies the number of the blanket order that the record originates from.';
+            TableRelation = "Purchase Header"."No." where("Document Type" = const("Blanket Order"));
         }
         field(98; "Blanket Order Line No."; Integer)
         {
             Caption = 'Blanket Order Line No.';
-            TableRelation = "Sales Line"."Line No." where("Document Type" = const("Blanket Order"),
-                                                           "Document No." = field("Blanket Order No."));
-            ToolTip = 'Specifies the number of the blanket order line that the record originates from.';
+            TableRelation = "Purchase Line"."Line No." where("Document Type" = const("Blanket Order"),
+                                                              "Document No." = field("Blanket Order No."));
         }
         field(99; "VAT Base Amount"; Decimal)
         {
@@ -495,7 +431,6 @@ table 5108 "Sales Line Archive"
             AutoFormatType = 1;
             CaptionClass = GetCaptionClass(FieldNo("Line Amount"));
             Caption = 'Line Amount';
-            ToolTip = 'Specifies the net amount, excluding any invoice discount amount, that must be paid for products on the line.';
         }
         field(104; "VAT Difference"; Decimal)
         {
@@ -656,24 +591,96 @@ table 5108 "Sales Line Archive"
             Caption = 'Project Task No.';
             Editable = false;
             TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
-            ToolTip = 'Specifies the number of the related project task.';
         }
-        field(1002; "Job Contract Entry No."; Integer)
+        field(1002; "Job Line Type"; Enum "Job Line Type")
         {
             AccessByPermission = TableData Job = R;
-            Caption = 'Project Contract Entry No.';
-            ToolTip = 'Specifies the entry number of the project planning line that the sales line is linked to.';
+            Caption = 'Project Line Type';
+        }
+        field(1003; "Job Unit Price"; Decimal)
+        {
+            AccessByPermission = TableData Job = R;
+            Caption = 'Project Unit Price';
+        }
+        field(1004; "Job Total Price"; Decimal)
+        {
+            AccessByPermission = TableData Job = R;
+            Caption = 'Project Total Price';
+        }
+        field(1005; "Job Line Amount"; Decimal)
+        {
+            AccessByPermission = TableData Job = R;
+            AutoFormatExpression = "Job Currency Code";
+            Caption = 'Project Line Amount';
+        }
+        field(1006; "Job Line Discount Amount"; Decimal)
+        {
+            AccessByPermission = TableData Job = R;
+            AutoFormatExpression = "Job Currency Code";
+            Caption = 'Project Line Discount Amount';
+        }
+        field(1007; "Job Line Discount %"; Decimal)
+        {
+            AccessByPermission = TableData Job = R;
+            Caption = 'Project Line Discount %';
+            DecimalPlaces = 0 : 5;
+        }
+        field(1008; "Job Unit Price (LCY)"; Decimal)
+        {
+            AccessByPermission = TableData Job = R;
+            Caption = 'Project Unit Price (LCY)';
+            AutoFormatType = 2;
+        }
+        field(1009; "Job Total Price (LCY)"; Decimal)
+        {
+            AccessByPermission = TableData Job = R;
+            Caption = 'Project Total Price (LCY)';
+            AutoFormatType = 1;
+        }
+        field(1010; "Job Line Amount (LCY)"; Decimal)
+        {
+            AccessByPermission = TableData Job = R;
+            Caption = 'Project Line Amount (LCY)';
+            AutoFormatType = 1;
+        }
+        field(1011; "Job Line Disc. Amount (LCY)"; Decimal)
+        {
+            AccessByPermission = TableData Job = R;
+            Caption = 'Project Line Disc. Amount (LCY)';
+            AutoFormatType = 1;
+        }
+        field(1012; "Job Currency Factor"; Decimal)
+        {
+            Caption = 'Project Currency Factor';
+        }
+        field(1013; "Job Currency Code"; Code[20])
+        {
+            Caption = 'Project Currency Code';
+        }
+        field(1019; "Job Planning Line No."; Integer)
+        {
+            AccessByPermission = TableData Job = R;
+            BlankZero = true;
+            Caption = 'Project Planning Line No.';
+        }
+        field(1030; "Job Remaining Qty."; Decimal)
+        {
+            AccessByPermission = TableData Job = R;
+            Caption = 'Project Remaining Qty.';
+            DecimalPlaces = 0 : 5;
+        }
+        field(1031; "Job Remaining Qty. (Base)"; Decimal)
+        {
+            Caption = 'Project Remaining Qty. (Base)';
         }
         field(1700; "Deferral Code"; Code[10])
         {
             Caption = 'Deferral Code';
             TableRelation = "Deferral Template"."Deferral Code";
-            ToolTip = 'Specifies the deferral template that governs how revenue earned with this sales document is deferred to the different accounting periods when the good or service was delivered.';
         }
         field(1702; "Returns Deferral Start Date"; Date)
         {
             Caption = 'Returns Deferral Start Date';
-            ToolTip = 'Specifies the starting date of the returns deferral period.';
         }
         field(5047; "Version No."; Integer)
         {
@@ -687,7 +694,6 @@ table 5108 "Sales Line Archive"
         {
             Caption = 'Variant Code';
             TableRelation = if (Type = const(Item)) "Item Variant".Code where("Item No." = field("No."));
-            ToolTip = 'Specifies the variant of the item on the line.';
         }
         field(5403; "Bin Code"; Code[20])
         {
@@ -700,17 +706,12 @@ table 5108 "Sales Line Archive"
             DecimalPlaces = 0 : 5;
             InitValue = 1;
         }
-        field(5405; Planned; Boolean)
-        {
-            Caption = 'Planned';
-        }
         field(5407; "Unit of Measure Code"; Code[10])
         {
             Caption = 'Unit of Measure Code';
             TableRelation = if (Type = const(Item)) "Item Unit of Measure".Code where("Item No." = field("No."))
             else
             "Unit of Measure";
-            ToolTip = 'Specifies how each unit of the item or resource is measured, such as in pieces or hours. By default, the value in the Base Unit of Measure field on the item or resource card is inserted.';
         }
         field(5415; "Quantity (Base)"; Decimal)
         {
@@ -727,19 +728,19 @@ table 5108 "Sales Line Archive"
             Caption = 'Qty. to Invoice (Base)';
             DecimalPlaces = 0 : 5;
         }
-        field(5418; "Qty. to Ship (Base)"; Decimal)
+        field(5418; "Qty. to Receive (Base)"; Decimal)
         {
-            Caption = 'Qty. to Ship (Base)';
+            Caption = 'Qty. to Receive (Base)';
             DecimalPlaces = 0 : 5;
         }
-        field(5458; "Qty. Shipped Not Invd. (Base)"; Decimal)
+        field(5458; "Qty. Rcd. Not Invoiced (Base)"; Decimal)
         {
-            Caption = 'Qty. Shipped Not Invd. (Base)';
+            Caption = 'Qty. Rcd. Not Invoiced (Base)';
             DecimalPlaces = 0 : 5;
         }
-        field(5460; "Qty. Shipped (Base)"; Decimal)
+        field(5460; "Qty. Received (Base)"; Decimal)
         {
-            Caption = 'Qty. Shipped (Base)';
+            Caption = 'Qty. Received (Base)';
             DecimalPlaces = 0 : 5;
         }
         field(5461; "Qty. Invoiced (Base)"; Decimal)
@@ -750,58 +751,57 @@ table 5108 "Sales Line Archive"
         field(5600; "FA Posting Date"; Date)
         {
             Caption = 'FA Posting Date';
-            ToolTip = 'Specifies the posting date of the related fixed asset transaction, such as a depreciation.';
+        }
+        field(5601; "FA Posting Type"; Enum "Purchase FA Posting Type")
+        {
+            Caption = 'FA Posting Type';
         }
         field(5602; "Depreciation Book Code"; Code[10])
         {
             Caption = 'Depreciation Book Code';
             TableRelation = "Depreciation Book";
-            ToolTip = 'Specifies the code for the depreciation book to which the line will be posted if you have selected Fixed Asset in the Type field for this line.';
+        }
+        field(5603; "Salvage Value"; Decimal)
+        {
+            AutoFormatType = 1;
+            Caption = 'Salvage Value';
         }
         field(5605; "Depr. until FA Posting Date"; Boolean)
         {
             Caption = 'Depr. until FA Posting Date';
-            ToolTip = 'Specifies if depreciation was calculated until the FA posting date of the line.';
+        }
+        field(5606; "Depr. Acquisition Cost"; Boolean)
+        {
+            Caption = 'Depr. Acquisition Cost';
+        }
+        field(5609; "Maintenance Code"; Code[10])
+        {
+            Caption = 'Maintenance Code';
+            TableRelation = Maintenance;
+        }
+        field(5610; "Insurance No."; Code[20])
+        {
+            Caption = 'Insurance No.';
+            TableRelation = Insurance;
+        }
+        field(5611; "Budgeted FA No."; Code[20])
+        {
+            Caption = 'Budgeted FA No.';
+            TableRelation = "Fixed Asset";
         }
         field(5612; "Duplicate in Depreciation Book"; Code[10])
         {
             Caption = 'Duplicate in Depreciation Book';
             TableRelation = "Depreciation Book";
-            ToolTip = 'Specifies a depreciation book code if you want the journal line to be posted to that depreciation book, as well as to the depreciation book in the Depreciation Book Code field.';
         }
         field(5613; "Use Duplication List"; Boolean)
         {
             Caption = 'Use Duplication List';
-            ToolTip = 'Specifies, if the type is Fixed Asset, that information on the line is to be posted to all the assets defined depreciation books. ';
         }
         field(5700; "Responsibility Center"; Code[10])
         {
             Caption = 'Responsibility Center';
             TableRelation = "Responsibility Center";
-        }
-        field(5701; "Out-of-Stock Substitution"; Boolean)
-        {
-            Caption = 'Out-of-Stock Substitution';
-        }
-        field(5702; "Substitution Available"; Boolean)
-        {
-            CalcFormula = exist("Item Substitution" where(Type = const(Item),
-                                                           "No." = field("No."),
-                                                           "Substitute Type" = const(Item)));
-            Caption = 'Substitution Available';
-            Editable = false;
-            FieldClass = FlowField;
-            ToolTip = 'Specifies whether a substitute is available for the item.';
-        }
-        field(5703; "Originally Ordered No."; Code[20])
-        {
-            Caption = 'Originally Ordered No.';
-            TableRelation = if (Type = const(Item)) Item;
-        }
-        field(5704; "Originally Ordered Var. Code"; Code[10])
-        {
-            Caption = 'Originally Ordered Var. Code';
-            TableRelation = if (Type = const(Item)) "Item Variant".Code where("Item No." = field("Originally Ordered No."));
         }
         field(5709; "Item Category Code"; Code[20])
         {
@@ -811,34 +811,30 @@ table 5108 "Sales Line Archive"
         field(5710; Nonstock; Boolean)
         {
             Caption = 'Catalog';
-            ToolTip = 'Specifies that the item on the sales line is a catalog item, which means it is not normally kept in inventory.';
         }
         field(5711; "Purchasing Code"; Code[10])
         {
             Caption = 'Purchasing Code';
             TableRelation = Purchasing;
-            ToolTip = 'Specifies the code for a special procurement method, such as drop shipment.';
         }
         field(5713; "Special Order"; Boolean)
         {
             Caption = 'Special Order';
-            ToolTip = 'Specifies that the item on the sales line is a special-order item.';
         }
-        field(5714; "Special Order Purchase No."; Code[20])
+        field(5714; "Special Order Sales No."; Code[20])
         {
-            Caption = 'Special Order Purchase No.';
-            TableRelation = if ("Special Order" = const(true)) "Purchase Header"."No." where("Document Type" = const(Order));
+            Caption = 'Special Order Sales No.';
+            TableRelation = if ("Special Order" = const(true)) "Sales Header"."No." where("Document Type" = const(Order));
         }
-        field(5715; "Special Order Purch. Line No."; Integer)
+        field(5715; "Special Order Sales Line No."; Integer)
         {
-            Caption = 'Special Order Purch. Line No.';
-            TableRelation = if ("Special Order" = const(true)) "Purchase Line"."Line No." where("Document Type" = const(Order),
-                                                                                               "Document No." = field("Special Order Purchase No."));
+            Caption = 'Special Order Sales Line No.';
+            TableRelation = if ("Special Order" = const(true)) "Sales Line"."Line No." where("Document Type" = const(Order),
+                                                                                            "Document No." = field("Special Order Sales No."));
         }
         field(5725; "Item Reference No."; Code[50])
         {
             Caption = 'Item Reference No.';
-            ToolTip = 'Specifies the referenced item number.';
         }
         field(5726; "Item Reference Unit of Measure"; Code[10])
         {
@@ -853,142 +849,144 @@ table 5108 "Sales Line Archive"
         {
             Caption = 'Item Reference Type No.';
         }
-        field(5752; "Completely Shipped"; Boolean)
+        field(5752; "Completely Received"; Boolean)
         {
-            Caption = 'Completely Shipped';
+            Caption = 'Completely Received';
         }
-        field(5790; "Requested Delivery Date"; Date)
+        field(5790; "Requested Receipt Date"; Date)
         {
-            Caption = 'Requested Delivery Date';
-            ToolTip = 'Specifies the date that your customer has asked for the order to be delivered.';
+            Caption = 'Requested Receipt Date';
         }
-        field(5791; "Promised Delivery Date"; Date)
+        field(5791; "Promised Receipt Date"; Date)
         {
-            Caption = 'Promised Delivery Date';
-            ToolTip = 'Specifies the date that you have promised to deliver the order, as a result of the Order Promising function.';
+            Caption = 'Promised Receipt Date';
         }
-        field(5792; "Shipping Time"; DateFormula)
+        field(5792; "Lead Time Calculation"; DateFormula)
         {
-            AccessByPermission = TableData "Shipping Agent Services" = R;
-            Caption = 'Shipping Time';
-            ToolTip = 'Specifies how long it takes from when the items are shipped from the warehouse to when they are delivered.';
+            AccessByPermission = TableData "Purch. Rcpt. Header" = R;
+            Caption = 'Lead Time Calculation';
         }
-        field(5793; "Outbound Whse. Handling Time"; DateFormula)
+        field(5793; "Inbound Whse. Handling Time"; DateFormula)
         {
             AccessByPermission = TableData Location = R;
-            Caption = 'Outbound Whse. Handling Time';
-            ToolTip = 'Specifies a date formula for the time it takes to get items ready to ship from this location. The time element is used in the calculation of the delivery date as follows: Shipment Date + Outbound Warehouse Handling Time = Planned Shipment Date + Shipping Time = Planned Delivery Date.';
+            Caption = 'Inbound Whse. Handling Time';
         }
-        field(5794; "Planned Delivery Date"; Date)
+        field(5794; "Planned Receipt Date"; Date)
         {
-            Caption = 'Planned Delivery Date';
-            ToolTip = 'Specifies the planned date that the shipment will be delivered at the customer''s address. If the customer requests a delivery date, the program calculates whether the items will be available for delivery on this date. If the items are available, the planned delivery date will be the same as the requested delivery date. If not, the program calculates the date that the items are available for delivery and enters this date in the Planned Delivery Date field.';
+            Caption = 'Planned Receipt Date';
         }
-        field(5795; "Planned Shipment Date"; Date)
+        field(5795; "Order Date"; Date)
         {
-            Caption = 'Planned Shipment Date';
-            ToolTip = 'Specifies the date that the shipment should ship from the warehouse. If the customer requests a delivery date, the program calculates the planned shipment date by subtracting the shipping time from the requested delivery date. If the customer does not request a delivery date or the requested delivery date cannot be met, the program calculates the content of this field by adding the shipment time to the shipping date.';
-        }
-        field(5796; "Shipping Agent Code"; Code[10])
-        {
-            AccessByPermission = TableData "Shipping Agent Services" = R;
-            Caption = 'Shipping Agent Code';
-            TableRelation = "Shipping Agent";
-            ToolTip = 'Specifies the code for the shipping agent who is transporting the items.';
-        }
-        field(5797; "Shipping Agent Service Code"; Code[10])
-        {
-            Caption = 'Shipping Agent Service Code';
-            TableRelation = "Shipping Agent Services".Code where("Shipping Agent Code" = field("Shipping Agent Code"));
-            ToolTip = 'Specifies the code for the service, such as a one-day delivery, that is offered by the shipping agent.';
+            AccessByPermission = TableData "Purch. Rcpt. Header" = R;
+            Caption = 'Order Date';
         }
         field(5800; "Allow Item Charge Assignment"; Boolean)
         {
             AccessByPermission = TableData "Item Charge" = R;
             Caption = 'Allow Item Charge Assignment';
             InitValue = true;
-            ToolTip = 'Specifies that you can assign item charges to this line.';
         }
-        field(5803; "Return Qty. to Receive"; Decimal)
+        field(5803; "Return Qty. to Ship"; Decimal)
         {
-            Caption = 'Return Qty. to Receive';
+            Caption = 'Return Qty. to Ship';
             DecimalPlaces = 0 : 5;
         }
-        field(5804; "Return Qty. to Receive (Base)"; Decimal)
+        field(5804; "Return Qty. to Ship (Base)"; Decimal)
         {
-            Caption = 'Return Qty. to Receive (Base)';
+            Caption = 'Return Qty. to Ship (Base)';
             DecimalPlaces = 0 : 5;
         }
-        field(5805; "Return Qty. Rcd. Not Invd."; Decimal)
+        field(5805; "Return Qty. Shipped Not Invd."; Decimal)
         {
-            Caption = 'Return Qty. Rcd. Not Invd.';
+            Caption = 'Return Qty. Shipped Not Invd.';
             DecimalPlaces = 0 : 5;
         }
-        field(5806; "Ret. Qty. Rcd. Not Invd.(Base)"; Decimal)
+        field(5806; "Ret. Qty. Shpd Not Invd.(Base)"; Decimal)
         {
-            Caption = 'Ret. Qty. Rcd. Not Invd.(Base)';
+            Caption = 'Ret. Qty. Shpd Not Invd.(Base)';
             DecimalPlaces = 0 : 5;
         }
-        field(5807; "Return Amt. Rcd. Not Invd."; Decimal)
+        field(5807; "Return Shpd. Not Invd."; Decimal)
         {
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
-            Caption = 'Return Amt. Rcd. Not Invd.';
+            Caption = 'Return Shpd. Not Invd.';
         }
-        field(5808; "Ret. Amt. Rcd. Not Invd. (LCY)"; Decimal)
+        field(5808; "Return Shpd. Not Invd. (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            Caption = 'Ret. Amt. Rcd. Not Invd. (LCY)';
+            Caption = 'Return Shpd. Not Invd. (LCY)';
         }
-        field(5809; "Return Qty. Received"; Decimal)
+        field(5809; "Return Qty. Shipped"; Decimal)
         {
-            Caption = 'Return Qty. Received';
+            Caption = 'Return Qty. Shipped';
             DecimalPlaces = 0 : 5;
         }
-        field(5810; "Return Qty. Received (Base)"; Decimal)
+        field(5810; "Return Qty. Shipped (Base)"; Decimal)
         {
-            Caption = 'Return Qty. Received (Base)';
+            Caption = 'Return Qty. Shipped (Base)';
             DecimalPlaces = 0 : 5;
         }
-        field(5811; "Appl.-from Item Entry"; Integer)
+        field(6200; "Non-Deductible VAT %"; Decimal)
         {
-            AccessByPermission = TableData Item = R;
-            Caption = 'Appl.-from Item Entry';
-            MinValue = 0;
-            ToolTip = 'Specifies the number of the item ledger entry that the document or journal line is applied from.';
+            Caption = 'Non-Deductible VAT %';
+            DecimalPlaces = 0 : 5;
         }
-        field(5909; "BOM Item No."; Code[20])
+        field(6201; "Non-Deductible VAT Base"; Decimal)
         {
-            Caption = 'BOM Item No.';
-            TableRelation = Item;
+            AutoFormatExpression = Rec."Currency Code";
+            Caption = 'Non-Deductible VAT Base';
         }
-        field(6600; "Return Receipt No."; Code[20])
+        field(6202; "Non-Deductible VAT Amount"; Decimal)
         {
-            Caption = 'Return Receipt No.';
+            AutoFormatExpression = Rec."Currency Code";
+            Caption = 'Non-Deductible VAT Amount';
         }
-        field(6601; "Return Receipt Line No."; Integer)
+        field(6203; "Non-Deductible VAT Diff."; Decimal)
         {
-            Caption = 'Return Receipt Line No.';
+            Caption = 'Non-Deductible VAT Difference';
+        }
+        field(6600; "Return Shipment No."; Code[20])
+        {
+            Caption = 'Return Shipment No.';
+        }
+        field(6601; "Return Shipment Line No."; Integer)
+        {
+            Caption = 'Return Shipment Line No.';
+            Editable = false;
         }
         field(6608; "Return Reason Code"; Code[10])
         {
             Caption = 'Return Reason Code';
             TableRelation = "Return Reason";
-            ToolTip = 'Specifies the code explaining why the item was returned.';
         }
         field(7000; "Price Calculation Method"; Enum "Price Calculation Method")
         {
             Caption = 'Price Calculation Method';
         }
-        field(7001; "Allow Line Disc."; Boolean)
+        field(12100; "No. of Fixed Asset Cards"; Integer)
         {
-            Caption = 'Allow Line Disc.';
-            InitValue = true;
+            BlankZero = true;
+            Caption = 'No. of Fixed Asset Cards';
+            ToolTip = 'Specifies the number of fixed assets that is being purchased.';
+            MinValue = 0;
         }
-        field(7002; "Customer Disc. Group"; Code[20])
+        field(99000755; "Overhead Rate"; Decimal)
         {
-            Caption = 'Customer Disc. Group';
-            TableRelation = "Customer Discount Group";
+            Caption = 'Overhead Rate';
+            DecimalPlaces = 0 : 5;
+        }
+        field(99000756; "MPS Order"; Boolean)
+        {
+            Caption = 'MPS Order';
+        }
+        field(99000757; "Planning Flexibility"; Enum "Reservation Planning Flexibility")
+        {
+            Caption = 'Planning Flexibility';
+        }
+        field(99000758; "Safety Lead Time"; DateFormula)
+        {
+            Caption = 'Safety Lead Time';
         }
     }
 
@@ -1001,46 +999,43 @@ table 5108 "Sales Line Archive"
         key(Key2; "Document Type", "Document No.", "Line No.", "Doc. No. Occurrence", "Version No.")
         {
         }
-        key(Key3; "Sell-to Customer No.")
+        key(Key3; "Buy-from Vendor No.")
         {
         }
-        key(Key4; "Bill-to Customer No.")
+        key(Key4; "Pay-to Vendor No.")
         {
         }
-        key(Key5; Type, "No.")
-        {
-        }
-        key(Key6; "Document No.", "Document Type", "Doc. No. Occurrence", "Version No.")
+        key(Key5; "Document No.", "Document Type", "Doc. No. Occurrence", "Version No.")
         {
             MaintainSqlIndex = false;
-            SumIndexFields = Amount, "Amount Including VAT", "Outstanding Amount", "Shipped Not Invoiced", "Outstanding Amount (LCY)", "Shipped Not Invoiced (LCY)";
+            SumIndexFields = Amount, "Amount Including VAT";
         }
     }
 
     fieldgroups
     {
-        fieldgroup(DropDown; "Document No.", "Line No.", "Version No.", "Sell-to Customer No.")
+        fieldgroup(DropDown; "Document No.", "Line No.", "Version No.", "Buy-from Vendor No.")
         {
         }
     }
 
     trigger OnDelete()
     var
-        SalesCommentLineArchive: Record "Sales Comment Line Archive";
+        PurchCommentLineArchive: Record "Purch. Comment Line Archive";
         DeferralHeaderArchive: Record "Deferral Header Archive";
     begin
-        SalesCommentLineArchive.SetRange("Document Type", Rec."Document Type");
-        SalesCommentLineArchive.SetRange("No.", Rec."Document No.");
-        SalesCommentLineArchive.SetRange("Document Line No.", Rec."Line No.");
-        SalesCommentLineArchive.SetRange("Doc. No. Occurrence", Rec."Doc. No. Occurrence");
-        SalesCommentLineArchive.SetRange("Version No.", Rec."Version No.");
-        if not SalesCommentLineArchive.IsEmpty() then
-            SalesCommentLineArchive.DeleteAll();
+        PurchCommentLineArchive.SetRange("Document Type", Rec."Document Type");
+        PurchCommentLineArchive.SetRange("No.", Rec."Document No.");
+        PurchCommentLineArchive.SetRange("Document Line No.", Rec."Line No.");
+        PurchCommentLineArchive.SetRange("Doc. No. Occurrence", Rec."Doc. No. Occurrence");
+        PurchCommentLineArchive.SetRange("Version No.", Rec."Version No.");
+        if not PurchCommentLineArchive.IsEmpty() then
+            PurchCommentLineArchive.DeleteAll();
 
         if Rec."Deferral Code" <> '' then
             DeferralHeaderArchive.DeleteHeader(
-                "Deferral Document Type"::Sales.AsInteger(), Rec."Document Type".AsInteger(),
-                Rec."Document No.", Rec."Doc. No. Occurrence", Rec."Version No.", Rec."Line No.");
+                "Deferral Document Type"::Purchase.AsInteger(),
+                Rec."Document Type".AsInteger(), Rec."Document No.", Rec."Doc. No. Occurrence", Rec."Version No.", Rec."Line No.");
     end;
 
     var
@@ -1049,13 +1044,13 @@ table 5108 "Sales Line Archive"
 
     procedure GetCaptionClass(FieldNumber: Integer): Text[80]
     var
-        SalesHeaderArchive: Record "Sales Header Archive";
+        PurchaseHeaderArchive: Record "Purchase Header Archive";
     begin
-        if not SalesHeaderArchive.Get("Document Type", "Document No.", "Doc. No. Occurrence", "Version No.") then begin
-            SalesHeaderArchive."No." := '';
-            SalesHeaderArchive.Init();
+        if not PurchaseHeaderArchive.Get("Document Type", "Document No.", "Doc. No. Occurrence", "Version No.") then begin
+            PurchaseHeaderArchive."No." := '';
+            PurchaseHeaderArchive.Init();
         end;
-        if SalesHeaderArchive."Prices Including VAT" then
+        if PurchaseHeaderArchive."Prices Including VAT" then
             exit(CopyStr('2,1,' + GetFieldCaption(FieldNumber), 1, 80));
 
         exit(CopyStr('2,0,' + GetFieldCaption(FieldNumber), 1, 80));
@@ -1065,7 +1060,7 @@ table 5108 "Sales Line Archive"
     var
         "Field": Record "Field";
     begin
-        Field.Get(DATABASE::"Sales Line", FieldNumber);
+        Field.Get(DATABASE::"Purchase Line", FieldNumber);
         exit(Field."Field Caption");
     end;
 
@@ -1081,17 +1076,17 @@ table 5108 "Sales Line Archive"
 
     procedure ShowLineComments()
     var
-        SalesCommentLineArch: Record "Sales Comment Line Archive";
-        SalesArchCommentSheet: Page "Sales Archive Comment Sheet";
+        PurchCommentLineArch: Record "Purch. Comment Line Archive";
+        PurchArchCommentSheet: Page "Purch. Archive Comment Sheet";
     begin
-        SalesCommentLineArch.SetRange("Document Type", "Document Type");
-        SalesCommentLineArch.SetRange("No.", "Document No.");
-        SalesCommentLineArch.SetRange("Document Line No.", "Line No.");
-        SalesCommentLineArch.SetRange("Doc. No. Occurrence", "Doc. No. Occurrence");
-        SalesCommentLineArch.SetRange("Version No.", "Version No.");
-        Clear(SalesArchCommentSheet);
-        SalesArchCommentSheet.SetTableView(SalesCommentLineArch);
-        SalesArchCommentSheet.RunModal();
+        PurchCommentLineArch.SetRange("Document Type", "Document Type");
+        PurchCommentLineArch.SetRange("No.", "Document No.");
+        PurchCommentLineArch.SetRange("Document Line No.", "Line No.");
+        PurchCommentLineArch.SetRange("Doc. No. Occurrence", "Doc. No. Occurrence");
+        PurchCommentLineArch.SetRange("Version No.", "Version No.");
+        Clear(PurchArchCommentSheet);
+        PurchArchCommentSheet.SetTableView(PurchCommentLineArch);
+        PurchArchCommentSheet.RunModal();
     end;
 
     procedure ShowDeferrals()
@@ -1104,38 +1099,32 @@ table 5108 "Sales Line Archive"
             exit;
 
         DeferralUtilities.OpenLineScheduleArchive(
-            "Deferral Code", "Deferral Document Type"::Sales.AsInteger(),
+            "Deferral Code", "Deferral Document Type"::Purchase.AsInteger(),
             "Document Type".AsInteger(), "Document No.", "Doc. No. Occurrence", "Version No.", "Line No.");
     end;
 
-    procedure CopyTempLines(SalesHeaderArchive: Record "Sales Header Archive"; var TempSalesLine: Record "Sales Line" temporary)
+    procedure CopyTempLines(PurchaseHeaderArchive: Record "Purchase Header Archive"; var TempPurchaseLine: Record "Purchase Line" temporary)
     var
-        SalesLineArchive: Record "Sales Line Archive";
+        PurchaseLineArchive: Record "Purchase Line Archive";
     begin
         DeleteAll();
 
-        SalesLineArchive.SetRange("Document Type", SalesHeaderArchive."Document Type");
-        SalesLineArchive.SetRange("Document No.", SalesHeaderArchive."No.");
-        SalesLineArchive.SetRange("Version No.", SalesHeaderArchive."Version No.");
-        SalesLineArchive.SetRange("Doc. No. Occurrence", SalesHeaderArchive."Doc. No. Occurrence");
-        OnCopyTempLinesOnAfterSalesLineArchiveSetFilters(SalesLineArchive, SalesHeaderArchive);
-        if SalesLineArchive.FindSet() then
+        PurchaseLineArchive.SetRange("Document Type", PurchaseHeaderArchive."Document Type");
+        PurchaseLineArchive.SetRange("Document No.", PurchaseHeaderArchive."No.");
+        PurchaseLineArchive.SetRange("Version No.", PurchaseHeaderArchive."Version No.");
+        PurchaseLineArchive.SetRange("Doc. No. Occurrence", PurchaseHeaderArchive."Doc. No. Occurrence");
+        if PurchaseLineArchive.FindSet() then
             repeat
                 Init();
-                Rec := SalesLineArchive;
+                Rec := PurchaseLineArchive;
                 Insert();
-                TempSalesLine.TransferFields(SalesLineArchive);
-                TempSalesLine.Insert();
-            until SalesLineArchive.Next() = 0;
+                TempPurchaseLine.TransferFields(PurchaseLineArchive);
+                TempPurchaseLine.Insert();
+            until PurchaseLineArchive.Next() = 0;
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopyTempLinesOnAfterSalesLineArchiveSetFilters(var SalesLineArchive: Record "Sales Line Archive"; SalesHeaderArchive: Record "Sales Header Archive")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeShowDeferrals(var SalesLineArchive: Record "Sales Line Archive"; var IsHandled: Boolean)
+    local procedure OnBeforeShowDeferrals(PurchaseLineArchive: Record "Purchase Line Archive"; var IsHandled: Boolean)
     begin
     end;
 }
