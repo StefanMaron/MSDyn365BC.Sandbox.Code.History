@@ -2,14 +2,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Setup;
+namespace Microsoft.Purchases.Setup;
 
 using Microsoft.CRM.BusinessRelation;
 using Microsoft.Foundation.Reporting;
-using Microsoft.Sales.Customer;
+using Microsoft.Purchases.Vendor;
 using System.Reflection;
 
-page 9657 "Customer Report Selections"
+page 9658 "Vendor Report Selections"
 {
     Caption = 'Document Layouts';
     DataCaptionFields = "Source No.";
@@ -33,26 +33,16 @@ page 9657 "Customer Report Selections"
                     trigger OnValidate()
                     begin
                         case Usage2 of
-                            "Custom Report Selection Sales"::Quote:
-                                Rec.Usage := "Report Selection Usage"::"S.Quote";
-                            "Custom Report Selection Sales"::"Confirmation Order":
-                                Rec.Usage := "Report Selection Usage"::"S.Order";
-                            "Custom Report Selection Sales"::Invoice:
-                                Rec.Usage := "Report Selection Usage"::"S.Invoice";
-                            "Custom Report Selection Sales"::"Credit Memo":
-                                Rec.Usage := "Report Selection Usage"::"S.Cr.Memo";
-                            "Custom Report Selection Sales"::"Customer Statement":
-                                Rec.Usage := "Report Selection Usage"::"C.Statement";
-                            "Custom Report Selection Sales"::"Job Quote":
-                                Rec.Usage := "Report Selection Usage"::JQ;
-                            "Custom Report Selection Sales"::Reminder:
-                                Rec.Usage := "Report Selection Usage"::Reminder;
-                            "Custom Report Selection Sales"::Shipment:
-                                Rec.Usage := "Report Selection Usage"::"S.Shipment";
-                            "Custom Report Selection Sales"::"Pro Forma Invoice":
-                                Rec.Usage := "Report Selection Usage"::"Pro Forma S. Invoice";
+                            Usage2::"Purchase Order":
+                                Rec.Usage := Rec.Usage::"P.Order";
+                            Usage2::"Vendor Remittance":
+                                Rec.Usage := Rec.Usage::"V.Remittance";
+                            Usage2::"Vendor Remittance - Posted Entries":
+                                Rec.Usage := Rec.Usage::"P.V.Remit.";
+                            Usage2::"Posted Return Shipment":
+                                Rec.Usage := Rec.Usage::"P.Ret.Shpt.";
                             else
-                                OnValidateUsage2OnCaseElse(Rec, Usage2.AsInteger());
+                                OnValidateUsage2OnCaseElse(Rec, Usage2);
                         end;
                     end;
                 }
@@ -60,11 +50,6 @@ page 9657 "Customer Report Selections"
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Report ID';
-
-                    trigger OnValidate()
-                    begin
-                        CurrPage.SaveRecord();
-                    end;
                 }
                 field(ReportCaption; Rec."Report Caption")
                 {
@@ -78,6 +63,7 @@ page 9657 "Customer Report Selections"
                     DrillDown = true;
                     Lookup = true;
                     Visible = false;
+
                     trigger OnDrillDown()
                     begin
                         Rec.LookupCustomReportDescription();
@@ -162,10 +148,6 @@ page 9657 "Customer Report Selections"
                         ReportManagementCodeunit: Codeunit ReportManagement;
                         IsReportLayoutSelected: Boolean;
                     begin
-                        if Rec.Sequence = 0 then begin
-                            Rec.Insert(true);
-                            Commit();
-                        end;
                         ReportLayoutListSelection.SetRange("Report ID", Rec."Report ID");
                         ReportManagementCodeunit.OnSelectReportLayout(ReportLayoutListSelection, IsReportLayoutSelected);
                         if IsReportLayoutSelected then begin
@@ -215,12 +197,12 @@ page 9657 "Customer Report Selections"
                 var
                     ReportSelections: Record "Report Selections";
                     CustomReportSelection: Record "Custom Report Selection";
-                    Customer: Record Customer;
+                    Vendor: Record Vendor;
                 begin
                     CustomReportSelection := Rec;
-                    FilterCustomerUsageReportSelections(ReportSelections);
-                    Customer.Get(Rec."Source No.");
-                    Rec.CopyFromReportSelections(ReportSelections, Database::Customer, Customer."No.");
+                    FilterVendorUsageReportSelections(ReportSelections);
+                    Vendor.Get(Rec."Source No.");
+                    Rec.CopyFromReportSelections(ReportSelections, Database::Vendor, Vendor."No.");
                     CurrPage.SetRecord(CustomReportSelection);
                 end;
             }
@@ -236,7 +218,7 @@ page 9657 "Customer Report Selections"
                 var
                     ContBusRel: Record "Contact Business Relation";
                 begin
-                    Rec.GetSendToEmailFromContactsSelection(ContBusRel."Link to Table"::Customer.AsInteger(), Rec.GetFilter("Source No."));
+                    Rec.GetSendToEmailFromContactsSelection(ContBusRel."Link to Table"::Vendor.AsInteger(), Rec.GetFilter("Source No."));
                 end;
             }
         }
@@ -264,7 +246,10 @@ page 9657 "Customer Report Selections"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
-        Rec.InitUsage();
+        // Set the default usage to the same as the page default.
+        if Rec.Usage = Rec.Usage::"S.Quote" then
+            Rec.Usage := Rec.Usage::"P.Order";
+
         MapTableUsageValueToPageValue();
     end;
 
@@ -273,63 +258,53 @@ page 9657 "Customer Report Selections"
         CouldNotFindCustomReportLayoutErr: Label 'There is no custom report layout with %1 in the description.', Comment = '%1 Description of custom report layout';
 
     protected var
-        Usage2: Enum "Custom Report Selection Sales";
+        Usage2: Enum "Report Selection Usage Vendor";
 
     local procedure MapTableUsageValueToPageValue()
+    var
+        CustomReportSelection: Record "Custom Report Selection";
     begin
         case Rec.Usage of
-            "Report Selection Usage"::"S.Quote":
-                Usage2 := "Custom Report Selection Sales"::Quote;
-            "Report Selection Usage"::"S.Order":
-                Usage2 := "Custom Report Selection Sales"::"Confirmation Order";
-            "Report Selection Usage"::"S.Invoice":
-                Usage2 := "Custom Report Selection Sales"::Invoice;
-            "Report Selection Usage"::"S.Cr.Memo":
-                Usage2 := "Custom Report Selection Sales"::"Credit Memo";
-            "Report Selection Usage"::"C.Statement":
-                Usage2 := "Custom Report Selection Sales"::"Customer Statement";
-            "Report Selection Usage"::JQ:
-                Usage2 := "Custom Report Selection Sales"::"Job Quote";
-            "Report Selection Usage"::Reminder:
-                Usage2 := "Custom Report Selection Sales"::Reminder;
-            "Report Selection Usage"::"S.Shipment":
-                Usage2 := "Custom Report Selection Sales"::Shipment;
-            "Report Selection Usage"::"Pro Forma S. Invoice":
-                Usage2 := "Custom Report Selection Sales"::"Pro Forma Invoice";
+            CustomReportSelection.Usage::"P.Order":
+                Usage2 := Usage2::"Purchase Order";
+            CustomReportSelection.Usage::"V.Remittance":
+                Usage2 := Usage2::"Vendor Remittance";
+            CustomReportSelection.Usage::"P.V.Remit.":
+                Usage2 := Usage2::"Vendor Remittance - Posted Entries";
+            CustomReportSelection.Usage::"P.Ret.Shpt.":
+                Usage2 := Usage2::"Posted Return Shipment";
+            else
+                OnMapTableUsageValueToPageValueOnCaseElse(CustomReportSelection, Usage2, Rec);
         end;
-
-        OnAfterOnMapTableUsageValueToPageValue(Rec, Usage2);
     end;
 
-    local procedure FilterCustomerUsageReportSelections(var ReportSelections: Record "Report Selections")
+    local procedure FilterVendorUsageReportSelections(var ReportSelections: Record "Report Selections")
+    var
+        CustomReportSelection: Record "Custom Report Selection";
     begin
         ReportSelections.SetFilter(
-            Usage, '%1|%2|%3|%4|%5|%6|%7|%8|%9',
-            "Report Selection Usage"::"S.Quote",
-            "Report Selection Usage"::"S.Order",
-            "Report Selection Usage"::"S.Invoice",
-            "Report Selection Usage"::"S.Cr.Memo",
-            "Report Selection Usage"::"C.Statement",
-            "Report Selection Usage"::JQ,
-            "Report Selection Usage"::Reminder,
-            "Report Selection Usage"::"S.Shipment",
-            "Report Selection Usage"::"Pro Forma S. Invoice");
+            Usage, '%1|%2|%3|%4',
+            CustomReportSelection.Usage::"P.Order",
+            CustomReportSelection.Usage::"V.Remittance",
+            CustomReportSelection.Usage::"P.V.Remit.",
+            CustomReportSelection.Usage::"P.Ret.Shpt.");
 
-        OnAfterFilterCustomerUsageReportSelections(ReportSelections);
+        OnAfterFilterVendorUsageReportSelections(ReportSelections);
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterOnMapTableUsageValueToPageValue(CustomReportSelection: Record "Custom Report Selection"; var Usage2: Enum "Custom Report Selection Sales")
+    local procedure OnAfterFilterVendorUsageReportSelections(var ReportSelections: Record "Report Selections")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnValidateUsage2OnCaseElse(var CustomReportSelection: Record "Custom Report Selection"; ReportUsage: Option)
+    local procedure OnMapTableUsageValueToPageValueOnCaseElse(CustomReportSelection: Record "Custom Report Selection"; var ReportUsage: Enum "Report Selection Usage Vendor"; Rec: Record "Custom Report Selection")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterFilterCustomerUsageReportSelections(var ReportSelections: Record "Report Selections")
+    local procedure OnValidateUsage2OnCaseElse(var CustomReportSelection: Record "Custom Report Selection"; ReportUsage: Enum "Report Selection Usage Vendor")
     begin
     end;
 }
+

@@ -2,23 +2,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.History;
+namespace Microsoft.Purchases.Archive;
 
 using Microsoft.Finance.Dimension;
-using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Navigate;
 using Microsoft.Inventory.Item.Catalog;
-using Microsoft.Utilities;
-using System.Environment.Configuration;
 
-page 133 "Posted Sales Invoice Subform"
+page 6645 "Purch Return Order Arc Subform"
 {
-    AutoSplitKey = true;
     Caption = 'Lines';
     Editable = false;
-    LinksAllowed = false;
     PageType = ListPart;
-    SourceTable = "Sales Invoice Line";
+    SourceTable = "Purchase Line Archive";
+    SourceTableView = where("Document Type" = const("Return Order"));
 
     layout
     {
@@ -32,16 +28,9 @@ page 133 "Posted Sales Invoice Subform"
                     ApplicationArea = Advanced;
                     ToolTip = 'Specifies the line type.';
                 }
-                field(FilteredTypeField; Rec.FormatType())
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Type';
-                    ToolTip = 'Specifies the type of transaction that was posted with the line.';
-                    Visible = IsFoundation;
-                }
                 field("No."; Rec."No.")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = PurchReturnOrder;
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
                 field("Item Reference No."; Rec."Item Reference No.")
@@ -50,52 +39,58 @@ page 133 "Posted Sales Invoice Subform"
                     ApplicationArea = Suite, ItemReferences;
                     ToolTip = 'Specifies the referenced item number.';
                 }
-                field("IC Partner Code"; Rec."IC Partner Code")
-                {
-                    ApplicationArea = Intercompany;
-                    ToolTip = 'Specifies the code of the intercompany partner that the transaction is related to if the entry was created from an intercompany transaction.';
-                    Visible = false;
-                }
                 field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = Planning;
                     ToolTip = 'Specifies the variant of the item on the line.';
                     Visible = false;
                 }
+                field(Nonstock; Rec.Nonstock)
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    ToolTip = 'Specifies that this item is a catalog item.';
+                    Visible = false;
+                }
                 field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = PurchReturnOrder;
                     ToolTip = 'Specifies the vendor''s or customer''s trade type to link transactions made for this business partner with the appropriate general ledger account according to the general posting setup.';
                     Visible = false;
                 }
                 field("Gen. Prod. Posting Group"; Rec."Gen. Prod. Posting Group")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = PurchReturnOrder;
                     ToolTip = 'Specifies the item''s product type to link transactions made for this item with the appropriate general ledger account according to the general posting setup.';
                     Visible = false;
                 }
                 field("VAT Bus. Posting Group"; Rec."VAT Bus. Posting Group")
                 {
-                    ApplicationArea = VAT;
+                    ApplicationArea = PurchReturnOrder;
                     ToolTip = 'Specifies the VAT specification of the involved customer or vendor to link transactions made for this record with the appropriate general ledger account according to the VAT posting setup.';
                     Visible = false;
                 }
                 field("VAT Prod. Posting Group"; Rec."VAT Prod. Posting Group")
                 {
-                    ApplicationArea = VAT;
+                    ApplicationArea = PurchReturnOrder;
                     ToolTip = 'Specifies the VAT specification of the involved item or resource to link transactions made for this record with the appropriate general ledger account according to the VAT posting setup.';
                     Visible = false;
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies a description of the product that was sold.';
+                    ApplicationArea = PurchReturnOrder;
+                    ToolTip = 'Specifies a description of the purchase return order. ';
                 }
                 field("Description 2"; Rec."Description 2")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = PurchReturnOrder;
                     Importance = Additional;
                     ToolTip = 'Specifies information in addition to the description.';
+                    Visible = false;
+                }
+                field("Drop Shipment"; Rec."Drop Shipment")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    ToolTip = 'Specifies if your vendor ships the items directly to your customer.';
                     Visible = false;
                 }
                 field("Return Reason Code"; Rec."Return Reason Code")
@@ -107,24 +102,17 @@ page 133 "Posted Sales Invoice Subform"
                 field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = Location;
-                    ToolTip = 'Specifies the inventory location from which the items sold should be picked and where the inventory decrease is registered.';
-                    Visible = false;
-                }
-                field("Bin Code"; Rec."Bin Code")
-                {
-                    ApplicationArea = Warehouse;
-                    ToolTip = 'Specifies the bin where the items are picked or put away.';
-                    Visible = false;
+                    ToolTip = 'Specifies a code for the location where you want the items to be placed when they are received.';
                 }
                 field(Quantity; Rec.Quantity)
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = PurchReturnOrder;
                     BlankZero = true;
-                    ToolTip = 'Specifies the number of units of the item specified on the line.';
+                    ToolTip = 'Specifies how many units are being returned.';
                 }
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = Suite;
                     ToolTip = 'Specifies how each unit of the item or resource is measured, such as in pieces or hours. By default, the value in the Base Unit of Measure field on the item or resource card is inserted.';
                 }
                 field("Unit of Measure"; Rec."Unit of Measure")
@@ -133,63 +121,133 @@ page 133 "Posted Sales Invoice Subform"
                     ToolTip = 'Specifies the name of the item or resource''s unit of measure, such as piece or hour.';
                     Visible = false;
                 }
+                field("Direct Unit Cost"; Rec."Direct Unit Cost")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    BlankZero = true;
+                    ToolTip = 'Specifies the cost of one unit of the selected item or resource.';
+                }
+                field("Indirect Cost %"; Rec."Indirect Cost %")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    ToolTip = 'Specifies the percentage of the item''s last purchase cost that includes indirect costs, such as freight that is associated with the purchase of the item.';
+                    Visible = false;
+                }
                 field("Unit Cost (LCY)"; Rec."Unit Cost (LCY)")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = PurchReturnOrder;
                     ToolTip = 'Specifies the cost, in LCY, of one unit of the item or resource on the line.';
                     Visible = false;
                 }
-                field("Unit Price"; Rec."Unit Price")
+                field("Unit Price (LCY)"; Rec."Unit Price (LCY)")
                 {
-                    ApplicationArea = Basic, Suite;
-                    BlankZero = true;
-                    ToolTip = 'Specifies the price of one unit of the item or resource. You can enter a price manually or have it entered according to the Price/Profit Calculation field on the related card.';
-                }
-                field("VAT %"; Rec."VAT %")
-                {
-                    ApplicationArea = VAT;
-                    ToolTip = 'Specifies the VAT %.';
+                    ApplicationArea = PurchReturnOrder;
+                    ToolTip = 'Specifies the price, in LCY, of one unit of the item or resource. You can enter a price manually or have it entered according to the Price/Profit Calculation field on the related card.';
                     Visible = false;
-                }
-                field("Tax Liable"; Rec."Tax Liable")
-                {
-                    ApplicationArea = SalesTax;
-                    ToolTip = 'Specifies if the customer or vendor is liable for sales tax.';
-                    Visible = false;
-                }
-                field("Tax Area Code"; Rec."Tax Area Code")
-                {
-                    ApplicationArea = SalesTax;
-                    ToolTip = 'Specifies the tax area that is used to calculate and post sales tax.';
-                    Visible = false;
-                }
-                field("Tax Group Code"; Rec."Tax Group Code")
-                {
-                    ApplicationArea = SalesTax;
-                    ToolTip = 'Specifies the tax group that is used to calculate and post sales tax.';
-                }
-                field("Line Discount %"; Rec."Line Discount %")
-                {
-                    ApplicationArea = Basic, Suite;
-                    BlankZero = true;
-                    ToolTip = 'Specifies the discount percentage that is granted for the item on the line.';
                 }
                 field("Line Amount"; Rec."Line Amount")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = PurchReturnOrder;
                     BlankZero = true;
                     ToolTip = 'Specifies the net amount, excluding any invoice discount amount, that must be paid for products on the line.';
                 }
+                field("Line Discount %"; Rec."Line Discount %")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    BlankZero = true;
+                    ToolTip = 'Specifies the discount percentage that is granted for the item on the line.';
+                }
+                field("Return Qty. to Ship"; Rec."Return Qty. to Ship")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    BlankZero = true;
+                    ToolTip = 'Specifies the quantity of items that remains to be shipped.';
+                }
+                field("Return Qty. Shipped"; Rec."Return Qty. Shipped")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    BlankZero = true;
+                    ToolTip = 'Specifies how many units of the item on the line have been posted as shipped.';
+                }
                 field("Line Discount Amount"; Rec."Line Discount Amount")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = PurchReturnOrder;
                     ToolTip = 'Specifies the discount amount that is granted for the item on the line.';
                     Visible = false;
                 }
                 field("Allow Invoice Disc."; Rec."Allow Invoice Disc.")
                 {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies whether the invoice line could have been included in a possible invoice discount calculation.';
+                    ApplicationArea = PurchReturnOrder;
+                    ToolTip = 'Specifies if the invoice line is included when the invoice discount is calculated.';
+                    Visible = false;
+                }
+                field("Inv. Discount Amount"; Rec."Inv. Discount Amount")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    ToolTip = 'Specifies the total calculated invoice discount amount for the line.';
+                    Visible = false;
+                }
+                field("Qty. to Receive"; Rec."Qty. to Receive")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    BlankZero = true;
+                    ToolTip = 'Specifies the quantity of items that remains to be received.';
+                }
+                field("Quantity Received"; Rec."Quantity Received")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    BlankZero = true;
+                    ToolTip = 'Specifies how many units of the item on the line have been posted as received.';
+                }
+                field("Qty. to Invoice"; Rec."Qty. to Invoice")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    BlankZero = true;
+                    ToolTip = 'Specifies the quantity that remains to be invoiced. It is calculated as Quantity - Qty. Invoiced.';
+                }
+                field("Quantity Invoiced"; Rec."Quantity Invoiced")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    BlankZero = true;
+                    ToolTip = 'Specifies how many units of the item on the line have been posted as invoiced.';
+                }
+                field("Allow Item Charge Assignment"; Rec."Allow Item Charge Assignment")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    ToolTip = 'Specifies that you can assign item charges to this line.';
+                    Visible = false;
+                }
+                field("Requested Receipt Date"; Rec."Requested Receipt Date")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    ToolTip = 'Specifies the requested date of receipt for the purchase return order.';
+                    Visible = false;
+                }
+                field("Promised Receipt Date"; Rec."Promised Receipt Date")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    ToolTip = 'Specifies the date that the vendor has promised to deliver the order.';
+                    Visible = false;
+                }
+                field("Planned Receipt Date"; Rec."Planned Receipt Date")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    ToolTip = 'Specifies the date when the item is planned to arrive in inventory. Forward calculation: planned receipt date = order date + vendor lead time (per the vendor calendar and rounded to the next working day in first the vendor calendar and then the location calendar). If no vendor calendar exists, then: planned receipt date = order date + vendor lead time (per the location calendar). Backward calculation: order date = planned receipt date - vendor lead time (per the vendor calendar and rounded to the previous working day in first the vendor calendar and then the location calendar). If no vendor calendar exists, then: order date = planned receipt date - vendor lead time (per the location calendar).';
+                }
+                field("Expected Receipt Date"; Rec."Expected Receipt Date")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    ToolTip = 'Specifies the date on which the received items were expected.';
+                }
+                field("Order Date"; Rec."Order Date")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    ToolTip = 'Specifies the date when the order was created.';
+                }
+                field("Lead Time Calculation"; Rec."Lead Time Calculation")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    ToolTip = 'Specifies a date formula for the amount of time it takes to replenish the item.';
                     Visible = false;
                 }
                 field("Job No."; Rec."Job No.")
@@ -198,28 +256,45 @@ page 133 "Posted Sales Invoice Subform"
                     ToolTip = 'Specifies the number of the related project.';
                     Visible = false;
                 }
-                field("Job Task No."; Rec."Job Task No.")
+                field("Planning Flexibility"; Rec."Planning Flexibility")
                 {
-                    ApplicationArea = Jobs;
-                    ToolTip = 'Specifies the number of the related project task.';
+                    ApplicationArea = Planning;
+                    ToolTip = 'Specifies whether the supply represented by this line is considered by the planning system when calculating action messages.';
                     Visible = false;
                 }
-                field("Job Contract Entry No."; Rec."Job Contract Entry No.")
+                field("Inbound Whse. Handling Time"; Rec."Inbound Whse. Handling Time")
                 {
-                    ApplicationArea = Jobs;
-                    ToolTip = 'Specifies the entry number of the project planning line that the sales line is linked to.';
+                    ApplicationArea = Warehouse;
+                    ToolTip = 'Specifies the time it takes to make items part of available inventory, after the items have been posted as received.';
+                    Visible = false;
+                }
+                field("Blanket Order No."; Rec."Blanket Order No.")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    ToolTip = 'Specifies the number of the blanket order that the record originates from.';
+                    Visible = false;
+                }
+                field("Blanket Order Line No."; Rec."Blanket Order Line No.")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    ToolTip = 'Specifies the number of the blanket order line that the record originates from.';
                     Visible = false;
                 }
                 field("Appl.-to Item Entry"; Rec."Appl.-to Item Entry")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = PurchReturnOrder;
                     ToolTip = 'Specifies the number of the item ledger entry that the document or journal line is applied to.';
                     Visible = false;
                 }
                 field("Deferral Code"; Rec."Deferral Code")
                 {
-                    ApplicationArea = Suite;
-                    ToolTip = 'Specifies the deferral template that governs how revenue earned with this sales document is deferred to the different accounting periods when the good or service was delivered.';
+                    ApplicationArea = PurchReturnOrder;
+                    ToolTip = 'Specifies the deferral template that governs how expenses paid with this purchase document are deferred to the different accounting periods when the expenses were incurred.';
+                }
+                field("Returns Deferral Start Date"; Rec."Returns Deferral Start Date")
+                {
+                    ApplicationArea = PurchReturnOrder;
+                    ToolTip = 'Specifies the starting date of the returns deferral period.';
                 }
                 field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                 {
@@ -233,54 +308,60 @@ page 133 "Posted Sales Invoice Subform"
                     ToolTip = 'Specifies the code for Shortcut Dimension 2, which is one of two global dimension codes that you set up in the General Ledger Setup window.';
                     Visible = DimVisible2;
                 }
-                field("ShortcutDimCode[3]"; ShortcutDimCode[3])
+                field(ShortcutDimCode3; ShortcutDimCode[3])
                 {
                     ApplicationArea = Dimensions;
+                    ToolTip = 'Specifies the dimension value code that is linked to the purchase line archive';
                     CaptionClass = '1,2,3';
                     TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
                                                                   "Dimension Value Type" = const(Standard),
                                                                   Blocked = const(false));
                     Visible = DimVisible3;
                 }
-                field("ShortcutDimCode[4]"; ShortcutDimCode[4])
+                field(ShortcutDimCode4; ShortcutDimCode[4])
                 {
                     ApplicationArea = Dimensions;
+                    ToolTip = 'Specifies the dimension value code that is linked to the purchase line archive';
                     CaptionClass = '1,2,4';
                     TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
                                                                   "Dimension Value Type" = const(Standard),
                                                                   Blocked = const(false));
                     Visible = DimVisible4;
                 }
-                field("ShortcutDimCode[5]"; ShortcutDimCode[5])
+                field(ShortcutDimCode5; ShortcutDimCode[5])
                 {
                     ApplicationArea = Dimensions;
+                    ToolTip = 'Specifies the dimension value code that is linked to the purchase line archive';
                     CaptionClass = '1,2,5';
                     TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
                                                                   "Dimension Value Type" = const(Standard),
                                                                   Blocked = const(false));
                     Visible = DimVisible5;
                 }
-                field("ShortcutDimCode[6]"; ShortcutDimCode[6])
+                field(ShortcutDimCode6; ShortcutDimCode[6])
                 {
                     ApplicationArea = Dimensions;
+                    ToolTip = 'Specifies the dimension value code that is linked to the purchase line archive';
                     CaptionClass = '1,2,6';
                     TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
                                                                   "Dimension Value Type" = const(Standard),
                                                                   Blocked = const(false));
                     Visible = DimVisible6;
                 }
-                field("ShortcutDimCode[7]"; ShortcutDimCode[7])
+                field(ShortcutDimCode7; ShortcutDimCode[7])
                 {
                     ApplicationArea = Dimensions;
+                    ToolTip = 'Specifies the dimension value code that is linked to the purchase line archive';
                     CaptionClass = '1,2,7';
                     TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
                                                                   "Dimension Value Type" = const(Standard),
                                                                   Blocked = const(false));
                     Visible = DimVisible7;
                 }
-                field("ShortcutDimCode[8]"; ShortcutDimCode[8])
+                field(ShortcutDimCode8; ShortcutDimCode[8])
                 {
                     ApplicationArea = Dimensions;
+                    ToolTip = 'Specifies the dimension value code that is linked to the purchase line archive';
                     CaptionClass = '1,2,8';
                     TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
                                                                   "Dimension Value Type" = const(Standard),
@@ -291,82 +372,27 @@ page 133 "Posted Sales Invoice Subform"
                 {
                     Caption = 'Unit Gross Weight';
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the gross weight of one unit of the item. In the sales statistics window, the gross weight on the line is included in the total gross weight of all the lines for the particular sales document.';
+                    ToolTip = 'Specifies the gross weight of one unit of the item. In the purchase statistics window, the gross weight on the line is included in the total gross weight of all the lines for the particular purchase document.';
                     Visible = false;
                 }
                 field("Net Weight"; Rec."Net Weight")
                 {
                     Caption = 'Unit Net Weight';
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the net weight of one unit of the item. In the sales statistics window, the net weight on the line is included in the total net weight of all the lines for the particular sales document.';
+                    ToolTip = 'Specifies the net weight of one unit of the item. In the purchase statistics window, the net weight on the line is included in the total net weight of all the lines for the particular purchase document.';
                     Visible = false;
                 }
                 field("Unit Volume"; Rec."Unit Volume")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the volume of one unit of the item. In the sales statistics window, the volume of one unit of the item on the line is included in the total volume of all the lines for the particular sales document.';
+                    ToolTip = 'Specifies the volume of one unit of the item. In the purchase statistics window, the volume of one unit of the item on the line is included in the total volume of all the lines for the particular purchase document.';
                     Visible = false;
                 }
                 field("Units per Parcel"; Rec."Units per Parcel")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the number of units per parcel of the item. In the sales statistics window, the number of units per parcel on the line helps to determine the total number of units for all the lines for the particular sales document.';
+                    ToolTip = 'Specifies the number of units per parcel of the item. In the purchase statistics window, the number of units per parcel on the line helps to determine the total number of units for all the lines for the particular purchase document.';
                     Visible = false;
-                }
-            }
-            group(Control28)
-            {
-                ShowCaption = false;
-                group(Control23)
-                {
-                    ShowCaption = false;
-                    field("Invoice Discount Amount"; TotalSalesInvoiceHeader."Invoice Discount Amount")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        AutoFormatExpression = TotalSalesInvoiceHeader."Currency Code";
-                        AutoFormatType = 1;
-                        CaptionClass = DocumentTotals.GetInvoiceDiscAmountWithVATCaption(TotalSalesInvoiceHeader."Prices Including VAT");
-                        Caption = 'Invoice Discount Amount';
-                        Editable = false;
-                        ToolTip = 'Specifies a discount amount that is deducted from the value of the Total Incl. VAT field, based on sales lines where the Allow Invoice Disc. field is selected.';
-                    }
-                }
-                group(Control9)
-                {
-                    ShowCaption = false;
-                    field("Total Amount Excl. VAT"; TotalSalesInvoiceHeader.Amount)
-                    {
-                        ApplicationArea = Basic, Suite;
-                        AutoFormatExpression = TotalSalesInvoiceHeader."Currency Code";
-                        AutoFormatType = 1;
-                        CaptionClass = DocumentTotals.GetTotalExclVATCaption(TotalSalesInvoiceHeader."Currency Code");
-                        Caption = 'Total Amount Excl. VAT';
-                        DrillDown = false;
-                        Editable = false;
-                        ToolTip = 'Specifies the sum of the value in the Line Amount Excl. VAT field on all lines in the document minus any discount amount in the Invoice Discount Amount field.';
-                    }
-                    field("Total VAT Amount"; VATAmount)
-                    {
-                        ApplicationArea = Basic, Suite;
-                        AutoFormatExpression = TotalSalesInvoiceHeader."Currency Code";
-                        AutoFormatType = 1;
-                        CaptionClass = DocumentTotals.GetTotalVATCaption(TotalSalesInvoiceHeader."Currency Code");
-                        Caption = 'Total VAT';
-                        Editable = false;
-                        ToolTip = 'Specifies the sum of VAT amounts on all lines in the document.';
-                    }
-                    field("Total Amount Incl. VAT"; TotalSalesInvoiceHeader."Amount Including VAT")
-                    {
-                        ApplicationArea = Basic, Suite;
-                        AutoFormatExpression = TotalSalesInvoiceHeader."Currency Code";
-                        AutoFormatType = 1;
-                        CaptionClass = DocumentTotals.GetTotalInclVATCaption(TotalSalesInvoiceHeader."Currency Code");
-                        Caption = 'Total Amount Incl. VAT';
-                        Editable = false;
-                        Style = Strong;
-                        StyleExpr = true;
-                        ToolTip = 'Specifies the sum of the value in the Line Amount Incl. VAT field on all lines in the document minus any discount amount in the Invoice Discount Amount field.';
-                    }
                 }
             }
         }
@@ -406,33 +432,7 @@ page 133 "Posted Sales Invoice Subform"
                         Rec.ShowLineComments();
                     end;
                 }
-                action(ItemTrackingEntries)
-                {
-                    ApplicationArea = ItemTracking;
-                    Caption = 'Item &Tracking Entries';
-                    Image = ItemTrackingLedger;
-                    ToolTip = 'View serial, lot or package numbers that are assigned to items.';
-
-                    trigger OnAction()
-                    begin
-                        Rec.ShowItemTrackingLines();
-                    end;
-                }
-                action(ItemShipmentLines)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Item Shipment &Lines';
-                    Image = ShipmentLines;
-                    ToolTip = 'View posted sales shipments for the item.';
-
-                    trigger OnAction()
-                    begin
-                        if not (Rec.Type in [Rec.Type::Item, Rec.Type::"Charge (Item)"]) then
-                            Rec.TestField(Type);
-                        Rec.ShowItemShipmentLines();
-                    end;
-                }
-                action(DocumentLineTracking)
+                action("Document &Line Tracking")
                 {
                     ApplicationArea = Basic, Suite;
                     Caption = 'Document &Line Tracking';
@@ -446,66 +446,33 @@ page 133 "Posted Sales Invoice Subform"
                 }
                 action(DeferralSchedule)
                 {
-                    ApplicationArea = Suite;
+                    ApplicationArea = PurchReturnOrder;
                     Caption = 'Deferral Schedule';
-                    Enabled = Rec."Deferral Code" <> '';
                     Image = PaymentPeriod;
-                    ToolTip = 'View the deferral schedule that governs how revenue made with this sales document was deferred to different accounting periods when the document was posted.';
+                    ToolTip = 'View the deferral schedule that governs how expenses paid with this purchase document were deferred to different accounting periods when the document was posted.';
 
                     trigger OnAction()
                     begin
                         Rec.ShowDeferrals();
                     end;
                 }
-                action(DocAttach)
-                {
-                    ApplicationArea = All;
-                    Caption = 'Attachments';
-                    Image = Attach;
-                    ToolTip = 'Add a file as an attachment. You can attach images as well as documents.';
-
-                    trigger OnAction()
-                    var
-                        DocumentAttachmentDetails: Page "Document Attachment Details";
-                        RecRef: RecordRef;
-                    begin
-                        RecRef.GetTable(Rec);
-                        DocumentAttachmentDetails.OpenForRecRef(RecRef);
-                        DocumentAttachmentDetails.RunModal();
-                    end;
-                }
             }
         }
     }
-
-    trigger OnAfterGetCurrRecord()
-    begin
-        DocumentTotals.CalculatePostedSalesInvoiceTotals(TotalSalesInvoiceHeader, VATAmount, Rec);
-    end;
-
-    trigger OnAfterGetRecord()
-    begin
-        Rec.ShowShortcutDimCode(ShortcutDimCode);
-    end;
-
-    trigger OnInit()
-    var
-        ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
-    begin
-        IsFoundation := ApplicationAreaMgmtFacade.IsFoundationEnabled();
-    end;
 
     trigger OnOpenPage()
     begin
         SetDimensionsVisibility();
     end;
 
+    trigger OnAfterGetRecord()
     var
-        DocumentTotals: Codeunit "Document Totals";
-        IsFoundation: Boolean;
+        DimMgt: Codeunit DimensionManagement;
+    begin
+        DimMgt.GetShortcutDimensions(Rec."Dimension Set ID", ShortcutDimCode);
+    end;
 
     protected var
-        TotalSalesInvoiceHeader: Record "Sales Invoice Header";
         ShortcutDimCode: array[8] of Code[20];
         DimVisible1: Boolean;
         DimVisible2: Boolean;
@@ -515,16 +482,15 @@ page 133 "Posted Sales Invoice Subform"
         DimVisible6: Boolean;
         DimVisible7: Boolean;
         DimVisible8: Boolean;
-        VATAmount: Decimal;
 
     procedure ShowDocumentLineTracking()
     var
-        DocumentLineTrackingPage: Page "Document Line Tracking";
+        DocumentLineTracking: Page "Document Line Tracking";
     begin
-        Clear(DocumentLineTrackingPage);
-        DocumentLineTrackingPage.SetSourceDoc(
-          "Document Line Source Type"::"Sales Invoice", Rec."Document No.", Rec."Line No.", Rec."Blanket Order No.", Rec."Blanket Order Line No.", Rec."Order No.", Rec."Order Line No.");
-        DocumentLineTrackingPage.RunModal();
+        Clear(DocumentLineTracking);
+        DocumentLineTracking.SetSourceDoc(
+            "Document Line Source Type"::"Purchase Return Order", Rec."Document No.", Rec."Line No.", Rec."Blanket Order No.", Rec."Blanket Order Line No.", '', 0);
+        DocumentLineTracking.RunModal();
     end;
 
     local procedure SetDimensionsVisibility()
@@ -544,13 +510,6 @@ page 133 "Posted Sales Invoice Subform"
           DimVisible1, DimVisible2, DimVisible3, DimVisible4, DimVisible5, DimVisible6, DimVisible7, DimVisible8);
 
         Clear(DimMgt);
-
-        OnAfterSetDimensionsVisibility();
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnAfterSetDimensionsVisibility()
-    begin
     end;
 }
 

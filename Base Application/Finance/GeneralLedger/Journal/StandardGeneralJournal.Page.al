@@ -2,13 +2,13 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Finance.GeneralLedger.Journal;
+namespace Microsoft.Purchases.Document;
 
-page 751 "Standard General Journal"
+page 175 "Standard Purchase Code Card"
 {
-    Caption = 'Standard General Journal';
+    Caption = 'Standard Purchase Code Card';
     PageType = ListPlus;
-    SourceTable = "Standard General Journal";
+    SourceTable = "Standard Purchase Code";
 
     layout
     {
@@ -20,19 +20,23 @@ page 751 "Standard General Journal"
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = Suite;
-                    ToolTip = 'Specifies a code to identify the standard general journal that you are about to save.';
+                    ToolTip = 'Specifies a code which identifies this standard purchase code.';
                 }
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = Suite;
-                    ToolTip = 'Specifies a text that indicates the purpose of the standard general journal.';
+                    ToolTip = 'Specifies a description of the standard purchase code.';
+                }
+                field("Currency Code"; Rec."Currency Code")
+                {
+                    ApplicationArea = Suite;
+                    ToolTip = 'Specifies the currency code for the amounts on the standard purchase lines.';
                 }
             }
-            part(StdGenJnlLines; "Standard Gen. Journal Subform")
+            part(StdPurchaseLines; "Standard Purchase Code Subform")
             {
                 ApplicationArea = Suite;
-                SubPageLink = "Journal Template Name" = field("Journal Template Name"),
-                              "Standard Journal Code" = field(Code);
+                SubPageLink = "Standard Purchase Code" = field(Code);
             }
         }
         area(factboxes)
@@ -53,11 +57,5 @@ page 751 "Standard General Journal"
     actions
     {
     }
-
-    trigger OnInsertRecord(BelowxRec: Boolean): Boolean
-    begin
-        if xRec.Code = '' then
-            Rec.SetRange(Code, Rec.Code);
-    end;
 }
 

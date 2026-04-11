@@ -2,17 +2,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Receivables;
+namespace Microsoft.Purchases.Payables;
 
-using Microsoft.Sales.Customer;
+using Microsoft.Purchases.Vendor;
 
-query 262 "Cust. Ledger Entries"
+query 263 "Vendor Ledger Entries"
 {
-    Caption = 'Cust. Ledger Entries';
+    Caption = 'Vendor Ledger Entries';
 
     elements
     {
-        dataitem(Cust_Ledger_Entry; "Cust. Ledger Entry")
+        dataitem(Vendor_Ledger_Entry; "Vendor Ledger Entry")
         {
             column(Entry_No; "Entry No.")
             {
@@ -20,7 +20,7 @@ query 262 "Cust. Ledger Entries"
             column(Transaction_No; "Transaction No.")
             {
             }
-            column(Customer_No; "Customer No.")
+            column(Vendor_No; "Vendor No.")
             {
             }
             column(Posting_Date; "Posting Date")
@@ -41,7 +41,7 @@ query 262 "Cust. Ledger Entries"
             column(Document_No; "Document No.")
             {
             }
-            column(Salesperson_Code; "Salesperson Code")
+            column(Purchaser_Code; "Purchaser Code")
             {
             }
             column(Source_Code; "Source Code")
@@ -89,10 +89,10 @@ query 262 "Cust. Ledger Entries"
             column(Dimension_Set_ID; "Dimension Set ID")
             {
             }
-            dataitem(Customer; Customer)
+            dataitem(Vendor; Vendor)
             {
-                DataItemLink = "No." = Cust_Ledger_Entry."Customer No.";
-                column(Customer_Name; Name)
+                DataItemLink = "No." = Vendor_Ledger_Entry."Vendor No.";
+                column(Vendor_Name; Name)
                 {
                 }
             }
