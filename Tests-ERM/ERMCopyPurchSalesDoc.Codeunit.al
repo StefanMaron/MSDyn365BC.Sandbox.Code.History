@@ -37,6 +37,7 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         ValueMustBeEqualErr: Label '%1 must be equal to %2 in the %3.', Comment = '%1 = Field Caption , %2 = Expected Value, %3 = Table Caption';
         GLEntryExistLbl: Label 'G/L Entry with zero amount is posted.';
         CostAmountErr: Label '%1 must be %2 in %3.', Comment = '%1= Field Name, %2= Field Value, %3= Table name.';
+        SalesLineQtyToShipErr: Label 'Sales Line qty. to ship must not be zero';
 
 #if not CLEAN25
     [Test]
@@ -8617,6 +8618,53 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
             exit(true);
     end;
 
+    local procedure VerifySalesLineQtyToShip(SalesHeader: Record "Sales Header")
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        SalesLine.Reset();
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.FindFirst();
+        Assert.AreNotEqual(SalesLine."Qty. to Ship", 0, SalesLineQtyToShipErr);
+    end;
+
+    local procedure ModifySalesReturnOrderLine(ItemNo: Code[20]; SalesHeader2: Record "Sales Header")
+    var
+        SalesLine: Record "Sales Line";
+        ItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        ItemLedgerEntry.Reset();
+        ItemLedgerEntry.SetRange("Item No.", ItemNo);
+        if ItemLedgerEntry.FindFirst() then;
+
+        SalesLine.Reset();
+        SalesLine.SetRange("Document Type", SalesHeader2."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader2."No.");
+        SalesLine.SetRange(Quantity, 0);
+        if SalesLine.FindSet() then
+            SalesLine.DeleteAll(true);
+
+        SalesLine.Reset();
+        SalesLine.SetRange("Document Type", SalesHeader2."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader2."No.");
+        SalesLine.SetFilter(Quantity, '<>%1', 0);
+        if SalesLine.FindFirst() then
+            SalesLine.Validate("Appl.-from Item Entry", ItemLedgerEntry."Entry No.");
+        SalesLine.Modify(true);
+    end;
+
+    local procedure SalesCopyDocument(SalesHeader: Record "Sales Header"; DocumentNo: Code[20]; DocumentType: Enum "Sales Document Type From")
+    var
+        CopySalesDocument: Report "Copy Sales Document";
+    begin
+        Clear(CopySalesDocument);
+        CopySalesDocument.SetSalesHeader(SalesHeader);
+        CopySalesDocument.SetParameters(DocumentType, DocumentNo, true, false);
+        CopySalesDocument.UseRequestPage(false);
+        CopySalesDocument.Run();
+    end;
+
     [RequestPageHandler]
     [Scope('OnPrem')]
     procedure CopySalesDocReportHandlerOKWithEmptyDocumentNo(var CopySalesDocument: TestRequestPage "Copy Sales Document")
@@ -8715,5 +8763,11 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         CopySalesDocument.RecalculateLines.SetValue(ValueFromQueue);
 
         CopySalesDocument.OK().Invoke();
+    end;
+
+    [StrMenuHandler]
+    procedure ReceiveAndInvoiceSalesReturnOrderStrMenuHandler(Options: Text[1024]; var Choice: Integer; Instructions: Text[1024])
+    begin
+        Choice := 3; //Sales Return Order - Receive and Invoice
     end;
 }
