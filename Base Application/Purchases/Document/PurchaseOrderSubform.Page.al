@@ -197,6 +197,7 @@ page 54 "Purchase Order Subform"
 
                     trigger OnValidate()
                     begin
+                        ForceTotalsCalculation();
                         DeltaUpdateTotals();
                     end;
                 }
