@@ -6665,6 +6665,19 @@ codeunit 136302 "Job Consumption Purchase"
         PurchaseLine.Modify(true);
     end;
 
+    local procedure CreateCorrectiveCreditMemoFromPostedInvoice(PurchInvHeader: Record "Purch. Inv. Header"; var PurchCredMemoHeader: Record "Purchase Header")
+    var
+        CopyDocumentMgt: Codeunit "Copy Document Mgt.";
+    begin
+        LibraryPurchase.CreatePurchHeader(
+          PurchCredMemoHeader, PurchCredMemoHeader."Document Type"::"Credit Memo", PurchInvHeader."Buy-from Vendor No.");
+        PurchCredMemoHeader."Vendor Cr. Memo No." := PurchInvHeader."No.";
+        PurchCredMemoHeader.Modify();
+
+        CopyDocumentMgt.SetProperties(true, false, false, false, true, false, false);
+        CopyDocumentMgt.CopyPurchDoc("Purchase Document Type From"::"Posted Invoice", PurchInvHeader."No.", PurchCredMemoHeader);
+    end;
+
     [ConfirmHandler]
     [Scope('OnPrem')]
     procedure ConfirmHandlerTrue(Question: Text[1024]; var Reply: Boolean)
