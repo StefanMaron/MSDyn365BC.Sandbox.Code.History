@@ -167,7 +167,7 @@ codeunit 11001 "VIES ELMA Xml"
     var
         Element: XmlElement;
     begin
-        Element := XmlElement.Create(ElementName, ELANNamespace, ElementValue);
+        Element := XmlElement.Create(ElementName, ELANNamespace, DelChr(ElementValue, '<>', ' '));
         exit(Element);
     end;
 
@@ -250,7 +250,7 @@ codeunit 11001 "VIES ELMA Xml"
     var
         Element: XmlElement;
     begin
-        Element := XmlElement.Create(ElementName, ZMNamespace, ElementValue);
+        Element := XmlElement.Create(ElementName, ZMNamespace, DelChr(ElementValue, '<>', ' '));
         exit(Element);
     end;
 
