@@ -182,6 +182,7 @@ permissionset 209 "D365 Basic - Read"
                   tabledata "Buffer IC Inbox Sales Line" = R,
                   tabledata "Buffer IC Inbox Transaction" = R,
                   tabledata "Buffer IC InOut Jnl. Line Dim." = R,
+                  tabledata "IC API Log" = R,
                   tabledata "IC Incoming Notification" = R,
                   tabledata "IC Outgoing Notification" = R,
                   tabledata "Code Coverage" = R,
