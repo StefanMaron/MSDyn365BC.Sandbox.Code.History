@@ -1791,6 +1791,17 @@ codeunit 1535 "Approvals Mgmt."
         end;
     end;
 
+    [EventSubscriber(ObjectType::Table, Database::"Requisition Wksh. Name", 'OnMoveRequisitionWkshBatch', '', false, false)]
+    procedure PostApprovalEntriesMoveRequisitionWkshBatch(var Sender: Record "Requisition Wksh. Name"; ToRecordID: RecordID)
+    var
+        RecordRestrictionMgt: Codeunit "Record Restriction Mgt.";
+    begin
+        if PostApprovalEntries(Sender.RecordId(), ToRecordID, '') then begin
+            RecordRestrictionMgt.AllowRecordUsage(Sender);
+            DeleteApprovalEntries(Sender.RecordId());
+        end;
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"Requisition Wksh. Name", 'OnAfterDeleteEvent', '', false, false)]
     procedure DeleteApprovalEntriesAfterDeleteRequisitionWkshName(var Rec: Record "Requisition Wksh. Name"; RunTrigger: Boolean)
     var
