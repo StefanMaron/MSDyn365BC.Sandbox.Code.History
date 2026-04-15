@@ -371,7 +371,7 @@ codeunit 90 "Purch.-Post"
         ApplicationAreaMgmt: Codeunit "Application Area Mgmt.";
         NonDeductibleVAT: Codeunit "Non-Deductible VAT";
         WHTManagement: Codeunit WHTManagement;
-        MatchedOrderLineMgmt: Codeunit "Matched Order Line Mgmt.";	
+        MatchedOrderLineMgmt: Codeunit "Matched Order Line Mgmt.";
         InvoicePostingInterface: Interface "Invoice Posting";
         IsInterfaceInitialized: Boolean;
         Window: Dialog;
@@ -7967,7 +7967,7 @@ codeunit 90 "Purch.-Post"
         end;
 
         PurchHeader."WHT Amount" := PurchHeader."WHT Amount" - CalcWHTAmountOnPrepayment(PurchHeader."No.");
-        if (PurchHeader."WHT Amount" <> 0) and InvoiceWHTEntryExists then
+        if (PurchHeader."WHT Amount" <> 0) and InvoiceWHTEntryExists and not PreviewMode then
             if PurchHeader."Document Type" = PurchHeader."Document Type"::"Credit Memo" then begin
                 if PurchSetup."Print WHT Docs. on Credit Memo" then
                     WHTManagement.PrintWHTSlips(GLReg, false);
