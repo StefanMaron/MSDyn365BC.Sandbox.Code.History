@@ -814,7 +814,8 @@ codeunit 99000854 "Inventory Profile Offsetting"
             exit;
 
         if not TempSKU.Find('=') then begin
-            PlanningGetParameters.SetLotForLot();
+            if not IsMissingSKUPlanningPolicyItemCard(TempSKU."Location Code") then
+                PlanningGetParameters.SetLotForLot();
             PlanningGetParameters.AtSKU(SKU2, TempSKU."Item No.", TempSKU."Variant Code", TempSKU."Location Code");
             TempSKU := SKU2;
             if TempSKU."Reordering Policy" <> TempSKU."Reordering Policy"::" " then begin
@@ -4891,6 +4892,23 @@ codeunit 99000854 "Inventory Profile Offsetting"
             OnCheckIsSNSpecificTracking(ItemTrackingCode, SerialSepecificTracking);
 
         exit(SerialSepecificTracking);
+    end;
+
+    /// <summary>
+    /// Determines if the missing SKU planning policy for a location is set to Item Card.
+    /// </summary>
+    /// <param name="LocationCode">The location code to check. If empty, returns false.</param>
+    /// <returns>True if the location's Missing SKU Planning Policy is set to Item Card; otherwise, false.</returns>
+    local procedure IsMissingSKUPlanningPolicyItemCard(LocationCode: Code[10]): Boolean
+    var
+        Location: Record Location;
+    begin
+        if LocationCode = '' then
+            exit(false);
+
+        Location.Get(LocationCode);
+
+        exit(Location."Missing SKU Planning Policy" = Location."Missing SKU Planning Policy"::"Item Card");
     end;
 
     [IntegrationEvent(false, false)]
