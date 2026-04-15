@@ -3299,6 +3299,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Insert Std. Sales Lines - NamedType InvalidNotificationIdMsg)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 253409855 - NamedType 2042888969" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[%1 must be same.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1= Field Caption]D;]A;(LookupHint=Codeunit ERM Insert Std. Sales Lines - NamedType ReferenceValueMustBeSameErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 253409855 - NamedType 549624305" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[If you delete the code %1, the related records in the %2 table will also be deleted. Do you want to continue?]]></Val>
