@@ -6341,6 +6341,24 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Planning - III - NamedType RelesedProdOrderComponentQtyPerRoundingErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2531980374 - NamedType 230553302" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Expected reservation entries with serial tracking on purchase line are %1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Planning - III - NamedType ReservationEntryCountErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2531980374 - NamedType 1520387808" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Serial No. %1 must exist in reservation entries]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Planning - III - NamedType SerialNoErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2531980374 - NamedType 1063772298" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Unexpected Message dialog.  %1]]></Val>
@@ -7122,6 +7140,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Orders VI - NamedType RecordMustBeDeletedTxt)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 248268497 - NamedType 684891198" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Reserved Quantity is incorrect.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Orders VI - NamedType ReservedQuantityErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 248268497 - NamedType 3438645911" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
