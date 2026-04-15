@@ -2984,6 +2984,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Finance Payment Tolerance - NamedType ConfirmMessageForPayment)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2570714987 - NamedType 1215799490" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Payment amount should match the original Gen. Journal Line amount]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Finance Payment Tolerance - NamedType PaymentAmountError)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2570714987 - NamedType 2522364550" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The journal lines were successfully posted.]]></Val>
@@ -3414,6 +3423,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Insert Std. Sales Lines - NamedType InvalidNotificationIdMsg)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 253409855 - NamedType 2042888969" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[%1 must be same.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1= Field Caption]D;]A;(LookupHint=Codeunit ERM Insert Std. Sales Lines - NamedType ReferenceValueMustBeSameErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 253409855 - NamedType 549624305" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
