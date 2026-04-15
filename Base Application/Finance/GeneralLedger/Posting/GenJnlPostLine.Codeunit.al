@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -82,6 +82,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
                   TableData "Vendor Ledger Entry" = rimd,
                   tabledata "Vendor Posting Group" = R,
                   TableData "G/L Register" = Rimd,
+                  TableData "G/L Transaction" = Rimd,
                   TableData "G/L Entry - VAT Entry Link" = rimd,
                   TableData "VAT Entry" = Rimd,
                   TableData "Bank Account Ledger Entry" = rimd,
@@ -7257,6 +7258,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         NewDtldCustLedgEntry."Source Code" := GenJnlLine."Source Code";
         NewDtldCustLedgEntry."User ID" := CopyStr(UserId(), 1, MaxStrLen(NewDtldCustLedgEntry."User ID"));
         NewDtldCustLedgEntry."Posting Group" := OldDtldCustLedgEntry."Posting Group";
+        NewDtldCustLedgEntry."G/L Register No." := GLReg."No.";
         OnBeforeInsertDtldCustLedgEntryUnapply(NewDtldCustLedgEntry, GenJnlLine, OldDtldCustLedgEntry, GLReg);
         NewDtldCustLedgEntry.Insert(true);
         NextDtldLedgEntryNo := NextDtldLedgEntryNo + 1;
@@ -7284,6 +7286,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         NewDtldVendLedgEntry."Source Code" := GenJnlLine."Source Code";
         NewDtldVendLedgEntry."User ID" := CopyStr(UserId(), 1, MaxStrLen(NewDtldVendLedgEntry."User ID"));
         NewDtldVendLedgEntry."Posting Group" := OldDtldVendLedgEntry."Posting Group";
+        NewDtldVendLedgEntry."G/L Register No." := GLReg."No.";
         OnBeforeInsertDtldVendLedgEntryUnapply(NewDtldVendLedgEntry, GenJnlLine, OldDtldVendLedgEntry, GLReg);
         NewDtldVendLedgEntry.Insert(true);
         NextDtldLedgEntryNo := NextDtldLedgEntryNo + 1;
@@ -7309,6 +7312,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         NewDtldEmplLedgEntry."Source Code" := GenJnlLine."Source Code";
         NewDtldEmplLedgEntry."User ID" := CopyStr(UserId(), 1, MaxStrLen(NewDtldEmplLedgEntry."User ID"));
         NewDtldEmplLedgEntry."Posting Group" := OldDtldEmplLedgEntry."Posting Group";
+        NewDtldEmplLedgEntry."G/L Register No." := GLReg."No.";
         OnBeforeInsertDtldEmplLedgEntryUnapply(NewDtldEmplLedgEntry, GenJnlLine, OldDtldEmplLedgEntry);
         NewDtldEmplLedgEntry.Insert(true);
         NextDtldLedgEntryNo := NextDtldLedgEntryNo + 1;
@@ -7329,6 +7333,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         TempVATEntry."User ID" := CopyStr(UserId(), 1, MaxStrLen(TempVATEntry."User ID"));
         TempVATEntry."Transaction No." := NextTransactionNo;
         TempVATEntry."G/L Acc. No." := '';
+        TempVATEntry."G/L Register No." := GLReg."No.";
         OnInsertTempVATEntryOnBeforeInsert(TempVATEntry, GenJnlLine, VATEntry);
         TempVATEntry.Insert();
     end;
