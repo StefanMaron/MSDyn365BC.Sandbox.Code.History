@@ -3741,7 +3741,7 @@ codeunit 136102 "Service Contracts"
         LibraryERMCountryData.UpdateJournalTemplMandatory(false);
 
         LibrarySetupStorage.Save(DATABASE::"Service Mgt. Setup");
-        LibrarySetupStorage.Save(DATABASE::"Sales & Receivables Setup");
+        LibrarySetupStorage.SaveSalesSetup();
         LibrarySetupStorage.SaveGeneralLedgerSetup();
 
         isInitialized := true;
@@ -5432,7 +5432,6 @@ codeunit 136102 "Service Contracts"
     var
         ServiceContractTemplate: Record "Service Contract Template";
         ShipToAddress: Record "Ship-to Address";
-        //SignServContractDoc1: Codeunit SignServContractDoc;
         CustomerNo: Code[20];
     begin
         CreatePrepaidServiceContractTemplate(ServiceContractTemplate);

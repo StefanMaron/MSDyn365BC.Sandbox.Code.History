@@ -906,6 +906,7 @@ codeunit 9998 "Upgrade Tag Definitions"
         exit('MS-415286-GLEntryJournalTemplateName-20211026');
     end;
 #endif
+
     procedure GetGLRegisterJournalTemplateNameUpgradeTag(): Code[250]
     begin
         exit('MS-415286-GLRegisterJournalTemplateName-20211026');
@@ -1350,5 +1351,4 @@ codeunit 9998 "Upgrade Tag Definitions"
     begin
         exit('MS-626097-DepreciationBooksGLIntegrationUpgradeTag-20260319');
     end;
-
 }
