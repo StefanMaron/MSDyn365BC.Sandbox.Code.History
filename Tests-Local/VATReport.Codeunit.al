@@ -2738,6 +2738,61 @@ codeunit 144001 "VAT Report"
         Cleanup(VATReportHeader."No.", TestPeriodStart, TestPeriodEnd);
     end;
 
+    [Test]
+    procedure ExportVATReportTrimsSpacesFromVATRegNo()
+    var
+        VATReportHeader: Record "VAT Report Header";
+        VATReportLine: Record "VAT Report Line";
+        CountryRegion: Record "Country/Region";
+        TempBlob: Codeunit "Temp Blob";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 630344] VIES ELMA XML trims leading and trailing spaces from VAT Registration No. in auslUStIdNrOhneLKZ node
+        Initialize();
+
+        // [GIVEN] A mock VAT report with a line where VAT Registration No. has leading and trailing spaces
+        CreateMockVATReportWithLines(VATReportHeader, VATReportHeader."VAT Report Type"::Standard, VATReportHeader."Report Period Type"::Month, 1);
+        VATReportLine.SetRange("VAT Report No.", VATReportHeader."No.");
+        VATReportLine.FindFirst();
+        CountryRegion.Get(VATReportLine."Country/Region Code");
+        VATReportLine."VAT Registration No." := CountryRegion."EU Country/Region Code" + ' U1234567 ';
+        VATReportLine.Modify();
+
+        // [WHEN] Export VIES report
+        ExportVATReportIntoTempBlob(VATReportHeader, TempBlob);
+
+        // [THEN] auslUStIdNrOhneLKZ node value has no leading or trailing spaces
+        InitXMLReaderForVIESReport(TempBlob);
+        LibraryXPathXMLReader.VerifyXmlNodeValue('//zm:zms/zm:unternehmer/zm:zm/zm:zmZeile/zm:auslUStIdNrOhneLKZ', 'U1234567');
+    end;
+
+    [Test]
+    procedure ExportVATReportTrimsSpacesFromAddressFields()
+    var
+        VATReportHeader: Record "VAT Report Header";
+        TempBlob: Codeunit "Temp Blob";
+        TestPeriodStart: Date;
+        TestPeriodEnd: Date;
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 630344] VIES ELMA XML trims leading/trailing spaces from address fields
+        Initialize();
+
+        // [GIVEN] Company information with leading/trailing spaces in name, address, and city
+        UpdateCompanyInformation(' Test Company ', ' Main Street ', ' Berlin ');
+
+        // [WHEN] Export VIES report
+        CreateVATReport(VATReportHeader, TestPeriodStart, TestPeriodEnd, TempBlob);
+
+        // [THEN] Address fields in XML are trimmed
+        InitXMLReaderForVIESReport(TempBlob);
+        LibraryXPathXMLReader.VerifyXmlNodeValue('//zm:zms/zm:unternehmer/zm:anschrift/zm:name', 'Test Company');
+        LibraryXPathXMLReader.VerifyXmlNodeValue('//zm:zms/zm:unternehmer/zm:anschrift/zm:strasse', 'Main Street');
+        LibraryXPathXMLReader.VerifyXmlNodeValue('//zm:zms/zm:unternehmer/zm:anschrift/zm:ort', 'Berlin');
+
+        Cleanup(VATReportHeader."No.", TestPeriodStart, TestPeriodEnd);
+    end;
+
     local procedure Initialize()
     begin
         LibrarySetupStorage.Restore();
