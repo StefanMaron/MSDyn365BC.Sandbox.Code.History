@@ -1170,6 +1170,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"G/L Entry - VAT Entry Link");
         ListOfTablesToMigrate.Add(Database::"G/L Entry");
         ListOfTablesToMigrate.Add(Database::"G/L Register");
+        ListOfTablesToMigrate.Add(Database::"G/L Transaction");
         ListOfTablesToMigrate.Add(Database::"Gen. Business Posting Group");
         ListOfTablesToMigrate.Add(Database::"Gen. Jnl. Allocation");
         ListOfTablesToMigrate.Add(Database::"Gen. Jnl. Dim. Filter");
