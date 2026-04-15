@@ -479,6 +479,7 @@ permissionset 209 "D365 Basic - Read"
                   tabledata "G/L Account Where-Used" = R,
                   tabledata "G/L Account Source Currency" = r,
                   tabledata "G/L Entry" = r,
+                  tabledata "G/L Transaction" = r,
                   tabledata "Gen. Business Posting Group" = R,
                   tabledata "Gen. Jnl. Allocation" = R,
                   tabledata "Gen. Journal Batch" = R,
