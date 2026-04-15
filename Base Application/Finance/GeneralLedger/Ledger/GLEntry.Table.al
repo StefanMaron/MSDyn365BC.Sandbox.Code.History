@@ -324,6 +324,8 @@ table 17 "G/L Entry"
         field(52; "Transaction No."; Integer)
         {
             Caption = 'Transaction No.';
+            TableRelation = "G/L Transaction";
+            ToolTip = 'Specifies the transaction number that groups related G/L entries from the same posting.';
         }
         /// <summary>
         /// Debit amount in local currency when transaction increases account balance.
@@ -543,6 +545,16 @@ table 17 "G/L Entry"
             Caption = 'VAT Date';
             ToolTip = 'Specifies the entry''s VAT date.';
             Editable = false;
+        }
+        /// <summary>
+        /// G/L Register number for this entry.
+        /// </summary>
+        field(95; "G/L Register No."; Integer)
+        {
+            Caption = 'G/L Register No.';
+            Editable = false;
+            TableRelation = "G/L Register";
+            ToolTip = 'Specifies the G/L register number that groups related G/L entries from the same posting.';
         }
         /// <summary>
         /// Dimension set ID linking to dimension combinations for this entry.
@@ -865,6 +877,14 @@ table 17 "G/L Entry"
             GeneralLedgerSetupRead := true;
         end;
         exit(GeneralLedgerSetup."Additional Reporting Currency")
+    end;
+
+    [InherentPermissions(PermissionObjectType::TableData, Database::"G/L Entry", 'r')]
+    procedure GetNextEntryNo(): Integer
+    var
+        SequenceNoMgt: Codeunit "Sequence No. Mgt.";
+    begin
+        exit(SequenceNoMgt.GetNextSeqNo(DATABASE::"G/L Entry"));
     end;
 
     /// <summary>
