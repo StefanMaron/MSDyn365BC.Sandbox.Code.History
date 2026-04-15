@@ -34,12 +34,12 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Quantity: Decimal;
     begin
         // [FEATURE] [Direct Transfer] [No Warehouse]
-        // [SCENARIO 617394] Direct Transfer with "Receipt and Shipment" mode and no warehouse requirements posts directly
+        // [SCENARIO 617394] Direct Transfer with "Shipment and Receipt" mode and no warehouse requirements posts directly
         Initialize();
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
-        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Receipt and Shipment"
-        SetDirectTransferPostingMode(0); // "Receipt and Shipment"
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
 
         // [GIVEN] Location "FROM" without warehouse requirements
         LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationFrom);
@@ -51,7 +51,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemWithPositiveInventory(Item, LocationFrom.Code, Quantity);
 
         // [WHEN] Create Direct Transfer Order
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
 
         // [WHEN] Post Transfer Order directly
         LibraryInventory.PostDirectTransferOrder(TransferHeader);
@@ -84,12 +84,12 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Quantity: Decimal;
     begin
         // [FEATURE] [Direct Transfer] [Warehouse Shipment]
-        // [SCENARIO 617394] Direct Transfer with "Receipt and Shipment" mode allows warehouse shipment on Transfer-from location
+        // [SCENARIO 617394] Direct Transfer with "Shipment and Receipt" mode allows warehouse shipment on Transfer-from location
         Initialize();
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
-        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Receipt and Shipment"
-        SetDirectTransferPostingMode(0); // "Receipt and Shipment"
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
 
         // [GIVEN] Location "FROM" with "Require Shipment" = TRUE
         CreateLocationWithWarehouseSetup(LocationFrom, false, false, false, false, true);
@@ -101,7 +101,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemWithPositiveInventory(Item, LocationFrom.Code, Quantity);
 
         // [WHEN] Create Direct Transfer Order from "FROM" to "TO"
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
 
         // [WHEN] Release Transfer Order
         LibraryInventory.ReleaseTransferOrder(TransferHeader);
@@ -145,8 +145,8 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Initialize();
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
-        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Receipt and Shipment"
-        SetDirectTransferPostingMode(0); // "Receipt and Shipment"
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
 
         // [GIVEN] Location "FROM" with "Require Shipment" = TRUE only (no pick)
         CreateLocationWithWarehouseSetup(LocationFrom, false, false, false, false, true);
@@ -158,7 +158,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemWithPositiveInventory(Item, LocationFrom.Code, Quantity);
 
         // [WHEN] Create Direct Transfer Order and Release
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
         LibraryInventory.ReleaseTransferOrder(TransferHeader);
 
         // [WHEN] Creation of Inventory  Pick is attempted
@@ -191,8 +191,8 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Initialize();
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
-        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Receipt and Shipment"
-        SetDirectTransferPostingMode(0); // "Receipt and Shipment"
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
 
         // [GIVEN] Location "FROM" with "Require Pick" = TRUE and "Require Shipment" = TRUE
         CreateLocationWithWarehouseSetup(LocationFrom, false, false, true, false, true);
@@ -205,7 +205,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemWithPositiveInventory(Item, LocationFrom.Code, Quantity);
 
         // [WHEN] Create Direct Transfer Order and Release
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
         LibraryInventory.ReleaseTransferOrder(TransferHeader);
 
         // [WHEN] Create Warehouse Shipment
@@ -248,8 +248,8 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Initialize();
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
-        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Receipt and Shipment"
-        SetDirectTransferPostingMode(0); // "Receipt and Shipment"
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
 
         // [GIVEN] Location "FROM" with "Require Pick" = TRUE and "Require Shipment" = TRUE
         CreateLocationWithWarehouseSetup(LocationFrom, false, false, true, false, true);
@@ -261,7 +261,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemWithPositiveInventory(Item, LocationFrom.Code, Quantity);
 
         // [WHEN] Create Direct Transfer Order and Release
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
         LibraryInventory.ReleaseTransferOrder(TransferHeader);
 
         // [WHEN] Create Warehouse Shipment
@@ -295,8 +295,8 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Initialize();
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
-        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Receipt and Shipment"
-        SetDirectTransferPostingMode(0); // "Receipt and Shipment"
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
 
         // [GIVEN] Location "FROM" without warehouse requirements
         LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationFrom);
@@ -309,7 +309,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
 
         // [WHEN] Create Direct Transfer Order with "TO" location requiring receive
         // [THEN] Creating Direct Transfer fails with validation error
-        asserterror CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        asserterror CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
         Assert.ExpectedError('Require Receive must be equal to ''No''');
     end;
 
@@ -329,8 +329,8 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Initialize();
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
-        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Receipt and Shipment"
-        SetDirectTransferPostingMode(0); // "Receipt and Shipment"
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
 
         // [GIVEN] Location "FROM" without warehouse requirements
         LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationFrom);
@@ -343,7 +343,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
 
         // [WHEN] Create Direct Transfer Order with "TO" location requiring put-away
         // [THEN] Creating Direct Transfer fails with validation error
-        asserterror CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        asserterror CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
         Assert.ExpectedError('Require Put-away must be equal to ''No''');
     end;
 
@@ -364,7 +364,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
         // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Direct Transfer" (original mode)
-        SetDirectTransferPostingMode(1); // "Direct Transfer"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Direct Transfer");
 
         // [GIVEN] Location "FROM" with "Require Shipment" = TRUE
         CreateLocationWithWarehouseSetup(LocationFrom, false, false, false, false, true);
@@ -376,7 +376,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemWithPositiveInventory(Item, LocationFrom.Code, Quantity);
 
         // [WHEN] Create Direct Transfer Order
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, TransferHeader."Direct Transfer Posting"::"Direct Transfer");
 
         // [THEN] Transfer Order created successfully - in "Direct Transfer" mode, warehouse handling is allowed
         TransferHeader.TestField("Direct Transfer", true);
@@ -401,7 +401,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
         // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Direct Transfer"
-        SetDirectTransferPostingMode(1); // "Direct Transfer"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Direct Transfer");
 
         // [GIVEN] Location "FROM" without warehouse requirements
         LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationFrom);
@@ -413,7 +413,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemWithPositiveInventory(Item, LocationFrom.Code, Quantity);
 
         // [WHEN] Create Direct Transfer Order
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, TransferHeader."Direct Transfer Posting"::"Direct Transfer");
 
         // [WHEN] Post Transfer Order directly
         LibraryInventory.PostDirectTransferOrder(TransferHeader);
@@ -453,7 +453,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
         // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Direct Transfer"
-        SetDirectTransferPostingMode(1); // "Direct Transfer"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Direct Transfer");
 
         // [GIVEN] Location "FROM" with "Require Shipment" = TRUE
         CreateLocationWithWarehouseSetup(LocationFrom, false, false, false, false, true);
@@ -465,7 +465,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemWithPositiveInventory(Item, LocationFrom.Code, Quantity);
 
         // [WHEN] Create Direct Transfer Order
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, TransferHeader."Direct Transfer Posting"::"Direct Transfer");
 
         // [WHEN] Release Transfer Order
         LibraryInventory.ReleaseTransferOrder(TransferHeader);
@@ -510,7 +510,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
         // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Direct Transfer"
-        SetDirectTransferPostingMode(1); // "Direct Transfer"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Direct Transfer");
 
         // [GIVEN] Location "FROM" with "Require Pick" = TRUE and "Require Shipment" = TRUE
         CreateLocationWithWarehouseSetup(LocationFrom, false, false, true, false, true);
@@ -522,7 +522,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemWithPositiveInventory(Item, LocationFrom.Code, Quantity);
 
         // [WHEN] Create Direct Transfer Order and Release
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, TransferHeader."Direct Transfer Posting"::"Direct Transfer");
         LibraryInventory.ReleaseTransferOrder(TransferHeader);
 
         // [WHEN] Create Warehouse Shipment
@@ -573,7 +573,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
         // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Direct Transfer"
-        SetDirectTransferPostingMode(1); // "Direct Transfer"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Direct Transfer");
 
         // [GIVEN] Location "FROM" with "Require Pick" = TRUE only
         CreateLocationWithWarehouseSetup(LocationFrom, true, false, true, false, false);
@@ -586,7 +586,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemWithInventoryInBin(Item, LocationFrom.Code, Quantity);
 
         // [WHEN] Create Direct Transfer Order
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, TransferHeader."Direct Transfer Posting"::"Direct Transfer");
         LibraryInventory.ReleaseTransferOrder(TransferHeader);
 
         // [WHEN] Create Inventory Pick
@@ -632,8 +632,8 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Quantity := LibraryRandom.RandIntInRange(10, 100);
         LotNo := LibraryUtility.GenerateGUID();
 
-        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Receipt and Shipment"
-        SetDirectTransferPostingMode(0); // "Receipt and Shipment"
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
 
         // [GIVEN] Location "FROM" with "Require Shipment" = TRUE
         CreateLocationWithWarehouseSetup(LocationFrom, false, false, false, false, true);
@@ -646,7 +646,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemInventoryWithLotNo(Item."No.", LocationFrom.Code, LotNo, Quantity);
 
         // [WHEN] Create Direct Transfer Order
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
         AssignLotNoToTransferLine(TransferLine, LotNo, Quantity);
         LibraryInventory.ReleaseTransferOrder(TransferHeader);
 
@@ -685,8 +685,8 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Initialize();
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
-        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Receipt and Shipment"
-        SetDirectTransferPostingMode(0); // "Receipt and Shipment"
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
 
         // [GIVEN] Location "FROM" with "Require Shipment" = TRUE
         CreateLocationWithWarehouseSetup(LocationFrom, false, false, false, false, true);
@@ -699,7 +699,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
             CreateItemWithPositiveInventory(Item[i], LocationFrom.Code, Quantity);
 
         // [WHEN] Create Direct Transfer Order with three lines
-        CreateDirectTransferOrderHeader(TransferHeader, LocationFrom.Code, LocationTo.Code);
+        CreateDirectTransferOrderHeader(TransferHeader, LocationFrom.Code, LocationTo.Code, Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
         for i := 1 to 3 do
             CreateDirectTransferLine(TransferHeader, TransferLine, Item[i]."No.", '', Quantity);
 
@@ -737,8 +737,8 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Initialize();
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
-        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Receipt and Shipment"
-        SetDirectTransferPostingMode(0); // "Receipt and Shipment"
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
 
         // [GIVEN] Location "FROM" with "Require Shipment" = TRUE and "Bin Mandatory" = TRUE
         CreateLocationWithWarehouseSetup(LocationFrom, true, false, false, false, true);
@@ -752,7 +752,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemWithInventoryInBin(Item, LocationFrom.Code, Quantity);
 
         // [WHEN] Create Direct Transfer Order and post via warehouse shipment
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
         LibraryInventory.ReleaseTransferOrder(TransferHeader);
         LibraryWarehouse.CreateWhseShipmentFromTO(TransferHeader);
         FindWarehouseShipmentHeader(WarehouseShipmentHeader, TransferHeader."No.");
@@ -782,8 +782,8 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Initialize();
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
-        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Receipt and Shipment"
-        SetDirectTransferPostingMode(0); // "Receipt and Shipment"
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
 
         // [GIVEN] Location "FROM" with "Require Shipment" = TRUE and "Bin Mandatory" = TRUE
         CreateLocationWithWarehouseSetup(LocationFrom, true, false, false, false, true);
@@ -797,7 +797,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemWithInventoryInBin(Item, LocationFrom.Code, Quantity);
 
         // [WHEN] Create Direct Transfer Order and post via warehouse shipment
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
         LibraryInventory.ReleaseTransferOrder(TransferHeader);
         LibraryWarehouse.CreateWhseShipmentFromTO(TransferHeader);
         FindWarehouseShipmentHeader(WarehouseShipmentHeader, TransferHeader."No.");
@@ -829,8 +829,8 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Initialize();
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
-        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Receipt and Shipment"
-        SetDirectTransferPostingMode(0); // "Receipt and Shipment"
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
 
         // [GIVEN] Location "FROM" with "Require Pick" = TRUE only
         CreateLocationWithWarehouseSetup(LocationFrom, true, false, true, false, false);
@@ -843,7 +843,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemWithInventoryInBin(Item, LocationFrom.Code, Quantity);
 
         // [WHEN] Create Direct Transfer Order
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
         LibraryInventory.ReleaseTransferOrder(TransferHeader);
 
         // [WHEN] Create Inventory Pick
@@ -879,8 +879,8 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Initialize();
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
-        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Receipt and Shipment"
-        SetDirectTransferPostingMode(0); // "Receipt and Shipment"
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
 
         // [GIVEN] Location "FROM" with warehouse requirements
         CreateLocationWithWarehouseSetup(LocationFrom, false, false, false, false, true);
@@ -892,7 +892,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemWithPositiveInventory(Item, LocationFrom.Code, Quantity);
 
         // [WHEN] Create Direct Transfer Order
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
 
         // [THEN] ShouldPostReceiptWithShipment() returns TRUE
         Assert.IsTrue(TransferHeader.ShouldPostReceiptWithShipment(), 'Should post shipment and receipt together');
@@ -915,7 +915,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
         // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Direct Transfer"
-        SetDirectTransferPostingMode(1); // "Direct Transfer"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Direct Transfer");
 
         // [GIVEN] Locations without warehouse requirements
         LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationFrom);
@@ -925,7 +925,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemWithPositiveInventory(Item, LocationFrom.Code, Quantity);
 
         // [WHEN] Create Direct Transfer Order
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, TransferHeader."Direct Transfer Posting"::"Direct Transfer");
 
         // [THEN] ShouldPostShipmentAndReceiptTogether() returns FALSE
         Assert.IsFalse(TransferHeader.ShouldPostReceiptWithShipment(), 'Should not post shipment and receipt together in Direct Transfer mode');
@@ -947,8 +947,8 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Initialize();
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
-        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Receipt and Shipment"
-        SetDirectTransferPostingMode(0); // "Receipt and Shipment"
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
 
         // [GIVEN] Location "FROM" without warehouse requirements
         LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationFrom);
@@ -990,8 +990,8 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Initialize();
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
-        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Receipt and Shipment"
-        SetDirectTransferPostingMode(0); // "Receipt and Shipment"
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt"); // "Shipment and Receipt"
 
         // [GIVEN] Location "FROM" with "Require Pick" = TRUE
         CreateLocationWithWarehouseSetup(LocationFrom, false, false, true, false, false);
@@ -1003,7 +1003,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemWithPositiveInventory(Item, LocationFrom.Code, Quantity);
 
         // [GIVEN] Direct Transfer Order from "FROM" to "TO"
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
         LibraryInventory.ReleaseTransferOrder(TransferHeader);
 
         // [GIVEN] Inventory Pick created from the transfer order
@@ -1058,8 +1058,8 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Quantity := LibraryRandom.RandIntInRange(10, 100);
         LotNo := LibraryUtility.GenerateGUID();
 
-        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Receipt and Shipment"
-        SetDirectTransferPostingMode(0); // "Receipt and Shipment"
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt"); // "Shipment and Receipt"
 
         // [GIVEN] Location "FROM" with "Require Pick" = TRUE
         CreateLocationWithWarehouseSetup(LocationFrom, false, false, true, false, false);
@@ -1075,7 +1075,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemInventoryWithLotNo(ItemLot."No.", LocationFrom.Code, LotNo, Quantity);
 
         // [GIVEN] Direct Transfer Order from "FROM" to "TO" with two lines: non-lot item (Line 1) and lot item (Line 2)
-        CreateDirectTransferOrderHeader(TransferHeader, LocationFrom.Code, LocationTo.Code);
+        CreateDirectTransferOrderHeader(TransferHeader, LocationFrom.Code, LocationTo.Code, Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
         CreateDirectTransferLine(TransferHeader, TransferLine, ItemNonLot."No.", '', Quantity);
         CreateDirectTransferLine(TransferHeader, TransferLine, ItemLot."No.", '', Quantity);
         AssignLotNoToTransferLine(TransferLine, LotNo, Quantity);
@@ -1129,8 +1129,8 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Initialize();
         Quantity := LibraryRandom.RandIntInRange(10, 100);
 
-        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Receipt and Shipment"
-        SetDirectTransferPostingMode(0); // "Receipt and Shipment"
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt"); // "Shipment and Receipt"
 
         // [GIVEN] Location "FROM" with "Require Shipment" = TRUE
         CreateLocationWithWarehouseSetup(LocationFrom, false, false, false, false, true);
@@ -1142,7 +1142,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemWithPositiveInventory(Item, LocationFrom.Code, Quantity);
 
         // [GIVEN] Direct Transfer Order from "FROM" to "TO"
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
         LibraryInventory.ReleaseTransferOrder(TransferHeader);
 
         // [GIVEN] Warehouse Shipment created from the transfer order (emits a "created" message consumed by handler)
@@ -1200,8 +1200,8 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Quantity := LibraryRandom.RandIntInRange(10, 20);
         PartialQty := Round(Quantity / 2, 1);
 
-        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Receipt and Shipment"
-        SetDirectTransferPostingMode(0); // "Receipt and Shipment"
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
 
         // [GIVEN] Location "FROM" with "Require Shipment" = TRUE
         CreateLocationWithWarehouseSetup(LocationFrom, false, false, false, false, true);
@@ -1213,7 +1213,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemWithPositiveInventory(Item, LocationFrom.Code, Quantity);
 
         // [GIVEN] Direct Transfer Order from "FROM" to "TO"
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
         LibraryInventory.ReleaseTransferOrder(TransferHeader);
 
         // [GIVEN] Warehouse Shipment created from the transfer order
@@ -1265,8 +1265,8 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         WarehouseSetup.Validate("Shipment Posting Policy", WarehouseSetup."Shipment Posting Policy"::"Posting errors are not processed");
         WarehouseSetup.Modify(true);
 
-        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Receipt and Shipment"
-        SetDirectTransferPostingMode(0); // "Receipt and Shipment"
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
 
         // [GIVEN] Location "FROM" with "Require Shipment" = TRUE
         CreateLocationWithWarehouseSetup(LocationFrom, false, false, false, false, true);
@@ -1278,7 +1278,7 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         CreateItemWithPositiveInventory(Item, LocationFrom.Code, Quantity);
 
         // [GIVEN] Direct Transfer Order from "FROM" to "TO"
-        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity);
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
         LibraryInventory.ReleaseTransferOrder(TransferHeader);
 
         // [GIVEN] Warehouse Shipment created from the transfer order
@@ -1294,6 +1294,263 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         VerifyItemLedgerEntriesForTransfer(Item."No.", LocationFrom.Code, LocationTo.Code, -Quantity, Quantity);
     end;
 
+    [Test]
+    [Scope('OnPrem')]
+    procedure TransferHeaderInheritsFromRoute()
+    var
+        TransferRoute: Record "Transfer Route";
+        TransferHeader: Record "Transfer Header";
+        LocationFrom: Record Location;
+        LocationTo: Record Location;
+    begin
+        // [FEATURE] [Transfer Route]
+        // [SCENARIO 617394] Transfer Header inherits Direct Transfer settings from Transfer Route
+        Initialize();
+
+        // [GIVEN] Two locations "From" and "To"
+        LibraryWarehouse.CreateLocation(LocationFrom);
+        LibraryWarehouse.CreateLocation(LocationTo);
+
+        // [GIVEN] Transfer Route with "Direct Transfer" mode
+        LibraryWarehouse.CreateAndUpdateTransferRoute(
+            TransferRoute, LocationFrom.Code, LocationTo.Code, '', '', '');
+        TransferRoute.Validate("Direct Transfer", true);
+        TransferRoute.Validate("Direct Transfer Posting", TransferRoute."Direct Transfer Posting"::"Direct Transfer");
+        TransferRoute.Modify(true);
+
+        // [WHEN] Create Transfer Order with these locations
+        LibraryInventory.CreateTransferHeader(TransferHeader, LocationFrom.Code, LocationTo.Code, '');
+        TransferHeader.Validate("Direct Transfer", true);
+
+        // [THEN] Transfer Header should inherit the settings
+        TransferHeader.TestField("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Direct Transfer");
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure TransferHeaderCanOverrideRoute()
+    var
+        TransferRoute: Record "Transfer Route";
+        TransferHeader: Record "Transfer Header";
+        LocationFrom: Record Location;
+        LocationTo: Record Location;
+    begin
+        // [FEATURE] [Transfer Route]
+        // [SCENARIO 617394] Transfer Header can override Direct Transfer settings from Transfer Route
+        Initialize();
+
+        // [GIVEN] Two locations "From" and "To"
+        LibraryWarehouse.CreateLocation(LocationFrom);
+        LibraryWarehouse.CreateLocation(LocationTo);
+
+        // [GIVEN] Transfer Route with "Direct Transfer" mode
+        LibraryWarehouse.CreateAndUpdateTransferRoute(
+            TransferRoute, LocationFrom.Code, LocationTo.Code, '', '', '');
+        TransferRoute.Validate("Direct Transfer", true);
+        TransferRoute.Validate("Direct Transfer Posting", TransferRoute."Direct Transfer Posting"::"Direct Transfer");
+        TransferRoute.Modify(true);
+
+        // [GIVEN] Create Transfer Order (inherits from route)
+        LibraryInventory.CreateTransferHeader(TransferHeader, LocationFrom.Code, LocationTo.Code, '');
+
+        // [WHEN] "Direct Transfer" is set to TRUE
+        TransferHeader.Validate("Direct Transfer", true);
+
+        // [THEN] "Direct Transfer Poting" is set to TRUE
+        TransferHeader.TestField("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Direct Transfer");
+
+        // [WHEN] Override to "Shipment and Receipt" mode
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
+
+        // [THEN] "Direct Transfer Posting" is overridden without any errors being thrown
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ReceiptAndShipmentModeRequiresMatchingQuantities()
+    var
+        TransferHeader: Record "Transfer Header";
+        TransferLine: Record "Transfer Line";
+        LocationFrom: Record Location;
+        LocationTo: Record Location;
+        Item: Record Item;
+        TransferOrderPostYesNo: Codeunit "TransferOrder-Post (Yes/No)";
+    begin
+        // [FEATURE] [Direct Transfer] [Validation]
+        // [SCENARIO 617394] "Shipment and Receipt" mode requires Qty to Ship = Qty to Receive
+        Initialize();
+
+        // [GIVEN] Two locations
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationFrom);
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationTo);
+
+        // [GIVEN] Item with inventory
+        LibraryInventory.CreateItem(Item);
+        CreateItemWithPositiveInventory(Item, LocationFrom.Code, LibraryRandom.RandIntInRange(50, 100));
+
+        // [GIVEN] Transfer Order with "Shipment and Receipt" mode
+        LibraryInventory.CreateTransferHeader(TransferHeader, LocationFrom.Code, LocationTo.Code, '');
+        TransferHeader.Validate("Direct Transfer", true);
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
+        TransferHeader.Modify(true);
+
+        // [GIVEN] Transfer Line with Quantity = 10
+        LibraryInventory.CreateTransferLine(TransferHeader, TransferLine, Item."No.", 10);
+
+        // [WHEN] Set Qty. to Ship = 10 but Qty. to Receive = 5
+        TransferLine.Validate("Qty. to Receive", 5);
+        TransferLine.Modify(true);
+
+        // [THEN] Posting should fail with error
+        asserterror TransferOrderPostYesNo.Run(TransferHeader);
+        Assert.ExpectedError('The quantity to ship and quantity to receive must be equal');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure InTransitCodeGetsClearedWhenDirectTransferIsTrue()
+    var
+        TransferHeader: Record "Transfer Header";
+        LocationFrom: Record Location;
+        LocationTo: Record Location;
+        LocationInTransit: Record Location;
+    begin
+        // [FEATURE] [Direct Transfer] [In-Transit]
+        // [SCENARIO 617394] "Shipment and Receipt" mode allows using In-Transit Code
+        Initialize();
+
+        // [GIVEN] Three locations
+        LibraryWarehouse.CreateLocation(LocationFrom);
+        LibraryWarehouse.CreateLocation(LocationTo);
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationInTransit);
+
+        // [GIVEN] Transfer Order with "Shipment and Receipt" mode
+        LibraryInventory.CreateTransferHeader(TransferHeader, LocationFrom.Code, LocationTo.Code, '');
+
+        // [WHEN] Direct Transfer is set to true
+        TransferHeader.Validate("Direct Transfer", true);
+
+        // [WHEN] In-Transit Code is set to ''
+        TransferHeader.TestField("In-Transit Code", '');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure DirectTransferModeBlocksInTransitCode()
+    var
+        TransferHeader: Record "Transfer Header";
+        LocationFrom: Record Location;
+        LocationTo: Record Location;
+    begin
+        // [FEATURE] [Direct Transfer] [In-Transit]
+        // [SCENARIO 617394] "Direct Transfer" mode should have Direct Transfer = TRUE which blocks In-Transit Code on page
+        Initialize();
+
+        // [GIVEN] Two locations
+        LibraryWarehouse.CreateLocation(LocationFrom);
+        LibraryWarehouse.CreateLocation(LocationTo);
+
+        // [GIVEN] Transfer Order with "Direct Transfer" mode
+        LibraryInventory.CreateTransferHeader(TransferHeader, LocationFrom.Code, LocationTo.Code, '');
+        TransferHeader.Validate("Direct Transfer", true);
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Direct Transfer");
+        TransferHeader.Modify(true);
+
+        // [THEN] Direct Transfer checkbox is TRUE (which makes In-Transit Code disabled on page)
+        TransferHeader.TestField("Direct Transfer", true);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure TransferHeaderDirectTransferPostingErrorsIfDirectTransferIsFalse()
+    var
+        TransferHeader: Record "Transfer Header";
+        LocationFrom: Record Location;
+        LocationTo: Record Location;
+        LocationInTransit: Record Location;
+        Item: Record Item;
+    begin
+        // [FEATURE] [Direct Transfer] [Receipt and Shipment]
+        // [SCENARIO 617394] Transfer Order errors if Direct Transfer Posting is set without switching "Direct Transfer" ON
+        Initialize();
+
+        // [GIVEN] Three locations: From, To, and In-Transit
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationFrom);
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationTo);
+        LibraryWarehouse.CreateInTransitLocation(LocationInTransit);
+
+        // [GIVEN] Item with inventory at From location
+        LibraryInventory.CreateItem(Item);
+        CreateItemWithPositiveInventory(Item, LocationFrom.Code, LibraryRandom.RandIntInRange(50, 100));
+
+        // [GIVEN] Create Transfer Order with "Shipment and Receipt" mode
+        LibraryInventory.CreateTransferHeader(TransferHeader, LocationFrom.Code, LocationTo.Code, LocationInTransit.Code);
+        TransferHeader.Validate("Direct Transfer", false);
+
+        // [WHEN] Try to set "Direct Transfer Posting" to "Shipment and Receipt" without switching "Direct Transfer" ON
+        asserterror TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
+        // [THEN] Error is raised
+        Assert.ExpectedError(TransferHeader.FieldCaption("Direct Transfer"));
+
+        // [WHEN] Try to set "Direct Transfer Posting" to "Direct Transfer" without switching "Direct Transfer" ON
+        asserterror TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Direct Transfer");
+        // [THEN] Error is raised
+        Assert.ExpectedError(TransferHeader.FieldCaption("Direct Transfer"));
+
+        // [WHEN] Set "Direct Transfer" to TRUE, then set "Direct Transfer Posting" to "Shipment and Receipt"
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::" ");
+        // [THEN] No error should occur
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure TransferHeaderDirectTransferModeVerifyDocs()
+    var
+        TransferHeader: Record "Transfer Header";
+        TransferLine: Record "Transfer Line";
+        LocationFrom: Record Location;
+        LocationTo: Record Location;
+        Item: Record Item;
+        DirectTransHeader: Record "Direct Trans. Header";
+        TransferShipmentHeader: Record "Transfer Shipment Header";
+        TransferReceiptHeader: Record "Transfer Receipt Header";
+    begin
+        // [FEATURE] [Direct Transfer] [Direct Transfer Mode]
+        // [SCENARIO 617394] Transfer Order with "Direct Transfer" mode creates single Posted Direct Transfer
+        Initialize();
+
+        // [GIVEN] Two locations: From and To
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationFrom);
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationTo);
+
+        // [GIVEN] Item with inventory at From location
+        LibraryInventory.CreateItem(Item);
+        CreateItemWithPositiveInventory(Item, LocationFrom.Code, LibraryRandom.RandIntInRange(50, 100));
+
+        // [GIVEN] Create Transfer Order with "Direct Transfer" mode
+        LibraryInventory.CreateTransferHeader(TransferHeader, LocationFrom.Code, LocationTo.Code, '');
+        TransferHeader.Validate("Direct Transfer", true);
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Direct Transfer");
+        TransferHeader.Modify(true);
+
+        // [GIVEN] Create Transfer Line
+        LibraryInventory.CreateTransferLine(TransferHeader, TransferLine, Item."No.", LibraryRandom.RandInt(10));
+
+        // [WHEN] Post Transfer Order
+        LibraryInventory.PostDirectTransferOrder(TransferHeader);
+
+        // [THEN] Posted Direct Transfer is created
+        DirectTransHeader.SetRange("Transfer Order No.", TransferHeader."No.");
+        Assert.RecordIsNotEmpty(DirectTransHeader);
+
+        // [THEN] No Transfer Shipment or Receipt created
+        TransferShipmentHeader.SetRange("Transfer Order No.", TransferHeader."No.");
+        Assert.RecordIsEmpty(TransferShipmentHeader);
+
+        TransferReceiptHeader.SetRange("Transfer Order No.", TransferHeader."No.");
+        Assert.RecordIsEmpty(TransferReceiptHeader);
+    end;
+
     local procedure Initialize()
     var
         InventorySetup: Record "Inventory Setup";
@@ -1302,19 +1559,19 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
             exit;
 
         InventorySetup.Get();
-        InventorySetup."Direct Transfer Posting" := 0; // "Receipt and Shipment"
+        InventorySetup.Validate("Direct Transfer Posting Type", InventorySetup."Direct Transfer Posting Type"::"Shipment and Receipt"); // "Shipment and Receipt"
         InventorySetup.Modify();
 
         isInitialized := true;
         Commit();
     end;
 
-    local procedure SetDirectTransferPostingMode(PostingMode: Option "Receipt and Shipment","Direct Transfer")
+    local procedure SetDirectTransferPostingMode(PostingMode: Enum "Direct Transfer Posting Type")
     var
         InventorySetup: Record "Inventory Setup";
     begin
         InventorySetup.Get();
-        InventorySetup."Direct Transfer Posting" := PostingMode;
+        InventorySetup.Validate("Direct Transfer Posting Type", PostingMode);
         InventorySetup.Modify();
         Commit();
     end;
@@ -1396,24 +1653,36 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
 
     local procedure CreateTransferOrderHeader(var TransferHeader: Record "Transfer Header"; FromLocationCode: Code[10]; ToLocationCode: Code[10]; DirectTransfer: Boolean)
     var
+        InventorySetup: Record "Inventory Setup";
+    begin
+        if DirectTransfer then begin
+            InventorySetup.Get();
+            CreateTransferOrderHeader(TransferHeader, FromLocationCode, ToLocationCode, DirectTransfer, InventorySetup."Direct Transfer Posting Type");
+        end else
+            CreateTransferOrderHeader(TransferHeader, FromLocationCode, ToLocationCode, DirectTransfer, Enum::"Direct Transfer Posting Type"::" ");
+    end;
+
+    local procedure CreateTransferOrderHeader(var TransferHeader: Record "Transfer Header"; FromLocationCode: Code[10]; ToLocationCode: Code[10]; DirectTransfer: Boolean; DirectTransferPosting: Enum "Direct Transfer Posting Type")
+    var
         InTransitLocation: Record Location;
     begin
         LibraryWarehouse.CreateInTransitLocation(InTransitLocation);
         LibraryInventory.CreateTransferHeader(TransferHeader, FromLocationCode, ToLocationCode, InTransitLocation.Code);
         if DirectTransfer then begin
             TransferHeader.Validate("Direct Transfer", true);
+            TransferHeader.Validate("Direct Transfer Posting", DirectTransferPosting);
             TransferHeader.Modify(true);
         end;
     end;
 
-    local procedure CreateDirectTransferOrderHeader(var TransferHeader: Record "Transfer Header"; FromLocationCode: Code[10]; ToLocationCode: Code[10])
+    local procedure CreateDirectTransferOrderHeader(var TransferHeader: Record "Transfer Header"; FromLocationCode: Code[10]; ToLocationCode: Code[10]; DirectTransferPosting: Enum "Direct Transfer Posting Type")
     begin
-        CreateTransferOrderHeader(TransferHeader, FromLocationCode, ToLocationCode, true);
+        CreateTransferOrderHeader(TransferHeader, FromLocationCode, ToLocationCode, true, DirectTransferPosting);
     end;
 
-    local procedure CreateDirectTransferOrder(var TransferHeader: Record "Transfer Header"; var TransferLine: Record "Transfer Line"; FromLocationCode: Code[10]; ToLocationCode: Code[10]; ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Decimal)
+    local procedure CreateDirectTransferOrder(var TransferHeader: Record "Transfer Header"; var TransferLine: Record "Transfer Line"; FromLocationCode: Code[10]; ToLocationCode: Code[10]; ItemNo: Code[20]; VariantCode: Code[10]; Quantity: Decimal; DirectTransferPosting: Enum "Direct Transfer Posting Type")
     begin
-        CreateDirectTransferOrderHeader(TransferHeader, FromLocationCode, ToLocationCode);
+        CreateDirectTransferOrderHeader(TransferHeader, FromLocationCode, ToLocationCode, DirectTransferPosting);
         CreateDirectTransferLine(TransferHeader, TransferLine, ItemNo, VariantCode, Quantity);
     end;
 
