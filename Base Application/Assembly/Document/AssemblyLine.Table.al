@@ -2218,15 +2218,8 @@ table 901 "Assembly Line"
         if (Item2."Rounding Precision" = 0) or (UOMQtyRoundPrecision = 0) then
             exit;
 
-        if Item2."Base Unit of Measure" <> Rec."Unit of Measure Code" then begin
-            Rec."Qty. Rounding Precision" := UOMQtyRoundPrecision;
-            Rec."Qty. Rounding Precision (Base)" := Item2."Rounding Precision";
-            exit;
-        end else begin
-            Rec."Qty. Rounding Precision" := UOMQtyRoundPrecision;
-            Rec."Qty. Rounding Precision (Base)" := Item2."Rounding Precision";
-        end;
-
+        Rec."Qty. Rounding Precision" := UOMQtyRoundPrecision;
+        Rec."Qty. Rounding Precision (Base)" := Item2."Rounding Precision";
     end;
 
     procedure UpdateAndPersistAvailWarning()
