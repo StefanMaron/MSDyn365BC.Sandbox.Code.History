@@ -545,11 +545,13 @@ table 312 "Purchases & Payables Setup"
             Caption = 'Posting Date Check on Posting';
             ToolTip = 'Specifies if you want to see a warning when you post a purchase document with a posting date that is different from the Work Date.';
         }
+#pragma warning disable AS0005
         field(11320; "Check Doc. Total Amounts"; Boolean)
         {
             Caption = 'Check Doc. Total Amounts';
             ToolTip = 'Specifies if you want the Doc. Amount Incl. VAT field in Purchase Invoice and Purchase Credit Memo to be compared to the sum of the VAT amounts fields in the purchase lines. If the amounts are not the same, you will be notified when posting the document. The totals will always be checked for invoices received from e-documents.';
         }
+#pragma warning restore AS0005
     }
 
     keys

@@ -4559,6 +4559,8 @@ codeunit 134468 "ERM Matched Order Line Tests"
     // ============================================================================
 
     local procedure Initialize()
+    var
+        LibraryERMCountryData: Codeunit "Library - ERM Country Data";
     begin
         LibraryTestInitialize.OnTestInitialize(Codeunit::"ERM Matched Order Line Tests");
         LibrarySetupStorage.Restore();
@@ -4568,23 +4570,14 @@ codeunit 134468 "ERM Matched Order Line Tests"
             exit;
 
         LibraryTestInitialize.OnBeforeTestSuiteInitialize(Codeunit::"ERM Matched Order Line Tests");
-        DisableCheckDocTotalAmounts();
 
+        LibraryERMCountryData.UpdatePurchasesPayablesSetup();
         LibrarySetupStorage.Save(Database::"Purchases & Payables Setup");
 
         IsInitialized := true;
         Commit();
 
         LibraryTestInitialize.OnAfterTestSuiteInitialize(Codeunit::"ERM Matched Order Line Tests");
-    end;
-
-    local procedure DisableCheckDocTotalAmounts()
-    var
-        PurchasesPayablesSetup: Record "Purchases & Payables Setup";
-    begin
-        PurchasesPayablesSetup.Get();
-        PurchasesPayablesSetup.Validate("Check Doc. Total Amounts", false);
-        PurchasesPayablesSetup.Modify(true);
     end;
 
     [RequestPageHandler]

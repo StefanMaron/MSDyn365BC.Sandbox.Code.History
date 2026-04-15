@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -355,6 +355,7 @@ report 98 "Date Compress General Ledger"
         DateComprReg: Record "Date Compr. Register";
         EntrdDateComprReg: Record "Date Compr. Register";
         GLReg: Record "G/L Register";
+        GLTransaction: Record "G/L Transaction";
         EntrdGLEntry: Record "G/L Entry";
         NewGLEntry: Record "G/L Entry";
         GLEntry2: Record "G/L Entry";
@@ -608,7 +609,7 @@ report 98 "Date Compress General Ledger"
         OnAfterInitNewEntry(NewGLEntry);
     end;
 
-    local procedure InsertNewEntry(var NewGLEntry: Record "G/L Entry"; DimEntryNo: Integer)
+    local procedure InsertNewEntry(var GLEntry: Record "G/L Entry"; DimEntryNo: Integer)
     var
         TempDimBuf: Record "Dimension Buffer" temporary;
         TempDimSetEntry: Record "Dimension Set Entry" temporary;
@@ -616,8 +617,11 @@ report 98 "Date Compress General Ledger"
         TempDimBuf.DeleteAll();
         DimBufMgt.GetDimensions(DimEntryNo, TempDimBuf);
         DimMgt.CopyDimBufToDimSetEntry(TempDimBuf, TempDimSetEntry);
-        NewGLEntry."Dimension Set ID" := DimMgt.GetDimensionSetID(TempDimSetEntry);
-        NewGLEntry.Insert();
+        GLEntry."Dimension Set ID" := DimMgt.GetDimensionSetID(TempDimSetEntry);
+        GLEntry."G/L Register No." := GLReg."No.";
+        GLEntry.Insert();
+
+        GLTransaction.InsertFromGLEntry(GLEntry, GLReg);
     end;
 
     local procedure InitializeParameter()

@@ -858,7 +858,7 @@
             PerfProfilerEventsTest."Object Type"::Report, REPORT::"Standard Statement", true);
     end;
 
-//    [Test]
+    [Test]
     [HandlerFunctions('ConfirmHandlerYes,PurchaseInvoicePageHandler')]
     [Scope('OnPrem')]
     procedure TestCorrectPostedPurchaseInvoicePerformance()
@@ -922,7 +922,7 @@
             PerfProfilerEventsTest."Object Type"::Codeunit, CODEUNIT::"Cancel PstdPurchInv (Yes/No)", true);
     end;
 
-//    [Test]
+    [Test]
     [HandlerFunctions('PrintPurchaseCreditMemoRequestPageHandler')]
     [Scope('OnPrem')]
     procedure TestPrintPostedPurchaseCreditMemoPerformance()
@@ -996,7 +996,7 @@
         PaymentJournal.Close();
     end;
 
-//    [Test]
+    [Test]
     [HandlerFunctions('BalanceToDateRequestHandler')]
     [Scope('OnPrem')]
     procedure TestVendorBalanceToDatePerformance()
@@ -1282,7 +1282,7 @@
           PerfProfilerEventsTest."Object Type"::Page, PAGE::"Posted Sales Invoice", true);
     end;
 
-//    [Test]
+    [Test]
     [HandlerFunctions('PurchaseInvoiceRequestHandler')]
     [Scope('OnPrem')]
     procedure TestPostedPurchaseInvoicePrintPerformance()
@@ -1407,7 +1407,7 @@
           PerfProfilerEventsTest."Object Type"::Page, PAGE::"Purchase Order", true);
     end;
 
-//    [Test]
+    [Test]
     [HandlerFunctions('MessageHandler')]
     [Scope('OnPrem')]
     procedure TestCombineShipmentsInSingleInvoice()

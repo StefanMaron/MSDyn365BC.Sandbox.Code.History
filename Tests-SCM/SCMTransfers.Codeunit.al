@@ -1014,9 +1014,10 @@
         Qty := LibraryRandom.RandIntInRange(100, 200);
         CreateItemWithPositiveInventory(Item, WMSLocation.Code, Qty * 2);
 
-        // [GIVEN] Create transfer order from "L1" to "L2". Quantity = "Q"
+        // [GIVEN] Create transfer order from "L1" to "L2" with "Direct Transfer" mode. Quantity = "Q"
         CreateTransferOrderNoRoute(TransferHeader, TransferLine, WMSLocation.Code, Location.Code, Item."No.", '', Qty * 2);
         TransferHeader.Validate("Direct Transfer", true);
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Direct Transfer");
         TransferHeader.Modify();
 
         // [GIVEN] Create warehouse shipment from transfer order, set "Qty. to Ship" = "Q" / 2
@@ -2227,12 +2228,12 @@
         // [SCENARIO] Direct Transfer Order shipped with blocked item on a previously shipped line
         Initialize();
 
-        // [GIVEN] Inventory Setup is configured for "Direct Transfer Posting" = "Receipt and Shipment"
+        // [GIVEN] Inventory Setup is configured for "Direct Transfer Posting" = "Shipment and Receipt"
         InventorySetup.Get();
-        InventorySetup.Validate("Direct Transfer Posting", InventorySetup."Direct Transfer Posting"::"Receipt and Shipment");
+        InventorySetup.Validate("Direct Transfer Posting Type", InventorySetup."Direct Transfer Posting Type"::"Shipment and Receipt");
         InventorySetup.Modify();
 
-        PostTransferShipmentPartiallyWithBlockedItem(true); //DirectTransfer = true
+        PostTransferShipmentPartiallyWithBlockedItem(true); //DirectTransfer = true, "Shipment and Receipt" mode
     end;
 
     [Test]
@@ -2276,6 +2277,7 @@
         // [GIVEN] Direct transfer order from "A" to "B".
         LibraryInventory.CreateTransferHeader(TransferHeader, LocationFrom.Code, LocationTo.Code, '');
         TransferHeader.Validate("Direct Transfer", true);
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Direct Transfer");
         TransferHeader.Modify(true);
         LibraryInventory.CreateTransferLine(TransferHeader, TransferLine, Item."No.", QtyToShip);
 
@@ -2379,6 +2381,7 @@
         // [GIVEN] Direct transfer order from "A" to "B".
         LibraryInventory.CreateTransferHeader(TransferHeader, LocationFrom.Code, LocationTo.Code, '');
         TransferHeader.Validate("Direct Transfer", true);
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Direct Transfer");
         TransferHeader.Modify(true);
         LibraryInventory.CreateTransferLine(TransferHeader, TransferLine, Item."No.", QtyTransferred);
 
@@ -3085,6 +3088,7 @@
         // [GIVEN] Dimension Set ID on the transfer line = "DimSetID".
         LibraryWarehouse.CreateTransferHeader(TransferHeader, Location[1].Code, Location[2].Code, '');
         TransferHeader.Validate("Direct Transfer", true);
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Direct Transfer");
         TransferHeader.Modify(true);
         LibraryWarehouse.CreateTransferLine(TransferHeader, TransferLine, Item."No.", LibraryRandom.RandInt(10));
         TransferLine.TestField("Dimension Set ID");
@@ -3114,6 +3118,7 @@
 
         LibraryWarehouse.CreateTransferHeader(TransferHeader, LocationFromCode, LocationToCode, '');
         TransferHeader.Validate("Direct Transfer", true);
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Direct Transfer");
         TransferHeader.Modify(true);
         LibraryWarehouse.CreateTransferLine(
             TransferHeader, TransferLine, LibraryInventory.CreateItemNo(), LibraryRandom.RandInt(10));
@@ -3163,6 +3168,7 @@
         // [GIVEN] Direct transfer order from "A" to "B".
         LibraryInventory.CreateTransferHeader(TransferHeader, LocationFrom.Code, LocationTo.Code, '');
         TransferHeader.Validate("Direct Transfer", true);
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
         TransferHeader.Modify(true);
         LibraryInventory.CreateTransferLine(TransferHeader, TransferLine, Item."No.", QtyTransferred);
 
@@ -3269,9 +3275,10 @@
           ReservationEntry, ItemJournalLine, '', LotNo, ItemJournalLine."Quantity (Base)");
         LibraryInventory.PostItemJournalLine(ItemJournalLine."Journal Template Name", ItemJournalLine."Journal Batch Name");
 
-        // [GIVEN] Create direct transfer "From" -> "To", select lot no. "L".
+        // [GIVEN] Create direct transfer "From" -> "To" with "Direct Transfer" mode, select lot no. "L".
         LibraryInventory.CreateTransferHeader(TransferHeader, LocationFromCode, LocationToCode, '');
         TransferHeader.Validate("Direct Transfer", true);
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Direct Transfer");
         TransferHeader.Modify(true);
         LibraryInventory.CreateTransferLine(TransferHeader, TransferLine, Item."No.", LibraryRandom.RandInt(10));
         LibraryItemTracking.CreateTransferOrderItemTracking(
@@ -3547,6 +3554,7 @@
         // [GIVEN] Create direct transfer "From" -> "To" for Item "I".
         LibraryInventory.CreateTransferHeader(TransferHeader, LocationFromCode, LocationToCode, '');
         TransferHeader.Validate("Direct Transfer", true);
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Direct Transfer");
         TransferHeader.Modify(true);
         LibraryInventory.CreateTransferLine(TransferHeader, TransferLine, Item."No.", LibraryRandom.RandInt(10));
 
@@ -3793,16 +3801,10 @@
         TransferHeader: Record "Transfer Header";
         TransferLine: array[3] of Record "Transfer Line";
         Item: array[3] of Record Item;
-        InventorySetup: Record "Inventory Setup";
     begin
-        // [SCENARIO] Transfer posting is not allowed for Direct Transfer Orders where 'Qty. to Ship' and 'Qty. to Receive' are different.
+        // [SCENARIO] Transfer posting is not allowed for Transfer Orders with "Shipment and Receipt" mode where 'Qty. to Ship' and 'Qty. to Receive' are different.
         // https://dynamicssmb2.visualstudio.com/Dynamics%20SMB/_workitems/edit/502987
         Initialize();
-
-        // [GIVEN] Inventory Setup is configured for "Direct Transfer Posting" = "Receipt and Shipment"
-        InventorySetup.Get();
-        InventorySetup.Validate("Direct Transfer Posting", InventorySetup."Direct Transfer Posting"::"Receipt and Shipment");
-        InventorySetup.Modify();
 
         // [GIVEN] Locations "L1" and "L2".
         LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location[1]);
@@ -3813,9 +3815,10 @@
         CreateItemWithPositiveInventory(Item[2], Location[1].Code, 10);
         CreateItemWithPositiveInventory(Item[3], Location[1].Code, 10);
 
-        // [GIVEN] Transfer Order From = "L1" To = "L2". Intransit is empty on direct transfer.
+        // [GIVEN] Transfer Order From = "L1" To = "L2" with "Shipment and Receipt" mode.
         LibraryInventory.CreateTransferHeader(TransferHeader, Location[1].Code, Location[2].Code, '');
         TransferHeader.Validate("Direct Transfer", true);
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
         TransferHeader.Modify();
 
         // [GIVEN] Three transfer lines - one will not be posted yet
@@ -4283,7 +4286,7 @@
         LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location[1]);
         LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location[2]);
 
-        // [GIVEN] An intransit location if it is not a direct transfer
+        // [GIVEN] An intransit location if it is not "Shipment and Receipt" mode
         if not DirectTransfer then
             LibraryWarehouse.CreateInTransitLocation(Location[3]);
 
@@ -4291,7 +4294,7 @@
         CreateItemWithPositiveInventory(Item[1], Location[1].Code, 10);
         CreateItemWithPositiveInventory(Item[2], Location[1].Code, 10);
 
-        // [GIVEN] Transfer Order From = "L1" To = "L2". Intransit is "L3" (which is empty on direct transfer)
+        // [GIVEN] Transfer Order From = "L1" To = "L2". Intransit is "L3" (which is empty on Receipt and Shipment mode)
         LibraryInventory.CreateTransferHeader(TransferHeader, Location[1].Code, Location[2].Code, Location[3].Code);
         TransferHeader.Validate("Direct Transfer", DirectTransfer);
         TransferHeader.Modify();
@@ -4782,8 +4785,9 @@
     var
         InventorySetup: Record "Inventory Setup";
     begin
+        // Setup number series for Posted Direct Transfers
         InventorySetup.Get();
-        InventorySetup.Validate("Direct Transfer Posting", InventorySetup."Direct Transfer Posting"::"Direct Transfer");
+        InventorySetup.Validate("Direct Transfer Posting Type", InventorySetup."Direct Transfer Posting Type"::"Direct Transfer");
         InventorySetup.Validate("Posted Direct Trans. Nos.", LibraryUtility.GetGlobalNoSeriesCode());
         InventorySetup.Modify(true);
     end;

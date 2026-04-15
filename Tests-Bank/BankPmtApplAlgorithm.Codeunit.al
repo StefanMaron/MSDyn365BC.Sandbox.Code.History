@@ -26,6 +26,7 @@
         LibraryApplicationArea: Codeunit "Library - Application Area";
         Assert: Codeunit Assert;
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
+        LibrarySetupStorage: Codeunit "Library - Setup Storage";
         isInitialized: Boolean;
         LinesAreAppliedTxt: Label 'are applied';
         RandomizeCount: Integer;
@@ -6184,7 +6185,11 @@
         LibraryERMCountryData.UpdateLocalData();
         LibraryERMCountryData.CreateVATData();
         LibraryERMCountryData.UpdateGeneralPostingSetup();
+        LibraryERMCountryData.UpdatePurchasesPayablesSetup();
         LibraryERM.FindZeroVATPostingSetup(ZeroVATPostingSetup, ZeroVATPostingSetup."VAT Calculation Type"::"Normal VAT");
+
+        LibrarySetupStorage.SavePurchasesSetup();
+        LibrarySetupStorage.SaveGeneralLedgerSetup();
 
         isInitialized := true;
         LibraryTestInitialize.OnAfterTestSuiteInitialize(CODEUNIT::"Bank Pmt. Appl. Algorithm");
@@ -6340,9 +6345,8 @@
         if DueDate <> 0D then
             PurchaseHeader.Validate("Due Date", DueDate);
 
-        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, Item."No.", 1);
-        PurchaseHeader.Validate("Doc. Amount Incl. VAT", PurchaseLine."Outstanding Amount");
         PurchaseHeader.Modify(true);
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, Item."No.", 1);
 
         exit(LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true));
     end;

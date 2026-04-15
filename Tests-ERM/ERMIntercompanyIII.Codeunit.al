@@ -3493,7 +3493,6 @@ codeunit 134154 "ERM Intercompany III"
             exit;
 
         LibraryTestInitialize.OnBeforeTestSuiteInitialize(Codeunit::"ERM Intercompany III");
-        DisableCheckDocTotalAmounts();
         if not ICSetup.Get() then begin
             ICSetup.Init();
             ICSetup.Insert();
@@ -3509,7 +3508,6 @@ codeunit 134154 "ERM Intercompany III"
 
         LibrarySetupStorage.Save(DATABASE::"General Ledger Setup");
         LibrarySetupStorage.Save(Database::"IC Setup");
-        LibrarySetupStorage.Save(DATABASE::"Purchases & Payables Setup");
         LibrarySetupStorage.Save(Database::"Inventory Setup");
 
         LibraryTestInitialize.OnAfterTestSuiteInitialize(Codeunit::"ERM Intercompany III");
@@ -3777,15 +3775,6 @@ codeunit 134154 "ERM Intercompany III"
     begin
         LibrarySales.CreateSalesLine(SalesLine, SalesHeader, "Sales Line Type"::Item, ItemNo, LibraryRandom.RandDecInRange(10, 20, 2));
         UpdateUnitPriceOnSalesLine(SalesLine, LibraryRandom.RandDecInRange(100, 200, 2));
-    end;
-
-    local procedure DisableCheckDocTotalAmounts()
-    var
-        PurchasesPayablesSetup: Record "Purchases & Payables Setup";
-    begin
-        PurchasesPayablesSetup.Get();
-        PurchasesPayablesSetup.Validate("Check Doc. Total Amounts", false);
-        PurchasesPayablesSetup.Modify(true);
     end;
 
     local procedure FindLastSalesInvoiceHeaderNo(OrderNo: Code[20]): Code[20]
