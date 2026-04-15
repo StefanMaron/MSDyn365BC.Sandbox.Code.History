@@ -678,9 +678,13 @@ codeunit 12 "Gen. Jnl.-Post Line"
             end;
         end;
 
-        GLEntry."Source Currency VAT Amount" := CalcAmountSrcCurr(GenJnlLine, GLEntry."VAT Amount");
+        if GenJnlLine."System-Created Entry" then
+            GLEntry."Source Currency VAT Amount" := GenJnlLine."Source Curr. VAT Amount"
+        else
+            GLEntry."Source Currency VAT Amount" := CalcAmountSrcCurr(GenJnlLine, GLEntry."VAT Amount");
         GLEntry."Additional-Currency Amount" :=
-          GLCalcAddCurrency(GLEntry.Amount, GLEntry."Additional-Currency Amount", GLEntry."Additional-Currency Amount", true, GenJnlLine);
+                  GLCalcAddCurrency(GLEntry.Amount, GLEntry."Additional-Currency Amount", GLEntry."Additional-Currency Amount", true, GenJnlLine);
+
         NonDeductibleVAT.CopyNonDedVATAmountFromGenJnlLineToGLEntry(GLEntry, GenJnlLine);
 
         OnAfterInitVAT(GenJnlLine, GLEntry, VATPostingSetup, AddCurrGLEntryVATAmt);
@@ -1024,10 +1028,16 @@ codeunit 12 "Gen. Jnl.-Post Line"
                     case VATPostingSetup."VAT Calculation Type" of
                         VATPostingSetup."VAT Calculation Type"::"Normal VAT",
                       VATPostingSetup."VAT Calculation Type"::"Full VAT":
-                            CreateGLEntry(
-                                GenJnlLine, VATPostingSetup.GetSalesAccount(VATPostingParameters."Unrealized VAT"),
-                                VATPostingParameters."Full VAT Amount", VATPostingParameters."Full VAT Amount ACY", true,
-                                CalcAmountSrcCurr(GenJnlLine, VATPostingParameters."Full VAT Amount"));
+                            if GenJnlLine."System-Created Entry" then
+                                CreateGLEntry(
+                                      GenJnlLine, VATPostingSetup.GetSalesAccount(VATPostingParameters."Unrealized VAT"),
+                                      VATPostingParameters."Full VAT Amount", VATPostingParameters."Full VAT Amount ACY", true,
+                                      GenJnlLine."Source Curr. VAT Amount")
+                            else
+                                CreateGLEntry(
+                                    GenJnlLine, VATPostingSetup.GetSalesAccount(VATPostingParameters."Unrealized VAT"),
+                                    VATPostingParameters."Full VAT Amount", VATPostingParameters."Full VAT Amount ACY", true,
+                                    CalcAmountSrcCurr(GenJnlLine, VATPostingParameters."Full VAT Amount"));
                         VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT":
                             ;
                         VATPostingSetup."VAT Calculation Type"::"Sales Tax":
@@ -1043,12 +1053,18 @@ codeunit 12 "Gen. Jnl.-Post Line"
         LastNextEntryNo: Integer;
     begin
         OnBeforeCreateNormalVATGLEntries(GenJnlLine, VATPostingSetup);
-
         if VATPostingParameters."Unrealized VAT" or (VATPostingParameters."Non-Deductible VAT %" <> 100) then
-            CreateGLEntry(
-                GenJnlLine, VATPostingSetup.GetPurchAccount(VATPostingParameters."Unrealized VAT"),
-                VATPostingParameters."Deductible VAT Amount", VATPostingParameters."Deductible VAT Amount ACY", true,
-                CalcAmountSrcCurr(GenJnlLine, VATPostingParameters."Deductible VAT Amount"));
+            if GenjnlLine."System-Created Entry" then
+                CreateGLEntry(
+                    GenJnlLine, VATPostingSetup.GetPurchAccount(VATPostingParameters."Unrealized VAT"),
+                    VATPostingParameters."Deductible VAT Amount", VATPostingParameters."Deductible VAT Amount ACY", true,
+                    GenJnlLine."Source Curr. VAT Amount")
+            else
+                CreateGLEntry(
+                    GenJnlLine, VATPostingSetup.GetPurchAccount(VATPostingParameters."Unrealized VAT"),
+                    VATPostingParameters."Deductible VAT Amount", VATPostingParameters."Deductible VAT Amount ACY", true,
+                    CalcAmountSrcCurr(GenJnlLine, VATPostingParameters."Deductible VAT Amount"));
+
         if VATPostingParameters."Non-Deductible VAT %" <> 0 then
             if VATPostingParameters."Non-Ded. Purchase VAT Account" = '' then begin
                 if GenJnlLine."Account Type" = GenJnlLine."Account Type"::"Fixed Asset" then begin
@@ -5438,7 +5454,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
                                         DetailedCVLedgEntryBuffer."Currency Code" = AddCurrencyCode,
                                         CalcAmountSrcCurr(GenJournalLine, -DetailedCVLedgEntryBuffer."Amount (LCY)"));
                                 end else
-                                    if LedgEntryInserted or not IsInvoicestoCartera(GenJournalLine."Payment Method Code") then
+                                    if LedgEntryInserted or not IsInvoicestoCartera(GenJournalLine."Payment Method Code") or MultiplePostingGroups then
                                         PostDtldVendLedgEntry(GenJournalLine, DetailedCVLedgEntryBuffer, VendPostingGr, AdjAmount);
                             else
                                 PostDtldVendLedgEntry(GenJournalLine, DetailedCVLedgEntryBuffer, VendPostingGr, AdjAmount);
@@ -5466,7 +5482,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
                     if (PayableAccAmtLCY <> 0) or
                     ((PayableAccAmtAddCurr <> 0) and (AddCurrencyCode <> ''))
                     then
-                        if not (LedgEntryInserted and MultiplePostingGroups and (DocAmountLCY <> 0)) then begin
+                        if LedgEntryInserted or not (MultiplePostingGroups and IDInvoiceSettlement and not IDBillSettlement and (DocAmountLCY <> 0)) then begin
                             InitGLEntry(
                                 GenJournalLine, GLEntry, AccNo, PayableAccAmtLCY, PayableAccAmtAddCurr, true, true,
                                 CalcAmountSrcCurr(GenJournalLine, PayableAccAmtLCY));
@@ -5489,10 +5505,11 @@ codeunit 12 "Gen. Jnl.-Post Line"
 
         OnPostDtldVendLedgEntriesOnAfterCreateGLEntriesForTotalAmounts(TempGLEntryBuf, GlobalGLEntry, NextTransactionNo);
 
-        if (IDInvoiceSettlement or IDBillSettlement) and (MultiplePostingGroups) and (DocAmountLCY <> 0) then
-            PostPayableDocsForMultiplePostingGroups(GenJournalLine, DetailedCVLedgEntryBuffer)
-        else
-            PostPayableDocs(GenJournalLine, VendPostingGr);
+        if LedgEntryInserted or not (MultiplePostingGroups and IDInvoiceSettlement and not IDBillSettlement and (DocAmountLCY <> 0)) then
+            if (IDInvoiceSettlement or IDBillSettlement) and (MultiplePostingGroups) and (DocAmountLCY <> 0) then
+                PostPayableDocsForMultiplePostingGroups(GenJournalLine, DetailedCVLedgEntryBuffer)
+            else
+                PostPayableDocs(GenJournalLine, VendPostingGr);
 
         DetailedCVLedgEntryBuffer.DeleteAll();
     end;
@@ -12681,7 +12698,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
     begin
     end;
 
-	[IntegrationEvent(false, false)]
+    [IntegrationEvent(false, false)]
     local procedure OnAfterSendDocToCartera(var GenJnlLine: Record "Gen. Journal Line"; var VendLedgEntry: Record "Vendor Ledger Entry"; var CustLedgEntry: Record "Cust. Ledger Entry"; DocType: Option Sale,Purchase; var CVLedgEntryBuf: Record "CV Ledger Entry Buffer")
     begin
     end;

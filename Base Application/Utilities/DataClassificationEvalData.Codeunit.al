@@ -381,6 +381,7 @@ codeunit 1751 "Data Classification Eval. Data"
         ClassifyPermissionSetInPlan();
         ClassifyFinancialReports();
         ClassifyICBankAccount();
+        ClassifyICAPILog();
         ClassifyAllocationAccounts();
         ClassifyAgents();
         ClassifyOrderTakerAgent();
@@ -3778,6 +3779,17 @@ codeunit 1751 "Data Classification Eval. Data"
         SetFieldToPersonal(TableNo, RemitAddress.FieldNo(Name));
         SetFieldToPersonal(TableNo, RemitAddress.FieldNo("Bank Account No."));
         SetFieldToPersonal(TableNo, RemitAddress.FieldNo(IBAN));
+    end;
+
+    local procedure ClassifyICAPILog()
+    var
+        DummyICAPILog: Record "IC API Log";
+        TableNo: Integer;
+    begin
+        TableNo := Database::"IC API Log";
+        SetTableFieldsToNormal(TableNo);
+        SetFieldToPersonal(TableNo, DummyICAPILog.FieldNo("Request Body"));
+        SetFieldToPersonal(TableNo, DummyICAPILog.FieldNo("Response Body"));
     end;
 
     local procedure ClassifyOrderTakerAgent()
