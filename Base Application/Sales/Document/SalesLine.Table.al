@@ -828,6 +828,8 @@ table 37 "Sales Line"
 
                     ValidateIncludeInDT();
                     UpdateUnitPriceByField(FieldNo(Quantity));
+                    if Type = Type::Resource then
+                        ApplyResUnitCost(FieldNo(Quantity));
                     UpdatePrePaymentAmounts();
 
                     CheckWMS();
