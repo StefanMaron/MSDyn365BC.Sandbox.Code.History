@@ -194,11 +194,6 @@ report 5913 "Service - Shipment"
                     column(CustNo_ServShptHrdCaption; "Service Shipment Header".FieldCaption("Customer No."))
                     {
                     }
-#if not CLEAN29
-                    column(EnterpriseRegister; CompanyInfo.GetEnterpriseClassification())
-                    {
-                    }
-#endif
                     dataitem(DimensionLoop1; "Integer")
                     {
                         DataItemLinkReference = "Service Shipment Header";
