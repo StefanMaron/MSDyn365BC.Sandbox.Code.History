@@ -117,6 +117,10 @@ page 461 "Inventory Setup"
                 {
                     ApplicationArea = Location;
                 }
+                field("Direct Transfer Posting Type"; Rec."Direct Transfer Posting Type")
+                {
+                    ApplicationArea = Basic, Suite;
+                }
             }
             group(Planning)
             {
@@ -198,10 +202,16 @@ page 461 "Inventory Setup"
                 {
                     ApplicationArea = Basic, Suite;
                 }
+#if not CLEAN29
                 field("Direct Transfer Posting"; Rec."Direct Transfer Posting")
                 {
                     ApplicationArea = Basic, Suite;
+                    Visible = false;
+                    ObsoleteState = Pending;
+                    ObsoleteReason = 'Replaced by field "Direct Transfer Posting Enum" of type Enum "Direct Transfer Posting".';
+                    ObsoleteTag = '29.0';
                 }
+#endif
                 field("Inventory Put-away Nos."; Rec."Inventory Put-away Nos.")
                 {
                     ApplicationArea = Warehouse;
