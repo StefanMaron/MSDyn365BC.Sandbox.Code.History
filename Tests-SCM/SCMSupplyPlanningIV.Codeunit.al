@@ -3445,7 +3445,7 @@ codeunit 137077 "SCM Supply Planning -IV"
 
         // [GIVEN] Transfer header, transfer line with filled shortcut dimensions
         InventorySetup.Get();
-        InventorySetup."Direct Transfer Posting" := InventorySetup."Direct Transfer Posting"::"Direct Transfer";
+        InventorySetup."Direct Transfer Posting Type" := InventorySetup."Direct Transfer Posting Type"::"Direct Transfer";
         InventorySetup.Modify();
 
         CreateItem(Item);
