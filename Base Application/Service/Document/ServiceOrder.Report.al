@@ -83,10 +83,10 @@ report 5900 "Service Order"
                     column(CustAddr1; CustAddr[1])
                     {
                     }
-                    column(CompanyAddr8; CompanyAddr[8])
+                    column(CompanyAddr7; CompanyAddr[7])
                     {
                     }
-                    column(CompanyAddr7; CompanyAddr[7])
+                    column(CompanyAddr8; CompanyAddr[8])
                     {
                     }
                     column(CompanyAddr6; CompanyAddr[6])
@@ -159,18 +159,6 @@ report 5900 "Service Order"
                     {
                     }
                     column(Description_ServHeaderCaption; "Service Header".FieldCaption(Description))
-                    {
-                    }
-                    column(CompanyInfoBusinessIdCode; CompanyInfo."Business Identity Code")
-                    {
-                    }
-                    column(CompanyInfoegHomeCity; CompanyInfo."Registered Home City")
-                    {
-                    }
-                    column(CompanyInfoBusinessIdentityCodeCaption; CompanyInfoBusinessIdentityCodeLbl)
-                    {
-                    }
-                    column(CompanyInfoRegisteredHomeCityCaption; CompanyInfoRegisteredHomeCityLbl)
                     {
                     }
                     dataitem(DimensionLoop1; "Integer")
@@ -721,8 +709,6 @@ report 5900 "Service Order"
         TotalCaptionLbl: Label 'Total';
         LineDimensionsCaptionLbl: Label 'Line Dimensions';
         ShiptoAddressCaptionLbl: Label 'Ship-to Address';
-        CompanyInfoBusinessIdentityCodeLbl: Label 'Business Identity Code';
-        CompanyInfoRegisteredHomeCityLbl: Label 'Registered Home City';
 
     protected var
         CompanyInfo: Record "Company Information";
