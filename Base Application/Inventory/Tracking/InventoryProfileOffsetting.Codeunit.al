@@ -2392,6 +2392,7 @@ codeunit 99000854 "Inventory Profile Offsetting"
         PrevTempEntryNo: Integer;
         PrevInsertedEntryNo: Integer;
         IsHandled: Boolean;
+        InsertedEntryNos: List of [Integer];
     begin
         IsHandled := false;
         OnBeforeCommitTracking(TempTrkgReservEntry, IsHandled);
@@ -2407,16 +2408,57 @@ codeunit 99000854 "Inventory Profile Offsetting"
                     ReservEntry."Entry No." := 0;
                 ReservEntry.UpdateItemTracking();
                 UpdateAppliedItemEntry(ReservEntry);
-                ReservEntry.Insert();
-                OnCommitTrackingOnAfterInsertReservationEntry(ReservEntry);
-                PrevTempEntryNo := TempTrkgReservEntry."Entry No.";
-                PrevInsertedEntryNo := ReservEntry."Entry No.";
+                if (ReservEntry."Source Type" = Database::"Transfer Line") and (ReservEntry."Reservation Status" = ReservEntry."Reservation Status"::Surplus) then begin
+                    if not UpdateOrSkipDuplicateSurplusEntry(ReservEntry, InsertedEntryNos) then begin
+                        ReservEntry.Insert();
+                        OnCommitTrackingOnAfterInsertReservationEntry(ReservEntry);
+                        PrevInsertedEntryNo := ReservEntry."Entry No.";
+                        InsertedEntryNos.Add(ReservEntry."Entry No.");
+                    end;
+                end else begin
+                    ReservEntry.Insert();
+                    OnCommitTrackingOnAfterInsertReservationEntry(ReservEntry);
+                    PrevTempEntryNo := TempTrkgReservEntry."Entry No.";
+                    PrevInsertedEntryNo := ReservEntry."Entry No.";
+                end;
                 TempTrkgReservEntry.Delete();
             until TempTrkgReservEntry.Next() = 0;
             Clear(TempTrkgReservEntry);
         end;
 
         OnAfterCommitTracking(TempItemTrkgEntry);
+    end;
+
+    local procedure UpdateOrSkipDuplicateSurplusEntry(var NewReservEntry: Record "Reservation Entry"; InsertedEntryNos: List of [Integer]): Boolean
+    var
+        ExistingReservEntry: Record "Reservation Entry";
+    begin
+        if NewReservEntry."Reservation Status" <> NewReservEntry."Reservation Status"::Surplus then
+            exit(false);
+
+        if not NewReservEntry.TrackingExists() then
+            exit(false);
+
+        ExistingReservEntry.SetSourceFilterFromReservEntry(NewReservEntry);
+        ExistingReservEntry.SetRange("Reservation Status", ExistingReservEntry."Reservation Status"::Surplus);
+        ExistingReservEntry.SetRange(Positive, NewReservEntry.Positive);
+        ExistingReservEntry.SetTrackingFilterFromReservEntry(NewReservEntry);
+        if ExistingReservEntry.FindSet() then
+            repeat
+                // Only treat as duplicate if the entry existed before this CommitTracking call
+                if not InsertedEntryNos.Contains(ExistingReservEntry."Entry No.") then begin
+                    if ExistingReservEntry."Quantity (Base)" <> NewReservEntry."Quantity (Base)" then begin
+                        ExistingReservEntry."Quantity (Base)" := NewReservEntry."Quantity (Base)";
+                        ExistingReservEntry.Quantity := NewReservEntry.Quantity;
+                        ExistingReservEntry."Qty. to Handle (Base)" := NewReservEntry."Qty. to Handle (Base)";
+                        ExistingReservEntry."Qty. to Invoice (Base)" := NewReservEntry."Qty. to Invoice (Base)";
+                        ExistingReservEntry.Modify();
+                    end;
+                    exit(true);
+                end;
+            until ExistingReservEntry.Next() = 0;
+
+        exit(false);
     end;
 
     procedure MaintainPlanningLine(var SupplyInvtProfile: Record "Inventory Profile"; DemandInvtProfile: Record "Inventory Profile"; NewPhase: Option " ","Line Created","Routing Created",Exploded,Obsolete; Direction: Option Forward,Backward)
