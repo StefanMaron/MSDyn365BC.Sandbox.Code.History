@@ -2,39 +2,29 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Inventory.Ledger;
+namespace Microsoft.Sales.Pricing;
 
-table 6508 "Value Entry Relation"
+/// <summary>
+/// The purpose of the table is to setup access to UX and logic of the sales price calculation.
+/// TableType is not set to Temporary only because the ReadPermission() method always returns true.
+/// </summary>
+table 7015 "Sales Price Access"
 {
-    Caption = 'Value Entry Relation';
     DataClassification = CustomerContent;
 
     fields
     {
-        field(1; "Value Entry No."; Integer)
+        field(1; Code; Code[20])
         {
-            Caption = 'Value Entry No.';
-            TableRelation = "Value Entry";
-        }
-        field(11; "Source RowId"; Text[250])
-        {
-            Caption = 'Source RowId';
+            DataClassification = SystemMetadata;
         }
     }
 
     keys
     {
-        key(Key1; "Value Entry No.")
+        key(Key1; Code)
         {
             Clustered = true;
         }
-        key(Key2; "Source RowId")
-        {
-        }
-    }
-
-    fieldgroups
-    {
     }
 }
-
