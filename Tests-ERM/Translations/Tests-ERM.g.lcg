@@ -4460,6 +4460,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Posting Outside Date - NamedType UnexpectedConfirmTextErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3810702948 - NamedType 1980795883" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[%1 should be updated when Direct Unit Cost is changed with %2]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Field Caption, %2 = Prices Including/Excluding VAT]D;]A;(LookupHint=Codeunit ERM Posting Rounding - NamedType AmountACYShouldBeUpdatedErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1514131158 - NamedType 4159681631" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Allocation dimension is not correct]]></Val>
