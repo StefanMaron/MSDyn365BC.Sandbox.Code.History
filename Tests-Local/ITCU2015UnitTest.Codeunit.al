@@ -1637,7 +1637,7 @@ codeunit 144021 "IT - CU 2015 Unit Test"
         // Validate D-Record
         ValidateTextFileValue(LineNumber, 1, 1, 'D');
         ValidateTextFileValue(LineNumber, 2, 16, CompanyInformation."Fiscal Code");
-        ValidateTextFileValue(LineNumber, 18, 8, '00000001'); // We only export a single file
+        ValidateTextFileValue(LineNumber, 18, 8, FormatToLength(RecordHEntryNumber, 8)); // D-3: Progressivo Modulo
         ValidateTextFileValue(LineNumber, 26, 16, Vendor."Fiscal Code");
         ValidateTextFileValue(LineNumber, 42, 5, FormatToLength(CertificationProgressive, 5)); // D-5: Progressivo Certificazione
 
