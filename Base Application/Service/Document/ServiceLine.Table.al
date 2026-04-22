@@ -3656,6 +3656,30 @@ table 5902 "Service Line"
         OnAfterUpdateAmounts(Rec);
     end;
 
+    procedure CalcServSalesTaxLines(var ServiceHeader: Record "Service Header"; var ServiceLine1: Record "Service Line")
+    var
+        TaxArea: Record "Tax Area";
+        ServTaxCalculate: Codeunit "Serv. Sales Tax Calculate";
+    begin
+        if ServiceHeader."Tax Area Code" = '' then
+            exit;
+        TaxArea.Get(ServiceHeader."Tax Area Code");
+        ServTaxCalculate.StartSalesTaxCalculation();
+
+        ServiceLine1.SetRange("Document Type", ServiceHeader."Document Type");
+        ServiceLine1.SetRange("Document No.", ServiceHeader."No.");
+        ServiceLine1.SetFilter(Type, '<>0');
+        ServiceLine1.SetFilter("Tax Group Code", '<>%1', '');
+        if ServiceLine1.FindSet() then
+            repeat
+                ServTaxCalculate.AddServiceLine(ServiceLine1);
+            until ServiceLine1.Next() = 0;
+        ServTaxCalculate.EndSalesTaxCalculation(ServiceHeader."Posting Date");
+
+        ServiceLine1.SetServHeader(ServiceHeader);
+        ServTaxCalculate.DistTaxOverServLines(ServiceLine1);
+    end;
+
     local procedure NotifyOnMissingSetup(FieldNumber: Integer)
     var
         DiscountNotificationMgt: Codeunit "Discount Notification Mgt.";
