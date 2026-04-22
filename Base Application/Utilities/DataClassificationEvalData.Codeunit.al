@@ -3810,6 +3810,7 @@ codeunit 1751 "Data Classification Eval. Data"
         DummyAgentTaskTimelineStepDetail: Record "Agent Task Timeline Step Det.";
         DummyAgentTaskTimeline: Record "Agent Task Timeline";
         DummyAgentTaskLogEntry: Record "Agent Task Log Entry";
+        DummyAgentCreationControl: Record "Agent Creation Control";
         TableNo: Integer;
     begin
         TableNo := DATABASE::"Agent";
@@ -3867,6 +3868,10 @@ codeunit 1751 "Data Classification Eval. Data"
         SetFieldToCompanyConfidential(TableNo, DummyAgentTaskLogEntry.FieldNo("Details"));
         SetFieldToCompanyConfidential(TableNo, DummyAgentTaskLogEntry.FieldNo("Description"));
         SetFieldToCompanyConfidential(TableNo, DummyAgentTaskLogEntry.FieldNo("Page Caption"));
+
+        TableNo := DATABASE::"Agent Creation Control";
+        SetTableFieldsToNormal(TableNo);
+        SetFieldToPersonal(TableNo, DummyAgentCreationControl.FieldNo("User Security ID"));
 
         // Agent Designer
         SetTableFieldsToNormal(4350); // "Custom Agent Setup"
