@@ -313,8 +313,17 @@
     "search.exclude": {
       "**.xlf": true
     },
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
-    "al.enableCodeActions": false
-  }
+    {
+      "path": "./AI Test Toolkit/src/TestSuite"
+    },
+    {
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
+    },
+    {
+      "path": "./Sales Lines Suggestions Tests/AI Tests"
+    },
+    {
+      "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
+    }
+  ]
 }
