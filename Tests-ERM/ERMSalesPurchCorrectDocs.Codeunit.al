@@ -2120,6 +2120,52 @@ codeunit 134398 "ERM Sales/Purch. Correct. Docs"
         Assert.AreEqual(false, IncomingDocument.Posted, IncomingDocumentPostedErr);
     end;
 
+    [Test]
+    procedure CancelPurchInvFromOrderResetsIncomingDocPostedFlag()
+    var
+        IncomingDocument: Record "Incoming Document";
+        IncomingDocumentAttachment: Record "Incoming Document Attachment";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseInvoiceHeader: Record "Purch. Inv. Header";
+        PurchaseLine: Record "Purchase Line";
+        CorrectPostedPurchaseInvoice: Codeunit "Correct Posted Purch. Invoice";
+        PstdDocNo: Code[20];
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO 631107] Cancelling a posted purchase invoice from a purchase order resets the linked Incoming Document Posted flag
+        Initialize();
+
+        // [GIVEN] Purchase Order "PO" with Quantity, Qty. to Receive, Qty. to Invoice
+        LibraryPurchase.CreatePurchaseOrder(PurchaseHeader);
+        GetPurchaseLine(PurchaseLine, PurchaseHeader);
+        PurchaseLine.Validate(Quantity, LibraryRandom.RandIntInRange(15, 20));
+        PurchaseLine.Validate("Qty. to Receive", LibraryRandom.RandIntInRange(5, 10));
+        PurchaseLine.Validate("Qty. to Invoice", LibraryRandom.RandIntInRange(5, 10));
+        PurchaseLine.Modify(true);
+
+        // [GIVEN] Incoming Document "ID" linked to Purchase Order "PO"
+        LibraryIncomingDocuments.CreateNewIncomingDocument(IncomingDocument);
+        IncomingDocument.Release();
+        PurchaseHeader.Validate("Incoming Document Entry No.", IncomingDocument."Entry No.");
+        PurchaseHeader.Modify(true);
+        CreateIncomingDocumentAttachment(IncomingDocument, IncomingDocumentAttachment);
+
+        // [GIVEN] Purchase Order "PO" is posted with Receive and Invoice
+        PstdDocNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
+        PurchaseInvoiceHeader.Get(PstdDocNo);
+
+        // [GIVEN] Incoming Document "ID" has Posted = Yes after posting
+        IncomingDocument.Find();
+        Assert.AreEqual(true, IncomingDocument.Posted, IncomingDocumentErr);
+
+        // [WHEN] Cancel the posted purchase invoice
+        CorrectPostedPurchaseInvoice.CancelPostedInvoice(PurchaseInvoiceHeader);
+
+        // [THEN] Incoming Document "ID" has Posted = No
+        IncomingDocument.Find();
+        Assert.AreEqual(false, IncomingDocument.Posted, IncomingDocumentPostedErr);
+    end;
+
     local procedure Initialize()
     begin
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"ERM Sales/Purch. Correct. Docs");
