@@ -538,8 +538,6 @@ page 6181 "E-Document Purchase Draft"
 
     local procedure FinalizeEDocument()
     var
-        TempErrorMessage: Record "Error Message" temporary;
-        ErrorMessage: Record "Error Message";
         EDocImportParameters: Record "E-Doc. Import Parameters";
         EDocImport: Codeunit "E-Doc. Import";
         EDocImpSessionTelemetry: Codeunit "E-Doc. Imp. Session Telemetry";
@@ -555,12 +553,7 @@ page 6181 "E-Document Purchase Draft"
         EDocImport.ProcessIncomingEDocument(Rec, EDocImportParameters);
         Rec.Get(Rec."Entry No");
 
-        if EDocumentErrorHelper.HasErrors(Rec) then begin
-            ErrorMessage.SetRange("Context Record ID", Rec.RecordId);
-            ErrorMessage.CopyToTemp(TempErrorMessage);
-            Commit(); // Persists error messages after error is thrown.
-            TempErrorMessage.ThrowError();
-        end;
+        EDocumentErrorHelper.ThrowIfHasErrors(Rec);
 
         PageEditable := IsEditable();
         CurrPage.Lines.Page.Update();
@@ -597,6 +590,7 @@ page 6181 "E-Document Purchase Draft"
         Rec.Get(Rec."Entry No");
         if GuiAllowed() then
             Progress.Close();
+        EDocumentErrorHelper.ThrowIfHasErrors(Rec);
     end;
 
     local procedure PrepareDraft()
@@ -639,6 +633,7 @@ page 6181 "E-Document Purchase Draft"
         Rec.Get(Rec."Entry No");
         if GuiAllowed() then
             Progress.Close();
+        EDocumentErrorHelper.ThrowIfHasErrors(Rec);
     end;
 
     local procedure ProvideFeedback()
