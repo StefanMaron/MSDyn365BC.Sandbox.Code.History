@@ -5,6 +5,7 @@
 namespace Microsoft.Finance.VAT.Reporting;
 
 using Microsoft.Foundation.Address;
+using System.Reflection;
 using System.Telemetry;
 using System.Utilities;
 
@@ -264,11 +265,15 @@ codeunit 11001 "VIES ELMA Xml"
         if (VATReportLine.Base = 0) and (VATReportLine."Line Type" <> VATReportLine."Line Type"::Correction) then
             exit;
 
-        ZMZeileElement := XmlElement.Create('zmZeile', ZMNamespace);
-        ZMZeileElement.Add(XmlAttribute.Create('uuid', CreateUUID()));
-
         // Parse VAT Registration No. to get country code and number
         GetVATRegNoParts(VATReportLine, CountryCode, VATRegNoWithoutCountry);
+
+        // Skip domestic country lines - VIES only reports cross-border EU supplies
+        if CountryCode = 'DE' then
+            exit;
+
+        ZMZeileElement := XmlElement.Create('zmZeile', ZMNamespace);
+        ZMZeileElement.Add(XmlAttribute.Create('uuid', CreateUUID()));
 
         // Country code
         ZMZeileElement.Add(CreateZMElement('lkz', CountryCode));
@@ -300,7 +305,20 @@ codeunit 11001 "VIES ELMA Xml"
         end else
             CountryCode := CopyStr(VATReportLine."Country/Region Code", 1, 2);
 
-        VATRegNoWithoutCountry := CopyStr(VATRegNo, 1, 12);
+        VATRegNoWithoutCountry := CopyStr(SanitizeVATRegNo(VATRegNo), 1, 12);
+    end;
+
+    local procedure SanitizeVATRegNo(VATRegNo: Text): Text
+    var
+        TypeHelper: Codeunit "Type Helper";
+        ResultTB: TextBuilder;
+        Ch: Char;
+    begin
+        foreach Ch in VATRegNo do
+            if TypeHelper.IsDigit(Ch) or TypeHelper.IsLatinLetter(Ch) or (Ch = '+') or (Ch = '*') then
+                ResultTB.Append(Ch);
+
+        exit(ResultTB.ToText());
     end;
 
     local procedure GetTurnoverType(VATReportLine: Record "VAT Report Line"): Text[1]
