@@ -1176,7 +1176,7 @@ codeunit 6201 "Non-Ded. VAT Impl."
     begin
         if (GenJournalLine."Document Type" = GenJournalLine."Document Type"::Invoice) and
             (GenJournalLine."VAT Calculation Type" = GenJournalLine."VAT Calculation Type"::"Normal VAT") and
-            (Vendor.Get(GenJournalLine."Bill-to/Pay-to No.") and (Vendor."Prices Including VAT")) then
+            ((Vendor.Get(GenJournalLine."Bill-to/Pay-to No.") and (Vendor."Prices Including VAT")) or (GenJournalLine."Non-Deductible VAT Diff." = 0)) then
             exit(true);
         exit(false);
     end;
