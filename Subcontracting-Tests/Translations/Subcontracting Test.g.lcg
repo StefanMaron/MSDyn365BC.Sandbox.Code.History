@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LCX SchemaVersion="6.0" Name="Subcontracting Test.g" PsrId="63" SrcCul="en-US" TgtCul="en-US" xmlns="http://schemas.microsoft.com/locstudio/2006/6/lcx">
+  <OwnedComments>
+    <Cmt Name="Dev" />
+    <Cmt Name="LcxAdmin" />
+    <Cmt Name="Rccx" />
+  </OwnedComments>
+  <Item ItemId=";Codeunit 1353084171 - Method 3713635277 - NamedType 2311994795" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[You cannot open Tracking Specification because this component is already specified in Transfer Order %1.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[|%1 = Transfer Order No.]D;]A;(Namespace=Microsoft.Manufacturing.Subcontracting.Test)(LookupHint=Codeunit Subc. Subcontracting Test - Method CheckBtnTrackingSpecificationOnProdOrderCompOnExistingReserveInTransferLine - NamedType AlreadySpecifiedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1455081095 - NamedType 2966984276" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Control %1 does not exist.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = field caption]D;]A;(Namespace=Microsoft.Manufacturing.Subcontracting.Test)(LookupHint=Codeunit Subc. Subcontracting UI Test - NamedType ControlNotExistMsg)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";PageExtension 241319753 - Action 384785703 - Property 1295455071" ItemType=";PageExtension - Action" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Delete the current record.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Page 670888405)(Namespace=Microsoft.Manufacturing.Subcontracting.Test)(LookupHint=PageExtension Subc. TST WizComp - Action Sub Delete - Property ToolTip)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";PageExtension 241319753 - Action 384785703 - Property 2879900210" ItemType=";PageExtension - Action" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Delete]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Page 670888405)(Namespace=Microsoft.Manufacturing.Subcontracting.Test)(LookupHint=PageExtension Subc. TST WizComp - Action Sub Delete - Property Caption)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";PageExtension 750943756 - Action 384785703 - Property 1295455071" ItemType=";PageExtension - Action" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Delete the current record.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Page 206129681)(Namespace=Microsoft.Manufacturing.Subcontracting.Test)(LookupHint=PageExtension Subc. TST WizProdRtng - Action Sub Delete - Property ToolTip)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";PageExtension 750943756 - Action 384785703 - Property 2879900210" ItemType=";PageExtension - Action" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Delete]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Page 206129681)(Namespace=Microsoft.Manufacturing.Subcontracting.Test)(LookupHint=PageExtension Subc. TST WizProdRtng - Action Sub Delete - Property Caption)]]></Cmt>
+    </Cmts>
+  </Item>
+</LCX>
