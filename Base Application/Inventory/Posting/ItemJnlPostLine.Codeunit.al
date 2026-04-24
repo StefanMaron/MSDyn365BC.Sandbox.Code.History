@@ -3579,7 +3579,10 @@ codeunit 22 "Item Jnl.-Post Line"
         CostCalcMgt: Codeunit "Cost Calculation Management";
     begin
         if Expected then begin
-            DirCost := ItemJnlLine."Unit Cost" * ItemJnlLine.Quantity + RoundingResidualAmount;
+            if ShouldUseCumulativeRoundingForExpectedCost() then
+                DirCost := ItemJnlLine.Amount + Round(CostCalcMgt.CalcOvhdCost(ItemJnlLine.Amount, ItemJnlLine."Indirect Cost %", ItemJnlLine."Overhead Rate", ItemJnlLine.Quantity), GLSetup."Amount Rounding Precision") + RoundingResidualAmount
+            else
+                DirCost := ItemJnlLine."Unit Cost" * ItemJnlLine.Quantity + RoundingResidualAmount;
             PurchVar := 0;
             PurchVarACY := 0;
             OvhdCost := 0;
@@ -7689,6 +7692,21 @@ codeunit 22 "Item Jnl.-Post Line"
         exit(false);
     end;
 
+    local procedure ShouldUseCumulativeRoundingForExpectedCost(): Boolean
+    begin
+        if ItemJnlLine."Entry Type" <> ItemJnlLine."Entry Type"::Purchase then
+            exit(false);
+
+        if not (InvtSetup."Automatic Cost Posting") or not (InvtSetup."Expected Cost Posting to G/L") then
+            exit(false);
+
+        if Item."Cost is Adjusted" or Item."Allow Online Adjustment" or
+            (Item."Flushing Method" <> Item."Flushing Method"::Manual) then
+            exit(false);
+
+        exit(true);
+    end;
+
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sequence No. Mgt.", 'OnPreviewableLedgerEntry', '', false, false)]
     local procedure OnPreviewableLedgerEntry(TableNo: Integer; var IsPreviewable: Boolean)
     begin
@@ -7722,8 +7740,8 @@ codeunit 22 "Item Jnl.-Post Line"
 
     internal procedure RestoreTempTrackingSpecification(var TempTrackingSpecificationFrom: Record "Tracking Specification" temporary)
     begin
-        TempSplitItemJnlLine.Reset();
-        TempSplitItemJnlLine.DeleteAll();
+        TempTrackingSpecification.Reset();
+        TempTrackingSpecification.DeleteAll();
         if TempTrackingSpecificationFrom.FindSet() then
             repeat
                 TempTrackingSpecification := TempTrackingSpecificationFrom;
