@@ -7966,6 +7966,72 @@ codeunit 137072 "SCM Production Orders II"
         NotificationLifecycleMgt.RecallAllNotifications();
     end;
 
+    [Test]
+    [HandlerFunctions('ItemTrackingPageHandler,ItemTrackingSummaryPageHandler')]
+    procedure PostOutputWithBackwardFlushingTwoTrackedCompsSameRoutingLink()
+    var
+        CompItem: Record Item;
+        CompItem2: Record Item;
+        ProdItem: Record Item;
+        RoutingHeader: Record "Routing Header";
+        RoutingLine: Record "Routing Line";
+        RoutingLink: Record "Routing Link";
+        WorkCenter: Record "Work Center";
+        ProductionBOMHeader: Record "Production BOM Header";
+        ProductionBOMLine: Record "Production BOM Line";
+        ProductionOrder: Record "Production Order";
+        ProdOrderComponent: Record "Prod. Order Component";
+        Qty: Decimal;
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 630224] Posting output with backward flushing for two lot-tracked components on the same routing link does not cause duplicate Tracking Specification error.
+        Initialize();
+        Qty := LibraryRandom.RandIntInRange(2, 10);
+
+        // [GIVEN] Two component items "C1" and "C2" with lot tracking.
+        CreateItemWithItemTrackingCode(CompItem, CreateItemTrackingCode());
+        CreateItemWithItemTrackingCode(CompItem2, CreateItemTrackingCode());
+
+        // [GIVEN] Post inventory for "C1" and "C2" with lot tracking.
+        AssignNoSeriesForItemJournalBatch(ItemJournalBatch, '');  // Value required to avoid the Document No mismatch.
+        CreateAndPostItemJournalLine(CompItem."No.", Qty * 2, '', '', true);
+        CreateAndPostItemJournalLine(CompItem2."No.", Qty * 2, '', '', true);
+
+        // [GIVEN] Production item "P" with routing and BOM containing "C1" and "C2" on the same routing link code.
+        LibraryInventory.CreateItem(ProdItem);
+        LibraryManufacturing.CreateRoutingLink(RoutingLink);
+        LibraryManufacturing.CreateWorkCenter(WorkCenter);
+        CreateAndCertifyRoutingWithRoutingLinkCode(RoutingHeader, RoutingLine, WorkCenter."No.", RoutingLink.Code);
+        CreateAndCertifyProductionBOMwithRoutingLinkCode(ProductionBOMHeader, ProductionBOMLine, ProdItem, CompItem, CompItem2, RoutingLink);
+        ProdItem.Validate("Routing No.", RoutingHeader."No.");
+        ProdItem.Validate("Production BOM No.", ProductionBOMHeader."No.");
+        ProdItem.Modify(true);
+
+        // [GIVEN] Released production order for "P".
+        CreateAndRefreshProductionOrder(ProductionOrder, ProductionOrder.Status::Released, ProdItem."No.", Qty, '', '');
+
+        // [GIVEN] Set backward flushing on both components.
+        ProdOrderComponent.SetRange("Prod. Order No.", ProductionOrder."No.");
+        ProdOrderComponent.ModifyAll("Flushing Method", ProdOrderComponent."Flushing Method"::Backward, true);
+
+        // [GIVEN] Assign lot tracking on component "C1".
+        SelectItemTrackingForProdOrderComponents(CompItem."No.");
+
+        // [GIVEN] Assign lot tracking on component "C2".
+        SelectItemTrackingForProdOrderComponents(CompItem2."No.");
+
+        // [WHEN] Post output journal for production order.
+        CreateAndPostOutputJournal(ProductionOrder."No.", Qty);
+
+        // [THEN] Consumption is posted for "C1" with lot tracking.
+        VerifyConsumptionWithLotTracking(CompItem."No.");
+
+        // [THEN] Consumption is posted for "C2" with lot tracking.
+        VerifyConsumptionWithLotTracking(CompItem2."No.");
+
+        LibraryVariableStorage.AssertEmpty();
+    end;
+    
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -10263,6 +10329,16 @@ codeunit 137072 "SCM Production Orders II"
         WarehouseEntry.FindLast();
     end;
 
+    local procedure VerifyConsumptionWithLotTracking(ItemNo: Code[20])
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Consumption);
+        ItemLedgerEntry.SetRange("Item No.", ItemNo);
+        ItemLedgerEntry.SetFilter("Lot No.", '<>%1', '');
+        Assert.RecordIsNotEmpty(ItemLedgerEntry);
+    end;
+    
     [ModalPageHandler]
     procedure ProductionJournalModalPageHandler(var ProductionJournal: TestPage "Production Journal")
     begin
