@@ -1551,6 +1551,59 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         Assert.RecordIsEmpty(TransferReceiptHeader);
     end;
 
+    [Test]
+    [HandlerFunctions('MessageHandler')]
+    [Scope('OnPrem')]
+    procedure PostAndPrintWhseShipmentDirectTransferMode()
+    var
+        LocationFrom: Record Location;
+        LocationTo: Record Location;
+        Item: Record Item;
+        TransferHeader: Record "Transfer Header";
+        TransferLine: Record "Transfer Line";
+        WarehouseShipmentHeader: Record "Warehouse Shipment Header";
+        DirectTransferHeader: Record "Direct Trans. Header";
+        Quantity: Decimal;
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO] Post & Print warehouse shipment for direct transfer with Direct Transfer posting mode does not error
+        Initialize();
+        Quantity := LibraryRandom.RandIntInRange(10, 100);
+
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Direct Transfer"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Direct Transfer");
+
+        // [GIVEN] Location "FROM" with "Require Shipment" = TRUE
+        CreateLocationWithWarehouseSetup(LocationFrom, false, false, false, false, true);
+
+        // [GIVEN] Location "TO" without warehouse requirements
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationTo);
+
+        // [GIVEN] Item "I" with positive inventory at location "FROM"
+        CreateItemWithPositiveInventory(Item, LocationFrom.Code, Quantity);
+
+        // [GIVEN] Direct Transfer Order from "FROM" to "TO"
+        CreateDirectTransferOrder(TransferHeader, TransferLine, LocationFrom.Code, LocationTo.Code, Item."No.", '', Quantity, TransferHeader."Direct Transfer Posting"::"Direct Transfer");
+
+        // [GIVEN] Transfer Order is released
+        LibraryInventory.ReleaseTransferOrder(TransferHeader);
+
+        // [GIVEN] Warehouse Shipment "WS" is created from Transfer Order
+        LibraryWarehouse.CreateWhseShipmentFromTO(TransferHeader);
+        FindWarehouseShipmentHeader(WarehouseShipmentHeader, TransferHeader."No.");
+        LibraryWarehouse.AutofillQtyToShipWhseShipment(WarehouseShipmentHeader);
+
+        // [WHEN] Post Warehouse Shipment.
+        PostWarehouseShipment(WarehouseShipmentHeader);
+
+        // [THEN] Direct Transfer Header is created (no error occurred)
+        DirectTransferHeader.SetRange("Transfer Order No.", TransferHeader."No.");
+        Assert.RecordCount(DirectTransferHeader, 1);
+
+        // [THEN] Inventory moved correctly from "FROM" to "TO"
+        VerifyItemLedgerEntriesForDirectTransfer(Item."No.", LocationFrom.Code, LocationTo.Code, -Quantity, Quantity);
+    end;
+
     local procedure Initialize()
     var
         InventorySetup: Record "Inventory Setup";
@@ -1813,5 +1866,11 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
     procedure TrackingMessageHandler(Message: Text[1024])
     begin
         LibraryVariableStorage.Enqueue(Message);
+    end;
+
+    [StrMenuHandler]
+    procedure StrMenuHandlerShip(Options: Text[1024]; var Choice: Integer; Instruction: Text[1024])
+    begin
+        Choice := 1;
     end;
 }
