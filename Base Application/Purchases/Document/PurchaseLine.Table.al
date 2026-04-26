@@ -3160,6 +3160,7 @@ table 39 "Purchase Line"
             Caption = 'Purchasing Code';
             Editable = false;
             TableRelation = Purchasing;
+            ToolTip = 'Specifies the purchasing code associated with the purchase line.';
 
             trigger OnValidate()
             var
