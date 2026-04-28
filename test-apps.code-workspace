@@ -171,6 +171,11 @@
     "search.exclude": {
       "**.xlf": true
     },
-    "al.enableCodeActions": false
-  }
+    {
+      "path": "./AI Test Toolkit/src/TestSuite"
+    },
+    {
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
+    }
+  ]
 }
