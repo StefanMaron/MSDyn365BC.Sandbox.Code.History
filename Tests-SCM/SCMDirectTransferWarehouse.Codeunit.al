@@ -19,6 +19,8 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         isInitialized: Boolean;
         WrongPostPreviewErr: Label 'Expected empty error from Preview. Actual error: ';
+        UnexpectedTransferQtyErr: Label 'Unexpected transfer quantity at location %1 (Positive=%2).', Comment = '%1 = Location Code, %2 = Positive flag';
+        InTransitCodeNotClearedErr: Label 'In-Transit Code must not be cleared when Direct Transfer Posting = "Shipment and Receipt".';
 
     [Test]
     [Scope('OnPrem')]
@@ -1367,6 +1369,86 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
 
     [Test]
     [Scope('OnPrem')]
+    procedure TransferFromValidateCopiesRouteDefaultsToHeader()
+    var
+        TransferRoute: Record "Transfer Route";
+        TransferHeader: Record "Transfer Header";
+        LocationFrom: Record Location;
+        LocationTo: Record Location;
+        LocationInTransit: Record Location;
+        ShippingAgent: Record "Shipping Agent";
+        ShippingAgentService: Record "Shipping Agent Services";
+        ShippingTime: DateFormula;
+    begin
+        // [FEATURE] [Transfer Route]
+        // [SCENARIO 631788] Transfer-from Code validation copies route defaults to the header.
+        Initialize();
+
+        // [GIVEN] Locations and a transfer route with in-transit and shipping defaults.
+        LibraryWarehouse.CreateLocation(LocationFrom);
+        LibraryWarehouse.CreateLocation(LocationTo);
+        LibraryWarehouse.CreateInTransitLocation(LocationInTransit);
+        LibraryInventory.CreateShippingAgent(ShippingAgent);
+        Evaluate(ShippingTime, '<1D>');
+        LibraryInventory.CreateShippingAgentService(ShippingAgentService, ShippingAgent.Code, ShippingTime);
+        LibraryWarehouse.CreateAndUpdateTransferRoute(
+            TransferRoute, LocationFrom.Code, LocationTo.Code, LocationInTransit.Code,
+            ShippingAgent.Code, ShippingAgentService.Code);
+
+        // [GIVEN] A transfer order with only the destination location selected.
+        LibraryInventory.CreateTransferHeader(TransferHeader, '', LocationTo.Code, '');
+
+        // [WHEN] Transfer-from Code is validated.
+        TransferHeader.Validate("Transfer-from Code", LocationFrom.Code);
+
+        // [THEN] Route defaults are copied to the header.
+        TransferHeader.TestField("In-Transit Code", LocationInTransit.Code);
+        TransferHeader.TestField("Shipping Agent Code", ShippingAgent.Code);
+        TransferHeader.TestField("Shipping Agent Service Code", ShippingAgentService.Code);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure TransferToValidateCopiesRouteDefaultsToHeader()
+    var
+        TransferRoute: Record "Transfer Route";
+        TransferHeader: Record "Transfer Header";
+        LocationFrom: Record Location;
+        LocationTo: Record Location;
+        LocationInTransit: Record Location;
+        ShippingAgent: Record "Shipping Agent";
+        ShippingAgentService: Record "Shipping Agent Services";
+        ShippingTime: DateFormula;
+    begin
+        // [FEATURE] [Transfer Route]
+        // [SCENARIO 631788] Transfer-to Code validation copies route defaults to the header.
+        Initialize();
+
+        // [GIVEN] Locations and a transfer route with in-transit and shipping defaults.
+        LibraryWarehouse.CreateLocation(LocationFrom);
+        LibraryWarehouse.CreateLocation(LocationTo);
+        LibraryWarehouse.CreateInTransitLocation(LocationInTransit);
+        LibraryInventory.CreateShippingAgent(ShippingAgent);
+        Evaluate(ShippingTime, '<1D>');
+        LibraryInventory.CreateShippingAgentService(ShippingAgentService, ShippingAgent.Code, ShippingTime);
+        LibraryWarehouse.CreateAndUpdateTransferRoute(
+            TransferRoute, LocationFrom.Code, LocationTo.Code, LocationInTransit.Code,
+            ShippingAgent.Code, ShippingAgentService.Code);
+
+        // [GIVEN] A transfer order with only the source location selected.
+        LibraryInventory.CreateTransferHeader(TransferHeader, LocationFrom.Code, '', '');
+
+        // [WHEN] Transfer-to Code is validated.
+        TransferHeader.Validate("Transfer-to Code", LocationTo.Code);
+
+        // [THEN] Route defaults are copied to the header.
+        TransferHeader.TestField("In-Transit Code", LocationInTransit.Code);
+        TransferHeader.TestField("Shipping Agent Code", ShippingAgent.Code);
+        TransferHeader.TestField("Shipping Agent Service Code", ShippingAgentService.Code);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
     procedure ReceiptAndShipmentModeRequiresMatchingQuantities()
     var
         TransferHeader: Record "Transfer Header";
@@ -1458,6 +1540,64 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
 
         // [THEN] Direct Transfer checkbox is TRUE (which makes In-Transit Code disabled on page)
         TransferHeader.TestField("Direct Transfer", true);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure DirectTransferPostingClearsInTransitCodeWhenSetToDirectTransferMode()
+    var
+        TransferHeader: Record "Transfer Header";
+        LocationFrom: Record Location;
+        LocationTo: Record Location;
+        LocationInTransit: Record Location;
+    begin
+        // [FEATURE] [Direct Transfer] [In-Transit]
+        // [SCENARIO 631788] Validating Direct Transfer Posting = "Direct Transfer" clears In-Transit Code on the header.
+        Initialize();
+
+        // [GIVEN] Locations and an in-transit location.
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationFrom);
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationTo);
+        LibraryWarehouse.CreateInTransitLocation(LocationInTransit);
+
+        // [GIVEN] Direct Transfer order in "Shipment and Receipt" mode with In-Transit Code entered.
+        LibraryInventory.CreateTransferHeader(TransferHeader, LocationFrom.Code, LocationTo.Code, '');
+        TransferHeader.Validate("Direct Transfer", true);
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
+        TransferHeader.Validate("In-Transit Code", LocationInTransit.Code);
+        TransferHeader.Modify(true);
+
+        // [WHEN] Direct Transfer Posting is changed to "Direct Transfer".
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Direct Transfer");
+
+        // [THEN] In-Transit Code is automatically cleared.
+        TransferHeader.TestField("In-Transit Code", '');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure DirectTransferPostingChecksInboundWhseHandlingOnTransferToLocation()
+    var
+        TransferHeader: Record "Transfer Header";
+        LocationFrom: Record Location;
+        LocationTo: Record Location;
+    begin
+        // [FEATURE] [Direct Transfer] [Warehouse]
+        // [SCENARIO 631788] Validating Direct Transfer Posting checks inbound warehouse handling requirements on Transfer-to location.
+        Initialize();
+
+        // [GIVEN] From location without WMS and To location requiring receive.
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationFrom);
+        LibraryWarehouse.CreateLocationWMS(LocationTo, false, false, false, true, false);
+
+        // [GIVEN] Direct Transfer order in "Direct Transfer" posting mode.
+        LibraryInventory.CreateTransferHeader(TransferHeader, LocationFrom.Code, LocationTo.Code, '');
+
+        // [WHEN] Direct Transfer is set to true which sets Direct Transfer Posting to "Shipment and Receipt".
+        asserterror TransferHeader.Validate("Direct Transfer", true);
+
+        // [THEN] Validation fails because Transfer-to location has inbound warehouse handling enabled.
+        Assert.ExpectedError(LocationTo.FieldCaption("Require Receive"));
     end;
 
     [Test]
@@ -1602,6 +1742,64 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
 
         // [THEN] Inventory moved correctly from "FROM" to "TO"
         VerifyItemLedgerEntriesForDirectTransfer(Item."No.", LocationFrom.Code, LocationTo.Code, -Quantity, Quantity);
+    end;
+
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure DirectTransferShipmentAndReceiptWithInTransitPostsViaInTransit()
+    var
+        LocationFrom: Record Location;
+        LocationTo: Record Location;
+        LocationInTransit: Record Location;
+        Item: Record Item;
+        TransferHeader: Record "Transfer Header";
+        TransferLine: Record "Transfer Line";
+        Quantity: Decimal;
+    begin
+        // [SCENARIO 631788] Direct Transfer with "Shipment and Receipt" posting type and an In-Transit Code entered on the order:
+        // items are first moved FROM → In-Transit (shipment leg) then In-Transit → TO (receipt leg) in one transaction.
+        Initialize();
+        Quantity := LibraryRandom.RandIntInRange(10, 100);
+
+        // [GIVEN] Inventory Setup has "Direct Transfer Posting" = "Shipment and Receipt"
+        SetDirectTransferPostingMode(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
+
+        // [GIVEN] Locations "FROM", "TO" and an In-Transit location
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationFrom);
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationTo);
+        LibraryWarehouse.CreateInTransitLocation(LocationInTransit);
+
+        // [GIVEN] Item with positive inventory at "FROM"
+        CreateItemWithPositiveInventory(Item, LocationFrom.Code, Quantity);
+
+        // [GIVEN] A Transfer Header created without an In-Transit Code
+        LibraryInventory.CreateTransferHeader(TransferHeader, LocationFrom.Code, LocationTo.Code, '');
+
+        // [WHEN] "Direct Transfer" is set to TRUE, posting is set to "Shipment and Receipt", and In-Transit Code is entered manually
+        TransferHeader.Validate("Direct Transfer", true);
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
+        TransferHeader.Validate("In-Transit Code", LocationInTransit.Code);
+        TransferHeader.Modify(true);
+
+        // [THEN] "In-Transit Code" is stored on the order and used during posting
+        Assert.AreEqual(
+            LocationInTransit.Code,
+            TransferHeader."In-Transit Code",
+            InTransitCodeNotClearedErr);
+
+        // [WHEN] Transfer line is added and the order is posted
+        LibraryInventory.CreateTransferLine(TransferHeader, TransferLine, Item."No.", Quantity);
+        LibraryInventory.PostDirectTransferOrder(TransferHeader);
+
+        // [THEN] An item ledger entry moves items FROM → In-Transit (shipment leg)
+        VerifyItemLedgerEntryByLocationAndSign(Item."No.", LocationInTransit.Code, true, Quantity);
+
+        // [THEN] An item ledger entry moves items In-Transit → TO (receipt leg)
+        VerifyItemLedgerEntryByLocationAndSign(Item."No.", LocationInTransit.Code, false, -Quantity);
+
+        // [THEN] Net movement: FROM loses Qty, TO gains Qty
+        VerifyItemLedgerEntriesForTransfer(Item."No.", LocationFrom.Code, LocationTo.Code, -Quantity, Quantity);
     end;
 
     local procedure Initialize()
@@ -1866,6 +2064,22 @@ codeunit 137108 "SCM Direct Transfer Warehouse"
     procedure TrackingMessageHandler(Message: Text[1024])
     begin
         LibraryVariableStorage.Enqueue(Message);
+    end;
+
+    local procedure VerifyItemLedgerEntryByLocationAndSign(ItemNo: Code[20]; LocationCode: Code[10]; IsPositive: Boolean; ExpectedQuantity: Decimal)
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        ItemLedgerEntry.SetRange("Item No.", ItemNo);
+        ItemLedgerEntry.SetRange("Location Code", LocationCode);
+        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Transfer);
+        ItemLedgerEntry.SetRange(Positive, IsPositive);
+        Assert.RecordCount(ItemLedgerEntry, 1);
+        ItemLedgerEntry.CalcSums(Quantity);
+        Assert.AreEqual(
+            ExpectedQuantity,
+            ItemLedgerEntry.Quantity,
+            StrSubstNo(UnexpectedTransferQtyErr, LocationCode, IsPositive));
     end;
 
     [StrMenuHandler]
