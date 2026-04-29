@@ -14027,4 +14027,5 @@ codeunit 80 "Sales-Post"
     local procedure OnSyncSurPlusItemTrackingOnBeforeModifyQtyToHandleInvoice(var SalesLine: Record "Sales Line"; var SalesHeader: Record "Sales Header"; var IsHandled: Boolean; var ReservationEntry: Record "Reservation Entry")
     begin
     end;
+    
 }
