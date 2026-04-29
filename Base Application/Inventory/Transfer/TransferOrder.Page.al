@@ -97,7 +97,7 @@ page 5740 "Transfer Order"
                     ApplicationArea = Location;
                     Editable = EnableTransferFields;
                     ShowMandatory = not Rec."Direct Transfer";
-                    Enabled = (not Rec."Direct Transfer") and (Rec.Status = Rec.Status::Open);
+                    Enabled = (not (Rec."Direct Transfer" and (Rec."Direct Transfer Posting" = Rec."Direct Transfer Posting"::"Direct Transfer"))) and (Rec.Status = Rec.Status::Open);
 
                     trigger OnValidate()
                     begin
