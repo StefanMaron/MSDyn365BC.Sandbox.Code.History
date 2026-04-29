@@ -1535,6 +1535,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Batch Job - NamedType NotPaidPurchPrepaymentErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3401192251 - NamedType 4030164260" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Posting Date %1 is different from Work Date %2.\\Do you want to continue?]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Posting Date, %2 = Work Date]D;]A;(LookupHint=Codeunit ERM Batch Job - NamedType PostingDateDiffersFromWorkDateQst)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3401192251 - NamedType 4102379502" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[You cannot delete the order line because it is associated with purchase order]]></Val>
