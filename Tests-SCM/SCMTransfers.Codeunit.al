@@ -2053,6 +2053,121 @@
 
     [Test]
     [Scope('OnPrem')]
+    procedure TransferOrderPageShowsRouteDefaultsAfterSelectingLocations()
+    var
+        TransferHeader: Record "Transfer Header";
+        TransferRoute: Record "Transfer Route";
+        LocationFrom: Record Location;
+        LocationTo: Record Location;
+        LocationInTransit: Record Location;
+        ShippingAgent: Record "Shipping Agent";
+        ShippingAgentService: Record "Shipping Agent Services";
+        ShippingTime: DateFormula;
+        TransferOrder: TestPage "Transfer Order";
+    begin
+        // [SCENARIO 631788] Transfer Order page shows Transfer Route defaults after the user selects the location pair.
+        Initialize();
+
+        // [GIVEN] Locations and a Transfer Route with in-transit and shipping defaults.
+        LibraryWarehouse.CreateLocation(LocationFrom);
+        LibraryWarehouse.CreateLocation(LocationTo);
+        LibraryWarehouse.CreateInTransitLocation(LocationInTransit);
+        LibraryInventory.CreateShippingAgent(ShippingAgent);
+        Evaluate(ShippingTime, '<1D>');
+        LibraryInventory.CreateShippingAgentService(ShippingAgentService, ShippingAgent.Code, ShippingTime);
+        LibraryWarehouse.CreateAndUpdateTransferRoute(
+            TransferRoute, LocationFrom.Code, LocationTo.Code, LocationInTransit.Code,
+            ShippingAgent.Code, ShippingAgentService.Code);
+        LibraryInventory.CreateTransferHeader(TransferHeader, '', '', '');
+
+        // [WHEN] The user selects the destination and source locations on Transfer Order page.
+        TransferOrder.OpenEdit();
+        TransferOrder.GotoRecord(TransferHeader);
+        TransferOrder."Transfer-to Code".SetValue(LocationTo.Code);
+        TransferOrder."Transfer-from Code".SetValue(LocationFrom.Code);
+
+        // [THEN] Route defaults are shown on the page and stored on the header.
+        TransferOrder."In-Transit Code".AssertEquals(LocationInTransit.Code);
+        TransferOrder."Shipping Agent Code".AssertEquals(ShippingAgent.Code);
+        TransferOrder."Shipping Agent Service Code".AssertEquals(ShippingAgentService.Code);
+        TransferOrder.Close();
+
+        TransferHeader.Get(TransferHeader."No.");
+        TransferHeader.TestField("In-Transit Code", LocationInTransit.Code);
+        TransferHeader.TestField("Shipping Agent Code", ShippingAgent.Code);
+        TransferHeader.TestField("Shipping Agent Service Code", ShippingAgentService.Code);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure TransferOrderPageInTransitCodeDisabledForDirectTransferMode()
+    var
+        TransferHeader: Record "Transfer Header";
+        LocationFrom: Record Location;
+        LocationTo: Record Location;
+        LocationInTransit: Record Location;
+        TransferOrder: TestPage "Transfer Order";
+    begin
+        // [SCENARIO 631788] In-Transit Code is disabled on Transfer Order page for direct-transfer posting mode.
+        Initialize();
+        EnableDirectTransfersInInventorySetup();
+
+        // [GIVEN] A direct transfer order using "Direct Transfer" posting mode.
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationFrom);
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationTo);
+        LibraryWarehouse.CreateInTransitLocation(LocationInTransit);
+        LibraryInventory.CreateTransferHeader(TransferHeader, LocationFrom.Code, LocationTo.Code, LocationInTransit.Code);
+        TransferHeader.Validate("Direct Transfer", true);
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Direct Transfer");
+        TransferHeader.Modify(true);
+
+        // [WHEN] The order is opened on Transfer Order page.
+        TransferOrder.OpenEdit();
+        TransferOrder.GotoRecord(TransferHeader);
+
+        // [THEN] In-Transit Code is disabled.
+        Assert.IsFalse(TransferOrder."In-Transit Code".Enabled(), 'In-Transit Code must be disabled for Direct Transfer posting mode.');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure TransferOrderPageInTransitCodeEnabledForShipmentAndReceiptMode()
+    var
+        InventorySetup: Record "Inventory Setup";
+        TransferHeader: Record "Transfer Header";
+        LocationFrom: Record Location;
+        LocationTo: Record Location;
+        LocationInTransit: Record Location;
+        TransferOrder: TestPage "Transfer Order";
+    begin
+        // [SCENARIO 631788] In-Transit Code is enabled on Transfer Order page for Shipment and Receipt posting mode.
+        Initialize();
+
+        // [GIVEN] Inventory Setup defaults direct transfer posting to Shipment and Receipt.
+        InventorySetup.Get();
+        InventorySetup.Validate("Direct Transfer Posting Type", InventorySetup."Direct Transfer Posting Type"::"Shipment and Receipt");
+        InventorySetup.Modify(true);
+
+        // [GIVEN] A direct transfer order using "Shipment and Receipt" posting mode.
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationFrom);
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(LocationTo);
+        LibraryWarehouse.CreateInTransitLocation(LocationInTransit);
+        LibraryInventory.CreateTransferHeader(TransferHeader, LocationFrom.Code, LocationTo.Code, '');
+        TransferHeader.Validate("Direct Transfer", true);
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
+        TransferHeader.Validate("In-Transit Code", LocationInTransit.Code);
+        TransferHeader.Modify(true);
+
+        // [WHEN] The order is opened on Transfer Order page.
+        TransferOrder.OpenEdit();
+        TransferOrder.GotoRecord(TransferHeader);
+
+        // [THEN] In-Transit Code is enabled.
+        Assert.IsTrue(TransferOrder."In-Transit Code".Enabled(), 'In-Transit Code must be enabled for Shipment and Receipt posting mode.');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
     procedure ShippingAgentServiceCodeFromWhseShpmtToTransferOrder()
     var
         LocationFrom: Record Location;
@@ -4140,6 +4255,51 @@
                 VariantCodeMandatoryErr,
                 TransferLine.FieldCaption("Variant Code"), TransferLine.TableCaption(),
                 TransferLine."Document No.", TransferLine."Line No."));
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure DirectTransferWithInTransitAndShipmentAndReceiptPostingQtyToReceiveIsSet()
+    var
+        FromLocation: Record Location;
+        ToLocation: Record Location;
+        InTransitLocation: Record Location;
+        Item: Record Item;
+        ItemJournalLine: Record "Item Journal Line";
+        TransferHeader: Record "Transfer Header";
+        TransferLine: Record "Transfer Line";
+        Quantity: Decimal;
+    begin
+        // [SCENARIO 631788] When a Direct Transfer Order uses an in-transit location with "Shipment and Receipt" posting type,
+        // Qty. to Receive is auto-set equal to Qty. to Ship so the order can be posted.
+        Initialize();
+        Quantity := LibraryRandom.RandIntInRange(5, 20);
+
+        // [GIVEN] From/To locations and an in-transit location.
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(FromLocation);
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(ToLocation);
+        LibraryWarehouse.CreateInTransitLocation(InTransitLocation);
+
+        // [GIVEN] Item with stock at FromLocation.
+        LibraryInventory.CreateItem(Item);
+        CreateAndPostItemJnlWithCostLocationVariant(
+            ItemJournalLine."Entry Type"::"Positive Adjmt.", Item."No.", Quantity, 0, FromLocation.Code, '');
+
+        // [GIVEN] Direct Transfer Order with In-Transit location and "Shipment and Receipt" posting.
+        LibraryInventory.CreateTransferHeader(TransferHeader, FromLocation.Code, ToLocation.Code, InTransitLocation.Code);
+        TransferHeader.Validate("Direct Transfer", true);
+        TransferHeader.Validate("Direct Transfer Posting", TransferHeader."Direct Transfer Posting"::"Shipment and Receipt");
+        TransferHeader.Modify(true);
+
+        // [WHEN] A transfer line with Quantity is added.
+        LibraryInventory.CreateTransferLine(TransferHeader, TransferLine, Item."No.", Quantity);
+
+        // [THEN] Qty. to Receive equals Qty. to Ship (not zero).
+        Assert.AreEqual(TransferLine."Qty. to Ship", TransferLine."Qty. to Receive",
+            'Qty. to Receive must equal Qty. to Ship for Direct Transfer with Shipment and Receipt posting and in-transit location.');
+
+        // [THEN] The transfer order can be posted without error.
+        LibraryInventory.PostTransferHeader(TransferHeader, true, true);
     end;
 
     local procedure Initialize()
