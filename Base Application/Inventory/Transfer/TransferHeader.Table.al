@@ -643,6 +643,13 @@ table 5740 "Transfer Header"
 
                 if not (Rec."Direct Transfer Posting" in [Rec."Direct Transfer Posting"::"Direct Transfer", Rec."Direct Transfer Posting"::"Shipment and Receipt"]) then
                     Rec.TestField("Direct Transfer", false);
+
+                if Rec."Direct Transfer" and (Rec."Direct Transfer Posting" = Rec."Direct Transfer Posting"::"Direct Transfer") then
+                    if Rec."In-Transit Code" <> '' then
+                        Rec.Validate("In-Transit Code", '');
+
+                if Rec."Direct Transfer" then
+                    VerifyNoInboundWhseHandlingOnLocation(Rec."Transfer-to Code");
             end;
         }
         field(480; "Dimension Set ID"; Integer)
