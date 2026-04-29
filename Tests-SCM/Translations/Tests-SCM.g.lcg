@@ -1832,6 +1832,24 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Delete Return Orders - NamedType MsgCorrectedInvoiceNo)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1649186578 - NamedType 133578055" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[In-Transit Code must not be cleared when Direct Transfer Posting = "Shipment and Receipt".]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Direct Transfer Warehouse - NamedType InTransitCodeNotClearedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1649186578 - NamedType 273267009" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Unexpected transfer quantity at location %1 (Positive=%2).]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Location Code, %2 = Positive flag]D;]A;(LookupHint=Codeunit SCM Direct Transfer Warehouse - NamedType UnexpectedTransferQtyErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1649186578 - NamedType 2789727144" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Expected empty error from Preview. Actual error: ]]></Val>
