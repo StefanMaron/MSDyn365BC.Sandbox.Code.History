@@ -256,6 +256,8 @@ report 108 "Customer - Order Detail"
                     "Sales Line".SetRange("Document Type", "Sales Line"."Document Type"::Order);
                     "Sales Line".SetRange("Document No.", "Sales Header"."No.");
                     "Sales Line".SetFilter("Outstanding Quantity", '<>%1', 0);
+                    if PeriodText <> '' then
+                        "Sales Line".SetFilter("Shipment Date", PeriodText);
                     if "Sales Line".IsEmpty() then
                         CurrReport.Skip();
                 end;
