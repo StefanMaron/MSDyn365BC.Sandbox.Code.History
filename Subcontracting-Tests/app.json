@@ -4,7 +4,7 @@
   "publisher": "Microsoft",
   "brief": "Tests for the Production Subcontracting App.",
   "description": "Contains automated tests and test libraries for validating the Production Subcontracting functionality, including production order wizards, purchase subcontracting, and location handling.",
-  "version": "29.0.49663.0",
+  "version": "29.0.49708.0",
   "contextSensitiveHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2345592",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
   "EULA": "https://go.microsoft.com/fwlink/?linkid=2182906",
