@@ -6158,6 +6158,244 @@ codeunit 134159 "Test Price Calculation - V16"
         LibraryPriceCalculation.SetupDefaultHandler(OldHandler);
     end;
 
+    [Test]
+    procedure DiscountPreservedWhenSpuriousZeroPctVariantLineExists()
+    var
+        Customer: Record Customer;
+        CustomerDiscountGroup: Record "Customer Discount Group";
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        ItemDiscountGroup: Record "Item Discount Group";
+        PriceListHeader: Record "Price List Header";
+        PriceListLine: Record "Price List Line";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        OldHandler: Enum "Price Calculation Handler";
+        DiscountPct: Decimal;
+    begin
+        // [FEATURE] [SalesPrice] [Item] [Variant] [Discount]
+        // [SCENARIO] Generic discount is preserved when a "Price & Discount" price list line with 0% discount and variant exists
+        Initialize();
+
+        // [GIVEN] Default price calculation is 'V16'
+        OldHandler := LibraryPriceCalculation.SetupDefaultHandler("Price Calculation Handler"::"Business Central (Version 16.0)");
+
+        // [GIVEN] Customer 'A' with Customer Discount Group 'D'
+        LibrarySales.CreateCustomer(Customer);
+        LibraryERM.CreateCustomerDiscountGroup(CustomerDiscountGroup);
+        Customer."Customer Disc. Group" := CustomerDiscountGroup.Code;
+        Customer.Modify(true);
+
+        // [GIVEN] Item 'I' with Variant 'V' and Item Discount Group 'X'
+        LibraryInventory.CreateItem(Item);
+        LibraryERM.CreateItemDiscountGroup(ItemDiscountGroup);
+        Item."Item Disc. Group" := ItemDiscountGroup.Code;
+        Item.Modify();
+        LibraryInventory.CreateItemVariant(ItemVariant, Item."No.");
+
+        DiscountPct := LibraryRandom.RandIntInRange(5, 20);
+
+        // [GIVEN] Active Discount Price List: 10% discount for Item Discount Group (no variant)
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader, "Price Type"::Sale, "Price Source Type"::"All Customers", '');
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine, PriceListHeader.Code, "Price Type"::Sale, PriceListLine."Source Type"::"Customer Disc. Group", CustomerDiscountGroup.Code, "Price Amount Type"::Discount, "Price Asset Type"::"Item Discount Group", ItemDiscountGroup.Code);
+        PriceListLine.Validate("Line Discount %", DiscountPct);
+        PriceListLine.Status := "Price Status"::Active;
+        PriceListLine.Modify(true);
+
+        Clear(PriceListLine);
+        Clear(PriceListHeader);
+
+        // [GIVEN] Active "Price & Discount" Price List (alphabetically before the discount list) with Item+Variant, Unit Price set, 0% discount
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader, "Price Type"::Sale, "Price Source Type"::"All Customers", '');
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine, PriceListHeader, "Price Amount Type"::Any, "Price Asset Type"::Item, Item."No.");
+        PriceListLine.Validate("Variant Code", ItemVariant.Code);
+        PriceListLine.Validate("Unit Price", LibraryRandom.RandDecInRange(50, 100, 2));
+        PriceListLine.Validate("Line Discount %", 0);
+        PriceListLine.Status := "Price Status"::Active;
+        PriceListLine.Modify(true);
+
+        // [GIVEN] Sales Quote for Customer 'A' with Item 'I'
+        LibrarySales.CreateSalesHeader(SalesHeader, "Sales Document Type"::Quote, Customer."No.");
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, "Sales Line Type"::Item, Item."No.", 1);
+
+        // [WHEN] Validate Variant Code 'V' on Sales Line
+        SalesLine.Validate("Variant Code", ItemVariant.Code);
+
+        // [THEN] Line Discount % is still the generic discount (not cleared to 0)
+        Assert.AreEqual(DiscountPct, SalesLine."Line Discount %",
+            StrSubstNo(ValueMustBeEqualErr, SalesLine.FieldCaption("Line Discount %"), DiscountPct, SalesLine.TableCaption()));
+
+        // Cleanup
+        LibraryPriceCalculation.SetupDefaultHandler(OldHandler);
+    end;
+
+    [Test]
+    procedure VariantSpecificDiscountOverridesHigherGenericDiscount()
+    var
+        Customer: Record Customer;
+        CustomerDiscountGroup: Record "Customer Discount Group";
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        ItemDiscountGroup: Record "Item Discount Group";
+        PriceListHeader: Record "Price List Header";
+        PriceListLine: Record "Price List Line";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        OldHandler: Enum "Price Calculation Handler";
+        GenericDiscountPct: Decimal;
+        VariantDiscountPct: Decimal;
+    begin
+        // [FEATURE] [SalesPrice] [Item] [Variant] [Discount]
+        // [SCENARIO] Variant-specific discount overrides a higher generic discount due to specificity
+        Initialize();
+
+        // [GIVEN] Default price calculation is 'V16'
+        OldHandler := LibraryPriceCalculation.SetupDefaultHandler("Price Calculation Handler"::"Business Central (Version 16.0)");
+
+        // [GIVEN] Customer 'A' with Customer Discount Group 'D'
+        LibrarySales.CreateCustomer(Customer);
+        LibraryERM.CreateCustomerDiscountGroup(CustomerDiscountGroup);
+        Customer."Customer Disc. Group" := CustomerDiscountGroup.Code;
+        Customer.Modify(true);
+
+        // [GIVEN] Item 'I' with Variant 'V' and Item Discount Group 'X'
+        LibraryInventory.CreateItem(Item);
+        LibraryERM.CreateItemDiscountGroup(ItemDiscountGroup);
+        Item."Item Disc. Group" := ItemDiscountGroup.Code;
+        Item.Modify();
+        LibraryInventory.CreateItemVariant(ItemVariant, Item."No.");
+
+        GenericDiscountPct := LibraryRandom.RandIntInRange(15, 25);
+        VariantDiscountPct := LibraryRandom.RandIntInRange(5, 14);
+
+        // [GIVEN] Active Price List with generic discount 20% for Item Discount Group (no variant)
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader, "Price Type"::Sale, "Price Source Type"::"All Customers", '');
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine, PriceListHeader.Code, "Price Type"::Sale, PriceListLine."Source Type"::"Customer Disc. Group", CustomerDiscountGroup.Code, "Price Amount Type"::Discount, "Price Asset Type"::"Item Discount Group", ItemDiscountGroup.Code);
+        PriceListLine.Validate("Line Discount %", GenericDiscountPct);
+        PriceListLine.Status := "Price Status"::Active;
+        PriceListLine.Modify(true);
+
+        Clear(PriceListLine);
+
+        // [GIVEN] Active Price List with variant-specific discount for Item + Variant 'V'
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine, PriceListHeader.Code, "Price Type"::Sale, PriceListLine."Source Type"::"Customer Disc. Group", CustomerDiscountGroup.Code, "Price Amount Type"::Discount, "Price Asset Type"::Item, Item."No.");
+        PriceListLine.Validate("Variant Code", ItemVariant.Code);
+        PriceListLine.Validate("Line Discount %", VariantDiscountPct);
+        PriceListLine.Status := "Price Status"::Active;
+        PriceListLine.Modify(true);
+
+        // [GIVEN] Sales Quote for Customer 'A' with Item 'I'
+        LibrarySales.CreateSalesHeader(SalesHeader, "Sales Document Type"::Quote, Customer."No.");
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, "Sales Line Type"::Item, Item."No.", 1);
+
+        // [THEN] Without variant, generic discount applies
+        Assert.AreEqual(GenericDiscountPct, SalesLine."Line Discount %",
+            StrSubstNo(ValueMustBeEqualErr, SalesLine.FieldCaption("Line Discount %"), GenericDiscountPct, SalesLine.TableCaption()));
+
+        // [WHEN] Validate Variant Code 'V' on Sales Line
+        SalesLine.Validate("Variant Code", ItemVariant.Code);
+
+        // [THEN] Variant-specific discount overrides generic (specificity wins)
+        Assert.AreEqual(VariantDiscountPct, SalesLine."Line Discount %",
+            StrSubstNo(ValueMustBeEqualErr, SalesLine.FieldCaption("Line Discount %"), VariantDiscountPct, SalesLine.TableCaption()));
+
+        // Cleanup
+        LibraryPriceCalculation.SetupDefaultHandler(OldHandler);
+    end;
+
+    [Test]
+    procedure VariantDiscountSelectedWhenSpuriousZeroPctAndRealVariantDiscountExist()
+    var
+        Customer: Record Customer;
+        CustomerDiscountGroup: Record "Customer Discount Group";
+        Item: Record Item;
+        ItemVariant: Record "Item Variant";
+        ItemDiscountGroup: Record "Item Discount Group";
+        PriceListHeader: Record "Price List Header";
+        PriceListLine: Record "Price List Line";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        OldHandler: Enum "Price Calculation Handler";
+        GenericDiscountPct: Decimal;
+        VariantDiscountPct: Decimal;
+    begin
+        // [FEATURE] [SalesPrice] [Item] [Variant] [Discount]
+        // [SCENARIO] When generic discount, spurious 0% variant line, and real variant discount all exist, the real variant discount wins
+        Initialize();
+
+        // [GIVEN] Default price calculation is 'V16'
+        OldHandler := LibraryPriceCalculation.SetupDefaultHandler("Price Calculation Handler"::"Business Central (Version 16.0)");
+
+        // [GIVEN] Customer 'A' with Customer Discount Group 'D'
+        LibrarySales.CreateCustomer(Customer);
+        LibraryERM.CreateCustomerDiscountGroup(CustomerDiscountGroup);
+        Customer."Customer Disc. Group" := CustomerDiscountGroup.Code;
+        Customer.Modify(true);
+
+        // [GIVEN] Item 'I' with Variant 'V' and Item Discount Group 'X'
+        LibraryInventory.CreateItem(Item);
+        LibraryERM.CreateItemDiscountGroup(ItemDiscountGroup);
+        Item."Item Disc. Group" := ItemDiscountGroup.Code;
+        Item.Modify();
+        LibraryInventory.CreateItemVariant(ItemVariant, Item."No.");
+
+        GenericDiscountPct := LibraryRandom.RandIntInRange(10, 20);
+        VariantDiscountPct := LibraryRandom.RandIntInRange(3, 9);
+
+        // [GIVEN] Active Discount Price List: generic discount for Item Discount Group (no variant)
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader, "Price Type"::Sale, "Price Source Type"::"All Customers", '');
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine, PriceListHeader.Code, "Price Type"::Sale, PriceListLine."Source Type"::"Customer Disc. Group", CustomerDiscountGroup.Code, "Price Amount Type"::Discount, "Price Asset Type"::"Item Discount Group", ItemDiscountGroup.Code);
+        PriceListLine.Validate("Line Discount %", GenericDiscountPct);
+        PriceListLine.Status := "Price Status"::Active;
+        PriceListLine.Modify(true);
+
+        Clear(PriceListLine);
+
+        // [GIVEN] Active Discount Price List: variant-specific discount for Item + Variant 'V'
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine, PriceListHeader.Code, "Price Type"::Sale, PriceListLine."Source Type"::"Customer Disc. Group", CustomerDiscountGroup.Code, "Price Amount Type"::Discount, "Price Asset Type"::Item, Item."No.");
+        PriceListLine.Validate("Variant Code", ItemVariant.Code);
+        PriceListLine.Validate("Line Discount %", VariantDiscountPct);
+        PriceListLine.Status := "Price Status"::Active;
+        PriceListLine.Modify(true);
+
+        Clear(PriceListLine);
+        Clear(PriceListHeader);
+
+        // [GIVEN] Active "Price & Discount" Price List with Item+Variant, Unit Price set, 0% discount (spurious)
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader, "Price Type"::Sale, "Price Source Type"::"All Customers", '');
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine, PriceListHeader, "Price Amount Type"::Any, "Price Asset Type"::Item, Item."No.");
+        PriceListLine.Validate("Variant Code", ItemVariant.Code);
+        PriceListLine.Validate("Unit Price", LibraryRandom.RandDecInRange(50, 100, 2));
+        PriceListLine.Validate("Line Discount %", 0);
+        PriceListLine.Status := "Price Status"::Active;
+        PriceListLine.Modify(true);
+
+        // [GIVEN] Sales Quote for Customer 'A' with Item 'I'
+        LibrarySales.CreateSalesHeader(SalesHeader, "Sales Document Type"::Quote, Customer."No.");
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, "Sales Line Type"::Item, Item."No.", 1);
+
+        // [THEN] Without variant, generic discount applies
+        Assert.AreEqual(GenericDiscountPct, SalesLine."Line Discount %",
+            StrSubstNo(ValueMustBeEqualErr, SalesLine.FieldCaption("Line Discount %"), GenericDiscountPct, SalesLine.TableCaption()));
+
+        // [WHEN] Validate Variant Code 'V' on Sales Line
+        SalesLine.Validate("Variant Code", ItemVariant.Code);
+
+        // [THEN] Real variant-specific discount wins (spurious 0% line is ignored)
+        Assert.AreEqual(VariantDiscountPct, SalesLine."Line Discount %",
+            StrSubstNo(ValueMustBeEqualErr, SalesLine.FieldCaption("Line Discount %"), VariantDiscountPct, SalesLine.TableCaption()));
+
+        // Cleanup
+        LibraryPriceCalculation.SetupDefaultHandler(OldHandler);
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
