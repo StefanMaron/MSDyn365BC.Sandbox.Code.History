@@ -7475,8 +7475,8 @@ codeunit 90 "Purch.-Post"
         ReplacePostingDate: Boolean;
         ReplaceDocumentDate: Boolean;
         ReplaceVATDate: Boolean;
-        IsHandled: Boolean;
         SkipTestPostingDate: Boolean;
+        IsHandled: Boolean;
     begin
         OnBeforeValidatePostingAndDocumentDate(PurchaseHeader, SuppressCommit);
 

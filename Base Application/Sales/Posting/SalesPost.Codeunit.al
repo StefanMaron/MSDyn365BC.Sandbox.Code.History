@@ -12033,4 +12033,5 @@ codeunit 80 "Sales-Post"
     local procedure OnBeforeArchiveRelatedJob(SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     begin
     end;
+    
 }
