@@ -912,7 +912,11 @@ codeunit 7322 "Create Inventory Pick/Movement"
                     InsertShelfWhseActivLine(NewWarehouseActivityLine, RemQtyToPickBase, WhseItemTrackingSetup);
         end;
 
-        QtyRemToPickBase := OriginalRemQtyToPickBase - QtyAvailToPickBase + RemQtyToPickBase;
+        // if there are expired items, we will create pick line for the whole remaining quantity to make sure the expired items will be picked     
+        if HasExpiredItems then
+            QtyRemToPickBase := RemQtyToPickBase
+        else
+            QtyRemToPickBase := OriginalRemQtyToPickBase - QtyAvailToPickBase + RemQtyToPickBase;
         if CurrLocation."Always Create Pick Line" and (QtyRemToPickBase > 0) then begin
             MakeWarehouseActivityHeader();
             MakeWarehouseActivityLine(NewWarehouseActivityLine, '', QtyRemToPickBase, QtyRemToPickBase);
