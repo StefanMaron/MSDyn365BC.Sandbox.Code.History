@@ -1107,8 +1107,10 @@ codeunit 1521 "Workflow Response Handling"
     begin
         OnBeforeAddResponseToLibrary(FunctionName, Description);
 
-        if WorkflowResponse.Get(FunctionName) then
+        if WorkflowResponse.Get(FunctionName) then begin
+            AddResponsePredecessors(FunctionName);
             exit;
+        end;
 
         WorkflowResponse.SetRange(Description, Description);
         if not WorkflowResponse.IsEmpty() then begin
