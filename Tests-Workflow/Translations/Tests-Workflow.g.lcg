@@ -1382,6 +1382,42 @@
       <Cmt Name="Dev"><![CDATA[%1=a function name, an internal code that identifies the function.]D;]A;(LookupHint=Codeunit WF Partner Extension Tests - NamedType NotSupportedResponseErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3495500005 - NamedType 3359363550" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Setup: predecessor should be gone after deletion]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit WF Supported Combinations Test - NamedType PredecessorShouldBeGoneAfterDeletionLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3495500005 - NamedType 1253051277" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Predecessor for CreateApprovalRequests should be restored after second init]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit WF Supported Combinations Test - NamedType PredecessorShouldBeRestoredAfterSecondInitLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3495500005 - NamedType 1964344947" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Setup: predecessor should exist after first init]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit WF Supported Combinations Test - NamedType PredecessorShouldExistAfterFirstInitLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3495500005 - NamedType 2198235484" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Setup: response record should still exist after deleting combination]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit WF Supported Combinations Test - NamedType ResponseRecordShouldStillExistLbl)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1153111 - NamedType 1139017764" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Contoso]]></Val>
