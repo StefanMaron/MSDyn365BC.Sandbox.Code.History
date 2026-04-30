@@ -8144,6 +8144,7 @@ codeunit 90 "Purch.-Post"
         ReplacePostingDate: Boolean;
         ReplaceDocumentDate: Boolean;
         ReplaceVATDate: Boolean;
+        SkipTestPostingDate: Boolean;
         IsHandled: Boolean;
     begin
         OnBeforeValidatePostingAndDocumentDate(PurchaseHeader, SuppressCommit);
@@ -8182,6 +8183,13 @@ codeunit 90 "Purch.-Post"
         if VATDateExists and (ReplaceVATDate) then begin
             PurchaseHeader."VAT Reporting Date" := VATDate;
             ModifyHeader := true;
+        end;
+
+        if not ReplacePostingDate then begin
+            SkipTestPostingDate := false;
+            OnValidatePostingAndDocumentDateOnBeforeTestPostingDate(PurchaseHeader, PostingDateExists, SkipTestPostingDate);
+            if not SkipTestPostingDate then
+                PurchaseHeader.TestPostingDate(PostingDateExists);
         end;
 
         OnValidatePostingAndDocumentDateOnBeforePurchaseHeaderModify(PurchaseHeader, ModifyHeader);
@@ -9923,6 +9931,11 @@ codeunit 90 "Purch.-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterUpdatePurchLineDimSetIDFromAppliedEntry(var PurchLineToPost: Record "Purchase Line"; PurchLine: Record "Purchase Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidatePostingAndDocumentDateOnBeforeTestPostingDate(var PurchaseHeader: Record "Purchase Header"; ReplacePostingDate: Boolean; var SkipTestPostingDate: Boolean)
     begin
     end;
 
