@@ -10034,6 +10034,7 @@ codeunit 80 "Sales-Post"
         ReplacePostingDate: Boolean;
         ReplaceDocumentDate: Boolean;
         ReplaceVATDate: Boolean;
+        SkipTestPostingDate: Boolean;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -10069,6 +10070,13 @@ codeunit 80 "Sales-Post"
         if VATDateExists and (ReplaceVATDate) then begin
             SalesHeader."VAT Reporting Date" := VATDate;
             ModifyHeader := true;
+        end;
+
+        if not ReplacePostingDate then begin
+            SkipTestPostingDate := false;
+            OnValidatePostingAndDocumentDateOnBeforeTestPostingDate(SalesHeader, PostingDateExists, SkipTestPostingDate);
+            if not SkipTestPostingDate then
+                SalesHeader.TestPostingDate(PostingDateExists);
         end;
 
         OnValidatePostingAndDocumentDateOnBeforeSalesHeaderModify(SalesHeader, ModifyHeader);
@@ -11984,6 +11992,11 @@ codeunit 80 "Sales-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCopyAndCheckItemCharge(var SalesHeader: Record "Sales Header"; var TempSalesLine: Record "Sales Line" temporary; var SalesLine: Record "Sales Line"; var InvoiceEverything: Boolean; var AssignError: Boolean; var QtyNeeded: Decimal; var TempItemChargeAssgntSales: Record "Item Charge Assignment (Sales)" temporary; var ItemChargeAssgntSales: Record "Item Charge Assignment (Sales)"; var TempSalesLineGlobal: Record "Sales Line" temporary; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidatePostingAndDocumentDateOnBeforeTestPostingDate(var SalesHeader: Record "Sales Header"; ReplacePostingDate: Boolean; var SkipTestPostingDate: Boolean)
     begin
     end;
 
