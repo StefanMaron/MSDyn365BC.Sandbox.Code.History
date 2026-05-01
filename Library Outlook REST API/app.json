@@ -52,10 +52,6 @@
     {
       "from": 139774,
       "to": 139774
-    },
-    {
-      "from": 139776,
-      "to": 139776
     }
   ],
   "contextSensitiveHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2134520",
@@ -64,8 +60,5 @@
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "target": "OnPrem",
-  "resourceFolders": [
-    "HttpResponseFiles"
-  ]
+  "target": "OnPrem"
 }
