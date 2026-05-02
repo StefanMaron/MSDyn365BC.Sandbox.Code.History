@@ -150,6 +150,7 @@ codeunit 30385 "Shpfy Payments API"
             Payout.Id := Id;
             Payout."Shop Code" := Shop.Code;
             Payout.Status := ConvertToPayoutStatus(JsonHelper.GetValueAsText(JPayout, 'status'));
+            Payout."Shop Code" := Shop.Code;
             Payout.Insert();
         end;
         DataCapture.Add(Database::"Shpfy Payout", Payout.SystemId, JPayout);
@@ -292,6 +293,7 @@ codeunit 30385 "Shpfy Payments API"
             Dispute.Status := ConvertToDisputeStatus(JsonHelper.GetValueAsText(JDispute, 'status'));
             Dispute."Evidence Sent On" := JsonHelper.GetValueAsDateTime(JDispute, 'evidenceDueBy');
             Dispute."Finalized On" := JsonHelper.GetValueAsDateTime(JDispute, 'finalizedOn');
+            Dispute."Shop Code" := Shop.Code;
             Dispute.Modify();
         end else begin
             RecordRef.Open(Database::"Shpfy Dispute");
@@ -309,6 +311,7 @@ codeunit 30385 "Shpfy Payments API"
             Dispute.Type := ConvertToDisputeType(JsonHelper.GetValueAsText(JDispute, 'type'));
             Dispute.Reason := ConvertToDisputeReason(JsonHelper.GetValueAsText(JDispute, 'reasonDetails.reason'));
             Dispute."Source Order Id" := CommunicationMgt.GetIdOfGId(JsonHelper.GetValueAsText(JDispute, 'order.id'));
+            Dispute."Shop Code" := Shop.Code;
             Dispute.Insert();
         end;
     end;
