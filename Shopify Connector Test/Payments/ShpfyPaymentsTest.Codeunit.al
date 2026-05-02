@@ -11,6 +11,7 @@ using System.TestLibraries.Utilities;
 codeunit 139566 "Shpfy Payments Test"
 {
     Subtype = Test;
+    TestType = IntegrationTest;
     TestPermissions = Disabled;
 
     var
@@ -132,15 +133,19 @@ codeunit 139566 "Shpfy Payments Test"
         JPayment: JsonObject;
     begin
         // [SCENARIO] Extract the data out json token that contains a payment info into the "Shpfy Payment Transaction" record.
+        Initialize();
+
         // [GIVEN] A random Generated Payment
         Id := Any.IntegerInRange(10000, 99999);
         JPayment := GetRandomPayment(Id);
 
         // [WHEN] Invoke the function ImportPaymentTransaction(JPayment)
+        PaymentsAPI.SetShop(Shop);
         PaymentsAPI.ImportPaymentTransaction(JPayment);
 
-        // [THEN] We must find the "Shpfy Payment" record with the same id
+        // [THEN] We must find the "Shpfy Payment" record with the same id and Shop Code
         LibraryAssert.IsTrue(PaymentTransaction.Get(Id), 'Get "Shpfy Payment Transaction" record');
+        LibraryAssert.AreEqual(Shop.Code, PaymentTransaction."Shop Code", 'Shop Code should match');
     end;
 
     [Test]
@@ -154,17 +159,21 @@ codeunit 139566 "Shpfy Payments Test"
         Id: BigInteger;
     begin
         // [SCENARIO] Extract the data out json token that contains a Dispute info into the "Shpfy Dispute" record.
+        Initialize();
+
         // [GIVEN] A random Generated Dispute
         Id := Any.IntegerInRange(10000, 99999);
         JDispute := GetRandomDispute(Id, DisputeStatus, FinalizedOn);
 
         // [WHEN] Invoke the function ImportDispute(JToken)
+        PaymentsAPI.SetShop(Shop);
         PaymentsAPI.ImportDispute(JDispute);
 
-        // // [THEN] A dispute record is created and the dispute status and finalized on should match the generated one
+        // [THEN] A dispute record is created and the dispute status, finalized on, and shop code should match
         Dispute.Get(Id);
         LibraryAssert.AreEqual(DisputeStatus, Dispute.Status, 'Dispute status should match the generated one');
         LibraryAssert.AreEqual(FinalizedOn, Dispute."Finalized On", 'Dispute finalized on should match the generated one');
+        LibraryAssert.AreEqual(Shop.Code, Dispute."Shop Code", 'Shop Code should match');
     end;
 
     local procedure GetRandomPayment(id: BigInteger): JsonObject
