@@ -2750,6 +2750,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.AITestToolkit)(LookupHint=Codeunit AIT Test Context Impl. - NamedType SuiteSetupDataNotLoadedErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 4049213933 - NamedType 812184224" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The turn_setup element was not found for the current turn.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.AITestToolkit)(LookupHint=Codeunit AIT Test Context Impl. - NamedType TurnSetupNotFoundErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3425709442 - Method 340927650 - NamedType 1158233154" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[No language version found for dataset %1 with language %2.]]></Val>
@@ -4966,7 +4975,7 @@
   </Item>
   <Item ItemId=";Page 1055193460 - Control 2184222557 - Property 1295455071" ItemType=";Page - Control" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Specifies the average execution of the eval line. The execution is calculated as the percentage of evals that were executed among the total evals (excluding skipped evals).]]></Val>
+      <Val><![CDATA[Specifies the average execution of the eval line. The execution is calculated as the percentage of evals that were executed among the total evals (including skipped evals).]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -5758,7 +5767,7 @@
   </Item>
   <Item ItemId=";Page 3812009960 - Control 2741313846 - Property 1295455071" ItemType=";Page - Control" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Specifies the average execution of the eval suite. The execution is calculated as the percentage of evals that were executed among the total evals (excluding skipped evals).]]></Val>
+      <Val><![CDATA[Specifies the average execution of the eval suite. The execution is calculated as the percentage of evals that were executed among the total evals (including skipped evals).]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
