@@ -148,6 +148,8 @@ codeunit 22 "Item Jnl.-Post Line"
         PostToGlLbl: Label 'Posting to G/L    #1#####', Comment = '%1 is an integer value';
         CanOnlyBeUsedForDropShipmentErr: Label 'This can be only used for Drop Shipment applications.';
         DropShipmentCostApplicationsCannotBeUnappliedErr: Label 'Drop Shipment cost applications cannot be unapplied.';
+        ValuationDateBeforeEarliestAllowedErr: Label 'The Valuation Date %1 is before the Earliest Allowed Valuation Date %2 in Inventory Setup.', Comment = '%1 = Valuation Date, %2 = Earliest Allowed Valuation Date';
+        ApplyToEntryValuationDateErr: Label 'Applying to entry %1 would result in a Valuation Date %2 before the Earliest Allowed Valuation Date %3 in Inventory Setup.', Comment = '%1 = Entry No., %2 = Valuation Date, %3 = Earliest Allowed Valuation Date';
 #pragma warning restore AA0074
 #pragma warning restore AA0470
 
@@ -2517,6 +2519,9 @@ codeunit 22 "Item Jnl.-Post Line"
                 ValueEntry."Valuation Date" := ItemJnlLine."Posting Date";
         end;
 
+        RedirectInvoicingValuationDateToPostingDate(ValueEntry);
+        CheckValuationDateAllowed(ValueEntry);
+
         GetInvtSetup();
         if (ItemJnlLine.Description = Item.Description) and not InvtSetup."Copy Item Descr. to Entries" then
             ValueEntry.Description := ''
@@ -4257,6 +4262,78 @@ codeunit 22 "Item Jnl.-Post Line"
             SourceCodeSetup.Get();
         end;
         InvtSetupRead := true;
+    end;
+
+    local procedure RedirectInvoicingValuationDateToPostingDate(var ValueEntry: Record "Value Entry")
+    var
+        EarliestAllowedValDate: Date;
+    begin
+        if CalledFromAdjustment then
+            exit;
+        if not IsPureInvoicing() then
+            exit;
+
+        GetInvtSetup();
+        EarliestAllowedValDate := InvtSetup."Earliest Allowed Val. Date";
+        if EarliestAllowedValDate = 0D then
+            exit;
+
+        if (ValueEntry."Valuation Date" < EarliestAllowedValDate) and
+           (ItemJnlLine."Posting Date" >= EarliestAllowedValDate)
+        then
+            ValueEntry."Valuation Date" := ItemJnlLine."Posting Date";
+    end;
+
+    local procedure IsPureInvoicing(): Boolean
+    begin
+        exit(
+            (ItemJnlLine.Quantity = 0) and
+            (ItemJnlLine."Invoiced Quantity" <> 0) and
+            (ItemJnlLine."Item Charge No." = '') and
+            not ItemJnlLine.Adjustment and
+            (ItemJnlLine."Value Entry Type" = ItemJnlLine."Value Entry Type"::"Direct Cost"));
+    end;
+
+    local procedure CheckValuationDateAllowed(ValueEntry: Record "Value Entry")
+    var
+        EarliestAllowedValuationDate: Date;
+    begin
+        if CalledFromAdjustment then
+            exit;
+        if IsExemptFromValuationDateCheck() then
+            exit;
+
+        GetInvtSetup();
+        EarliestAllowedValuationDate := InvtSetup."Earliest Allowed Val. Date";
+        if EarliestAllowedValuationDate = 0D then
+            exit;
+
+        if ValueEntry."Valuation Date" < EarliestAllowedValuationDate then
+            if (ItemJnlLine."Applies-to Entry" <> 0) or (ItemJnlLine."Applies-from Entry" <> 0) then
+                Error(
+                    ApplyToEntryValuationDateErr,
+                    GetAppliedEntryNo(),
+                    ValueEntry."Valuation Date",
+                    EarliestAllowedValuationDate)
+            else
+                Error(
+                    ValuationDateBeforeEarliestAllowedErr,
+                    ValueEntry."Valuation Date",
+                    EarliestAllowedValuationDate);
+    end;
+
+    local procedure IsExemptFromValuationDateCheck(): Boolean
+    begin
+        exit(
+            ItemJnlLine.Adjustment or
+            (ItemJnlLine."Value Entry Type" = ItemJnlLine."Value Entry Type"::Rounding));
+    end;
+
+    local procedure GetAppliedEntryNo(): Integer
+    begin
+        if ItemJnlLine."Applies-to Entry" <> 0 then
+            exit(ItemJnlLine."Applies-to Entry");
+        exit(ItemJnlLine."Applies-from Entry");
     end;
 
     local procedure UndoQuantityPosting()
