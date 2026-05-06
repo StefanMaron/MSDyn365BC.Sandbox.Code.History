@@ -5648,6 +5648,33 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Item Analysis View - NamedType InvPickCreatedMessageTxt)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 566219988 - NamedType 1021850354" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[G3: chain must contain at least %1 consumption entries, got %2.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = expected min count, %2 = actual count]D;]A;(LookupHint=Codeunit SCM Item Appln. Entry Perf - NamedType ChainTooShortErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 566219988 - NamedType 4117436879" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Hit count of %1 is not linear in N. N1=%2:%3, N2=%4:%5, N3=%6:%7.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = proc name, %2, %3,%4, %5, %6, %7 = sizes and hit counts]D;]A;(LookupHint=Codeunit SCM Item Appln. Entry Perf - NamedType NotLinearErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 566219988 - NamedType 4062902762" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Hit count for %1 exceeds expected bound: got %2, expected <= %3.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = function name, %2 = actual hits, %3 = expected upper bound]D;]A;(LookupHint=Codeunit SCM Item Appln. Entry Perf - NamedType UnexpectedHitCountErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3348869921 - NamedType 431092131" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The item attribute '%1' is blocked.]]></Val>
