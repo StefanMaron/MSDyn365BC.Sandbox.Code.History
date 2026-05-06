@@ -2803,6 +2803,8 @@ codeunit 12 "Gen. Jnl.-Post Line"
                         OnCalcPmtDiscIfAdjVATCopyFields(DtldCVLedgEntryBuf2, OldCVLedgEntryBuf, GenJnlLine);
                         DtldCVLedgEntryBuf2.CopyPostingGroupsFromVATEntry(VATEntry2);
                         TotalVATAmount := 0;
+                        NonDedTotalVATAmount := 0;
+                        NonDedTotalVATAmountACY := 0;
                         LastConnectionNo := VATEntry2."Sales Tax Connection No.";
                     end;
 
@@ -2988,6 +2990,8 @@ codeunit 12 "Gen. Jnl.-Post Line"
                 end else begin
                     VATAmount := 0;
                     VATAmountAddCurr := 0;
+                    NonDedVATAmount := 0;
+                    NonDedVATAmountAddCurr := 0;
                 end;
             VATEntry2."VAT Calculation Type"::"Reverse Charge VAT":
                 begin
