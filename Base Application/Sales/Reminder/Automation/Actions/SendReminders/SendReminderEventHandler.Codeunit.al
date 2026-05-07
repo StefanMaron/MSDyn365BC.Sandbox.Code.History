@@ -272,4 +272,9 @@ codeunit 6753 "Send Reminder Event Handler"
     local procedure OnAttachRelatedDocumentsBeforeEmailFileInternalOnAfterAttachRelatedDocument(var TempEmailItem: Record "Email Item" temporary; var PostedDocNo: Code[20]; SendRemindersSetup: Record "Send Reminders Setup"; SourceTableID: Integer; SourceRelationID: Integer; SourceID: Guid; ReportUsage: Integer)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAttachRelatedDocumentsBeforeEmailFileInternalOnAfterAttachRelatedDocument(var TempEmailItem: Record "Email Item" temporary; var PostedDocNo: Code[20]; SendRemindersSetup: Record "Send Reminders Setup"; SourceTableID: Integer; SourceRelationID: Integer; SourceID: Guid; ReportUsage: Integer)
+    begin
+    end;
 }
