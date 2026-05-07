@@ -144,6 +144,11 @@ page 30093 "APIV2 - Pstd. Approval Entries"
                 {
                     Caption = 'Iteration No.';
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date';
+                    Editable = false;
+                }
             }
         }
     }

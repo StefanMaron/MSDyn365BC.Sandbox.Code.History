@@ -135,6 +135,11 @@ page 2146 "APIV2 - Workflow Resp. Options"
                 {
                     Caption = 'Response Option Group';
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date';
+                    Editable = false;
+                }
             }
         }
     }

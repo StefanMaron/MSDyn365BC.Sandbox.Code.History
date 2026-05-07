@@ -52,6 +52,11 @@ page 2145 "APIV2 - Workflows"
                 {
                     Caption = 'Category';
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date';
+                    Editable = false;
+                }
                 part(workflowSteps; "APIV2 - Workflow Steps")
                 {
                     Caption = 'Workflow Steps';

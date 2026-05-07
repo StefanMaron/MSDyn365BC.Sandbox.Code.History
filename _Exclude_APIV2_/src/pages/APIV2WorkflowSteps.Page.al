@@ -72,6 +72,11 @@ page 2147 "APIV2 - Workflow Steps"
                 {
                     Caption = 'Sequence No.';
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date';
+                    Editable = false;
+                }
                 part(workflowResponseOptions; "APIV2 - Workflow Resp. Options")
                 {
                     Caption = 'Workflow Response Options';

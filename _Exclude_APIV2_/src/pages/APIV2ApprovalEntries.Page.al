@@ -152,6 +152,11 @@ page 30094 "APIV2 - Approval Entries"
                 {
                     Caption = 'Workflow Step Instance Id';
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date';
+                    Editable = false;
+                }
             }
         }
     }

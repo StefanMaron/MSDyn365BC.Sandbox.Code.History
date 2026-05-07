@@ -86,6 +86,11 @@ page 2148 "APIV2 - Workflow Approvers"
                 {
                     Caption = 'Sequence';
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date';
+                    Editable = false;
+                }
             }
         }
     }

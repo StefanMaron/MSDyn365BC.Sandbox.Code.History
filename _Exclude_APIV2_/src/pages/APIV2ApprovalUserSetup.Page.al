@@ -89,6 +89,11 @@ page 30095 "APIV2 - Approval User Setup"
                 {
                     Caption = 'Approval Administrator';
                 }
+                field(lastModifiedDateTime; Rec.SystemModifiedAt)
+                {
+                    Caption = 'Last Modified Date';
+                    Editable = false;
+                }
             }
         }
     }
