@@ -21,11 +21,11 @@ using System.Email;
 using System.Globalization;
 using System.Utilities;
 
-report 404 "Purchase - Quote"
+report 410 "Blanket Purchase Order"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Purchases/Document/PurchaseQuote.rdlc';
-    Caption = 'Purchase - Quote';
+    RDLCLayout = './Purchases/Document/BlanketPurchaseOrder.rdlc';
+    Caption = 'Blanket Purchase Order';
     PreviewMode = PrintLayout;
     WordMergeDataItem = "Purchase Header";
 
@@ -33,67 +33,19 @@ report 404 "Purchase - Quote"
     {
         dataitem("Purchase Header"; "Purchase Header")
         {
-            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const(Quote));
+            DataItemTableView = sorting("Document Type", "No.") where("Document Type" = const("Blanket Order"));
             RequestFilterFields = "No.", "Buy-from Vendor No.", "No. Printed";
-            RequestFilterHeading = 'Purchase Quote';
-            column(DocType_PurchHead; "Document Type")
+            RequestFilterHeading = 'Blanket Purchase Order';
+            column(No2_PurchHdr; "No.")
             {
             }
-            column(PurchHeadNo; "No.")
-            {
-            }
-            column(CompanyInfoPhoneNoCap; CompanyInfoPhoneNoCapLbl)
-            {
-            }
-            column(CompanyInfoVATRegNoCap; CompanyInfoVATRegNoCapLbl)
-            {
-            }
-            column(CompanyInfoGiroNoCap; CompanyInfoGiroNoCapLbl)
-            {
-            }
-            column(CompanyInfoBankNameCap; CompanyInfoBankNameCapLbl)
-            {
-            }
-            column(CompInfoBankAccNoCap; CompInfoBankAccNoCapLbl)
-            {
-            }
-            column(DocumentDateCap; DocumentDateCapLbl)
-            {
-            }
-            column(PageNoCaption; PageNoCaptionLbl)
-            {
-            }
-            column(ShipmentMethodDescCap; ShipmentMethodDescCapLbl)
-            {
-            }
-            column(PurchLineVendItemNoCap; PurchLineVendItemNoCapLbl)
-            {
-            }
-            column(PurchaseLineDescCap; PurchaseLineDescCapLbl)
-            {
-            }
-            column(PurchaseLineQuantityCap; PurchaseLineQuantityCapLbl)
-            {
-            }
-            column(PurchaseLineUOMCaption; PurchaseLineUOMCaptionLbl)
-            {
-            }
-            column(PurchaseLineNoCaption; PurchaseLineNoCaptionLbl)
-            {
-            }
-            column(PurchaserTextCaption; PurchaserTextCaptionLbl)
-            {
-            }
-            column(ReferenceTextCaption; ReferenceTextCaptionLbl)
+            column(DocumentDateCaption; DocumentDateCaptionLbl)
             {
             }
             column(HomePageCaption; HomePageCaptionLbl)
             {
             }
             column(EMailCaption; EMailCaptionLbl)
-            {
-            }
-            column(VatRegistrationNoCaption; VatRegistrationNoCaptionLbl)
             {
             }
             column(BuyFromContactPhoneNoLbl; BuyFromContactPhoneNoLbl)
@@ -138,7 +90,7 @@ report 404 "Purchase - Quote"
                 dataitem(PageLoop; "Integer")
                 {
                     DataItemTableView = sorting(Number) where(Number = const(1));
-                    column(PurchaseQuoteCopyText; StrSubstNo(Text002, CopyText))
+                    column(BlankPOCopyText; StrSubstNo(BlanketPurchaseOrderLbl, CopyText))
                     {
                     }
                     column(VendAddr1; VendAddr[1])
@@ -168,28 +120,23 @@ report 404 "Purchase - Quote"
                     column(VendAddr5; VendAddr[5])
                     {
                     }
-                    column(CompanyInfoPhoneNo; CompanyInfo."Phone No.")
+                    column(CompanyInfoPhNo; CompanyInfo."Phone No.")
                     {
-                        IncludeCaption = false;
                     }
                     column(VendAddr6; VendAddr[6])
                     {
                     }
                     column(CompanyInfoVatRegNo; CompanyInfo."VAT Registration No.")
                     {
-                        IncludeCaption = false;
                     }
                     column(CompanyInfoGiroNo; CompanyInfo."Giro No.")
                     {
-                        IncludeCaption = false;
                     }
                     column(CompanyInfoBankName; CompanyInfo."Bank Name")
                     {
-                        IncludeCaption = false;
                     }
                     column(CompanyInfoBankAccNo; CompanyInfo."Bank Account No.")
                     {
-                        IncludeCaption = false;
                     }
                     column(CompanyInfoHomePage; CompanyInfo."Home Page")
                     {
@@ -200,19 +147,19 @@ report 404 "Purchase - Quote"
                     column(CompanyPicture; DummyCompanyInfo.Picture)
                     {
                     }
-                    column(PaytoVendNo_PurchHdr; "Purchase Header"."Pay-to Vendor No.")
+                    column(PayToVendNo_PurchHdr; "Purchase Header"."Pay-to Vendor No.")
                     {
                     }
-                    column(DocDate_PurchHdr; Format("Purchase Header"."Document Date", 0, 4))
+                    column(DocumentDate_PurchHdr; Format("Purchase Header"."Document Date", 0, 4))
                     {
                     }
-                    column(VatNoText; VATNoText)
+                    column(VATNoText; VATNoText)
                     {
                     }
-                    column(VatTRegNo_PurchHdr; "Purchase Header"."VAT Registration No.")
+                    column(VATRegNo_PurchHdr; "Purchase Header"."VAT Registration No.")
                     {
                     }
-                    column(ExpctRecpDt_PurchHdr; Format("Purchase Header"."Expected Receipt Date"))
+                    column(ExpRcptDate_PurchHdr; Format("Purchase Header"."Expected Receipt Date"))
                     {
                     }
                     column(PurchaserText; PurchaserText)
@@ -221,7 +168,7 @@ report 404 "Purchase - Quote"
                     column(SalesPurchPersonName; SalesPurchPerson.Name)
                     {
                     }
-                    column(No1_PurchaseHdr; "Purchase Header"."No.")
+                    column(No1_PurchHdr; "Purchase Header"."No.")
                     {
                     }
                     column(ReferenceText; ReferenceText)
@@ -248,25 +195,58 @@ report 404 "Purchase - Quote"
                     column(CompanyAddr8; CompanyAddr[8])
                     {
                     }
-                    column(ShipMethodDesc; ShipmentMethod.Description)
+                    column(OutputNo; OutputNo)
                     {
                     }
-                    column(OutpuNo; OutputNo)
+                    column(ShptMethodDesc; ShipmentMethod.Description)
                     {
                     }
-                    column(BuyfromVendNo_PurchHdr; "Purchase Header"."Buy-from Vendor No.")
+                    column(CompanyInfoPhNoCaption; CompanyInfoPhNoCaptionLbl)
+                    {
+                    }
+                    column(CompanyInfoVatRegNoCaption; CompanyInfoVatRegNoCaptionLbl)
+                    {
+                    }
+                    column(CompanyInfoGiroNoCaption; CompanyInfoGiroNoCaptionLbl)
+                    {
+                    }
+                    column(CompanyInfoBankNameCaption; CompanyInfoBankNameCaptionLbl)
+                    {
+                    }
+                    column(CompanyInfoBankAccNoCaption; CompanyInfoBankAccNoCaptionLbl)
                     {
                     }
                     column(ExpectedDateCaption; ExpectedDateCaptionLbl)
                     {
                     }
-                    column(QuoteNoCaption; QuoteNoCaptionLbl)
+                    column(BlanketPurchOrderNoCaption; BlanketPurchOrderNoCaptionLbl)
                     {
                     }
-                    column(PaytoVendNo_PurchHdrCaption; "Purchase Header".FieldCaption("Pay-to Vendor No."))
+                    column(PageCaption; PageCaptionLbl)
                     {
                     }
-                    column(BuyfromVendNo_PurchHdrCaption; "Purchase Header".FieldCaption("Buy-from Vendor No."))
+                    column(UOM_PurchLineCaption; "Purchase Line".FieldCaption("Unit of Measure"))
+                    {
+                    }
+                    column(Quantity_PurchLineCaption; "Purchase Line".FieldCaption(Quantity))
+                    {
+                    }
+                    column(Description_PurchLineCaption; "Purchase Line".FieldCaption(Description))
+                    {
+                    }
+                    column(ShipmentMethodDescCaption; ShipmentMethodDescCaptionLbl)
+                    {
+                    }
+                    column(PurchLineExpectedReceiptDateCaption; PurchLineExpectedReceiptDateCaptionLbl)
+                    {
+                    }
+                    column(PurchLineNoCaption; PurchLineNoCaptionLbl)
+                    {
+                    }
+                    column(PurchLineVendItemNoCaption; PurchLineVendItemNoCaptionLbl)
+                    {
+                    }
+                    column(PayToVendNo_PurchHdrCaption; "Purchase Header".FieldCaption("Pay-to Vendor No."))
                     {
                     }
                     dataitem(DimensionLoop1; "Integer")
@@ -276,7 +256,7 @@ report 404 "Purchase - Quote"
                         column(DimText; DimText)
                         {
                         }
-                        column(Number_DimensionLoop1; Number)
+                        column(Number1_IntegerLine; Number)
                         {
                         }
                         column(HeaderDimensionsCaption; HeaderDimensionsCaptionLbl)
@@ -343,44 +323,25 @@ report 404 "Purchase - Quote"
                         column(ShowInternalInfo; ShowInternalInfo)
                         {
                         }
-                        column(ArchiveDocument; ArchiveDocument)
+                        column(Type_PurchLine; Format("Purchase Line".Type, 0, 2))
                         {
                         }
-                        column(LogInteraction; LogInteraction)
+                        column(Description_PurchLine; "Purchase Line".Description)
                         {
                         }
-                        column(Type_PurchaseLine; Format("Purchase Line".Type, 0, 2))
+                        column(Quantity_PurchLine; "Purchase Line".Quantity)
                         {
-                            IncludeCaption = false;
                         }
-                        column(LineNo_PurchaseLine; "Purchase Line"."Line No.")
+                        column(UOM_PurchLine; "Purchase Line"."Unit of Measure")
                         {
-                            IncludeCaption = false;
                         }
-                        column(Description_PurchaseLine; "Purchase Line".Description)
+                        column(ExpRcptDate_PurchLine; Format("Purchase Line"."Expected Receipt Date"))
                         {
-                            IncludeCaption = false;
                         }
-                        column(Quantity_PurchaseLine; "Purchase Line".Quantity)
-                        {
-                            IncludeCaption = false;
-                        }
-                        column(UnitOfMeasure_PurchaseLine; "Purchase Line"."Unit of Measure")
-                        {
-                            IncludeCaption = false;
-                        }
-                        column(ExpcRecpDt_PurchHdr; Format("Purchase Line"."Expected Receipt Date"))
-                        {
-                            IncludeCaption = false;
-                        }
-                        column(No_PurchaseLine; "Purchase Line"."No.")
+                        column(No_PurchLine; "Purchase Line"."No.")
                         {
                         }
                         column(VendItemNo_PurchLine; "Purchase Line"."Vendor Item No.")
-                        {
-                            IncludeCaption = false;
-                        }
-                        column(PurchaseLineNoOurNoCap; PurchaseLineNoOurNoCapLbl)
                         {
                         }
                         dataitem(DimensionLoop2; "Integer")
@@ -389,7 +350,7 @@ report 404 "Purchase - Quote"
                             column(DimText1; DimText)
                             {
                             }
-                            column(Number2_DimensionLoop; Number)
+                            column(Number2_IntegerLine; Number)
                             {
                             }
                             column(LineDimensionsCaption; LineDimensionsCaptionLbl)
@@ -439,10 +400,6 @@ report 404 "Purchase - Quote"
                                 TempPurchaseLine.Next();
                             "Purchase Line" := TempPurchaseLine;
 
-                            if ("Purchase Line"."Item Reference No." <> '') and (not ShowInternalInfo) then
-                                "Purchase Line"."No." :=
-                                    CopyStr("Purchase Line"."Item Reference No.", 1, MaxStrLen("Purchase Line"."No."));
-
                             DimSetEntry2.SetRange("Dimension Set ID", "Purchase Line"."Dimension Set ID");
                         end;
 
@@ -463,6 +420,27 @@ report 404 "Purchase - Quote"
                                 CurrReport.Break();
                             TempPurchaseLine.SetRange("Line No.", 0, TempPurchaseLine."Line No.");
                             SetRange(Number, 1, TempPurchaseLine.Count);
+                        end;
+                    }
+                    dataitem(Total; "Integer")
+                    {
+                        DataItemTableView = sorting(Number) where(Number = const(1));
+                    }
+                    dataitem(Total2; "Integer")
+                    {
+                        DataItemTableView = sorting(Number) where(Number = const(1));
+                        column(BuyFrmVendNo_PurchHdr; "Purchase Header"."Buy-from Vendor No.")
+                        {
+                            IncludeCaption = false;
+                        }
+                        column(BuyFrmVendNo_PurchHdrCaption; "Purchase Header".FieldCaption("Buy-from Vendor No."))
+                        {
+                        }
+
+                        trigger OnPreDataItem()
+                        begin
+                            if "Purchase Header"."Buy-from Vendor No." = "Purchase Header"."Pay-to Vendor No." then
+                                CurrReport.Break();
                         end;
                     }
                     dataitem(Total3; "Integer")
@@ -527,15 +505,16 @@ report 404 "Purchase - Quote"
                 trigger OnPostDataItem()
                 begin
                     if not IsReportInPreviewMode() then
-                        CODEUNIT.Run(CODEUNIT::"Purch.Header-Printed", "Purchase Header");
+                        Codeunit.Run(Codeunit::"Purch.Header-Printed", "Purchase Header");
                 end;
 
                 trigger OnPreDataItem()
                 begin
+                    OutputNo := 1;
+
                     NoOfLoops := Abs(NoOfCopies) + 1;
                     CopyText := '';
                     SetRange(Number, 1, NoOfLoops);
-                    OutputNo := 1;
                 end;
             }
 
@@ -561,11 +540,6 @@ report 404 "Purchase - Quote"
             trigger OnPreDataItem()
             begin
                 FirstLineHasBeenOutput := false;
-            end;
-
-            trigger OnPostDataItem()
-            begin
-                OnAfterPostDataItem("Purchase Header");
             end;
         }
     }
@@ -597,7 +571,7 @@ report 404 "Purchase - Quote"
                     {
                         ApplicationArea = Suite;
                         Caption = 'Archive Document';
-                        ToolTip = 'Specifies if the document is archived after you print it.';
+                        ToolTip = 'Specifies whether to archive the order.';
 
                         trigger OnValidate()
                         begin
@@ -611,12 +585,6 @@ report 404 "Purchase - Quote"
                         Caption = 'Log Interaction';
                         Enabled = LogInteractionEnable;
                         ToolTip = 'Specifies if you want the program to log this interaction.';
-
-                        trigger OnValidate()
-                        begin
-                            if LogInteraction then
-                                ArchiveDocument := ArchiveDocumentEnable;
-                        end;
                     }
                 }
             }
@@ -630,13 +598,7 @@ report 404 "Purchase - Quote"
         begin
             InitLogInteraction();
             LogInteractionEnable := LogInteraction;
-
-            case PurchSetup."Archive Quotes" of
-                PurchSetup."Archive Quotes"::Never:
-                    ArchiveDocument := false;
-                PurchSetup."Archive Quotes"::Always:
-                    ArchiveDocument := true;
-            end;
+            ArchiveDocument := PurchSetup."Archive Blanket Orders";
         end;
     }
 
@@ -649,8 +611,6 @@ report 404 "Purchase - Quote"
         CompanyInfo.SetAutoCalcFields(Picture);
         CompanyInfo.Get();
         PurchSetup.Get();
-
-        OnAfterInitReport();
     end;
 
     trigger OnPostReport()
@@ -660,20 +620,19 @@ report 404 "Purchase - Quote"
                 repeat
                     "Purchase Header".CalcFields("No. of Archived Versions");
                     SegManagement.LogDocument(
-                      11, "Purchase Header"."No.", "Purchase Header"."Doc. No. Occurrence", "Purchase Header"."No. of Archived Versions",
-                      DATABASE::Vendor, "Purchase Header"."Pay-to Vendor No.", "Purchase Header"."Purchaser Code", '',
-                      "Purchase Header"."Posting Description", '');
+                      12, "Purchase Header"."No.", "Purchase Header"."Doc. No. Occurrence",
+                      "Purchase Header"."No. of Archived Versions", Database::Vendor, "Purchase Header"."Pay-to Vendor No.",
+                      "Purchase Header"."Purchaser Code", '', "Purchase Header"."Posting Description", '');
                 until "Purchase Header".Next() = 0;
     end;
 
+    trigger OnPreReport()
+    begin
+        OnBeforeOnPreReport("Purchase Header");
+    end;
+
     var
-#pragma warning disable AA0074
-        Text002: Label 'Purchase - Quote %1', Comment = '%1 = Document No.';
-#pragma warning restore AA0074
         DummyCompanyInfo: Record "Company Information";
-        ShipmentMethod: Record "Shipment Method";
-        SalesPurchPerson: Record "Salesperson/Purchaser";
-        TempPurchaseLine: Record "Purchase Line" temporary;
         DimSetEntry1: Record "Dimension Set Entry";
         DimSetEntry2: Record "Dimension Set Entry";
         RespCenter: Record "Responsibility Center";
@@ -683,47 +642,42 @@ report 404 "Purchase - Quote"
         LanguageMgt: Codeunit Language;
         PurchPost: Codeunit "Purch.-Post";
         FormatAddr: Codeunit "Format Address";
-        FormatDocument: Codeunit "Format Document";
         SegManagement: Codeunit SegManagement;
         ArchiveManagement: Codeunit ArchiveManagement;
-        VendAddr: array[8] of Text[100];
-        ShipToAddr: array[8] of Text[100];
-        CompanyAddr: array[8] of Text[100];
-        PurchaserText: Text[50];
         VATNoText: Text[80];
         ReferenceText: Text[80];
         MoreLines: Boolean;
+        NoOfCopies: Integer;
         NoOfLoops: Integer;
         CopyText: Text[30];
         DimText: Text[120];
         OldDimText: Text[75];
+        ShowInternalInfo: Boolean;
         Continue: Boolean;
+        LogInteraction: Boolean;
         OutputNo: Integer;
+        ArchiveDocument: Boolean;
         LogInteractionEnable: Boolean;
+
+        BlanketPurchaseOrderLbl: Label 'Blanket Purchase Order %1', Comment = '%1 = Document No.';
+        CompanyInfoPhNoCaptionLbl: Label 'Phone No.';
+        CompanyInfoVatRegNoCaptionLbl: Label 'VAT Registration No.';
+        CompanyInfoGiroNoCaptionLbl: Label 'Giro No.';
+        CompanyInfoBankNameCaptionLbl: Label 'Bank';
+        CompanyInfoBankAccNoCaptionLbl: Label 'Account No.';
         ExpectedDateCaptionLbl: Label 'Expected Date';
-        QuoteNoCaptionLbl: Label 'Quote No.';
+        BlanketPurchOrderNoCaptionLbl: Label 'Blanket Purchase Order No.';
+        PageCaptionLbl: Label 'Page';
+        ShipmentMethodDescCaptionLbl: Label 'Shipment Method';
         HeaderDimensionsCaptionLbl: Label 'Header Dimensions';
-        PurchaseLineNoOurNoCapLbl: Label 'Our No.';
+        PurchLineExpectedReceiptDateCaptionLbl: Label 'Expected Date';
+        PurchLineNoCaptionLbl: Label 'Our No.';
+        PurchLineVendItemNoCaptionLbl: Label 'No.';
         LineDimensionsCaptionLbl: Label 'Line Dimensions';
         ShiptoAddressCaptionLbl: Label 'Ship-to Address';
-        CompanyInfoPhoneNoCapLbl: Label 'Phone No.';
-        CompanyInfoVATRegNoCapLbl: Label 'VAT Reg. No.';
-        CompanyInfoGiroNoCapLbl: Label 'Giro No.';
-        CompanyInfoBankNameCapLbl: Label 'Bank';
-        CompInfoBankAccNoCapLbl: Label 'Account No.';
-        DocumentDateCapLbl: Label 'Document Date';
-        PageNoCaptionLbl: Label 'Page';
-        ShipmentMethodDescCapLbl: Label 'Shipment Method';
-        PurchLineVendItemNoCapLbl: Label 'Vendor Item No.';
-        PurchaseLineDescCapLbl: Label 'Description';
-        PurchaseLineQuantityCapLbl: Label 'Quantity';
-        PurchaseLineUOMCaptionLbl: Label 'Unit of Measure';
-        PurchaseLineNoCaptionLbl: Label 'Item No.';
-        PurchaserTextCaptionLbl: Label 'Purchaser';
-        ReferenceTextCaptionLbl: Label 'Your Reference';
+        DocumentDateCaptionLbl: Label 'Document Date';
         HomePageCaptionLbl: Label 'Home Page';
         EMailCaptionLbl: Label 'Email';
-        VatRegistrationNoCaptionLbl: Label 'VAT Registration No.';
         BuyFromContactPhoneNoLbl: Label 'Buy-from Contact Phone No.';
         BuyFromContactMobilePhoneNoLbl: Label 'Buy-from Contact Mobile Phone No.';
         BuyFromContactEmailLbl: Label 'Buy-from Contact E-Mail';
@@ -732,32 +686,34 @@ report 404 "Purchase - Quote"
         PayToContactEmailLbl: Label 'Pay-to Contact E-Mail';
 
     protected var
+        TempPurchaseLine: Record "Purchase Line" temporary;
         CompanyInfo: Record "Company Information";
-        ArchiveDocument: Boolean;
-        ArchiveDocumentEnable: Boolean;
-        LogInteraction: Boolean;
-        NoOfCopies: Integer;
-        ShowInternalInfo: Boolean;
+        ShipmentMethod: Record "Shipment Method";
+        SalesPurchPerson: Record "Salesperson/Purchaser";
+        FormatDocument: Codeunit "Format Document";
         FirstLineHasBeenOutput: Boolean;
+        VendAddr: array[8] of Text[100];
+        ShipToAddr: array[8] of Text[100];
+        CompanyAddr: array[8] of Text[100];
+        PurchaserText: Text[50];
 
-    procedure IntializeRequest(NewNoOfCopies: Integer; NewShowInternalInfo: Boolean; NewArchiveDocument: Boolean; NewLogInteraction: Boolean)
+    procedure InitializeRequest(NewNoOfCopies: Integer; NewShowInternalInfo: Boolean; NewLogInteraction: Boolean)
     begin
         NoOfCopies := NewNoOfCopies;
         ShowInternalInfo := NewShowInternalInfo;
-        ArchiveDocument := NewArchiveDocument;
         LogInteraction := NewLogInteraction;
+    end;
+
+    local procedure InitLogInteraction()
+    begin
+        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Purch. Blnkt. Ord.") <> '';
     end;
 
     local procedure IsReportInPreviewMode(): Boolean
     var
         MailManagement: Codeunit "Mail Management";
     begin
-        exit(CurrReport.Preview or MailManagement.IsHandlingGetEmailBody());
-    end;
-
-    local procedure InitLogInteraction()
-    begin
-        LogInteraction := SegManagement.FindInteractionTemplateCode(Enum::"Interaction Log Entry Document Type"::"Purch.Qte.") <> '';
+        exit(CurrReport.Preview() or MailManagement.IsHandlingGetEmailBody());
     end;
 
     local procedure FormatAddressFields(PurchaseHeader: Record "Purchase Header")
@@ -775,13 +731,8 @@ report 404 "Purchase - Quote"
         VATNoText := FormatDocument.SetText(PurchaseHeader."VAT Registration No." <> '', PurchaseHeader.FieldCaption("VAT Registration No."));
     end;
 
-    [IntegrationEvent(true, false)]
-    local procedure OnAfterInitReport()
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnAfterPostDataItem(var PurchaseHeader: Record "Purchase Header")
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnPreReport(var PurchaseHeader: Record "Purchase Header")
     begin
     end;
 }

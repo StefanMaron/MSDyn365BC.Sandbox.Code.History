@@ -283,19 +283,19 @@
       "path": "./VAT Group Management Tests"
     },
     {
-      "path": "./PayPalPaymentsStandard/Test/PayPal Payments Standard Tests"
+      "path": "./System Application/Email/src/Test Email"
     },
     {
       "path": "./Shopify Connector Test/DisabledTests"
     },
     {
-      "path": "./DataArchive/test/Data Archive Tests"
+      "path": "./Sales Lines Suggestions Tests/AI Tests"
     },
     {
-      "path": "./ServiceManagement/Test/Service Management Tests"
+      "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
     },
     {
-      "path": "./EDocumentConnectors/SignUp/Test/E-Document Connector - SignUp Tests"
+      "path": "./Test Runner/src/DataDrivenTest"
     },
     {
       "path": "./Subscription Billing Tests/DisabledTests"
@@ -322,19 +322,10 @@
       "path": "./AI Test Toolkit/src/TestSuite"
     },
     {
-      "path": "./FieldServiceIntegration/Test Library/Field Service Integration Test Library"
+      "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
     },
     {
-      "path": "./EDocument Core/Test/E-Document Core Tests"
-    },
-    {
-      "path": "./Email - Outlook REST API/Test"
-    },
-    {
-      "path": "./Email - Microsoft 365 Connector/Test/Email - Microsoft 365 Connector Tests"
-    },
-    {
-      "path": "./StatisticalAccounts/Test/Statistical Accounts Tests"
+      "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
     }
   ],
   "settings": {

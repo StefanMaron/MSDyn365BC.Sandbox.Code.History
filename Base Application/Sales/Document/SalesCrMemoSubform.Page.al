@@ -4,24 +4,24 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.Document;
 
+using Microsoft.Finance.AllocationAccount;
+using Microsoft.Finance.AllocationAccount.Sales;
 using Microsoft.Finance.Currency;
-using Microsoft.Finance.Deferral;
 using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.ExtendedText;
-using Microsoft.Foundation.Navigate;
 using Microsoft.Inventory.Availability;
 using Microsoft.Inventory.BOM;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Item.Catalog;
 using Microsoft.Inventory.Location;
-using Microsoft.Inventory.Setup;
 using Microsoft.Sales.History;
 using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
 using System.Environment.Configuration;
+using System.Integration.Excel;
 
-page 6631 "Sales Return Order Subform"
+page 96 "Sales Cr. Memo Subform"
 {
     AutoSplitKey = true;
     Caption = 'Lines';
@@ -30,7 +30,7 @@ page 6631 "Sales Return Order Subform"
     MultipleNewLines = true;
     PageType = ListPart;
     SourceTable = "Sales Line";
-    SourceTableView = where("Document Type" = filter("Return Order"));
+    SourceTableView = where("Document Type" = filter("Credit Memo"));
 
     layout
     {
@@ -48,8 +48,6 @@ page 6631 "Sales Return Order Subform"
                     trigger OnValidate()
                     begin
                         NoOnAfterValidate();
-                        SetLocationCodeMandatory();
-
                         UpdateEditableOnRow();
                         UpdateTypeText();
                         DeltaUpdateTotals();
@@ -68,7 +66,7 @@ page 6631 "Sales Return Order Subform"
                     trigger OnValidate()
                     begin
                         TempOptionLookupBuffer.SetCurrentType(Rec.Type.AsInteger());
-                        if TempOptionLookupBuffer.AutoCompleteLookup(TypeAsText, TempOptionLookupBuffer."Lookup Type"::Sales) then
+                        if TempOptionLookupBuffer.AutoCompleteLookup(TypeAsText, Enum::"Option Lookup Type"::Sales) then
                             Rec.Validate(Type, TempOptionLookupBuffer.ID);
                         TempOptionLookupBuffer.ValidateOption(TypeAsText);
                         UpdateEditableOnRow();
@@ -89,7 +87,6 @@ page 6631 "Sales Return Order Subform"
                         NoOnAfterValidate();
                         UpdateEditableOnRow();
                         Rec.ShowShortcutDimCode(ShortcutDimCode);
-                        QuantityOnAfterValidate();
                         UpdateTypeText();
                         DeltaUpdateTotals();
                         if Rec."Variant Code" = '' then
@@ -110,7 +107,8 @@ page 6631 "Sales Return Order Subform"
                     var
                         ItemReferenceMgt: Codeunit "Item Reference Management";
                     begin
-                        ItemReferenceMgt.SalesReferenceNoLookup(Rec);
+                        ItemReferenceMgt.SalesReferenceNoLookUp(Rec);
+                        InsertExtendedText(false);
                         NoOnAfterValidate();
                         UpdateEditableOnRow();
                         DeltaUpdateTotals();
@@ -120,11 +118,18 @@ page 6631 "Sales Return Order Subform"
 
                     trigger OnValidate()
                     begin
+                        InsertExtendedText(false);
                         NoOnAfterValidate();
                         UpdateEditableOnRow();
                         DeltaUpdateTotals();
                         CurrPage.Update();
                     end;
+                }
+                field("IC Partner Code"; Rec."IC Partner Code")
+                {
+                    ApplicationArea = Intercompany;
+                    ToolTip = 'Specifies the code of the intercompany partner that the transaction is related to if the entry was created from an intercompany transaction.';
+                    Visible = false;
                 }
                 field("IC Partner Ref. Type"; Rec."IC Partner Ref. Type")
                 {
@@ -207,9 +212,8 @@ page 6631 "Sales Return Order Subform"
                 field(Description; Rec.Description)
                 {
                     ApplicationArea = Basic, Suite;
-                    QuickEntry = false;
                     ShowMandatory = not IsCommentLine;
-                    ToolTip = 'Specifies a description of the entry of the product to be sold. To add a non-transactional text line, fill in the Description field only.';
+                    ToolTip = 'Specifies a description of the entry, which is based on the contents of the Type and No. fields.';
 
                     trigger OnValidate()
                     begin
@@ -220,8 +224,8 @@ page 6631 "Sales Return Order Subform"
                         if Rec."No." = xRec."No." then
                             exit;
 
-                        NoOnAfterValidate();
                         Rec.ShowShortcutDimCode(ShortcutDimCode);
+                        NoOnAfterValidate();
                         UpdateTypeText();
                         DeltaUpdateTotals();
                     end;
@@ -240,22 +244,19 @@ page 6631 "Sales Return Order Subform"
                 }
                 field("Return Reason Code"; Rec."Return Reason Code")
                 {
-                    ApplicationArea = SalesReturnOrder;
+                    ApplicationArea = Suite;
                     ToolTip = 'Specifies the code explaining why the item was returned.';
+                    Visible = false;
                 }
                 field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = Location;
                     Editable = not IsBlankNumber;
                     Enabled = not IsBlankNumber;
-                    QuickEntry = false;
-                    ShowMandatory = LocationCodeMandatory;
-                    ToolTip = 'Specifies the location from where inventory items to the customer on the sales document are to be shipped by default.';
-                    Visible = LocationCodeVisible;
+                    ToolTip = 'Specifies the inventory location from which the items sold should be picked and where the inventory decrease is registered.';
 
                     trigger OnValidate()
                     begin
-                        LocationCodeOnAfterValidate();
                         DeltaUpdateTotals();
                     end;
                 }
@@ -265,10 +266,10 @@ page 6631 "Sales Return Order Subform"
                     ToolTip = 'Specifies the bin where the items are picked or put away.';
                     Visible = false;
                 }
-                field(Control28; Rec.Reserve)
+                field(Reserve; Rec.Reserve)
                 {
                     ApplicationArea = Reservation;
-                    ToolTip = 'Specifies whether items will never, automatically (Always), or optionally be reserved for this customer. Optional means that you must manually reserve items for this customer.';
+                    ToolTip = 'Specifies whether a reservation can be made for items on this line.';
                     Visible = false;
 
                     trigger OnValidate()
@@ -283,23 +284,20 @@ page 6631 "Sales Return Order Subform"
                     Editable = not IsBlankNumber;
                     Enabled = not IsBlankNumber;
                     ShowMandatory = (Rec.Type <> Rec.Type::" ") and (Rec."No." <> '');
-                    ToolTip = 'Specifies how many units are being returned.';
+                    ToolTip = 'Specifies how many units are being sold.';
 
                     trigger OnValidate()
                     begin
                         QuantityOnAfterValidate();
-                        DeltaUpdateTotals();
                         if SalesSetup."Calc. Inv. Discount" and (Rec.Quantity = 0) then
                             CurrPage.Update(false);
                     end;
                 }
-                field("Reserved Quantity"; ReverseReservedQtySign())
+                field("Reserved Quantity"; Rec."Reserved Quantity")
                 {
                     ApplicationArea = Reservation;
                     BlankZero = true;
-                    CaptionClass = Rec.FieldCaption("Reserved Quantity");
-                    DecimalPlaces = 0 : 5;
-                    QuickEntry = false;
+                    ToolTip = 'Specifies how many units of the item on the line have been reserved.';
                     Visible = false;
 
                     trigger OnDrillDown()
@@ -315,13 +313,11 @@ page 6631 "Sales Return Order Subform"
                     ApplicationArea = Basic, Suite;
                     Editable = UnitofMeasureCodeIsChangeable;
                     Enabled = UnitofMeasureCodeIsChangeable;
-                    QuickEntry = false;
                     ToolTip = 'Specifies how each unit of the item or resource is measured, such as in pieces or hours. By default, the value in the Base Unit of Measure field on the item or resource card is inserted.';
 
                     trigger OnValidate()
                     begin
                         UnitofMeasureCodeOnAfterValidate();
-                        DeltaUpdateTotals();
                     end;
                 }
                 field("Unit of Measure"; Rec."Unit of Measure")
@@ -360,19 +356,35 @@ page 6631 "Sales Return Order Subform"
                 field("Tax Area Code"; Rec."Tax Area Code")
                 {
                     ApplicationArea = SalesTax;
-                    ToolTip = 'Specifies the tax area code for the customer.';
+                    ToolTip = 'Specifies the tax area that is used to calculate and post sales tax.';
                     Visible = false;
 
                     trigger OnValidate()
                     begin
-                        DeltaUpdateTotals();
+                        RedistributeTotalsOnAfterValidate();
                     end;
                 }
                 field("Tax Group Code"; Rec."Tax Group Code")
                 {
                     ApplicationArea = SalesTax;
+                    Editable = not IsCommentLine;
+                    Enabled = not IsCommentLine;
                     ShowMandatory = Rec."Tax Area Code" <> '';
                     ToolTip = 'Specifies the tax group that is used to calculate and post sales tax.';
+
+                    trigger OnValidate()
+                    begin
+                        RedistributeTotalsOnAfterValidate();
+                    end;
+                }
+                field("Line Amount"; Rec."Line Amount")
+                {
+                    ApplicationArea = Basic, Suite;
+                    BlankZero = true;
+                    Editable = not IsBlankNumber;
+                    Enabled = not IsBlankNumber;
+                    ShowMandatory = (Rec.Type <> Rec.Type::" ") and (Rec."No." <> '');
+                    ToolTip = 'Specifies the net amount, excluding any invoice discount amount, that must be paid for products on the line.';
 
                     trigger OnValidate()
                     begin
@@ -392,20 +404,6 @@ page 6631 "Sales Return Order Subform"
                         DeltaUpdateTotals();
                     end;
                 }
-                field("Line Amount"; Rec."Line Amount")
-                {
-                    ApplicationArea = Basic, Suite;
-                    BlankZero = true;
-                    Editable = not IsBlankNumber;
-                    Enabled = not IsBlankNumber;
-                    ShowMandatory = (Rec.Type <> Rec.Type::" ") and (Rec."No." <> '');
-                    ToolTip = 'Specifies the net amount, excluding any invoice discount amount, that must be paid for products on the line.';
-
-                    trigger OnValidate()
-                    begin
-                        DeltaUpdateTotals();
-                    end;
-                }
                 field("Line Discount Amount"; Rec."Line Discount Amount")
                 {
                     ApplicationArea = Basic, Suite;
@@ -419,7 +417,7 @@ page 6631 "Sales Return Order Subform"
                 }
                 field("Allow Invoice Disc."; Rec."Allow Invoice Disc.")
                 {
-                    ApplicationArea = SalesReturnOrder;
+                    ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the invoice line is included when the invoice discount is calculated.';
                     Visible = false;
 
@@ -429,7 +427,6 @@ page 6631 "Sales Return Order Subform"
                         AmountWithDiscountAllowed := DocumentTotals.CalcTotalSalesAmountOnlyDiscountAllowed(Rec);
                         InvoiceDiscountAmount := Round(AmountWithDiscountAllowed * InvoiceDiscountPct / 100, Currency."Amount Rounding Precision");
                         ValidateInvoiceDiscountAmount();
-                        DeltaUpdateTotals();
                     end;
                 }
                 field("Inv. Discount Amount"; Rec."Inv. Discount Amount")
@@ -443,54 +440,6 @@ page 6631 "Sales Return Order Subform"
                         DeltaUpdateTotals();
                     end;
                 }
-                field("Return Qty. to Receive"; Rec."Return Qty. to Receive")
-                {
-                    ApplicationArea = Basic, Suite;
-                    BlankZero = true;
-                    ToolTip = 'Specifies the quantity of items that remain to be shipped.';
-                    AboutTitle = 'The quantity that is returned';
-                    AboutText = 'If the customer is not returning the full quantity, adjust the ‘Qty. to Receive’ value. Similarly, choose the quantity to credit the customer in the Qty to Invoice field.';
-                }
-                field("Return Qty. Received"; Rec."Return Qty. Received")
-                {
-                    ApplicationArea = Basic, Suite;
-                    BlankZero = true;
-                    ToolTip = 'Specifies how many units of the item on the line have been posted as shipped.';
-
-                    trigger OnDrillDown()
-                    var
-                        ReturnReceiptLine: Record "Return Receipt Line";
-                    begin
-                        ReturnReceiptLine.SetCurrentKey("Document No.", "No.", "Posting Date");
-                        ReturnReceiptLine.SetRange("Return Order No.", Rec."Document No.");
-                        ReturnReceiptLine.SetRange("Return Order Line No.", Rec."Line No.");
-                        ReturnReceiptLine.SetFilter(Quantity, '<>%1', 0);
-                        Page.RunModal(0, ReturnReceiptLine);
-                    end;
-                }
-                field("Qty. to Invoice"; Rec."Qty. to Invoice")
-                {
-                    ApplicationArea = Basic, Suite;
-                    BlankZero = true;
-                    ToolTip = 'Specifies the quantity that remains to be invoiced. It is calculated as Quantity - Qty. Invoiced.';
-                }
-                field("Quantity Invoiced"; Rec."Quantity Invoiced")
-                {
-                    ApplicationArea = Basic, Suite;
-                    BlankZero = true;
-                    ToolTip = 'Specifies how many units of the item on the line have been posted as invoiced.';
-
-                    trigger OnDrillDown()
-                    var
-                        SalesCrMemoLine: Record "Sales Cr.Memo Line";
-                    begin
-                        SalesCrMemoLine.SetCurrentKey("Document No.", "No.", "Posting Date");
-                        SalesCrMemoLine.SetRange("Order No.", Rec."Document No.");
-                        SalesCrMemoLine.SetRange("Order Line No.", Rec."Line No.");
-                        SalesCrMemoLine.SetFilter(Quantity, '<>%1', 0);
-                        Page.RunModal(0, SalesCrMemoLine);
-                    end;
-                }
                 field("Allow Item Charge Assignment"; Rec."Allow Item Charge Assignment")
                 {
                     ApplicationArea = ItemCharges;
@@ -500,7 +449,6 @@ page 6631 "Sales Return Order Subform"
                 field("Qty. to Assign"; Rec."Qty. to Assign")
                 {
                     ApplicationArea = ItemCharges;
-                    QuickEntry = false;
                     StyleExpr = ItemChargeStyleExpression;
                     ToolTip = 'Specifies how many units of the item charge will be assigned to the line.';
 
@@ -515,7 +463,6 @@ page 6631 "Sales Return Order Subform"
                 {
                     ApplicationArea = ItemCharges;
                     BlankZero = true;
-                    QuickEntry = false;
                     ToolTip = 'Specifies the quantity of the item charge that was assigned to a specified item when you posted this sales line.';
 
                     trigger OnDrillDown()
@@ -525,79 +472,46 @@ page 6631 "Sales Return Order Subform"
                         UpdateForm(false);
                     end;
                 }
-                field("Requested Delivery Date"; Rec."Requested Delivery Date")
+                field("Allocation Account No."; Rec."Selected Alloc. Account No.")
+                {
+                    ApplicationArea = All;
+                    Caption = 'Allocation Account No.';
+                    ToolTip = 'Specifies the allocation account number that will be used to distribute the amounts during the posting process.';
+                    Visible = UseAllocationAccountNumber;
+                    trigger OnValidate()
+                    var
+                        SalesAllocAccMgt: Codeunit "Sales Alloc. Acc. Mgt.";
+                    begin
+                        SalesAllocAccMgt.VerifySelectedAllocationAccountNo(Rec);
+                    end;
+                }
+                field("Job No."; Rec."Job No.")
+                {
+                    ApplicationArea = Jobs;
+                    ToolTip = 'Specifies the number of the related project. If you fill in this field and the Project Task No. field, then a project ledger entry will be posted together with the sales line.';
+                    Visible = false;
+
+                    trigger OnValidate()
+                    begin
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
+                    end;
+                }
+                field("Job Task No."; Rec."Job Task No.")
+                {
+                    ApplicationArea = Jobs;
+                    ToolTip = 'Specifies the number of the related project task.';
+                    Visible = false;
+                }
+                field("Tax Category"; Rec."Tax Category")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the date that the customer has asked for the order to be delivered.';
-                    Visible = false;
-
-                    trigger OnValidate()
-                    begin
-                        UpdateForm(true);
-                    end;
-                }
-                field("Promised Delivery Date"; Rec."Promised Delivery Date")
-                {
-                    ApplicationArea = OrderPromising;
-                    ToolTip = 'Specifies the date that you have promised to deliver the order, as a result of the Order Promising function.';
-                    Visible = false;
-
-                    trigger OnValidate()
-                    begin
-                        UpdateForm(true);
-                    end;
-                }
-                field("Planned Delivery Date"; Rec."Planned Delivery Date")
-                {
-                    ApplicationArea = SalesReturnOrder;
-                    QuickEntry = false;
-                    ToolTip = 'Specifies the planned date that the shipment will be delivered at the customer''s address. If the customer requests a delivery date, the program calculates whether the items will be available for delivery on this date. If the items are available, the planned delivery date will be the same as the requested delivery date. If not, the program calculates the date that the items are available for delivery and enters this date in the Planned Delivery Date field.';
-                    Visible = false;
-
-                    trigger OnValidate()
-                    begin
-                        UpdateForm(true);
-                    end;
-                }
-                field("Planned Shipment Date"; Rec."Planned Shipment Date")
-                {
-                    ApplicationArea = SalesReturnOrder;
-                    ToolTip = 'Specifies the date that the shipment should ship from the warehouse. If the customer requests a delivery date, the program calculates the planned shipment date by subtracting the shipping time from the requested delivery date. If the customer does not request a delivery date or the requested delivery date cannot be met, the program calculates the content of this field by adding the shipment time to the shipping date.';
-                    Visible = false;
-
-                    trigger OnValidate()
-                    begin
-                        UpdateForm(true);
-                    end;
-                }
-                field("Shipment Date"; Rec."Shipment Date")
-                {
-                    ApplicationArea = Basic, Suite;
-                    QuickEntry = false;
-                    ToolTip = 'Specifies when items on the document are shipped or were shipped. A shipment date is usually calculated from a requested delivery date plus lead time.';
-                    Visible = false;
-
-                    trigger OnValidate()
-                    begin
-                        ShipmentDateOnAfterValidate();
-                    end;
-                }
-                field("Shipping Agent Code"; Rec."Shipping Agent Code")
-                {
-                    ApplicationArea = SalesReturnOrder;
-                    ToolTip = 'Specifies the code for the shipping agent who is transporting the items.';
+                    ToolTip = 'Specifies the VAT category in connection with electronic document sending. For example, when you send sales documents through the PEPPOL service, the value in this field is used to populate several fields, such as the ClassifiedTaxCategory element in the Item group. It is also used to populate the TaxCategory element in both the TaxSubtotal and AllowanceCharge group. The number is based on the UNCL5305 standard.';
                     Visible = false;
                 }
-                field("Shipping Agent Service Code"; Rec."Shipping Agent Service Code")
+                field("Work Type Code"; Rec."Work Type Code")
                 {
-                    ApplicationArea = SalesReturnOrder;
-                    ToolTip = 'Specifies the code for the service, such as a one-day delivery, that is offered by the shipping agent.';
-                    Visible = false;
-                }
-                field("Shipping Time"; Rec."Shipping Time")
-                {
-                    ApplicationArea = SalesReturnOrder;
-                    ToolTip = 'Specifies how long it takes from when the items are shipped from the warehouse to when they are delivered.';
+                    ApplicationArea = Jobs;
+                    ToolTip = 'Specifies which work type the resource applies to when the sale is related to a project.';
                     Visible = false;
                 }
                 field("Blanket Order No."; Rec."Blanket Order No.")
@@ -626,8 +540,7 @@ page 6631 "Sales Return Order Subform"
                 }
                 field("Deferral Code"; Rec."Deferral Code")
                 {
-                    ApplicationArea = SalesReturnOrder;
-                    Enabled = (Rec.Type <> Rec.Type::"Fixed Asset") and (Rec.Type <> Rec.Type::" ");
+                    ApplicationArea = Suite;
                     ToolTip = 'Specifies the deferral template that governs how revenue earned with this sales document is deferred to the different accounting periods when the good or service was delivered.';
                     Visible = false;
 
@@ -637,13 +550,6 @@ page 6631 "Sales Return Order Subform"
                         Commit();
                         Rec.ShowDeferralSchedule();
                     end;
-                }
-                field("Returns Deferral Start Date"; Rec."Returns Deferral Start Date")
-                {
-                    ApplicationArea = SalesReturnOrder;
-                    Enabled = (Rec.Type <> Rec.Type::"Fixed Asset") and (Rec.Type <> Rec.Type::" ");
-                    ToolTip = 'Specifies the starting date of the returns deferral period.';
-                    Visible = false;
                 }
                 field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                 {
@@ -664,7 +570,6 @@ page 6631 "Sales Return Order Subform"
                     TableRelation = "Dimension Value".Code where("Global Dimension No." = const(3),
                                                                   "Dimension Value Type" = const(Standard),
                                                                   Blocked = const(false));
-                    ToolTip = 'Specifies the code for Shortcut Dimension 3.';
                     Visible = DimVisible3;
 
                     trigger OnValidate()
@@ -681,7 +586,6 @@ page 6631 "Sales Return Order Subform"
                     TableRelation = "Dimension Value".Code where("Global Dimension No." = const(4),
                                                                   "Dimension Value Type" = const(Standard),
                                                                   Blocked = const(false));
-                    ToolTip = 'Specifies the code for Shortcut Dimension 4.';
                     Visible = DimVisible4;
 
                     trigger OnValidate()
@@ -698,7 +602,6 @@ page 6631 "Sales Return Order Subform"
                     TableRelation = "Dimension Value".Code where("Global Dimension No." = const(5),
                                                                   "Dimension Value Type" = const(Standard),
                                                                   Blocked = const(false));
-                    ToolTip = 'Specifies the code for Shortcut Dimension 5.';
                     Visible = DimVisible5;
 
                     trigger OnValidate()
@@ -715,7 +618,6 @@ page 6631 "Sales Return Order Subform"
                     TableRelation = "Dimension Value".Code where("Global Dimension No." = const(6),
                                                                   "Dimension Value Type" = const(Standard),
                                                                   Blocked = const(false));
-                    ToolTip = 'Specifies the code for Shortcut Dimension 6.';
                     Visible = DimVisible6;
 
                     trigger OnValidate()
@@ -732,7 +634,6 @@ page 6631 "Sales Return Order Subform"
                     TableRelation = "Dimension Value".Code where("Global Dimension No." = const(7),
                                                                   "Dimension Value Type" = const(Standard),
                                                                   Blocked = const(false));
-                    ToolTip = 'Specifies the code for Shortcut Dimension 7.';
                     Visible = DimVisible7;
 
                     trigger OnValidate()
@@ -749,7 +650,6 @@ page 6631 "Sales Return Order Subform"
                     TableRelation = "Dimension Value".Code where("Global Dimension No." = const(8),
                                                                   "Dimension Value Type" = const(Standard),
                                                                   Blocked = const(false));
-                    ToolTip = 'Specifies the code for Shortcut Dimension 8.';
                     Visible = DimVisible8;
 
                     trigger OnValidate()
@@ -785,26 +685,16 @@ page 6631 "Sales Return Order Subform"
                     ToolTip = 'Specifies the number of units per parcel of the item. In the sales statistics window, the number of units per parcel on the line helps to determine the total number of units for all the lines for the particular sales document.';
                     Visible = false;
                 }
-                field("Attached to Line No."; Rec."Attached to Line No.")
-                {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the line number to which this sales line is attached.';
-                    Visible = false;
-                }
-                field("Attached Lines Count"; Rec."Attached Lines Count")
-                {
-                    ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the number of non-inventory product lines attached to the sales line.';
-                    Visible = AttachingLinesEnabled;
-                }
             }
-            group(Control37)
+            group(Control39)
             {
                 ShowCaption = false;
-                group(Control33)
+                group(Control35)
                 {
                     ShowCaption = false;
-                    field(SubtotalExclVAT; TotalSalesLine."Line Amount")
+#pragma warning disable AA0100
+                    field("TotalSalesLine.""Line Amount"""; TotalSalesLine."Line Amount")
+#pragma warning restore AA0100
                     {
                         ApplicationArea = Basic, Suite;
                         AutoFormatExpression = Currency.Code;
@@ -847,7 +737,7 @@ page 6631 "Sales Return Order Subform"
                         end;
                     }
                 }
-                group(Control15)
+                group(Control17)
                 {
                     ShowCaption = false;
                     field("Total Amount Excl. VAT"; TotalSalesLine.Amount)
@@ -890,6 +780,88 @@ page 6631 "Sales Return Order Subform"
     {
         area(processing)
         {
+            action(InsertExtTexts)
+            {
+                AccessByPermission = TableData "Extended Text Header" = R;
+                ApplicationArea = Suite;
+                Caption = 'Insert &Ext. Texts';
+                Image = Text;
+                ToolTip = 'Insert the extended item description that is set up for the item that is being processed on the line.';
+
+                trigger OnAction()
+                begin
+                    InsertExtendedText(true);
+                end;
+            }
+            action(Dimensions)
+            {
+                AccessByPermission = TableData Dimension = R;
+                ApplicationArea = Dimensions;
+                Caption = 'Dimensions';
+                Image = Dimensions;
+                ShortCutKey = 'Alt+D';
+                ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
+
+                trigger OnAction()
+                begin
+                    Rec.ShowDimensions();
+                end;
+            }
+            action(DeferralSchedule)
+            {
+                ApplicationArea = Suite;
+                Caption = 'Deferral Schedule';
+                Enabled = Rec."Deferral Code" <> '';
+                Image = PaymentPeriod;
+                ToolTip = 'View or edit the deferral schedule that governs how revenue made with this sales document is deferred to different accounting periods when the document is posted.';
+
+                trigger OnAction()
+                begin
+                    Rec.ShowDeferralSchedule();
+                end;
+            }
+            action(RedistributeAccAllocations)
+            {
+                ApplicationArea = All;
+                Caption = 'Redistribute Account Allocations';
+                Image = EditList;
+#pragma warning disable AA0219
+                ToolTip = 'Use this action to redistribute the account allocations for this line.';
+#pragma warning restore AA0219
+
+                trigger OnAction()
+                var
+                    AllocAccManualOverride: Page "Redistribute Acc. Allocations";
+                begin
+                    if ((Rec."Type" <> Rec."Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '')) then
+                        Error(ActionOnlyAllowedForAllocationAccountsErr);
+
+                    AllocAccManualOverride.SetParentSystemId(Rec.SystemId);
+                    AllocAccManualOverride.SetParentTableId(Database::"Sales Line");
+                    AllocAccManualOverride.RunModal();
+                end;
+            }
+            action(ReplaceAllocationAccountWithLines)
+            {
+                ApplicationArea = All;
+                Caption = 'Generate lines from Allocation Account Line';
+                Image = CreateLinesFromJob;
+#pragma warning disable AA0219
+                ToolTip = 'Use this action to replace the Allocation Account line with the actual lines that would be generated from the line itself.';
+#pragma warning restore AA0219
+
+                trigger OnAction()
+                var
+                    SalesAllocAccMgt: Codeunit "Sales Alloc. Acc. Mgt.";
+                begin
+                    if ((Rec."Type" <> Rec."Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '')) then
+                        Error(ActionOnlyAllowedForAllocationAccountsErr);
+
+                    SalesAllocAccMgt.CreateLinesFromAllocationAccountLine(Rec);
+                    Rec.Delete();
+                    CurrPage.Update(false);
+                end;
+            }
             group("F&unctions")
             {
                 Caption = 'F&unctions';
@@ -908,60 +880,19 @@ page 6631 "Sales Return Order Subform"
                         ExplodeBOM();
                     end;
                 }
-                action("Insert &Ext. Texts")
+                action("Get Return &Receipt Lines")
                 {
-                    AccessByPermission = TableData "Extended Text Header" = R;
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Insert &Ext. Texts';
-                    Image = Text;
-                    ToolTip = 'Insert the extended item description that is set up for the item that is being processed on the line.';
+                    AccessByPermission = TableData "Return Receipt Header" = R;
+                    ApplicationArea = SalesReturnOrder;
+                    Caption = 'Get Return &Receipt Lines';
+                    Ellipsis = true;
+                    Image = ReturnReceipt;
+                    ToolTip = 'Select a posted return receipt for the item that you want to assign the item charge to, for example, if you received an invoice for the item charge after you posted the original return receipt.';
 
                     trigger OnAction()
                     begin
-                        InsertExtendedText(true);
-                    end;
-                }
-                action("Attach to Inventory Item Line")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Attach to inventory item line';
-                    Image = Allocations;
-                    Visible = AttachingLinesEnabled;
-                    Enabled = AttachToInvtItemEnabled;
-                    ToolTip = 'Attach the selected non-inventory product lines to a inventory item line in this sales return order.';
-
-                    trigger OnAction()
-                    var
-                        SelectedSalesLine: Record "Sales Line";
-                    begin
-                        CurrPage.SetSelectionFilter(SelectedSalesLine);
-                        Rec.AttachToInventoryItemLine(SelectedSalesLine);
-                    end;
-                }
-                action(Reserve)
-                {
-                    ApplicationArea = Reservation;
-                    Caption = '&Reserve';
-                    Image = Reserve;
-                    Enabled = Rec.Type = Rec.Type::Item;
-                    ToolTip = 'Reserve the quantity of the selected item that is required on the document line from which you opened this page. This action is available only for lines that contain an item.';
-
-                    trigger OnAction()
-                    begin
-                        PageShowReservation();
-                    end;
-                }
-                action("Order &Tracking")
-                {
-                    ApplicationArea = ItemTracking;
-                    Caption = 'Order &Tracking';
-                    Image = OrderTracking;
-                    Enabled = Rec.Type = Rec.Type::Item;
-                    ToolTip = 'Track the connection of a supply to its corresponding demand for the selected item. This can help you find the original demand that created a specific production order or purchase order. This action is available only for lines that contain an item.';
-
-                    trigger OnAction()
-                    begin
-                        Rec.ShowOrderTracking();
+                        GetReturnReceipt();
+                        RedistributeTotalsOnAfterValidate();
                     end;
                 }
             }
@@ -1036,6 +967,7 @@ page 6631 "Sales Return Order Subform"
                     }
                     action("BOM Level")
                     {
+                        AccessByPermission = TableData "BOM Buffer" = R;
                         ApplicationArea = Assembly;
                         Caption = 'BOM Level';
                         Image = BOMLevel;
@@ -1047,21 +979,7 @@ page 6631 "Sales Return Order Subform"
                         end;
                     }
                 }
-                action(Dimensions)
-                {
-                    AccessByPermission = TableData Dimension = R;
-                    ApplicationArea = Dimensions;
-                    Caption = 'Dimensions';
-                    Image = Dimensions;
-                    ShortCutKey = 'Alt+D';
-                    ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
-
-                    trigger OnAction()
-                    begin
-                        Rec.ShowDimensions();
-                    end;
-                }
-                action(Comments)
+                action("Co&mments")
                 {
                     ApplicationArea = Comments;
                     Caption = 'Co&mments';
@@ -1100,39 +1018,6 @@ page 6631 "Sales Return Order Subform"
                     trigger OnAction()
                     begin
                         Rec.OpenItemTrackingLines();
-                    end;
-                }
-                action(DocumentLineTracking)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Document &Line Tracking';
-                    Image = Navigate;
-                    ToolTip = 'View related open, posted, or archived documents or document lines.';
-
-                    trigger OnAction()
-                    begin
-                        ShowDocumentLineTracking();
-                    end;
-                }
-                action(DeferralSchedule)
-                {
-                    ApplicationArea = Suite;
-                    Caption = 'Deferral Schedule';
-                    Enabled = Rec."Deferral Code" <> '';
-                    Image = PaymentPeriod;
-                    ToolTip = 'View or edit the deferral schedule that governs how revenue made with this sales document is deferred to different accounting periods when the document is posted.';
-
-                    trigger OnAction()
-                    var
-                        DeferralUtilities: Codeunit "Deferral Utilities";
-                    begin
-                        if Rec.ShowDeferrals(Rec."Posting Date", Rec."Currency Code") then begin
-                            Rec."Returns Deferral Start Date" :=
-                                DeferralUtilities.GetDeferralStartDate(
-                                    "Deferral Document Type"::Sales.AsInteger(), Rec."Document Type".AsInteger(),
-                                    Rec."Document No.", Rec."Line No.", Rec."Deferral Code", Rec."Posting Date");
-                            CurrPage.SaveRecord();
-                        end;
                     end;
                 }
                 action(DocAttach)
@@ -1189,7 +1074,35 @@ page 6631 "Sales Return Order Subform"
                     end;
                 }
             }
+            group("Page")
+            {
+                Caption = 'Page';
 
+                action(EditInExcel)
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Edit in Excel';
+                    Image = Excel;
+                    Visible = IsSaaSExcelAddinEnabled;
+                    ToolTip = 'Send the data in the sub page to an Excel file for analysis or editing';
+                    AccessByPermission = System "Allow Action Export To Excel" = X;
+
+                    trigger OnAction()
+                    var
+                        EditinExcel: Codeunit "Edit in Excel";
+                        EditinExcelFilters: Codeunit "Edit in Excel Filters";
+                    begin
+                        EditinExcelFilters.AddFieldV2('Document_No', Enum::"Edit in Excel Filter Type"::Equal, Rec."Document No.", Enum::"Edit in Excel Edm Type"::"Edm.String");
+
+                        EditinExcel.EditPageInExcel(
+                            'Sales_Cr_Memo_Line',
+                            Page::"Sales Cr. Memo Subform",
+                            EditinExcelFilters,
+                            StrSubstNo(ExcelFileNameTxt, Rec."Document No."));
+                    end;
+
+                }
+            }
         }
     }
 
@@ -1197,11 +1110,9 @@ page 6631 "Sales Return Order Subform"
     begin
         GetTotalSalesHeader();
         CalculateTotals();
-        SetLocationCodeMandatory();
         UpdateEditableOnRow();
         UpdateTypeText();
         SetItemChargeFieldsStyle();
-        UpdateCurrency();
     end;
 
     trigger OnAfterGetRecord()
@@ -1242,8 +1153,6 @@ page 6631 "Sales Return Order Subform"
     end;
 
     trigger OnInit()
-    var
-        ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
     begin
         SalesSetup.Get();
         Currency.InitRoundingPrecision();
@@ -1267,19 +1176,13 @@ page 6631 "Sales Return Order Subform"
 
     trigger OnOpenPage()
     var
-        [SecurityFiltering(SecurityFilter::Filtered)]
-        Location: Record Location;
-        DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
+        AllocationAccountMgt: Codeunit "Allocation Account Mgt.";
     begin
-        if Location.ReadPermission then
-            LocationCodeVisible := not Location.IsEmpty();
+        UseAllocationAccountNumber := AllocationAccountMgt.UseAllocationAccountNoField();
+        SetOpenPage();
 
-        AttachingLinesEnabled :=
-            SalesSetup."Auto Post Non-Invt. via Whse." = SalesSetup."Auto Post Non-Invt. via Whse."::"Attached/Assigned";
-
-        SetDimensionsVisibility();
-        BackgroundErrorCheck := DocumentErrorsMgt.BackgroundValidationEnabled();
         SetItemReferenceVisibility();
+        SetDimensionsVisibility();
     end;
 
     var
@@ -1287,15 +1190,18 @@ page 6631 "Sales Return Order Subform"
         TempOptionLookupBuffer: Record "Option Lookup Buffer" temporary;
         TransferExtendedText: Codeunit "Transfer Extended Text";
         SalesAvailabilityMgt: Codeunit "Sales Availability Mgt.";
-        SalesCalcDiscByType: Codeunit "Sales - Calc Discount By Type";
+        SalesCalcDiscountByType: Codeunit "Sales - Calc Discount By Type";
+        ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
         AmountWithDiscountAllowed: Decimal;
+        CurrPageIsEditable: Boolean;
+        IsSaaSExcelAddinEnabled: Boolean;
+        VariantCodeMandatory: Boolean;
         TypeAsText: Text[30];
         TypeAsTextFieldVisible: Boolean;
         ItemChargeStyleExpression: Text;
-        VariantCodeMandatory: Boolean;
-        LocationCodeVisible: Boolean;
-        CurrPageIsEditable: Boolean;
-        AttachingLinesEnabled: Boolean;
+        UseAllocationAccountNumber: Boolean;
+        ActionOnlyAllowedForAllocationAccountsErr: Label 'This action is only available for lines that have Allocation Account set as Type.';
+        ExcelFileNameTxt: Label 'Sales Credit Memo %1 - Lines', Comment = '%1 = document number, ex. 10000';
 
     protected var
         Currency: Record Currency;
@@ -1319,15 +1225,36 @@ page 6631 "Sales Return Order Subform"
         ShowAllLinesEnabled: Boolean;
         IsCommentLine: Boolean;
         ItemReferenceVisible: Boolean;
-        LocationCodeMandatory: Boolean;
-        UnitofMeasureCodeIsChangeable: Boolean;
-        AttachToInvtItemEnabled: Boolean;
         VATAmount: Decimal;
+        UnitofMeasureCodeIsChangeable: Boolean;
+
+    local procedure SetOpenPage()
+    var
+        ServerSetting: Codeunit "Server Setting";
+        DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
+    begin
+        OnBeforeSetOpenPage();
+        IsSaaSExcelAddinEnabled := ServerSetting.GetIsSaasExcelAddinEnabled();
+        BackgroundErrorCheck := DocumentErrorsMgt.BackgroundValidationEnabled();
+    end;
 
     procedure ApproveCalcInvDisc()
     begin
         CODEUNIT.Run(CODEUNIT::"Sales-Disc. (Yes/No)", Rec);
         DocumentTotals.SalesDocTotalsNotUpToDate();
+    end;
+
+    procedure ExplodeBOM()
+    begin
+        CODEUNIT.Run(CODEUNIT::"Sales-Explode BOM", Rec);
+        DocumentTotals.SalesDocTotalsNotUpToDate();
+    end;
+
+    local procedure SetItemReferenceVisibility()
+    var
+        ItemReference: Record "Item Reference";
+    begin
+        ItemReferenceVisible := not ItemReference.IsEmpty();
     end;
 
     local procedure SetDefaultType()
@@ -1343,42 +1270,23 @@ page 6631 "Sales Return Order Subform"
             Rec.Type := Rec.GetDefaultLineType();
     end;
 
-    local procedure ValidateInvoiceDiscountAmount()
-    var
-        SalesHeader: Record "Sales Header";
-    begin
-        SalesHeader.Get(Rec."Document Type", Rec."Document No.");
-        SalesCalcDiscByType.ApplyInvDiscBasedOnAmt(InvoiceDiscountAmount, SalesHeader);
-        DocumentTotals.SalesDocTotalsNotUpToDate();
-        CurrPage.Update(false);
-    end;
-
     procedure CalcInvDisc()
+    var
+        SalesCalcDiscount: Codeunit "Sales-Calc. Discount";
     begin
-        CODEUNIT.Run(CODEUNIT::"Sales-Calc. Discount", Rec);
+        SalesCalcDiscount.CalculateInvoiceDiscountOnLine(Rec);
         DocumentTotals.SalesDocTotalsNotUpToDate();
     end;
 
-    local procedure ExplodeBOM()
+    procedure GetReturnReceipt()
     begin
-        CODEUNIT.Run(CODEUNIT::"Sales-Explode BOM", Rec);
-        DocumentTotals.SalesDocTotalsNotUpToDate();
-    end;
-
-    procedure SalesDocTotalsNotUpToDate()
-    begin
+        CODEUNIT.Run(CODEUNIT::"Sales-Get Return Receipts", Rec);
         DocumentTotals.SalesDocTotalsNotUpToDate();
     end;
 
     procedure InsertExtendedText(Unconditionally: Boolean)
-    var
-        IsHandled: Boolean;
     begin
-        IsHandled := false;
-        OnBeforeInsertExtendedText(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
+        OnBeforeInsertExtendedText(Rec, xRec);
         if TransferExtendedText.SalesCheckIfAnyExtText(Rec, Unconditionally) then begin
             CurrPage.SaveRecord();
             Commit();
@@ -1386,12 +1294,6 @@ page 6631 "Sales Return Order Subform"
         end;
         if TransferExtendedText.MakeUpdate() then
             UpdateForm(true);
-    end;
-
-    local procedure PageShowReservation()
-    begin
-        Rec.Find();
-        Rec.ShowReservation();
     end;
 
     local procedure ItemChargeAssgnt()
@@ -1402,16 +1304,6 @@ page 6631 "Sales Return Order Subform"
     procedure UpdateForm(SetSaveRecord: Boolean)
     begin
         CurrPage.Update(SetSaveRecord);
-    end;
-
-    procedure ShowDocumentLineTracking()
-    var
-        DocumentLineTrackingPage: Page "Document Line Tracking";
-    begin
-        Clear(DocumentLineTrackingPage);
-        DocumentLineTrackingPage.SetSourceDoc(
-            "Document Line Source Type"::"Sales Return Order", Rec."Document No.", Rec."Line No.", Rec."Blanket Order No.", Rec."Blanket Order Line No.", '', 0);
-        DocumentLineTrackingpage.RunModal();
     end;
 
     procedure NoOnAfterValidate()
@@ -1427,50 +1319,27 @@ page 6631 "Sales Return Order Subform"
         OnAfterNoOnAfterValidate(Rec, xRec);
     end;
 
-    protected procedure LocationCodeOnAfterValidate()
-    begin
-        if (Rec.Reserve = Rec.Reserve::Always) and
-           (Rec."Outstanding Qty. (Base)" <> 0) and
-           (Rec."Location Code" <> xRec."Location Code")
-        then begin
-            CurrPage.SaveRecord();
-            Rec.AutoReserve();
-            CurrPage.Update(false);
-        end;
-        OnAfterLocationCodeOnAfterValidate(Rec, xRec);
-    end;
-
     protected procedure ReserveOnAfterValidate()
     begin
         if (Rec.Reserve = Rec.Reserve::Always) and (Rec."Outstanding Qty. (Base)" <> 0) then begin
             CurrPage.SaveRecord();
             Rec.AutoReserve();
-            CurrPage.Update(false);
         end;
     end;
 
     protected procedure QuantityOnAfterValidate()
     begin
+        OnBeforeQuantityOnAfterValidate(Rec, xRec);
+
         if Rec.Reserve = Rec.Reserve::Always then begin
             CurrPage.SaveRecord();
             Rec.AutoReserve();
-            CurrPage.Update(false);
         end;
 
-        OnAfterQuantityOnAfterValidate(Rec, xRec);
-    end;
+        OnQuantityOnAfterValidateOnBeforeDeltaUpdateTotals(Rec, xRec);
+        DeltaUpdateTotals();
 
-    protected procedure ShipmentDateOnAfterValidate()
-    begin
-        if (Rec.Reserve = Rec.Reserve::Always) and
-           (Rec."Outstanding Qty. (Base)" <> 0) and
-           (Rec."Shipment Date" <> xRec."Shipment Date")
-        then begin
-            CurrPage.SaveRecord();
-            Rec.AutoReserve();
-            CurrPage.Update(false);
-        end else
-            CurrPage.Update(true);
+        OnAfterQuantityOnAfterValidate(Rec, xRec);
     end;
 
     protected procedure UnitofMeasureCodeOnAfterValidate()
@@ -1479,20 +1348,56 @@ page 6631 "Sales Return Order Subform"
             CurrPage.SaveRecord();
             Rec.AutoReserve();
         end;
+        DeltaUpdateTotals();
     end;
 
-    local procedure SetLocationCodeMandatory()
-    var
-        InventorySetup: Record "Inventory Setup";
+    procedure UpdateEditableOnRow()
     begin
-        InventorySetup.Get();
-        LocationCodeMandatory := InventorySetup."Location Mandatory" and (Rec.Type = Rec.Type::Item);
+        IsCommentLine := not Rec.HasTypeToFillMandatoryFields();
+        IsBlankNumber := IsCommentLine;
+        UnitofMeasureCodeIsChangeable := not IsCommentLine;
+
+        CurrPageIsEditable := CurrPage.Editable();
+        InvDiscAmountEditable :=
+            CurrPageIsEditable and not SalesSetup."Calc. Inv. Discount" and
+            (TotalSalesHeader.Status = TotalSalesHeader.Status::Open);
+
+        OnAfterUpdateEditableOnRow(Rec, IsCommentLine, IsBlankNumber);
+    end;
+
+    procedure CalculateTotals()
+    begin
+        DocumentTotals.SalesCheckIfDocumentChanged(Rec, xRec);
+        DocumentTotals.CalculateSalesSubPageTotals(TotalSalesHeader, TotalSalesLine, VATAmount, InvoiceDiscountAmount, InvoiceDiscountPct);
+        DocumentTotals.RefreshSalesLine(Rec);
+    end;
+
+    procedure DeltaUpdateTotals()
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeDeltaUpdateTotals(Rec, xRec, IsHandled);
+        if IsHandled then
+            exit;
+
+        DocumentTotals.SalesDeltaUpdateTotals(Rec, xRec, TotalSalesLine, VATAmount, InvoiceDiscountAmount, InvoiceDiscountPct);
+        if Rec."Line Amount" <> xRec."Line Amount" then
+            Rec.SendLineInvoiceDiscountResetNotification();
+    end;
+
+    procedure ForceTotalsCalculation()
+    begin
+        DocumentTotals.SalesDocTotalsNotUpToDate();
     end;
 
     procedure RedistributeTotalsOnAfterValidate()
+    var
+        SalesHeader: Record "Sales Header";
     begin
         CurrPage.SaveRecord();
 
+        SalesHeader.Get(Rec."Document Type", Rec."Document No.");
         DocumentTotals.SalesRedistributeInvoiceDiscountAmounts(Rec, VATAmount, TotalSalesLine);
         CurrPage.Update(false);
     end;
@@ -1507,55 +1412,19 @@ page 6631 "Sales Return Order Subform"
         Clear(TotalSalesHeader);
     end;
 
-    procedure CalculateTotals()
+    local procedure ValidateInvoiceDiscountAmount()
+    var
+        SalesHeader: Record "Sales Header";
     begin
-        DocumentTotals.SalesCheckIfDocumentChanged(Rec, xRec);
-        DocumentTotals.CalculateSalesSubPageTotals(TotalSalesHeader, TotalSalesLine, VATAmount, InvoiceDiscountAmount, InvoiceDiscountPct);
-        DocumentTotals.RefreshSalesLine(Rec);
-    end;
-
-    procedure DeltaUpdateTotals()
-    begin
-        OnBeforeDeltaUpdateTotals(Rec, xRec);
-        DocumentTotals.SalesDeltaUpdateTotals(Rec, xRec, TotalSalesLine, VATAmount, InvoiceDiscountAmount, InvoiceDiscountPct);
-        if Rec."Line Amount" <> xRec."Line Amount" then
-            Rec.SendLineInvoiceDiscountResetNotification();
-    end;
-
-    procedure ForceTotalsCalculation()
-    begin
-        DocumentTotals.SalesDocTotalsNotUpToDate();
-    end;
-
-    local procedure ReverseReservedQtySign(): Decimal
-    begin
-        Rec.CalcFields("Reserved Quantity");
-        exit(-Rec."Reserved Quantity");
-    end;
-
-    procedure UpdateEditableOnRow()
-    begin
-        IsCommentLine := not Rec.HasTypeToFillMandatoryFields();
-        IsBlankNumber := IsCommentLine;
-        UnitofMeasureCodeIsChangeable := not IsCommentLine;
-        if AttachingLinesEnabled then
-            AttachToInvtItemEnabled := not Rec.IsInventoriableItem();
-
-        CurrPageIsEditable := CurrPage.Editable;
-        InvDiscAmountEditable :=
-            CurrPageIsEditable and not SalesSetup."Calc. Inv. Discount" and
-            (TotalSalesHeader.Status = TotalSalesHeader.Status::Open);
-
-        OnAfterUpdateEditableOnRow(Rec, IsCommentLine, IsBlankNumber, UnitofMeasureCodeIsChangeable);
+        SalesHeader.Get(Rec."Document Type", Rec."Document No.");
+        SalesCalcDiscountByType.ApplyInvDiscBasedOnAmt(InvoiceDiscountAmount, SalesHeader);
+        CurrPage.Update(false);
     end;
 
     procedure UpdateTypeText()
     var
         RecRef: RecordRef;
     begin
-        if not TypeAsTextFieldVisible then
-            exit;
-
         OnBeforeUpdateTypeText(Rec);
 
         RecRef.GetTable(Rec);
@@ -1586,22 +1455,8 @@ page 6631 "Sales Return Order Subform"
           DimVisible1, DimVisible2, DimVisible3, DimVisible4, DimVisible5, DimVisible6, DimVisible7, DimVisible8);
 
         Clear(DimMgt);
-    end;
 
-    local procedure SetItemReferenceVisibility()
-    var
-        ItemReference: Record "Item Reference";
-    begin
-        ItemReferenceVisible := not ItemReference.IsEmpty();
-    end;
-
-    local procedure UpdateCurrency()
-    begin
-        if Currency.Code <> TotalSalesHeader."Currency Code" then
-            if not Currency.Get(TotalSalesHeader."Currency Code") then begin
-                Clear(Currency);
-                Currency.InitRoundingPrecision();
-            end
+        OnAfterSetDimensionsVisibility();
     end;
 
     [IntegrationEvent(true, false)]
@@ -1609,18 +1464,8 @@ page 6631 "Sales Return Order Subform"
     begin
     end;
 
-    [IntegrationEvent(true, false)]
-    local procedure OnBeforeNoOnAfterValidate(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnAfterQuantityOnAfterValidate(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnAfterLocationCodeOnAfterValidate(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line")
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterUpdateEditableOnRow(SalesLine: Record "Sales Line"; var IsCommentLine: Boolean; var IsBlankNumber: Boolean);
     begin
     end;
 
@@ -1630,12 +1475,12 @@ page 6631 "Sales Return Order Subform"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterUpdateEditableOnRow(SalesLine: Record "Sales Line"; var IsCommentLine: Boolean; var IsBlankNumber: Boolean; var UnitofMeasureCodeIsChangeable: Boolean);
+    local procedure OnBeforeInsertExtendedText(var SalesLine: Record "Sales Line"; var xSalesLine: Record "Sales Line")
     begin
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertExtendedText(var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeNoOnAfterValidate(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line")
     begin
     end;
 
@@ -1655,12 +1500,37 @@ page 6631 "Sales Return Order Subform"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeDeltaUpdateTotals(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line")
+    local procedure OnBeforeSetOpenPage()
     begin
     end;
 
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeOnDeleteRecord(SalesLine: Record "Sales Line"; var DocumentTotals: Codeunit "Document Totals"; var Result: Boolean; var IsHandled: Boolean)
+    [IntegrationEvent(true, false)]
+    local procedure OnAfterSetDimensionsVisibility();
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnQuantityOnAfterValidateOnBeforeDeltaUpdateTotals(var SalesLine: Record "Sales Line"; var xSalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeDeltaUpdateTotals(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeOnDeleteRecord(var SalesLine: Record "Sales Line"; var DocumentTotals: Codeunit "Document Totals"; var Result: Boolean; var IsHandled: Boolean);
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnBeforeQuantityOnAfterValidate(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(true, false)]
+    local procedure OnAfterQuantityOnAfterValidate(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line")
     begin
     end;
 }

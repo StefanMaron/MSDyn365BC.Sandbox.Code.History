@@ -9,29 +9,26 @@ using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.Reporting;
-using Microsoft.Sales.Customer;
 using Microsoft.Service.Comment;
 using Microsoft.Service.Document;
-using Microsoft.Service.History;
-using Microsoft.Service.Ledger;
 using Microsoft.Service.Reports;
 using Microsoft.Utilities;
 using System.Security.User;
 using System.Utilities;
 
-page 6050 "Service Contract"
+page 6053 "Service Contract Quote"
 {
-    Caption = 'Service Contract';
+    Caption = 'Service Contract Quote';
     PageType = Document;
     RefreshOnActivate = true;
     SourceTable = "Service Contract Header";
-    SourceTableView = where("Contract Type" = filter(Contract));
+    SourceTableView = where("Contract Type" = filter(Quote));
 
     layout
     {
         area(content)
         {
-            group(Control1)
+            group(General)
             {
                 Caption = 'General';
                 field("Contract No."; Rec."Contract No.")
@@ -68,9 +65,9 @@ page 6050 "Service Contract"
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the number of the contact who will receive the service delivery.';
                 }
-                group(Control13)
+                group("Sell-to")
                 {
-                    ShowCaption = false;
+                    Caption = 'Sell-to';
                     field(Name; Rec.Name)
                     {
                         ApplicationArea = Service;
@@ -98,7 +95,7 @@ page 6050 "Service Contract"
                         QuickEntry = false;
                         ToolTip = 'Specifies the name of the city in where the customer is located.';
                     }
-                    group(Control24)
+                    group(Control13)
                     {
                         ShowCaption = false;
                         Visible = IsSellToCountyVisible;
@@ -129,14 +126,13 @@ page 6050 "Service Contract"
                     field("Contact Name"; Rec."Contact Name")
                     {
                         ApplicationArea = Service;
-                        DrillDown = false;
                         ToolTip = 'Specifies the name of the person you regularly contact when you do business with the customer in this service contract.';
                     }
                 }
                 field("Phone No."; Rec."Phone No.")
                 {
                     ApplicationArea = Service;
-                    ToolTip = 'Specifies the customer telephone number.';
+                    ToolTip = 'Specifies the customer phone number.';
                 }
                 field(SellToMobilePhoneNo; SellToContact."Mobile Phone No.")
                 {
@@ -163,6 +159,11 @@ page 6050 "Service Contract"
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the code of the salesperson assigned to this service contract.';
                 }
+                field("Quote Type"; Rec."Quote Type")
+                {
+                    ApplicationArea = Service;
+                    ToolTip = 'Specifies the type of the service contract quote.';
+                }
                 field("Starting Date"; Rec."Starting Date")
                 {
                     ApplicationArea = Service;
@@ -177,18 +178,21 @@ page 6050 "Service Contract"
                 field(Status; Rec.Status)
                 {
                     ApplicationArea = Service;
+                    Editable = true;
                     Importance = Promoted;
+#pragma warning disable AL0600
+                    OptionCaption = ' ,,Canceled';
+#pragma warning restore AL0600
                     ToolTip = 'Specifies the status of the service contract or contract quote.';
 
                     trigger OnValidate()
                     begin
-                        ActivateFields();
                         StatusOnAfterValidate();
                     end;
                 }
                 field("Responsibility Center"; Rec."Responsibility Center")
                 {
-                    ApplicationArea = Service;
+                    ApplicationArea = Suite;
                     ToolTip = 'Specifies the code of the responsibility center, such as a distribution hub, that is associated with the involved user, company, customer, or vendor.';
                 }
                 field("Change Status"; Rec."Change Status")
@@ -197,7 +201,7 @@ page 6050 "Service Contract"
                     ToolTip = 'Specifies if a service contract or contract quote is locked or open for changes.';
                 }
             }
-            part(ServContractLines; "Service Contract Subform")
+            part(ServContractLines; "Service Contract Quote Subform")
             {
                 ApplicationArea = Service;
                 SubPageLink = "Contract No." = field("Contract No.");
@@ -221,28 +225,25 @@ page 6050 "Service Contract"
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the number of the contact person at the customer''s billing address.';
                 }
-                group(Control27)
+                group(Control14)
                 {
                     ShowCaption = false;
                     field("Bill-to Name"; Rec."Bill-to Name")
                     {
                         ApplicationArea = Service;
-                        Caption = 'Name';
                         DrillDown = false;
                         ToolTip = 'Specifies the name of the customer that you send or sent the invoice or credit memo to.';
                     }
                     field("Bill-to Address"; Rec."Bill-to Address")
                     {
                         ApplicationArea = Service;
-                        Caption = 'Address';
                         DrillDown = false;
                         QuickEntry = false;
-                        ToolTip = 'Specifies the address of the customer to whom you sent the invoice.';
+                        ToolTip = 'Specifies the address of the customer to whom you will send the invoice.';
                     }
                     field("Bill-to Address 2"; Rec."Bill-to Address 2")
                     {
                         ApplicationArea = Service;
-                        Caption = 'Address 2';
                         DrillDown = false;
                         QuickEntry = false;
                         ToolTip = 'Specifies an additional line of the address.';
@@ -250,12 +251,11 @@ page 6050 "Service Contract"
                     field("Bill-to City"; Rec."Bill-to City")
                     {
                         ApplicationArea = Service;
-                        Caption = 'City';
                         DrillDown = false;
                         QuickEntry = false;
                         ToolTip = 'Specifies the city of the address.';
                     }
-                    group(Control33)
+                    group(Control23)
                     {
                         ShowCaption = false;
                         Visible = IsBillToCountyVisible;
@@ -264,12 +264,12 @@ page 6050 "Service Contract"
                             ApplicationArea = Service;
                             CaptionClass = '5,1,' + Rec."Bill-to Country/Region Code";
                             QuickEntry = false;
+                            ToolTip = 'Specifies the county code of the customer''s billing address.';
                         }
                     }
                     field("Bill-to Post Code"; Rec."Bill-to Post Code")
                     {
                         ApplicationArea = Service;
-                        Caption = 'Post Code';
                         DrillDown = false;
                         QuickEntry = false;
                         ToolTip = 'Specifies the postal code of the customer''s billing address.';
@@ -277,8 +277,8 @@ page 6050 "Service Contract"
                     field("Bill-to Country/Region Code"; Rec."Bill-to Country/Region Code")
                     {
                         ApplicationArea = Service;
-                        Caption = 'Country/Region';
                         QuickEntry = false;
+                        ToolTip = 'Specifies the country/region code of the customer''s billing address.';
 
                         trigger OnValidate()
                         begin
@@ -288,7 +288,6 @@ page 6050 "Service Contract"
                     field("Bill-to Contact"; Rec."Bill-to Contact")
                     {
                         ApplicationArea = Service;
-                        Caption = 'Contact';
                         ToolTip = 'Specifies the name of the contact person at the customer''s billing address.';
                     }
                     field(BillToContactPhoneNo; BillToContact."Phone No.")
@@ -345,18 +344,6 @@ page 6050 "Service Contract"
                     Importance = Promoted;
                     ToolTip = 'Specifies a formula that calculates the payment due date, payment discount date, and payment discount amount.';
                 }
-                field("Payment Method Code"; Rec."Payment Method Code")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Importance = Additional;
-                    ToolTip = 'Specifies how to make payment, such as with bank transfer, cash, or check.';
-                }
-                field("Direct Debit Mandate ID"; Rec."Direct Debit Mandate ID")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Importance = Additional;
-                    ToolTip = 'Specifies the direct-debit mandate that the customer has signed to allow direct-debit collection of payments.';
-                }
                 field("Currency Code"; Rec."Currency Code")
                 {
                     ApplicationArea = Service;
@@ -378,81 +365,68 @@ page 6050 "Service Contract"
                         ShiptoCodeOnAfterValidate();
                     end;
                 }
-                group("Ship-to")
+                group(Control25)
                 {
-                    Caption = 'Ship-to';
-                    field("Ship-to Name"; Rec."Ship-to Name")
+                    ShowCaption = false;
+                }
+                field("Ship-to Name"; Rec."Ship-to Name")
+                {
+                    ApplicationArea = Service;
+                    DrillDown = false;
+                    ToolTip = 'Specifies the name of the customer at the address that the items are shipped to.';
+                }
+                field("Ship-to Name 2"; Rec."Ship-to Name 2")
+                {
+                    ApplicationArea = Service;
+                    Importance = Additional;
+                    ToolTip = 'Specifies an additional part of the name of the customer that the items are shipped to.';
+                    Visible = false;
+                }
+                field("Ship-to Address"; Rec."Ship-to Address")
+                {
+                    ApplicationArea = Service;
+                    DrillDown = false;
+                    ToolTip = 'Specifies the address that the items are shipped to.';
+                }
+                field("Ship-to Address 2"; Rec."Ship-to Address 2")
+                {
+                    ApplicationArea = Service;
+                    DrillDown = false;
+                    ToolTip = 'Specifies an additional part of the ship-to address, in case it is a long address.';
+                }
+                field("Ship-to City"; Rec."Ship-to City")
+                {
+                    ApplicationArea = Service;
+                    DrillDown = false;
+                    ToolTip = 'Specifies the city of the address that the items are shipped to.';
+                }
+                group(Control33)
+                {
+                    ShowCaption = false;
+                    Visible = IsShipToCountyVisible;
+                    field("Ship-to County"; Rec."Ship-to County")
                     {
                         ApplicationArea = Service;
-                        Caption = 'Name';
-                        DrillDown = false;
-                        ToolTip = 'Specifies the name of the customer at the address that the items are shipped to.';
+                        CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
+                        ToolTip = 'Specifies the county of the address.';
                     }
-                    field("Ship-to Name 2"; Rec."Ship-to Name 2")
-                    {
-                        ApplicationArea = Service;
-                        Caption = 'Name 2';
-                        Importance = Additional;
-                        ToolTip = 'Specifies an additional part of the name of the customer that the items are shipped to.';
-                        QuickEntry = false;
-                        Visible = false;
-                    }
-                    field("Ship-to Address"; Rec."Ship-to Address")
-                    {
-                        ApplicationArea = Service;
-                        Caption = 'Address';
-                        DrillDown = false;
-                        QuickEntry = false;
-                        ToolTip = 'Specifies the address that the items are shipped to.';
-                    }
-                    field("Ship-to Address 2"; Rec."Ship-to Address 2")
-                    {
-                        ApplicationArea = Service;
-                        Caption = 'Address 2';
-                        DrillDown = false;
-                        QuickEntry = false;
-                        ToolTip = 'Specifies an additional part of the ship-to address, in case it is a long address.';
-                    }
-                    field("Ship-to City"; Rec."Ship-to City")
-                    {
-                        ApplicationArea = Service;
-                        Caption = 'City';
-                        DrillDown = false;
-                        QuickEntry = false;
-                        ToolTip = 'Specifies the city of the address that the items are shipped to.';
-                    }
-                    group(Control38)
-                    {
-                        ShowCaption = false;
-                        Visible = IsShipToCountyVisible;
-                        field("Ship-to County"; Rec."Ship-to County")
-                        {
-                            ApplicationArea = Service;
-                            CaptionClass = '5,1,' + Rec."Ship-to Country/Region Code";
-                            QuickEntry = false;
-                        }
-                    }
-                    field("Ship-to Post Code"; Rec."Ship-to Post Code")
-                    {
-                        ApplicationArea = Service;
-                        Caption = 'Post Code';
-                        DrillDown = false;
-                        Importance = Promoted;
-                        QuickEntry = false;
-                        ToolTip = 'Specifies the postal code of the address that the items are shipped to.';
-                    }
-                    field("Ship-to Country/Region Code"; Rec."Ship-to Country/Region Code")
-                    {
-                        ApplicationArea = Service;
-                        Caption = 'Country/Region';
-                        QuickEntry = false;
-                    }
-                    field("Ship-to Phone No."; Rec."Ship-to Phone No.")
-                    {
-                        ApplicationArea = Service;
-                        Caption = 'Phone No.';
-                        ToolTip = 'Specifies the telephone number of the company''s shipping address.';
-                    }
+                }
+                field("Ship-to Post Code"; Rec."Ship-to Post Code")
+                {
+                    ApplicationArea = Service;
+                    DrillDown = false;
+                    Importance = Promoted;
+                    ToolTip = 'Specifies the postal code of the address that the items are shipped to.';
+                }
+                field("Ship-to Country/Region Code"; Rec."Ship-to Country/Region Code")
+                {
+                    ApplicationArea = Service;
+                    ToolTip = 'Specifies the country/region code of the address.';
+                }
+                field("Ship-to Phone No."; Rec."Ship-to Phone No.")
+                {
+                    ApplicationArea = Service;
+                    ToolTip = 'Specifies the telephone number of the company''s shipping address.';
                 }
             }
             group(Service)
@@ -467,6 +441,7 @@ page 6050 "Service Contract"
                 field("Service Period"; Rec."Service Period")
                 {
                     ApplicationArea = Service;
+                    Importance = Promoted;
                     ToolTip = 'Specifies a default service period for the items in the contract.';
 
                     trigger OnValidate()
@@ -477,14 +452,8 @@ page 6050 "Service Contract"
                 field("First Service Date"; Rec."First Service Date")
                 {
                     ApplicationArea = Service;
-                    Editable = FirstServiceDateEditable;
                     Importance = Promoted;
                     ToolTip = 'Specifies the date of the first expected service for the service items in the contract.';
-
-                    trigger OnValidate()
-                    begin
-                        FirstServiceDateOnAfterValidat();
-                    end;
                 }
                 field("Response Time (Hours)"; Rec."Response Time (Hours)")
                 {
@@ -519,7 +488,6 @@ page 6050 "Service Contract"
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies if the contents of the Calcd. Annual Amount field are copied into the Annual Amount field in the service contract or contract quote.';
-                    Importance = Additional;
 
                     trigger OnValidate()
                     begin
@@ -531,33 +499,19 @@ page 6050 "Service Contract"
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the sum of the Line Amount field values on all contract lines associated with the service contract or contract quote.';
                 }
-                field(ActiveAnnualAmount; Rec.GetActiveAnnualAmount())
-                {
-                    ApplicationArea = Service;
-                    Importance = Promoted;
-                    Caption = 'Active Annual Amount';
-                    ToolTip = 'Specifies the sum of the Line Amount field values on all contract lines associated with the service contract or contract quote, respecting the contract expiration date.';
-                    AutoFormatExpression = Rec."Currency Code";
-                    AutoFormatType = 1;
-
-                    trigger OnDrillDown()
-                    begin
-                        Rec.ShowActiveServiceContractLines();
-                    end;
-                }
-                field(InvoicePeriod; Rec."Invoice Period")
+                field("Invoice Period"; Rec."Invoice Period")
                 {
                     ApplicationArea = Service;
                     Importance = Promoted;
                     ToolTip = 'Specifies the invoice period for the service contract.';
                 }
-                field(NextInvoiceDate; Rec."Next Invoice Date")
+                field("Next Invoice Date"; Rec."Next Invoice Date")
                 {
                     ApplicationArea = Service;
                     Importance = Promoted;
                     ToolTip = 'Specifies the date of the next invoice for this service contract.';
                 }
-                field(AmountPerPeriod; Rec."Amount per Period")
+                field("Amount per Period"; Rec."Amount per Period")
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the amount that will be invoiced for each invoice period for the service contract.';
@@ -566,12 +520,7 @@ page 6050 "Service Contract"
                 {
                     ApplicationArea = Service;
                     Caption = 'Next Invoice Period';
-                    ToolTip = 'Specifies the ending date of the next invoice period for the service contract.';
-                }
-                field("Last Invoice Date"; Rec."Last Invoice Date")
-                {
-                    ApplicationArea = Service;
-                    ToolTip = 'Specifies the date when this service contract was last invoiced.';
+                    ToolTip = 'Specifies the next invoice period for the filed service contract quote: the first date of the period and the ending date.';
                 }
                 field(Prepaid; Rec.Prepaid)
                 {
@@ -610,26 +559,6 @@ page 6050 "Service Contract"
                     ApplicationArea = Service;
                     ToolTip = 'Specifies that you want the lines for this contract to appear as text on the invoice.';
                 }
-                field("No. of Unposted Invoices"; Rec."No. of Unposted Invoices")
-                {
-                    ApplicationArea = Service;
-                    ToolTip = 'Specifies the number of unposted service invoices linked to the service contract.';
-                }
-                field("No. of Unposted Credit Memos"; Rec."No. of Unposted Credit Memos")
-                {
-                    ApplicationArea = Service;
-                    ToolTip = 'Specifies the number of unposted credit memos linked to the service contract.';
-                }
-                field("No. of Posted Invoices"; Rec."No. of Posted Invoices")
-                {
-                    ApplicationArea = Service;
-                    ToolTip = 'Specifies the number of posted service invoices linked to the service contract.';
-                }
-                field("No. of Posted Credit Memos"; Rec."No. of Posted Credit Memos")
-                {
-                    ApplicationArea = Service;
-                    ToolTip = 'Specifies the number of posted credit memos linked to this service contract.';
-                }
             }
             group("Price Update")
             {
@@ -646,21 +575,6 @@ page 6050 "Service Contract"
                     Importance = Promoted;
                     ToolTip = 'Specifies the next date you want contract prices to be updated.';
                 }
-                field("Last Price Update %"; Rec."Last Price Update %")
-                {
-                    ApplicationArea = Service;
-                    ToolTip = 'Specifies the price update percentage you used the last time you updated the contract prices.';
-                }
-                field("Last Price Update Date"; Rec."Last Price Update Date")
-                {
-                    ApplicationArea = Service;
-                    ToolTip = 'Specifies the date you last updated the contract prices.';
-                }
-                field("Print Increase Text"; Rec."Print Increase Text")
-                {
-                    ApplicationArea = Service;
-                    ToolTip = 'Specifies the standard text code printed on service invoices, informing the customer which prices have been updated since the last invoice.';
-                }
                 field("Price Inv. Increase Code"; Rec."Price Inv. Increase Code")
                 {
                     ApplicationArea = Service;
@@ -673,22 +587,27 @@ page 6050 "Service Contract"
                 field("Expiration Date"; Rec."Expiration Date")
                 {
                     ApplicationArea = Service;
-                    ToolTip = 'Specifies the date when the service contract expires, which is when the service contract is no longer valid. The date is copied to the Contract Expiration Date field for a newly added service contract line. The date in this field must not be earlier than the value in the Starting Date field.';
+                    ToolTip = 'Specifies the date when the service contract expires.';
 
                     trigger OnValidate()
                     begin
                         ExpirationDateOnAfterValidate();
                     end;
                 }
-                field("Cancel Reason Code"; Rec."Cancel Reason Code")
-                {
-                    ApplicationArea = Service;
-                    ToolTip = 'Specifies a reason code for canceling the service contract.';
-                }
                 field("Max. Labor Unit Price"; Rec."Max. Labor Unit Price")
                 {
                     ApplicationArea = Service;
                     ToolTip = 'Specifies the maximum unit price that can be set for a resource on all service orders and lines for the service contract.';
+                }
+                field("Accept Before"; Rec."Accept Before")
+                {
+                    ApplicationArea = Service;
+                    ToolTip = 'Specifies the date before which the customer must accept this contract quote.';
+                }
+                field(Probability; Rec.Probability)
+                {
+                    ApplicationArea = Service;
+                    ToolTip = 'Specifies the probability of the customer approving the service contract quote.';
                 }
             }
         }
@@ -704,7 +623,7 @@ page 6050 "Service Contract"
                 Caption = 'Attachments';
                 Visible = false;
                 SubPageLink = "Table ID" = const(Database::"Service Contract Header"),
-                              "Document Type" = const("Service Contract"),
+                              "Document Type" = const("Service Contract Quote"),
                               "No." = field("Contract No.");
             }
 #endif
@@ -714,22 +633,8 @@ page 6050 "Service Contract"
                 Caption = 'Documents';
                 UpdatePropagation = Both;
                 SubPageLink = "Table ID" = const(Database::"Service Contract Header"),
-                              "Document Type" = const("Service Contract"),
+                              "Document Type" = const("Service Contract Quote"),
                               "No." = field("Contract No.");
-            }
-            part(Control1902018507; "Customer Statistics FactBox")
-            {
-                ApplicationArea = Service;
-                SubPageLink = "No." = field("Bill-to Customer No."),
-                              "Date Filter" = field("Date Filter");
-                Visible = true;
-            }
-            part(Control1900316107; "Customer Details FactBox")
-            {
-                ApplicationArea = Service;
-                SubPageLink = "No." = field("Customer No."),
-                              "Date Filter" = field("Date Filter");
-                Visible = true;
             }
             systempart(Control1900383207; Links)
             {
@@ -748,57 +653,10 @@ page 6050 "Service Contract"
     {
         area(navigation)
         {
-            group(Overview)
+            group("&Quote")
             {
-                Caption = 'Overview';
-                group("Ser&vice Overview")
-                {
-                    Caption = 'Ser&vice Overview';
-                    Image = Tools;
-                    action("Service Orders")
-                    {
-                        ApplicationArea = Service;
-                        Caption = 'Service Orders';
-                        Image = Document;
-                        RunObject = Page "Service List";
-                        RunPageLink = "Document Type" = const(Order),
-                                      "Contract No." = field("Contract No.");
-                        RunPageView = sorting("Contract No.");
-                        ToolTip = 'Open the list of ongoing service orders.';
-                    }
-                    action("Posted Service Shipments")
-                    {
-                        ApplicationArea = Service;
-                        Caption = 'Posted Service Shipments';
-                        Image = PostedShipment;
-                        ToolTip = 'Open the list of posted service shipments.';
-
-                        trigger OnAction()
-                        var
-                            TempServShptHeader: Record "Service Shipment Header" temporary;
-                        begin
-                            CollectShpmntsByLineContractNo(TempServShptHeader);
-                            PAGE.RunModal(PAGE::"Posted Service Shipments", TempServShptHeader);
-                        end;
-                    }
-                    action("Posted Service Invoices")
-                    {
-                        ApplicationArea = Service;
-                        Caption = 'Posted Service Invoices';
-                        Image = PostedServiceOrder;
-                        RunObject = Page "Service Document Registers";
-                        RunPageLink = "Source Document No." = field("Contract No.");
-                        RunPageView = sorting("Source Document Type", "Source Document No.", "Destination Document Type", "Destination Document No.")
-                                      where("Source Document Type" = const(Contract),
-                                            "Destination Document Type" = const("Posted Invoice"));
-                        ToolTip = 'Open the list of posted service invoices.';
-                    }
-                }
-            }
-            group("&Contract")
-            {
-                Caption = '&Contract';
-                Image = Agreement;
+                Caption = '&Quote';
+                Image = Quote;
                 action(Dimensions)
                 {
                     AccessByPermission = TableData Dimension = R;
@@ -813,64 +671,6 @@ page 6050 "Service Contract"
                         Rec.ShowDocDim();
                         CurrPage.SaveRecord();
                     end;
-                }
-                action("Service Dis&counts")
-                {
-                    ApplicationArea = Service;
-                    Caption = 'Service Dis&counts';
-                    Image = Discount;
-                    RunObject = Page "Contract/Service Discounts";
-                    RunPageLink = "Contract Type" = field("Contract Type"),
-                                  "Contract No." = field("Contract No.");
-                    ToolTip = 'View or edit the discounts that you grant for the contract on spare parts in particular service item groups, the discounts on resource hours for resources in particular resource groups, and the discounts on particular service costs.';
-                }
-                action("Service &Hours")
-                {
-                    ApplicationArea = Service;
-                    Caption = 'Service &Hours';
-                    Image = ServiceHours;
-                    RunObject = Page "Service Hours";
-                    RunPageLink = "Service Contract No." = field("Contract No."),
-                                  "Service Contract Type" = filter(Contract);
-                    ToolTip = 'View the service hours that are valid for the service contract. This window displays the starting and ending service hours for the contract for each weekday.';
-                }
-                group(Statistics)
-                {
-                    Caption = 'Statistics';
-                    Image = Statistics;
-                    action(Action178)
-                    {
-                        ApplicationArea = Service;
-                        Caption = 'Statistics';
-                        Image = Statistics;
-                        RunObject = Page "Contract Statistics";
-                        RunPageLink = "Contract Type" = const(Contract),
-                                      "Contract No." = field("Contract No.");
-                        ShortCutKey = 'F7';
-                        ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-                    }
-                    action("Tr&endscape")
-                    {
-                        ApplicationArea = Service;
-                        Caption = 'Tr&endscape';
-                        Image = Trendscape;
-                        RunObject = Page "Contract Trendscape";
-                        RunPageLink = "Contract Type" = const(Contract),
-                                      "Contract No." = field("Contract No.");
-                        ToolTip = 'View a detailed account of service item transactions by time intervals.';
-                    }
-                }
-                action("Filed Contracts")
-                {
-                    ApplicationArea = Service;
-                    Caption = 'Filed Contracts';
-                    Image = Agreement;
-                    RunObject = Page "Filed Service Contract List";
-                    RunPageLink = "Contract Type Relation" = field("Contract Type"),
-                                  "Contract No. Relation" = field("Contract No.");
-                    RunPageView = sorting("Contract Type Relation", "Contract No. Relation", "File Date", "File Time")
-                                  order(descending);
-                    ToolTip = 'View service contracts that are filed.';
                 }
                 action("Co&mments")
                 {
@@ -901,313 +701,57 @@ page 6050 "Service Contract"
                         DocumentAttachmentDetails.RunModal();
                     end;
                 }
-                action("&Gain/Loss Entries")
+                action("Service Dis&counts")
                 {
                     ApplicationArea = Service;
-                    Caption = '&Gain/Loss Entries';
-                    Image = GainLossEntries;
-                    RunObject = Page "Contract Gain/Loss Entries";
-                    RunPageLink = "Contract No." = field("Contract No.");
-                    RunPageView = sorting("Contract No.", "Change Date")
+                    Caption = 'Service Dis&counts';
+                    Image = Discount;
+                    RunObject = Page "Contract/Service Discounts";
+                    RunPageLink = "Contract Type" = field("Contract Type"),
+                                  "Contract No." = field("Contract No.");
+                    ToolTip = 'View or edit the discounts that you grant for the contract on spare parts in particular service item groups, the discounts on resource hours for resources in particular resource groups, and the discounts on particular service costs.';
+                }
+                action("Service &Hours")
+                {
+                    ApplicationArea = Service;
+                    Caption = 'Service &Hours';
+                    Image = ServiceHours;
+                    RunObject = Page "Service Hours";
+                    RunPageLink = "Service Contract No." = field("Contract No."),
+                                  "Service Contract Type" = filter(Quote);
+                    ToolTip = 'View the service hours that are valid for the service contract. This window displays the starting and ending service hours for the contract for each weekday.';
+                }
+                action("&Filed Contract Quotes")
+                {
+                    ApplicationArea = Service;
+                    Caption = '&Filed Contract Quotes';
+                    Image = Quote;
+                    RunObject = Page "Filed Service Contract List";
+                    RunPageLink = "Contract Type Relation" = field("Contract Type"),
+                                  "Contract No. Relation" = field("Contract No.");
+                    RunPageView = sorting("Contract Type Relation", "Contract No. Relation", "File Date", "File Time")
                                   order(descending);
-                    ToolTip = 'View the contract number, reason code, contract group code, responsibility center, customer number, ship-to code, customer name, and type of change, as well as the contract gain and loss. You can print all your service contract gain/loss entries.';
-                }
-            }
-            group(History)
-            {
-                Caption = 'History';
-                action("C&hange Log")
-                {
-                    ApplicationArea = Service;
-                    Caption = 'C&hange Log';
-                    Image = ChangeLog;
-                    RunObject = Page "Contract Change Log";
-                    RunPageLink = "Contract No." = field("Contract No.");
-                    RunPageView = sorting("Contract No.")
-                                  order(descending);
-                    ToolTip = 'View all changes that have been made to the service contract.';
-                }
-                action("&Warranty Ledger Entries")
-                {
-                    ApplicationArea = Service;
-                    Caption = '&Warranty Ledger Entries';
-                    Image = WarrantyLedger;
-                    RunObject = Page "Warranty Ledger Entries";
-                    RunPageLink = "Service Contract No." = field("Contract No.");
-                    RunPageView = sorting("Service Contract No.", "Posting Date", "Document No.");
-                    ToolTip = 'View all the ledger entries for the service item or service order that result from posting transactions in service documents that contain warranty agreements.';
-                }
-                action("Service Ledger E&ntries")
-                {
-                    ApplicationArea = Service;
-                    Caption = 'Service Ledger E&ntries';
-                    Image = ServiceLedger;
-                    RunObject = Page "Service Ledger Entries";
-                    RunPageLink = "Service Contract No." = field("Contract No.");
-                    RunPageView = sorting("Service Contract No.");
-                    ShortCutKey = 'Ctrl+F7';
-                    ToolTip = 'View all the ledger entries for the service item or service order that result from posting transactions in service documents.';
+                    ToolTip = 'View filed contract quotes.';
                 }
             }
         }
         area(processing)
         {
-            group(General)
-            {
-                Caption = 'General';
-                action("&Print")
-                {
-                    ApplicationArea = Service;
-                    Caption = '&Print';
-                    Ellipsis = true;
-                    Image = Print;
-                    ToolTip = 'Prepare to print the document. A report request window for the document opens where you can specify what to include on the print-out.';
-
-                    trigger OnAction()
-                    var
-                        ServDocumentPrint: Codeunit "Serv. Document Print";
-                    begin
-                        ServDocumentPrint.PrintServiceContract(Rec);
-                    end;
-                }
-                action(AttachAsPDF)
-                {
-                    ApplicationArea = Service;
-                    Caption = 'Attach as PDF';
-                    Ellipsis = true;
-                    Image = PrintAttachment;
-                    ToolTip = 'Create a PDF file and attach it to the document.';
-
-                    trigger OnAction()
-                    var
-                        ServiceContractHeader: Record "Service Contract Header";
-                        ServDocumentPrint: Codeunit "Serv. Document Print";
-                    begin
-                        ServiceContractHeader := Rec;
-                        ServiceContractHeader.SetRecFilter();
-                        ServDocumentPrint.PrintServiceContractToDocumentAttachment(ServiceContractHeader);
-                    end;
-                }
-            }
-            group("New Documents")
-            {
-                Caption = 'New Documents';
-                action("Create Service Credit &Memo")
-                {
-                    ApplicationArea = Service;
-                    Caption = 'Create Service Credit &Memo';
-                    Image = CreateCreditMemo;
-                    ToolTip = 'Create a new credit memo for the related service invoice.';
-
-                    trigger OnAction()
-                    var
-                        ConfirmManagement: Codeunit "Confirm Management";
-                        W1: Dialog;
-                        CreditNoteNo: Code[20];
-                        i: Integer;
-                        j: Integer;
-                        LineFound: Boolean;
-                        IsHandled: Boolean;
-                    begin
-                        CurrPage.Update();
-
-                        IsHandled := false;
-                        OnCreateServiceCreditMemoOnBeforeAction(Rec, IsHandled);
-                        if IsHandled then
-                            exit;
-
-                        Rec.TestField(Status, Rec.Status::Signed);
-                        if Rec."No. of Unposted Credit Memos" <> 0 then
-                            if not ConfirmManagement.GetResponseOrDefault(Text009, true) then
-                                exit;
-
-                        ServContractMgt.CopyCheckSCDimToTempSCDim(Rec);
-
-                        if not ConfirmManagement.GetResponseOrDefault(Text010, true) then
-                            exit;
-
-                        ServContractLine.Reset();
-                        ServContractLine.SetCurrentKey("Contract Type", "Contract No.", Credited, "New Line");
-                        ServContractLine.SetRange("Contract Type", Rec."Contract Type");
-                        ServContractLine.SetRange("Contract No.", Rec."Contract No.");
-                        ServContractLine.SetRange(Credited, false);
-                        ServContractLine.SetFilter("Credit Memo Date", '>%1&<=%2', 0D, WorkDate());
-                        i := ServContractLine.Count();
-                        j := 0;
-                        if ServContractLine.Find('-') then begin
-                            LineFound := true;
-                            W1.Open(
-                              Text011 +
-                              '@1@@@@@@@@@@@@@@@@@@@@@');
-                            Clear(ServContractMgt);
-                            ServContractMgt.InitCodeUnit();
-                            OnCreateServiceCreditMemoOnAfterInitCodeunit(Rec, ServContractLine, ServContractMgt);
-                            repeat
-                                ServContractLine1 := ServContractLine;
-                                CreditNoteNo := ServContractMgt.CreateContractLineCreditMemo(ServContractLine1, false);
-                                j := j + 1;
-                                W1.Update(1, Round(j / i * 10000, 1));
-                            until ServContractLine.Next() = 0;
-                            ServContractMgt.FinishCodeunit();
-                            W1.Close();
-                            CurrPage.Update(false);
-                        end;
-                        ServContractLine.SetFilter("Credit Memo Date", '>%1', WorkDate());
-                        if CreditNoteNo <> '' then
-                            Message(StrSubstNo(Text012, CreditNoteNo))
-                        else
-                            if not ServContractLine.Find('-') or LineFound then
-                                Message(Text013)
-                            else
-                                Message(Text016, ServContractLine.FieldCaption("Credit Memo Date"), ServContractLine."Credit Memo Date");
-                    end;
-                }
-                action(CreateServiceInvoice)
-                {
-                    ApplicationArea = Service;
-                    Caption = 'Create Service &Invoice';
-                    Image = NewInvoice;
-                    ToolTip = 'Create a service invoice for a service contract that is due for invoicing. ';
-
-                    trigger OnAction()
-                    var
-                        ConfirmManagement: Codeunit "Confirm Management";
-                    begin
-                        CurrPage.Update();
-                        Rec.TestField(Status, Rec.Status::Signed);
-                        Rec.TestField("Change Status", Rec."Change Status"::Locked);
-
-                        if Rec."No. of Unposted Invoices" <> 0 then
-                            if not ConfirmManagement.GetResponseOrDefault(Text003, true) then
-                                exit;
-
-                        if Rec."Invoice Period" = Rec."Invoice Period"::None then
-                            Error(
-                              Text004,
-                              Rec.TableCaption, Rec."Contract No.", Rec.FieldCaption("Invoice Period"), Format(Rec."Invoice Period"));
-
-                        if Rec."Next Invoice Date" > WorkDate() then
-                            if (Rec."Last Invoice Date" = 0D) and
-                               (Rec."Starting Date" < Rec."Next Invoice Period Start")
-                            then begin
-                                Clear(ServContractMgt);
-                                ServContractMgt.InitCodeUnit();
-                                if ServContractMgt.CreateRemainingPeriodInvoice(Rec) <> '' then
-                                    Message(Text006);
-                                ServContractMgt.FinishCodeunit();
-                                exit;
-                            end else
-                                Error(Text005);
-
-                        ServContractMgt.CopyCheckSCDimToTempSCDim(Rec);
-
-                        if ConfirmManagement.GetResponseOrDefault(Text007, true) then begin
-                            Clear(ServContractMgt);
-                            ServContractMgt.InitCodeUnit();
-                            ServContractMgt.CreateInvoice(Rec);
-                            ServContractMgt.FinishCodeunit();
-                            Message(Text008);
-                        end;
-                    end;
-                }
-            }
-            group(Lock)
-            {
-                Caption = 'Lock';
-                action(LockContract)
-                {
-                    ApplicationArea = Service;
-                    Caption = '&Lock Contract';
-                    Image = Lock;
-                    ToolTip = 'Make sure that the changes will be part of the contract.';
-
-                    trigger OnAction()
-                    var
-                        LockOpenServContract: Codeunit "Lock-OpenServContract";
-                    begin
-                        CurrPage.Update();
-                        LockOpenServContract.LockServContract(Rec);
-                        CurrPage.Update();
-                    end;
-                }
-                action(OpenContract)
-                {
-                    ApplicationArea = Service;
-                    Caption = '&Open Contract';
-                    Image = ReOpen;
-                    ToolTip = 'Open the service contract.';
-
-                    trigger OnAction()
-                    var
-                        LockOpenServContract: Codeunit "Lock-OpenServContract";
-                    begin
-                        CurrPage.Update();
-                        LockOpenServContract.OpenServContract(Rec);
-                        CurrPage.Update();
-                    end;
-                }
-            }
             group("F&unctions")
             {
                 Caption = 'F&unctions';
                 Image = "Action";
-                action(SelectContractLines)
+                action("&Select Contract Quote Lines")
                 {
                     ApplicationArea = Service;
-                    Caption = '&Select Contract Lines';
+                    Caption = '&Select Contract Quote Lines';
                     Image = CalculateLines;
-                    ToolTip = 'Open the list of all the service items that are registered to the customer and select which to include in the contract. ';
+                    ToolTip = 'Open the list of all the service items that are registered to the customer and select which to include in the contract quote. ';
 
                     trigger OnAction()
                     begin
                         CheckRequiredFields();
                         GetServItemLine();
-                    end;
-                }
-                action("&Remove Contract Lines")
-                {
-                    ApplicationArea = Service;
-                    Caption = '&Remove Contract Lines';
-                    Image = RemoveLine;
-                    ToolTip = 'Remove the selected contract lines from the service contract, for example because you remove the corresponding service items as they are expired or broken.';
-
-                    trigger OnAction()
-                    begin
-                        ServContractLine.Reset();
-                        ServContractLine.SetRange("Contract Type", Rec."Contract Type");
-                        ServContractLine.SetRange("Contract No.", Rec."Contract No.");
-                        REPORT.RunModal(REPORT::"Remove Lines from Contract", true, true, ServContractLine);
-                        CurrPage.Update();
-                    end;
-                }
-                action(SignContract)
-                {
-                    ApplicationArea = Service;
-                    Caption = 'Si&gn Contract';
-                    Image = Signature;
-                    ToolTip = 'Confirm the contract.';
-
-                    trigger OnAction()
-                    var
-                        SignServContractDoc: Codeunit SignServContractDoc;
-                    begin
-                        CurrPage.Update();
-                        SignServContractDoc.SignContract(Rec);
-                        CurrPage.Update();
-                    end;
-                }
-                action("C&hange Customer")
-                {
-                    ApplicationArea = Service;
-                    Caption = 'C&hange Customer';
-                    Image = ChangeCustomer;
-                    ToolTip = 'Change the customer in a service contract. If a service item that is subject to a service contract is registered in other contracts owned by the customer, the owner is automatically changed for all service item-related contracts and all contract-related service items.';
-
-                    trigger OnAction()
-                    begin
-                        Clear(ChangeCustomerinContract);
-                        ChangeCustomerinContract.SetRecord(Rec."Contract No.");
-                        ChangeCustomerinContract.RunModal();
                     end;
                 }
                 action("Copy &Document...")
@@ -1225,140 +769,196 @@ page 6050 "Service Contract"
                         CopyServDoc.RunModal();
                     end;
                 }
-                action("&File Contract")
+                action("&File Contract Quote")
                 {
                     ApplicationArea = Service;
-                    Caption = '&File Contract';
-                    Image = Agreement;
-                    ToolTip = 'Record and archive a copy of the contract. Service contracts are automatically filed when you convert contract quotes to service contracts or cancel service contracts.';
+                    Caption = '&File Contract Quote';
+                    Image = FileContract;
+                    ToolTip = 'Record and archive a copy of the contract quote. Service contract quotes are automatically filed when you convert contract quotes to service contracts or cancel service contracts.';
 
                     trigger OnAction()
                     var
                         FiledServiceContractHeader: Record "Filed Service Contract Header";
                         ConfirmManagement: Codeunit "Confirm Management";
                     begin
-                        if ConfirmManagement.GetResponseOrDefault(Text014, true) then
+                        if ConfirmManagement.GetResponseOrDefault(Text001, true) then
                             FiledServiceContractHeader.FileContract(Rec);
                     end;
                 }
+                action("Update &Discount % on All Lines")
+                {
+                    ApplicationArea = Service;
+                    Caption = 'Update &Discount % on All Lines';
+                    Image = Refresh;
+                    ToolTip = 'Update the quote discount on all the service items in a service contract quote. You need to specify the number that you want to add to or subtract from the quote discount percentage that you have specified in the Contract/Service Discount table. The batch job then updates the quote amounts accordingly.';
+
+                    trigger OnAction()
+                    begin
+                        ServContractLine.Reset();
+                        ServContractLine.SetRange("Contract Type", Rec."Contract Type");
+                        ServContractLine.SetRange("Contract No.", Rec."Contract No.");
+                        REPORT.RunModal(REPORT::"Upd. Disc.% on Contract", true, true, ServContractLine);
+                    end;
+                }
+                action("Update with Contract &Template")
+                {
+                    ApplicationArea = Service;
+                    Caption = 'Update with Contract &Template';
+                    Image = Refresh;
+                    ToolTip = 'Implement template information on the contract.';
+
+                    trigger OnAction()
+                    var
+                        ConfirmManagement: Codeunit "Confirm Management";
+                    begin
+                        if not ConfirmManagement.GetResponseOrDefault(Text002, true) then
+                            exit;
+                        CurrPage.Update(true);
+                        Clear(ServContrQuoteTmplUpd);
+                        ServContrQuoteTmplUpd.Run(Rec);
+                        CurrPage.Update(true);
+                    end;
+                }
+                action("Loc&k")
+                {
+                    ApplicationArea = Service;
+                    Caption = 'Loc&k';
+                    Image = Lock;
+                    ToolTip = 'Make sure that the contract cannot be changed.';
+
+                    trigger OnAction()
+                    begin
+                        LockOpenServContract.LockServContract(Rec);
+                        CurrPage.Update();
+                    end;
+                }
+                action("&Open")
+                {
+                    ApplicationArea = Service;
+                    Caption = '&Open';
+                    Image = Edit;
+                    ShortCutKey = 'Return';
+                    ToolTip = 'Open the service contract quote.';
+
+                    trigger OnAction()
+                    begin
+                        LockOpenServContract.OpenServContract(Rec);
+                        CurrPage.Update();
+                    end;
+                }
+            }
+            action("&Make Contract")
+            {
+                ApplicationArea = Service;
+                Caption = '&Make Contract';
+                Image = MakeAgreement;
+                ToolTip = 'Prepare to create a service contract.';
+
+                trigger OnAction()
+                var
+                    SignServContractDoc: Codeunit SignServContractDoc;
+                begin
+                    CurrPage.Update(true);
+                    SignServContractDoc.SignContractQuote(Rec);
+                end;
+            }
+            action("&Print")
+            {
+                ApplicationArea = Service;
+                Caption = '&Print';
+                Ellipsis = true;
+                Image = Print;
+                ToolTip = 'Prepare to print the document. A report request window for the document opens where you can specify what to include on the print-out.';
+
+                trigger OnAction()
+                var
+                    ServDocumentPrint: Codeunit "Serv. Document Print";
+                begin
+                    ServDocumentPrint.PrintServiceContract(Rec);
+                end;
+            }
+            action(AttachAsPDF)
+            {
+                ApplicationArea = Service;
+                Caption = 'Attach as PDF';
+                Ellipsis = true;
+                Image = PrintAttachment;
+                ToolTip = 'Create a PDF file and attach it to the document.';
+
+                trigger OnAction()
+                var
+                    ServiceContractHeader: Record "Service Contract Header";
+                    ServDocumentPrint: Codeunit "Serv. Document Print";
+                begin
+                    ServiceContractHeader := Rec;
+                    ServiceContractHeader.SetRecFilter();
+                    ServDocumentPrint.PrintServiceContractToDocumentAttachment(ServiceContractHeader);
+                end;
             }
         }
         area(reporting)
         {
-            action("Contract Details")
+            action("Service Quote Details")
             {
                 ApplicationArea = Service;
-                Caption = 'Contract Details';
+                Caption = 'Service Quote Details';
                 Image = "Report";
-                RunObject = Report "Service Contract-Detail";
-                ToolTip = 'Specifies billable prices for the project task that are related to items.';
+                RunObject = Report "Service Contract Quote-Detail";
+                ToolTip = 'View details information for the quote.';
             }
-            action("Contract Gain/Loss Entries")
+            action("Contract Quotes to be Signed")
             {
                 ApplicationArea = Service;
-                Caption = 'Contract Gain/Loss Entries';
+                Caption = 'Contract Quotes to be Signed';
                 Image = "Report";
-                RunObject = Report "Contract Gain/Loss Entries";
-                ToolTip = 'Specifies billable prices for the project task that are related to G/L accounts, expressed in the local currency.';
-            }
-            action("Contract Invoicing")
-            {
-                ApplicationArea = Service;
-                Caption = 'Contract Invoicing';
-                Image = "Report";
-                RunObject = Report "Contract Invoicing";
-                ToolTip = 'Specifies all billable profits for the project task.';
-            }
-            action("Contract Price Update - Test")
-            {
-                ApplicationArea = Service;
-                Caption = 'Contract Price Update - Test';
-                Image = "Report";
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = "Report";
-                RunObject = Report "Contract Price Update - Test";
-                ToolTip = 'View the contracts numbers, customer numbers, contract amounts, price update percentages, and any errors that occur. You can test which service contracts need price updates up to the date that you have specified.';
-            }
-            action("Prepaid Contract")
-            {
-                ApplicationArea = Prepayments;
-                Caption = 'Prepaid Contract';
-                Image = "Report";
-                //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
-                //PromotedCategory = "Report";
-                RunObject = Report "Prepaid Contr. Entries - Test";
-                ToolTip = 'View the prepaid service contract.';
-            }
-            action("Expired Contract Lines")
-            {
-                ApplicationArea = Service;
-                Caption = 'Expired Contract Lines';
-                Image = "Report";
-                RunObject = Report "Expired Contract Lines - Test";
-                ToolTip = 'View the service contract, the service items to be removed, the contract expiration dates, and the line amounts.';
+                RunObject = Report "Contract Quotes to Be Signed";
+                ToolTip = 'View the contract number, customer name and address, salesperson code, starting date, probability, quoted amount, and forecast. You can print all your information about contract quotes to be signed.';
             }
         }
         area(Promoted)
         {
             group(Category_Process)
             {
-                Caption = 'Process', Comment = 'Generated from the PromotedActionCategories property index 1.';
+                Caption = 'Process';
 
-                actionref(OpenContract_Promoted; OpenContract)
+                actionref("&Make Contract_Promoted"; "&Make Contract")
                 {
                 }
-                actionref(LockContract_Promoted; LockContract)
+                group(Category_CategoryPrint)
                 {
-                }
-                actionref(SignContract_Promoted; SignContract)
-                {
-                }
-                actionref(CreateServiceInvoice_Promoted; CreateServiceInvoice)
-                {
-                }
-                actionref("Create Service Credit &Memo_Promoted"; "Create Service Credit &Memo")
-                {
-                }
-            }
-            group(Category_Prepare)
-            {
-                Caption = 'Prepare';
+                    ShowAs = SplitButton;
 
+                    actionref("&Print_Promoted"; "&Print")
+                    {
+                    }
+                    actionref(AttachAsPDF_Promoted; AttachAsPDF)
+                    {
+                    }
+                }
+                group(Category_Lock)
+                {
+                    Caption = 'Lock';
+                    ShowAs = SplitButton;
+
+                    actionref("Loc&k_Promoted"; "Loc&k")
+                    {
+                    }
+                    actionref("&Open_Promoted"; "&Open")
+                    {
+                    }
+                }
                 actionref("Copy &Document..._Promoted"; "Copy &Document...")
                 {
                 }
-                actionref(SelectContractLines_Promoted; SelectContractLines)
-                {
-                }
-                actionref("C&hange Customer_Promoted"; "C&hange Customer")
-                {
-                }
-                actionref("&File Contract_Promoted"; "&File Contract")
-                {
-                }
-                actionref("&Remove Contract Lines_Promoted"; "&Remove Contract Lines")
+                actionref("&File Contract Quote_Promoted"; "&File Contract Quote")
                 {
                 }
             }
-            group(Category_Category4)
+            group(Category_Quote)
             {
-                Caption = 'Print/Send', Comment = 'Generated from the PromotedActionCategories property index 3.';
-
-                actionref("&Print_Promoted"; "&Print")
-                {
-                }
-                actionref(AttachAsPDF_Promoted; AttachAsPDF)
-                {
-                }
-            }
-            group(Category_Category5)
-            {
-                Caption = 'Contract', Comment = 'Generated from the PromotedActionCategories property index 4.';
+                Caption = 'Quote';
 
                 actionref(Dimensions_Promoted; Dimensions)
-                {
-                }
-                actionref(Action178_Promoted; Action178)
                 {
                 }
                 actionref("Co&mments_Promoted"; "Co&mments")
@@ -1370,18 +970,12 @@ page 6050 "Service Contract"
             }
             group(Category_Report)
             {
-                Caption = 'Report', Comment = 'Generated from the PromotedActionCategories property index 2.';
+                Caption = 'Reports';
 
-                actionref("Contract Details_Promoted"; "Contract Details")
+                actionref("Service Quote Details_Promoted"; "Service Quote Details")
                 {
                 }
-                actionref("Contract Gain/Loss Entries_Promoted"; "Contract Gain/Loss Entries")
-                {
-                }
-                actionref("Contract Invoicing_Promoted"; "Contract Invoicing")
-                {
-                }
-                actionref("Expired Contract Lines_Promoted"; "Expired Contract Lines")
+                actionref("Contract Quotes to be Signed_Promoted"; "Contract Quotes to be Signed")
                 {
                 }
             }
@@ -1390,7 +984,7 @@ page 6050 "Service Contract"
 
     trigger OnAfterGetCurrRecord()
     begin
-        Rec.CalcFields("Calcd. Annual Amount", "No. of Posted Invoices", "No. of Unposted Invoices");
+        Rec.CalcFields("Calcd. Annual Amount");
         ActivateFields();
     end;
 
@@ -1405,7 +999,6 @@ page 6050 "Service Contract"
     begin
         InvoiceAfterServiceEnable := true;
         PrepaidEnable := true;
-        FirstServiceDateEditable := true;
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -1426,39 +1019,22 @@ page 6050 "Service Contract"
 #pragma warning disable AA0470
         Text000: Label '%1 must not be blank in %2 %3', Comment = 'Contract No. must not be blank in Service Contract Header SC00004';
 #pragma warning restore AA0470
-        Text003: Label 'There are unposted invoices associated with this contract.\\Do you want to continue?';
-#pragma warning disable AA0470
-        Text004: Label 'You cannot create an invoice for %1 %2 because %3 is %4.', Comment = 'You cannot create an invoice for Service Contract Header Contract No. because Invoice Period is Month.';
-#pragma warning restore AA0470
-        Text005: Label 'The next invoice date has not expired.';
-        Text006: Label 'An invoice was created successfully.';
-        Text007: Label 'Do you want to create an invoice for the contract?';
-        Text008: Label 'The invoice was created successfully.';
-        Text009: Label 'There are unposted credit memos associated with this contract.\\Do you want to continue?';
-        Text010: Label 'Do you want to create a credit note for the contract?';
-        Text011: Label 'Processing...        \\';
-#pragma warning disable AA0470
-        Text012: Label 'Contract lines have been credited.\\Credit memo %1 was created.';
-#pragma warning restore AA0470
-        Text013: Label 'A credit memo cannot be created. There must be at least one invoiced and expired service contract line which has not yet been credited.';
-        Text014: Label 'Do you want to file the contract?';
+        Text001: Label 'Do you want to file the contract quote?';
+        Text002: Label 'Do you want to update the contract quote using a contract template?';
 #pragma warning restore AA0074
         ServContractLine: Record "Service Contract Line";
-        ServContractLine1: Record "Service Contract Line";
         SellToContact: Record Contact;
         BillToContact: Record Contact;
-        ChangeCustomerinContract: Report "Change Customer in Contract";
         CopyServDoc: Report "Copy Service Document";
-        ServContractMgt: Codeunit ServContractManagement;
         UserMgt: Codeunit "User Setup Management";
+        ServContrQuoteTmplUpd: Codeunit "ServContractQuote-Tmpl. Upd.";
 #pragma warning disable AA0074
 #pragma warning disable AA0470
-        Text015: Label '%1 must not be %2 in %3 %4', Comment = 'Status must not be Locked in Service Contract Header SC00005';
-        Text016: Label 'A credit memo cannot be created, because the %1 %2 is after the work date.', Comment = 'A credit memo cannot be created, because the Credit Memo Date 03-02-11 is after the work date.';
+        Text003: Label '%1 must not be %2 in %3 %4', Comment = 'Status must not be blank in Signed SC00001';
 #pragma warning restore AA0470
 #pragma warning restore AA0074
+        LockOpenServContract: Codeunit "Lock-OpenServContract";
         FormatAddress: Codeunit "Format Address";
-        FirstServiceDateEditable: Boolean;
         PrepaidEnable: Boolean;
         InvoiceAfterServiceEnable: Boolean;
         IsShipToCountyVisible: Boolean;
@@ -1466,33 +1042,13 @@ page 6050 "Service Contract"
         IsBillToCountyVisible: Boolean;
         DocNoVisible: Boolean;
 
-    local procedure CollectShpmntsByLineContractNo(var TempServShptHeader: Record "Service Shipment Header" temporary)
-    var
-        ServShptHeader: Record "Service Shipment Header";
-        ServShptLine: Record "Service Shipment Line";
-    begin
-        TempServShptHeader.Reset();
-        TempServShptHeader.DeleteAll();
-        ServShptLine.Reset();
-        ServShptLine.SetCurrentKey("Contract No.");
-        ServShptLine.SetRange("Contract No.", Rec."Contract No.");
-        if ServShptLine.Find('-') then
-            repeat
-                if ServShptHeader.Get(ServShptLine."Document No.") then begin
-                    TempServShptHeader.Copy(ServShptHeader);
-                    if TempServShptHeader.Insert() then;
-                end;
-            until ServShptLine.Next() = 0;
-    end;
-
     local procedure ActivateFields()
     begin
-        FirstServiceDateEditable := Rec.Status <> Rec.Status::Signed;
         PrepaidEnable := (not Rec."Invoice after Service" or Rec.Prepaid);
         InvoiceAfterServiceEnable := (not Rec.Prepaid or Rec."Invoice after Service");
-        IsBillToCountyVisible := FormatAddress.UseCounty(Rec."Bill-to Country/Region Code");
         IsSellToCountyVisible := FormatAddress.UseCounty(Rec."Country/Region Code");
         IsShipToCountyVisible := FormatAddress.UseCounty(Rec."Ship-to Country/Region Code");
+        IsBillToCountyVisible := FormatAddress.UseCounty(Rec."Bill-to Country/Region Code");
     end;
 
     local procedure SetDocNoVisible()
@@ -1503,7 +1059,7 @@ page 6050 "Service Contract"
         DocNoVisible := ServDocumentNoVisibility.ServiceDocumentNoIsVisible(DocType::Contract, Rec."Contract No.");
     end;
 
-    procedure CheckRequiredFields()
+    local procedure CheckRequiredFields()
     begin
         if Rec."Contract No." = '' then
             Error(Text000, Rec.FieldCaption("Contract No."), Rec.TableCaption(), Rec."Contract No.");
@@ -1514,9 +1070,9 @@ page 6050 "Service Contract"
         if Rec."First Service Date" = 0D then
             Error(Text000, Rec.FieldCaption("First Service Date"), Rec.TableCaption(), Rec."Contract No.");
         if Rec.Status = Rec.Status::Cancelled then
-            Error(Text015, Rec.FieldCaption(Rec.Status), Format(Rec.Status), Rec.TableCaption(), Rec."Contract No.");
+            Error(Text003, Rec.FieldCaption(Status), Format(Rec.Status), Rec.TableCaption(), Rec."Contract No.");
         if Rec."Change Status" = Rec."Change Status"::Locked then
-            Error(Text015, Rec.FieldCaption("Change Status"), Format(Rec."Change Status"), Rec.TableCaption(), Rec."Contract No.");
+            Error(Text003, Rec.FieldCaption("Change Status"), Format(Rec."Change Status"), Rec.TableCaption(), Rec."Contract No.");
     end;
 
     local procedure GetServItemLine()
@@ -1529,17 +1085,17 @@ page 6050 "Service Contract"
         CurrPage.Update(false);
     end;
 
-    local procedure StartingDateOnAfterValidate()
-    begin
-        CurrPage.Update();
-    end;
-
     local procedure StatusOnAfterValidate()
     begin
         CurrPage.Update();
     end;
 
     local procedure CustomerNoOnAfterValidate()
+    begin
+        CurrPage.Update();
+    end;
+
+    local procedure StartingDateOnAfterValidate()
     begin
         CurrPage.Update();
     end;
@@ -1557,11 +1113,6 @@ page 6050 "Service Contract"
     local procedure ResponseTimeHoursOnAfterValida()
     begin
         CurrPage.Update(true);
-    end;
-
-    local procedure ServicePeriodOnAfterValidate()
-    begin
-        CurrPage.Update();
     end;
 
     local procedure AnnualAmountOnAfterValidate()
@@ -1589,18 +1140,9 @@ page 6050 "Service Contract"
         CurrPage.Update();
     end;
 
-    local procedure FirstServiceDateOnAfterValidat()
+    local procedure ServicePeriodOnAfterValidate()
     begin
         CurrPage.Update();
     end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnCreateServiceCreditMemoOnBeforeAction(var ServiceContractHeader: Record "Service Contract Header"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnCreateServiceCreditMemoOnAfterInitCodeunit(var ServiceContractHeader: Record "Service Contract Header"; var ServiceContractLine: Record "Service Contract Line"; var ServContractManagement: Codeunit ServContractManagement)
-    begin
-    end;
 }
+
