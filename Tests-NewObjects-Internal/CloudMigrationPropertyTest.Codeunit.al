@@ -1141,6 +1141,10 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Filed Contract Service Hour");
         ListOfTablesToMigrate.Add(Database::"Filed Contract/Serv. Discount");
         ListOfTablesToMigrate.Add(Database::"Fin. Charge Comment Line");
+        ListOfTablesToMigrate.Add(Database::"Fin. Report Package Recipient");
+        ListOfTablesToMigrate.Add(Database::"Fin. Report Package Report");
+        ListOfTablesToMigrate.Add(Database::"Fin. Report Package Schedule");
+        ListOfTablesToMigrate.Add(Database::"Fin. Rep. Package Export Log");
         ListOfTablesToMigrate.Add(Database::"Finance Charge Interest Rate");
         ListOfTablesToMigrate.Add(Database::"Finance Charge Memo Header");
         ListOfTablesToMigrate.Add(Database::"Finance Charge Memo Line");
@@ -1155,6 +1159,11 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Financial Report User Filters");
         ListOfTablesToMigrate.Add(Database::"Financial Report Audit Log");
         ListOfTablesToMigrate.Add(Database::"Fin. Report Excel Template");
+        ListOfTablesToMigrate.Add(Database::"Financial Report Package");
+        ListOfTablesToMigrate.Add(Database::"Fin. Report Package Report");
+        ListOfTablesToMigrate.Add(Database::"Fin. Report Package Schedule");
+        ListOfTablesToMigrate.Add(Database::"Fin. Report Package Recipient");
+        ListOfTablesToMigrate.Add(Database::"Fin. Rep. Package Export Log");
         ListOfTablesToMigrate.Add(Database::"Financial Report Status");
         ListOfTablesToMigrate.Add(Database::"Fixed Asset");
         ListOfTablesToMigrate.Add(Database::"G/L - Item Ledger Relation");
