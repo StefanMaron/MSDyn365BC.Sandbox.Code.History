@@ -543,4 +543,9 @@ codeunit 99000843 "Undo Prod. Posting Mgmt."
     local procedure OnReverseProdItemLedgerEntryOnAfterProcessItemLedgerEntries(var ItemLedgerEntry: Record "Item Ledger Entry")
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateProdOrderOnIsLastOperation(var CapacityLedgerEntry: Record "Capacity Ledger Entry")
+    begin
+    end;
 }
