@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Pricing.PriceList;
+namespace Microsoft.Pricing.Worksheet;
 
 using Microsoft.CRM.Campaign;
 using Microsoft.CRM.Contact;
@@ -12,7 +12,7 @@ using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Item;
 using Microsoft.Pricing.Asset;
-using Microsoft.Pricing.Calculation;
+using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
 using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Resources.Resource;
@@ -20,10 +20,9 @@ using Microsoft.Purchases.Pricing;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Pricing;
-using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
 
-table 7001 "Price List Line"
+table 7022 "Price Worksheet Line"
 {
     DataClassification = CustomerContent;
 
@@ -62,7 +61,7 @@ table 7001 "Price List Line"
         }
         field(4; "Source No."; Code[20])
         {
-            Caption = 'Assign-to No. (custom)';
+            Caption = 'Assign-to No.';
             DataClassification = CustomerContent;
 
             trigger OnValidate()
@@ -88,7 +87,7 @@ table 7001 "Price List Line"
         }
         field(5; "Parent Source No."; Code[20])
         {
-            Caption = 'Assign-to Parent No. (custom)';
+            Caption = 'Assign-to Parent No.';
             DataClassification = CustomerContent;
 
             trigger OnValidate()
@@ -148,7 +147,7 @@ table 7001 "Price List Line"
         }
         field(8; "Asset No."; Code[20])
         {
-            Caption = 'Product No. (custom)';
+            Caption = 'Product No.';
             DataClassification = CustomerContent;
 
             trigger OnValidate()
@@ -166,7 +165,6 @@ table 7001 "Price List Line"
 
             trigger OnLookup()
             begin
-                PriceCalculationMgt.FeatureCustomizedLookupUsage(Database::"Price List Line");
                 CopyTo(PriceAsset);
                 if PriceAsset.LookupNo() then begin
                     FieldLookedUp := true;
@@ -177,7 +175,6 @@ table 7001 "Price List Line"
         }
         field(9; "Variant Code"; Code[10])
         {
-            Caption = 'Variant Code (custom)';
             DataClassification = CustomerContent;
 
             trigger OnValidate()
@@ -219,6 +216,7 @@ table 7001 "Price List Line"
             Caption = 'Work Type Code';
             DataClassification = CustomerContent;
             TableRelation = "Work Type";
+
             trigger OnValidate()
             begin
                 TestStatusDraft();
@@ -231,6 +229,7 @@ table 7001 "Price List Line"
         {
             Caption = 'Starting Date';
             DataClassification = CustomerContent;
+
             trigger OnValidate()
             begin
                 TestHeadersValue(FieldNo("Starting Date"));
@@ -243,6 +242,7 @@ table 7001 "Price List Line"
         {
             Caption = 'Ending Date';
             DataClassification = CustomerContent;
+
             trigger OnValidate()
             begin
                 TestHeadersValue(FieldNo("Ending Date"));
@@ -265,7 +265,6 @@ table 7001 "Price List Line"
         }
         field(15; "Unit of Measure Code"; Code[10])
         {
-            Caption = 'Unit of Measure Code (custom)';
             DataClassification = CustomerContent;
 
             trigger OnValidate()
@@ -444,6 +443,7 @@ table 7001 "Price List Line"
         {
             Caption = 'Asset ID';
             DataClassification = CustomerContent;
+
             trigger OnValidate()
             begin
                 TestStatusDraft();
@@ -483,7 +483,7 @@ table 7001 "Price List Line"
         }
         field(30; Status; Enum "Price Status")
         {
-            Caption = 'Price Status';
+            Caption = 'Status';
             DataClassification = CustomerContent;
 
             trigger OnValidate()
@@ -596,45 +596,69 @@ table 7001 "Price List Line"
                 Validate("Unit of Measure Code", "Unit of Measure Code Lookup");
             end;
         }
+        field(100; "Existing Line"; Boolean)
+        {
+            Caption = 'Existing Line';
+            DataClassification = SystemMetadata;
+
+            trigger OnValidate()
+            begin
+                if not "Existing Line" then begin
+                    "Price List Code" := '';
+                    Status := Status::Draft;
+                    "Line No." := 0;
+                end;
+            end;
+        }
+        field(101; "Existing Unit Price"; Decimal)
+        {
+            AccessByPermission = tabledata "Sales Price Access" = R;
+            DataClassification = CustomerContent;
+            AutoFormatExpression = Rec."Currency Code";
+            AutoFormatType = 2;
+            Caption = 'Existing Unit Price';
+            Editable = false;
+            BlankZero = true;
+        }
+        field(102; "Existing Direct Unit Cost"; Decimal)
+        {
+            AccessByPermission = tabledata "Purchase Price Access" = R;
+            DataClassification = CustomerContent;
+            AutoFormatExpression = Rec."Currency Code";
+            AutoFormatType = 2;
+            Caption = 'Existing Direct Unit Cost';
+            Editable = false;
+            BlankZero = true;
+        }
+        field(103; "Existing Unit Cost"; Decimal)
+        {
+            AccessByPermission = tabledata "Purchase Price Access" = R;
+            DataClassification = CustomerContent;
+            AutoFormatExpression = Rec."Currency Code";
+            AutoFormatType = 2;
+            Caption = 'Existing Unit Cost';
+            Editable = false;
+            BlankZero = true;
+        }
     }
 
     keys
     {
-        key(PK; "Price List Code", "Line No.")
+        key(PK; "Price List Code", "Existing Line", "Line No.")
         {
             Clustered = true;
         }
-        key(Key1; "Asset Type", "Asset No.", "Source Type", "Source No.", "Starting Date", "Currency Code", "Variant Code", "Unit of Measure Code", "Minimum Quantity")
-        {
-        }
-        key(Key2; "Source Type", "Source No.", "Asset Type", "Asset No.", "Starting Date", "Currency Code", "Variant Code", "Unit of Measure Code", "Minimum Quantity")
-        {
-        }
-        key(Key3; Status, "Price Type", "Amount Type", "Currency Code", "Unit of Measure Code", "Source Type", "Source No.", "Asset Type", "Asset No.", "Variant Code", "Starting Date", "Ending Date", "Minimum Quantity")
-        {
-        }
-        key(Key4; Status, "Price Type", "Amount Type", "Currency Code", "Unit of Measure Code", "Source Type", "Parent Source No.", "Source No.", "Asset Type", "Asset No.", "Work Type Code", "Starting Date", "Ending Date", "Minimum Quantity")
-        {
-        }
-        key(Key5; "Product No.", "Asset No.")
+        key(Key1; "Price Type", "Source Group")
         {
         }
     }
 
-    trigger OnDelete()
-    begin
-        if (Status = Status::Active) and not IsEditable() then
-            Error(CannotDeleteActivePriceListLineErr, "Price List Code", "Line No.");
-    end;
-
     trigger OnInsert()
+    var
+        PriceListManagement: Codeunit "Price List Management";
     begin
-        if ("Price List Code" = '') and ("Price Type" = "Price Type"::Sale) and ("Amount Type" <> "Amount Type"::Discount) then begin
-            if not ("Source Type" in ["Source Type"::Customer, "Source Type"::"Customer Price Group"]) then
-                "Allow Line Disc." := true;
-            if ("Source Type" <> "Source Type"::"Customer Price Group") and ("Asset Type" <> "Asset Type"::Item) then
-                "Allow Invoice Disc." := true;
-        end;
+        if "Price List Code" = '' then
+            "Price List Code" := PriceListManagement.GetDefaultPriceListCode("Price Type", "Source Group", false);
     end;
 
     protected var
@@ -643,30 +667,11 @@ table 7001 "Price List Line"
         PriceSource: Record "Price Source";
 
     var
-        PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
         IsNewRecord: Boolean;
         FieldLookedUp: Boolean;
         FieldNotAllowedForAmountTypeErr: Label 'Field %1 is not allowed in the price list line where %2 is %3.',
             Comment = '%1 - the field caption; %2 - Amount Type field caption; %3 - amount type value: Discount or Price';
         LineSourceTypeErr: Label 'cannot be set to %1 if the header''s source type is %2.', Comment = '%1 and %2 - the source type value.';
-        CannotDeleteActivePriceListLineErr: Label 'You cannot delete the active price list line %1 %2.', Comment = '%1 - the price list code, %2 - line no';
-
-    procedure SetNextLineNo()
-    var
-        PriceListLine: Record "Price List Line";
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeSetNextLineNo(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
-        "Line No." := 10000;
-        PriceListLine.SetLoadFields("Line No.");
-        PriceListLine.SetRange("Price List Code", "Price List Code");
-        if PriceListLine.FindLast() then
-            "Line No." += PriceListLine."Line No.";
-    end;
 
     procedure IsAssetItem(): Boolean;
     begin
@@ -701,12 +706,11 @@ table 7001 "Price List Line"
         Result := (Status = Status::Draft) and IsHeaderActive();
     end;
 
-    local procedure IsAllowedEditingActivePrice() Result: Boolean;
+    local procedure IsAllowedEditingActivePrice(): Boolean;
     var
         PriceListManagement: Codeunit "Price List Management";
     begin
-        Result := PriceListManagement.IsAllowedEditingActivePrice("Price Type");
-        OnAfterIsAllowedEditingActivePrice(Rec, Result);
+        exit(PriceListManagement.IsAllowedEditingActivePrice("Price Type"));
     end;
 
     procedure IsUOMSupported() Result: Boolean;
@@ -750,6 +754,14 @@ table 7001 "Price List Line"
             Error(FieldNotAllowedForAmountTypeErr, FldCaption, FieldCaption("Amount Type"), Format("Amount Type"));
     end;
 
+    procedure CopyExistingPrices(PriceListLine: Record "Price List Line")
+    begin
+        "Existing Unit Price" := PriceListLine."Unit Price";
+        "Existing Direct Unit Cost" := PriceListLine."Direct Unit Cost";
+        "Existing Unit Cost" := PriceListLine."Unit Cost";
+        OnAfterCopyExistingPrices(Rec, PriceListLine);
+    end;
+
     procedure CopySourceFrom(PriceListHeader: Record "Price List Header")
     begin
         "Source Group" := PriceListHeader."Source Group";
@@ -761,14 +773,9 @@ table 7001 "Price List Line"
 
     procedure CopyFrom(PriceListHeader: Record "Price List Header")
     begin
-        CopyFrom(PriceListHeader, false);
-    end;
-
-    procedure CopyFrom(PriceListHeader: Record "Price List Header"; ForceDefaults: Boolean)
-    begin
         "Price Type" := PriceListHeader."Price Type";
         Status := "Price Status"::Draft;
-        if not PriceListHeader."Allow Updating Defaults" or ForceDefaults then begin
+        if not PriceListHeader."Allow Updating Defaults" then begin
             CopySourceFrom(PriceListHeader);
             "Starting Date" := PriceListHeader."Starting Date";
             "Ending Date" := PriceListHeader."Ending Date";
@@ -781,8 +788,7 @@ table 7001 "Price List Line"
         "VAT Bus. Posting Gr. (Price)" := PriceListHeader."VAT Bus. Posting Gr. (Price)";
         "Allow Invoice Disc." := PriceListHeader."Allow Invoice Disc.";
         "Allow Line Disc." := PriceListHeader."Allow Line Disc.";
-
-        OnAfterCopyFromPriceListHeader(PriceListHeader, ForceDefaults);
+        OnAfterCopyFromPriceListHeader(PriceListHeader);
     end;
 
     local procedure CopyFrom(PriceSource: Record "Price Source")
@@ -802,7 +808,7 @@ table 7001 "Price List Line"
             "Starting Date" := PriceSource."Starting Date";
             "Ending Date" := PriceSource."Ending Date";
         end;
-        OnAfterCopyFromPriceSource(PriceSource, Rec);
+        OnAfterCopyFromPriceSource(PriceSource);
     end;
 
     procedure CopyFrom(PriceAsset: Record "Price Asset")
@@ -815,7 +821,6 @@ table 7001 "Price List Line"
         "Asset ID" := PriceAsset."Asset ID";
         Description := PriceAsset.Description;
         "Unit of Measure Code" := PriceAsset."Unit of Measure Code";
-        "Unit of Measure Code Lookup" := PriceAsset."Unit of Measure Code";
         "Variant Code" := PriceAsset."Variant Code";
         "Work Type Code" := PriceAsset."Work Type Code";
 
@@ -828,27 +833,7 @@ table 7001 "Price List Line"
         if (PriceListHeader.Code = '') or (IsNullGuid(PriceListHeader.SystemId)) or (not PriceListHeader."Allow Invoice Disc.") then
             "Allow Invoice Disc." := PriceAsset."Allow Invoice Disc.";
 
-        CopyFromAssetType();
-
-#if not CLEAN25
         OnAfterCopyFromPriceAsset(PriceAsset, Rec);
-#endif
-        OnAfterCopyFromForPriceAsset(PriceAsset, Rec);
-    end;
-
-    procedure CopyPriceFrom(PriceAsset: Record "Price Asset")
-    begin
-        case PriceAsset."Price Type" of
-            PriceAsset."Price Type"::Sale:
-                "Unit Price" := PriceAsset."Unit Price";
-            PriceAsset."Price Type"::Purchase:
-                begin
-                    "Direct Unit Cost" := PriceAsset."Unit Price";
-                    "Unit Cost" := PriceAsset."Unit Price 2";
-                end;
-        end;
-
-        OnAfterCopyPriceFrom(Rec, PriceAsset);
     end;
 
     procedure SetNewRecord(NewRecord: Boolean)
@@ -881,6 +866,7 @@ table 7001 "Price List Line"
         PriceAsset."Asset ID" := "Asset ID";
         PriceAsset."Unit of Measure Code" := "Unit of Measure Code";
         PriceAsset."Variant Code" := "Variant Code";
+        PriceAsset."Work Type Code" := "Work Type Code";
 
         PriceAsset."Allow Invoice Disc." := "Allow Invoice Disc.";
         PriceAsset."Price Includes VAT" := "Price Includes VAT";
@@ -907,26 +893,6 @@ table 7001 "Price List Line"
         OnAfterCopyToPriceSource(PriceSource);
     end;
 
-    procedure CopyFilteredLinesToTemporaryBuffer(var TempPriceListLine: Record "Price List Line" temporary) Copied: Boolean;
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeCopyFilteredLinesToTemporaryBuffer(Rec, TempPriceListLine, Copied, IsHandled);
-        if IsHandled then
-            exit;
-
-        if FindSet() then
-            repeat
-                TempPriceListLine := Rec;
-                OnCopyFilteredLinesToTemporaryBufferOnBeforeInsert(TempPriceListLine);
-                if TempPriceListLine.Insert() then
-                    Copied := true;
-            until Next() = 0;
-
-        OnAfterCopyFilteredLinesToTemporaryBuffer(TempPriceListLine);
-    end;
-
     local procedure GetHeader(): Boolean;
     begin
         if "Price List Code" <> '' then begin
@@ -936,11 +902,6 @@ table 7001 "Price List Line"
         end;
 
         Clear(PriceListHeader);
-    end;
-
-    procedure SetHeader(var NewPriceListHeader: Record "Price List Header")
-    begin
-        PriceListHeader := NewPriceListHeader;
     end;
 
     local procedure GetValueFromHeader(FieldId: Integer)
@@ -971,7 +932,7 @@ table 7001 "Price List Line"
         exit(PriceSourceGroup.IsSourceTypeSupported("Source Type"));
     end;
 
-    procedure SetAssetNo(AssetNo: Code[20])
+    local procedure SetAssetNo(AssetNo: Code[20])
     begin
         "Asset No." := AssetNo;
         "Product No." := AssetNo;
@@ -1044,27 +1005,23 @@ table 7001 "Price List Line"
             end;
     end;
 
-    procedure TestStatusDraft()
+    local procedure TestStatusDraft()
     begin
         if not IsEditable() then
             TestField(Status, Status::Draft);
     end;
 
-    procedure Verify()
-    var
-        IsHandled: Boolean;
+    procedure Verify(): Boolean;
     begin
-        IsHandled := false;
-        OnBeforeVerify(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
         VerifySource();
         TestField("Asset Type");
-        if ("Asset Type" = "Asset Type"::Item) and ("Amount Type" <> "Amount Type"::Discount) then
-            TestField("Asset No.");
+        exit(true);
+    end;
 
-        OnAfterVerify(Rec);
+    [TryFunction]
+    procedure TryVerify()
+    begin
+        Verify();
     end;
 
     local procedure VerifyParentSource() Result: Boolean;
@@ -1083,7 +1040,7 @@ table 7001 "Price List Line"
         PriceSource.VerifyAmountTypeForSourceType(AmountType);
     end;
 
-    procedure VerifySource()
+    local procedure VerifySource()
     begin
         if VerifyParentSource() then
             TestField("Parent Source No.")
@@ -1096,103 +1053,23 @@ table 7001 "Price List Line"
             TestField("Source No.", '');
     end;
 
-    procedure UseCustomizedLookup(): Boolean
-    var
-        SalesReceivablesSetup: Record "Sales & Receivables Setup";
-        PriceListLineSync: Codeunit "Price List Line Sync";
-    begin
-        if not PriceListLineSync.IsPriceListLineSynchronized() then begin
-            if GuiAllowed() then
-                PriceListLineSync.SendOutOfSyncNotification();
-            exit(true);
-        end;
-        SalesReceivablesSetup.Get();
-        exit(SalesReceivablesSetup."Use Customized Lookup");
-    end;
-
-    procedure RenameNo(LineType: Enum "Price Asset Type"; OldNo: Code[20]; NewNo: Code[20])
-    begin
-        Reset();
-        SetRange("Asset Type", LineType);
-        SetRange("Product No.", OldNo);
-        if not Rec.IsEmpty() then
-            ModifyAll("Product No.", NewNo, true);
-    end;
-
-    local procedure CopyFromAssetType()
-    var
-        Item: Record Item;
-        GLAccount: Record "G/L Account";
-        Resource: Record Resource;
-        IsHandled: Boolean;
-    begin
-        OnBeforeCopyFromAssetType(Rec, IsHandled);
-        if IsHandled then
-            exit;
-
-        if "Asset No." = '' then
-            exit;
-
-        case "Asset Type" of
-            "Asset Type"::Item:
-                begin
-                    Item.Get("Asset No.");
-                    Validate("VAT Prod. Posting Group", Item."VAT Prod. Posting Group");
-
-                    OnCopyFromAssetTypeOnAfterCopyFromAssetTypeItem(Item, Rec);
-                end;
-            "Asset Type"::"G/L Account":
-                begin
-                    GLAccount.Get("Asset No.");
-                    Validate("VAT Prod. Posting Group", GLAccount."VAT Prod. Posting Group");
-
-                    OnCopyFromAssetTypeOnAfterCopyFromAssetTypeGLAccount(GLAccount, Rec);
-                end;
-            "Asset Type"::Resource:
-                begin
-                    Resource.Get("Asset No.");
-                    Validate("VAT Prod. Posting Group", Resource."VAT Prod. Posting Group");
-
-                    OnCopyFromAssetTypeOnAfterCopyFromAssetTypeResource(Resource, Rec);
-                end;
-            else begin
-                OnCopyFromAssetTypeElseCase(Rec, IsHandled);
-                if IsHandled then
-                    exit;
-            end;
-        end;
-    end;
-
-#if not CLEAN25
-    [Obsolete('typo, use OnAfterCopyFromForPriceAsset instead', '23.0')]
     [IntegrationEvent(true, false)]
-    local procedure OnAfterCopyFromPriceAsset(PriceAsset: Record "Price Asset"; var riceListLine: Record "Price List Line")
-    begin
-    end;
-#endif
-
-    [IntegrationEvent(true, false)]
-    local procedure OnAfterCopyFromForPriceAsset(PriceAsset: Record "Price Asset"; var PriceListLine: Record "Price List Line")
+    local procedure OnAfterCopyFromPriceAsset(PriceAsset: Record "Price Asset"; var PriceWorksheetLine: Record "Price Worksheet Line")
     begin
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnAfterCopyFromPriceListHeader(PriceListHeader: Record "Price List Header"; ForceDefaults: Boolean)
+    local procedure OnAfterCopyFromPriceListHeader(PriceListHeader: Record "Price List Header")
     begin
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnAfterCopyFromPriceSource(PriceSource: Record "Price Source"; var PriceListLine: Record "Price List Line")
+    local procedure OnAfterCopyFromPriceSource(PriceSource: Record "Price Source")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyPriceFrom(var PriceListLine: Record "Price List Line"; PriceAsset: Record "Price Asset")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCopySourceFrom(var PriceListLine: Record "Price List Line"; PriceListHeader: Record "Price List Header")
+    local procedure OnAfterCopyExistingPrices(var PriceWorksheetLine: Record "Price Worksheet Line"; PriceListLine: Record "Price List Line")
     begin
     end;
 
@@ -1206,73 +1083,18 @@ table 7001 "Price List Line"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCopySourceFrom(var PriceWorksheetLine: Record "Price Worksheet Line"; PriceListHeader: Record "Price List Header")
+    begin
+    end;
+
     [IntegrationEvent(true, false)]
     local procedure OnAfterInitHeaderDefaults(PriceListHeader: Record "Price List Header")
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterIsAllowedEditingActivePrice(PriceListLine: Record "Price List Line"; var Result: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    procedure OnAfterIsUOMSupported(PriceListLine: Record "Price List Line"; var Result: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterVerify(var PriceListLine: Record "Price List Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeVerify(var PriceListLine: Record "Price List Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCopyFilteredLinesToTemporaryBufferOnBeforeInsert(var TempPriceListLine: Record "Price List Line" temporary)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeCopyFromAssetType(var PriceListLine: Record "Price List Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnBeforeSetNextLineNo(var PriceListLine: Record "Price List Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCopyFromAssetTypeElseCase(var PriceListLine: Record "Price List Line"; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCopyFromAssetTypeOnAfterCopyFromAssetTypeItem(Item: Record Item; var PriceListLine: Record "Price List Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCopyFromAssetTypeOnAfterCopyFromAssetTypeGLAccount(GLAccount: Record "G/L Account"; var PriceListLine: Record "Price List Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnCopyFromAssetTypeOnAfterCopyFromAssetTypeResource(Resource: Record Resource; var PriceListLine: Record "Price List Line")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterCopyFilteredLinesToTemporaryBuffer(var TempPriceListLine: Record "Price List Line" temporary)
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnBeforeCopyFilteredLinesToTemporaryBuffer(var PriceListLine: Record "Price List Line"; var TempPriceListLine: Record "Price List Line" temporary; var Copied: Boolean; var IsHandled: Boolean)
+    procedure OnAfterIsUOMSupported(PriceWorksheetLine: Record "Price Worksheet Line"; var Result: Boolean)
     begin
     end;
 }
