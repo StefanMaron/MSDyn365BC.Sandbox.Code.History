@@ -121,7 +121,7 @@ codeunit 99000784 "Mfg. Undo Purch. Rcpt. Line"
         ItemLedgEntry.SetRange("Item Register No.", ItemRegisterNo);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Undo Posting Management", 'OnCollectOutputItemLedgEntriesForSubcontructingPurcReceiptLine', '', false, false)]
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Undo Posting Management", 'OnCollectOutputItemLedgEntriesForSubcontructingPurcReceiptLine', '', true, false)]
     local procedure OnCollectOutputItemLedgEntriesForSubcontructingPurcReceiptLine(var TempItemLedgerEntry: Record "Item Ledger Entry" temporary; PurchRcptLine: Record "Purch. Rcpt. Line"; var Result: Boolean)
     begin
         Result := CollectOutputItemLedgEntriesForSubcontructingPurcReceiptLine(TempItemLedgerEntry, PurchRcptLine);
