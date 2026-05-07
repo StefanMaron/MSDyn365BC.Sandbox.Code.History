@@ -2721,6 +2721,87 @@ codeunit 137047 "SCM Warehouse I"
         SalesLine2.TestField("Reserved Quantity", 0);
     end;
 
+    [Test]
+    [HandlerFunctions('ItemTrackingLinesPageHandler')]
+    procedure GetBinContentWithLotAndSerialTrackingAfterReclassification()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        ItemTrackingCode: Record "Item Tracking Code";
+        ItemJournalLine: Record "Item Journal Line";
+        Location: Record Location;
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        WarehouseActivityHeader: Record "Warehouse Activity Header";
+        WarehouseActivityLine: Record "Warehouse Activity Line";
+        WarehouseEmployee: Record "Warehouse Employee";
+        WarehouseShipmentHeader: Record "Warehouse Shipment Header";
+        Quantity: Decimal;
+        LotNo: Code[20];
+    begin
+        // [SCENARIO 616739] Get Bin Content in Item Reclass Journal with Lot Specific and  Serial Number (Outbound) Tracking
+        // after item was reclassed from Shipment bin back to Storage bin
+        Initialize();
+
+        // [GIVEN] Create location with Inventory Posting Setup
+        LibraryWarehouse.CreateLocationWMS(Location, true, false, true, true, true);
+
+        // [GIVEN] Assign Bins to "Receipt Bin Code", "Shipment Bin Code" fields on Location.
+        Location.Validate("Receipt Bin Code", AddBin(Location.Code));
+        Location.Validate("Shipment Bin Code", AddBin(Location.Code));
+        Location.Modify(true);
+
+        // [GIVEN] Create Warehouse Employee for Location.
+        LibraryWarehouse.CreateWarehouseEmployee(WarehouseEmployee, Location.Code, true);
+
+        // [GIVEN] Create an Item with Lot Specific Tracking and Serial tracking for Outbound only.
+        CreateItemWithLotAndOutboundSerialTracking(Item, ItemTrackingCode);
+
+        // [GIVEN] Set Lot No and Quantity.
+        LotNo := LibraryUtility.GenerateGUID();
+        Quantity := LibraryRandom.RandIntInRange(3, 3);
+
+        // [GIVEN] Create and Post Item Journal Line With Lot No.
+        CreateItemJournalLine(ItemJournalLine, Item."No.", Location.Code, Quantity);
+        ItemJournalLine.Validate("Bin Code", Location."Receipt Bin Code");
+        ItemJournalLine.Modify(true);
+
+        AssignLotNoToItemJournalLine(ItemJournalLine, LotNo, Quantity);
+        LibraryInventory.PostItemJournalLine(ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name);
+
+        // [GIVEN] Create Sales Document and release it.
+        LibrarySales.CreateCustomer(Customer);
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.");
+        SalesHeader.Validate("Location Code", Location.Code);
+        SalesHeader.Modify(true);
+
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", Quantity);
+
+        LibrarySales.ReleaseSalesDocument(SalesHeader);
+
+        //[GIVEN] Create Warehouse Shipment from Sales Order.
+        LibraryWarehouse.CreateWhseShipmentFromSO(SalesHeader);
+
+        // [GIVEN] Create Warehouse Pick.
+        WarehouseShipmentHeader.SetRange("Location Code", Location.Code);
+        WarehouseShipmentHeader.FindLast();
+        LibraryWarehouse.CreatePick(WarehouseShipmentHeader);
+        FindWarehouseActivityLine(
+                WarehouseActivityLine, DATABASE::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.");
+        WarehouseActivityHeader.Get(WarehouseActivityLine."Activity Type", WarehouseActivityLine."No.");
+
+        //  [GIVEN] Split Pick lines into quantity of 1 and assign serial numbers and lot number. 
+        SplitPickLinesAndAssignSerialNumbers(WarehouseActivityHeader, LotNo);
+
+        // [GIVEN] Register the pick.
+        LibraryWarehouse.RegisterWhseActivity(WarehouseActivityHeader);
+
+        // [WHEN] Reclassify Items from Shipment bin back to Storage bin.
+        ReclassifyItemsFromShipmentToStorage(Item, Location);
+
+        // [THEN] Get Bin Content in Item Reclass Journal should work without any error.
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
