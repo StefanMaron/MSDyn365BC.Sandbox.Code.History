@@ -180,6 +180,7 @@ page 97 "Purchase Quote Subform"
 
                     trigger OnValidate()
                     begin
+                        ForceTotalsCalculation();
                         DeltaUpdateTotals();
                     end;
                 }
