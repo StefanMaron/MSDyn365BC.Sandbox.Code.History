@@ -5,6 +5,15 @@
     <Cmt Name="LcxAdmin" />
     <Cmt Name="Rccx" />
   </OwnedComments>
+  <Item ItemId=";Codeunit 4124633478 - NamedType 4007439157" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Do you want to create the Subcontracting Order anyway?]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Subcontracting.Test)(LookupHint=Codeunit Subc. Location Handler Test - NamedType CreateSubcontractingOrderAnywayQst)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1353084171 - Method 3713635277 - NamedType 2311994795" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[You cannot open Tracking Specification because this component is already specified in Transfer Order %1.]]></Val>
