@@ -406,6 +406,11 @@ codeunit 1751 "Data Classification Eval. Data"
         SetTableFieldsToNormal(Database::"Financial Report Audit Log");
         SetTableFieldsToNormal(Database::"Financial Report Status");
         SetFieldToPersonal(Database::"Financial Report User Filters", FinancialReportUserFilters.FieldNo("User ID"));
+        SetTableFieldsToNormal(Database::"Financial Report Package");
+        SetTableFieldsToNormal(Database::"Fin. Report Package Report");
+        SetTableFieldsToNormal(Database::"Fin. Report Package Schedule");
+        SetTableFieldsToNormal(Database::"Fin. Report Package Recipient");
+        SetTableFieldsToNormal(Database::"Fin. Rep. Package Export Log");
         SetFieldToPersonal(Database::"Financial Report Audit Log", FinancialReportAuditLog.FieldNo("User"));
     end;
 
