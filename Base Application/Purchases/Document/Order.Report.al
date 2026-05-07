@@ -464,6 +464,8 @@ report 6641 "Return Order"
                                 TempPurchaseLine.Find('-')
                             else
                                 TempPurchaseLine.Next();
+
+                            OnAfterGetRecordRoundLoopOnBeforeAssignPurchaseLine(TempPurchaseLine);
                             "Purchase Line" := TempPurchaseLine;
 
                             if (TempPurchaseLine.Type = TempPurchaseLine.Type::"G/L Account") and (not ShowInternalInfo) then
@@ -950,6 +952,11 @@ report 6641 "Return Order"
 
     [IntegrationEvent(true, false)]
     local procedure OnAfterPostDataItem(var PurchaseHeader: Record "Purchase Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetRecordRoundLoopOnBeforeAssignPurchaseLine(var TempPurchaseLine: Record "Purchase Line" temporary)
     begin
     end;
 }
