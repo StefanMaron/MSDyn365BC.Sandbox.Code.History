@@ -2158,6 +2158,66 @@ codeunit 137140 "SCM Inventory Documents"
         Assert.IsTrue(InvtReceiptHeader.FindFirst(), InventoryReceiptErr);
     end;
 
+    [Test]
+    procedure ValidateManualNoOnInvtReceiptHeaderBeforeInsert()
+    var
+        InvtDocumentHeader: Record "Invt. Document Header";
+        InventorySetup: Record "Inventory Setup";
+        NoSeries: Record "No. Series";
+        ManualNo: Code[20];
+    begin
+        // [SCENARIO 1857] Validating "No." on Invt. Document Header (Receipt) before Insert should not fail even if Inventory Setup has not been retrieved into the table's InvtSetup variable yet.
+        Initialize();
+
+        // [GIVEN] A No. Series allowing manual numbers is configured as Invt. Receipt Nos.
+        NoSeries.Get(LibraryERM.CreateNoSeriesCode());
+        NoSeries.Validate("Manual Nos.", true);
+        NoSeries.Modify(true);
+        InventorySetup.Get();
+        InventorySetup."Invt. Receipt Nos." := NoSeries.Code;
+        InventorySetup.Modify(true);
+        ManualNo := LibraryUtility.GenerateRandomCode20(InvtDocumentHeader.FieldNo("No."), DATABASE::"Invt. Document Header");
+
+        // [WHEN] Creating a new Invt. Document Header with a manual "No." before Insert
+        InvtDocumentHeader.Init();
+        InvtDocumentHeader.Validate("Document Type", InvtDocumentHeader."Document Type"::Receipt);
+        InvtDocumentHeader.Validate("No.", ManualNo);
+        InvtDocumentHeader.Insert(true);
+
+        // [THEN] The record is inserted with the manually assigned number
+        Assert.AreEqual(ManualNo, InvtDocumentHeader."No.", 'Invt. Receipt Header "No." must equal the manually assigned number.');
+    end;
+
+    [Test]
+    procedure ValidateManualNoOnInvtShipmentHeaderBeforeInsert()
+    var
+        InvtDocumentHeader: Record "Invt. Document Header";
+        InventorySetup: Record "Inventory Setup";
+        NoSeries: Record "No. Series";
+        ManualNo: Code[20];
+    begin
+        // [SCENARIO 1857] Validating "No." on Invt. Document Header (Shipment) before Insert should not fail even if Inventory Setup has not been retrieved into the table's InvtSetup variable yet.
+        Initialize();
+
+        // [GIVEN] A No. Series allowing manual numbers is configured as Invt. Shipment Nos.
+        NoSeries.Get(LibraryERM.CreateNoSeriesCode());
+        NoSeries.Validate("Manual Nos.", true);
+        NoSeries.Modify(true);
+        InventorySetup.Get();
+        InventorySetup."Invt. Shipment Nos." := NoSeries.Code;
+        InventorySetup.Modify(true);
+        ManualNo := LibraryUtility.GenerateRandomCode20(InvtDocumentHeader.FieldNo("No."), DATABASE::"Invt. Document Header");
+
+        // [WHEN] Creating a new Invt. Document Header with a manual "No." before Insert
+        InvtDocumentHeader.Init();
+        InvtDocumentHeader.Validate("Document Type", InvtDocumentHeader."Document Type"::Shipment);
+        InvtDocumentHeader.Validate("No.", ManualNo);
+        InvtDocumentHeader.Insert(true);
+
+        // [THEN] The record is inserted with the manually assigned number
+        Assert.AreEqual(ManualNo, InvtDocumentHeader."No.", 'Invt. Shipment Header "No." must equal the manually assigned number.');
+    end;
+
     local procedure PostWhseShipmentFromTO(DocumentNo: Code[20])
     var
         WhseShipmentLine: Record "Warehouse Shipment Line";
