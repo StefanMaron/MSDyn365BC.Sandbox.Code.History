@@ -257,6 +257,8 @@ codeunit 5407 "Prod. Order Status Management"
         ProductionOrder."Reopened" := true;
         ProductionOrder.Insert();
 
+        ToProdOrder := ProductionOrder;
+
         OnAfterTransferReopenProdOrder(ProductionOrder, FromProdOrder);
     end;
 
