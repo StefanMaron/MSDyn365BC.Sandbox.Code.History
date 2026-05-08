@@ -9248,6 +9248,35 @@
         PurchaseOrder.Close();
     end;
 
+    [Test]
+    [Scope('OnPrem')]
+    procedure PurchLineSetHideValidationDialogSetsFlag()
+    var
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+    begin
+        // [FEATURE] [Purchase Line] [HideValidationDialog]
+        // [SCENARIO 1878] SetHideValidationDialog sets the flag and GetHideValidationDialog returns it correctly.
+        Initialize();
+
+        // [GIVEN] A purchase order with one item line.
+        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Order, CreateVendor());
+        LibraryPurchase.CreatePurchaseLine(
+            PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, LibraryInventory.CreateItemNo(), LibraryRandom.RandInt(10));
+
+        // [WHEN] SetHideValidationDialog is called with true.
+        PurchaseLine.SetHideValidationDialog(true);
+
+        // [THEN] GetHideValidationDialog returns true.
+        Assert.IsTrue(PurchaseLine.GetHideValidationDialog(), 'GetHideValidationDialog must return true after SetHideValidationDialog(true).');
+
+        // [WHEN] SetHideValidationDialog is called with false.
+        PurchaseLine.SetHideValidationDialog(false);
+
+        // [THEN] GetHideValidationDialog returns false.
+        Assert.IsFalse(PurchaseLine.GetHideValidationDialog(), 'GetHideValidationDialog must return false after SetHideValidationDialog(false).');
+    end;
+
     local procedure Initialize()
     var
         PurchaseHeader: Record "Purchase Header";
