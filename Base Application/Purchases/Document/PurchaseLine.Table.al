@@ -6842,6 +6842,25 @@ table 39 "Purchase Line"
     end;
 
     /// <summary>
+    /// Sets the global HideValidationDialog flag.
+    /// </summary>
+    /// <param name="NewHideValidationDialog">The new value of the flag.</param>
+    procedure SetHideValidationDialog(NewHideValidationDialog: Boolean)
+    begin
+        HideValidationDialog := NewHideValidationDialog;
+        OnAfterSetHideValidationDialog(Rec, NewHideValidationDialog);
+    end;
+
+    /// <summary>
+    /// Gets the global HideValidationDialog flag.
+    /// </summary>
+    /// <returns>The value of the flag.</returns>
+    procedure GetHideValidationDialog(): Boolean
+    begin
+        exit(HideValidationDialog);
+    end;
+
+    /// <summary>
     /// Gets a caption class for a field.
     /// </summary>
     /// <param name="FieldNumber">The number of the field to get the caption class for.</param>
@@ -12296,6 +12315,16 @@ table 39 "Purchase Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateGenBusPostingGroupOnBeforeValidateVATBusPostingGroup(var PurchaseLine: Record "Purchase Line"; var ValidateVATBusPostingGroup: Boolean)
+    begin
+    end;
+
+    /// <summary>
+    /// Raised after setting the hide validation dialog flag on the purchase line.
+    /// </summary>
+    /// <param name="PurchaseLine">The purchase line being processed.</param>
+    /// <param name="NewHideValidationDialog">The new hide validation dialog value.</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSetHideValidationDialog(var PurchaseLine: Record "Purchase Line"; NewHideValidationDialog: Boolean)
     begin
     end;
 }
