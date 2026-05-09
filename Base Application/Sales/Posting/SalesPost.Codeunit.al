@@ -260,7 +260,7 @@ codeunit 80 "Sales-Post"
         SendShipmentAlsoQst: Label 'You can take the same actions for the related Sales - Shipment document.\\Do you want to do that now?';
         SuppressCommit: Boolean;
         PostingPreviewNoTok: Label '***', Locked = true;
-        PostingPreviewNoFormatTxt: Label '<Filler Character,0><Integer,6>', Comment = 'Previewed document numbers are displayed in the format ***000000', Locked = true;
+        PostingPreviewNoFormatTxt: Label '<Integer,6><Filler Character,0>', Comment = 'Previewed document numbers are displayed in the format ***000000', Locked = true;
         InvPickExistsErr: Label 'One or more related inventory picks must be registered before you can post the shipment.';
         InvPutAwayExistsErr: Label 'One or more related inventory put-aways must be registered before you can post the receipt.';
         CheckSalesHeaderMsg: Label 'Check sales document fields.';
