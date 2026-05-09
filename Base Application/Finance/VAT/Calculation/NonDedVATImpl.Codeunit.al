@@ -895,6 +895,7 @@ codeunit 6201 "Non-Ded. VAT Impl."
             Round(
                 PurchaseLine.Amount * VATPostingSetup."VAT %" / 100,
                 Currency."Amount Rounding Precision", Currency.VATRoundingDirection());
+        NonDeductibleVAT.OnAfterCalcRevChargeVATAmountInPurchLine(PurchaseLine, VATAmount);
     end;
 
     procedure Copy(var InvoicePostingBuffer: Record "Invoice Posting Buffer"; PurchaseLine: Record "Purchase Line")
