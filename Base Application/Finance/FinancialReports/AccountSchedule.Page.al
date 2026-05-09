@@ -142,6 +142,11 @@ page 104 "Account Schedule"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the totaling type for the financial report line. The type determines which accounts within the totaling interval you specify in the Totaling field will be totaled. ';
+
+                    trigger OnValidate()
+                    begin
+                        UpdateAccountFactbox();
+                    end;
                 }
                 field(Totaling; TotalingDisplayed)
                 {
@@ -156,6 +161,8 @@ page 104 "Account Schedule"
                             TotalingDisplayed := GetAccountCategoryTotalingToDisplay()
                         else
                             Rec.Validate(Totaling, TotalingDisplayed);
+
+                        UpdateAccountFactbox();
                     end;
 
                     trigger OnLookup(var Text: Text): Boolean
@@ -165,6 +172,8 @@ page 104 "Account Schedule"
                             TotalingDisplayed := GetAccountCategoryTotalingToDisplay()
                         else
                             TotalingDisplayed := Rec.Totaling;
+
+                        UpdateAccountFactbox();
                     end;
 
                 }
@@ -257,6 +266,11 @@ page 104 "Account Schedule"
         }
         area(factboxes)
         {
+            part(TotalingAccountsFactbox; "Totaling Accounts Factbox")
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'G/L Accounts';
+            }
             systempart(Control1900383207; Links)
             {
                 ApplicationArea = RecordLinks;
@@ -474,6 +488,7 @@ page 104 "Account Schedule"
     trigger OnAfterGetCurrRecord()
     begin
         FormatLines();
+        UpdateAccountFactbox();
     end;
 
     trigger OnOpenPage()
@@ -553,6 +568,14 @@ page 104 "Account Schedule"
             TotalingDisplayed := GetAccountCategoryTotalingToDisplay()
         else
             TotalingDisplayed := Rec.Totaling;
+    end;
+
+    local procedure UpdateAccountFactbox()
+    begin
+        if (Rec.Totaling <> '') and (Rec."Totaling Type" in [Rec."Totaling Type"::"Posting Accounts", Rec."Totaling Type"::"Total Accounts"]) then
+            CurrPage.TotalingAccountsFactbox.Page.SetTotalingFilter(Rec.Totaling)
+        else
+            CurrPage.TotalingAccountsFactbox.Page.SetTotalingFilter('=''''');
     end;
 
     /// <summary>

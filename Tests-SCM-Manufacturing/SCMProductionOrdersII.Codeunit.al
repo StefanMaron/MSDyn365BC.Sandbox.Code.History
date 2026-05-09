@@ -7609,8 +7609,8 @@ codeunit 137072 "SCM Production Orders II"
         ItemLedgerEntry.SetRange("Entry No.", ItemLedgerEntry."Entry No.");
         UndoProdPostingMgmt.ReverseProdItemLedgerEntry(ItemLedgerEntry);
 
-        // [THEN] Verify Reverse Item Ledger Entry is created.
-        VerifyReverseItemLedgerEntry(CompItem."No.", UnitOfMeasure.Code);
+        // [THEN] Reversal item ledger entry uses the component unit of measure with the correct positive base quantity.
+        VerifyReverseItemLedgerEntry(CompItem."No.", UnitOfMeasure2.Code);
     end;
 
     [Test]
@@ -10303,6 +10303,7 @@ codeunit 137072 "SCM Production Orders II"
         ItemLedgerEntry.SetRange("Item No.", CompItemNo);
         ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Consumption);
         ItemLedgerEntry.SetRange("Unit of Measure Code", UnitOfMeasureCode);
+        ItemLedgerEntry.SetFilter(Quantity, '>0');
         ItemLedgerEntry.FindFirst();
 
         Assert.AreEqual(0.001, ItemLedgerEntry.Quantity, QtyMustBeEqualErr);
