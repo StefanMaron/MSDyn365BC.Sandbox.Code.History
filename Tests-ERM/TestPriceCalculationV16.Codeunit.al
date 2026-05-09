@@ -6391,6 +6391,128 @@ codeunit 134159 "Test Price Calculation - V16"
         LibraryPriceCalculation.SetupDefaultHandler(OldHandler);
     end;
 
+    [Test]
+    procedure SalesLineResourceUnitCostIsNetWhenSalesHeaderPricesInclVAT()
+    var
+        Customer: Record Customer;
+        PriceListLine: Record "Price List Line";
+        Resource: Record Resource;
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        OldHandler: Enum "Price Calculation Handler";
+    begin
+        // [SCENARIO 1588] Resource Unit Cost (LCY) on a sales line is not grossed up by VAT
+        // when the sales header has Prices Including VAT = true and the purchase price list
+        // line stores a net cost (Price Includes VAT = false).
+        Initialize();
+
+        // [GIVEN] Default price calculation handler is 'V16'.
+        OldHandler := LibraryPriceCalculation.SetupDefaultHandler("Price Calculation Handler"::"Business Central (Version 16.0)");
+
+        // [GIVEN] VAT Posting Setup with Normal VAT.
+        LibraryERM.FindVATPostingSetup(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT");
+
+        // [GIVEN] Customer 'C' with Prices Including VAT = true.
+        Customer.Get(LibrarySales.CreateCustomerWithVATBusPostingGroup(VATPostingSetup."VAT Bus. Posting Group"));
+        Customer.Validate("Prices Including VAT", true);
+        Customer.Modify(true);
+
+        // [GIVEN] Resource 'R' with the matching VAT posting groups.
+        Resource.Get(CreateResource(VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group"));
+
+        // [GIVEN] Purchase price list line for 'R' where "Price Includes VAT" is false and "Unit Cost" is a net value.
+        LibraryPriceCalculation.CreatePurchPriceLine(
+            PriceListLine, '', "Price Source Type"::"All Vendors", '', "Price Asset Type"::Resource, Resource."No.");
+        PriceListLine."Unit Cost" := LibraryRandom.RandDecInRange(40, 80, 2);
+        PriceListLine.Status := "Price Status"::Active;
+        PriceListLine.Modify();
+
+        // [GIVEN] Sales Order for Customer 'C'.
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.");
+
+        // [WHEN] A sales line is added for Resource 'R'.
+        LibrarySales.CreateSalesLineSimple(SalesLine, SalesHeader);
+        SalesLine.Validate(Type, SalesLine.Type::Resource);
+        SalesLine.Validate("No.", Resource."No.");
+        SalesLine.Validate(Quantity, 1);
+        SalesLine.Modify(true);
+
+        // [THEN] "Unit Cost (LCY)" equals the net Unit Cost from the price list line and is not multiplied by VAT%.
+        Assert.AreNearlyEqual(
+            PriceListLine."Unit Cost",
+            SalesLine."Unit Cost (LCY)",
+            0.01,
+            StrSubstNo(ValueMustBeEqualErr, SalesLine.FieldCaption("Unit Cost (LCY)"), PriceListLine."Unit Cost", SalesLine.TableCaption()));
+
+        // Cleanup
+        LibraryPriceCalculation.SetupDefaultHandler(OldHandler);
+    end;
+
+    [Test]
+    procedure SalesLineResourceUnitCostIsNetWhenPurchasePriceLineHasGrossCost()
+    var
+        Customer: Record Customer;
+        ExpectedNetCost: Decimal;
+        PriceListLine: Record "Price List Line";
+        Resource: Record Resource;
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        OldHandler: Enum "Price Calculation Handler";
+        GrossCost: Decimal;
+    begin
+        // [SCENARIO 1588] Resource Unit Cost (LCY) on a sales line is converted to net
+        // when the purchase price list line stores a gross cost (Price Includes VAT = true),
+        // even when the sales header has Prices Including VAT = true.
+        Initialize();
+
+        // [GIVEN] Default price calculation handler is 'V16'.
+        OldHandler := LibraryPriceCalculation.SetupDefaultHandler("Price Calculation Handler"::"Business Central (Version 16.0)");
+
+        // [GIVEN] VAT Posting Setup with Normal VAT.
+        LibraryERM.FindVATPostingSetup(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT");
+
+        // [GIVEN] Customer 'C' with Prices Including VAT = true.
+        Customer.Get(LibrarySales.CreateCustomerWithVATBusPostingGroup(VATPostingSetup."VAT Bus. Posting Group"));
+        Customer.Validate("Prices Including VAT", true);
+        Customer.Modify(true);
+
+        // [GIVEN] Resource 'R' with the matching VAT posting groups.
+        Resource.Get(CreateResource(VATPostingSetup."VAT Bus. Posting Group", VATPostingSetup."VAT Prod. Posting Group"));
+
+        // [GIVEN] Purchase price list line for 'R' where "Price Includes VAT" is true (gross cost).
+        GrossCost := LibraryRandom.RandDecInRange(60, 100, 2);
+        ExpectedNetCost := Round(GrossCost / (1 + VATPostingSetup."VAT %" / 100), 0.01);
+        LibraryPriceCalculation.CreatePurchPriceLine(
+            PriceListLine, '', "Price Source Type"::"All Vendors", '', "Price Asset Type"::Resource, Resource."No.");
+        PriceListLine."Price Includes VAT" := true;
+        PriceListLine."VAT Bus. Posting Gr. (Price)" := VATPostingSetup."VAT Bus. Posting Group";
+        PriceListLine."Unit Cost" := GrossCost;
+        PriceListLine.Status := "Price Status"::Active;
+        PriceListLine.Modify();
+
+        // [GIVEN] Sales Order for Customer 'C'.
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.");
+
+        // [WHEN] A sales line is added for Resource 'R'.
+        LibrarySales.CreateSalesLineSimple(SalesLine, SalesHeader);
+        SalesLine.Validate(Type, SalesLine.Type::Resource);
+        SalesLine.Validate("No.", Resource."No.");
+        SalesLine.Validate(Quantity, 1);
+        SalesLine.Modify(true);
+
+        // [THEN] "Unit Cost (LCY)" is the gross cost divided by (1 + VAT%) - the net cost.
+        Assert.AreNearlyEqual(
+            ExpectedNetCost,
+            SalesLine."Unit Cost (LCY)",
+            0.01,
+            StrSubstNo(ValueMustBeEqualErr, SalesLine.FieldCaption("Unit Cost (LCY)"), ExpectedNetCost, SalesLine.TableCaption()));
+
+        // Cleanup
+        LibraryPriceCalculation.SetupDefaultHandler(OldHandler);
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
