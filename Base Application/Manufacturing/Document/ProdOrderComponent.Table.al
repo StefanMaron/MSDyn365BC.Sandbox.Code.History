@@ -349,6 +349,7 @@ table 5407 "Prod. Order Component"
                                                                    "Order Line No." = field("Prod. Order Line No."),
                                                                    "Prod. Order Comp. Line No." = field("Line No.")));
             Caption = 'Act. Consumption (Qty)';
+            ToolTip = 'Specifies the quantity of the component that has been posted as consumed by the production order.';
             DecimalPlaces = 0 : 5;
             Editable = false;
             FieldClass = FlowField;
