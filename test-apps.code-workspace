@@ -153,7 +153,7 @@
     "search.exclude": {
       "**.xlf": true
     },
-    "al.enableCodeAnalysis": false,
-    "al.enableCodeActions": false
+    "al.enableCodeActions": false,
+    "al.enableCodeAnalysis": false
   }
 }
