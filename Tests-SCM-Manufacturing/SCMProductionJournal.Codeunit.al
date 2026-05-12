@@ -1979,10 +1979,10 @@ codeunit 137034 "SCM Production Journal"
           Item, Item."Costing Method"::FIFO, RoutingHeader."No.", ProductionBOMHeader."No.", Item."Manufacturing Policy"::"Make-to-Order");
         CreateAndRefreshRelProdOrder(ProductionOrder, ProductionOrder."Source Type"::Item, Item."No.");
         ProductionOrderNo := ProductionOrder."No.";
-         
+
         // [WHEN] Open Production Journal based on Production Order Lines
         OpenProductionJournal(ProductionOrder, ProductionOrderNo);
-         
+
         // [THEN] Verification done in VerifyConsumptionEntriesBasedOnActualOutput after JournalPageHandler captures journal lines
         VerifyConsumptionEntriesBasedOnActualOutput(ProductionOrderNo);
 
@@ -2025,13 +2025,13 @@ codeunit 137034 "SCM Production Journal"
           Item, Item."Costing Method"::FIFO, RoutingHeader."No.", ProductionBOMHeader."No.", Item."Manufacturing Policy"::"Make-to-Order");
         CreateAndRefreshRelProdOrder(ProductionOrder, ProductionOrder."Source Type"::Item, Item."No.");
         ProductionOrderNo := ProductionOrder."No.";
-         
+
         // [GIVEN] Post output in Production Journal
         CreateAndPostOutputJournal(ProductionOrderNo, OperationNo, Item."No.", '', '');
-         
+
         // [WHEN] Open Production Journal based on Production Order Lines
         OpenProductionJournal(ProductionOrder, ProductionOrderNo);
-         
+
         // [THEN] Verification done in VerifyConsumptionEntriesBasedOnActualOutput after JournalPageHandler captures journal lines
         VerifyConsumptionEntriesBasedOnActualOutput(ProductionOrderNo);
 
@@ -2050,7 +2050,7 @@ codeunit 137034 "SCM Production Journal"
         ItemJournalLine: Record "Item Journal Line";
         ComponentQuantity: Decimal;
     begin
-       // [SCENARIO 617913] Verify the Reserve from inventory creates reservation matching Production Order line quantity.
+        // [SCENARIO 617913] Verify the Reserve from inventory creates reservation matching Production Order line quantity.
         Initialize();
 
         // [GIVEN] Generate Random component quantity.
@@ -2078,7 +2078,7 @@ codeunit 137034 "SCM Production Journal"
 
         // [THEN] Verify reserved quantity matches Production component expected quantity.
         ProdOrderComponent.CalcFields("Reserved Quantity");
-        Assert.AreEqual(ProdOrderComponent."Expected Quantity", ProdOrderComponent."Reserved Quantity",ReservedQtyProdCompErr);
+        Assert.AreEqual(ProdOrderComponent."Expected Quantity", ProdOrderComponent."Reserved Quantity", ReservedQtyProdCompErr);
     end;
 
     [Test]
@@ -2383,7 +2383,7 @@ codeunit 137034 "SCM Production Journal"
         // Random value important for test.
         LibraryManufacturing.CreateItemManufacturing(
           Item, CostingMethod, LibraryRandom.RandInt(50) + 10, Item."Reordering Policy",
-          Item."Flushing Method", RoutingNo, ProductionBOMNo);
+          Item."Flushing Method"::"Pick + Manual", RoutingNo, ProductionBOMNo);
         Item.Validate("Manufacturing Policy", ItemManufacturingPolicy);
         Item.Validate("Replenishment System", Item."Replenishment System"::"Prod. Order");
         Item.Modify(true);
