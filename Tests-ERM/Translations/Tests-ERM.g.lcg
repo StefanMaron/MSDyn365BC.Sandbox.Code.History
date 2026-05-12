@@ -6791,6 +6791,15 @@
       <Cmt Name="Dev"><![CDATA[%1=Document No.,%2=Original Customer Template Code,%3=Customer Template Code]D;]A;(LookupHint=Codeunit ERM Sales Quotes - NamedType DifferentCustomerTemplateMsg)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2154995965 - NamedType 4048728497" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Doc. No. Occurrence should be preserved after Bill-to Customer No. validation]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Sales Quotes - NamedType DocNoOccurrencePreservedErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2154995965 - NamedType 3742820574" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[%1 not updated correctly.]]></Val>
