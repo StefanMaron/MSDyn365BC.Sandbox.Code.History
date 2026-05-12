@@ -2629,7 +2629,7 @@ codeunit 137079 "SCM Production Order III"
 
     [Test]
     [Scope('OnPrem')]
-    procedure PlannedProdOrderRoutingGetsToProdBinFromWorkCenter()
+    procedure PlannedProdOrderRoutingGetsOpenShopFloorBinFromWorkCenterForManualFlushingMethod()
     var
         RequisitionLine: Record "Requisition Line";
         WorkCenter: Record "Work Center";
@@ -2637,21 +2637,21 @@ codeunit 137079 "SCM Production Order III"
         ItemNo: Code[20];
     begin
         // [FEATURE] [Planning Worksheet] [Work Center] [Bin]
-        // [SCENARIO 379347] Prod. Order Routing Line gets "To-Production Bin Code" from Work Center with Manual Flushing Method through Planning.
+        // [SCENARIO 379347] Prod. Order Routing Line gets "Open Shop Floor Bin Code" from Work Center with Manual Flushing Method through Planning.
         Initialize();
 
-        // [GIVEN] Create Work Center with "Flushing Method" = Manual and "To-Production Bin Code" = "B".
+        // [GIVEN] Create Work Center with "Flushing Method" = Manual and "Open Shop Floor Bin Code" = "B".
         // [GIVEN] Create Requisition Line by calculating Regenerative Plan. Update Work Center on Planning Routing.
         CreateRequisitionLineWithPlanningRouting(RequisitionLine, WorkCenter, ItemNo);
 
         // [WHEN] Carry out Action Message.
         LibraryPlanning.CarryOutActionMsgPlanWksh(RequisitionLine);
 
-        // [THEN] "To-Production Bin Code" in Prod. Order Routing Line is equal to "B".
+        // [THEN] "Open Shop Floor Bin Code" in Prod. Order Routing Line is equal to "B".
         FindProdOrderRoutingLine(ProdOrderRoutingLine, ItemNo);
         Assert.AreEqual(
-          WorkCenter."To-Production Bin Code", ProdOrderRoutingLine."To-Production Bin Code",
-          StrSubstNo(RtngLineBinCodeErr, ProdOrderRoutingLine.FieldCaption("To-Production Bin Code"), ProdOrderRoutingLine.TableCaption()));
+          WorkCenter."Open Shop Floor Bin Code", ProdOrderRoutingLine."Open Shop Floor Bin Code",
+          StrSubstNo(RtngLineBinCodeErr, ProdOrderRoutingLine.FieldCaption("Open Shop Floor Bin Code"), ProdOrderRoutingLine.TableCaption()));
     end;
 
     [Test]
