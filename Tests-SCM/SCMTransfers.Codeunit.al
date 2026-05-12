@@ -4294,7 +4294,7 @@
         // Random values used are not important for test.
         LibraryManufacturing.CreateItemManufacturing(
           Item, Item."Costing Method", LibraryRandom.RandDec(50, 2) + LibraryRandom.RandDec(10, 2),
-          Item."Reordering Policy"::Order, Item."Flushing Method", '', '');
+          Item."Reordering Policy"::Order, Item."Flushing Method"::"Pick + Manual", '', '');
         Item.Validate("Manufacturing Policy", Item."Manufacturing Policy"::"Make-to-Order");
         Item.Validate("Order Tracking Policy", Item."Order Tracking Policy"::"Tracking Only");
         Item.Modify(true);
