@@ -1322,10 +1322,10 @@ codeunit 137297 "SCM Inventory Misc. V"
         Initialize();
 
         // [GIVEN] Create Main Item.
-        ProdItem.Get(CreateAndModifyItem('', ProdItem."Flushing Method"::Manual, ProdItem."Replenishment System"::"Prod. Order"));
+        ProdItem.Get(CreateAndModifyItem('', ProdItem."Flushing Method"::"Pick + Manual", ProdItem."Replenishment System"::"Prod. Order"));
 
         // [GIVEN] Create Component Item.
-        CompItem.Get(CreateAndModifyItem('', CompItem."Flushing Method"::Manual, CompItem."Replenishment System"::Purchase));
+        CompItem.Get(CreateAndModifyItem('', CompItem."Flushing Method"::"Pick + Manual", CompItem."Replenishment System"::Purchase));
 
         // [GIVEN] Create Certify Production BOM.
         CreateAndCertifyProductionBOM(ProductionBOMHeader, ProdItem."Base Unit of Measure", CompItem."No.", '');
