@@ -6359,6 +6359,67 @@ codeunit 134902 "ERM Account Schedule"
         Assert.AreNotEqual('', GLNofilter, GLAccountFilterErr);
     end;
 
+    [Test]
+    procedure DrilldownWithAnalysisViewVerifiesGLAccountFilter()
+    var
+        AccScheduleLine: Record "Acc. Schedule Line";
+        AccScheduleName: Record "Acc. Schedule Name";
+        AnalysisView: Record "Analysis View";
+        ColumnLayout: Record "Column Layout";
+        FinancialReport: Record "Financial Report";
+        GLAccount: Record "G/L Account";
+        AccountScheduleOverview: TestPage "Acc. Schedule Overview";
+        ChartOfAccsAnalysisView: TestPage "Chart of Accs. (Analysis View)";
+        FinancialReports: TestPage "Financial Reports";
+        Amount: Decimal;
+        GLNoFilter: Text;
+    begin
+        // [SCENARIO] When an Analysis View is assigned to an Account Schedule and the column layout has a G/L Account Totaling filter,
+        // the DrillDown on the Account Schedule Overview page must open the Chart of Accs. (Analysis View) filtered to those accounts.
+        Initialize();
+
+        // [GIVEN] A G/L Account with posted entries
+        MockGLAccountWithGLEntries(GLAccount, Amount);
+
+        // [GIVEN] An Analysis View
+        LibraryERM.CreateAnalysisView(AnalysisView);
+
+        // [GIVEN] An Account Schedule Name with the Analysis View assigned
+        LibraryERM.CreateAccScheduleName(AccScheduleName);
+        AccScheduleName."Analysis View Name" := AnalysisView.Code;
+        AccScheduleName.Modify();
+
+        // [GIVEN] An Account Schedule Line referencing the G/L Account
+        LibraryERM.CreateAccScheduleLine(AccScheduleLine, AccScheduleName.Name);
+        AccScheduleLine.Validate(Totaling, GLAccount."No.");
+        AccScheduleLine.Validate("Totaling Type", AccScheduleLine."Totaling Type"::"Posting Accounts");
+        AccScheduleLine.Modify(true);
+
+        // [GIVEN] A Column Layout with G/L Account Totaling restricted to the same account
+        CreateColumnLayout(ColumnLayout);
+        ColumnLayout.Validate("G/L Account Totaling", GLAccount."No.");
+        ColumnLayout.Modify(true);
+
+        // [GIVEN] The Financial Report's column group is set to the column layout
+        FinancialReport.Get(AccScheduleName.Name);
+        FinancialReport."Financial Report Column Group" := ColumnLayout."Column Layout Name";
+        FinancialReport.Modify();
+
+        // [WHEN] The Account Schedule Overview is opened via Financial Reports and a DrillDown is performed
+        AccountScheduleOverview.OpenView();
+        FinancialReports.OpenEdit();
+        FinancialReports.Filter.SetFilter(Name, AccScheduleName.Name);
+        AccountScheduleOverview.Trap();
+        FinancialReports.Overview.Invoke();
+        AccountScheduleOverview.DateFilter.SetValue(WorkDate());
+
+        // [THEN] The Chart of Accs. (Analysis View) page has a non-empty "No." filter matching the column layout's G/L Account Totaling
+        ChartOfAccsAnalysisView.Trap();
+        AccountScheduleOverview.ColumnValues1.Drilldown();
+        GLNoFilter := ChartOfAccsAnalysisView.FILTER.GetFilter("No.");
+        Assert.AreNotEqual('', GLNoFilter, GLAccountFilterErr);
+    end;
+
     [RequestPageHandler]
     [Scope('OnPrem')]
     procedure AccountScheduleSetNegativeFormatRequestHandler(var AccountSchedule: TestRequestPage "Account Schedule")
