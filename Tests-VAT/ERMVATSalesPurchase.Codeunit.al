@@ -5603,6 +5603,70 @@
         Assert.AreEqual(0, TotalAmountInclVAT - TotalAmount, TotalVATAmountErr);
     end;
 
+    [Test]
+    procedure FullVATLineShownInPostedPurchInvStatistics()
+    var
+        VATPostingSetup: Record "VAT Posting Setup";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        PurchInvHeader: Record "Purch. Inv. Header";
+        PurchInvLine: Record "Purch. Inv. Line";
+        TempVATAmountLine: Record "VAT Amount Line" temporary;
+        GLAccount: Record "G/L Account";
+        GeneralPostingSetup: Record "General Posting Setup";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        PostedDocNo: Code[20];
+        FullVATAmount: Decimal;
+    begin
+        // [AI test 0.3]
+        // [SCENARIO 631295] VAT Amount Line with Full VAT appears in Posted Purchase Invoice Statistics even though VAT Base is zero
+        Initialize();
+
+        // [GIVEN] VAT Period control is disabled to avoid country-specific confirm dialogs
+        GeneralLedgerSetup.Get();
+        GeneralLedgerSetup."Control VAT Period" := GeneralLedgerSetup."Control VAT Period"::Disabled;
+        GeneralLedgerSetup.Modify();
+
+        // [GIVEN] VAT Posting Setup with VAT Calculation Type = "Full VAT" and VAT % = 100
+        LibraryERM.CreateVATPostingSetupWithAccounts(
+            VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Full VAT", 100);
+
+        // [GIVEN] G/L Account with the Full VAT posting group
+        GLAccount.Get(VATPostingSetup.GetPurchAccount(false));
+        LibraryERM.FindGeneralPostingSetup(GeneralPostingSetup);
+        GLAccount.Validate("Gen. Prod. Posting Group", GeneralPostingSetup."Gen. Prod. Posting Group");
+        GLAccount.Validate("VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
+        GLAccount.Modify(true);
+
+        // [GIVEN] Purchase Invoice with one Full VAT line
+        FullVATAmount := LibraryRandom.RandDecInRange(100, 1000, 2);
+        LibraryPurchase.CreatePurchHeader(
+            PurchaseHeader, PurchaseHeader."Document Type"::Invoice,
+            LibraryPurchase.CreateVendorWithVATBusPostingGroup(VATPostingSetup."VAT Bus. Posting Group"));
+        LibraryPurchase.CreatePurchaseLine(
+            PurchaseLine, PurchaseHeader, PurchaseLine.Type::"G/L Account", GLAccount."No.", 1);
+        PurchaseLine.Validate("Direct Unit Cost", FullVATAmount);
+        PurchaseLine.Modify(true);
+
+        // [WHEN] Post the purchase invoice and calculate VAT Amount Lines from posted invoice
+        PostedDocNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
+        PurchInvHeader.Get(PostedDocNo);
+        PurchInvLine.CalcVATAmountLines(PurchInvHeader, TempVATAmountLine);
+
+        // [THEN] One VAT Amount Line exists with Full VAT type, zero VAT Base, and correct Amount Including VAT
+        Assert.RecordCount(TempVATAmountLine, 1);
+        TempVATAmountLine.FindFirst();
+        Assert.AreEqual(
+            TempVATAmountLine."VAT Calculation Type"::"Full VAT", TempVATAmountLine."VAT Calculation Type",
+            TempVATAmountLine.FieldCaption("VAT Calculation Type"));
+        Assert.AreEqual(
+            0, TempVATAmountLine."VAT Base",
+            TempVATAmountLine.FieldCaption("VAT Base"));
+        Assert.AreEqual(
+            FullVATAmount, TempVATAmountLine."Amount Including VAT",
+            TempVATAmountLine.FieldCaption("Amount Including VAT"));
+    end;
+
     local procedure Initialize()
     var
         PurchaseHeader: Record "Purchase Header";
