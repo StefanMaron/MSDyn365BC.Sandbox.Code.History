@@ -5018,6 +5018,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Reminder/Fin.Charge Memo - NamedType CancelNextLevelReminderErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3654225320 - NamedType 3949348095" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Dimension Set ID should be assigned on reversal posting]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Reminder/Fin.Charge Memo - NamedType DimensionSetIdShouldBeAssignedOnReversalPostingErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3654225320 - NamedType 1884832600" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[AddFee_IssuedFinChrgMemoHeader]]></Val>
