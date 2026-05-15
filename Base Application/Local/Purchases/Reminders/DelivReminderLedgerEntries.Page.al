@@ -143,12 +143,12 @@ page 5005276 "Deliv. Reminder Ledger Entries"
         CurrentFilter := Rec.GetFilter("Order No.");
         if CurrentFilter <> '' then
             CaptionString :=
-              Text1140000 + CurrentFilter;
+              PurchOrderLbl + CurrentFilter;
 
         CurrentFilter := Rec.GetFilter("Vendor No.");
         if CurrentFilter <> '' then begin
             if CaptionString <> '' then
-                CaptionString := CaptionString + Text1140001;
+                CaptionString := CaptionString + CustomerLbl;
             CaptionString :=
               CaptionString + ' ' + CurrentFilter;
         end;
@@ -157,10 +157,10 @@ page 5005276 "Deliv. Reminder Ledger Entries"
     end;
 
     var
-        Text1140000: Label 'PurchOrder ';
-        Text1140001: Label ' Customer';
         Navigate: Page Navigate;
-        CaptionString: Text[100];
-        CurrentFilter: Text[30];
+        CaptionString: Text;
+        CurrentFilter: Text;
+        PurchOrderLbl: Label 'PurchOrder ';
+        CustomerLbl: Label ' Customer';
 }
 

@@ -29,7 +29,7 @@ codeunit 5005396 "Print Document Comfort"
         OnPrintDeliveryReminderOnAfterSetFilters(ReportSelections, DeliveryReminderHeader);
         ReportSelections.Find('-');
         repeat
-            REPORT.RunModal(ReportSelections."Report ID", true, false, DeliveryReminderHeader)
+            Report.RunModal(ReportSelections."Report ID", true, false, DeliveryReminderHeader)
         until ReportSelections.Next() = 0;
     end;
 
@@ -49,7 +49,7 @@ codeunit 5005396 "Print Document Comfort"
         ReportSelections.SetFilter("Report ID", '<>0');
         ReportSelections.Find('-');
         repeat
-            REPORT.RunModal(ReportSelections."Report ID", ShowRequestForm, false, IssuedDeliveryReminderHeader)
+            Report.RunModal(ReportSelections."Report ID", ShowRequestForm, false, IssuedDeliveryReminderHeader)
         until ReportSelections.Next() = 0;
     end;
 

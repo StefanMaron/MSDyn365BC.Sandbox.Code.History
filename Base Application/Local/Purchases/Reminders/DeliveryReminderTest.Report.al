@@ -12,7 +12,7 @@ using System.Utilities;
 report 5005272 "Delivery Reminder - Test"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/Purchases/Document/DeliveryReminderTest.rdlc';
+    RDLCLayout = './Local/Purchases/Reminders/DeliveryReminderTest.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Delivery Reminder - Test';
     UsageCategory = ReportsAndAnalysis;
@@ -357,7 +357,7 @@ report 5005272 "Delivery Reminder - Test"
         Text1140004: Label '%1 is not within your allowed range of posting dates.';
         Text1140006: Label 'Reminder: ';
         Text1140007: Label '%1 has to be 0.';
-        Text1140008: Label 'Delivery Remainder Line has no valid Purch. Order Line';
+        Text1140008: Label 'Delivery Reminder Line has no valid Purch. Order Line';
         GLSetup: Record "General Ledger Setup";
         UserSetup: Record "User Setup";
         Vend: Record Vendor;
