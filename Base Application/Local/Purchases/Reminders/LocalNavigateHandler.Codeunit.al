@@ -6,6 +6,8 @@ namespace Microsoft.Foundation.Navigate;
 
 using Microsoft.Purchases.Document;
 
+
+
 codeunit 355 "Local Navigate Handler"
 {
     var

@@ -27,12 +27,12 @@ codeunit 5005270 "Issue Delivery Reminder"
         DeliveryReminderLine.SetRange("Document No.", DeliveryReminderHeader."No.");
         DeliveryReminderLine.SetFilter(Quantity, '<>0');
         if not DeliveryReminderLine.Find('-') then
-            Error(Text1140000);
+            Error(NothingToIssueErr);
 
         Window.Open(
-          Text1140001 +
-          Text1140002 +
-          Text1140003);
+            DeliveryReminderLbl +
+            CheckingLinesLbl +
+            PostingLinesLbl);
 
         Window.Update(1, DeliveryReminderHeader."No.");
 
@@ -47,6 +47,7 @@ codeunit 5005270 "Issue Delivery Reminder"
             DocumentNo := DeliveryReminderHeader."Issuing No."
         else
             DocumentNo := DeliveryReminderHeader."No.";
+
         // Checking Lines
         DeliveryReminderLine.Reset();
         DeliveryReminderLine.SetRange("Document No.", DeliveryReminderHeader."No.");
@@ -73,7 +74,7 @@ codeunit 5005270 "Issue Delivery Reminder"
         IssuedDeliveryReminderHeader."No." := DocumentNo;
         IssuedDeliveryReminderHeader."Pre-Assigned No." := DeliveryReminderHeader."No.";
         IssuedDeliveryReminderHeader."Source Code" := SourceCode;
-        IssuedDeliveryReminderHeader."User ID" := UserId;
+        IssuedDeliveryReminderHeader."User ID" := CopyStr(UserId, 1, 50);
         IssuedDeliveryReminderHeader."No. Printed" := 0;
         OnBeforeIssuedDeliveryReminderHeaderInsert(IssuedDeliveryReminderHeader, DeliveryReminderHeader);
         IssuedDeliveryReminderHeader.Insert();
@@ -104,7 +105,7 @@ codeunit 5005270 "Issue Delivery Reminder"
                     DelivReminLedgerEntries."Reorder Quantity" := DeliveryReminderLine."Reorder Quantity";
                     DelivReminLedgerEntries."Remaining Quantity" := DeliveryReminderLine."Remaining Quantity";
                     DelivReminLedgerEntries.Quantity := DeliveryReminderLine.Quantity;
-                    DelivReminLedgerEntries."User ID" := UserId;
+                    DelivReminLedgerEntries."User ID" := CopyStr(UserId, 1, 50);
                     DelivReminLedgerEntries."Source Code" := SourceCode;
                     DelivReminLedgerEntries."Purch. Expected Receipt Date" := DeliveryReminderLine."Expected Receipt Date";
                     DelivReminLedgerEntries."Days overdue" := DeliveryReminderLine."Days overdue";
@@ -138,10 +139,6 @@ codeunit 5005270 "Issue Delivery Reminder"
     end;
 
     var
-        Text1140000: Label 'There is nothing to issue.';
-        Text1140001: Label 'Delivery Reminder  #1#########\\';
-        Text1140002: Label 'Checking lines        #2######\';
-        Text1140003: Label 'Posting Lines         #3######\';
         DeliveryReminderHeader: Record "Delivery Reminder Header";
         DeliveryReminderLine: Record "Delivery Reminder Line";
         IssuedDeliveryReminderHeader: Record "Issued Deliv. Reminder Header";
@@ -151,12 +148,16 @@ codeunit 5005270 "Issue Delivery Reminder"
         IssDelivReminCommLine2: Record "Delivery Reminder Comment Line";
         SourceCodeSetup: Record "Source Code Setup";
         DocumentNo: Code[20];
-        SourceCode: Code[20];
+        SourceCode: Code[10];
         NextEntryNo: Integer;
         Window: Dialog;
         LineCount: Integer;
         ReplacePostingDate: Boolean;
         PostingDate: Date;
+        NothingToIssueErr: Label 'There is nothing to issue.';
+        DeliveryReminderLbl: Label 'Delivery Reminder  #1#########\\', Comment = '#1 = Delivery Reminder No.';
+        CheckingLinesLbl: Label 'Checking lines        #2######\', Comment = '%2 = Line Count';
+        PostingLinesLbl: Label 'Posting Lines         #3######\', Comment = '%3 = Progress indicator';
 
     local procedure CheckDeliveryReminderHeader()
     var

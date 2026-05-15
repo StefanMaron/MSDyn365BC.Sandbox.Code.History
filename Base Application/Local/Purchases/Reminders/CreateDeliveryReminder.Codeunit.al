@@ -14,7 +14,6 @@ codeunit 5005271 "Create Delivery Reminder"
     end;
 
     var
-        Text1140000: Label 'There is not enough space to insert the text.';
         DeliveryReminderLine: Record "Delivery Reminder Line";
         DeliveryReminderLevel: Record "Delivery Reminder Level";
         DeliveryReminderText: Record "Delivery Reminder Text";
@@ -25,6 +24,7 @@ codeunit 5005271 "Create Delivery Reminder"
         RemindingDate: Date;
         LineLevel: Integer;
         MaxLineLevel: Integer;
+        NotEnoughSpaceErr: Label 'There is not enough space to insert the text.';
 
     procedure Remind(PurchLine: Record "Purchase Line"; DeliveryReminderTerms: Record "Delivery Reminder Term"; var DeliveryReminderLevel: Record "Delivery Reminder Level"; DateOfTheCurrentDay: Date) RetValue: Boolean
     var
@@ -251,7 +251,7 @@ codeunit 5005271 "Create Delivery Reminder"
             if DeliveryReminderLine.Find('-') then begin
                 LineOffset := DeliveryReminderLine."Line No." div (DeliveryReminderText.Count + 2);
                 if LineOffset = 0 then
-                    Error(Text1140000);
+                    Error(NotEnoughSpaceErr);
             end else
                 LineOffset := 10000;
             NextLineNo := 0;
