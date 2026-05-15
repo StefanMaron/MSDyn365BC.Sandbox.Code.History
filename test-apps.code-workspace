@@ -1,11 +1,11 @@
 {
   "settings": {
-    "allint.enabled": false,
+    "al.enableCodeActions": false,
     "search.exclude": {
       "**.xlf": true
     },
-    "al.enableCodeActions": false,
-    "al.enableCodeAnalysis": false
+    "al.enableCodeAnalysis": false,
+    "allint.enabled": false
   },
   "folders": [
     {
@@ -300,13 +300,16 @@
       "path": "./Withholding Tax Tests"
     },
     {
-      "path": "./System Application/Email/src/Test Email"
+      "path": "./System Application Test Library/Extension Management/testArtifacts"
     },
     {
-      "path": "./Shopify Connector Test/DisabledTests"
+      "path": "./E-Document Core Tests/DisabledTests"
     },
     {
-      "path": "./Quality Management/src/Configuration/Template/Test"
+      "path": "./System Application Test/DisabledTests"
+    },
+    {
+      "path": "./Business Foundation Tests/DisabledTests"
     },
     {
       "path": "./Sales Lines Suggestions Tests/AI Tests"
@@ -315,40 +318,19 @@
       "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
     },
     {
-      "path": "./Test Runner/src/DataDrivenTest"
-    },
-    {
-      "path": "./Subcontracting-Tests/DisabledTests"
-    },
-    {
-      "path": "./Subcontracting-Tests/src/Codeunits/Tests"
-    },
-    {
-      "path": "./Business Foundation Tests/DisabledTests"
-    },
-    {
-      "path": "./PowerBI Reports Tests/DisabledTests"
-    },
-    {
-      "path": "./Performance Toolkit Tests/src/Mock Tests"
+      "path": "./Quality Management-Tests/DisabledTests"
     },
     {
       "path": "./Base Application/System/DevTools/CALTest"
     },
     {
-      "path": "./System Application Test/DisabledTests"
-    },
-    {
-      "path": "./Quality Management-Tests/DisabledTests"
-    },
-    {
-      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
+      "path": "./Test Runner/src/DataDrivenTest"
     },
     {
       "path": "./AI Test Toolkit/src/TestSuite"
     },
     {
-      "path": "./System Application Test Library/Extension Management/testArtifacts"
+      "path": "./PowerBI Reports Tests/DisabledTests"
     },
     {
       "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
@@ -357,10 +339,28 @@
       "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
     },
     {
-      "path": "./Error Messages with Recommendations Tests/DisabledTests"
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
     },
     {
-      "path": "./E-Document Core Tests/DisabledTests"
+      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
+    },
+    {
+      "path": "./Quality Management/src/Configuration/Template/Test"
+    },
+    {
+      "path": "./Subcontracting-Tests/DisabledTests"
+    },
+    {
+      "path": "./Subcontracting-Tests/src/Codeunits/Tests"
+    },
+    {
+      "path": "./System Application/Email/src/Test Email"
+    },
+    {
+      "path": "./Shopify Connector Test/DisabledTests"
+    },
+    {
+      "path": "./Error Messages with Recommendations Tests/DisabledTests"
     }
   ]
 }
