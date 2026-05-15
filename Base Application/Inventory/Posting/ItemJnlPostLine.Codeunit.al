@@ -7639,8 +7639,8 @@ codeunit 22 "Item Jnl.-Post Line"
 
     internal procedure RestoreTempTrackingSpecification(var TempTrackingSpecificationFrom: Record "Tracking Specification" temporary)
     begin
-        TempSplitItemJnlLine.Reset();
-        TempSplitItemJnlLine.DeleteAll();
+        TempTrackingSpecification.Reset();
+        TempTrackingSpecification.DeleteAll();
         if TempTrackingSpecificationFrom.FindSet() then
             repeat
                 TempTrackingSpecification := TempTrackingSpecificationFrom;
