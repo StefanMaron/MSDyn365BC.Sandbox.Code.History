@@ -11,7 +11,7 @@ using System.Utilities;
 report 5005273 "Issued Delivery Reminder"
 {
     DefaultLayout = RDLC;
-    RDLCLayout = './Local/Purchases/Document/IssuedDeliveryReminder.rdlc';
+    RDLCLayout = './Local/Purchases/Reminders/IssuedDeliveryReminder.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Delivery Reminder';
     UsageCategory = ReportsAndAnalysis;

@@ -99,8 +99,8 @@ report 5005341 "Issue Delivery Reminder"
         "Delivery Reminder Header".MarkedOnly := true;
         if (NoOfRecords <> 1) and "Delivery Reminder Header".Find('-') then
             if Confirm(
-                 Text1140001 +
-                 Text1140002,
+                 NotEnoughSpaceErr +
+                 ViewDeliveryRemindersQst,
                  true)
             then
                 PAGE.RunModal(0, "Delivery Reminder Header");
@@ -109,13 +109,10 @@ report 5005341 "Issue Delivery Reminder"
     trigger OnPreReport()
     begin
         if ReplacePostingDate and (PostingDateReq = 0D) then
-            Error(Text1140000);
+            Error(EnterPostingDateErr);
     end;
 
     var
-        Text1140000: Label 'Please enter the posting date.';
-        Text1140001: Label 'It wa not possible to issue some of the selected Delivery Reminders.\\';
-        Text1140002: Label 'Would you like to see these Delivery Reminders?';
         IssuedDeliveryReminderHeader: Record "Issued Deliv. Reminder Header";
         IssueDeliveryReminder: Codeunit "Issue Delivery Reminder";
         PrintDocumentProfessional: Codeunit "Print Document Comfort";
@@ -123,6 +120,9 @@ report 5005341 "Issue Delivery Reminder"
         ReplacePostingDate: Boolean;
         PrintDoc: Boolean;
         NoOfRecords: Integer;
+        EnterPostingDateErr: Label 'Please enter the posting date.';
+        NotEnoughSpaceErr: Label 'It was not possible to issue some of the selected Delivery Reminders.\\';
+        ViewDeliveryRemindersQst: Label 'Would you like to see these Delivery Reminders?';
 
     [IntegrationEvent(false, false)]
     local procedure OnPostReportOnBeforePrintIssuedDeliveryReminder(var IssuedDelivReminderHeader: Record "Issued Deliv. Reminder Header"; var PrintDoc: Boolean)

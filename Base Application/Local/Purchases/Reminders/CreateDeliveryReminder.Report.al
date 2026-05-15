@@ -87,7 +87,7 @@ report 5005340 "Create Delivery Reminder"
 
         Window.Close();
 
-        Message(Text1140002, ReminderCounter);
+        Message(DelivRemindersCreatedMsg, ReminderCounter);
     end;
 
     trigger OnPreReport()
@@ -97,14 +97,11 @@ report 5005340 "Create Delivery Reminder"
         ReminderCounter := 0;
 
         Window.Open(
-          Text1140000 +
-          Text1140001);
+          ChangingPurchOrderMsg +
+          ChangingLineMsg);
     end;
 
     var
-        Text1140000: Label 'Changing Purch. Order   #1#########\';
-        Text1140001: Label 'Changing Line          #2######';
-        Text1140002: Label '%1 Delivery Reminders had been created.';
         DeliveryReminderHeader: Record "Delivery Reminder Header";
         DeliveryReminderTerms: Record "Delivery Reminder Term";
         DeliveryReminderLevel: Record "Delivery Reminder Level";
@@ -115,9 +112,12 @@ report 5005340 "Create Delivery Reminder"
         LastVendorNo: Code[20];
         VendorChanged: Boolean;
         DateOfTheCurrentDay: Date;
+        ChangingPurchOrderMsg: Label 'Changing Purch. Order   #1#########\', Comment = '#1 = Purchase Order Number';
+        ChangingLineMsg: Label 'Changing Line          #2######', Comment = '#2 = Line Number';
+        DelivRemindersCreatedMsg: Label '%1 Delivery Reminders had been created.', Comment = '%1 = Number of reminders created';
 
     [IntegrationEvent(true, false)]
-    local procedure OnAfterGetVendorChanged(PurchaseHeader:Record "Purchase Header"; PurchaseLine:Record "Purchase Line"; var VendorChanged:Boolean)
+    local procedure OnAfterGetVendorChanged(PurchaseHeader: Record "Purchase Header"; PurchaseLine: Record "Purchase Line"; var VendorChanged: Boolean)
     begin
     end;
 }

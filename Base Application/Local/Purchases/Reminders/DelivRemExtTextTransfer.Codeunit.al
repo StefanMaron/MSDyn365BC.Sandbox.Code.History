@@ -15,13 +15,13 @@ codeunit 5005272 "Deliv.-Rem. Ext. Text Transfer"
     end;
 
     var
-        Text1140000: Label 'There is not enough space to insert extended text lines.';
         GLAcc: Record "G/L Account";
-        TmpExtTextLine: Record "Extended Text Line" temporary;
+        TempExtTextLine: Record "Extended Text Line" temporary;
         NextLineNo: Integer;
         LineSpacing: Integer;
         MakeUpdateRequired: Boolean;
         AutoText: Boolean;
+        NotEnoughSpaceForExtTextErr: Label 'There is not enough space to insert extended text lines.';
 
     procedure ReminderCheckIfAnyExtText(var DeliveryReminderLine: Record "Delivery Reminder Line"; Unconditionally: Boolean): Boolean
     var
@@ -61,7 +61,7 @@ codeunit 5005272 "Deliv.-Rem. Ext. Text Transfer"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeDelivReminInsertExtendedText(DeliveryReminderLine, TmpExtTextLine, IsHandled, MakeUpdateRequired);
+        OnBeforeDelivReminInsertExtendedText(DeliveryReminderLine, TempExtTextLine, IsHandled, MakeUpdateRequired);
         if IsHandled then
             exit;
 
@@ -71,30 +71,30 @@ codeunit 5005272 "Deliv.-Rem. Ext. Text Transfer"
         if ForDeliveryReminderLine.Find('>') then begin
             LineSpacing :=
               (ForDeliveryReminderLine."Line No." - DeliveryReminderLine."Line No.") div
-              (1 + TmpExtTextLine.Count);
+              (1 + TempExtTextLine.Count);
             if LineSpacing = 0 then
-                Error(Text1140000);
+                Error(NotEnoughSpaceForExtTextErr);
         end else
             LineSpacing := 10000;
 
         NextLineNo := DeliveryReminderLine."Line No." + LineSpacing;
 
-        TmpExtTextLine.Reset();
-        if TmpExtTextLine.Find('-') then begin
+        TempExtTextLine.Reset();
+        if TempExtTextLine.Find('-') then begin
             repeat
                 ForDeliveryReminderLine.Init();
                 ForDeliveryReminderLine."Document No." := DeliveryReminderLine."Document No.";
                 ForDeliveryReminderLine."Line No." := NextLineNo;
                 NextLineNo := NextLineNo + LineSpacing;
-                ForDeliveryReminderLine.Description := TmpExtTextLine.Text;
+                ForDeliveryReminderLine.Description := TempExtTextLine.Text;
                 ForDeliveryReminderLine."Attached to Line No." := DeliveryReminderLine."Line No.";
 
-                OnDelivReminInsertExtendedTextOnBeforeInsertForDeliveryReminderLine(ForDeliveryReminderLine, DeliveryReminderLine, TmpExtTextLine, NextLineNo, LineSpacing);
+                OnDelivReminInsertExtendedTextOnBeforeInsertForDeliveryReminderLine(ForDeliveryReminderLine, DeliveryReminderLine, TempExtTextLine, NextLineNo, LineSpacing);
                 ForDeliveryReminderLine.Insert();
-            until TmpExtTextLine.Next() = 0;
+            until TempExtTextLine.Next() = 0;
             MakeUpdateRequired := true;
         end;
-        TmpExtTextLine.DeleteAll();
+        TempExtTextLine.DeleteAll();
     end;
 
     procedure DeleteDellivReminLine(var DeliveryReminderLine: Record "Delivery Reminder Line"): Boolean
@@ -126,7 +126,7 @@ codeunit 5005272 "Deliv.-Rem. Ext. Text Transfer"
     begin
         IsHandled := false;
         Result := false;
-        OnBeforeReadLines(ExtTextHeader, DocDate, LanguageCode, IsHandled, Result, TmpExtTextLine);
+        OnBeforeReadLines(ExtTextHeader, DocDate, LanguageCode, IsHandled, Result, TempExtTextLine);
         if IsHandled then
             exit(Result);
 
@@ -153,14 +153,14 @@ codeunit 5005272 "Deliv.-Rem. Ext. Text Transfer"
         ExtTextLine.SetRange("Language Code", ExtTextHeader."Language Code");
         ExtTextLine.SetRange("Text No.", ExtTextHeader."Text No.");
         if ExtTextLine.Find('-') then begin
-            TmpExtTextLine.DeleteAll();
+            TempExtTextLine.DeleteAll();
             repeat
-                TmpExtTextLine := ExtTextLine;
-                TmpExtTextLine.Insert();
+                TempExtTextLine := ExtTextLine;
+                TempExtTextLine.Insert();
             until ExtTextLine.Next() = 0;
             exit(true);
         end;
-        OnAfterReadLines(TmpExtTextLine, ExtTextHeader, LanguageCode);
+        OnAfterReadLines(TempExtTextLine, ExtTextHeader, LanguageCode);
     end;
 
     [IntegrationEvent(false, false)]
