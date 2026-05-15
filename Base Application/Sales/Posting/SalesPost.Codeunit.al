@@ -11966,7 +11966,7 @@ codeunit 80 "Sales-Post"
 
         ReservEntry.CalcSums("Qty. to Handle (Base)");
         SurplusQtyToHandle := Abs(ReservEntry."Qty. to Handle (Base)");
-        if (QtyReservedForCurrLine + SurplusQtyToHandle) < SalesLine."Qty. to Ship (Base)" then
+        if (QtyReservedForCurrLine + SurplusQtyToHandle) <= SalesLine."Qty. to Ship (Base)" then
             exit;
 
         IsHandled := false;
