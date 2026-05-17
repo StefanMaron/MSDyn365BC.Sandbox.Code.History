@@ -9533,8 +9533,8 @@ table 36 "Sales Header"
         if not PaymentTerm.Get("Payment Terms Code") then
             exit;
 
-        DueDateCalc := CalcDate(PaymentTerms."Due Date Calculation", "Document Date");
-        AdjustDueDate.SalesAdjustDueDate(DueDateCalc, "Document Date", PaymentTerms.CalculateMaxDueDate("Document Date"), "Bill-to Customer No.");
+        DueDateCalc := CalcDate(PaymentTerm."Due Date Calculation", "Document Date");
+        AdjustDueDate.SalesAdjustDueDate(DueDateCalc, "Document Date", PaymentTerm.CalculateMaxDueDate("Document Date"), "Bill-to Customer No.");
 
         if DueDateCalc = "Due Date" then
             "Due Date Modified" := false;
