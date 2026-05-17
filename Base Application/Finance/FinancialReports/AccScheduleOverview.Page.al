@@ -1045,6 +1045,7 @@ page 490 "Acc. Schedule Overview"
                 trigger OnAction()
                 begin
                     AccSchedManagement.ForceRecalculate(true);
+                    ReloadPage();
                 end;
             }
             action(RestoreFinRepFilters)
