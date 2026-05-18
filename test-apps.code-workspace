@@ -154,7 +154,6 @@
     "search.exclude": {
       "**.xlf": true
     },
-    "al.enableCodeActions": false,
-    "allint.enabled": false
+    "al.enableCodeActions": false
   }
 }
