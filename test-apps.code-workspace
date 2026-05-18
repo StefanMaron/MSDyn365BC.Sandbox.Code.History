@@ -1,6 +1,5 @@
 {
   "settings": {
-    "al.enableCodeActions": false,
     "allint.enabled": false,
     "al.enableCodeActions": false,
     "search.exclude": {
