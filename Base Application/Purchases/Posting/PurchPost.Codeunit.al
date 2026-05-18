@@ -1138,7 +1138,7 @@ codeunit 90 "Purch.-Post"
             PurchLine.Type::"Charge (Item)":
                 PostItemChargeLine(PurchHeader, PurchLine);
             else
-                OnPostPurchLineOnTypeCaseElse(PurchHeader, PurchLine, PurchInvHeader, PurchCrMemoHeader, SrcCode, GenJnlPostLine);
+                OnPostPurchLineOnTypeCaseElse(PurchHeader, PurchLine, PurchInvHeader, PurchCrMemoHeader, SrcCode, GenJnlPostLine, TempDropShptPostBuffer);
         end;
 
         OnPostPurchLineOnAfterPostByType(PurchHeader, PurchLine, GenJnlPostLine, GenJnlLineDocNo, GenJnlLineExtDocNo, GenJnlLineDocType, SrcCode);
@@ -5693,6 +5693,8 @@ codeunit 90 "Purch.-Post"
           PurchOrderLine."Document Type"::Order,
           PurchRcptLine."Order No.", PurchRcptLine."Order Line No.");
         PurchOrderLine."Prepmt Amt to Deduct" := PurchLine."Prepmt Amt to Deduct";
+
+        OnAfterGetPurchOrderLine(PurchOrderLine, PurchLine, PurchRcptLine);
     end;
 
     /// <summary>
@@ -8458,6 +8460,8 @@ codeunit 90 "Purch.-Post"
                     JobReservEntry.Insert();
                 until ReservationEntry.Next() = 0;
         end;
+
+        OnAfterCollectPurchaseLineReservEntries(JobReservEntry, ItemJournalLine);
     end;
 
     /// <summary>
@@ -10587,6 +10591,16 @@ codeunit 90 "Purch.-Post"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCollectPurchaseLineReservEntries(var JobReservationEntry: Record "Reservation Entry"; ItemJournalLine: Record "Item Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetPurchOrderLine(var PurchaseLineOrder: Record "Purchase Line"; PurchaseLine: Record "Purchase Line"; PurchRcptLine: Record "Purch. Rcpt. Line")
+    begin
+    end;
+
     [IntegrationEvent(true, false)]
     local procedure OnPostPurchLineOnBeforePostByType(PurchHeader: Record "Purchase Header"; PurchInvHeader: Record "Purch. Inv. Header"; PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; PurchLine: Record "Purchase Line"; PurchLineACY: Record "Purchase Line"; Sourcecode: Code[10])
     begin
@@ -10618,7 +10632,7 @@ codeunit 90 "Purch.-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPostPurchLineOnTypeCaseElse(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; PurchInvHeader: Record "Purch. Inv. Header"; PurchCrMemoHeader: Record "Purch. Cr. Memo Hdr."; SourceCode: Code[10]; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line");
+    local procedure OnPostPurchLineOnTypeCaseElse(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; PurchInvHeader: Record "Purch. Inv. Header"; PurchCrMemoHeader: Record "Purch. Cr. Memo Hdr."; SourceCode: Code[10]; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line"; TempDropShptPostBuffer: Record "Drop Shpt. Post. Buffer" temporary);
     begin
     end;
 
