@@ -3428,6 +3428,7 @@ codeunit 7312 "Create Pick"
 
         OnBeforeTempWhseActivLineInsert(TempWarehouseActivityLine, ActionType, WhseSource2);
         TempWarehouseActivityLine.Insert();
+        OnCreateTempActivityLineOnAfterTempWarehouseActivityLineInsert(TempWarehouseActivityLine, ActionType, WhseSource2);
     end;
 
     procedure UpdateQuantitiesToPick(QtyAvailableBase: Decimal; FromQtyPerUOM: Decimal; var FromQtyToPick: Decimal; var FromQtyToPickBase: Decimal; ToQtyPerUOM: Decimal; var ToQtyToPick: Decimal; var ToQtyToPickBase: Decimal; var TotalQtyToPick: Decimal; var TotalQtyToPickBase: Decimal)
@@ -4366,6 +4367,11 @@ codeunit 7312 "Create Pick"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTempWhseActivLineInsert(var TempWarehouseActivityLine: Record "Warehouse Activity Line" temporary; ActionType: Integer; WhseSource2: Option)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateTempActivityLineOnAfterTempWarehouseActivityLineInsert(var TempWarehouseActivityLine: Record "Warehouse Activity Line" temporary; ActionType: Integer; WhseSource2: Option)
     begin
     end;
 
