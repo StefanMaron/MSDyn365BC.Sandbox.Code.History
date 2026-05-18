@@ -459,6 +459,7 @@ codeunit 22 "Item Jnl.-Post Line"
             OnPostItemOnAfterCheckCostingMethodStandard(Item, ItemJnlLine);
             ItemJnlLine."Overhead Rate" := Item."Overhead Rate";
             ItemJnlLine."Indirect Cost %" := Item."Indirect Cost %";
+            OnPostItemOnAfterSetItemJnlCostingMethodStandard(Item, ItemJnlLine);
         end;
 
         if (ItemJnlLine."Value Entry Type" <> ItemJnlLine."Value Entry Type"::"Direct Cost") or
@@ -1926,6 +1927,8 @@ codeunit 22 "Item Jnl.-Post Line"
     begin
         ItemLedgEntryNo := GetNextItemLedgerEntryNo(ItemLedgEntryNo);
 
+        OnInitItemLedgEntryOnBeforeInit(ItemLedgEntry, ItemJnlLine);
+
         ItemLedgEntry.Init();
         ItemLedgEntry."Entry No." := ItemLedgEntryNo;
         ItemLedgEntry."Item No." := ItemJnlLine."Item No.";
@@ -2444,6 +2447,8 @@ codeunit 22 "Item Jnl.-Post Line"
     var
         OutbndItemLedgEntry: Record "Item Ledger Entry";
     begin
+        OnBeforeGetOutputComplInvcdDate(ItemApplnEntry);
+
         if ItemApplnEntry.Quantity > 0 then
             exit(ItemApplnEntry."Posting Date");
         if OutbndItemLedgEntry.Get(ItemApplnEntry."Outbound Item Entry No.") then
@@ -3568,6 +3573,8 @@ codeunit 22 "Item Jnl.-Post Line"
     var
         CostCalcMgt: Codeunit "Cost Calculation Management";
     begin
+        OnBeforeCalcPosShares(ItemJnlLine, Expected, CalcPurchVar);
+
         if Expected then begin
             if ShouldUseCumulativeRoundingForExpectedCost() then
                 DirCost := ItemJnlLine.Amount + Round(CostCalcMgt.CalcOvhdCost(ItemJnlLine.Amount, ItemJnlLine."Indirect Cost %", ItemJnlLine."Overhead Rate", ItemJnlLine.Quantity), GLSetup."Amount Rounding Precision") + RoundingResidualAmount
@@ -3819,6 +3826,7 @@ codeunit 22 "Item Jnl.-Post Line"
         DisableItemTracking := false;
         OnSetupSplitJnlLineOnSetDisableItemTracking(ItemJnlLine2, DisableItemTracking);
         Invoice := ItemJnlLine2."Invoiced Qty. (Base)" <> 0;
+        OnSetupSplitJnlLineOnAfterCalcInvoice(ItemJnlLine2, Invoice);
 
         if (ItemJnlLine2."Entry Type" = ItemJnlLine2."Entry Type"::Transfer) and PostponeReservationHandling then
             SignFactor := 1
@@ -4191,6 +4199,8 @@ codeunit 22 "Item Jnl.-Post Line"
                 then
                     if TempTrackingSpecification."New Expiration Date" = 0D then
                         TempTrackingSpecification."New Expiration Date" := ExistingExpirationDate;
+
+                OnCheckExpirationDateOnBeforeTestNewLotNo(ItemJnlLine2, TempTrackingSpecification, ExistingExpirationDate, SumOfEntries);
 
                 if (TempTrackingSpecification."New Lot No." <> '') and
                    ((ItemJnlLine2."Order Type" <> ItemJnlLine2."Order Type"::Transfer) or
@@ -5956,6 +5966,11 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetOutputComplInvcdDate(var ItemApplicationEntry: Record "Item Application Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertTransferEntry(var NewItemLedgerEntry: Record "Item Ledger Entry"; var OldItemLedgerEntry: Record "Item Ledger Entry"; var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
@@ -6021,6 +6036,11 @@ codeunit 22 "Item Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitItemLedgEntry(var NewItemLedgEntry: Record "Item Ledger Entry"; var ItemJournalLine: Record "Item Journal Line"; var ItemLedgEntryNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInitItemLedgEntryOnBeforeInit(var ItemLedgerEntry: Record "Item Ledger Entry"; var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 
@@ -6290,6 +6310,11 @@ codeunit 22 "Item Jnl.-Post Line"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnSetupSplitJnlLineOnAfterCalcInvoice(var ItemJournalLine: Record "Item Journal Line"; var Invoice: Boolean)
+    begin
+    end;
+
     [InternalEvent(false)]
     local procedure OnSetupSplitJnlLineOnCheckOperationNo(var ItemJournalLine: Record "Item Journal Line")
     begin
@@ -6312,6 +6337,11 @@ codeunit 22 "Item Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCalcPosShares(var ItemJournalLine: Record "Item Journal Line"; var DirCost: Decimal; var OvhdCost: Decimal; var PurchVar: Decimal; var DirCostACY: Decimal; var OvhdCostACY: Decimal; var PurchVarACY: Decimal; var CalcUnitCost: Boolean; CalcPurchVar: Boolean; Expected: Boolean; GlobalItemLedgerEntry: Record "Item Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalcPosShares(var ItemJournalLine: Record "Item Journal Line"; Expected: Boolean; CalcPurchVar: Boolean)
     begin
     end;
 
@@ -7918,6 +7948,11 @@ codeunit 22 "Item Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnCheckExpirationDateOnBeforeTestNewLotNo(var ItemJournalLine: Record "Item Journal Line"; var TempTrackingSpecification: Record "Tracking Specification" temporary; ExistingExpirationDate: Date; SumOfEntries: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnCheckExpirationDateOnBeforeAssignExpirationDate(var TempTrackingSpecification: Record "Tracking Specification" temporary; ExistingExpirationDate: Date; var IsHandled: Boolean)
     begin
     end;
@@ -8236,6 +8271,11 @@ codeunit 22 "Item Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnPostItemOnAfterCheckCostingMethodStandard(var Item: Record Item; var ItemJnlLine: Record "Item Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPostItemOnAfterSetItemJnlCostingMethodStandard(var Item: Record Item; var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 
