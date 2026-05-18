@@ -15,7 +15,6 @@ codeunit 2024 "Image Analysis Wrapper V1.0" implements "Image Analysis Provider"
         ComputerVisionApiTxt: Label 'Computer Vision API';
         CustomVisionServiceTxt: Label 'Custom Vision Service';
         UrlPatternTxt: Label '?visualFeatures=%1', Locked = true;
-        UseOAuth2: Boolean;
         LastError: Text;
         HttpMessageHandler: DotNet HttpMessageHandler;
 
@@ -25,15 +24,6 @@ codeunit 2024 "Image Analysis Wrapper V1.0" implements "Image Analysis Provider"
             Error(OnlyOneAnalysisSupportedErr);
 
         exit(TryInvokeAnalysisInternal(JSONManagement, BaseUrl, ImageAnalysisKey, ImagePath, ImageAnalysisTypes.Get(1)));
-    end;
-
-    /// <summary>
-    /// Sets whether OAuth2 authentication should be used for Auth.
-    /// </summary>
-    /// <param name="NewUseOAuth2">True to use OAuth2 bearer token authentication; false to use subscription key.</param>
-    procedure SetUseOAuth2(NewUseOAuth2: Boolean)
-    begin
-        UseOAuth2 := NewUseOAuth2;
     end;
 
     [TryFunction]
@@ -64,16 +54,12 @@ codeunit 2024 "Image Analysis Wrapper V1.0" implements "Image Analysis Provider"
         HttpClient.BaseAddress := ApiUri.Uri(BaseUrl);
 
         HttpRequestHeaders := HttpClient.DefaultRequestHeaders;
-        if UseOAuth2 then
-            AddRequestHeader(HttpRequestHeaders, 'Authorization', SecretStrSubstNo('Bearer %1', ImageAnalysisKey))
-        else
-            if HasCustomVisionUri(BaseUrl) then
-                AddRequestHeader(HttpRequestHeaders, 'Prediction-Key', ImageAnalysisKey)
-            else
-                AddRequestHeader(HttpRequestHeaders, 'Ocp-Apim-Subscription-Key', ImageAnalysisKey);
-
-        if not HasCustomVisionUri(BaseUrl) then
+        if HasCustomVisionUri(BaseUrl) then
+            AddRequestHeader(HttpRequestHeaders, 'Prediction-Key', ImageAnalysisKey)
+        else begin
+            AddRequestHeader(HttpRequestHeaders, 'Ocp-Apim-Subscription-Key', ImageAnalysisKey);
             PostParameters := StrSubstNo(UrlPatternTxt, Format(ImageAnalysisType));
+        end;
         HttpHeaderValueCollection := HttpRequestHeaders.Accept();
         MediaTypeWithQualityHeaderValue :=
           MediaTypeWithQualityHeaderValue.MediaTypeWithQualityHeaderValue('application/json');
