@@ -145,7 +145,7 @@
       "path": "./AI Test Toolkit/src/TestSuite"
     },
     {
-      "path": "./Base Application/System/DevTools/CALTest"
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
     },
     {
       "path": "./System Application/Email/src/Test Email"
@@ -157,7 +157,6 @@
     "search.exclude": {
       "**.xlf": true
     },
-    "al.enableCodeActions": false,
-    "allint.enabled": false
+    "al.enableCodeActions": false
   }
 }
