@@ -53,7 +53,7 @@ codeunit 137077 "SCM Supply Planning -IV"
         AmountType: Option "Net Change","Balance at Date";
         AppliesToEntryMissingErr: Label 'Applies-to Entry must have a value';
         ItemNoErr: Label 'Item No. must be equal';
-        DimSetIDErr: Label 'Dimension set id on Requisition Line does not match the updated dimension set id on production order line.';
+        AmountErr: Label '%1 must be equal to %2', Comment = '%1 = Cost Amount, %2 = Expected Amount';
 
     [Test]
     [Scope('OnPrem')]
@@ -4321,37 +4321,44 @@ codeunit 137077 "SCM Supply Planning -IV"
     end;
 
     [Test]
-    procedure VerifyDimensionCalcSubcontractOrderForReleasedProdOrder()
+    procedure AssemblyOrderCostAmountCalculatedFromPlanningWorksheet()
     var
+        AssemblyHeader: Record "Assembly Header";
+        CompItem: Record Item;
         Item: Record Item;
-        ProductionOrder: Record "Production Order";
         RequisitionLine: Record "Requisition Line";
-        RoutingHeader: Record "Routing Header";
-        WorkCenter: Record "Work Center";
-        NewDimSetID: Integer;
+        PlanningCreateAsmOrder: Enum "Planning Create Assembly Order";
+        ExpectedCostAmount: Decimal;
+        StandardCost: Decimal;
+        Quantity: Decimal;
     begin
-        // [SCENARIO 620065] Missing Dimension in Subcontracting Worksheet.
+        // [SCENARIO 616613] Cost Amount is calculated when creating Assembly Order from Planning Worksheet.
         Initialize();
 
-        // [GIVEN] Create Item with Routing with Subcontractor and Workcenter.
-        CreateItem(Item);
-        CreateRoutingSetup(WorkCenter, RoutingHeader);
-        UpdateItemRoutingNo(Item, RoutingHeader."No.");
+        // [GIVEN] Create an Assembly Item with Standard Cost and a Component in Assembly BOM.
+        StandardCost := LibraryRandom.RandDecInRange(100, 500, 2);
+        Quantity := LibraryRandom.RandIntInRange(5, 20);
+        CreateAssemblyItemWithStandardCost(Item, CompItem, StandardCost);
 
-        // [GIVEN] Create and refresh Released Production Order without Location and Bin.
-        CreateAndRefreshReleasedProductionOrderWithLocationAndBin(ProductionOrder, Item."No.", '', '');
+        // [GIVEN] Create a  Sales Order for the Assembly Item.
+        CreateSalesOrder(Item."No.", '', Quantity);
 
-        // [GIVEN] Update Dimension on Production Order Line.
-        NewDimSetID := UpdateProductionOrderDimension(ProductionOrder."No.");
+        // [GIVEN] Calculate Regenerative Plan in Planning Worksheet and Accept Action Message.
+        CalculateRegenPlanForPlanningWorksheet(Item);
+        AcceptActionMessage(RequisitionLine, Item."No.");
 
-        // [WHEN] Calculate Subcontracting Worksheet for Work Center.
-        CalculateSubcontractOrder(WorkCenter);
+        // [WHEN] Carry Out Action Message to create Assembly Order.
+        LibraryPlanning.CarryOutPlanWksh(RequisitionLine, 0, 0, 0, PlanningCreateAsmOrder::"Make Assembly Orders".AsInteger(), '', '', '', '');
 
-        // [THEN] Verify Dimension Set ID on Requisition Line matches updated Dimension Set ID on Production Order Line.
-        RequisitionLine.SetRange(Type, RequisitionLine.Type::Item);
-        RequisitionLine.SetRange("Prod. Order No.", ProductionOrder."No.");
-        RequisitionLine.FindFirst();
-        Assert.AreEqual(NewDimSetID, RequisitionLine."Dimension Set ID", DimSetIDErr);
+        // [THEN] Verify Assembly Order is created with correct Cost Amount.
+        AssemblyHeader.SetRange("Item No.", Item."No.");
+        AssemblyHeader.FindFirst();
+        ExpectedCostAmount := Round(Quantity * StandardCost);
+
+        Assert.AreEqual(StandardCost, AssemblyHeader."Unit Cost",
+            StrSubstNo(AmountErr, AssemblyHeader.FieldCaption("Unit Cost"), StandardCost));
+        Assert.AreEqual(ExpectedCostAmount, AssemblyHeader."Cost Amount",
+            StrSubstNo(AmountErr, AssemblyHeader.FieldCaption("Cost Amount"), ExpectedCostAmount));
     end;
 
     local procedure Initialize()
@@ -5829,29 +5836,30 @@ codeunit 137077 "SCM Supply Planning -IV"
         Assert.AreEqual(WarehouseEntry."Item No.", ItemNo, ItemNoErr);
     end;
 
-    local procedure UpdateProductionOrderDimension(ProductionOrderNo: Code[20]) DimensionSetID: Integer
+    local procedure CreateAssemblyItemWithStandardCost(var Item: Record Item; var CompItem: Record Item; StandardCost: Decimal)
     var
-        ProductionOrder: Record "Production Order";
-        ProductionOrderLine: Record "Prod. Order Line";
+        BOMComponent: Record "BOM Component";
+        QuantityPer: Decimal;
     begin
-        ProductionOrder.Get(ProductionOrder.Status::Released, ProductionOrderNo);
-        ProductionOrderLine.SetRange("Prod. Order No.", ProductionOrder."No.");
-        ProductionOrderLine.FindFirst();
-        DimensionSetID := SelectNewDimSetID(ProductionOrderLine."Dimension Set ID");
+        // [GIVEN] Create Assembly Item with Standard Costing Method and Assemble-to-Stock policy.
+        CreateAndUpdateItem(
+            Item, Item."Replenishment System"::Assembly, Item."Reordering Policy"::Order,
+            Item."Manufacturing Policy", '');
+        Item.Validate("Costing Method", Item."Costing Method"::Standard);
+        Item.Validate("Assembly Policy", Item."Assembly Policy"::"Assemble-to-Stock");
+        Item.Validate("Standard Cost", StandardCost);
+        Item.Modify(true);
 
-        ProductionOrderLine.Validate("Dimension Set ID", DimensionSetID);
-        ProductionOrderLine.Modify(true);
-    end;
+        // [GIVEN] Create Component Item.
+        CreateAndUpdateItem(
+            CompItem, CompItem."Replenishment System"::Purchase, CompItem."Reordering Policy"::Order,
+            CompItem."Manufacturing Policy", LibraryPurchase.CreateVendorNo());
 
-    local procedure SelectNewDimSetID(OldDimSetID: Integer): Integer
-    var
-        Dimension: Record Dimension;
-        DimensionValue: Record "Dimension Value";
-    begin
-        LibraryDimension.FindDimension(Dimension);
-        Dimension.Next();
-        LibraryDimension.FindDimensionValue(DimensionValue, Dimension.Code);
-        exit(LibraryDimension.CreateDimSet(OldDimSetID, Dimension.Code, DimensionValue.Code));
+        // [GIVEN] Create Assembly BOM with component.
+        QuantityPer := LibraryRandom.RandInt(5);
+        LibraryAssembly.CreateAssemblyListComponent(
+            BOMComponent.Type::Item, CompItem."No.", Item."No.", '',
+            BOMComponent."Resource Usage Type", QuantityPer, true);
     end;
 
     [RequestPageHandler]
