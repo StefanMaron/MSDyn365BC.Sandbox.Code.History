@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '0 0 * * *'
   workflow_dispatch:
+    inputs:
+      lookbackDays:
+        description: 'Days to look back for artifacts (default 1, increase for backfill)'
+        required: false
+        default: '1'
 
 jobs:
   prepare:
@@ -50,8 +55,8 @@ jobs:
         uses: actions/checkout@v4.1.2
         
       - name: Build Commits
-        shell: pwsh       
+        shell: pwsh
         run: |
-          ./scripts/Auto_load_versions.ps1 -country ${{matrix.countries}}
+          ./scripts/Auto_load_versions.ps1 -country ${{matrix.countries}} -lookbackDays ${{ github.event.inputs.lookbackDays || '1' }}
       
     
