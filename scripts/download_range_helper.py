@@ -147,9 +147,9 @@ def main():
 
         download_size = range_end - first_offset
 
-        # Safety check: if range exceeds 50% of total, fall back
-        if download_size > total_size * 0.5:
-            print(f"ERROR: Range ({download_size // 1048576} MB) exceeds 50% of total ({total_size // 1048576} MB)")
+        # Safety check: if range exceeds 70% of total, fall back to full download
+        if download_size > total_size * 0.7:
+            print(f"ERROR: Range ({download_size // 1048576} MB) exceeds 70% of total ({total_size // 1048576} MB)")
             sys.exit(1)
 
         savings = round((1 - download_size / total_size) * 100)
