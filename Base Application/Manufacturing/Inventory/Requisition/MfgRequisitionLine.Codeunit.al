@@ -293,7 +293,7 @@ codeunit 99000866 "Mfg. Requisition Line"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Requisition Line", 'OnValidateVendorNoOnAfterCheckVendor', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Requisition Line", 'OnValidateVendorNoOnAfterCheckVendor', '', true, false)]
     local procedure OnValidateVendorNoOnAfterCheckVendor(var RequisitionLine: Record "Requisition Line"; Vend: Record Vendor; CurrentFieldNo: Integer)
     var
         SubcontractingManagement: Codeunit SubcontractingManagement;
@@ -307,7 +307,7 @@ codeunit 99000866 "Mfg. Requisition Line"
         end;
     end;
 
-    [EventSubscriber(ObjectType::Table, Database::"Requisition Line", 'OnValidateVendorNoOnAfterSetSupplyFrom', '', true, true)]
+    [EventSubscriber(ObjectType::Table, Database::"Requisition Line", 'OnValidateVendorNoOnAfterSetSupplyFrom', '', true, false)]
     local procedure OnValidateVendorNoOnAfterSetSupplyFrom(var RequisitionLine: Record "Requisition Line")
     begin
         if (RequisitionLine.Type = RequisitionLine.Type::Item) and (RequisitionLine."No." <> '') and RequisitionLine.IsProdOrder() then

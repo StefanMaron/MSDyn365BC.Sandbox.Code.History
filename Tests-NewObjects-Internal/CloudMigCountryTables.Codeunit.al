@@ -46,8 +46,8 @@ codeunit 135161 "Cloud Mig Country Tables"
         ListOfTablesToMigrate.Add(Database::"Lifo Category");
         ListOfTablesToMigrate.Add(Database::"Payment Lines");
         ListOfTablesToMigrate.Add(Database::"Periodic VAT Settlement Entry");
-#if not CLEAN27
-        ListOfTablesToMigrate.Add(Database::"Periodic Settlement VAT Entry");
+#if not CLEANSCHEMA30
+        ListOfTablesToMigrate.Add(12135); //Database::"Periodic Settlement VAT Entry"
 #endif
         ListOfTablesToMigrate.Add(Database::"Posted Payment Lines");
         ListOfTablesToMigrate.Add(Database::"Posted Vendor Bill Header");
@@ -57,8 +57,8 @@ codeunit 135161 "Cloud Mig Country Tables"
         ListOfTablesToMigrate.Add(Database::"Service Tariff Number");
         ListOfTablesToMigrate.Add(Database::"Spesometro Appointment");
         ListOfTablesToMigrate.Add(Database::"Split VAT Test");
-#if not CLEAN27
-        ListOfTablesToMigrate.Add(Database::"Subcontractor Prices");
+#if not CLEANSCHEMA30
+        ListOfTablesToMigrate.Add(12152); // Database::"Subcontractor Prices")
 #endif
         ListOfTablesToMigrate.Add(Database::"Tmp Withholding Contribution");
         ListOfTablesToMigrate.Add(Database::"Transport Reason Code");
