@@ -3928,10 +3928,12 @@ table 246 "Requisition Line"
     begin
     end;
 
+#pragma warning disable AS0077
     [IntegrationEvent(false, false)]
-    local procedure OnGetDimFromRefOrderLineElseCase(var RequisitionLine: Record "Requisition Line"; DimSetIDArr: array[10] of Integer; i: Integer)
+    local procedure OnGetDimFromRefOrderLineElseCase(var RequisitionLine: Record "Requisition Line"; var DimSetIDArr: array[10] of Integer; i: Integer)
     begin
     end;
+#pragma warning restore AS0077
 
     [IntegrationEvent(false, false)]
     local procedure OnLookupRefOrderNoElseCase(var RequisitionLine: Record "Requisition Line"; var IsHandled: Boolean)
