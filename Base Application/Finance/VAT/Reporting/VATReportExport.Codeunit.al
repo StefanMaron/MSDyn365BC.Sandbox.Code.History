@@ -7,6 +7,10 @@ namespace Microsoft.Finance.VAT.Reporting;
 using System.IO;
 using System.Utilities;
 
+/// <summary>
+/// Provides export functionality for VAT reports with automatic release capability.
+/// Handles export operations based on report status and ensures proper workflow progression.
+/// </summary>
 codeunit 743 "VAT Report Export"
 {
 
@@ -21,6 +25,11 @@ codeunit 743 "VAT Report Export"
         Text002: Label 'You cannot export already submitted report. Reopen report first.';
 #pragma warning restore AA0074
 
+    /// <summary>
+    /// Exports VAT report based on current status with automatic release if needed.
+    /// Routes to appropriate export method based on report status.
+    /// </summary>
+    /// <param name="VATReportHeader">VAT report to export</param>
     procedure Export(VATReportHeader: Record "VAT Report Header")
     begin
         case VATReportHeader.Status of
