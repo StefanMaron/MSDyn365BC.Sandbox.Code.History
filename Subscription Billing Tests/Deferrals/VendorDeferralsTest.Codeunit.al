@@ -247,6 +247,55 @@ codeunit 139913 "Vendor Deferrals Test"
 
     [Test]
     [HandlerFunctions('CreateVendorBillingDocsContractPageHandler,MessageHandler')]
+    procedure CheckContractDeferralsWhenStartDateIsOnFirstDayInMonthAndEndDateIsMidMonthLCY()
+    var
+        DeferralCount: Integer;
+        FullMonthAmount: Decimal;
+        TotalDeferralBaseAmount: Decimal;
+        i: Integer;
+        LastDayOfBillingPeriod: Date;
+    begin
+        // [SCENARIO] When billing starts on 1st of month and ends mid-month (partial last month),
+        // full months get equal deferral amounts and the partial last month gets a day-proportioned amount.
+        Initialize();
+
+        // [GIVEN] A vendor contract with deferrals starting on Jan 1
+        CreateVendorContractWithDeferrals('<-CY>', true);
+
+        // [WHEN] Billing from Jan 1 to Jul 23 (partial last month) and document is posted
+        CreateBillingProposalAndCreateBillingDocuments('<-CY>', '<-CY+6M+22D>');
+        PostPurchDocumentAndFetchDeferrals();
+
+        DeferralCount := VendorContractDeferral.Count;
+        TotalDeferralBaseAmount := VendorContractDeferral."Deferral Base Amount";
+        LastDayOfBillingPeriod := CalcDate('<-CY+6M+22D>', WorkDate());
+
+        // [THEN] 7 deferral periods are created (Jan through Jul)
+        Assert.AreEqual(7, DeferralCount, 'Expected 7 deferral periods for Jan to Jul billing.');
+
+        // Use the first full-month deferral amount as reference; verify all other full months match it
+        FullMonthAmount := VendorContractDeferral.Amount;
+
+        // [THEN] The first 6 full-month periods have equal amounts and full month Number of Days
+        for i := 1 to DeferralCount - 1 do begin
+            Assert.AreEqual(FullMonthAmount, VendorContractDeferral.Amount, 'Full month deferrals should have equal amounts.');
+            VendorContractDeferral.TestField("Number of Days", Date2DMY(CalcDate('<CM>', VendorContractDeferral."Posting Date"), 1));
+            VendorContractDeferral.Next();
+        end;
+
+        // [THEN] Last partial month has a different (day-proportioned) amount and correct Number of Days
+        Assert.AreNotEqual(FullMonthAmount, VendorContractDeferral.Amount, 'Partial last month should have a different amount than full months.');
+        VendorContractDeferral.TestField("Number of Days", Date2DMY(LastDayOfBillingPeriod, 1));
+
+        // [THEN] Sum of all deferral amounts equals the total deferral base amount
+        VendorContractDeferral.Reset();
+        VendorContractDeferral.SetRange("Document No.", PostedDocumentNo);
+        VendorContractDeferral.CalcSums(Amount);
+        Assert.AreEqual(TotalDeferralBaseAmount, VendorContractDeferral.Amount, 'Sum of deferral amounts must equal the deferral base amount.');
+    end;
+
+    [Test]
+    [HandlerFunctions('CreateVendorBillingDocsContractPageHandler,MessageHandler')]
     procedure DeferralsAreCorrectAfterPostingPartialPurchCreditMemo()
     begin
         Initialize();
@@ -588,15 +637,21 @@ codeunit 139913 "Vendor Deferrals Test"
     procedure TestIfDeferralsExistOnAfterPostPurchCreditMemoWithoutAppliesToDocNo()
     begin
         Initialize();
+        // [GIVEN] Contract has been created and the billing proposal with a posted contract invoice
         CreateVendorContractWithDeferrals('<2M-CM>', true);
         CreateBillingProposalAndCreateBillingDocuments('<2M-CM>', '<8M+CM>');
         PostPurchDocumentAndGetPurchInvoice();
+
+        // [WHEN] A credit memo is created from the posted invoice but without any link to the original invoice
         CorrectPostedPurchaseInvoice.CreateCreditMemoCopyDocument(PurchaseInvoiceHeader, PurchaseCrMemoHeader);
         PurchaseCrMemoHeader.Validate("Vendor Cr. Memo No.", LibraryUtility.GenerateGUID());
         PurchaseCrMemoHeader."Applies-to Doc. Type" := PurchaseCrMemoHeader."Applies-to Doc. Type"::" ";
         PurchaseCrMemoHeader."Applies-to Doc. No." := '';
         PurchaseCrMemoHeader.Modify(false);
+        ClearCorrectionDocumentNoFromBillingLines(PurchaseCrMemoHeader."No.");
         CorrectedDocumentNo := LibraryPurchase.PostPurchaseDocument(PurchaseCrMemoHeader, true, true);
+
+        // [THEN] Deferral entries are created for the standalone credit memo
         FetchVendorContractDeferrals(CorrectedDocumentNo);
     end;
 
@@ -709,6 +764,48 @@ codeunit 139913 "Vendor Deferrals Test"
             GLEntry.TestField("Subscription Contract No.", VendorContractDeferral."Subscription Contract No.");
             FetchAndTestUpdatedVendorContractDeferral();
         until VendorContractDeferral.Next() = 0;
+    end;
+
+    [Test]
+    [HandlerFunctions('CreateVendorBillingDocsContractPageHandler,ContractDeferralsReleaseRequestPageHandler,MessageHandler')]
+    procedure VerifyVendSubContrDefAccountBalancedForCreditMemoWithDiscount()
+    var
+        SubscriptionLine: Record "Subscription Line";
+        ContractDeferralsRelease: Report "Contract Deferrals Release";
+        ActualAmount: Decimal;
+    begin
+        // [SCENARIO 623041] Verify that released vendor contract deferral amounts have correct sign and GL accounts balance.
+        Initialize();
+        SetPostingAllowTo(0D);
+
+        // [GIVEN] Create Vendor Contract with deferral enabled
+        CreateVendorContractWithDeferrals('<2M-CM>', true, 1);
+
+        // [GIVEN] Set Discount flag to True on subscription lines
+        SubscriptionLine.SetRange("Subscription Header No.", ServiceObject."No.");
+        SubscriptionLine.FindSet();
+        repeat
+            SubscriptionLine.Validate(Discount, true);
+            SubscriptionLine.Modify(false);
+        until SubscriptionLine.Next() = 0;
+
+        // [GIVEN] Contract has been created and the billing proposal with non posted contract invoice
+        CreateBillingProposalAndCreateBillingDocuments('<2M-CM>', '<8M+CM>');
+
+        // [GIVEN] Post credit memo document
+        PostPurchDocumentAndFetchDeferrals();
+
+        // [WHEN] Run Subscription Contract Deferral Release for credit memo
+        repeat
+            PostingDate := VendorContractDeferral."Posting Date";
+            Commit(); // close transaction before report is called
+            ContractDeferralsRelease.Run();  // ContractDeferralsReleaseRequestPageHandler
+        until VendorContractDeferral.Next() = 0;
+
+        // [THEN] Verify "Vend. Sub. Contr. Def. Account" should be balanced after credit memo reversal, which means that released deferral amount was reversed properly
+        GeneralPostingSetup.Get(Vendor."Gen. Bus. Posting Group", Item."Gen. Prod. Posting Group");
+        GetGLEntryAmountFromAccountNo(ActualAmount, GeneralPostingSetup."Vend. Sub. Contr. Def. Account");
+        Assert.AreEqual(0, ActualAmount, ReleasedContractDeferralErr);
     end;
 
     [Test]
@@ -1032,6 +1129,16 @@ codeunit 139913 "Vendor Deferrals Test"
         VendorContractDeferral.Reset();
         VendorContractDeferral.SetRange("Document No.", DocumentNo);
         VendorContractDeferral.FindFirst();
+    end;
+
+    local procedure ClearCorrectionDocumentNoFromBillingLines(CreditMemoDocumentNo: Code[20])
+    var
+        CrMemoBillingLine: Record "Billing Line";
+    begin
+        CrMemoBillingLine.SetRange(Partner, CrMemoBillingLine.Partner::Vendor);
+        CrMemoBillingLine.SetRange("Document Type", CrMemoBillingLine."Document Type"::"Credit Memo");
+        CrMemoBillingLine.SetRange("Document No.", CreditMemoDocumentNo);
+        CrMemoBillingLine.ModifyAll("Correction Document No.", '', false);
     end;
 
     local procedure GetCalculatedMonthAmountsForDeferrals(SourceDeferralBaseAmount: Decimal; NumberOfPeriods: Integer; FirstDayOfBillingPeriod: Date; LastDayOfBillingPeriod: Date; CalculateInLCY: Boolean)
