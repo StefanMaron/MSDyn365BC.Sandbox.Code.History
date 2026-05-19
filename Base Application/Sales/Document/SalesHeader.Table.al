@@ -244,7 +244,7 @@ table 36 "Sales Header"
                     UpdateSalesLinesByFieldNo(FieldNo("Sell-to Customer No."), false);
 
                 if xRec."Sell-to Customer No." <> "Sell-to Customer No." then
-                    SalesCalcDiscountByType.ApplyDefaultInvoiceDiscount(0, Rec, true);
+                    SalesCalcDiscountByType.ApplyDefaultInvoiceDiscount(0, Rec, not IsNullGuid(Rec.SystemId));
             end;
         }
         /// <summary>
@@ -372,7 +372,7 @@ table 36 "Sales Header"
                 FatturaDocHelper.UpdateFatturaDocTypeInSalesDoc(Rec);
 
                 if xRec."Bill-to Customer No." <> "Bill-to Customer No." then
-                    SalesCalcDiscountByType.ApplyDefaultInvoiceDiscount(0, Rec, true);
+                    SalesCalcDiscountByType.ApplyDefaultInvoiceDiscount(0, Rec, not IsNullGuid(Rec.SystemId));
             end;
         }
         /// <summary>
@@ -994,7 +994,7 @@ table 36 "Sales Header"
                     StandardCodesMgt.CheckShowSalesRecurringLinesNotification(Rec);
 
                 if "Currency Code" <> xRec."Currency Code" then
-                    SalesCalcDiscountByType.ApplyDefaultInvoiceDiscount(0, Rec, true);
+                    SalesCalcDiscountByType.ApplyDefaultInvoiceDiscount(0, Rec, not IsNullGuid(Rec.SystemId));
 
                 if Status = Status::Open then
                     SetCompanyBankAccount();
@@ -2310,7 +2310,7 @@ table 36 "Sales Header"
                     "VAT Bus. Posting Group" := xRec."VAT Bus. Posting Group";
                 if xRec."VAT Bus. Posting Group" <> "VAT Bus. Posting Group" then begin
                     RecreateSalesLines(FieldCaption("VAT Bus. Posting Group"));
-                    SalesCalcDiscountByType.ApplyDefaultInvoiceDiscount(0, Rec, true);
+                    SalesCalcDiscountByType.ApplyDefaultInvoiceDiscount(0, Rec, not IsNullGuid(Rec.SystemId));
                 end;
                 ValidateOperationType();
             end;
