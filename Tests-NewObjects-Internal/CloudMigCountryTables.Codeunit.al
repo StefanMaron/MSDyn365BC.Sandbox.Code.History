@@ -1,4 +1,4 @@
-﻿codeunit 135161 "Cloud Mig Country Tables"
+codeunit 135161 "Cloud Mig Country Tables"
 {
     procedure GetTablesThatShouldBeCloudMigrated(var ListOfTablesToMigrate: List of [Integer])
     begin
@@ -27,9 +27,9 @@
         ListOfTablesToMigrate.Add(Database::"EFT Export Workset");
         ListOfTablesToMigrate.Add(Database::"EFT Export");
         ListOfTablesToMigrate.Add(Database::"GIFI Code");
-#if not CLEAN25
-        ListOfTablesToMigrate.Add(Database::"IRS 1099 Adjustment");
-        ListOfTablesToMigrate.Add(Database::"IRS 1099 Form-Box");
+#if not CLEANSCHEMA28
+        ListOfTablesToMigrate.Add(10016); //Database::"IRS 1099 Adjustment"
+        ListOfTablesToMigrate.Add(10010); //Database::"IRS 1099 Form-Box"
 #endif
         ListOfTablesToMigrate.Add(Database::"Item Location Variant Buffer");
         ListOfTablesToMigrate.Add(Database::"MX Electronic Invoicing Setup");
@@ -71,10 +71,6 @@
         ListOfTablesToMigrate.Add(Database::"EFT Export Workset");
         ListOfTablesToMigrate.Add(Database::"EFT Export");
         ListOfTablesToMigrate.Add(Database::"GIFI Code");
-#if not CLEAN25
-        ListOfTablesToMigrate.Add(Database::"IRS 1099 Adjustment");
-        ListOfTablesToMigrate.Add(Database::"IRS 1099 Form-Box");
-#endif
         ListOfTablesToMigrate.Add(Database::"Item Location Variant Buffer");
         ListOfTablesToMigrate.Add(Database::"MX Electronic Invoicing Setup");
         ListOfTablesToMigrate.Add(Database::"PAC Web Service Detail");
