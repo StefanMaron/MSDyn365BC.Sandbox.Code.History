@@ -1,15 +1,18 @@
 {
   "settings": {
-    "al.enableCodeActions": false,
+    "allint.enabled": false,
     "al.enableCodeAnalysis": false,
+    "al.enableCodeActions": false,
     "search.exclude": {
       "**.xlf": true
-    },
-    "allint.enabled": false
+    }
   },
   "folders": [
     {
       "path": "./AI Test Toolkit"
+    },
+    {
+      "path": "./Application Test Library"
     },
     {
       "path": "./Business Foundation Test Libraries"
@@ -142,6 +145,9 @@
     },
     {
       "path": "./Tests-Workflow"
+    },
+    {
+      "path": "./System Application Test Library/Extension Management/testArtifacts"
     },
     {
       "path": "./Base Application/System/DevTools/CALTest"
