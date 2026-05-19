@@ -1,4 +1,4 @@
-﻿namespace Microsoft.Sales.Document;
+namespace Microsoft.Sales.Document;
 
 using Microsoft.Finance.AllocationAccount;
 using Microsoft.Finance.AllocationAccount.Sales;
@@ -11,13 +11,16 @@ using Microsoft.Inventory.BOM;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Item.Catalog;
 using Microsoft.Inventory.Location;
+using Microsoft.Pricing.Calculation;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Sales.History;
+using Microsoft.Sales.Pricing;
 using Microsoft.Sales.Setup;
 using Microsoft.Utilities;
 using System.Environment.Configuration;
 using System.Integration.Excel;
 
-page 96 "Sales Cr. Memo Subform"
+page 47 "Sales Invoice Subform"
 {
     AutoSplitKey = true;
     Caption = 'Lines';
@@ -26,7 +29,7 @@ page 96 "Sales Cr. Memo Subform"
     MultipleNewLines = true;
     PageType = ListPart;
     SourceTable = "Sales Line";
-    SourceTableView = where("Document Type" = filter("Credit Memo"));
+    SourceTableView = where("Document Type" = filter(Invoice));
 
     layout
     {
@@ -74,7 +77,7 @@ page 96 "Sales Cr. Memo Subform"
                 {
                     ApplicationArea = Basic, Suite;
                     ShowMandatory = not IsCommentLine;
-                    ToolTip = 'Specifies the number of a general ledger account, item, resource, additional cost, or fixed asset, depending on the contents of the Type field.';
+                    ToolTip = 'Specifies what you''re selling. The options vary, depending on what you choose in the Type field.';
 
                     trigger OnValidate()
                     var
@@ -96,15 +99,14 @@ page 96 "Sales Cr. Memo Subform"
                     AccessByPermission = tabledata "Item Reference" = R;
                     ApplicationArea = Suite, ItemReferences;
                     QuickEntry = false;
-                    ToolTip = 'Specifies the referenced item number.';
+                    ToolTip = 'Specifies the referenced item number. If you enter a cross reference between yours and your vendor''s or customer''s item number, then this number will override the standard item number when you enter the reference number on a sales or purchase document.';
                     Visible = ItemReferenceVisible;
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
                         ItemReferenceMgt: Codeunit "Item Reference Management";
                     begin
-                        ItemReferenceMgt.SalesReferenceNoLookUp(Rec);
-                        InsertExtendedText(false);
+                        ItemReferenceMgt.SalesReferenceNoLookup(Rec);
                         NoOnAfterValidate();
                         UpdateEditableOnRow();
                         DeltaUpdateTotals();
@@ -114,7 +116,6 @@ page 96 "Sales Cr. Memo Subform"
 
                     trigger OnValidate()
                     begin
-                        InsertExtendedText(false);
                         NoOnAfterValidate();
                         UpdateEditableOnRow();
                         DeltaUpdateTotals();
@@ -209,7 +210,7 @@ page 96 "Sales Cr. Memo Subform"
                 {
                     ApplicationArea = Basic, Suite;
                     ShowMandatory = not IsCommentLine;
-                    ToolTip = 'Specifies a description of the entry, which is based on the contents of the Type and No. fields.';
+                    ToolTip = 'Specifies a description of what you are selling. Based on your choices in the Type and No. fields, the field may show suggested text that you can change it for this document. To add a comment, set the Type field to Comment and write the comment itself here.';
 
                     trigger OnValidate()
                     begin
@@ -220,8 +221,8 @@ page 96 "Sales Cr. Memo Subform"
                         if Rec."No." = xRec."No." then
                             exit;
 
-                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                         NoOnAfterValidate();
+                        Rec.ShowShortcutDimCode(ShortcutDimCode);
                         UpdateTypeText();
                         DeltaUpdateTotals();
                     end;
@@ -250,10 +251,12 @@ page 96 "Sales Cr. Memo Subform"
                     Editable = not IsBlankNumber;
                     Enabled = not IsBlankNumber;
                     ToolTip = 'Specifies the inventory location from which the items sold should be picked and where the inventory decrease is registered.';
+                    Visible = LocationCodeVisible;
 
                     trigger OnValidate()
                     begin
                         DeltaUpdateTotals();
+                        CurrPage.Update();
                     end;
                 }
                 field("Bin Code"; Rec."Bin Code")
@@ -261,17 +264,6 @@ page 96 "Sales Cr. Memo Subform"
                     ApplicationArea = Warehouse;
                     ToolTip = 'Specifies the bin where the items are picked or put away.';
                     Visible = false;
-                }
-                field(Reserve; Rec.Reserve)
-                {
-                    ApplicationArea = Reservation;
-                    ToolTip = 'Specifies whether a reservation can be made for items on this line.';
-                    Visible = false;
-
-                    trigger OnValidate()
-                    begin
-                        ReserveOnAfterValidate();
-                    end;
                 }
                 field(Quantity; Rec.Quantity)
                 {
@@ -289,21 +281,6 @@ page 96 "Sales Cr. Memo Subform"
                             CurrPage.Update(false);
                     end;
                 }
-                field("Reserved Quantity"; Rec."Reserved Quantity")
-                {
-                    ApplicationArea = Reservation;
-                    BlankZero = true;
-                    ToolTip = 'Specifies how many units of the item on the line have been reserved.';
-                    Visible = false;
-
-                    trigger OnDrillDown()
-                    begin
-                        CurrPage.SaveRecord();
-                        Commit();
-                        Rec.ShowReservationEntries(true);
-                        UpdateForm(true);
-                    end;
-                }
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
                     ApplicationArea = Basic, Suite;
@@ -313,7 +290,8 @@ page 96 "Sales Cr. Memo Subform"
 
                     trigger OnValidate()
                     begin
-                        UnitofMeasureCodeOnAfterValidate();
+                        ValidateAutoReserve();
+                        DeltaUpdateTotals();
                     end;
                 }
                 field("Unit of Measure"; Rec."Unit of Measure")
@@ -326,6 +304,14 @@ page 96 "Sales Cr. Memo Subform"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the unit cost of the item on the line.';
+                    Visible = false;
+                }
+                field(PriceExists; Rec.PriceExists())
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Sales Price Exists';
+                    Editable = false;
+                    ToolTip = 'Specifies that there is a specific price for this customer.';
                     Visible = false;
                 }
                 field("Unit Price"; Rec."Unit Price")
@@ -353,34 +339,19 @@ page 96 "Sales Cr. Memo Subform"
                 {
                     ApplicationArea = SalesTax;
                     ToolTip = 'Specifies the tax area that is used to calculate and post sales tax.';
-                    Visible = false;
 
                     trigger OnValidate()
                     begin
-                        RedistributeTotalsOnAfterValidate();
+                        DeltaUpdateTotals();
                     end;
                 }
                 field("Tax Group Code"; Rec."Tax Group Code")
                 {
                     ApplicationArea = SalesTax;
-                    Editable = not IsCommentLine;
-                    Enabled = not IsCommentLine;
+                    Editable = Rec.Type <> Rec.Type::" ";
+                    Enabled = Rec.Type <> Rec.Type::" ";
                     ShowMandatory = Rec."Tax Area Code" <> '';
                     ToolTip = 'Specifies the tax group that is used to calculate and post sales tax.';
-
-                    trigger OnValidate()
-                    begin
-                        RedistributeTotalsOnAfterValidate();
-                    end;
-                }
-                field("Line Amount"; Rec."Line Amount")
-                {
-                    ApplicationArea = Basic, Suite;
-                    BlankZero = true;
-                    Editable = not IsBlankNumber;
-                    Enabled = not IsBlankNumber;
-                    ShowMandatory = (Rec.Type <> Rec.Type::" ") and (Rec."No." <> '');
-                    ToolTip = 'Specifies the net amount, excluding any invoice discount amount, that must be paid for products on the line.';
 
                     trigger OnValidate()
                     begin
@@ -399,6 +370,28 @@ page 96 "Sales Cr. Memo Subform"
                     begin
                         DeltaUpdateTotals();
                     end;
+                }
+                field("Line Amount"; Rec."Line Amount")
+                {
+                    ApplicationArea = Basic, Suite;
+                    BlankZero = true;
+                    Editable = not IsBlankNumber;
+                    Enabled = not IsBlankNumber;
+                    ShowMandatory = (Rec.Type <> Rec.Type::" ") and (Rec."No." <> '');
+                    ToolTip = 'Specifies the net amount, excluding any invoice discount amount, that must be paid for products on the line.';
+
+                    trigger OnValidate()
+                    begin
+                        DeltaUpdateTotals();
+                    end;
+                }
+                field(LineDiscExists; Rec.LineDiscExists())
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Sales Line Disc. Exists';
+                    Editable = false;
+                    ToolTip = 'Specifies that there is a specific discount for this customer.';
+                    Visible = false;
                 }
                 field("Line Discount Amount"; Rec."Line Discount Amount")
                 {
@@ -452,7 +445,7 @@ page 96 "Sales Cr. Memo Subform"
                     begin
                         CurrPage.SaveRecord();
                         Rec.ShowItemChargeAssgnt();
-                        UpdateForm(false);
+                        UpdatePage(false);
                     end;
                 }
                 field("Qty. Assigned"; Rec."Qty. Assigned")
@@ -460,12 +453,13 @@ page 96 "Sales Cr. Memo Subform"
                     ApplicationArea = ItemCharges;
                     BlankZero = true;
                     ToolTip = 'Specifies the quantity of the item charge that was assigned to a specified item when you posted this sales line.';
+                    Visible = false;
 
                     trigger OnDrillDown()
                     begin
                         CurrPage.SaveRecord();
                         Rec.ShowItemChargeAssgnt();
-                        UpdateForm(false);
+                        UpdatePage(false);
                     end;
                 }
                 field("Allocation Account No."; Rec."Selected Alloc. Account No.")
@@ -484,6 +478,7 @@ page 96 "Sales Cr. Memo Subform"
                 field("Job No."; Rec."Job No.")
                 {
                     ApplicationArea = Jobs;
+                    Editable = false;
                     ToolTip = 'Specifies the number of the related project. If you fill in this field and the Project Task No. field, then a project ledger entry will be posted together with the sales line.';
                     Visible = false;
 
@@ -495,13 +490,33 @@ page 96 "Sales Cr. Memo Subform"
                 field("Job Task No."; Rec."Job Task No.")
                 {
                     ApplicationArea = Jobs;
+                    Editable = false;
                     ToolTip = 'Specifies the number of the related project task.';
+                    Visible = false;
+                }
+                field("Job Contract Entry No."; Rec."Job Contract Entry No.")
+                {
+                    ApplicationArea = Jobs;
+                    Editable = false;
+                    ToolTip = 'Specifies the entry number of the project planning line that the sales line is linked to.';
                     Visible = false;
                 }
                 field("Tax Category"; Rec."Tax Category")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the VAT category in connection with electronic document sending. For example, when you send sales documents through the PEPPOL service, the value in this field is used to populate several fields, such as the ClassifiedTaxCategory element in the Item group. It is also used to populate the TaxCategory element in both the TaxSubtotal and AllowanceCharge group. The number is based on the UNCL5305 standard.';
+                    Visible = false;
+                }
+                field("Shipping Agent Code"; Rec."Shipping Agent Code")
+                {
+                    ApplicationArea = Suite;
+                    ToolTip = 'Specifies the code for the shipping agent who is transporting the items.';
+                    Visible = false;
+                }
+                field("Shipping Agent Service Code"; Rec."Shipping Agent Service Code")
+                {
+                    ApplicationArea = Suite;
+                    ToolTip = 'Specifies the code for the service, such as a one-day delivery, that is offered by the shipping agent.';
                     Visible = false;
                 }
                 field("Work Type Code"; Rec."Work Type Code")
@@ -522,6 +537,36 @@ page 96 "Sales Cr. Memo Subform"
                     ToolTip = 'Specifies the number of the blanket order line that the record originates from.';
                     Visible = false;
                 }
+                field("FA Posting Date"; Rec."FA Posting Date")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the date that will be used on related fixed asset ledger entries.';
+                    Visible = false;
+                }
+                field("Depr. until FA Posting Date"; Rec."Depr. until FA Posting Date")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies if depreciation was calculated until the FA posting date of the line.';
+                    Visible = false;
+                }
+                field("Depreciation Book Code"; Rec."Depreciation Book Code")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the code for the depreciation book to which the line will be posted if you have selected Fixed Asset in the Type field for this line.';
+                    Visible = false;
+                }
+                field("Use Duplication List"; Rec."Use Duplication List")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies, if the type is Fixed Asset, that information on the line is to be posted to all the assets defined depreciation books. ';
+                    Visible = false;
+                }
+                field("Duplicate in Depreciation Book"; Rec."Duplicate in Depreciation Book")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies a depreciation book code if you want the journal line to be posted to that depreciation book, as well as to the depreciation book in the Depreciation Book Code field.';
+                    Visible = false;
+                }
                 field("Appl.-from Item Entry"; Rec."Appl.-from Item Entry")
                 {
                     ApplicationArea = Basic, Suite;
@@ -537,6 +582,7 @@ page 96 "Sales Cr. Memo Subform"
                 field("Deferral Code"; Rec."Deferral Code")
                 {
                     ApplicationArea = Suite;
+                    Enabled = (Rec.Type <> Rec.Type::"Fixed Asset") and (Rec.Type <> Rec.Type::" ");
                     ToolTip = 'Specifies the deferral template that governs how revenue earned with this sales document is deferred to the different accounting periods when the good or service was delivered.';
                     Visible = false;
 
@@ -655,6 +701,20 @@ page 96 "Sales Cr. Memo Subform"
                         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, 8);
                     end;
                 }
+                field("Document No."; Rec."Document No.")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Editable = false;
+                    ToolTip = 'Specifies the document number.';
+                    Visible = false;
+                }
+                field("Line No."; Rec."Line No.")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Editable = false;
+                    ToolTip = 'Specifies the line number.';
+                    Visible = false;
+                }
                 field("Gross Weight"; Rec."Gross Weight")
                 {
                     Caption = 'Unit Gross Weight';
@@ -685,7 +745,7 @@ page 96 "Sales Cr. Memo Subform"
             group(Control39)
             {
                 ShowCaption = false;
-                group(Control35)
+                group(Control33)
                 {
                     ShowCaption = false;
 #pragma warning disable AA0100
@@ -733,7 +793,7 @@ page 96 "Sales Cr. Memo Subform"
                         end;
                     }
                 }
-                group(Control17)
+                group(Control15)
                 {
                     ShowCaption = false;
                     field("Total Amount Excl. VAT"; TotalSalesLine.Amount)
@@ -776,131 +836,122 @@ page 96 "Sales Cr. Memo Subform"
     {
         area(processing)
         {
-            action(InsertExtTexts)
+            action(SelectMultiItems)
             {
-                AccessByPermission = TableData "Extended Text Header" = R;
-                ApplicationArea = Suite;
-                Caption = 'Insert &Ext. Texts';
-                Image = Text;
-                ToolTip = 'Insert the extended item description that is set up for the item that is being processed on the line.';
+                AccessByPermission = TableData Item = R;
+                ApplicationArea = Basic, Suite;
+                Caption = 'Select items';
+                Ellipsis = true;
+                Image = NewItem;
+                ToolTip = 'Add two or more items from the full list of your inventory items.';
 
                 trigger OnAction()
                 begin
-                    InsertExtendedText(true);
+                    Rec.SelectMultipleItems();
                 end;
-            }
-            action(Dimensions)
-            {
-                AccessByPermission = TableData Dimension = R;
-                ApplicationArea = Dimensions;
-                Caption = 'Dimensions';
-                Image = Dimensions;
-                ShortCutKey = 'Alt+D';
-                ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
-
-                trigger OnAction()
-                begin
-                    Rec.ShowDimensions();
-                end;
-            }
-            action(DeferralSchedule)
-            {
-                ApplicationArea = Suite;
-                Caption = 'Deferral Schedule';
-                Enabled = Rec."Deferral Code" <> '';
-                Image = PaymentPeriod;
-                ToolTip = 'View or edit the deferral schedule that governs how revenue made with this sales document is deferred to different accounting periods when the document is posted.';
-
-                trigger OnAction()
-                begin
-                    Rec.ShowDeferralSchedule();
-                end;
-            }
-            action(RedistributeAccAllocations)
-            {
-                ApplicationArea = All;
-                Caption = 'Redistribute Account Allocations';
-                Image = EditList;
-#pragma warning disable AA0219
-                ToolTip = 'Use this action to redistribute the account allocations for this line.';
-#pragma warning restore AA0219
-
-                trigger OnAction()
-                var
-                    AllocAccManualOverride: Page "Redistribute Acc. Allocations";
-                begin
-                    if ((Rec."Type" <> Rec."Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '')) then
-                        Error(ActionOnlyAllowedForAllocationAccountsErr);
-
-                    AllocAccManualOverride.SetParentSystemId(Rec.SystemId);
-                    AllocAccManualOverride.SetParentTableId(Database::"Sales Line");
-                    AllocAccManualOverride.RunModal();
-                end;
-            }
-            action(ReplaceAllocationAccountWithLines)
-            {
-                ApplicationArea = All;
-                Caption = 'Generate lines from Allocation Account Line';
-                Image = CreateLinesFromJob;
-#pragma warning disable AA0219
-                ToolTip = 'Use this action to replace the Allocation Account line with the actual lines that would be generated from the line itself.';
-#pragma warning restore AA0219
-
-                trigger OnAction()
-                var
-                    SalesAllocAccMgt: Codeunit "Sales Alloc. Acc. Mgt.";
-                begin
-                    if ((Rec."Type" <> Rec."Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '')) then
-                        Error(ActionOnlyAllowedForAllocationAccountsErr);
-
-                    SalesAllocAccMgt.CreateLinesFromAllocationAccountLine(Rec);
-                    Rec.Delete();
-                    CurrPage.Update(false);
-                end;
-            }
-            group("F&unctions")
-            {
-                Caption = 'F&unctions';
-                Image = "Action";
-                action("E&xplode BOM")
-                {
-                    AccessByPermission = TableData "BOM Component" = R;
-                    ApplicationArea = Suite;
-                    Caption = 'E&xplode BOM';
-                    Image = ExplodeBOM;
-                    Enabled = Rec.Type = Rec.Type::Item;
-                    ToolTip = 'Add a line for each component on the bill of materials for the selected item. For example, this is useful for selling the parent item as a kit. CAUTION: The line for the parent item will be deleted and only its description will display. To undo this action, delete the component lines and add a line for the parent item again. This action is available only for lines that contain an item.';
-
-                    trigger OnAction()
-                    begin
-                        ExplodeBOM();
-                    end;
-                }
-                action("Get Return &Receipt Lines")
-                {
-                    AccessByPermission = TableData "Return Receipt Header" = R;
-                    ApplicationArea = SalesReturnOrder;
-                    Caption = 'Get Return &Receipt Lines';
-                    Ellipsis = true;
-                    Image = ReturnReceipt;
-                    ToolTip = 'Select a posted return receipt for the item that you want to assign the item charge to, for example, if you received an invoice for the item charge after you posted the original return receipt.';
-
-                    trigger OnAction()
-                    begin
-                        GetReturnReceipt();
-                        RedistributeTotalsOnAfterValidate();
-                    end;
-                }
             }
             group("&Line")
             {
                 Caption = '&Line';
                 Image = Line;
+                group("F&unctions")
+                {
+                    Caption = 'F&unctions';
+                    Image = "Action";
+                    action(GetPrice)
+                    {
+                        AccessByPermission = TableData "Sales Price Access" = R;
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Get &Price';
+                        Ellipsis = true;
+                        Image = Price;
+                        Visible = ExtendedPriceEnabled;
+                        ToolTip = 'Insert the lowest possible price in the Unit Price field according to any special price that you have set up.';
+
+                        trigger OnAction()
+                        begin
+                            ShowPrices()
+                        end;
+                    }
+                    action(GetLineDiscount)
+                    {
+                        AccessByPermission = TableData "Sales Discount Access" = R;
+                        ApplicationArea = Basic, Suite;
+                        Caption = 'Get Li&ne Discount';
+                        Ellipsis = true;
+                        Image = LineDiscount;
+                        Visible = ExtendedPriceEnabled;
+                        ToolTip = 'Insert the best possible discount in the Line Discount field according to any special discounts that you have set up.';
+
+                        trigger OnAction()
+                        begin
+                            ShowLineDisc()
+                        end;
+                    }
+                    action("E&xplode BOM")
+                    {
+                        AccessByPermission = TableData "BOM Component" = R;
+                        ApplicationArea = Suite;
+                        Caption = 'E&xplode BOM';
+                        Image = ExplodeBOM;
+                        Enabled = Rec.Type = Rec.Type::Item;
+                        ToolTip = 'Add a line for each component on the bill of materials for the selected item. For example, this is useful for selling the parent item as a kit. CAUTION: The line for the parent item will be deleted and only its description will display. To undo this action, delete the component lines and add a line for the parent item again. This action is available only for lines that contain an item.';
+
+                        trigger OnAction()
+                        begin
+                            ExplodeBOM();
+                        end;
+                    }
+                    action(InsertExtTexts)
+                    {
+                        AccessByPermission = TableData "Extended Text Header" = R;
+                        ApplicationArea = Suite;
+                        Caption = 'Insert &Ext. Texts';
+                        Image = Text;
+                        Scope = Repeater;
+                        ToolTip = 'Insert the extended item description that is set up for the item that is being processed on the line.';
+
+                        trigger OnAction()
+                        begin
+                            InsertExtendedText(true);
+                        end;
+                    }
+                    action(GetShipmentLines)
+                    {
+                        AccessByPermission = TableData "Sales Shipment Header" = R;
+                        ApplicationArea = Suite;
+                        Caption = 'Get &Shipment Lines';
+                        Ellipsis = true;
+                        Image = Shipment;
+                        ToolTip = 'Select multiple shipments to the same customer because you want to combine them on one invoice.';
+
+                        trigger OnAction()
+                        begin
+                            GetShipment();
+                            RedistributeTotalsOnAfterValidate();
+                        end;
+                    }
+                    action(GetJobPlanningLines)
+                    {
+                        AccessByPermission = TableData "Job Planning Line" = R;
+                        ApplicationArea = Jobs;
+                        Caption = 'Get &Project Planning Lines';
+                        Ellipsis = true;
+                        Image = JobLines;
+                        ToolTip = 'Select multiple planning lines associated with the same billing and selling customer to consolidate them into a single invoice. Lines must be associated with invoice currency code that matches that of the invoice.';
+
+                        trigger OnAction()
+                        begin
+                            GetJobLines();
+                            RedistributeTotalsOnAfterValidate();
+                        end;
+                    }
+                }
                 group("Item Availability by")
                 {
-                    Enabled = Rec.Type = Rec.Type::Item;
                     Caption = 'Item Availability by';
                     Image = ItemAvailability;
+                    Enabled = Rec.Type = Rec.Type::Item;
                     action("Event")
                     {
                         ApplicationArea = Basic, Suite;
@@ -910,7 +961,7 @@ page 96 "Sales Cr. Memo Subform"
 
                         trigger OnAction()
                         begin
-                            SalesAvailabilityMgt.ShowItemAvailabilityFromSalesLine(Rec, "Item Availability Type"::"Event");
+                            SalesAvailabilityMgt.ShowItemAvailabilityFromSalesLine(Rec, "Item Availability Type"::Period);
                         end;
                     }
                     action(Period)
@@ -975,63 +1026,137 @@ page 96 "Sales Cr. Memo Subform"
                         end;
                     }
                 }
-                action("Co&mments")
+                group("Related Information")
                 {
-                    ApplicationArea = Comments;
-                    Caption = 'Co&mments';
-                    Image = ViewComments;
-                    ToolTip = 'View or add comments for the record.';
+                    Caption = 'Related Information';
+                    action(Dimensions)
+                    {
+                        AccessByPermission = TableData Dimension = R;
+                        ApplicationArea = Dimensions;
+                        Caption = 'Dimensions';
+                        Image = Dimensions;
+                        Scope = Repeater;
+                        ShortCutKey = 'Alt+D';
+                        ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
 
-                    trigger OnAction()
-                    begin
-                        Rec.ShowLineComments();
-                    end;
-                }
-                action("Item Charge &Assignment")
-                {
-                    AccessByPermission = TableData "Item Charge" = R;
-                    ApplicationArea = ItemCharges;
-                    Caption = 'Item Charge &Assignment';
-                    Enabled = Rec.Type = Rec.Type::"Charge (Item)";
-                    Image = ItemCosts;
-                    ToolTip = 'Record additional direct costs, for example for freight. This action is available only for Charge (Item) line types.';
+                        trigger OnAction()
+                        begin
+                            Rec.ShowDimensions();
+                        end;
+                    }
+                    action("Co&mments")
+                    {
+                        ApplicationArea = Comments;
+                        Caption = 'Co&mments';
+                        Image = ViewComments;
+                        ToolTip = 'View or add comments for the record.';
 
-                    trigger OnAction()
-                    begin
-                        ItemChargeAssgnt();
-                        SetItemChargeFieldsStyle();
-                    end;
-                }
-                action(ItemTrackingLines)
-                {
-                    ApplicationArea = ItemTracking;
-                    Caption = 'Item &Tracking Lines';
-                    Image = ItemTrackingLines;
-                    ShortCutKey = 'Ctrl+Alt+I';
-                    Enabled = Rec.Type = Rec.Type::Item;
-                    ToolTip = 'View or edit serial, lot and package numbers for the selected item. This action is available only for lines that contain an item.';
+                        trigger OnAction()
+                        begin
+                            Rec.ShowLineComments();
+                        end;
+                    }
+                    action("Item Charge &Assignment")
+                    {
+                        AccessByPermission = TableData "Item Charge" = R;
+                        ApplicationArea = ItemCharges;
+                        Caption = 'Item Charge &Assignment';
+                        Enabled = Rec.Type = Rec.Type::"Charge (Item)";
+                        Image = ItemCosts;
+                        ToolTip = 'Record additional direct costs, for example for freight. This action is available only for Charge (Item) line types.';
 
-                    trigger OnAction()
-                    begin
-                        Rec.OpenItemTrackingLines();
-                    end;
-                }
-                action(DocAttach)
-                {
-                    ApplicationArea = All;
-                    Caption = 'Attachments';
-                    Image = Attach;
-                    ToolTip = 'Add a file as an attachment. You can attach images as well as documents.';
+                        trigger OnAction()
+                        begin
+                            Rec.ShowItemChargeAssgnt();
+                            SetItemChargeFieldsStyle();
+                        end;
+                    }
+                    action("Item &Tracking Lines")
+                    {
+                        ApplicationArea = ItemTracking;
+                        Caption = 'Item &Tracking Lines';
+                        Image = ItemTrackingLines;
+                        ShortCutKey = 'Ctrl+Alt+I';
+                        Enabled = Rec.Type = Rec.Type::Item;
+                        ToolTip = 'View or edit serial, lot and package numbers for the selected item. This action is available only for lines that contain an item.';
 
-                    trigger OnAction()
-                    var
-                        DocumentAttachmentDetails: Page "Document Attachment Details";
-                        RecRef: RecordRef;
-                    begin
-                        RecRef.GetTable(Rec);
-                        DocumentAttachmentDetails.OpenForRecRef(RecRef);
-                        DocumentAttachmentDetails.RunModal();
-                    end;
+                        trigger OnAction()
+                        begin
+                            Rec.OpenItemTrackingLines();
+                        end;
+                    }
+                    action(DocAttach)
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Attachments';
+                        Image = Attach;
+                        ToolTip = 'Add a file as an attachment. You can attach images as well as documents.';
+
+                        trigger OnAction()
+                        var
+                            DocumentAttachmentDetails: Page "Document Attachment Details";
+                            RecRef: RecordRef;
+                        begin
+                            RecRef.GetTable(Rec);
+                            DocumentAttachmentDetails.OpenForRecRef(RecRef);
+                            DocumentAttachmentDetails.RunModal();
+                        end;
+                    }
+                    action(DeferralSchedule)
+                    {
+                        ApplicationArea = Suite;
+                        Caption = 'Deferral Schedule';
+                        Enabled = Rec."Deferral Code" <> '';
+                        Image = PaymentPeriod;
+                        ToolTip = 'View or edit the deferral schedule that governs how revenue made with this sales document is deferred to different accounting periods when the document is posted.';
+
+                        trigger OnAction()
+                        begin
+                            Rec.ShowDeferralSchedule();
+                        end;
+                    }
+                    action(RedistributeAccAllocations)
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Redistribute Account Allocations';
+                        Image = EditList;
+#pragma warning disable AA0219
+                        ToolTip = 'Use this action to redistribute the account allocations for this line.';
+#pragma warning restore AA0219
+
+                        trigger OnAction()
+                        var
+                            AllocAccManualOverride: Page "Redistribute Acc. Allocations";
+                        begin
+                            if ((Rec."Type" <> Rec."Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '')) then
+                                Error(ActionOnlyAllowedForAllocationAccountsErr);
+
+                            AllocAccManualOverride.SetParentSystemId(Rec.SystemId);
+                            AllocAccManualOverride.SetParentTableId(Database::"Sales Line");
+                            AllocAccManualOverride.RunModal();
+                        end;
+                    }
+                    action(ReplaceAllocationAccountWithLines)
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Generate lines from Allocation Account Line';
+                        Image = CreateLinesFromJob;
+#pragma warning disable AA0219
+                        ToolTip = 'Use this action to replace the Allocation Account line with the actual lines that would be generated from the line itself.';
+#pragma warning restore AA0219
+
+                        trigger OnAction()
+                        var
+                            SalesAllocAccMgt: Codeunit "Sales Alloc. Acc. Mgt.";
+                        begin
+                            if ((Rec."Type" <> Rec."Type"::"Allocation Account") and (Rec."Selected Alloc. Account No." = '')) then
+                                Error(ActionOnlyAllowedForAllocationAccountsErr);
+
+                            SalesAllocAccMgt.CreateLinesFromAllocationAccountLine(Rec);
+                            Rec.Delete();
+                            CurrPage.Update(false);
+                        end;
+                    }
                 }
             }
             group(Errors)
@@ -1091,8 +1216,8 @@ page 96 "Sales Cr. Memo Subform"
                         EditinExcelFilters.AddFieldV2('Document_No', Enum::"Edit in Excel Filter Type"::Equal, Rec."Document No.", Enum::"Edit in Excel Edm Type"::"Edm.String");
 
                         EditinExcel.EditPageInExcel(
-                            'Sales_Cr_Memo_Line',
-                            Page::"Sales Cr. Memo Subform",
+                            'Sales_InvoiceSalesLines',
+                            page::"Sales Invoice Subform",
                             EditinExcelFilters,
                             StrSubstNo(ExcelFileNameTxt, Rec."Document No."));
                     end;
@@ -1144,6 +1269,11 @@ page 96 "Sales Cr. Memo Subform"
 
     trigger OnFindRecord(Which: Text): Boolean
     begin
+        Rec.AddLoadFields(
+            "Price Calculation Method", "Sell-to Customer No.", "Customer Disc. Group", "Customer Price Group",
+            "VAT %", "VAT Calculation Type", "VAT Bus. Posting Group", "VAT Prod. Posting Group",
+            "Dimension Set ID", "Currency Code", "Qty. per Unit of Measure", "Allow Line Disc.");
+
         DocumentTotals.SalesCheckAndClearTotals(Rec, xRec, TotalSalesLine, VATAmount, InvoiceDiscountAmount, InvoiceDiscountPct);
         exit(Rec.Find(Which));
     end;
@@ -1177,27 +1307,32 @@ page 96 "Sales Cr. Memo Subform"
         UseAllocationAccountNumber := AllocationAccountMgt.UseAllocationAccountNoField();
         SetOpenPage();
 
-        SetItemReferenceVisibility();
         SetDimensionsVisibility();
+        SetItemReferenceVisibility();
     end;
 
     var
         SalesSetup: Record "Sales & Receivables Setup";
         TempOptionLookupBuffer: Record "Option Lookup Buffer" temporary;
+        ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
         TransferExtendedText: Codeunit "Transfer Extended Text";
         SalesAvailabilityMgt: Codeunit "Sales Availability Mgt.";
-        SalesCalcDiscountByType: Codeunit "Sales - Calc Discount By Type";
-        ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
+        SalesCalcDiscByType: Codeunit "Sales - Calc Discount By Type";
         AmountWithDiscountAllowed: Decimal;
+        UpdateAllowedVar: Boolean;
+#pragma warning disable AA0074
+        Text000: Label 'Unable to run this function while in View mode.';
+#pragma warning restore AA0074
+        VariantCodeMandatory: Boolean;
         CurrPageIsEditable: Boolean;
         IsSaaSExcelAddinEnabled: Boolean;
-        VariantCodeMandatory: Boolean;
+        ExtendedPriceEnabled: Boolean;
+        ItemChargeStyleExpression: Text;
         TypeAsText: Text[30];
         TypeAsTextFieldVisible: Boolean;
-        ItemChargeStyleExpression: Text;
         UseAllocationAccountNumber: Boolean;
         ActionOnlyAllowedForAllocationAccountsErr: Label 'This action is only available for lines that have Allocation Account set as Type.';
-        ExcelFileNameTxt: Label 'Sales Credit Memo %1 - Lines', Comment = '%1 = document number, ex. 10000';
+        ExcelFileNameTxt: Label 'Sales Invoice %1 - Lines', Comment = '%1 = document number, ex. 10000';
 
     protected var
         Currency: Record Currency;
@@ -1220,17 +1355,28 @@ page 96 "Sales Cr. Memo Subform"
         BackgroundErrorCheck: Boolean;
         ShowAllLinesEnabled: Boolean;
         IsCommentLine: Boolean;
+        SuppressTotals: Boolean;
         ItemReferenceVisible: Boolean;
-        VATAmount: Decimal;
+        LocationCodeVisible: Boolean;
         UnitofMeasureCodeIsChangeable: Boolean;
+        VATAmount: Decimal;
 
     local procedure SetOpenPage()
     var
+        [SecurityFiltering(SecurityFilter::Filtered)]
+        Location: Record Location;
         ServerSetting: Codeunit "Server Setting";
+        PriceCalculationMgt: Codeunit "Price Calculation Mgt.";
         DocumentErrorsMgt: Codeunit "Document Errors Mgt.";
     begin
         OnBeforeSetOpenPage();
+
+        if Location.ReadPermission then
+            LocationCodeVisible := not Location.IsEmpty();
+
         IsSaaSExcelAddinEnabled := ServerSetting.GetIsSaasExcelAddinEnabled();
+        SuppressTotals := CurrentClientType() = ClientType::ODataV4;
+        ExtendedPriceEnabled := PriceCalculationMgt.IsExtendedPriceCalculationEnabled();
         BackgroundErrorCheck := DocumentErrorsMgt.BackgroundValidationEnabled();
     end;
 
@@ -1240,30 +1386,27 @@ page 96 "Sales Cr. Memo Subform"
         DocumentTotals.SalesDocTotalsNotUpToDate();
     end;
 
-    procedure ExplodeBOM()
-    begin
-        CODEUNIT.Run(CODEUNIT::"Sales-Explode BOM", Rec);
-        DocumentTotals.SalesDocTotalsNotUpToDate();
-    end;
-
-    local procedure SetItemReferenceVisibility()
+    local procedure ValidateInvoiceDiscountAmount()
     var
-        ItemReference: Record "Item Reference";
+        SalesHeader: Record "Sales Header";
     begin
-        ItemReferenceVisible := not ItemReference.IsEmpty();
-    end;
-
-    local procedure SetDefaultType()
-    var
-        IsHandled: Boolean;
-    begin
-        IsHandled := false;
-        OnBeforeSetDefaultType(Rec, xRec, IsHandled);
-        if IsHandled then
+        if SuppressTotals then
             exit;
 
-        if xRec."Document No." = '' then
-            Rec.Type := Rec.GetDefaultLineType();
+        SalesHeader.Get(Rec."Document Type", Rec."Document No.");
+        SalesCalcDiscByType.ApplyInvDiscBasedOnAmt(InvoiceDiscountAmount, SalesHeader);
+        DocumentTotals.SalesDocTotalsNotUpToDate();
+        CurrPage.Update(false);
+    end;
+
+    protected procedure QuantityOnAfterValidate()
+    begin
+        OnBeforeQuantityOnAfterValidate(Rec, xRec);
+
+        ValidateAutoReserve();
+        DeltaUpdateTotals();
+
+        OnAfterQuantityOnAfterValidate(Rec, xRec);
     end;
 
     procedure CalcInvDisc()
@@ -1274,32 +1417,61 @@ page 96 "Sales Cr. Memo Subform"
         DocumentTotals.SalesDocTotalsNotUpToDate();
     end;
 
-    procedure GetReturnReceipt()
+    procedure ExplodeBOM()
     begin
-        CODEUNIT.Run(CODEUNIT::"Sales-Get Return Receipts", Rec);
+        CODEUNIT.Run(CODEUNIT::"Sales-Explode BOM", Rec);
         DocumentTotals.SalesDocTotalsNotUpToDate();
+    end;
+
+    procedure GetShipment()
+    begin
+        CODEUNIT.Run(CODEUNIT::"Sales-Get Shipment", Rec);
+    end;
+
+    local procedure GetJobLines()
+    begin
+        Codeunit.Run(Codeunit::"Job-Process Plan. Lines", Rec);
     end;
 
     procedure InsertExtendedText(Unconditionally: Boolean)
     begin
-        OnBeforeInsertExtendedText(Rec, xRec);
+        OnBeforeInsertExtendedText(Rec);
         if TransferExtendedText.SalesCheckIfAnyExtText(Rec, Unconditionally) then begin
             CurrPage.SaveRecord();
             Commit();
             TransferExtendedText.InsertSalesExtText(Rec);
         end;
         if TransferExtendedText.MakeUpdate() then
-            UpdateForm(true);
+            UpdatePage(true);
     end;
 
-    local procedure ItemChargeAssgnt()
-    begin
-        Rec.ShowItemChargeAssgnt();
-    end;
-
-    procedure UpdateForm(SetSaveRecord: Boolean)
+    procedure UpdatePage(SetSaveRecord: Boolean)
     begin
         CurrPage.Update(SetSaveRecord);
+    end;
+
+    procedure ShowPrices()
+    begin
+        Rec.PickPrice();
+    end;
+
+    procedure ShowLineDisc()
+    begin
+        Rec.PickDiscount();
+    end;
+
+    procedure SetUpdateAllowed(UpdateAllowed: Boolean)
+    begin
+        UpdateAllowedVar := UpdateAllowed;
+    end;
+
+    procedure UpdateAllowed(): Boolean
+    begin
+        if UpdateAllowedVar = false then begin
+            Message(Text000);
+            exit(false);
+        end;
+        exit(true);
     end;
 
     procedure NoOnAfterValidate()
@@ -1307,44 +1479,11 @@ page 96 "Sales Cr. Memo Subform"
         OnBeforeNoOnAfterValidate(Rec, xRec);
 
         InsertExtendedText(false);
-        if (Rec.Type = Rec.Type::"Charge (Item)") and (Rec."No." <> xRec."No.") and
-           (xRec."No." <> '')
-        then
+
+        if (Rec.Type = Rec.Type::"Charge (Item)") and (Rec."No." <> xRec."No.") and (xRec."No." <> '') then
             CurrPage.SaveRecord();
 
         OnAfterNoOnAfterValidate(Rec, xRec);
-    end;
-
-    protected procedure ReserveOnAfterValidate()
-    begin
-        if (Rec.Reserve = Rec.Reserve::Always) and (Rec."Outstanding Qty. (Base)" <> 0) then begin
-            CurrPage.SaveRecord();
-            Rec.AutoReserve();
-        end;
-    end;
-
-    protected procedure QuantityOnAfterValidate()
-    begin
-        OnBeforeQuantityOnAfterValidate(Rec, xRec);
-
-        if Rec.Reserve = Rec.Reserve::Always then begin
-            CurrPage.SaveRecord();
-            Rec.AutoReserve();
-        end;
-
-        OnQuantityOnAfterValidateOnBeforeDeltaUpdateTotals(Rec, xRec);
-        DeltaUpdateTotals();
-
-        OnAfterQuantityOnAfterValidate(Rec, xRec);
-    end;
-
-    protected procedure UnitofMeasureCodeOnAfterValidate()
-    begin
-        if Rec.Reserve = Rec.Reserve::Always then begin
-            CurrPage.SaveRecord();
-            Rec.AutoReserve();
-        end;
-        DeltaUpdateTotals();
     end;
 
     procedure UpdateEditableOnRow()
@@ -1361,8 +1500,32 @@ page 96 "Sales Cr. Memo Subform"
         OnAfterUpdateEditableOnRow(Rec, IsCommentLine, IsBlankNumber);
     end;
 
+    protected procedure ValidateAutoReserve()
+    begin
+        if Rec.Reserve = Rec.Reserve::Always then begin
+            CurrPage.SaveRecord();
+            Rec.AutoReserve();
+        end;
+
+        OnAfterValidateAutoReserve(Rec, xRec);
+    end;
+
+    local procedure GetTotalSalesHeader()
+    begin
+        DocumentTotals.GetTotalSalesHeaderAndCurrency(Rec, TotalSalesHeader, Currency);
+    end;
+
+    procedure ClearTotalSalesHeader();
+    begin
+        Clear(TotalSalesHeader);
+    end;
+
     procedure CalculateTotals()
     begin
+        OnBeforeCalculateTotals(TotalSalesLine, SuppressTotals);
+        if SuppressTotals then
+            exit;
+
         DocumentTotals.SalesCheckIfDocumentChanged(Rec, xRec);
         DocumentTotals.CalculateSalesSubPageTotals(TotalSalesHeader, TotalSalesLine, VATAmount, InvoiceDiscountAmount, InvoiceDiscountPct);
         DocumentTotals.RefreshSalesLine(Rec);
@@ -1372,8 +1535,11 @@ page 96 "Sales Cr. Memo Subform"
     var
         IsHandled: Boolean;
     begin
+        if SuppressTotals then
+            exit;
+
         IsHandled := false;
-        OnBeforeDeltaUpdateTotals(Rec, xRec, IsHandled);
+        OnBeforeDeltaUpdateTotals(Rec, xRec, SuppressTotals, IsHandled);
         if IsHandled then
             exit;
 
@@ -1391,29 +1557,13 @@ page 96 "Sales Cr. Memo Subform"
     var
         SalesHeader: Record "Sales Header";
     begin
+        if SuppressTotals then
+            exit;
+
         CurrPage.SaveRecord();
 
         SalesHeader.Get(Rec."Document Type", Rec."Document No.");
         DocumentTotals.SalesRedistributeInvoiceDiscountAmounts(Rec, VATAmount, TotalSalesLine);
-        CurrPage.Update(false);
-    end;
-
-    local procedure GetTotalSalesHeader()
-    begin
-        DocumentTotals.GetTotalSalesHeaderAndCurrency(Rec, TotalSalesHeader, Currency);
-    end;
-
-    procedure ClearTotalSalesHeader();
-    begin
-        Clear(TotalSalesHeader);
-    end;
-
-    local procedure ValidateInvoiceDiscountAmount()
-    var
-        SalesHeader: Record "Sales Header";
-    begin
-        SalesHeader.Get(Rec."Document Type", Rec."Document No.");
-        SalesCalcDiscountByType.ApplyInvDiscBasedOnAmt(InvoiceDiscountAmount, SalesHeader);
         CurrPage.Update(false);
     end;
 
@@ -1455,6 +1605,26 @@ page 96 "Sales Cr. Memo Subform"
         OnAfterSetDimensionsVisibility();
     end;
 
+    local procedure SetItemReferenceVisibility()
+    var
+        ItemReference: Record "Item Reference";
+    begin
+        ItemReferenceVisible := not ItemReference.IsEmpty();
+    end;
+
+    local procedure SetDefaultType()
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeSetDefaultType(Rec, xRec, IsHandled);
+        if IsHandled then
+            exit;
+
+        if xRec."Document No." = '' then
+            Rec.Type := Rec.GetDefaultLineType();
+    end;
+
     [IntegrationEvent(true, false)]
     local procedure OnAfterNoOnAfterValidate(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line")
     begin
@@ -1465,13 +1635,18 @@ page 96 "Sales Cr. Memo Subform"
     begin
     end;
 
+    [IntegrationEvent(true, false)]
+    local procedure OnAfterValidateAutoReserve(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line")
+    begin
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterValidateShortcutDimCode(var SalesLine: Record "Sales Line"; var ShortcutDimCode: array[8] of Code[20]; DimIndex: Integer)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeInsertExtendedText(var SalesLine: Record "Sales Line"; var xSalesLine: Record "Sales Line")
+    local procedure OnBeforeInsertExtendedText(var SalesLine: Record "Sales Line")
     begin
     end;
 
@@ -1491,6 +1666,11 @@ page 96 "Sales Cr. Memo Subform"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalculateTotals(var TotalSalesLine: Record "Sales Line"; var SuppressTotals: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnItemReferenceNoOnLookup(var SalesLine: Record "Sales Line")
     begin
     end;
@@ -1506,12 +1686,7 @@ page 96 "Sales Cr. Memo Subform"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnQuantityOnAfterValidateOnBeforeDeltaUpdateTotals(var SalesLine: Record "Sales Line"; var xSalesLine: Record "Sales Line")
-    begin
-    end;
-
-    [IntegrationEvent(true, false)]
-    local procedure OnBeforeDeltaUpdateTotals(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    local procedure OnBeforeDeltaUpdateTotals(var SalesLine: Record "Sales Line"; xSalesLine: Record "Sales Line"; SuppressTotals: Boolean; var IsHandled: Boolean)
     begin
     end;
 

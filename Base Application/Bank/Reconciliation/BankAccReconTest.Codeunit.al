@@ -38,7 +38,7 @@ codeunit 380 "Bank Acc. Recon. Test"
         end;
     end;
 
-    internal procedure SetOutstandingFilters(BankAccReconciliation: Record "Bank Acc. Reconciliation"; var BankAccountLedgerEntry: Record "Bank Account Ledger Entry")
+    procedure SetOutstandingFilters(BankAccReconciliation: Record "Bank Acc. Reconciliation"; var BankAccountLedgerEntry: Record "Bank Account Ledger Entry")
     begin
         BankAccountLedgerEntry.SetRange("Bank Account No.", BankAccReconciliation."Bank Account No.");
         BankAccountLedgerEntry.SetRange(Reversed, false);
@@ -47,72 +47,8 @@ codeunit 380 "Bank Acc. Recon. Test"
         BankAccountLedgerEntry.SetFilter("Statement No.", '<> %1', BankAccReconciliation."Statement No.");
     end;
 
-    local procedure TotalOfClosedEntriesWithNoClosedAtDate(var BankAccountLedgerEntry: Record "Bank Account Ledger Entry"): Decimal
+    procedure CheckBankAccountLedgerEntryFilters(var BankAccountLedgerEntry: Record "Bank Account Ledger Entry"; StatementNo: Code[20]; StatementDate: Date): Boolean
     begin
-        BankAccountLedgerEntry.SetRange("Closed at Date", 0D);
-        BankAccountLedgerEntry.SetRange(Open, false);
-        BankAccountLedgerEntry.CalcSums(Amount);
-        exit(BankAccountLedgerEntry.Amount);
-    end;
-
-    procedure TotalOutstandingBankTransactions(BankAccReconciliation: Record "Bank Acc. Reconciliation") Total: Decimal
-    var
-        BankAccountLedgerEntry: Record "Bank Account Ledger Entry";
-        BankAccReconciliationLine: Record "Bank Acc. Reconciliation Line";
-        DocNo: Text;
-    begin
-        SetOutstandingFilters(BankAccReconciliation, BankAccountLedgerEntry);
-        BankAccountLedgerEntry.SetRange("Check Ledger Entries", 0);
-        if BankAccountLedgerEntry.IsEmpty() then
-            exit;
-
-        FilterOutstandingBankAccLedgerEntry(BankAccountLedgerEntry, BankAccReconciliation."Statement No.", BankAccReconciliation."Statement Date");
-        BankAccountLedgerEntry.MarkedOnly(true);
-
-        BankAccountLedgerEntry.CalcSums(Amount);
-        Total := BankAccountLedgerEntry.Amount;
-        Total -= TotalOfClosedEntriesWithNoClosedAtDate(BankAccountLedgerEntry);
-
-        if BankAccReconciliation."Statement Type" = BankAccReconciliation."Statement Type"::"Payment Application" then begin
-            // When the BankAccReconciliation is created from the Payment Reconciliation Journal:
-            // we subtract the "Applied Amount" to Bank Ledger Entries with no CLE, since those are no longer outstanding.
-            // These are the lines with "Account Type" "Bank Account", that are applied to some "Document No." (Lines of type Bank Account without Doc. No are bank to bank transfers, which are not outstanding)
-            BankAccReconciliation.SetFiltersOnBankAccReconLineTable(BankAccReconciliation, BankAccReconciliationLine);
-            BankAccReconciliationLine.SetRange("Account Type", BankAccReconciliationLine."Account Type"::"Bank Account");
-            if BankAccReconciliationLine.FindSet() then
-                repeat
-                    DocNo := BankAccReconciliationLine.GetAppliedToDocumentNo('|');
-                    if DocNo <> '' then begin
-                        // We will just subtract the "Applied Amount" if there is no Check Ledger Entry
-                        // associated to that BLE
-                        BankAccountLedgerEntry.Reset();
-                        BankAccountLedgerEntry.SetFilter("Document No.", DocNo);
-                        BankAccountLedgerEntry.SetRange("Check Ledger Entries", 0);
-                        if not BankAccountLedgerEntry.IsEmpty() then
-                            Total -= BankAccReconciliationLine."Applied Amount";
-                    end;
-                until BankAccReconciliationLine.Next() = 0;
-        end;
-        exit(Total);
-    end;
-
-    local procedure FilterOutstandingBankAccLedgerEntry(var BankAccountLedgerEntry: Record "Bank Account Ledger Entry"; StatementNo: Code[20]; StatementDate: Date)
-    begin
-        if BankAccountLedgerEntry.FindSet() then
-            repeat
-                if CheckBankAccountLedgerEntryFilters(BankAccountLedgerEntry, StatementNo, StatementDate) then
-                    BankAccountLedgerEntry.Mark(true);
-            until BankAccountLedgerEntry.Next() = 0;
-    end;
-
-    internal procedure CheckBankAccountLedgerEntryFilters(var BankAccountLedgerEntry: Record "Bank Account Ledger Entry"; StatementNo: Code[20]; StatementDate: Date): Boolean
-    begin
-        if not BankAccountLedgerEntry.Open then
-            exit(false);
-
-        if (BankAccountLedgerEntry."Closed at Date" <> 0D) and (BankAccountLedgerEntry."Closed at Date" <= StatementDate) then
-            exit(false);
-
         if BankAccountLedgerEntry."Statement No." = '' then begin
             if CheckBankLedgerEntryIsOpen(BankAccountLedgerEntry, StatementDate) then
                 exit(true);
