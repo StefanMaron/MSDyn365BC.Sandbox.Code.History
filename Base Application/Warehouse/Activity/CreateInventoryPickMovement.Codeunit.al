@@ -2318,11 +2318,10 @@ codeunit 7322 "Create Inventory Pick/Movement"
         WareHouseActivityLine: Record "Warehouse Activity Line";
         TotalQtyPicked: Decimal;
         TotalQtyOutstanding: Decimal;
+        TotalPickedQuantityCalculated: Decimal;
         TotalQtyOutStandingCalculated: Decimal;
     begin
         if WarehouseActivityHeader.Type <> WarehouseActivityHeader.Type::"Invt. Pick" then
-            exit;
-        if SalesLine.Type <> SalesLine.Type::Item then
             exit;
 
         WareHouseActivityLine.SetSource(Database::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.", 0);
@@ -2330,15 +2329,16 @@ codeunit 7322 "Create Inventory Pick/Movement"
         WareHouseActivityLine.CalcSums(Quantity, "Qty. (Base)", "Qty. Outstanding", "Qty. Outstanding (Base)");
         TotalQtyPicked := WareHouseActivityLine.Quantity;
         TotalQtyOutstanding := WareHouseActivityLine."Qty. Outstanding";
-        TotalQtyOutStandingCalculated := SalesLine.Quantity - SalesLine."Quantity Shipped";
+        TotalPickedQuantityCalculated := Round(WareHouseActivityLine."Qty. (Base)" / SalesLine."Qty. per Unit of Measure", 0.00001);
+        TotalQtyOutStandingCalculated := Round(WareHouseActivityLine."Qty. Outstanding (Base)" / SalesLine."Qty. per Unit of Measure", 0.00001);
+        if TotalQtyPicked = TotalPickedQuantityCalculated then
+            exit;
 
-        if (SalesLine.Quantity = TotalQtyPicked) or
-           (SalesLine.Quantity <> Round(TotalQtyPicked)) or
-           (WareHouseActivityLine."Qty. (Base)" <> SalesLine."Quantity (Base)") then
+        if Abs(TotalPickedQuantityCalculated - TotalQtyPicked) > SalesLine."Qty. Rounding Precision (Base)" then
             exit;
 
         WareHouseActivityLine.FindLast();
-        WareHouseActivityLine.Quantity += (SalesLine.Quantity - TotalQtyPicked);
+        WareHouseActivityLine.Quantity += (TotalPickedQuantityCalculated - TotalQtyPicked);
         WareHouseActivityLine."Qty. Outstanding" += (TotalQtyOutStandingCalculated - TotalQtyOutstanding);
         WareHouseActivityLine.Modify();
     end;
