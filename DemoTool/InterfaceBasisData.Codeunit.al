@@ -72,9 +72,7 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create Salesperson/Purchaser");
         RunCodeunit(CODEUNIT::"Create Location");
         RunCodeunit(CODEUNIT::"Create Cust. Invoice Disc.");
-#if not CLEAN25
         RunCodeunit(CODEUNIT::"Create Sales Discount");
-#endif
         RunCodeunit(CODEUNIT::"Create Vendor Invoice Disc.");
         RunCodeunit(CODEUNIT::"Create Rounding Method");
         RunCodeunit(CODEUNIT::"Create Accounting Period");
@@ -147,9 +145,7 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create Item Unit of Measure");
         RunCodeunit(CODEUNIT::"Create Unit of Measure Trans.");
         RunCodeunit(CODEUNIT::"Create Extended text");
-#if not CLEAN25
         RunCodeunit(CODEUNIT::"Create Sales Price");
-#endif
         RunCodeunit(CODEUNIT::"Create Resource");
         RunCodeunit(CODEUNIT::"Create Res. Unit of Measure");
         RunCodeunit(CODEUNIT::"Create Resource Capacity Entry");
@@ -157,11 +153,9 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create Default Dimension");
 
         RunCodeunit(CODEUNIT::"Create Job");
-#if not CLEAN25
         RunCodeunit(CODEUNIT::"Create Job G/L Prices");
         RunCodeunit(CODEUNIT::"Create Job Item Prices");
         RunCodeunit(CODEUNIT::"Create Job Resource Prices");
-#endif
         RunCodeunit(CODEUNIT::"Create Job Task");
         if not DemoDataSetup."Skip sequence of actions" then
             RunCodeunit(CODEUNIT::"Create Job Planning Lines");
@@ -177,10 +171,8 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create Inventory Posting Setup");
         RunCodeunit(CODEUNIT::"Create WIP Accounts");
         RunCodeunit(CODEUNIT::"Create Item Vendor");
-#if not CLEAN25
         RunCodeunit(CODEUNIT::"Create Purchase Price");
         RunCodeunit(CODEUNIT::"Create Purch. Line Discount");
-#endif
         if not DemoDataSetup."Skip sequence of actions" then
             RunCodeunit(CODEUNIT::"Create Sales Header");
         if not DemoDataSetup."Skip sequence of actions" then
@@ -224,7 +216,9 @@ codeunit 110000 "Interface Basis Data"
         RunCodeunit(CODEUNIT::"Create FA Insurance");
         RunCodeunit(CODEUNIT::"Create FA Main Asset Comp.");
         RunCodeunit(CODEUNIT::"Create FA Journal Setup");
+#if not CLEAN28
         RunCodeunit(CODEUNIT::"Create Payment");
+#endif
         if not DemoDataSetup."Skip sequence of actions" then
             RunCodeunit(CODEUNIT::"Create Purchase Header");
         if not DemoDataSetup."Skip sequence of actions" then
