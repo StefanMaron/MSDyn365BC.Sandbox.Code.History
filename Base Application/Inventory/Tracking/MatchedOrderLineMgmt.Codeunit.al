@@ -617,6 +617,7 @@ codeunit 5826 "Matched Order Line Mgmt."
         PurchaseLineOrder.SetRange("Document Type", PurchaseLineOrder."Document Type"::Order);
         PurchaseLineOrder.SetRange("Buy-from Vendor No.", PurchaseLineInvoice."Buy-from Vendor No.");
         PurchaseLineOrder.SetRange("Pay-to Vendor No.", PurchaseLineInvoice."Pay-to Vendor No.");
+        PurchaseLineOrder.SetRange("Currency Code", PurchaseLineInvoice."Currency Code");
         PurchaseLineOrder.SetRange(Type, PurchaseLineInvoice.Type);
         PurchaseLineOrder.SetRange("No.", PurchaseLineInvoice."No.");
         PurchaseLineOrder.SetRange("Location Code", PurchaseLineInvoice."Location Code");
@@ -892,6 +893,7 @@ codeunit 5826 "Matched Order Line Mgmt."
         PurchaseLineOrder.SetRange("Document Type", PurchaseHeaderInvoice."Document Type"::Order);
         PurchaseLineOrder.SetRange("Buy-from Vendor No.", PurchaseHeaderInvoice."Buy-from Vendor No.");
         PurchaseLineOrder.SetRange("Pay-to Vendor No.", PurchaseHeaderInvoice."Pay-to Vendor No.");
+        PurchaseLineOrder.SetRange("Currency Code", PurchaseHeaderInvoice."Currency Code");
         if PurchaseLineOrder.FindSet() then
             repeat
                 PurchaseLineOrder.Mark(true);
