@@ -370,7 +370,8 @@ table 7001 "Price List Line"
             trigger OnValidate()
             begin
                 TestStatusDraft();
-                CheckAmountType(FieldCaption("Cost Factor"), "Amount Type"::Discount);
+                if not CheckDefaultValueExists("Cost Factor") then
+                    CheckAmountType(FieldCaption("Cost Factor"), "Amount Type"::Discount);
                 TestField("Source Group", "Source Group"::Job);
                 Verify();
                 if "Cost Factor" <> 0 then
@@ -390,7 +391,8 @@ table 7001 "Price List Line"
             trigger OnValidate()
             begin
                 TestStatusDraft();
-                CheckAmountType(FieldCaption("Unit Cost"), "Amount Type"::Discount);
+                if not CheckDefaultValueExists("Unit Cost") then
+                    CheckAmountType(FieldCaption("Unit Cost"), "Amount Type"::Discount);
                 Verify();
             end;
         }
@@ -407,7 +409,8 @@ table 7001 "Price List Line"
             trigger OnValidate()
             begin
                 TestStatusDraft();
-                CheckAmountType(FieldCaption("Line Discount %"), "Amount Type"::Price);
+                if not CheckDefaultValueExists("Line Discount %") then
+                    CheckAmountType(FieldCaption("Line Discount %"), "Amount Type"::Price);
                 Verify();
             end;
         }
@@ -420,7 +423,8 @@ table 7001 "Price List Line"
             trigger OnValidate()
             begin
                 TestStatusDraft();
-                CheckAmountType(FieldCaption("Allow Line Disc."), "Amount Type"::Discount);
+                if "Allow Line Disc." then
+                    CheckAmountType(FieldCaption("Allow Line Disc."), "Amount Type"::Discount);
             end;
         }
         field(22; "Allow Invoice Disc."; Boolean)
@@ -432,7 +436,8 @@ table 7001 "Price List Line"
             trigger OnValidate()
             begin
                 TestStatusDraft();
-                CheckAmountType(FieldCaption("Allow Invoice Disc."), "Amount Type"::Discount);
+                if "Allow Invoice Disc." then
+                    CheckAmountType(FieldCaption("Allow Invoice Disc."), "Amount Type"::Discount);
             end;
         }
         field(23; "Price Includes VAT"; Boolean)
@@ -535,7 +540,8 @@ table 7001 "Price List Line"
             trigger OnValidate()
             begin
                 TestStatusDraft();
-                CheckAmountType(FieldCaption("Direct Unit Cost"), "Amount Type"::Discount);
+                if not CheckDefaultValueExists("Direct Unit Cost") then
+                    CheckAmountType(FieldCaption("Direct Unit Cost"), "Amount Type"::Discount);
                 Verify();
             end;
         }
@@ -1266,6 +1272,11 @@ table 7001 "Price List Line"
                     exit;
             end;
         end;
+    end;
+
+    local procedure CheckDefaultValueExists(Value: Decimal): Boolean
+    begin
+        exit(Value = 0);
     end;
 
     [IntegrationEvent(true, false)]
