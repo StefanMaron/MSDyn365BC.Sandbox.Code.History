@@ -17,6 +17,7 @@ using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Planning;
 using Microsoft.Inventory.Requisition;
+using Microsoft.Inventory.Setup;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.Capacity;
@@ -7912,69 +7913,87 @@ codeunit 137072 "SCM Production Orders II"
     end;
 
     [Test]
-    [HandlerFunctions('ItemTrackingPageHandler,ItemTrackingSummaryPageHandler')]
-    procedure PostOutputWithBackwardFlushingTwoTrackedCompsSameRoutingLink()
+    [HandlerFunctions('ConfirmHandler')]
+    procedure FinishProdOrderWIPAdjustmentsUseFinishPostingDate()
     var
-        CompItem: Record Item;
-        CompItem2: Record Item;
-        ProdItem: Record Item;
-        RoutingHeader: Record "Routing Header";
-        RoutingLine: Record "Routing Line";
-        RoutingLink: Record "Routing Link";
-        WorkCenter: Record "Work Center";
+        Item: array[2] of Record Item;
+        Location: Record Location;
         ProductionBOMHeader: Record "Production BOM Header";
-        ProductionBOMLine: Record "Production BOM Line";
         ProductionOrder: Record "Production Order";
-        ProdOrderComponent: Record "Prod. Order Component";
-        Qty: Decimal;
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        InventorySetup: Record "Inventory Setup";
+        ItemJournalBatch: Record "Item Journal Batch";
+        ItemJournalLine: Record "Item Journal Line";
+        ProdOrderStatusMgt: Codeunit "Prod. Order Status Management";
+        ConsumptionPostingDate: Date;
+        FinishPostingDate: Date;
     begin
-        // [FEATURE] [AI test 0.3]
-        // [SCENARIO 630224] Posting output with backward flushing for two lot-tracked components on the same routing link does not cause duplicate Tracking Specification error.
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO] When finishing a Production Order on date "D2", WIP adjustment G/L entries use "D2" as Posting Date, not original consumption date "D1".
         Initialize();
-        Qty := LibraryRandom.RandIntInRange(2, 10);
 
-        // [GIVEN] Two component items "C1" and "C2" with lot tracking.
-        CreateItemWithItemTrackingCode(CompItem, CreateItemTrackingCode());
-        CreateItemWithItemTrackingCode(CompItem2, CreateItemTrackingCode());
+        // [GIVEN] Consumption date "D1" = WorkDate - 1 month, finish date "D2" = WorkDate.
+        ConsumptionPostingDate := CalcDate('<-1M>', WorkDate());
+        FinishPostingDate := WorkDate();
 
-        // [GIVEN] Post inventory for "C1" and "C2" with lot tracking.
-        AssignNoSeriesForItemJournalBatch(ItemJournalBatch, '');  // Value required to avoid the Document No mismatch.
-        CreateAndPostItemJournalLine(CompItem."No.", Qty * 2, '', '', true);
-        CreateAndPostItemJournalLine(CompItem2."No.", Qty * 2, '', '', true);
+        // [GIVEN] Enable Automatic Cost Posting in Inventory Setup.
+        InventorySetup.Get();
+        InventorySetup."Automatic Cost Posting" := true;
+        InventorySetup.Modify();
 
-        // [GIVEN] Production item "P" with routing and BOM containing "C1" and "C2" on the same routing link code.
-        LibraryInventory.CreateItem(ProdItem);
-        LibraryManufacturing.CreateRoutingLink(RoutingLink);
-        LibraryManufacturing.CreateWorkCenter(WorkCenter);
-        CreateAndCertifyRoutingWithRoutingLinkCode(RoutingHeader, RoutingLine, WorkCenter."No.", RoutingLink.Code);
-        CreateAndCertifyProductionBOMwithRoutingLinkCode(ProductionBOMHeader, ProductionBOMLine, ProdItem, CompItem, CompItem2, RoutingLink);
-        ProdItem.Validate("Routing No.", RoutingHeader."No.");
-        ProdItem.Validate("Production BOM No.", ProductionBOMHeader."No.");
-        ProdItem.Modify(true);
+        // [GIVEN] Create a Location "L" with Inventory Posting Setup.
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
 
-        // [GIVEN] Released production order for "P".
-        CreateAndRefreshProductionOrder(ProductionOrder, ProductionOrder.Status::Released, ProdItem."No.", Qty, '', '');
+        // [GIVEN] Create component Item "I1" with FIFO costing.
+        LibraryInventory.CreateItem(Item[1]);
+        Item[1].Validate("Costing Method", Item[1]."Costing Method"::FIFO);
+        Item[1].Modify(true);
 
-        // [GIVEN] Set backward flushing on both components.
-        ProdOrderComponent.SetRange("Prod. Order No.", ProductionOrder."No.");
-        ProdOrderComponent.ModifyAll("Flushing Method", ProdOrderComponent."Flushing Method"::Backward, true);
+        // [GIVEN] Post inventory for Item "I1" on date "D1" at Location "L".
+        LibraryInventory.CreateItemJnlLine(
+            ItemJournalLine, ItemJournalLine."Entry Type"::"Positive Adjmt.",
+            ConsumptionPostingDate, Item[1]."No.", LibraryRandom.RandIntInRange(10, 20), Location.Code);
+        LibraryInventory.PostItemJournalLine(
+            ItemJournalLine."Journal Template Name", ItemJournalLine."Journal Batch Name");
 
-        // [GIVEN] Assign lot tracking on component "C1".
-        SelectItemTrackingForProdOrderComponents(CompItem."No.");
+        // [GIVEN] Create a certified Production BOM with Item "I1".
+        LibraryManufacturing.CreateCertifiedProductionBOM(ProductionBOMHeader, Item[1]."No.", 1);
 
-        // [GIVEN] Assign lot tracking on component "C2".
-        SelectItemTrackingForProdOrderComponents(CompItem2."No.");
+        // [GIVEN] Create produced Item "I2" with FIFO costing and Production BOM.
+        LibraryInventory.CreateItem(Item[2]);
+        Item[2].Validate("Costing Method", Item[2]."Costing Method"::FIFO);
+        Item[2].Validate("Production BOM No.", ProductionBOMHeader."No.");
+        Item[2].Modify(true);
 
-        // [WHEN] Post output journal for production order.
-        CreateAndPostOutputJournal(ProductionOrder."No.", Qty);
+        // [GIVEN] Create and refresh a Released Production Order for Item "I2" at Location "L".
+        LibraryManufacturing.CreateProductionOrder(
+            ProductionOrder, ProductionOrder.Status::Released,
+            ProductionOrder."Source Type"::Item, Item[2]."No.", 1);
+        ProductionOrder.Validate("Location Code", Location.Code);
+        ProductionOrder.Modify(true);
+        LibraryManufacturing.RefreshProdOrder(ProductionOrder, false, true, true, true, false);
 
-        // [THEN] Consumption is posted for "C1" with lot tracking.
-        VerifyConsumptionWithLotTracking(CompItem."No.");
+        // [GIVEN] Post consumption journal on date "D1".
+        LibraryManufacturing.CreateProdItemJournal(
+            ItemJournalBatch, Item[2]."No.",
+            ItemJournalBatch."Template Type"::Consumption, ProductionOrder."No.");
+        SetItemJournalLinePostingDate(ItemJournalBatch, ConsumptionPostingDate);
+        LibraryInventory.PostItemJournalLine(ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name);
 
-        // [THEN] Consumption is posted for "C2" with lot tracking.
-        VerifyConsumptionWithLotTracking(CompItem2."No.");
+        // [GIVEN] Restrict Allow Posting From to finish date "D2" so posting on "D1" would fail.
+        GeneralLedgerSetup.Get();
+        GeneralLedgerSetup."Allow Posting From" := FinishPostingDate;
+        GeneralLedgerSetup.Modify();
 
-        LibraryVariableStorage.AssertEmpty();
+        // [WHEN] Change Production Order status to Finished with posting date "D2".
+        ProdOrderStatusMgt.SetFinishOrderWithoutOutput(true);
+        ProdOrderStatusMgt.ChangeProdOrderStatus(
+            ProductionOrder, ProductionOrder.Status::Finished, FinishPostingDate, false);
+
+        // [THEN] WIP adjustment G/L entries have Posting Date = "D2".
+        ProductionOrder.SetRange(Status, ProductionOrder.Status::Finished);
+        ProductionOrder.SetRange("No.", ProductionOrder."No.");
+        Assert.RecordIsNotEmpty(ProductionOrder);
     end;
 
     local procedure Initialize()
@@ -10261,15 +10280,14 @@ codeunit 137072 "SCM Production Orders II"
         WarehouseEntry.SetRange("Location Code", LocationCode);
         WarehouseEntry.FindLast();
     end;
-
-    local procedure VerifyConsumptionWithLotTracking(ItemNo: Code[20])
+    
+    local procedure SetItemJournalLinePostingDate(ItemJournalBatch: Record "Item Journal Batch"; PostingDate: Date)
     var
-        ItemLedgerEntry: Record "Item Ledger Entry";
+        ItemJournalLine: Record "Item Journal Line";
     begin
-        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Consumption);
-        ItemLedgerEntry.SetRange("Item No.", ItemNo);
-        ItemLedgerEntry.SetFilter("Lot No.", '<>%1', '');
-        Assert.RecordIsNotEmpty(ItemLedgerEntry);
+        ItemJournalLine.SetRange("Journal Template Name", ItemJournalBatch."Journal Template Name");
+        ItemJournalLine.SetRange("Journal Batch Name", ItemJournalBatch.Name);
+        ItemJournalLine.ModifyAll("Posting Date", PostingDate);
     end;
 
     [ModalPageHandler]
