@@ -1,9 +1,5 @@
-#if not CLEAN25
 codeunit 101212 "Create Job G/L Prices"
 {
-    ObsoleteState = Pending;
-    ObsoleteTag = '19.0';
-    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
 
     trigger OnRun()
     begin
@@ -29,4 +25,3 @@ codeunit 101212 "Create Job G/L Prices"
         JobGLPrice.Insert();
     end;
 }
-#endif

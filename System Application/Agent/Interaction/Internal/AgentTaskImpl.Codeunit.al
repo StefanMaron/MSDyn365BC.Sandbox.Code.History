@@ -7,6 +7,7 @@ namespace System.Agents;
 
 using System.Agents.Troubleshooting;
 using System.Environment;
+using System.Environment.Consumption;
 using System.Integration;
 
 codeunit 4300 "Agent Task Impl."
@@ -14,16 +15,6 @@ codeunit 4300 "Agent Task Impl."
     Access = Internal;
     InherentEntitlements = X;
     InherentPermissions = X;
-
-    procedure SetMessageText(var AgentTaskMessage: Record "Agent Task Message"; MessageText: Text)
-    var
-        ContentOutStream: OutStream;
-    begin
-        Clear(AgentTaskMessage.Content);
-        AgentTaskMessage.Content.CreateOutStream(ContentOutStream, GetDefaultEncoding());
-        ContentOutStream.Write(MessageText);
-        AgentTaskMessage.Modify(true);
-    end;
 
     procedure GetStepsDoneCount(var AgentTask: Record "Agent Task"): Integer
     var
@@ -53,7 +44,7 @@ codeunit 4300 "Agent Task Impl."
         Page.Run(Page::"Agent Task Log Entry List", AgentTaskLogEntry);
     end;
 
-    procedure CreateTask(AgentUserSecurityID: Guid; TaskTitle: Text[150]; ExternalID: Text[2048]; var NewAgentTask: Record "Agent Task")
+    procedure CreateTask(AgentUserSecurityID: Guid; TaskTitle: Text[150]; ExternalID: Text[2048]; BillingContext: Enum "Agent Task Billing Context"; var NewAgentTask: Record "Agent Task")
     begin
         NewAgentTask."Agent User Security ID" := AgentUserSecurityID;
         NewAgentTask."Created By" := UserSecurityId();
@@ -61,12 +52,14 @@ codeunit 4300 "Agent Task Impl."
         NewAgentTask."Needs Attention" := false;
         NewAgentTask.Status := NewAgentTask.Status::Paused;
         NewAgentTask."External ID" := ExternalID;
+        NewAgentTask."Billing Context" := BillingContext;
         NewAgentTask.Insert();
     end;
 
     procedure AddMessage(From: Text[250]; MessageText: Text; ExternalMessageId: Text[2048]; var CurrentAgentTask: Record "Agent Task"; RequiresReview: Boolean): Record "Agent Task Message"
     var
         AgentTaskMessage: Record "Agent Task Message";
+        AgentMessageImpl: Codeunit "Agent Message Impl.";
     begin
         if MessageText = '' then
             Error(MessageTextMustBeProvidedErr);
@@ -78,88 +71,61 @@ codeunit 4300 "Agent Task Impl."
         AgentTaskMessage."Requires Review" := RequiresReview;
         AgentTaskMessage.Insert();
 
-        SetMessageText(AgentTaskMessage, MessageText);
+        AgentMessageImpl.UpdateText(AgentTaskMessage, MessageText);
         exit(AgentTaskMessage);
     end;
 
-    procedure CreateUserIntervention(UserInterventionRequestEntry: Record "Agent Task Log Entry")
-    begin
-        CreateUserIntervention(UserInterventionRequestEntry, '', -1);
-    end;
-
-    procedure CreateUserIntervention(UserInterventionRequestEntry: Record "Agent Task Log Entry"; UserInput: Text)
-    begin
-        CreateUserIntervention(UserInterventionRequestEntry, UserInput, -1);
-    end;
-
-    procedure CreateUserIntervention(UserInterventionRequestEntry: Record "Agent Task Log Entry"; SelectedSuggestionId: Integer)
-    begin
-        CreateUserIntervention(UserInterventionRequestEntry, '', SelectedSuggestionId);
-    end;
-
-    procedure CreateUserIntervention(UserInterventionRequestEntry: Record "Agent Task Log Entry"; UserInput: Text; SelectedSuggestionId: Text)
-    var
-        SelectedSuggestionIdInt: Integer;
-    begin
-        if SelectedSuggestionId <> '' then
-            if Evaluate(SelectedSuggestionIdInt, SelectedSuggestionId) then begin
-                CreateUserIntervention(UserInterventionRequestEntry, UserInput, SelectedSuggestionIdInt);
-                exit;
-            end
-            else
-                Session.LogMessage('0000PKA', StrSubstNo(InvalidSelectedSuggestionIdErr, SelectedSuggestionId), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', CategoryTok);
-
-        CreateUserIntervention(UserInterventionRequestEntry, UserInput);
-    end;
-
-    procedure CreateUserIntervention(UserInterventionRequestEntry: Record "Agent Task Log Entry"; UserInput: Text; SelectedSuggestionId: Integer)
+    procedure StopTask(AgentTaskID: BigInteger; AgentTaskStatus: enum "Agent Task Status"; UserConfirm: Boolean)
     var
         AgentTask: Record "Agent Task";
-        AgentALFunctions: DotNet AgentALFunctions;
-        UserIntervention: DotNet "AgentTaskUserIntervention";
     begin
-        AgentTask.Get(UserInterventionRequestEntry."Task ID");
-
-        UserIntervention := UserIntervention.AgentTaskUserInterventionDetails();
-        if UserInput <> '' then
-            UserIntervention.UserInput := UserInput;
-        if SelectedSuggestionId >= 0 then
-            UserIntervention.SelectedSuggestionId := SelectedSuggestionId;
-        AgentALFunctions.CreateAgentTaskUserIntervention(AgentTask."Agent User Security ID", AgentTask.ID, UserInterventionRequestEntry.ID, UserIntervention);
-    end;
-
-    procedure GetUserInterventionRequestDetails(UserInterventionRequestEntry: Record "Agent Task Log Entry"; var UserInterventionRequest: DotNet "AgentTaskUserInterventionRequest")
-    var
-        AgentTask: Record "Agent Task";
-        AgentALFunctions: DotNet AgentALFunctions;
-    begin
-        AgentTask.Get(UserInterventionRequestEntry."Task ID");
-        UserInterventionRequest := AgentALFunctions.GetAgentTaskUserInterventionRequest(AgentTask."Agent User Security ID", AgentTask.ID, UserInterventionRequestEntry.ID);
+        AgentTask.ID := AgentTaskID;
+        StopTask(AgentTask, AgentTaskStatus, UserConfirm);
     end;
 
     procedure StopTask(var AgentTask: Record "Agent Task"; AgentTaskStatus: enum "Agent Task Status"; UserConfirm: Boolean)
+    var
+        AgentTaskToModify: Record "Agent Task";
     begin
-        if ((AgentTask.Status = AgentTaskStatus) and (AgentTask."Needs Attention" = false)) then
+        AgentTaskToModify.Get(AgentTask.ID);
+        if ((AgentTaskToModify.Status = AgentTaskStatus) and (AgentTaskToModify."Needs Attention" = false)) then
             exit; // Task is already stopped and does not need attention.
 
         if UserConfirm then
             if not Confirm(AreYouSureThatYouWantToStopTheTaskQst) then
                 exit;
 
-        AgentTask.Status := AgentTaskStatus;
-        AgentTask."Needs Attention" := false;
-        AgentTask.Modify(true);
+        AgentTaskToModify.Status := AgentTaskStatus;
+        AgentTaskToModify."Needs Attention" := false;
+        AgentTaskToModify.Modify(true);
+
+        AgentTask.Status := AgentTaskToModify.Status;
+        AgentTask."Needs Attention" := AgentTaskToModify."Needs Attention";
+    end;
+
+    procedure RestartTask(AgentTaskID: BigInteger; UserConfirm: Boolean)
+    var
+        AgentTask: Record "Agent Task";
+    begin
+        AgentTask.ID := AgentTaskID;
+        RestartTask(AgentTask, UserConfirm);
     end;
 
     procedure RestartTask(var AgentTask: Record "Agent Task"; UserConfirm: Boolean)
+    var
+        AgentTaskToModify: Record "Agent Task";
     begin
         if UserConfirm then
             if not Confirm(AreYouSureThatYouWantToRestartTheTaskQst) then
                 exit;
 
-        AgentTask."Needs Attention" := false;
-        AgentTask.Status := AgentTask.Status::Ready;
-        AgentTask.Modify(true);
+        AgentTaskToModify.Get(AgentTask.ID);
+        AgentTaskToModify."Needs Attention" := false;
+        AgentTaskToModify.Status := AgentTaskToModify.Status::Ready;
+        AgentTaskToModify.Modify(true);
+
+        AgentTask."Needs Attention" := AgentTaskToModify."Needs Attention";
+        AgentTask.Status := AgentTaskToModify.Status;
     end;
 
     procedure TaskExists(AgentUserSecurityID: Guid; ConversationId: Text): Boolean
@@ -177,14 +143,34 @@ codeunit 4300 "Agent Task Impl."
         exit(TextEncoding::UTF8);
     end;
 
+    procedure SetTaskStatusToReadyIfPossible(AgentTaskID: BigInteger)
+    var
+        AgentTask: Record "Agent Task";
+    begin
+        AgentTask.ID := AgentTaskID;
+        SetTaskStatusToReadyIfPossible(AgentTask);
+    end;
+
     procedure SetTaskStatusToReadyIfPossible(var AgentTask: Record "Agent Task")
+    var
+        AgentTaskToModify: Record "Agent Task";
     begin
         // Only change the status if the task is in a status where it can be started again.
         // If the task is running, we should not change the state, as platform will pickup a new message automatically.
         if CanAgentTaskBeSetToReady(AgentTask) then begin
-            AgentTask.Status := AgentTask.Status::Ready;
-            AgentTask.Modify(true);
+            AgentTaskToModify.Get(AgentTask.ID);
+            AgentTaskToModify.Status := AgentTaskToModify.Status::Ready;
+            AgentTaskToModify.Modify(true);
+            AgentTask.Status := AgentTaskToModify.Status;
         end;
+    end;
+
+    procedure CanAgentTaskBeSetToReady(AgentTaskID: BigInteger): Boolean
+    var
+        AgentTask: Record "Agent Task";
+    begin
+        AgentTask.Get(AgentTaskID);
+        exit(CanAgentTaskBeSetToReady(AgentTask));
     end;
 
     procedure CanAgentTaskBeSetToReady(var AgentTask: Record "Agent Task"): Boolean
@@ -192,9 +178,25 @@ codeunit 4300 "Agent Task Impl."
         exit((AgentTask.Status = AgentTask.Status::Paused) or (AgentTask.Status = AgentTask.Status::Completed));
     end;
 
+    procedure IsTaskRunning(AgentTaskID: BigInteger): Boolean
+    var
+        AgentTask: Record "Agent Task";
+    begin
+        AgentTask.Get(AgentTaskID);
+        exit(IsTaskRunning(AgentTask));
+    end;
+
     procedure IsTaskRunning(var AgentTask: Record "Agent Task"): Boolean
     begin
         exit(AgentTask.Status = AgentTask.Status::Running);
+    end;
+
+    procedure IsTaskCompleted(AgentTaskID: BigInteger): Boolean
+    var
+        AgentTask: Record "Agent Task";
+    begin
+        AgentTask.Get(AgentTaskID);
+        exit(IsTaskCompleted(AgentTask));
     end;
 
     procedure IsTaskCompleted(var AgentTask: Record "Agent Task"): Boolean
@@ -202,9 +204,29 @@ codeunit 4300 "Agent Task Impl."
         exit(AgentTask.Status = AgentTask.Status::Completed);
     end;
 
+    procedure IsTaskStopped(AgentTaskID: BigInteger): Boolean
+    var
+        AgentTask: Record "Agent Task";
+    begin
+        AgentTask.Get(AgentTaskID);
+        exit(IsTaskStopped(AgentTask));
+    end;
+
     procedure IsTaskStopped(var AgentTask: Record "Agent Task"): Boolean
     begin
         exit((AgentTask.Status = AgentTask.Status::"Stopped by User") or (AgentTask.Status = AgentTask.Status::"Stopped by System"));
+    end;
+
+    procedure GetCopilotCreditsConsumed(AgentTaskID: BigInteger): Decimal
+    var
+        AgentTask: Record "Agent Task";
+        UserAIConsumptionData: Record "User AI Consumption Data";
+    begin
+        if not AgentTask.Get(AgentTaskID) then
+            exit(0);
+        UserAIConsumptionData.SetRange("Agent Task Id", AgentTask.ID);
+        UserAIConsumptionData.CalcSums("Copilot Credits");
+        exit(UserAIConsumptionData."Copilot Credits");
     end;
 
     internal procedure TryGetAgentRecordFromTaskId(TaskId: Integer; var Agent: Record Agent): Boolean
@@ -247,6 +269,4 @@ codeunit 4300 "Agent Task Impl."
         MessageTextMustBeProvidedErr: Label 'You must provide a message text.';
         AreYouSureThatYouWantToRestartTheTaskQst: Label 'Are you sure that you want to restart the task?';
         AreYouSureThatYouWantToStopTheTaskQst: Label 'Are you sure that you want to stop the task?';
-        InvalidSelectedSuggestionIdErr: Label 'Invalid SelectedSuggestionId: %1', Comment = '%1 - SelectedSuggestionId', Locked = true;
-        CategoryTok: Label 'Agents', Locked = true;
 }

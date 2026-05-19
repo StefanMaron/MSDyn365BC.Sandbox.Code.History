@@ -413,9 +413,9 @@ codeunit 139111 "Mail Service Test"
         CompanyInformation: Record "Company Information";
         FeatureKey: Record "Feature Key";
         FeatureKeyUpdateStatus: Record "Feature Data Update Status";
-        LibraryWorkflow: Codeunit "Library - Workflow";
+        LibraryEmail: Codeunit "Library - Email";
     begin
-        LibraryWorkflow.SetUpEmailAccount();
+        LibraryEmail.SetUpEmailAccount();
         BindActiveDirectoryMockEvents();
         LibraryVariableStorage.Clear();
         LibraryERMCountryData.CreateVATData();
