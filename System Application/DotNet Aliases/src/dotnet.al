@@ -1273,10 +1273,6 @@ dotnet
         type("MimeKit.MimePart"; "MimePart")
         {
         }
-
-        type("MimeKit.EncodingConstraint"; "EncodingConstraint")
-        {
-        }
     }
 
     assembly("IDAutomation.LinearFontEncoder")
