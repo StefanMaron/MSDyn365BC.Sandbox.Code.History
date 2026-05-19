@@ -988,14 +988,17 @@ codeunit 144051 "ERM EVAT"
                 ElementName := 'bd-i:ABCSuppliesAmount'
             else
                 ElementName := 'bd-i:SuppliesAmount';
-                
+
         ExpectedAmount := Format(-VATEntry.Base, 0, '<Sign><Integer>');
         if CountryRegion.Get(VATEntry."Country/Region Code") then;
+
         // Verify the amount fact exists with correct value
         LibraryXMLRead.VerifyNodeValueInSubtree(XbrliXbrlTok, ElementName, ExpectedAmount);
+
         // Verify dimensional context contains the right country and VAT number
         LibraryXMLRead.VerifyNodeValueInSubtree('xbrli:scenario', 'bd-dim-dom:CountryCodeEUDomain', CopyStr(CountryRegion."EU Country/Region Code", 1, 2));
         LibraryXMLRead.VerifyNodeValueInSubtree('xbrli:scenario', 'bd-dim-dom:VATNumberDomain', VATEntry."VAT Registration No.");
+
         LibraryXMLRead.VerifyXMLDeclaration('1.0', 'UTF-8', 'yes');
     end;
 
