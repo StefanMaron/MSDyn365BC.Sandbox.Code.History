@@ -676,7 +676,7 @@ codeunit 1252 "Match Bank Rec. Lines"
 
         AmountMatched := (TempMatchingDetailsBankStatementMatchingBuffer."Amount Difference" = 0);
         AmountClose := IsAmountClose(TempBankAccLedgerEntryMatchingBuffer."Remaining Amount", BankAccReconciliationLine.Difference);
-        if not AmountMatched and not AmountClose then
+        if not AmountClose then
             exit(false);
 
         BankReconciliationLineTextSimilarityScores(TempBankAccLedgerEntryMatchingBuffer."Document No.", BankAccReconciliationLine, TempMatchingDetailsBankStatementMatchingBuffer."Doc. No. Score", TempMatchingDetailsBankStatementMatchingBuffer."Doc. No. Exact Score");
@@ -697,7 +697,10 @@ codeunit 1252 "Match Bank Rec. Lines"
         ListOfMatchFields := ListOfMatchedFields(AmountMatched, DocumentNoMatched, ExternalDocumentNoMatched, TransactionDateMatched, false, DescriptionMatched);
         TempMatchingDetailsBankStatementMatchingBuffer."Match Details" := StrSubstNo(MatchDetailsTxt, ListOfMatchFields);
 
-        exit(((DocumentNoMatched or ExternalDocumentNoMatched or DescriptionMatched) and AmountClose) or AmountMatched);
+        if AmountMatched then
+            exit(true);
+
+        exit(DocumentNoMatched or ExternalDocumentNoMatched or DescriptionMatched);
     end;
 
 
@@ -742,36 +745,36 @@ codeunit 1252 "Match Bank Rec. Lines"
 
         FieldNear := RecordMatchMgt.CalculateStringNearness(BankAccReconciliationLine.Description, TextToMatch, 4, 100);
         FieldExact := RecordMatchMgt.CalculateExactStringNearness(BankAccReconciliationLine.Description, TextToMatch, 100);
-        if FieldNear > NearScore then 
+        if FieldNear > NearScore then
             NearScore := FieldNear;
-        if FieldExact > ExactScore then 
+        if FieldExact > ExactScore then
             ExactScore := FieldExact;
         if (NearScore = 100) and (ExactScore = 100) then
             exit;
 
         FieldNear := RecordMatchMgt.CalculateStringNearness(BankAccReconciliationLine."Related-Party Name", TextToMatch, 4, 100);
         FieldExact := RecordMatchMgt.CalculateExactStringNearness(BankAccReconciliationLine."Related-Party Name", TextToMatch, 100);
-        if FieldNear > NearScore then 
+        if FieldNear > NearScore then
             NearScore := FieldNear;
-        if FieldExact > ExactScore then 
+        if FieldExact > ExactScore then
             ExactScore := FieldExact;
         if (NearScore = 100) and (ExactScore = 100) then
             exit;
 
         FieldNear := RecordMatchMgt.CalculateStringNearness(BankAccReconciliationLine."Additional Transaction Info", TextToMatch, 4, 100);
         FieldExact := RecordMatchMgt.CalculateExactStringNearness(BankAccReconciliationLine."Additional Transaction Info", TextToMatch, 100);
-        if FieldNear > NearScore then 
+        if FieldNear > NearScore then
             NearScore := FieldNear;
-        if FieldExact > ExactScore then 
+        if FieldExact > ExactScore then
             ExactScore := FieldExact;
         if (NearScore = 100) and (ExactScore = 100) then
             exit;
 
         FieldNear := RecordMatchMgt.CalculateStringNearness(BankAccReconciliationLine."Document No.", TextToMatch, 4, 100);
         FieldExact := RecordMatchMgt.CalculateExactStringNearness(BankAccReconciliationLine."Document No.", TextToMatch, 100);
-        if FieldNear > NearScore then 
+        if FieldNear > NearScore then
             NearScore := FieldNear;
-        if FieldExact > ExactScore then 
+        if FieldExact > ExactScore then
             ExactScore := FieldExact;
     end;
 
