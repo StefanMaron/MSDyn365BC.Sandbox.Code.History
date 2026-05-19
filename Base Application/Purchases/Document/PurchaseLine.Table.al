@@ -3158,6 +3158,7 @@ table 39 "Purchase Line"
             Caption = 'Purchasing Code';
             Editable = false;
             TableRelation = Purchasing;
+            ToolTip = 'Specifies the purchasing code associated with the purchase line.';
 
             trigger OnValidate()
             var
@@ -5203,6 +5204,8 @@ table 39 "Purchase Line"
             UpdateAmounts();
 
         ShouldExit := ((CalledByFieldNo <> CurrFieldNo) and (CurrFieldNo <> 0)) or IsProdOrder();
+
+        OverturnExitConditionForNoViaDescription(CalledByFieldNo, ShouldExit);
         OverturnExitConditionForDefaultGLAccountQuantityValidation(ShouldExit);
         OnUpdateDirectUnitCostByFieldOnAfterCalcShouldExit(Rec, xRec, CalledByFieldNo, CurrFieldNo, ShouldExit);
         if ShouldExit then
@@ -6015,7 +6018,6 @@ table 39 "Purchase Line"
     procedure AddItem(var PurchLine: Record "Purchase Line"; ItemNo: Code[20])
     var
         LastPurchLine: Record "Purchase Line";
-        TransferExtendedText: Codeunit "Transfer Extended Text";
     begin
         PurchLine.Init();
         PurchLine."Line No." += 10000;
@@ -6023,11 +6025,35 @@ table 39 "Purchase Line"
         PurchLine.Validate("No.", ItemNo);
         OnAddItemOnBeforeInsert(PurchLine);
         PurchLine.Insert(true);
-        if TransferExtendedText.PurchCheckIfAnyExtText(PurchLine, false) then begin
-            TransferExtendedText.InsertPurchExtTextRetLast(PurchLine, LastPurchLine);
-            PurchLine."Line No." := LastPurchLine."Line No."
-        end;
+
+        TransferExtendedTexts(PurchLine, LastPurchLine);
+
         OnAfterAddItem(PurchLine, LastPurchLine);
+    end;
+
+    /// <summary>
+    /// Transfers extended texts for the purchase line.
+    /// </summary>
+    /// <remarks>
+    /// If purchase line has automatic ext. texts enabled, it inserts extended texts to purchase line.
+    /// This procedure can be called independently to apply extended text logic without initializing a new line.
+    /// </remarks>
+    /// <param name="PurchaseLine">The purchase line to process.</param>
+    /// <param name="LastPurchaseLine">Return value: The last purchase line after extended text insertion.</param>
+    procedure TransferExtendedTexts(var PurchaseLine: Record "Purchase Line"; var LastPurchaseLine: Record "Purchase Line")
+    var
+        TransferExtendedText: Codeunit "Transfer Extended Text";
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeTransferExtendedTexts(PurchaseLine, LastPurchaseLine, IsHandled);
+        if IsHandled then
+            exit;
+
+        if TransferExtendedText.PurchCheckIfAnyExtText(PurchaseLine, false) then begin
+            TransferExtendedText.InsertPurchExtTextRetLast(PurchaseLine, LastPurchaseLine);
+            PurchaseLine."Line No." := LastPurchaseLine."Line No."
+        end;
     end;
 
     /// <summary>
@@ -8279,7 +8305,7 @@ table 39 "Purchase Line"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeUpdatePrepmtAmounts(Rec, PurchHeader, IsHandled);
+        OnBeforeUpdatePrepmtAmounts(Rec, PurchHeader, IsHandled, CurrFieldNo);
         if IsHandled then
             exit;
 
@@ -10030,6 +10056,12 @@ table 39 "Purchase Line"
               PurchaseHeader.FieldCaption("Pay-to Vendor Templ. Code"));
     end;
 
+    local procedure OverturnExitConditionForNoViaDescription(CalledByFieldNo: Integer; var ShouldExit: Boolean)
+    begin
+        if (CalledByFieldNo = FieldNo("No.")) and (CurrFieldNo = FieldNo(Description)) and (ShouldExit) then
+            ShouldExit := false;
+    end;
+
     local procedure OverturnExitConditionForDefaultGLAccountQuantityValidation(var ShouldExit: Boolean)
     begin
         if not ShouldExit then
@@ -10164,6 +10196,11 @@ table 39 "Purchase Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterAddItem(var PurchaseLine: Record "Purchase Line"; LastPurchaseLine: Record "Purchase Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTransferExtendedTexts(var PurchaseLine: Record "Purchase Line"; var LastPurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
     begin
     end;
 
@@ -10863,7 +10900,7 @@ table 39 "Purchase Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeUpdatePrepmtAmounts(var PurchaseLine: Record "Purchase Line"; PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
+    local procedure OnBeforeUpdatePrepmtAmounts(var PurchaseLine: Record "Purchase Line"; PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean; CurrentFieldNo: Integer)
     begin
     end;
 
