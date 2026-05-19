@@ -643,10 +643,7 @@ table 37 "Sales Line"
                 if not IsHandled then
                     if ("No." = '') and GuiAllowed then
                         if ApplicationAreaMgmtFacade.IsFoundationEnabled() then
-                            if "Document Type" in
-                            ["Document Type"::Order, "Document Type"::Invoice, "Document Type"::Quote, "Document Type"::"Credit Memo"]
-                            then
-                                Error(CannotFindDescErr, Type, Description);
+                            Error(CannotFindDescErr, Type, Description);
             end;
         }
         /// <summary>
