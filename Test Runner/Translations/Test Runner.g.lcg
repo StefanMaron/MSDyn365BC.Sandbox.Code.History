@@ -1067,6 +1067,42 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.TestRunner)(LookupHint=Table Test Input Group - Field Sensitive - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Table 1890310249 - Field 2712309635 - Property 1295455071" ItemType=";Table - Field" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Specifies whether the per-suite setup has been executed for this test input group.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.TestRunner)(LookupHint=Table Test Input Group - Field Suite Setup Done - Property ToolTip)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Table 1890310249 - Field 2712309635 - Property 2879900210" ItemType=";Table - Field" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Suite Setup Done]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.TestRunner)(LookupHint=Table Test Input Group - Field Suite Setup Done - Property Caption)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Table 1890310249 - Field 3931461763 - Property 1295455071" ItemType=";Table - Field" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Specifies the group name of the test input group that contains suite setup data for this dataset.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.TestRunner)(LookupHint=Table Test Input Group - Field Suite Setup Group Name - Property ToolTip)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Table 1890310249 - Field 3931461763 - Property 2879900210" ItemType=";Table - Field" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Suite Setup Group Name]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.TestRunner)(LookupHint=Table Test Input Group - Field Suite Setup Group Name - Property Caption)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Table 1101906057 - Property 2879900210" ItemType=";Table - Table" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Test Method Line]]></Val>
@@ -1407,6 +1443,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.TestRunner)(LookupHint=Codeunit Test Inputs Management - NamedType LineTypeMustBeCodeunitErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3313963396 - NamedType 3745595370" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Suite setup datasets can only contain a single entry per language.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.TestRunner)(LookupHint=Codeunit Test Inputs Management - NamedType SuiteSetupOnlyOneRowErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1790304243 - NamedType 2759911107" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -2768,6 +2813,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.TestRunner)(LookupHint=Page Test Input Groups - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Page 2175372352 - NamedType 2922641754" ItemType=";Page - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Are you sure you want to delete the selected test input groups?]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.TestRunner)(LookupHint=Page Test Input Groups - NamedType DeleteSelectedQst)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Page 2175372352 - Control 2200046723 - Property 1295455071" ItemType=";Page - Control" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Specifies the indentation level for the tree view]]></Val>
@@ -2784,6 +2838,24 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.TestRunner)(LookupHint=Page Test Input Groups - Control Indentation - Property Caption)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Page 2175372352 - Action 1923430844 - Property 1295455071" ItemType=";Page - Action" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Delete the selected test input groups and their entries.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.TestRunner)(LookupHint=Page Test Input Groups - Action DeleteSelected - Property ToolTip)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Page 2175372352 - Action 1923430844 - Property 2879900210" ItemType=";Page - Action" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Delete Selected]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.TestTools.TestRunner)(LookupHint=Page Test Input Groups - Action DeleteSelected - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Page 2175372352 - Action 2726531340 - Property 1295455071" ItemType=";Page - Action" PsrId="63" InstFlg="true" Leaf="true">
