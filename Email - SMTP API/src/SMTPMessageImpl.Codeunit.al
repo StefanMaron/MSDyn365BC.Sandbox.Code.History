@@ -141,6 +141,22 @@ codeunit 4614 "SMTP Message Impl"
     end;
 
     /// <summary>
+    /// Builds the underlying MimeMessage and calls Prepare() on it — the same
+    /// code path that MailKit's SmtpClient.Send() takes internally. Exposed for
+    /// tests so they can verify the message can be serialized without pulling
+    /// MimeKit into the test library.
+    /// </summary>
+    [TryFunction]
+    internal procedure TryPrepareMessage()
+    var
+        MimeMessage: DotNet MimeMessage;
+        EncodingConstraint: DotNet EncodingConstraint;
+    begin
+        GetMessage(MimeMessage);
+        MimeMessage.Prepare(EncodingConstraint.SevenBit);
+    end;
+
+    /// <summary>
     /// Try function for adding an attachment
     /// </summary>
     /// <remarks>
