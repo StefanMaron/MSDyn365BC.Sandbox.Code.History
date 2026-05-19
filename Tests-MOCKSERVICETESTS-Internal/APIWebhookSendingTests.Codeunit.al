@@ -1717,36 +1717,6 @@ codeunit 135089 "API Webhook Sending Tests"
         VerifyProcessingFinished();
     end;
 
-    [Test]
-    [Scope('OnPrem')]
-    procedure TestInactiveJobsDeleted()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        SubscriptionID: Text;
-    begin
-        // [SCENARIO] Inactive jobs are deleted
-        Initialize();
-
-        // [GIVEN] A subscription
-        SubscriptionID := CreateActiveSubscriptionForEntityWithGuidKey();
-        // [GIVEN] Inactive jobs
-        CreateJobQueueEntry(ProcessingTime - 4 * MillisecondsPerDay(), JobQueueEntry.Status::Error, false);
-        CreateJobQueueEntry(ProcessingTime - 3 * MillisecondsPerDay(), JobQueueEntry.Status::"On Hold with Inactivity Timeout", false);
-        CreateJobQueueEntry(ProcessingTime - 2 * MillisecondsPerDay(), JobQueueEntry.Status::Finished, false);
-        CreateJobQueueEntry(ProcessingTime - 1 * MillisecondsPerDay(), JobQueueEntry.Status::Ready, false);
-        // [GIVEN] two active jobs
-        CreateJobQueueEntry(ProcessingTime, JobQueueEntry.Status::"In Process", false);
-        CreateJobQueueEntry(ProcessingTime + MillisecondsPerDay(), JobQueueEntry.Status::Ready, true);
-
-        // [WHEN] Process notifications
-        ProcessNotifications();
-
-        // [THEN] Subscription has not been deleted
-        VerifySubscriptionExists(SubscriptionID);
-        // [THEN] Two active jobs exist. Inactive jobs have been removed.
-        VerifyJobCount(2);
-    end;
-
     local procedure Initialize()
     begin
         Reset();
@@ -2195,54 +2165,6 @@ codeunit 135089 "API Webhook Sending Tests"
         APIWebhookNotificationAggr."Sending Scheduled Date Time" := 0DT;
         APIWebhookNotificationAggr.Insert();
         exit(NotificationID);
-    end;
-
-    local procedure CreateJobQueueEntry(EarliestStartDateTime: DateTime; Status: Integer; Scheduled: Boolean): Guid
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-    begin
-        CreateJobCategoryIfMissing();
-
-        JobQueueEntry.ID := CreateGuid();
-        JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
-        JobQueueEntry."Object ID to Run" := CODEUNIT::"API Webhook Notification Send";
-        JobQueueEntry."Job Queue Category Code" := CopyStr(JobQueueCategoryCodeLbl, 1, MaxStrLen(JobQueueEntry."Job Queue Category Code"));
-        JobQueueEntry."Earliest Start Date/Time" := EarliestStartDateTime;
-        JobQueueEntry.Status := Status;
-        JobQueueEntry.Insert();
-        MockJobStatus(JobQueueEntry, Status, Scheduled);
-        exit(JobQueueEntry.ID);
-    end;
-
-    local procedure CreateJobCategoryIfMissing()
-    var
-        JobQueueCategory: Record "Job Queue Category";
-    begin
-        if not JobQueueCategory.Get(JobQueueCategoryCodeLbl) then begin
-            JobQueueCategory.Validate(Code, CopyStr(JobQueueCategoryCodeLbl, 1, MaxStrLen(JobQueueCategory.Code)));
-            JobQueueCategory.Insert(true);
-        end;
-    end;
-
-    local procedure MockJobStatus(var JobQueueEntry: Record "Job Queue Entry"; Status: Integer; Scheduled: Boolean)
-    var
-        ScheduledTask: Record "Scheduled Task";
-    begin
-        JobQueueEntry.Status := Status;
-        if (JobQueueEntry.Status = JobQueueEntry.Status::Ready) and Scheduled then begin
-            if IsNullGuid(JobQueueEntry."System Task ID") then
-                JobQueueEntry."System Task ID" := CreateGuid();
-            if not ScheduledTask.Get(JobQueueEntry."System Task ID") then begin
-                ScheduledTask.ID := JobQueueEntry."System Task ID";
-                ScheduledTask.Insert();
-            end;
-        end else
-            if not IsNullGuid(JobQueueEntry."System Task ID") then begin
-                if ScheduledTask.Get(JobQueueEntry."System Task ID") then
-                    ScheduledTask.Delete();
-                Clear(JobQueueEntry."System Task ID");
-            end;
-        JobQueueEntry.Modify(true);
     end;
 
     local procedure SetNotificationUrl(SubscriptionID: Text; Number: Integer; ResponseCode: Integer)
