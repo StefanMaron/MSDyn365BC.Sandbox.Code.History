@@ -162,8 +162,8 @@ codeunit 144021 "IT - CU 2015 Unit Test"
         LoadFile(Filename);
         // Bug id 438543: A "0" char must be exported on the 527 position for the header's line
         ValidateHeader(SigningCompanyOfficialNo);
-        ValidateRecordDAndH(VendorNo, SigningCompanyOfficialNo, "Withholding Tax Reason"::A, 3, '', WithholdingTax."Non-Taxable Income Type"::"1", 1, 1);
-        ValidateRecordDAndH(VendorNo, SigningCompanyOfficialNo, "Withholding Tax Reason"::B, 5, '', WithholdingTax."Non-Taxable Income Type"::"1", 2, 1);
+        ValidateRecordDAndH(VendorNo, SigningCompanyOfficialNo, "Withholding Tax Reason"::A, 3, '', WithholdingTax."Non-Taxable Income Type"::"1", 1);
+        ValidateRecordDAndH(VendorNo, SigningCompanyOfficialNo, "Withholding Tax Reason"::B, 5, '', WithholdingTax."Non-Taxable Income Type"::"1", 2);
         ValidateFooter(7, 2);
     end;
 
@@ -426,21 +426,21 @@ codeunit 144021 "IT - CU 2015 Unit Test"
         // [THEN] Record with "AU001001" = "G", field "AU001002" = 2016, "AU001006" = 1
         ValidateRecordDAndH(
           VendorNo, SigningCompanyOfficialNo, "Withholding Tax Reason"::G, 3, Format(Date2DMY(WorkDate(), 3) - 1),
-          WithholdingTax."Non-Taxable Income Type"::"1", 1, 1);
+          WithholdingTax."Non-Taxable Income Type"::"1", 1);
 
         // [THEN] Record with "AU001001" = "H", field "AU001002" = 2016, "AU001006" = 2
         ValidateRecordDAndH(
           VendorNo, SigningCompanyOfficialNo, "Withholding Tax Reason"::H, 5, Format(Date2DMY(WorkDate(), 3) - 1),
-          WithholdingTax."Non-Taxable Income Type"::"2", 2, 1);
+          WithholdingTax."Non-Taxable Income Type"::"2", 2);
 
         // [THEN] Record with "AU001001" = "I", field "AU001002" = 2016, "AU001006" = 5
         ValidateRecordDAndH(
           VendorNo, SigningCompanyOfficialNo, "Withholding Tax Reason"::I, 7, Format(Date2DMY(WorkDate(), 3) - 1),
-          WithholdingTax."Non-Taxable Income Type"::"5", 3, 1);
+          WithholdingTax."Non-Taxable Income Type"::"5", 3);
 
         // [THEN] Record with "AU001001" = "ZO", without field "AU001002", "AU001006" = 6
         ValidateRecordDAndH(
-          VendorNo, SigningCompanyOfficialNo, "Withholding Tax Reason"::ZO, 9, '', WithholdingTax."Non-Taxable Income Type"::"6", 4, 1);
+          VendorNo, SigningCompanyOfficialNo, "Withholding Tax Reason"::ZO, 9, '', WithholdingTax."Non-Taxable Income Type"::"6", 4);
     end;
 
     [Test]
@@ -1077,7 +1077,7 @@ codeunit 144021 "IT - CU 2015 Unit Test"
 
         // [THEN] All H records have entry number matching the D record entry number
         LoadFile(Filename);
-        VerifyDAndHRecordEntryNumbers(3, 1, 1, 3);
+        VerifyDAndHRecordEntryNumbers(3, 1, 3);
         ValidateFooterOfDAndHRecords(7, 3, 1);
     end;
 
@@ -1089,8 +1089,8 @@ codeunit 144021 "IT - CU 2015 Unit Test"
         VendorNo: Code[20];
         Filename: Text;
     begin
-        // [FEATURE] [AI test 0.4]
-        // [SCENARIO 625603] Module numbers increment per reason within same vendor; certification progressive stays same
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 625603] Entry numbers are sequential per vendor-reason group and consistent between D and H records
         Initialize();
 
         // [GIVEN] Vendor "V"
@@ -1107,12 +1107,12 @@ codeunit 144021 "IT - CU 2015 Unit Test"
         // [WHEN] Export withholding taxes
         Filename := Export(CreateCompanyOfficial());
 
-        // [THEN] First group (reason A): Module=1, CertProg=1
+        // [THEN] First group (reason A): D and H records have entry number 1
         LoadFile(Filename);
-        VerifyDAndHRecordEntryNumbers(3, 1, 1, 2);
+        VerifyDAndHRecordEntryNumbers(3, 1, 2);
 
-        // [THEN] Second group (reason B): Module=2, same CertProg=1
-        VerifyDAndHRecordEntryNumbers(6, 2, 1, 2);
+        // [THEN] Second group (reason B): D and H records have entry number 2
+        VerifyDAndHRecordEntryNumbers(6, 2, 2);
         ValidateFooterOfDAndHRecords(9, 4, 2);
     end;
 
@@ -1663,7 +1663,7 @@ codeunit 144021 "IT - CU 2015 Unit Test"
     begin
         LoadFile(Filename);
         ValidateHeader(SigningCompanyOfficialNo);
-        ValidateRecordDAndH(VendorNo, SigningCompanyOfficialNo, "Withholding Tax Reason"::A, 3, '', WithholdingTax."Non-Taxable Income Type"::"1", 1, 1);
+        ValidateRecordDAndH(VendorNo, SigningCompanyOfficialNo, "Withholding Tax Reason"::A, 3, '', WithholdingTax."Non-Taxable Income Type"::"1", 1);
         ValidateFooter(5, 1);
     end;
 
@@ -1712,7 +1712,7 @@ codeunit 144021 "IT - CU 2015 Unit Test"
         Assert.AreEqual(Expected, DelChr(LibrarySpesometro.ReadValue(TextFile, LineNumber, Position, Length), '<>', ' '), '');
     end;
 
-    local procedure ValidateRecordDAndH(VendorNo: Code[20]; SigningCompanyOfficialNo: Code[20]; WithholdingTaxReason: Enum "Withholding Tax Reason"; LineNumber: Integer; Year: Text; NonTaxableIncomeType: Enum "Non-Taxable Income Type"; RecordHEntryNumber: Integer; CertificationProgressive: Integer)
+    local procedure ValidateRecordDAndH(VendorNo: Code[20]; SigningCompanyOfficialNo: Code[20]; WithholdingTaxReason: Enum "Withholding Tax Reason"; LineNumber: Integer; Year: Text; NonTaxableIncomeType: Enum "Non-Taxable Income Type"; RecordHEntryNumber: Integer)
     var
         WithholdingTax: Record "Withholding Tax";
         TempWithholdingTax: Record "Withholding Tax" temporary;
@@ -1741,46 +1741,37 @@ codeunit 144021 "IT - CU 2015 Unit Test"
         // Validate D-Record
         ValidateTextFileValue(LineNumber, 1, 1, 'D');
         ValidateTextFileValue(LineNumber, 2, 16, CompanyInformation."Fiscal Code");
-        ValidateTextFileValue(LineNumber, 18, 8, FormatToLength(RecordHEntryNumber, 8)); // D-3: Progressivo Modulo
+        ValidateTextFileValue(LineNumber, 18, 8, '00000001'); // We only export a single file
         ValidateTextFileValue(LineNumber, 26, 16, Vendor."Fiscal Code");
-        ValidateTextFileValue(LineNumber, 42, 5, FormatToLength(CertificationProgressive, 5)); // D-5: Progressivo Certificazione
 
-        if RecordHEntryNumber = 1 then begin
-            ValidateBlockValue(LineNumber, 'DA001001', 0, CompanyInformation."Fiscal Code");
+        ValidateBlockValue(LineNumber, 'DA001001', 0, CompanyInformation."Fiscal Code");
 
-            ValidateBlockValue(LineNumber, 'DA001002', ConstFormat::AN, CompanyInformation.Name);
-            ValidateBlockValue(LineNumber, 'DA001004', ConstFormat::AN, CompanyInformation.City);
-            ValidateBlockValue(LineNumber, 'DA001005', ConstFormat::PR, CompanyInformation.County);
-            ValidateBlockValue(LineNumber, 'DA001006', ConstFormat::AN, CompanyInformation."Post Code");
-            ValidateBlockValue(LineNumber, 'DA001007', ConstFormat::AN, CompanyInformation.Address);
-            ValidateBlockValue(LineNumber, 'DA001009', ConstFormat::AN, CompanyInformation."E-Mail");
-            ValidateBlockValue(LineNumber, 'DA001011', ConstFormat::AN, CompanyInformation."Office Code");
+        ValidateBlockValue(LineNumber, 'DA001002', ConstFormat::AN, CompanyInformation.Name);
+        ValidateBlockValue(LineNumber, 'DA001004', ConstFormat::AN, CompanyInformation.City);
+        ValidateBlockValue(LineNumber, 'DA001005', ConstFormat::PR, CompanyInformation.County);
+        ValidateBlockValue(LineNumber, 'DA001006', ConstFormat::AN, CompanyInformation."Post Code");
+        ValidateBlockValue(LineNumber, 'DA001007', ConstFormat::AN, CompanyInformation.Address);
+        ValidateBlockValue(LineNumber, 'DA001009', ConstFormat::AN, CompanyInformation."E-Mail");
+        ValidateBlockValue(LineNumber, 'DA001011', ConstFormat::AN, CompanyInformation."Office Code");
 
-            // Bug id 468097: DA002001 tag must contain the fiscal code of the vendor
-            ValidateBlockValue(LineNumber, 'DA002001', ConstFormat::CF, Vendor."Fiscal Code");
-            ValidateBlockValue(LineNumber, 'DA002002', ConstFormat::AN, Vendor."Last Name");
-            ValidateBlockValue(LineNumber, 'DA002003', ConstFormat::AN, Vendor."First Name");
-            ValidateBlockValue(LineNumber, 'DA002006', ConstFormat::AN, Vendor."Birth City");
-            ValidateBlockValue(LineNumber, 'DA002007', ConstFormat::PN, Vendor."Birth County");
-            ValidateSpecialCategoryBlockValue(LineNumber, 'DA002008', Vendor."Special Category");
+        // Bug id 468097: DA002001 tag must contain the fiscal code of the vendor
+        ValidateBlockValue(LineNumber, 'DA002001', ConstFormat::CF, Vendor."Fiscal Code");
+        ValidateBlockValue(LineNumber, 'DA002002', ConstFormat::AN, Vendor."Last Name");
+        ValidateBlockValue(LineNumber, 'DA002003', ConstFormat::AN, Vendor."First Name");
+        ValidateBlockValue(LineNumber, 'DA002006', ConstFormat::AN, Vendor."Birth City");
+        ValidateBlockValue(LineNumber, 'DA002007', ConstFormat::PN, Vendor."Birth County");
+        ValidateSpecialCategoryBlockValue(LineNumber, 'DA002008', Vendor."Special Category");
 
-            ValidateBlockValue(LineNumber, 'DA002030', ConstFormat::AN, '');
+        ValidateBlockValue(LineNumber, 'DA002030', ConstFormat::AN, '');
 
-            ValidateBlockValue(LineNumber, 'DA003002', ConstFormat::CB, '1');
-        end else begin
-            ValidateBlockAbsence(LineNumber, 'DA001001');
-            ValidateBlockAbsence(LineNumber, 'DA001002');
-            ValidateBlockAbsence(LineNumber, 'DA002001');
-            ValidateBlockAbsence(LineNumber, 'DA003001');
-            ValidateBlockAbsence(LineNumber, 'DA003002');
-        end;
+        ValidateBlockValue(LineNumber, 'DA003002', ConstFormat::CB, '1');
 
         // Validate H-Record
         ValidateTextFileValue(LineNumber + 1, 1, 1, 'H');
         ValidateTextFileValue(LineNumber + 1, 2, 16, CompanyInformation."Fiscal Code");
-        ValidateTextFileValue(LineNumber + 1, 18, 8, FormatToLength(RecordHEntryNumber, 8)); // H-3: Progressivo Modulo
+        // Bug id 468097: H record must contain the progressive entry number
+        ValidateTextFileValue(LineNumber + 1, 18, 8, '0000000' + Format(RecordHEntryNumber)); // We only export a single file
         ValidateTextFileValue(LineNumber + 1, 26, 16, Vendor."Fiscal Code");
-        ValidateTextFileValue(LineNumber + 1, 42, 5, FormatToLength(CertificationProgressive, 5)); // H-5: Progressivo Certificazione
 
         ValidateBlockValue(LineNumber + 1, 'AU001001', 0, Format(WithholdingTax.Reason));
         ValidateBlockValue(LineNumber + 1, 'AU001002', 0, Year);
@@ -1854,17 +1845,15 @@ codeunit 144021 "IT - CU 2015 Unit Test"
         ValidateTextFileValue(LineNo, 52, 9, '00000000' + Format(NumHRecords, 0, 1)); // Number of H-Records
     end;
 
-    local procedure VerifyDAndHRecordEntryNumbers(DRecordLineNo: Integer; ExpectedModuleNumber: Integer; ExpectedCertProgressive: Integer; HRecordCount: Integer)
+    local procedure VerifyDAndHRecordEntryNumbers(DRecordLineNo: Integer; ExpectedEntryNumber: Integer; HRecordCount: Integer)
     var
         i: Integer;
     begin
         ValidateTextFileValue(DRecordLineNo, 1, 1, 'D');
-        ValidateTextFileValue(DRecordLineNo, 18, 8, FormatToLength(ExpectedModuleNumber, 8)); // D-3: Progressivo Modulo
-        ValidateTextFileValue(DRecordLineNo, 42, 5, FormatToLength(ExpectedCertProgressive, 5)); // D-5: Progressivo Certificazione
+        ValidateTextFileValue(DRecordLineNo, 42, 5, FormatToLength(ExpectedEntryNumber, 5));
         for i := 1 to HRecordCount do begin
             ValidateTextFileValue(DRecordLineNo + i, 1, 1, 'H');
-            ValidateTextFileValue(DRecordLineNo + i, 18, 8, FormatToLength(ExpectedModuleNumber, 8)); // H-3: Progressivo Modulo
-            ValidateTextFileValue(DRecordLineNo + i, 42, 5, FormatToLength(ExpectedCertProgressive, 5)); // H-5: Progressivo Certificazione
+            ValidateTextFileValue(DRecordLineNo + i, 18, 8, FormatToLength(ExpectedEntryNumber, 8));
         end;
     end;
 
