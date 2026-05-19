@@ -111,7 +111,6 @@ codeunit 12 "Gen. Jnl.-Post Line"
         BalanceCheckSrcCurrAmount2: Decimal;
         CurrentBalance: Decimal;
         TotalAddCurrAmount: Decimal;
-        TotalSrcCurrAmount: Decimal;
         TotalAmount: Decimal;
         UnrealizedRemainingAmountCust: Decimal;
         UnrealizedRemainingAmountVend: Decimal;
@@ -601,9 +600,13 @@ codeunit 12 "Gen. Jnl.-Post Line"
             end;
         end;
 
-        GLEntry."Source Currency VAT Amount" := CalcAmountSrcCurr(GenJnlLine, GLEntry."VAT Amount");
+        if GenJnlLine."System-Created Entry" then
+            GLEntry."Source Currency VAT Amount" := GenJnlLine."Source Curr. VAT Amount"
+        else
+            GLEntry."Source Currency VAT Amount" := CalcAmountSrcCurr(GenJnlLine, GLEntry."VAT Amount");
         GLEntry."Additional-Currency Amount" :=
-          GLCalcAddCurrency(GLEntry.Amount, GLEntry."Additional-Currency Amount", GLEntry."Additional-Currency Amount", true, GenJnlLine);
+                  GLCalcAddCurrency(GLEntry.Amount, GLEntry."Additional-Currency Amount", GLEntry."Additional-Currency Amount", true, GenJnlLine);
+
         NonDeductibleVAT.CopyNonDedVATAmountFromGenJnlLineToGLEntry(GLEntry, GenJnlLine);
 
         OnAfterInitVAT(GenJnlLine, GLEntry, VATPostingSetup, AddCurrGLEntryVATAmt);
@@ -935,10 +938,16 @@ codeunit 12 "Gen. Jnl.-Post Line"
                     case VATPostingSetup."VAT Calculation Type" of
                         VATPostingSetup."VAT Calculation Type"::"Normal VAT",
                       VATPostingSetup."VAT Calculation Type"::"Full VAT":
-                            CreateGLEntry(
-                                GenJnlLine, VATPostingSetup.GetSalesAccount(VATPostingParameters."Unrealized VAT"),
-                                VATPostingParameters."Full VAT Amount", VATPostingParameters."Full VAT Amount ACY", true,
-                                CalcAmountSrcCurr(GenJnlLine, VATPostingParameters."Full VAT Amount"));
+                            if GenJnlLine."System-Created Entry" then
+                                CreateGLEntry(
+                                      GenJnlLine, VATPostingSetup.GetSalesAccount(VATPostingParameters."Unrealized VAT"),
+                                      VATPostingParameters."Full VAT Amount", VATPostingParameters."Full VAT Amount ACY", true,
+                                      GenJnlLine."Source Curr. VAT Amount")
+                            else
+                                CreateGLEntry(
+                                    GenJnlLine, VATPostingSetup.GetSalesAccount(VATPostingParameters."Unrealized VAT"),
+                                    VATPostingParameters."Full VAT Amount", VATPostingParameters."Full VAT Amount ACY", true,
+                                    CalcAmountSrcCurr(GenJnlLine, VATPostingParameters."Full VAT Amount"));
                         VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT":
                             ;
                         VATPostingSetup."VAT Calculation Type"::"Sales Tax":
@@ -954,12 +963,18 @@ codeunit 12 "Gen. Jnl.-Post Line"
         LastNextEntryNo: Integer;
     begin
         OnBeforeCreateNormalVATGLEntries(GenJnlLine, VATPostingSetup);
-
         if VATPostingParameters."Unrealized VAT" or (VATPostingParameters."Non-Deductible VAT %" <> 100) then
-            CreateGLEntry(
-                GenJnlLine, VATPostingSetup.GetPurchAccount(VATPostingParameters."Unrealized VAT"),
-                VATPostingParameters."Deductible VAT Amount", VATPostingParameters."Deductible VAT Amount ACY", true,
-                CalcAmountSrcCurr(GenJnlLine, VATPostingParameters."Deductible VAT Amount"));
+            if GenjnlLine."System-Created Entry" then
+                CreateGLEntry(
+                    GenJnlLine, VATPostingSetup.GetPurchAccount(VATPostingParameters."Unrealized VAT"),
+                    VATPostingParameters."Deductible VAT Amount", VATPostingParameters."Deductible VAT Amount ACY", true,
+                    GenJnlLine."Source Curr. VAT Amount")
+            else
+                CreateGLEntry(
+                    GenJnlLine, VATPostingSetup.GetPurchAccount(VATPostingParameters."Unrealized VAT"),
+                    VATPostingParameters."Deductible VAT Amount", VATPostingParameters."Deductible VAT Amount ACY", true,
+                    CalcAmountSrcCurr(GenJnlLine, VATPostingParameters."Deductible VAT Amount"));
+
         if VATPostingParameters."Non-Deductible VAT %" <> 0 then
             if VATPostingParameters."Non-Ded. Purchase VAT Account" = '' then begin
                 if GenJnlLine."Account Type" = GenJnlLine."Account Type"::"Fixed Asset" then begin
@@ -2229,7 +2244,6 @@ codeunit 12 "Gen. Jnl.-Post Line"
                 NextEntryNo, TotalAmount, TotalAddCurrAmount, GLEntry);
 
             TempGLEntryBuf.Insert();
-            TotalSrcCurrAmount += TempGLEntryBuf."Source Currency Amount";
 
             if FirstEntryNo = 0 then
                 FirstEntryNo := TempGLEntryBuf."Entry No.";
@@ -7309,7 +7323,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
                         GenJnlLine, GLEntry, GLAccNo, TotalAmountLCY, TotalAmountAddCurr, true, true, TotalAmountAddCurr)
                 else
                     InitGLEntry(
-                        GenJnlLine, GLEntry, GLAccNo, TotalAmountLCY, TotalAmountAddCurr, true, true, -TotalSrcCurrAmount);
+                        GenJnlLine, GLEntry, GLAccNo, TotalAmountLCY, 0, false, true, TotalAmountAddCurr);
         end;
     end;
 
@@ -7332,8 +7346,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
             end;
             InitGLEntry(
                 GenJnlLine, GLEntry, GLAcc, TotalAmountLCY + AdjAmount[ArrayIndex],
-                TotalAmountAddCurr + AdjAmount[ArrayIndex + 1], true, true,
-                CalcAmountSrcCurr(GenJnlLine, TotalAmountLCY + AdjAmount[ArrayIndex]));
+                TotalAmountAddCurr + AdjAmount[ArrayIndex + 1], true, true, TotalAmountAddCurr);
             AdjAmount[ArrayIndex] := 0;
             AdjAmount[ArrayIndex + 1] := 0;
             exit(true);
