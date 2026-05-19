@@ -55,6 +55,7 @@ codeunit 137077 "SCM Supply Planning -IV"
         ItemNoErr: Label 'Item No. must be equal';
         AmountErr: Label '%1 must be equal to %2', Comment = '%1 = Cost Amount, %2 = Expected Amount';
         DimSetIDErr: Label 'Dimension set id on Requisition Line does not match the updated dimension set id on production order line.';
+        AssemblyOrderCreatedErr: Label 'The assembly order has been created.';
 
     [Test]
     [Scope('OnPrem')]
@@ -4396,6 +4397,37 @@ codeunit 137077 "SCM Supply Planning -IV"
         Assert.AreEqual(NewDimSetID, RequisitionLine."Dimension Set ID", DimSetIDErr);
     end;
 
+    [Test]
+    procedure AssemblyOrdersFromPlanningWorksheet()
+    var
+        AssemblyHeader: Record "Assembly Header";
+        CompItem: Record Item;
+        Item: Record Item;
+        RequisitionLine: Record "Requisition Line";
+        PlanningCreateAsmOrder: Enum "Planning Create Assembly Order";
+    begin
+        // [SCENARIO 620790] Carry out action on planning worksheet with Make and Print assembly orders should be able to print multiple assembly orders. 
+        Initialize();
+
+        // [GIVEN] Create Item with planning parameters and Asm. BOM.
+        CreateAssemblyItemWithBOM(Item, CompItem);
+        CreateSalesOrder(Item."No.", '');
+
+        // [GIVEN] Calculate the plan in Planning Worksheet.
+        CalculateRegenPlanForPlanningWorksheet(Item);
+        AcceptActionMessage(RequisitionLine, Item."No.");
+
+        // [WHEN] Carry out action to create Assembly Order for Sales Lines with Option: Make Assembly Orders'
+        LibraryPlanning.CarryOutPlanWksh(RequisitionLine, 0, 0, 0, PlanningCreateAsmOrder::"Make Assembly Orders".AsInteger(), '', '', '', '');
+
+        // [THEN] Assembly Order is created
+        AssemblyHeader.SetRange("Item No.", Item."No.");
+        Assert.IsFalse(AssemblyHeader.IsEmpty(), AssemblyOrderCreatedErr);
+
+        // [THEN] Verify the assembly order is not printed.
+        VerifyNotPrintedAsmOrders(AssemblyHeader);
+    end;
+
     local procedure Initialize()
     var
         RequisitionLine: Record "Requisition Line";
@@ -5920,6 +5952,15 @@ codeunit 137077 "SCM Supply Planning -IV"
         Dimension.Next();
         LibraryDimension.FindDimensionValue(DimensionValue, Dimension.Code);
         exit(LibraryDimension.CreateDimSet(OldDimSetID, Dimension.Code, DimensionValue.Code));
+    end;
+
+    local procedure VerifyNotPrintedAsmOrders(var AssemblyHeader: Record "Assembly Header")
+    begin
+        AssemblyHeader.FindSet();
+        repeat
+            LibraryReportDataset.AssertElementWithValueNotExist('No_AssemblyHeader', AssemblyHeader."No.");
+            LibraryReportDataset.GetNextRow();
+        until AssemblyHeader.Next() = 0;
     end;
 
     [RequestPageHandler]
