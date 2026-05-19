@@ -1850,10 +1850,12 @@ codeunit 144021 "IT - CU 2015 Unit Test"
         i: Integer;
     begin
         ValidateTextFileValue(DRecordLineNo, 1, 1, 'D');
-        ValidateTextFileValue(DRecordLineNo, 42, 5, FormatToLength(ExpectedEntryNumber, 5));
+        ValidateTextFileValue(DRecordLineNo, 18, 8, FormatToLength(ExpectedEntryNumber, 8)); // D-3: Progressivo Modulo
+        ValidateTextFileValue(DRecordLineNo, 42, 5, FormatToLength(ExpectedEntryNumber, 5)); // D-5: Progressivo Certificazione
         for i := 1 to HRecordCount do begin
             ValidateTextFileValue(DRecordLineNo + i, 1, 1, 'H');
-            ValidateTextFileValue(DRecordLineNo + i, 18, 8, FormatToLength(ExpectedEntryNumber, 8));
+            ValidateTextFileValue(DRecordLineNo + i, 18, 8, FormatToLength(ExpectedEntryNumber, 8)); // H-3: Progressivo Modulo
+            ValidateTextFileValue(DRecordLineNo + i, 42, 5, FormatToLength(ExpectedEntryNumber, 5)); // H-5: Progressivo Certificazione
         end;
     end;
 
