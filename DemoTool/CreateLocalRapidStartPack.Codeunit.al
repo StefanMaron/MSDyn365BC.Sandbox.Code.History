@@ -13,10 +13,6 @@ codeunit 101931 "Create Local RapidStart Pack"
 
     procedure CreateTables()
     begin
-#if not CLEAN25
-        CreateTable(DATABASE::"IRS 1099 Form-Box");
-        CreateTable(DATABASE::"IRS 1099 Adjustment");
-#endif
         CreateTable(DATABASE::"Vendor Location");
         CreateTable(DATABASE::"GIFI Code");
         CreateTable(DATABASE::"Data Dictionary Info");
@@ -34,10 +30,6 @@ codeunit 101931 "Create Local RapidStart Pack"
         CreateConfigWorksheet: Codeunit "Create Config. Worksheet";
     begin
         CreateConfigWorksheet.CreateConfigGroup(XLocalSettingsTxt);
-#if not CLEAN25
-        CreateConfigWorksheet.CreateConfigLine(DATABASE::"IRS 1099 Form-Box");
-        CreateConfigWorksheet.CreateConfigLine(DATABASE::"IRS 1099 Adjustment");
-#endif
         CreateConfigWorksheet.CreateConfigLine(DATABASE::"Vendor Location");
         CreateConfigWorksheet.CreateConfigLine(DATABASE::"GIFI Code");
         CreateConfigWorksheet.CreateConfigLine(DATABASE::"Data Dictionary Info");
@@ -51,4 +43,3 @@ codeunit 101931 "Create Local RapidStart Pack"
         end;
     end;
 }
-
