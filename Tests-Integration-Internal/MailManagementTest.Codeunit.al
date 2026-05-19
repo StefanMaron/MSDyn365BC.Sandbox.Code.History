@@ -371,11 +371,11 @@ codeunit 139134 "Mail Management Test"
 
     local procedure Initialize()
     var
-        LibraryWorkflow: Codeunit "Library - Workflow";
+        LibraryEmail: Codeunit "Library - Email";
         EnvironmentInfoTestLibrary: Codeunit "Environment Info Test Library";
     begin
         EnvironmentInfoTestLibrary.SetTestabilitySoftwareAsAService(false);
-        LibraryWorkflow.SetUpEmailAccount();
+        LibraryEmail.SetUpEmailAccount();
         BindActiveDirectoryMockEvents();
 
         LibraryVariableStorage.Clear();
