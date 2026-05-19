@@ -3454,7 +3454,7 @@ codeunit 408 DimensionManagement
         repeat
             DefaultDimension.CreateDimValuePerAccountFromDimValue(DimensionValue, Confirmed);
             if Confirmed then
-                DefaultDimension.AddDimensionValueToAllowedFilter(DimensionValue.Code);
+                DefaultDimension.UpdateDefaultDimensionAllowedValuesFilter();
         until DefaultDimension.Next() = 0;
     end;
 
