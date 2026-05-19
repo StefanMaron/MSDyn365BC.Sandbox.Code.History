@@ -22,7 +22,6 @@ codeunit 134897 "ERM Source Currency"
         SourceCurrencyCodeFXGainLossErr: Label 'The Source Currency Code should be empty on the G/L Entry for FX Gain/Loss', Locked = true;
         SourceCurrencyAmountShouldBeZeroErr: Label 'The Source Currency Amount should be 0', Locked = true;
         SourceCurrencyAmountShouldMatchEnteredAmountErr: Label 'Source Currency Amount should match manually entered amount', Locked = true;
-        PayablesSCYAmountErr: Label 'Source Currency Amount on payables G/L entry should match the FCY invoice amount', Locked = true;
 
     [Test]
     procedure GenJournalPurchaseNormalVATLCY()
