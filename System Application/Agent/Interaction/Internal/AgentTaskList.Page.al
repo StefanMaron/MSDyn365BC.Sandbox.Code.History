@@ -14,7 +14,7 @@ page 4300 "Agent Task List"
     ApplicationArea = All;
     UsageCategory = Administration;
     SourceTable = "Agent Task";
-    Caption = 'Agent Tasks';
+    Caption = 'Agent Tasks', Comment = 'Agent Tasks in this page should be translated as Tasks that AI agents were assigned.';
     InsertAllowed = false;
     ModifyAllowed = false;
     DeleteAllowed = false;
@@ -34,6 +34,7 @@ page 4300 "Agent Task List"
                 {
                     Caption = 'Task ID';
                     Editable = false;
+                    ExtendedDatatype = Task;
 
                     trigger OnDrillDown()
                     var
@@ -170,7 +171,7 @@ page 4300 "Agent Task List"
                 var
                     AgentTaskImpl: Codeunit "Agent Task Impl.";
                 begin
-                    AgentTaskImpl.StopTask(Rec, Rec."Status"::"Stopped by User", true);
+                    AgentTaskImpl.StopTask(Rec.ID, Rec."Status"::"Stopped by User", true);
                     CurrPage.Update(false);
                 end;
             }

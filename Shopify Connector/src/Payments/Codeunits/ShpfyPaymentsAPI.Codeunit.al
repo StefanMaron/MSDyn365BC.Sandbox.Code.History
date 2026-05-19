@@ -30,7 +30,7 @@ codeunit 30385 "Shpfy Payments API"
         Parameters: Dictionary of [Text, Text];
     begin
         GraphQLType := GraphQLType::GetPaymentTransactions;
-        Parameters.Add('SinceId', Format(SinceId));
+        Parameters.Add('SinceId', Format(SinceId + 1));
         repeat
             JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
             if JsonHelper.GetJsonObject(JResponse, JPaymentsAccount, 'data.shopifyPaymentsAccount') then
@@ -96,7 +96,7 @@ codeunit 30385 "Shpfy Payments API"
         Parameters: Dictionary of [Text, Text];
     begin
         GraphQLType := GraphQLType::GetPayouts;
-        Parameters.Add('SinceId', Format(SinceId));
+        Parameters.Add('SinceId', Format(SinceId + 1));
         repeat
             JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
             if JsonHelper.GetJsonObject(JResponse, JPaymentsAccount, 'data.shopifyPaymentsAccount') then
@@ -143,6 +143,7 @@ codeunit 30385 "Shpfy Payments API"
             JsonHelper.GetValueIntoField(JPayout, 'summary.reservedFundsGross.amount', RecordRef, Payout.FieldNo("Reserved Funds Gross Amount"));
             JsonHelper.GetValueIntoField(JPayout, 'summary.retriedPayoutsFee.amount', RecordRef, Payout.FieldNo("Retried Payouts Fee Amount"));
             JsonHelper.GetValueIntoField(JPayout, 'summary.retriedPayoutsGross.amount', RecordRef, Payout.FieldNo("Retried Payouts Gross Amount"));
+            JsonHelper.GetValueIntoField(JPayout, 'externalTraceId', RecordRef, Payout.FieldNo("External Trace Id"));
             RecordRef.SetTable(Payout);
             RecordRef.Close();
             Payout.Id := Id;
@@ -238,7 +239,7 @@ codeunit 30385 "Shpfy Payments API"
         Parameters: Dictionary of [Text, Text];
     begin
         GraphQLType := GraphQLType::GetDisputes;
-        Parameters.Add('SinceId', Format(SinceId));
+        Parameters.Add('SinceId', Format(SinceId + 1));
         repeat
             JResponse := CommunicationMgt.ExecuteGraphQL(GraphQLType, Parameters);
             if JsonHelper.GetJsonObject(JResponse, JPaymentsAccount, 'data.shopifyPaymentsAccount') then

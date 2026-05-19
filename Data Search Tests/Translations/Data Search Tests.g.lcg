@@ -11,7 +11,7 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Table Test Data Search - Property Caption)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.Foundation.DataSearch)(LookupHint=Table Test Data Search - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Table 463480604 - Field 2961552353 - Property 2879900210" ItemType=";Table - Field" PsrId="63" InstFlg="true" Leaf="true">
@@ -20,7 +20,7 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Table Test Data Search - Field Name - Property Caption)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.Foundation.DataSearch)(LookupHint=Table Test Data Search - Field Name - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Table 463480604 - Field 4200184881 - Property 2879900210" ItemType=";Table - Field" PsrId="63" InstFlg="true" Leaf="true">
@@ -29,7 +29,7 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Table Test Data Search - Field No. - Property Caption)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.Foundation.DataSearch)(LookupHint=Table Test Data Search - Field No. - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";PageExtension 268328707 - Action 2633103055 - Property 1295455071" ItemType=";PageExtension - Action" PsrId="63" InstFlg="true" Leaf="true">
@@ -38,7 +38,7 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Page 3130159978)(LookupHint=PageExtension Test Data Search Extension - Action TestClearResults - Property ToolTip)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Page 3130159978)(Namespace=Microsoft.Test.Foundation.DataSearch)(LookupHint=PageExtension Test Data Search Extension - Action TestClearResults - Property ToolTip)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";PageExtension 268328707 - Action 2633103055 - Property 2879900210" ItemType=";PageExtension - Action" PsrId="63" InstFlg="true" Leaf="true">
@@ -47,7 +47,7 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Page 3130159978)(LookupHint=PageExtension Test Data Search Extension - Action TestClearResults - Property Caption)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Page 3130159978)(Namespace=Microsoft.Test.Foundation.DataSearch)(LookupHint=PageExtension Test Data Search Extension - Action TestClearResults - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";PageExtension 268328707 - Action 873149162 - Property 1295455071" ItemType=";PageExtension - Action" PsrId="63" InstFlg="true" Leaf="true">
@@ -56,7 +56,7 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Page 3130159978)(LookupHint=PageExtension Test Data Search Extension - Action TestSearchForSalesOrders - Property ToolTip)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Page 3130159978)(Namespace=Microsoft.Test.Foundation.DataSearch)(LookupHint=PageExtension Test Data Search Extension - Action TestSearchForSalesOrders - Property ToolTip)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";PageExtension 268328707 - Action 873149162 - Property 2879900210" ItemType=";PageExtension - Action" PsrId="63" InstFlg="true" Leaf="true">
@@ -65,7 +65,7 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Page 3130159978)(LookupHint=PageExtension Test Data Search Extension - Action TestSearchForSalesOrders - Property Caption)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Page 3130159978)(Namespace=Microsoft.Test.Foundation.DataSearch)(LookupHint=PageExtension Test Data Search Extension - Action TestSearchForSalesOrders - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
 </LCX>

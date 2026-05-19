@@ -1,3 +1,14 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved. 
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Test.Foundation.DataSearch;
+
+using Microsoft.Foundation.DataSearch;
+using Microsoft.Sales.Archive;
+using Microsoft.Sales.Document;
+
 pageextension 139507 "Test Data Search Extension" extends "Data Search"
 {
 

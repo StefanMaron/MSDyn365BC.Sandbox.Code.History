@@ -93,7 +93,6 @@ codeunit 139771 "SMTP API Test"
         // [THEN] Fails to send email
         LibraryAssert.IsFalse(LibrarySMTPAPI.Send(SMTPMessage), 'Message sent');
     end;
-
     local procedure Initialize(var iSMTPClient: Interface "iSMTP Client")
     var
         SMTPAPIClientMock: Codeunit "SMTP API Client Mock";

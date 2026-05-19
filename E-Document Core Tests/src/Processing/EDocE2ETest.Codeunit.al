@@ -1,3 +1,32 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument.Test;
+
+using Microsoft.eServices.EDocument;
+using Microsoft.eServices.EDocument.Integration;
+using Microsoft.eServices.EDocument.Processing.Import;
+using Microsoft.eServices.EDocument.Service;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Reporting;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Location;
+using Microsoft.Inventory.Transfer;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Setup;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using Microsoft.Sales.FinanceCharge;
+using Microsoft.Sales.History;
+using Microsoft.Sales.Reminder;
+using System.IO;
+using System.TestLibraries.Utilities;
+using System.Threading;
+using System.Utilities;
+
 codeunit 139624 "E-Doc E2E Test"
 {
     Subtype = Test;
@@ -101,7 +130,9 @@ codeunit 139624 "E-Doc E2E Test"
         EDocService := Variant;
         LibraryVariableStorage.Dequeue(Variant);
         EDocProcessingPhaseInt := Variant;
+#pragma warning disable AL0603
         EDocProcessingPhase := EDocProcessingPhaseInt;
+#pragma warning restore AL0603
 
         // [THEN] EDocService that was created by test for flow, is the one that is provided by event
 
@@ -1683,7 +1714,9 @@ codeunit 139624 "E-Doc E2E Test"
 
         // [THEN] No e-Document is created
         LibraryEDoc.PostInvoice(Customer);
+#pragma warning disable AA0175
         asserterror EDocument.FindLast();
+#pragma warning restore AA0175
     end;
 
     [Test]
@@ -1716,7 +1749,6 @@ codeunit 139624 "E-Doc E2E Test"
         EDocument.FindLast();
         Assert.AreEqual(Enum::"E-Document Status"::"In Progress", EDocument.Status, 'E-Document should be in In Progress status.');
     end;
-
 
     [Test]
     procedure ImportPEPPOLInvoiceWithTextOnlyDocumentReferences()
@@ -1770,6 +1802,7 @@ codeunit 139624 "E-Doc E2E Test"
         PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
         Assert.AreEqual(2, PurchaseLine.Count(), 'Expected 2 purchase lines to be imported.');
     end;
+
     local procedure CheckPDFEmbedToXML(TempBlob: Codeunit "Temp Blob")
     var
         TempXMLBuffer: Record "XML Buffer" temporary;
@@ -2072,7 +2105,6 @@ codeunit 139624 "E-Doc E2E Test"
         TransformationRule: Record "Transformation Rule";
         EDocument: Record "E-Document";
         EDocumentServiceStatus: Record "E-Document Service Status";
-        EDocumentSetup: Record "E-Documents Setup";
         Vendor: Record Vendor;
         Currency: Record Currency;
         LibraryERM: Codeunit "Library - ERM";
@@ -2093,7 +2125,6 @@ codeunit 139624 "E-Doc E2E Test"
         LibraryEDoc.SetupStandardSalesScenario(Customer, EDocumentService, Enum::"E-Document Format"::Mock, Integration);
         LibraryEDoc.SetupStandardPurchaseScenario(Vendor, EDocumentService, Enum::"E-Document Format"::Mock, Integration);
         EDocumentService.Modify();
-        EDocumentSetup.InsertNewExperienceSetup();
 
         // Set a currency that can be used across all localizations
         Currency.Init();
@@ -2900,7 +2931,9 @@ codeunit 139624 "E-Doc E2E Test"
 
         // [THEN] No e-Document is created
         LibraryEDoc.PostInvoice(Customer);
+#pragma warning disable AA0175
         asserterror EDocument.FindLast();
+#pragma warning restore AA0175
         Assert.AssertNothingInsideFilter();
     end;
 

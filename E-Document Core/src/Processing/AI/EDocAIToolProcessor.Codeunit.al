@@ -6,9 +6,9 @@ namespace Microsoft.eServices.EDocument.Processing.AI;
 
 using System.AI;
 using System.Environment;
-using System.Telemetry;
 using System.Environment.Configuration;
 using System.Globalization;
+using System.Telemetry;
 
 /// <summary>
 /// Codeunit for processing E-Document AI tasks.

@@ -1,18 +1,18 @@
 namespace Microsoft.Bank.Deposit;
 
-using Microsoft.Sales.Receivables;
-using Microsoft.Finance.GeneralLedger.Journal;
-using Microsoft.Finance.GeneralLedger.Ledger;
-using Microsoft.Finance.Dimension;
-using Microsoft.Purchases.Payables;
 using Microsoft.Bank.BankAccount;
 using Microsoft.Bank.Ledger;
 using Microsoft.Finance.Analysis;
-using System.Telemetry;
 using Microsoft.Finance.Currency;
-using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Posting;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Foundation.AuditCodes;
+using Microsoft.Purchases.Payables;
+using Microsoft.Sales.Receivables;
+using System.Telemetry;
 using System.Utilities;
 
 codeunit 1690 "Bank Deposit-Post"
@@ -134,7 +134,6 @@ codeunit 1690 "Bank Deposit-Post"
         ShowDialog := true;
         OnAfterBankDepositPost(Rec, PostedBankDepositHeader, ShowDialog);
 
-        BankDepositPost.GetPostedBankDepositHeader(PostedBankDepositHeader);
         if ShowDialog then
             Page.Run(Page::"Posted Bank Deposit", PostedBankDepositHeader);
     end;
@@ -381,11 +380,6 @@ codeunit 1690 "Bank Deposit-Post"
         PostedBankDepositHeader.Insert();
         SetPostedBankDepositHeaderCreated(true);
         RecordLinkManagement.CopyLinks(BankDepositHeader, PostedBankDepositHeader);
-    end;
-
-    internal procedure GetPostedBankDepositHeader(var ReturnPostedBankDepositHeader: Record "Posted Bank Deposit Header")
-    begin
-        ReturnPostedBankDepositHeader.Copy(PostedBankDepositHeader);
     end;
 
     internal procedure SetCurrentDeposit(BankDepositHeader: Record "Bank Deposit Header")

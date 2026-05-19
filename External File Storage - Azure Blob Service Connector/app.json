@@ -36,5 +36,8 @@
   "resourceFolders": [
     "data"
   ],
-  "target": "Cloud"
+  "target": "Cloud",
+  "features": [
+    "TranslationFile"
+  ]
 }

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -6,14 +6,14 @@ namespace Microsoft.eServices.EDocument.Processing.AI;
 
 using Microsoft.eServices.EDocument.Processing.Import;
 using Microsoft.eServices.EDocument.Processing.Import.Purchase;
-using Microsoft.Purchases.Document;
 using Microsoft.Finance.AllocationAccount;
+using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
-using System.AI;
 using Microsoft.Purchases.Vendor;
+using System.AI;
 using System.Azure.KeyVault;
-using System.Telemetry;
 using System.Config;
+using System.Telemetry;
 
 codeunit 6177 "E-Doc. Historical Matching" implements "AOAI Function", IEDocAISystem
 {
@@ -219,8 +219,8 @@ codeunit 6177 "E-Doc. Historical Matching" implements "AOAI Function", IEDocAISy
     local procedure LoadHistoricalDataIntoTempTable(var TempPurchInvLine: Record "Purch. Inv. Line" temporary; VendorNo: Code[20]; HistoricalMatchingConfig: Text)
     var
         PurchInvLine: Record "Purch. Inv. Line";
-        AllocationAccount: Record "Allocation Account";
         EDocPurchaseLineHistory: Record "E-Doc. Purchase Line History";
+        AllocationAccount: Record "Allocation Account";
         FeatureTelemetry: Codeunit "Feature Telemetry";
         OneYearAgoDate: Date;
         RecordCount: Integer;
@@ -654,6 +654,7 @@ codeunit 6177 "E-Doc. Historical Matching" implements "AOAI Function", IEDocAISy
         end;
         exit(CompletePromptSecretText);
     end;
+
 
     procedure GetTools(): List of [Interface "AOAI Function"]
     var

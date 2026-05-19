@@ -243,7 +243,7 @@ codeunit 6196 "E-Doc. PO Matching"
         RemainingToInvoice := PurchaseLinesQuantity - PurchaseLinesQuantityInvoiced;
         InvoiceableQty := PurchaseLinesQuantityReceived - PurchaseLinesQuantityInvoiced;
 
-        // I > J: Invoice exceeds what has been received and not yet invoiced
+        // I > J: Invoice exceeds what has been received and not yet invoiced 
         if EDocLineQuantity > InvoiceableQty then
             if ShouldWarnIfNotYetReceived(EDocumentPurchaseLine.GetBCVendor()."No.") then begin
                 POMatchWarnings."E-Doc. Purchase Line SystemId" := EDocumentPurchaseLine.SystemId;
@@ -252,7 +252,7 @@ codeunit 6196 "E-Doc. PO Matching"
                 POMatchWarnings.Insert();
             end;
 
-        // I > R: Invoice exceeds what remains on the order
+        // I > R: Invoice exceeds what remains on the order 
         if EDocLineQuantity > RemainingToInvoice then begin
             POMatchWarnings."E-Doc. Purchase Line SystemId" := EDocumentPurchaseLine.SystemId;
             POMatchWarnings."Warning Type" := "E-Doc PO Match Warning"::ExceedsRemainingToInvoice;
@@ -260,7 +260,7 @@ codeunit 6196 "E-Doc. PO Matching"
             POMatchWarnings.Insert();
         end;
 
-        // I = R and I < J: Order will be closed but there is an over-receipt
+        // I = R and I < J: Order will be closed but there is an over-receipt 
         if (EDocLineQuantity = RemainingToInvoice) and (EDocLineQuantity < InvoiceableQty) then begin
             POMatchWarnings."E-Doc. Purchase Line SystemId" := EDocumentPurchaseLine.SystemId;
             POMatchWarnings."Warning Type" := "E-Doc PO Match Warning"::OverReceipt;

@@ -3,6 +3,13 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 
+namespace System.Test.DataAdministration;
+
+using Microsoft.Foundation.Address;
+using Microsoft.Sales.Customer;
+using System.DataAdministration;
+using System.TestLibraries.Utilities;
+
 /// <summary>
 /// This codeunit tests archiving scenarios.
 /// </summary>
