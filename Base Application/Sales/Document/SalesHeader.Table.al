@@ -6007,7 +6007,7 @@ table 36 "Sales Header"
     local procedure CheckCustomerContactRelation(Cont: Record Contact; CustomerNo: Code[20]; ContBusinessRelationNo: Code[20])
     var
         ContactBusinessRelationLinkType: Enum "Contact Business Relation Link To Table";
-                                             IsHandled: Boolean;
+        IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeCheckCustomerContactRelation(Rec, Cont, IsHandled, CustomerNo, ContBusinessRelationNo);
@@ -6588,7 +6588,7 @@ table 36 "Sales Header"
     procedure GetPstdDocLinesToReverse()
     var
         SalesPostedDocLines: Page "Posted Sales Document Lines";
-                                 IsHandled: Boolean;
+        IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeGetPstdDocLinesToReverse(Rec, IsHandled);
@@ -7073,9 +7073,9 @@ table 36 "Sales Header"
     local procedure UpdateOpportunityLink(Opportunity: Record Opportunity; SalesDocumentType: Enum "Opportunity Document Type"; SalesHeaderNo: Code[20])
     begin
         Opportunity."Sales Document Type" := SalesDocumentType;
-                                                                                                  Opportunity."Sales Document No." := SalesHeaderNo;
-                                                                                                  OnUpdateOpportunityLinkOnBeforeModify(Opportunity, Rec, SalesDocumentType.AsInteger(), SalesHeaderNo);
-                                                                                                  Opportunity.Modify();
+        Opportunity."Sales Document No." := SalesHeaderNo;
+        OnUpdateOpportunityLinkOnBeforeModify(Opportunity, Rec, SalesDocumentType.AsInteger(), SalesHeaderNo);
+        Opportunity.Modify();
     end;
 
     /// <summary>
@@ -8985,8 +8985,8 @@ table 36 "Sales Header"
         MyNotifications: Record "My Notifications";
         NotificationLifecycleMgt: Codeunit "Notification Lifecycle Mgt.";
         PageMyNotifications: Page "My Notifications";
-                                 ModifyCustomerAddressNotification: Notification;
-                                 IsHandled: Boolean;
+        ModifyCustomerAddressNotification: Notification;
+        IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeShowModifyAddressNotification(IsHandled, Rec, CustomerNumber);
@@ -10084,7 +10084,7 @@ table 36 "Sales Header"
     internal procedure CalculateReservableOutstandingQuantityBase() OutstandingQtyBase: Decimal
     var
         RemQtyBaseInvtItemSalesLine: Query RemQtyBaseInvtItemSalesLine;
-                                         IsHandled: Boolean;
+        IsHandled: Boolean;
     begin
         IsHandled := false;
         OnBeforeCalculateReservableOutstandingQuantityBase(Rec, IsHandled, OutstandingQtyBase);
@@ -10164,8 +10164,8 @@ table 36 "Sales Header"
         if not PaymentTerm.Get("Payment Terms Code") then
             exit;
 
-        DueDateCalc := CalcDate(PaymentTerms."Due Date Calculation", "Document Date");
-        AdjustDueDate.SalesAdjustDueDate(DueDateCalc, "Document Date", PaymentTerms.CalculateMaxDueDate("Document Date"), "Bill-to Customer No.");
+        DueDateCalc := CalcDate(PaymentTerm."Due Date Calculation", "Document Date");
+        AdjustDueDate.SalesAdjustDueDate(DueDateCalc, "Document Date", PaymentTerm.CalculateMaxDueDate("Document Date"), "Bill-to Customer No.");
 
         if DueDateCalc = "Due Date" then
             "Due Date Modified" := false;
