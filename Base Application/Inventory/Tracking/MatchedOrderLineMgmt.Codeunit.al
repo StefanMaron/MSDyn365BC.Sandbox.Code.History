@@ -943,6 +943,7 @@ codeunit 5826 "Matched Order Line Mgmt."
                     PurchaseLineInvoice."Description 2" := PurchaseLineOrder."Description 2";
                     PurchaseLineInvoice.Validate("Direct Unit Cost", PurchaseLineOrder."Direct Unit Cost");
                     PurchaseLineInvoice.Validate("Location Code", PurchaseLineOrder."Location Code");
+                    OnGetPurchaseOrderLinesOnBeforeInsertPurchaseLineInvoice(PurchaseLineInvoice, PurchaseLineOrder);
                     PurchaseLineInvoice.Insert(true);
 
                     if PurchaseHeaderOrder."No." <> PurchaseLineOrder."Document No." then
@@ -978,6 +979,7 @@ codeunit 5826 "Matched Order Line Mgmt."
 
                     // Late update quantity to avoid WMS errors
                     PurchaseLineInvoice.Validate(Quantity, Qty);
+                    OnGetPurchaseOrderLinesOnBeforeModifyPurchaseLineInvoice(PurchaseLineInvoice, PurchaseLineOrder);
                     PurchaseLineInvoice.Modify(true);
                 until PurchaseLineOrder.Next() = 0;
 
@@ -1138,6 +1140,7 @@ codeunit 5826 "Matched Order Line Mgmt."
         MatchedOrderLine."Qty. to Invoice" := QtyToInvoice;
         MatchedOrderLine."Qty. to Invoice (Base)" := QtyToInvoiceBase;
         MatchedOrderLine."Receipt on Invoice" := ReceiptOnInvoice;
+        OnInsertMatchedOrderLineOnBeforeInsert(MatchedOrderLine);
         MatchedOrderLine.Insert();
 
         FeatureTelemetry.LogUptake('0000SIX', MatchedOrderLinesTok, Enum::"Feature Uptake Status"::"Set up");
@@ -1181,4 +1184,19 @@ codeunit 5826 "Matched Order Line Mgmt."
         GetOrderLinesLbl: Label 'Used Get Order Lines to match order lines to invoice line', Locked = true;
         GetPurchaseOrderLinesLbl: Label 'Used Get Purchase Order Lines to create invoice lines from order lines', Locked = true;
         GetReceiptLinesLbl: Label 'Used Get Receipt Lines to match receipt lines', Locked = true;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertMatchedOrderLineOnBeforeInsert(var MatchedOrderLine: Record "Matched Order Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetPurchaseOrderLinesOnBeforeInsertPurchaseLineInvoice(var PurchaseLineInvoice: Record "Purchase Line"; PurchaseLineOrder: Record "Purchase Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetPurchaseOrderLinesOnBeforeModifyPurchaseLineInvoice(var PurchaseLineInvoice: Record "Purchase Line"; PurchaseLineOrder: Record "Purchase Line")
+    begin
+    end;
 }
