@@ -4559,6 +4559,8 @@ codeunit 134468 "ERM Matched Order Line Tests"
     // ============================================================================
 
     local procedure Initialize()
+    var
+        PurchasesPayablesSetup: Record "Purchases & Payables Setup";
     begin
         LibraryTestInitialize.OnTestInitialize(Codeunit::"ERM Matched Order Line Tests");
         LibrarySetupStorage.Restore();
@@ -4568,6 +4570,10 @@ codeunit 134468 "ERM Matched Order Line Tests"
             exit;
 
         LibraryTestInitialize.OnBeforeTestSuiteInitialize(Codeunit::"ERM Matched Order Line Tests");
+
+        PurchasesPayablesSetup.Get();
+        PurchasesPayablesSetup."Check Doc. Total Amounts" := false;
+        PurchasesPayablesSetup.Modify();
 
         LibrarySetupStorage.Save(Database::"Purchases & Payables Setup");
 
