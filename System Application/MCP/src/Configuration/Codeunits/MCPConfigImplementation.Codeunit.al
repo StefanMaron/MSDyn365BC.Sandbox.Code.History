@@ -54,6 +54,10 @@ codeunit 8351 "MCP Config Implementation"
         JsonFilterTxt: Label 'JSON Files (*.json)|*.json';
         InvalidJsonErr: Label 'The selected file is not a valid configuration file.';
         ConfigNameExistsMsg: Label 'A configuration with the name ''%1'' already exists. Please provide a different name.', Comment = '%1 = configuration name';
+        MCPServerFeedbackConfirmQst: Label 'We noticed you no longer have any active configurations. Could you share what made you decide to stop using the MCP server? Your feedback helps us improve the experience.';
+        MCPServerFeedbackQst: Label 'What could we do to improve the MCP server experience?';
+        NoActiveConfigsFeedbackTxt: Label 'No active configs feedback triggered', Locked = true;
+        GeneralFeedbackTxt: Label 'General MCP feedback triggered', Locked = true;
 
     #region Configurations
     internal procedure GetConfigurationIdByName(Name: Text[100]): Guid
@@ -1089,4 +1093,5 @@ codeunit 8351 "MCP Config Implementation"
         Session.LogMessage('0000QEB', MCPConfigurationDeletedLbl, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, GetDimensions(MCPConfiguration));
         Session.LogAuditMessage(StrSubstNo(MCPConfigurationAuditDeletedLbl, MCPConfiguration.Name, UserSecurityId(), CompanyName()), SecurityOperationResult::Success, AuditCategory::ApplicationManagement, 3, 0);
     end;
+    #endregion
 }
