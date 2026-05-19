@@ -1,9 +1,5 @@
-#if not CLEAN25
 codeunit 101702 "Create Purchase Price"
 {
-    ObsoleteState = Pending;
-    ObsoleteTag = '19.0';
-    ObsoleteReason = 'Replaced by the new implementation (V16) of price calculation.';
 
     trigger OnRun()
     begin
@@ -40,4 +36,3 @@ codeunit 101702 "Create Purchase Price"
         PurchPrice.Insert(true);
     end;
 }
-#endif

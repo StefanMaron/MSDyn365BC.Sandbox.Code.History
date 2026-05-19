@@ -13,7 +13,9 @@ codeunit 101931 "Create Local RapidStart Pack"
 
     procedure CreateTables()
     begin
+#if not CLEAN28
         CreateTable(DATABASE::"Fin. Charge Interest Rate");
+#endif
     end;
 
     procedure CreateTable(TableID: Integer)
@@ -27,7 +29,9 @@ codeunit 101931 "Create Local RapidStart Pack"
         CreateConfigWorksheet: Codeunit "Create Config. Worksheet";
     begin
         CreateConfigWorksheet.CreateConfigGroup(XLocalSettingsTxt);
+#if not CLEAN28
         CreateConfigWorksheet.CreateConfigLine(DATABASE::"Fin. Charge Interest Rate");
+#endif
     end;
 
     procedure SetFieldsAndFilters(TableID: Integer)
