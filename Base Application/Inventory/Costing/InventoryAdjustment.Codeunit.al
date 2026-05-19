@@ -255,6 +255,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         IsFirstTime: Boolean;
         IsHandled: Boolean;
         xUnitCost: Decimal;
+        AnyLevelExceeded: Boolean;
     begin
         IsHandled := false;
         OnBeforeMakeSingleLevelAdjmt(TheItem, TempAvgCostAdjmtEntryPoint, IsHandled);
@@ -316,7 +317,12 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
                 CheckAndCommit();
 
                 OnAfterAdjustItem(TheItem);
-            until (TheItem.Next() = 0) or LevelExceeded;
+                if LevelExceeded then
+                    AnyLevelExceeded := true;
+                LevelExceeded := false;
+            until TheItem.Next() = 0;
+
+        LevelExceeded := AnyLevelExceeded;
     end;
 
     local procedure AdjustItemAppliedCost()
@@ -430,7 +436,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
                         ValueEntry.CalcItemLedgEntryCost(ItemApplicationEntriesOutb.Item_Ledger_Entry_No, false);
                         ValueEntry.AddCost(TempInvtAdjmtBuf);
                         AppliedCostAmt -= ValueEntry."Cost Amount (Actual)";
-                        AppliedCostAmtACY -= ValueEntry."Cost Amount (Actual)";
+                        AppliedCostAmtACY -= ValueEntry."Cost Amount (Actual) (ACY)";
                     until not ItemApplicationEntriesOutb.Read();
 
                     if (Abs(CostAmt - AppliedCostAmt) = GLSetup."Amount Rounding Precision") or
@@ -496,7 +502,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
             if OutbndValueEntry.FindSet() then
                 repeat
                     NeedsAdjustment := not (OutbndValueEntry.Adjustment or ExpCostIsCompletelyInvoiced(OutbndItemLedgEntry, OutbndValueEntry)) and OutbndValueEntry.Inventoriable;
-                    OnAdjustAppliedOutbndEntriesOnBeforeAdjustEntry(OutbndItemLedgEntry, NeedsAdjustment);
+                    OnAdjustAppliedOutbndEntriesOnBeforeAdjustEntry(OutbndItemLedgEntry, OutbndValueEntry, NeedsAdjustment);
                     if NeedsAdjustment then begin
                         OutbndValueEntry.SetRange("Document No.", OutbndValueEntry."Document No.");
                         OutbndValueEntry.SetRange("Document Line No.", OutbndValueEntry."Document Line No.");
@@ -2432,11 +2438,11 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
     local procedure GetOrigPosItemLedgEntryNo(var ItemApplnEntry: Record "Item Application Entry")
     begin
         ItemApplnEntry.SetCurrentKey("Inbound Item Entry No.", "Item Ledger Entry No.");
-        ItemApplnEntry.SetRange("Item Ledger Entry No.", ItemApplnEntry."Transferred-from Entry No.");
-        ItemApplnEntry.SetRange("Inbound Item Entry No.", ItemApplnEntry."Transferred-from Entry No.");
-        ItemApplnEntry.FindFirst();
-        if ItemApplnEntry."Transferred-from Entry No." <> 0 then
-            GetOrigPosItemLedgEntryNo(ItemApplnEntry);
+        while ItemApplnEntry."Transferred-from Entry No." <> 0 do begin
+            ItemApplnEntry.SetRange("Item Ledger Entry No.", ItemApplnEntry."Transferred-from Entry No.");
+            ItemApplnEntry.SetRange("Inbound Item Entry No.", ItemApplnEntry."Transferred-from Entry No.");
+            ItemApplnEntry.FindFirst();
+        end;
     end;
 
     local procedure CalcTransEntryNewRevAmt(ItemLedgEntry: Record "Item Ledger Entry"; TransValueEntry: Record "Value Entry"; var AdjustedCostElementBuf: Record "Cost Element Buffer")
@@ -3511,7 +3517,7 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAdjustAppliedOutbndEntriesOnBeforeAdjustEntry(var OutbndItemLedgEntry: Record "Item Ledger Entry"; var NeedsAdjustment: Boolean)
+    local procedure OnAdjustAppliedOutbndEntriesOnBeforeAdjustEntry(var OutbndItemLedgEntry: Record "Item Ledger Entry"; var OutbndValueEntry: Record "Value Entry"; var NeedsAdjustment: Boolean)
     begin
     end;
 
