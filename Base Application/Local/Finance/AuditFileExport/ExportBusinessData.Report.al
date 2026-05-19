@@ -138,7 +138,6 @@ report 11015 "Export Business Data"
     var
         GLSetup: Record "General Ledger Setup";
         TempDataExportRecordSource: Record "Data Export Record Source" temporary;
-        TempDataExportRecordField: Record "Data Export Record Field" temporary;
         TempBlobZipArchive: Codeunit "Temp Blob";
         TempBlobArray: array[100] of Codeunit "Temp Blob";
         FeatureTelemetry: Codeunit "Feature Telemetry";
@@ -147,7 +146,6 @@ report 11015 "Export Business Data"
         BlobDataApproxSizeArr: array[100] of Integer;
         FileNameArr: array[100] of Text;
         BlobsToExport: Dictionary of [Integer, List of [Integer]];
-        FlowFilterFieldNosCache: Dictionary of [Integer, List of [Integer]];
         ZipArchive: DotNet ZipArchive;
         StartDate: Date;
         EndDate: Date;
@@ -349,8 +347,6 @@ report 11015 "Export Business Data"
         CurrTempDataExportRecordSource: Record "Data Export Record Source";
         RecRef: RecordRef;
     begin
-        CacheAllFieldDefinitions(DataExportRecordDefinition);
-
         TempDataExportRecordSource.Reset();
         TempDataExportRecordSource.SetRange("Data Export Code", DataExportRecordDefinition."Data Export Code");
         TempDataExportRecordSource.SetRange("Data Exp. Rec. Type Code", DataExportRecordDefinition."Data Exp. Rec. Type Code");
@@ -486,8 +482,7 @@ report 11015 "Export Business Data"
         RecordText: Text;
         IsFirstField: Boolean;
     begin
-        FilterCachedFields(DataExportRecordSource);
-        if TempDataExportRecordField.FindSet() then begin
+        if FindFields(DataExportRecordField, DataExportRecordSource) then begin
             if IsCurrentBlobFull(CurrBlobIndex) then
                 CurrBlobIndex := InitNewTempBlob(DataExportRecordSource."Line No.", CurrBlobIndex);
             IsFirstField := true;
@@ -502,7 +497,8 @@ report 11015 "Export Business Data"
             RecordText := RecordBuilder.ToText();
             DotNetStreamWriterArr[CurrBlobIndex].WriteLine(RecordText);
             UpdateBlobDataSize(CurrBlobIndex, StrLen(RecordText));
-        end;
+        end else
+            Error(NoExportFieldsErr, DataExportRecordSource."Data Export Code");
     end;
 
     local procedure FormatField2String(var FieldRef: FieldRef; DataExportRecordField: Record "Data Export Record Field") FieldValueText: Text
@@ -764,90 +760,6 @@ report 11015 "Export Business Data"
             DataExportRecField."Date Filter Handling"::"Start Date Only":
                 FieldRef.SetRange(0D, ClosingDate(StartDate - 1));
         end;
-    end;
-
-    local procedure CacheAllFieldDefinitions(DataExportRecordDefinition: Record "Data Export Record Definition")
-    var
-        DataExportRecordField: Record "Data Export Record Field";
-    begin
-        TempDataExportRecordField.Reset();
-        TempDataExportRecordField.DeleteAll();
-        DataExportRecordField.SetRange("Data Export Code", DataExportRecordDefinition."Data Export Code");
-        DataExportRecordField.SetRange("Data Exp. Rec. Type Code", DataExportRecordDefinition."Data Exp. Rec. Type Code");
-        if DataExportRecordField.FindSet() then
-            repeat
-                TempDataExportRecordField := DataExportRecordField;
-                TempDataExportRecordField.Insert();
-            until DataExportRecordField.Next() = 0;
-    end;
-
-    local procedure FilterCachedFields(DataExportRecordSource: Record "Data Export Record Source")
-    begin
-        TempDataExportRecordField.Reset();
-        TempDataExportRecordField.SetRange("Data Export Code", DataExportRecordSource."Data Export Code");
-        TempDataExportRecordField.SetRange("Data Exp. Rec. Type Code", DataExportRecordSource."Data Exp. Rec. Type Code");
-        TempDataExportRecordField.SetRange("Source Line No.", DataExportRecordSource."Line No.");
-    end;
-
-    local procedure HasCachedFields(DataExportRecordSource: Record "Data Export Record Source"): Boolean
-    begin
-        FilterCachedFields(DataExportRecordSource);
-        exit(not TempDataExportRecordField.IsEmpty());
-    end;
-
-    local procedure CacheFlowFilterFieldNos(DataExportRecordSource: Record "Data Export Record Source")
-    var
-        "Field": Record "Field";
-        FieldNos: List of [Integer];
-    begin
-        // Cache is keyed only by Table No., so its contents must not depend on "Date Filter Field No.".
-        // Always cache all FlowFilter Date fields for the table; the explicit "Date Filter Field No."
-        // (if set on a particular source) is handled separately when applying the filters.
-        if FlowFilterFieldNosCache.ContainsKey(DataExportRecordSource."Table No.") then
-            exit;
-
-        Field.SetRange(TableNo, DataExportRecordSource."Table No.");
-        Field.SetRange(Type, Field.Type::Date);
-        Field.SetRange(Class, Field.Class::FlowFilter);
-        Field.SetRange(Enabled, true);
-        Field.SetFilter(ObsoleteState, '<>%1', Field.ObsoleteState::Removed);
-        if Field.FindSet() then
-            repeat
-                FieldNos.Add(Field."No.");
-            until Field.Next() = 0;
-
-        FlowFilterFieldNosCache.Add(DataExportRecordSource."Table No.", FieldNos);
-    end;
-
-    local procedure PreApplyFlowFilters(DataExportRecordSource: Record "Data Export Record Source"; var RecRef: RecordRef)
-    var
-        FieldNos: List of [Integer];
-        FieldNo: Integer;
-    begin
-        if DataExportRecordSource."Date Filter Handling" = DataExportRecordSource."Date Filter Handling"::" " then
-            exit;
-
-        if DataExportRecordSource."Date Filter Field No." > 0 then begin
-            SetFlowFilter(DataExportRecordSource."Date Filter Field No.", DataExportRecordSource."Date Filter Handling", RecRef);
-            exit;
-        end;
-
-        if FlowFilterFieldNosCache.Get(DataExportRecordSource."Table No.", FieldNos) then
-            foreach FieldNo in FieldNos do
-                SetFlowFilter(FieldNo, DataExportRecordSource."Date Filter Handling", RecRef);
-    end;
-
-    local procedure SetFlowFilterDateFieldCached(var DataExportRecordField: Record "Data Export Record Field"; DateFilterFieldNo: Integer; var RecRef: RecordRef)
-    var
-        FieldNos: List of [Integer];
-        FieldNo: Integer;
-    begin
-        if DateFilterFieldNo > 0 then
-            SetFlowFilter(DateFilterFieldNo, DataExportRecordField."Date Filter Handling", RecRef)
-        else
-            if FlowFilterFieldNosCache.Get(DataExportRecordField."Table No.", FieldNos) then
-                foreach FieldNo in FieldNos do
-                    SetFlowFilter(FieldNo, DataExportRecordField."Date Filter Handling", RecRef);
     end;
 
     [Scope('OnPrem')]
