@@ -103,6 +103,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         DeferralDocType: Enum "Deferral Document Type";
         LastDocType: Enum "Gen. Journal Document Type";
         AddCurrencyCode: Code[10];
+        ApplyingCurrencyCode: Code[10];
         JournalsSourceCodesList: List of [Code[10]];
         LastDocNo: Code[20];
         FiscalYearStartDate: Date;
@@ -5843,9 +5844,12 @@ codeunit 12 "Gen. Jnl.-Post Line"
                 begin
                     IsHandled := false;
                     OnPostDtldCVLedgEntryOnBeforeCreateGLEntryGainLoss(GenJournalLine, DetailedCVLedgEntryBuffer, Unapply, AccNo, IsHandled, AdjAmount, AddCurrencyCode, MultiplePostingGroups);
+                    if IsApplicableCurrencyCodeNeeded(GenJournalLine."Currency Code") then
+                        SetApplyingCurrencyCode(DetailedCVLedgEntryBuffer."Currency Code");
                     if not IsHandled then
                         CreateGLEntryGainLoss(GenJournalLine, AccNo, -DetailedCVLedgEntryBuffer."Amount (LCY)", DetailedCVLedgEntryBuffer."Currency Code" = AddCurrencyCode);
 
+                    SetApplyingCurrencyCode('');
                     if MultiplePostingGroups and (DetailedCVLedgEntryBuffer."Entry Type" in [DetailedCVLedgEntryBuffer."Entry Type"::"Unrealized Loss", DetailedCVLedgEntryBuffer."Entry Type"::"Unrealized Gain"]) then begin
                         case GenJournalLine."Account Type" of
                             GenJournalLine."Account Type"::Customer:
@@ -7929,6 +7933,9 @@ codeunit 12 "Gen. Jnl.-Post Line"
         Currency: Record Currency;
     begin
         if CurrencyCode = '' then
+            CurrencyCode := ApplyingCurrencyCode;
+
+        if CurrencyCode = '' then
             exit(false);
 
         if not Currency.Get(CurrencyCode) then
@@ -9994,6 +10001,31 @@ codeunit 12 "Gen. Jnl.-Post Line"
         for i := 1 to ArrayLen(AdjAmount) do
             if AdjAmount[i] <> 0 then
                 BillSettlementGainLoss := true;
+    end;
+
+    procedure SetApplyingCurrencyCode(NewApplyingCurrencyCode: Code[10])
+    begin
+        ApplyingCurrencyCode := NewApplyingCurrencyCode;
+    end;
+
+    local procedure IsApplicableCurrencyCodeNeeded(CurrencyCode: Code[10]): boolean
+    begin
+        if CurrencyCode <> '' then
+            exit(false);
+
+        if not IsCustApplnBetweenCurrencies() then
+            exit(false);
+
+        exit(true);
+    end;
+
+    local procedure IsCustApplnBetweenCurrencies(): Boolean
+    var
+        SalesReceivablesSetup: Record "Sales & Receivables Setup";
+    begin
+        SalesReceivablesSetup.SetLoadFields("Appln. between Currencies");
+        SalesReceivablesSetup.GetRecordOnce();
+        exit(SalesReceivablesSetup."Appln. between Currencies" = SalesReceivablesSetup."Appln. between Currencies"::All);
     end;
 
     [IntegrationEvent(true, false)]
