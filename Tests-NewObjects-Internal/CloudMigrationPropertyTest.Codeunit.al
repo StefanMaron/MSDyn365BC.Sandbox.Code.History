@@ -72,6 +72,8 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Allocation Account");
         ListOfTablesToMigrate.Add(Database::"Allocation Line");
         ListOfTablesToMigrate.Add(Database::"Allowed Language");
+        ListOfTablesToMigrate.Add(Database::"Dimension Perspective Line");
+        ListOfTablesToMigrate.Add(Database::"Dimension Perspective Name");
         ListOfTablesToMigrate.Add(Database::"Dispute Status");
         ListOfTablesToMigrate.Add(Database::"Job Journal Template");
         ListOfTablesToMigrate.Add(Database::"Job Ledger Entry");
@@ -120,6 +122,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Manufacturing Setup");
         ListOfTablesToMigrate.Add(Database::"Manufacturing User Template");
         ListOfTablesToMigrate.Add(Database::"Marketing Setup");
+        ListOfTablesToMigrate.Add(Database::"Matched Order Line");
         ListOfTablesToMigrate.Add(Database::"Memoized Result");
         ListOfTablesToMigrate.Add(Database::"Miniform Function Group");
         ListOfTablesToMigrate.Add(Database::"Miniform Function");
@@ -220,6 +223,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Posted Invt. Pick Line");
         ListOfTablesToMigrate.Add(Database::"Posted Invt. Put-away Header");
         ListOfTablesToMigrate.Add(Database::"Posted Invt. Put-away Line");
+        ListOfTablesToMigrate.Add(Database::"Posted Matched Order Line");
         ListOfTablesToMigrate.Add(Database::"Posted Payment Recon. Hdr");
         ListOfTablesToMigrate.Add(Database::"Posted Payment Recon. Line");
         ListOfTablesToMigrate.Add(Database::"Posted Whse. Receipt Header");
@@ -714,9 +718,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(1304); // Database::"Sales Price and Line Disc Buff"
         ListOfTablesToMigrate.Add(7023); // Database::"Sales Price Worksheet"
         ListOfTablesToMigrate.Add(7002); // Database::"Sales Price"
-#if CLEAN25
         ListOfTablesToMigrate.Add(6418); // Database::"FS Connection Setup"
-#endif
 #endif
         // AL Costing
         ListOfTablesToMigrate.Add(103405); // Database::"Required Input Data");
@@ -788,6 +790,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(8912); // Database::"Email Rate Limit"
         ListOfTablesToMigrate.Add(8930); // Database::"Email View Policy"
         ListOfTablesToMigrate.Add(1750); // Database::"Fields Sync Status"
+        ListOfTablesToMigrate.Add(8351); // Database::"MCP Entra Application"
         ListOfTablesToMigrate.Add(4151); // Database::"Persistent Blob"
         ListOfTablesToMigrate.Add(4690); // Database::"Recurrence Schedule"
         ListOfTablesToMigrate.Add(3903); // Database::"Retention Policy Allowed Table"
@@ -799,6 +802,9 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(9987); // Database::"Word Templates Table"
 
         // E-Document
+        ListOfTablesToMigrate.Add(7013); // Database::"Contact Sync Queue"
+        ListOfTablesToMigrate.Add(7121); // Database::"Contact Sync User"
+        ListOfTablesToMigrate.Add(7122); // Database::"Outlook Contacts"
         ListOfTablesToMigrate.Add(6121); // Database::"E-Document"
         ListOfTablesToMigrate.Add(6103); // Database::"E-Document Service"
 
@@ -1141,12 +1147,15 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Finance Charge Text");
         ListOfTablesToMigrate.Add(Database::"Finance Cue");
         ListOfTablesToMigrate.Add(Database::"Financial Report");
+        ListOfTablesToMigrate.Add(Database::"Financial Report Category");
+        ListOfTablesToMigrate.Add(Database::"Financial Report Export Log");
+        ListOfTablesToMigrate.Add(Database::"Financial Report Recipient");
+        ListOfTablesToMigrate.Add(Database::"Financial Report Schedule");
         ListOfTablesToMigrate.Add(Database::"Financial Report User Filters");
+        ListOfTablesToMigrate.Add(Database::"Financial Report Audit Log");
         ListOfTablesToMigrate.Add(Database::"Fin. Report Excel Template");
+        ListOfTablesToMigrate.Add(Database::"Financial Report Status");
         ListOfTablesToMigrate.Add(Database::"Fixed Asset");
-#if not CLEAN25
-        ListOfTablesToMigrate.Add(Database::"FS Connection Setup");
-#endif
         ListOfTablesToMigrate.Add(Database::"G/L - Item Ledger Relation");
         ListOfTablesToMigrate.Add(Database::"G/L Acc. Balance Buffer");
         ListOfTablesToMigrate.Add(Database::"G/L Acc. Balance/Budget Buffer");
@@ -1269,6 +1278,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Item Attr. Value Translation");
         ListOfTablesToMigrate.Add(Database::"Item Attribute Translation");
         ListOfTablesToMigrate.Add(Database::"Item Attribute Value Mapping");
+        ListOfTablesToMigrate.Add(Database::"Item Var. Attr. Value Mapping");
         ListOfTablesToMigrate.Add(Database::"Item Attribute Value Selection");
         ListOfTablesToMigrate.Add(Database::"Item Attribute Value");
         ListOfTablesToMigrate.Add(Database::"Item Attribute");
