@@ -46,6 +46,7 @@ codeunit 137055 "SCM Warehouse Pick"
         ReservationAction: Option AutoReserve,GetQuantities;
         PickQuantityErr: Label 'Expected picked quantity %1 %2, but got %3 %2', Comment = '%1, %3 - Quantity; %2 - Unit of Measure Code';
         ShipQtyErr: Label 'Sales line should be fully shipped with no residual quantity';
+        PickNotFoundErr: Label 'Pick should be created for reserved Sales Order %1', Comment = '%1 = Document No.';
 
     [Test]
     [HandlerFunctions('ReservationPageHandler')]
@@ -3221,6 +3222,13 @@ codeunit 137055 "SCM Warehouse Pick"
     begin
         CreateInvtPutAwayPickMvmt.CInvtPick.SetValue(true);
         CreateInvtPutAwayPickMvmt.OK().Invoke();
+    end;
+
+    [ConfirmHandler]
+    [Scope('OnPrem')]
+    procedure ConfirmHandlerTrue(Question: Text[1024]; var Reply: Boolean)
+    begin
+        Reply := true;
     end;
 }
 
