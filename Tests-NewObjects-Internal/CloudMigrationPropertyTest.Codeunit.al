@@ -67,6 +67,7 @@ codeunit 135160 "Cloud Migration Property Test"
     var
         CloudMigCountryTables: Codeunit "Cloud Mig Country Tables";
     begin
+        ListOfTablesToMigrate.Add(Database::"Adv. Bonus Depreciation Setup");
         ListOfTablesToMigrate.Add(Database::"Alloc. Acc. Manual Override");
         ListOfTablesToMigrate.Add(Database::"Alloc. Account Distribution");
         ListOfTablesToMigrate.Add(Database::"Allocation Account");
