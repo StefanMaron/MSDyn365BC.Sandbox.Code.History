@@ -21,24 +21,18 @@ codeunit 135161 "Cloud Mig Country Tables"
         ListOfTablesToMigrate.Add(Database::"Customer/Vendor Warning 349");
         ListOfTablesToMigrate.Add(Database::"Doc. Post. Buffer");
         ListOfTablesToMigrate.Add(Database::"Fee Range");
-#if not CLEAN25
-        ListOfTablesToMigrate.Add(Database::"G/L Acc. Equiv. Tool Setup");
+#if not CLEANSCHEMA28
+        ListOfTablesToMigrate.Add(10720); //Database::"G/L Accounts Equivalence Tool"
+        ListOfTablesToMigrate.Add(10721); //Database::"Historic G/L Account"
+        ListOfTablesToMigrate.Add(10722); //Database::"New G/L Account"
+        ListOfTablesToMigrate.Add(10723); //Database::"G/L Acc. Equiv. Tool Setup"
+        ListOfTablesToMigrate.Add(10724); //Database::"History of Equivalences COA"
+        ListOfTablesToMigrate.Add(10725); //Database::"Hist. G/L Account (An. View)"
 #endif
         ListOfTablesToMigrate.Add(Database::"G/L Account Buffer");
-#if not CLEAN25
-        ListOfTablesToMigrate.Add(Database::"G/L Accounts Equivalence Tool");
-#endif
         ListOfTablesToMigrate.Add(Database::"Gen. Prod. Post. Group Buffer");
-#if not CLEAN25
-        ListOfTablesToMigrate.Add(Database::"Hist. G/L Account (An. View)");
-        ListOfTablesToMigrate.Add(Database::"Historic G/L Account");
-        ListOfTablesToMigrate.Add(Database::"History of Equivalences COA");
-#endif
         ListOfTablesToMigrate.Add(Database::"Inc. Stmt. Clos. Buffer");
         ListOfTablesToMigrate.Add(Database::"Installment");
-#if not CLEAN25
-        ListOfTablesToMigrate.Add(Database::"New G/L Account");
-#endif
         ListOfTablesToMigrate.Add(Database::"No Taxable Entry");
         ListOfTablesToMigrate.Add(Database::"Non-Payment Period");
         ListOfTablesToMigrate.Add(Database::"Operation Code");
