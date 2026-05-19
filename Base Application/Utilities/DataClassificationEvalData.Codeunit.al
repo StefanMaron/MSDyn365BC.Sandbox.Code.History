@@ -384,6 +384,7 @@ codeunit 1751 "Data Classification Eval. Data"
         ClassifyAllocationAccounts();
         ClassifyAgents();
         ClassifyOrderTakerAgent();
+        ClassifySalesValidationAgent();
         ClasifyScheduledPerformanceProfiling();
     end;
 
@@ -763,6 +764,7 @@ codeunit 1751 "Data Classification Eval. Data"
         SetTableFieldsToNormal(DATABASE::"Aged Report Entity");
         SetTableFieldsToNormal(DATABASE::"Acc. Schedule Line Entity");
         SetTableFieldsToNormal(DATABASE::"Fixed Asset");
+        SetTableFieldsToNormal(DATABASE::"Adv. Bonus Depreciation Setup");
         SetTableFieldsToNormal(DATABASE::"FA Setup");
         SetTableFieldsToNormal(DATABASE::"FA Posting Type Setup");
         SetTableFieldsToNormal(DATABASE::"FA Posting Group");
@@ -3795,6 +3797,11 @@ codeunit 1751 "Data Classification Eval. Data"
         SetTableFieldsToNormal(4587); // SOA Billing Task Setup
         SetFieldToPersonal(4592, 9); // Sender Email
         SetFieldToPersonal(4592, 10); // Sender Name
+    end;
+
+    local procedure ClassifySalesValidationAgent()
+    begin
+        SetTableFieldsToNormal(53607); // "Sales Val. Agent KPI"
     end;
 
     local procedure ClassifyAgents()
