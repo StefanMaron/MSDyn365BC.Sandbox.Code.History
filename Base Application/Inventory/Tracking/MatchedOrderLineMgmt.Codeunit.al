@@ -1184,4 +1184,19 @@ codeunit 5826 "Matched Order Line Mgmt."
         GetOrderLinesLbl: Label 'Used Get Order Lines to match order lines to invoice line', Locked = true;
         GetPurchaseOrderLinesLbl: Label 'Used Get Purchase Order Lines to create invoice lines from order lines', Locked = true;
         GetReceiptLinesLbl: Label 'Used Get Receipt Lines to match receipt lines', Locked = true;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertMatchedOrderLineOnBeforeInsert(var MatchedOrderLine: Record "Matched Order Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetPurchaseOrderLinesOnBeforeInsertPurchaseLineInvoice(var PurchaseLineInvoice: Record "Purchase Line"; PurchaseLineOrder: Record "Purchase Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetPurchaseOrderLinesOnBeforeModifyPurchaseLineInvoice(var PurchaseLineInvoice: Record "Purchase Line"; PurchaseLineOrder: Record "Purchase Line")
+    begin
+    end;
 }
