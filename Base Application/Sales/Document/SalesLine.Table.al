@@ -106,6 +106,7 @@ table 37 "Sales Line"
             trigger OnValidate()
             var
                 TempSalesLine: Record "Sales Line" temporary;
+                JobCreateInvoice: Codeunit "Job Create-Invoice";
                 IsHandled: Boolean;
             begin
                 IsHandled := false;
@@ -161,7 +162,8 @@ table 37 "Sales Line"
                     OnValidateTypeOnAfterVerifyChange(Rec, xRec);
                 end;
                 CheckReceiptOrderStatus();
-
+                if (Rec.Type <> xRec.Type) and (Rec."Job Contract Entry No." <> 0) then
+                    JobCreateInvoice.DeleteSalesLine(Rec);
                 OnValidateTypeOnBeforeInitRec(Rec, xRec, CurrFieldNo);
                 TempSalesLine := Rec;
                 Init();
