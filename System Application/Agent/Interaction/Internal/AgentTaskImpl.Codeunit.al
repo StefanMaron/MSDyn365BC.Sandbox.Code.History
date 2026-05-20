@@ -75,6 +75,14 @@ codeunit 4300 "Agent Task Impl."
         exit(AgentTaskMessage);
     end;
 
+    procedure StopTask(AgentTaskID: BigInteger; AgentTaskStatus: enum "Agent Task Status"; UserConfirm: Boolean)
+    var
+        AgentTask: Record "Agent Task";
+    begin
+        AgentTask.ID := AgentTaskID;
+        StopTask(AgentTask, AgentTaskStatus, UserConfirm);
+    end;
+
     procedure StopTask(var AgentTask: Record "Agent Task"; AgentTaskStatus: enum "Agent Task Status"; UserConfirm: Boolean)
     var
         AgentTaskToModify: Record "Agent Task";
