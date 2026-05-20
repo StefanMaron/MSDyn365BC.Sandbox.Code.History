@@ -595,6 +595,11 @@ codeunit 6500 "Item Tracking Management"
         CopyItemTracking3(ReservEntry, ToRowID, SwapSign, SkipReservation, ReservEntry."Reservation Status"::Prospect);
     end;
 
+    procedure CopyItemTracking(var ReservEntry: Record "Reservation Entry"; ToRowID: Text[250]; SwapSign: Boolean)
+    begin
+        CopyItemTracking3(ReservEntry, ToRowID, SwapSign, false, ReservEntry."Reservation Status"::Prospect);
+    end;
+
     local procedure CopyItemTracking3(var ReservEntry: Record "Reservation Entry"; ToRowID: Text[250]; SwapSign: Boolean; SkipReservation: Boolean; NewReservationStatus: Enum "Reservation Status")
     var
         ReservEntry1: Record "Reservation Entry";
