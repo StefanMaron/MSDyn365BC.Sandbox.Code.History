@@ -7,6 +7,7 @@ namespace System.MCP;
 
 using System.Azure.Identity;
 using System.Environment;
+using System.Feedback;
 using System.Reflection;
 using System.Utilities;
 
@@ -1041,6 +1042,40 @@ codeunit 8351 "MCP Config Implementation"
     end;
     #endregion
 
+    #region Feedback
+    internal procedure TriggerNoActiveConfigsFeedback()
+    var
+        Feedback: Codeunit "Microsoft User Feedback";
+    begin
+        if not Confirm(MCPServerFeedbackConfirmQst, true) then
+            exit;
+
+        Feedback.WithCustomQuestion(MCPServerFeedbackQst, MCPServerFeedbackQst).WithCustomQuestionType(Enum::FeedbackQuestionType::Text);
+        Feedback.RequestDislikeFeedback('MCP Server', 'MCPServer', 'Model Context Protocol (MCP) Server');
+
+        Session.LogMessage('0000RTR', NoActiveConfigsFeedbackTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', GetTelemetryCategory());
+    end;
+
+    internal procedure TriggerGeneralFeedback()
+    var
+        Feedback: Codeunit "Microsoft User Feedback";
+    begin
+        Feedback.RequestFeedback('MCP Server', 'MCPServer', 'Model Context Protocol (MCP) Server');
+
+        Session.LogMessage('0000RTS', GeneralFeedbackTxt, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::All, 'Category', GetTelemetryCategory());
+    end;
+
+    internal procedure HasNoActiveConfigurations(): Boolean
+    var
+        MCPConfiguration: Record "MCP Configuration";
+    begin
+        MCPConfiguration.SetRange(Active, true);
+        MCPConfiguration.SetFilter(Name, '<>%1', '');
+        exit(MCPConfiguration.IsEmpty());
+    end;
+    #endregion Feedback
+
+    #region Telemetry
     local procedure GetDimensions(MCPConfiguration: Record "MCP Configuration") Dimensions: Dictionary of [Text, Text]
     begin
         Dimensions.Add('Category', GetTelemetryCategory());
