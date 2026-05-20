@@ -2335,7 +2335,7 @@ codeunit 7322 "Create Inventory Pick/Movement"
         WareHouseActivityLine.CalcSums(Quantity, "Qty. (Base)", "Qty. Outstanding", "Qty. Outstanding (Base)");
         TotalQtyPicked := WareHouseActivityLine.Quantity;
         TotalQtyOutstanding := WareHouseActivityLine."Qty. Outstanding";
-        TotalQtyOutStandingCalculated := SalesLine.Quantity - SalesLine."Quantity Shipped";
+        TotalQtyOutStandingCalculated := Salesline.Quantity - Salesline."Quantity Shipped";
 
         if (SalesLine.Quantity = TotalQtyPicked) or
            (SalesLine.Quantity <> Round(TotalQtyPicked)) or
