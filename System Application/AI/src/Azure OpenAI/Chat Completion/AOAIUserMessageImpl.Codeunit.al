@@ -11,19 +11,15 @@ codeunit 7784 "AOAI User Message Impl"
     InherentPermissions = X;
 
     var
-        CopilotCapabilityImpl: Codeunit "Copilot Capability Impl";
         [NonDebuggable]
         ContentParts: JsonArray;
         HasFileContent, HasTextContent : Boolean;
-        NotMicrosoftPublisherErr: Label 'This functionality is only available to Microsoft published apps.';
 
     [NonDebuggable]
-    procedure AddTextPart(TextContent: Text; CallerModuleInfo: ModuleInfo)
+    procedure AddTextPart(TextContent: Text)
     var
         TextPartObject: JsonObject;
     begin
-        if not CopilotCapabilityImpl.IsPublisherMicrosoft(CallerModuleInfo) then
-            Error(NotMicrosoftPublisherErr);
         TextPartObject.Add('type', 'text');
         TextPartObject.Add('text', TextContent);
         ContentParts.Add(TextPartObject);
@@ -31,13 +27,11 @@ codeunit 7784 "AOAI User Message Impl"
     end;
 
     [NonDebuggable]
-    procedure AddFilePart(FileData: Text; CallerModuleInfo: ModuleInfo)
+    procedure AddFilePart(FileData: Text)
     var
         FilePartObject: JsonObject;
         FileDataObject: JsonObject;
     begin
-        if not CopilotCapabilityImpl.IsPublisherMicrosoft(CallerModuleInfo) then
-            Error(NotMicrosoftPublisherErr);
         FileDataObject.Add('file_data', FileData);
         FilePartObject.Add('type', 'file');
         FilePartObject.Add('file', FileDataObject);
