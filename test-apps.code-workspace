@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "al.enableCodeActions": false,
+    "al.enableCodeAnalysis": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "allint.enabled": false
+  },
   "folders": [
     {
       "path": "./_Exclude_APIV1_ Tests"
@@ -348,13 +356,5 @@
     {
       "path": "./Error Messages with Recommendations Tests/DisabledTests"
     }
-  ],
-  "settings": {
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeActions": false
-  }
+  ]
 }
