@@ -2,16 +2,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
+namespace System.Agents;
 
-namespace System.Security.AccessControl;
-
-using System.Environment.Consumption;
-
-permissionset 4306 "Agent - Diagnostics"
+codeunit 4331 "Agent Install"
 {
-    Assignable = true;
-    Caption = 'Agent Diagnostics';
-    IncludedPermissionSets = "D365 Agent";
-    Permissions = tabledata "User AI Consumption Data" = R,
-                  system "Troubleshoot All Agents" = X;
+    Access = Internal;
+    Subtype = Install;
+    InherentEntitlements = X;
+    InherentPermissions = X;
+
+    trigger OnInstallAppPerDatabase()
+    var
+        AgentUpgrade: Codeunit "Agent Upgrade";
+    begin
+        AgentUpgrade.InsertDefaultPermissionIfEmpty();
+    end;
 }
