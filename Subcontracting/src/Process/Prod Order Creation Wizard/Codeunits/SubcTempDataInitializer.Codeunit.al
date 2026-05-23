@@ -34,6 +34,13 @@ codeunit 99001552 "Subc. Temp Data Initializer"
         HasManufacturingSetup: Boolean;
         HasSubcManagementSetup: Boolean;
         SubcRtngBOMSourceType: Enum "Subc. RtngBOMSourceType";
+        TempProdOrderNoLbl: Label 'TEMP-%1', Locked = true, MaxLength = 20;
+        BOMForLbl: Label 'BOM for %1', Comment = '%1 = Item description';
+        TempBOMNoLbl: Label 'TEMP-BOM-%1', Locked = true, MaxLength = 20;
+        RoutingForLbl: Label 'Routing for %1', Comment = '%1 = Item description';
+        TempRoutingNoLbl: Label 'TEMP-RTNG-%1', Locked = true, MaxLength = 20;
+        PutAwayOperationLbl: Label 'Put-Away Operation';
+        SubcontractingOperationLbl: Label 'Subcontracting Operation';
 
     /// <summary>
     /// Initializes the temporary structure for production order processing based on a purchase line.
@@ -60,8 +67,6 @@ codeunit 99001552 "Subc. Temp Data Initializer"
     end;
 
     local procedure CreateTemporaryProductionOrder()
-    var
-        TempProdOrderNoLbl: Label 'TEMP-%1', Locked = true, MaxLength = 20;
     begin
         TempGlobalProductionBOMLine.Reset();
         TempGlobalProductionBOMLine.DeleteAll();
@@ -141,8 +146,6 @@ codeunit 99001552 "Subc. Temp Data Initializer"
     local procedure InitializeTemporaryBOMHeaderFromSetup(Item: Record Item): Code[20]
     var
         BOMNo: Code[20];
-        BOMForLbl: Label 'BOM for %1', Comment = '%1 = Item description';
-        TempBOMNoLbl: Label 'TEMP-BOM-%1', Locked = true, MaxLength = 20;
     begin
         TempGlobalProductionBOMHeader.Init();
         BOMNo := StrSubstNo(TempBOMNoLbl, CopyStr(Format(CreateGuid()), 2, 10));
@@ -196,8 +199,6 @@ codeunit 99001552 "Subc. Temp Data Initializer"
     local procedure InitializeTemporaryRoutingHeaderFromSetup(Item: Record Item): Code[20]
     var
         RoutingNo: Code[20];
-        RoutingForLbl: Label 'Routing for %1', Comment = '%1 = Item description';
-        TempRoutingNoLbl: Label 'TEMP-RTNG-%1', Locked = true, MaxLength = 20;
     begin
         TempGlobalRoutingHeader.Init();
         RoutingNo := StrSubstNo(TempRoutingNoLbl, CopyStr(Format(CreateGuid()), 2, 10));
@@ -213,9 +214,9 @@ codeunit 99001552 "Subc. Temp Data Initializer"
         WorkCenterNo: Code[20];
     begin
         GetManufacturingSetup();
-        Vendor.SetLoadFields("Work Center No.");
+        Vendor.SetLoadFields("Subc. Work Center No.");
         Vendor.Get(TempGlobalPurchaseLine."Buy-from Vendor No.");
-        WorkCenterNo := Vendor."Work Center No.";
+        WorkCenterNo := Vendor."Subc. Work Center No.";
         if WorkCenterNo = '' then begin
             SubcManagementSetup.TestField("Common Work Center No.");
             WorkCenterNo := SubcManagementSetup."Common Work Center No.";
@@ -226,8 +227,6 @@ codeunit 99001552 "Subc. Temp Data Initializer"
     local procedure InitializeTemporaryRoutingLinesFromSetup(RoutingNo: Code[20]; WorkCenterNo: Code[20])
     var
         Location: Record Location;
-        PutAwayOperationLbl: Label 'Put-Away Operation';
-        SubcontractingOperationLbl: Label 'Subcontracting Operation';
     begin
         TempGlobalRoutingLine.Init();
         TempGlobalRoutingLine."Routing No." := RoutingNo;
@@ -268,7 +267,7 @@ codeunit 99001552 "Subc. Temp Data Initializer"
         BuildTemporaryComponents();
 
         GetVendor();
-        SubcSessionState.SetCode('SetSubcontractingLocationCodeFromVendor', TempGlobalVendor."Subcontr. Location Code");
+        SubcSessionState.SetCode('SetSubcontractingLocationCodeFromVendor', TempGlobalVendor."Subc. Location Code");
     end;
 
     local procedure BuildTemporaryComponents()
@@ -573,8 +572,8 @@ codeunit 99001552 "Subc. Temp Data Initializer"
                 "Subcontracting Type"::InventoryByVendor, "Subcontracting Type"::Purchase:
                     begin
                         GetVendor();
-                        TempGlobalProdOrderComponent.Validate("Location Code", TempGlobalVendor."Subcontr. Location Code");
-                        TempGlobalProdOrderComponent."Orig. Location Code" := ComponentsLocationCode;
+                        TempGlobalProdOrderComponent.Validate("Location Code", TempGlobalVendor."Subc. Location Code");
+                        TempGlobalProdOrderComponent."Subc. Original Location Code" := ComponentsLocationCode;
                     end;
                 "Subcontracting Type"::Transfer:
                     TempGlobalProdOrderComponent.Validate("Location Code", ComponentsLocationCode);

@@ -132,13 +132,13 @@
       "path": "./OnPrem Permissions Tests"
     },
     {
+      "path": "./Payment Practices Test Library"
+    },
+    {
       "path": "./Payment Practices Tests"
     },
     {
       "path": "./PayPal Payments Standard Tests"
-    },
-    {
-      "path": "./PEPPOL Tests"
     },
     {
       "path": "./Performance Toolkit Tests"
@@ -319,6 +319,9 @@
     },
     {
       "path": "./Quality Management-Tests/DisabledTests"
+    },
+    {
+      "path": "./PEPPOL Tests/DisabledTests"
     },
     {
       "path": "./Base Application/System/DevTools/CALTest"

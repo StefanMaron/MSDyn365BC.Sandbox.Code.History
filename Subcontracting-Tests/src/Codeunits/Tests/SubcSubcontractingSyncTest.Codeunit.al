@@ -139,7 +139,7 @@ codeunit 139992 "Subc. Subcontracting Sync Test"
         LibraryWarehouse.CreateLocation(Location);
         LibraryWarehouse.CreateLocation(Location2);
         LibraryPurchase.CreateVendor(Vendor);
-        Vendor."Subcontr. Location Code" := Location2.Code;
+        Vendor."Subc. Location Code" := Location2.Code;
         Vendor.Modify();
         LibraryPurchase.CreatePurchaseOrderWithLocation(PurchaseHeader, Vendor."No.", Location.Code);
         LibraryPurchase.CreatePurchaseLine(PurchLine, PurchaseHeader, "Purchase Line Type"::Item, LibraryInventory.CreateItemNo(), LibraryRandom.RandInt(100));
@@ -359,7 +359,7 @@ codeunit 139992 "Subc. Subcontracting Sync Test"
     begin
         LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
         Vendor.Get(WorkCenter."Subcontractor No.");
-        Vendor."Subcontr. Location Code" := Location.Code;
+        Vendor."Subc. Location Code" := Location.Code;
         LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
         Vendor."Location Code" := Location.Code;
         Vendor.Modify();
@@ -407,7 +407,7 @@ codeunit 139992 "Subc. Subcontracting Sync Test"
         LibrarySetupStorage.Restore();
 
         SubcontractingMgmtLibrary.Initialize();
-        UpdateSubMgmtSetup_ComponentAtLocation("Components at Location"::Purchase);
+        UpdateSubMgmtSetupComponentAtLocation("Components at Location"::Purchase);
         LibraryMfgManagement.Initialize();
 
         if IsInitialized then
@@ -435,12 +435,12 @@ codeunit 139992 "Subc. Subcontracting Sync Test"
         LibraryMfgManagement.CreateSubcontractingReqWkshTemplateAndNameAndUpdateSetup();
     end;
 
-    local procedure UpdateSubMgmtSetup_ComponentAtLocation(CompAtLocation: Enum "Components at Location")
+    local procedure UpdateSubMgmtSetupComponentAtLocation(CompAtLocation: Enum "Components at Location")
     var
         ManufacturingSetup: Record "Manufacturing Setup";
     begin
         ManufacturingSetup.Get();
-        ManufacturingSetup."Subc. Comp. at Location" := CompAtLocation;
+        ManufacturingSetup."Subc. Default Comp. Location" := CompAtLocation;
         ManufacturingSetup.Modify();
     end;
 
