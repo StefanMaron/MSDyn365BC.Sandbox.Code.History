@@ -5797,7 +5797,8 @@ codeunit 80 "Sales-Post"
         DiffToLineDiscAmt: Decimal;
         IsHandled: Boolean;
     begin
-        OnBeforeAdjustFinalInvWith100PctPrepmt(TempPrepmtDeductLCYSalesLine, CombinedSalesLine);
+        IsHandled := false;
+        OnBeforeAdjustFinalInvWith100PctPrepmt(TempPrepmtDeductLCYSalesLine, CombinedSalesLine, IsHandled);
         if IsHandled then
             exit;
         TempPrepmtDeductLCYSalesLine.Reset();
@@ -14144,7 +14145,7 @@ codeunit 80 "Sales-Post"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeAdjustFinalInvWith100PctPrepmt(var TempPrepmtDeductLCYSalesLine: Record "Sales Line" temporary; var CombinedSalesLine: Record "Sales Line")
+    local procedure OnBeforeAdjustFinalInvWith100PctPrepmt(var TempPrepmtDeductLCYSalesLine: Record "Sales Line" temporary; var CombinedSalesLine: Record "Sales Line"; var IsHandled: Boolean)
     begin
     end;
 
