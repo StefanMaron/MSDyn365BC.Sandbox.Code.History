@@ -6878,6 +6878,7 @@ table 36 "Sales Header"
         SalesLine2.SetRange("Document No.", "No.");
         SalesLine2.SetRange("Drop Shipment", false);
         SalesLine2.SetRange(Type, SalesLine.Type::Item);
+        OnCheckShippingAdviceOnAfterSetLineFilters(SalesLine2, Rec);
         Result := true;
         if SalesLine2.FindSet() then
             repeat
@@ -10043,6 +10044,11 @@ table 36 "Sales Header"
     /// <param name="Result">The result of the shipping advice check.</param>
     [IntegrationEvent(false, false)]
     local procedure OnAfterCheckShippingAdvice(var SalesHeader: Record "Sales Header"; var Result: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckShippingAdviceOnAfterSetLineFilters(var SalesLine: Record "Sales Line"; var SalesHeader: Record "Sales Header")
     begin
     end;
 
