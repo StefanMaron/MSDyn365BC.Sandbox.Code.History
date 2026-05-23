@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "al.enableCodeAnalysis": false,
+    "allint.enabled": false,
+    "al.enableCodeActions": false,
+    "search.exclude": {
+      "**.xlf": true
+    }
+  },
   "folders": [
     {
       "path": "./_Exclude_APIV1_ Tests"
@@ -122,6 +130,9 @@
     },
     {
       "path": "./OnPrem Permissions Tests"
+    },
+    {
+      "path": "./Payment Practices Test Library"
     },
     {
       "path": "./Payment Practices Tests"
@@ -327,13 +338,5 @@
     {
       "path": "./Shopify Connector Test/DisabledTests"
     }
-  ],
-  "settings": {
-    "allint.enabled": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeAnalysis": false,
-    "al.enableCodeActions": false
-  }
+  ]
 }
