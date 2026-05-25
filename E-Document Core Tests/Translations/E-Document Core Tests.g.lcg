@@ -50,6 +50,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.eServices.EDocument.Test)(LookupHint=Table E-Doc. Mapping Test Rec - Field Text Value - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1034236877 - NamedType 2265274365" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The status of the EDocument was not updated to the expected status after the step was executed.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.eServices.EDocument.Test)(LookupHint=Codeunit E-Doc Data Exch Tests - NamedType EDocumentStatusNotUpdatedErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1786721224 - NamedType 3406384565" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The E-Document has already been processed and cannot be deleted.]]></Val>
