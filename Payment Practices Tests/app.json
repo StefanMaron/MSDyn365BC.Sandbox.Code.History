@@ -4,7 +4,7 @@
   "publisher": "Microsoft",
   "brief": "Tests for Payment Practices app.",
   "description": "Tests for Payment Practices app.",
-  "version": "28.2.50705.0",
+  "version": "28.2.50736.0",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
   "EULA": "https://go.microsoft.com/fwlink/?linkid=2009120",
   "help": "https://go.microsoft.com/fwlink/?LinkId=724011",
@@ -15,6 +15,12 @@
     {
       "id": "64977288-facd-4b48-aaaa-bb0e288edfb3",
       "name": "Payment Practices",
+      "publisher": "Microsoft",
+      "version": "28.2.0.0"
+    },
+    {
+      "id": "cc329ed7-8840-45f6-860b-3eb99c408998",
+      "name": "Payment Practices Test Library",
       "publisher": "Microsoft",
       "version": "28.2.0.0"
     },
@@ -41,7 +47,7 @@
   "platform": "28.0.0.0",
   "idRanges": [
     {
-      "from": 134196,
+      "from": 134197,
       "to": 134197
     }
   ],
