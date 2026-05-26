@@ -3209,6 +3209,7 @@ codeunit 80 "Sales-Post"
             UpdateItemChargeAssgnt(SalesHeader);
             OnFinalizePostingOnAfterUpdateItemChargeAssgnt(SalesHeader, TempDropShptPostBuffer, GenJnlPostLine);
         end else begin
+            OnFinalizePostingOnBeforeInsertTrackingSpecification(TempDropShptPostBuffer, TempItemChargeAssgntSales, SalesHeader, TempTrackingSpecification, EverythingInvoiced, TempSalesLine, TempSalesLineGlobal, this);
             case SalesHeader."Document Type" of
                 SalesHeader."Document Type"::Invoice:
                     begin
@@ -12730,6 +12731,11 @@ codeunit 80 "Sales-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnFinalizePostingOnAfterUpdateItemChargeAssgnt(var SalesHeader: Record "Sales Header"; var TempDropShptPostBuffer: Record "Drop Shpt. Post. Buffer" temporary; var GenJnlPostLine: Codeunit "Gen. Jnl.-Post Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnFinalizePostingOnBeforeInsertTrackingSpecification(var TempDropShptPostBuffer: Record "Drop Shpt. Post. Buffer" temporary; var TempItemChargeAssignmentSales: Record "Item Charge Assignment (Sales)" temporary; SalesHeader: Record "Sales Header"; var TempTrackingSpecification: Record "Tracking Specification" temporary; EverythingInvoiced: Boolean; var TempSalesLine: Record "Sales Line" temporary; var TempSalesLineGlobal: Record "Sales Line" temporary; SalesPost: Codeunit "Sales-Post")
     begin
     end;
 
