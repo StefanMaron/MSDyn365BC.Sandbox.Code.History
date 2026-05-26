@@ -1023,6 +1023,11 @@ report 5753 "Get Source Documents"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnAfterSetDoNotFillQtytoHandle(var DoNotFillQuantityToHandle: Boolean; RequestType: Option Receive,Ship; SourceDocumentNo: Code[20]; var WarehouseReceiptHeader: Record "Warehouse Receipt Header"; var WarehouseShipmentHeader: Record "Warehouse Shipment Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnBeforeSalesLineOnAfterGetRecord(SalesLine: Record "Sales Line"; WarehouseRequest: Record "Warehouse Request"; RequestType: Option; var IsHandled: Boolean; SkipBlockedItem: Boolean)
     begin
     end;
@@ -1209,11 +1214,6 @@ report 5753 "Get Source Documents"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterSetSalesLineFilters(var SalesLine: Record "Sales Line"; WarehouseRequest: Record "Warehouse Request")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterSetDoNotFillQtytoHandle(var DoNotFillQuantityToHandle: Boolean; RequestType: Option Receive,Ship; SourceDocumentNo: Code[20]; var WarehouseReceiptHeader: Record "Warehouse Receipt Header"; var WarehouseShipmentHeader: Record "Warehouse Shipment Header")
     begin
     end;
 }
