@@ -5250,41 +5250,45 @@ codeunit 22 "Item Jnl.-Post Line"
         ItemApplicationEntry: Record "Item Application Entry";
         Enough: Boolean;
         FixedApplication: Boolean;
+        IsHandled: Boolean;
     begin
         OnBeforeMoveApplication(ItemLedgerEntry, OldItemLedgerEntry);
 
         FixedApplication := false;
         OldItemLedgerEntry.TestField(Positive, true);
 
-        if (OldItemLedgerEntry."Remaining Quantity" < Abs(ItemLedgerEntry.Quantity)) and
-           (OldItemLedgerEntry."Remaining Quantity" < OldItemLedgerEntry.Quantity)
-        then begin
-            Enough := false;
-            ItemApplicationEntry.Reset();
-            ItemApplicationEntry.SetCurrentKey("Inbound Item Entry No.");
-            ItemApplicationEntry.SetRange("Inbound Item Entry No.", ItemLedgerEntry."Applies-to Entry");
-            ItemApplicationEntry.SetFilter("Outbound Item Entry No.", '<>0');
+        IsHandled := false;
+        OnMoveApplicationOnBeforeRemainingQtyCheck(ItemLedgerEntry, OldItemLedgerEntry, IsHandled);
+        if not IsHandled then
+            if (OldItemLedgerEntry."Remaining Quantity" < Abs(ItemLedgerEntry.Quantity)) and
+               (OldItemLedgerEntry."Remaining Quantity" < OldItemLedgerEntry.Quantity)
+            then begin
+                Enough := false;
+                ItemApplicationEntry.Reset();
+                ItemApplicationEntry.SetCurrentKey("Inbound Item Entry No.");
+                ItemApplicationEntry.SetRange("Inbound Item Entry No.", ItemLedgerEntry."Applies-to Entry");
+                ItemApplicationEntry.SetFilter("Outbound Item Entry No.", '<>0');
 
-            if ItemApplicationEntry.FindSet() then
-                repeat
-                    if not ItemApplicationEntry.Fixed() then begin
-                        UnApply(ItemApplicationEntry);
-                        OldItemLedgerEntry.Get(OldItemLedgerEntry."Entry No.");
-                        OldItemLedgerEntry.CalcReservedQuantity();
-                        Enough :=
-                          Abs(OldItemLedgerEntry."Remaining Quantity" - OldItemLedgerEntry."Reserved Quantity") >=
-                          Abs(ItemLedgerEntry."Remaining Quantity");
-                    end else
-                        FixedApplication := true;
-                until (ItemApplicationEntry.Next() = 0) or Enough
-            else
-                exit(false);
-            // no applications found that could be undone
-            OnAfterMoveApplication(ItemLedgerEntry, OldItemLedgerEntry, Enough);
-            if not Enough and FixedApplication then
-                ShowFixedApplicationError();
-            exit(Enough);
-        end;
+                if ItemApplicationEntry.FindSet() then
+                    repeat
+                        if not ItemApplicationEntry.Fixed() then begin
+                            UnApply(ItemApplicationEntry);
+                            OldItemLedgerEntry.Get(OldItemLedgerEntry."Entry No.");
+                            OldItemLedgerEntry.CalcReservedQuantity();
+                            Enough :=
+                              Abs(OldItemLedgerEntry."Remaining Quantity" - OldItemLedgerEntry."Reserved Quantity") >=
+                              Abs(ItemLedgerEntry."Remaining Quantity");
+                        end else
+                            FixedApplication := true;
+                    until (ItemApplicationEntry.Next() = 0) or Enough
+                else
+                    exit(false);
+                // no applications found that could be undone
+                OnAfterMoveApplication(ItemLedgerEntry, OldItemLedgerEntry, Enough);
+                if not Enough and FixedApplication then
+                    ShowFixedApplicationError();
+                exit(Enough);
+            end;
         exit(true);
     end;
 
@@ -5352,6 +5356,7 @@ codeunit 22 "Item Jnl.-Post Line"
         DialogWindow: Dialog;
         "Count": Integer;
         t: Integer;
+        IsHandled: Boolean;
     begin
         TempTouchedItemLedgerEntries.SetCurrentKey("Item No.", Open, "Variant Code", Positive, "Location Code", "Posting Date", "Entry No.");
         if TempTouchedItemLedgerEntries.Find('-') then begin
@@ -5364,10 +5369,13 @@ codeunit 22 "Item Jnl.-Post Line"
                 t := t + 1;
                 DialogWindow.Update(1, Round(t * 10000 / Count, 1));
                 TouchedItemLedgEntry.Get(TempTouchedItemLedgerEntries."Entry No.");
-                if TouchedItemLedgEntry."Remaining Quantity" <> 0 then begin
-                    ReApply(TouchedItemLedgEntry, 0);
-                    TouchedItemLedgEntry.Get(TempTouchedItemLedgerEntries."Entry No.");
-                end;
+                IsHandled := false;
+                OnRedoApplicationsOnBeforeReApply(TouchedItemLedgEntry, IsHandled);
+                if not IsHandled then
+                    if TouchedItemLedgEntry."Remaining Quantity" <> 0 then begin
+                        ReApply(TouchedItemLedgEntry, 0);
+                        TouchedItemLedgEntry.Get(TempTouchedItemLedgerEntries."Entry No.");
+                    end;
             until TempTouchedItemLedgerEntries.Next() = 0;
             if AnyTouchedEntries() then
                 VerifyTouchedOnInventory();
@@ -6515,6 +6523,16 @@ codeunit 22 "Item Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeMoveApplication(var ItemLedgEntry: Record "Item Ledger Entry"; var OldItemLedgEntry: Record "Item Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnMoveApplicationOnBeforeRemainingQtyCheck(var ItemLedgerEntry: Record "Item Ledger Entry"; var OldItemLedgerEntry: Record "Item Ledger Entry"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnRedoApplicationsOnBeforeReApply(var TouchedItemLedgerEntry: Record "Item Ledger Entry"; var IsHandled: Boolean)
     begin
     end;
 
