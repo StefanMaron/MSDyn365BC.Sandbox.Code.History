@@ -5,7 +5,7 @@
 $requestedCountry = $country
 
 [System.Collections.ArrayList]$Versions = @()
-Get-BCArtifactUrl -select All -Type Sandbox -country $country -accept_insiderEula -storageAccount bcinsider -after ([DateTime]::Today.AddDays(-1)) | % {
+Get-BCArtifactUrl -select All -Type Sandbox -country $country -accept_insiderEula -storageAccount bcinsider -after ([DateTime]::Today.AddDays(-2)) | % {
     [System.Uri]$Url = $_
     $TempString = $Url.AbsolutePath
     [version]$Version = $TempString.Split('/')[2]

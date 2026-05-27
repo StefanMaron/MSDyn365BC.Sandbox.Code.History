@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       lookbackDays:
-        description: 'Days to look back for artifacts (default 1, increase for backfill)'
+        description: 'Days to look back for artifacts (default 2, increase for backfill)'
         required: false
-        default: '1'
+        default: '2'
 
 jobs:
   prepare:
@@ -57,6 +57,6 @@ jobs:
       - name: Build Commits
         shell: pwsh
         run: |
-          ./scripts/Auto_load_versions.ps1 -country ${{matrix.countries}} -lookbackDays ${{ github.event.inputs.lookbackDays || '1' }}
+          ./scripts/Auto_load_versions.ps1 -country ${{matrix.countries}} -lookbackDays ${{ github.event.inputs.lookbackDays || '2' }}
       
     

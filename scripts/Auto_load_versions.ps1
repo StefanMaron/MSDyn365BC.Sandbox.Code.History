@@ -1,6 +1,6 @@
 ﻿param (
     [string]$country = 'w1',
-    [int]$lookbackDays = 1
+    [int]$lookbackDays = 2
 )
 
 $requestedCountry = $country
