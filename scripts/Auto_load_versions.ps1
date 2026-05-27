@@ -275,11 +275,32 @@ $Versions | Sort-Object -Property Country, Version | % {
 
             Write-Host "Rebase completed successfully"
 
-            # Force push with lease to prevent overwriting concurrent changes
+            # Force push with lease; retry on failure to handle GitHub replication lag
+            # (a fresh force-push to server A may not be visible on server B yet when we fetch)
             Write-Host "Force pushing rebased history..."
-            git push --force-with-lease origin "$($country)-$($Version.Major)"
-            if ($LASTEXITCODE -ne 0) {
-                Write-Host "##[error]Force push failed for $($country)-$($Version.Major)"
+            $MaxRetries = 3
+            $PushSuccess = $false
+            for ($Attempt = 1; $Attempt -le $MaxRetries; $Attempt++) {
+                if ($Attempt -gt 1) {
+                    Write-Host "Retrying force push (attempt $Attempt of $MaxRetries)..."
+                    Start-Sleep -Seconds 3
+                    git fetch origin "$($country)-$($Version.Major)" 2>&1 | Out-Null
+                    $RemoteSHA = git rev-parse "origin/$($country)-$($Version.Major)"
+                    $LocalSHA  = git rev-parse "$($country)-$($Version.Major)"
+                    if ($RemoteSHA -eq $LocalSHA) {
+                        Write-Host "Remote already matches local after re-fetch, skipping push"
+                        $PushSuccess = $true
+                        break
+                    }
+                }
+                git push --force-with-lease origin "$($country)-$($Version.Major)"
+                if ($LASTEXITCODE -eq 0) {
+                    $PushSuccess = $true
+                    break
+                }
+            }
+            if (-not $PushSuccess) {
+                Write-Host "##[error]Force push failed for $($country)-$($Version.Major) after $MaxRetries attempts"
                 exit 1
             }
         }
