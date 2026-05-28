@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "al.enableCodeAnalysis": false,
+    "allint.enabled": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeActions": false
+  },
   "folders": [
     {
       "path": "./_Exclude_APIV1_ Tests"
@@ -292,7 +300,16 @@
       "path": "./Withholding Tax Tests"
     },
     {
-      "path": "./System Application Test Library/Extension Management/testArtifacts"
+      "path": "./Subcontracting-Tests/DisabledTests"
+    },
+    {
+      "path": "./Subcontracting-Tests/src/Codeunits/Tests"
+    },
+    {
+      "path": "./Error Messages with Recommendations Tests/DisabledTests"
+    },
+    {
+      "path": "./Shopify Connector Test/DisabledTests"
     },
     {
       "path": "./E-Document Core Tests/DisabledTests"
@@ -301,31 +318,13 @@
       "path": "./System Application Test/DisabledTests"
     },
     {
-      "path": "./Business Foundation Tests/DisabledTests"
-    },
-    {
-      "path": "./Sales Lines Suggestions Tests/AI Tests"
-    },
-    {
-      "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
-    },
-    {
-      "path": "./Quality Management-Tests/DisabledTests"
+      "path": "./AI Test Toolkit/src/TestSuite"
     },
     {
       "path": "./PEPPOL Tests/DisabledTests"
     },
     {
-      "path": "./Base Application/System/DevTools/CALTest"
-    },
-    {
-      "path": "./Test Runner/src/DataDrivenTest"
-    },
-    {
-      "path": "./AI Test Toolkit/src/TestSuite"
-    },
-    {
-      "path": "./PowerBI Reports Tests/DisabledTests"
+      "path": "./Quality Management-Tests/DisabledTests"
     },
     {
       "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
@@ -334,36 +333,37 @@
       "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
     },
     {
-      "path": "./Performance Toolkit Tests/src/Mock Tests"
-    },
-    {
       "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
     },
     {
       "path": "./Quality Management/src/Configuration/Template/Test"
     },
     {
-      "path": "./Subcontracting-Tests/DisabledTests"
+      "path": "./Business Foundation Tests/DisabledTests"
     },
     {
-      "path": "./Subcontracting-Tests/src/Codeunits/Tests"
+      "path": "./Test Runner/src/DataDrivenTest"
+    },
+    {
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
+    },
+    {
+      "path": "./Sales Lines Suggestions Tests/AI Tests"
+    },
+    {
+      "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
+    },
+    {
+      "path": "./Base Application/System/DevTools/CALTest"
     },
     {
       "path": "./System Application/Email/src/Test Email"
     },
     {
-      "path": "./Shopify Connector Test/DisabledTests"
+      "path": "./PowerBI Reports Tests/DisabledTests"
     },
     {
-      "path": "./Error Messages with Recommendations Tests/DisabledTests"
+      "path": "./System Application Test Library/Extension Management/testArtifacts"
     }
-  ],
-  "settings": {
-    "al.enableCodeActions": false,
-    "allint.enabled": false,
-    "al.enableCodeAnalysis": false,
-    "search.exclude": {
-      "**.xlf": true
-    }
-  }
+  ]
 }
