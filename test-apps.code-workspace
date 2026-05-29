@@ -1,12 +1,4 @@
 {
-  "settings": {
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeActions": false
-  },
   "folders": [
     {
       "path": "./_Exclude_APIV1_ Tests"
@@ -168,6 +160,9 @@
       "path": "./Service Management Tests"
     },
     {
+      "path": "./Shopify Connector Test"
+    },
+    {
       "path": "./Simplified Bank Statement Import Test"
     },
     {
@@ -309,9 +304,6 @@
       "path": "./Error Messages with Recommendations Tests/DisabledTests"
     },
     {
-      "path": "./Shopify Connector Test/DisabledTests"
-    },
-    {
       "path": "./E-Document Core Tests/DisabledTests"
     },
     {
@@ -365,5 +357,13 @@
     {
       "path": "./System Application Test Library/Extension Management/testArtifacts"
     }
-  ]
+  ],
+  "settings": {
+    "al.enableCodeActions": false,
+    "al.enableCodeAnalysis": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "allint.enabled": false
+  }
 }
