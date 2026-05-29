@@ -1123,6 +1123,7 @@ table 254 "VAT Entry"
     /// <param name="Response">User response from any confirmation dialogs</param>
     procedure SetGLAccountNoWithResponse(WithUI: Boolean; ShowConfirm: Boolean; var Response: Boolean)
     var
+        VATEntryLocal: Record "VAT Entry";
         ConfirmManagement: Codeunit "Confirm Management";
         Window: Dialog;
         EntryNosByGLAccountNo: Dictionary of [Code[20], List of [Integer]];
@@ -1139,7 +1140,8 @@ table 254 "VAT Entry"
         if IsHandled then
             exit;
 
-        SetRange("G/L Acc. No.", '');
+        VATEntryLocal.Copy(Rec);
+        VATEntryLocal.SetRange("G/L Acc. No.", '');
         if WithUI then begin
             if ShowConfirm then
                 Response := ConfirmManagement.GetResponseOrDefault(ConfirmAdjustQst, false);
@@ -1147,7 +1149,7 @@ table 254 "VAT Entry"
                 exit;
 
             if GuiAllowed() then begin
-                NoOfRecords := count();
+                NoOfRecords := VATEntryLocal.Count();
                 Window.Open(AdjustTitleMsg + ProgressMsg);
             end;
         end;
@@ -1200,7 +1202,10 @@ table 254 "VAT Entry"
         GLEntryVATLink: Record "G/L Entry - VAT Entry Link";
     begin
         VATEntryLocal.Copy(Rec);
+        VATEntryLocal.ReadIsolation := IsolationLevel::ReadCommitted;
+        VATEntryLocal.SetCurrentKey("G/L Acc. No.");
         VATEntryLocal.SetRange("G/L Acc. No.", '');
+        VATEntryLocal.SetLoadFields("Entry No.");
         if not VATEntryLocal.FindSet() then
             exit;
 
@@ -1219,7 +1224,7 @@ table 254 "VAT Entry"
         GLEntryVATEntryLink: Record "G/L Entry - VAT Entry Link";
     begin
         GLEntryVATEntryLink.SetCurrentKey("VAT Entry No.");
-        GLEntryVATEntryLink.SetRange("VAT Entry No.", "Entry No.");
+        GLEntryVATEntryLink.SetRange("VAT Entry No.", VATEntry."Entry No.");
         if not GLEntryVATEntryLink.FindFirst() then begin
             if not AddMissingGLEntryVATEntryLink(VATEntry, GLEntry, GLEntryVATEntryLink) then
                 exit(false);
