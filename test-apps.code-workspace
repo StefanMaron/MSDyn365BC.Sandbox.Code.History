@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "al.enableCodeAnalysis": false,
+    "allint.enabled": false,
+    "al.enableCodeActions": false,
+    "search.exclude": {
+      "**.xlf": true
+    }
+  },
   "folders": [
     {
       "path": "./_Exclude_APIV1_ Tests"
@@ -289,37 +297,25 @@
       "path": "./Withholding Tax Tests"
     },
     {
-      "path": "./System Application Test Library/Extension Management/testArtifacts"
+      "path": "./Error Messages with Recommendations Tests/DisabledTests"
+    },
+    {
+      "path": "./Shopify Connector Test/DisabledTests"
     },
     {
       "path": "./E-Document Core Tests/DisabledTests"
     },
     {
+      "path": "./Subscription Billing Tests/DisabledTests"
+    },
+    {
       "path": "./System Application Test/DisabledTests"
-    },
-    {
-      "path": "./Business Foundation Tests/DisabledTests"
-    },
-    {
-      "path": "./Sales Lines Suggestions Tests/AI Tests"
-    },
-    {
-      "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
-    },
-    {
-      "path": "./Quality Management-Tests/DisabledTests"
-    },
-    {
-      "path": "./Base Application/System/DevTools/CALTest"
-    },
-    {
-      "path": "./Test Runner/src/DataDrivenTest"
     },
     {
       "path": "./AI Test Toolkit/src/TestSuite"
     },
     {
-      "path": "./PowerBI Reports Tests/DisabledTests"
+      "path": "./Quality Management-Tests/DisabledTests"
     },
     {
       "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
@@ -328,33 +324,37 @@
       "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
     },
     {
-      "path": "./Performance Toolkit Tests/src/Mock Tests"
-    },
-    {
       "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
     },
     {
       "path": "./Quality Management/src/Configuration/Template/Test"
     },
     {
+      "path": "./Business Foundation Tests/DisabledTests"
+    },
+    {
+      "path": "./Test Runner/src/DataDrivenTest"
+    },
+    {
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
+    },
+    {
+      "path": "./Sales Lines Suggestions Tests/AI Tests"
+    },
+    {
+      "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
+    },
+    {
+      "path": "./Base Application/System/DevTools/CALTest"
+    },
+    {
       "path": "./System Application/Email/src/Test Email"
     },
     {
-      "path": "./Subscription Billing Tests/DisabledTests"
+      "path": "./PowerBI Reports Tests/DisabledTests"
     },
     {
-      "path": "./Shopify Connector Test/DisabledTests"
-    },
-    {
-      "path": "./Error Messages with Recommendations Tests/DisabledTests"
+      "path": "./System Application Test Library/Extension Management/testArtifacts"
     }
-  ],
-  "settings": {
-    "al.enableCodeActions": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false
-  }
+  ]
 }
