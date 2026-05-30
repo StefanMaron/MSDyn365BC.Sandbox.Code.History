@@ -222,6 +222,11 @@ codeunit 11401 "Post Code Management"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterPurchaseHeaderOnBeforeValidateBuyFromAddress(var PurchaseHeader: Record "Purchase Header"; PhoneNo: Text[30]; FaxNo: Text[30])
+    begin
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"Alternative Address", 'OnBeforeValidateEvent', 'Address', false, false)]
     local procedure AlternativeAddressOnBeforeValidateAddress(var Rec: Record "Alternative Address")
     begin
@@ -381,6 +386,7 @@ codeunit 11401 "Post Code Management"
         FindStreetName(
             Rec."Buy-from Address", Rec."Buy-from Address 2", Rec."Buy-from Post Code", Rec."Buy-from City",
             Rec."Buy-from Country/Region Code", PhoneNo, FaxNo);
+        OnAfterPurchaseHeaderOnBeforeValidateBuyFromAddress(Rec, PhoneNo, FaxNo);
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Reminder Header", 'OnBeforeValidateEvent', 'Address', false, false)]
