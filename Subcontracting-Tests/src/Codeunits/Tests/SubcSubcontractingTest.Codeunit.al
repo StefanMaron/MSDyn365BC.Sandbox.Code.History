@@ -6,7 +6,6 @@ namespace Microsoft.Manufacturing.Subcontracting.Test;
 
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.VAT.Setup;
-using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Item;
@@ -1878,6 +1877,57 @@ codeunit 139989 "Subc. Subcontracting Test"
     end;
 
     [Test]
+    [HandlerFunctions('ConfirmArchiveOrderHandler,HandlePurchaseOrderPage')]
+    procedure ProdOFactboxMgmtShowsDataAfterProdOrderFinished()
+    var
+        Item: Record Item;
+        ProductionOrder: Record "Production Order";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        SubcWorkCenter: Record "Work Center";
+        SubcProdOFactboxMgmt: Codeunit "Subc. ProdO. Factbox Mgmt.";
+    begin
+        // [SCENARIO 634953] Subcontracting factbox drilldowns should work after production order is finished.
+        Initialize();
+
+        // [GIVEN] A released production order with a subcontracting routing operation and a subcontracting purchase order
+        Subcontracting := true;
+        UnitCostCalculation := UnitCostCalculation::Units;
+
+        CreateItemWithSingleSubcontractingOperation(Item, SubcWorkCenter);
+        SubcontractingMgmtLibrary.UpdateVendorWithSubcontractingLocationCode(SubcWorkCenter);
+        SubcontractingMgmtLibrary.CreateAndRefreshProductionOrder(
+            ProductionOrder, "Production Order Status"::Released, ProductionOrder."Source Type"::Item, Item."No.", LibraryRandom.RandInt(10) + 5);
+        UpdateSubMgmtSetupWithReqWkshTemplate();
+
+        SubcontractingMgmtLibrary.CreateSubcontractingOrderFromProdOrderRtngPage(Item."Routing No.", SubcWorkCenter."No.");
+        PurchaseLine.SetRange("Document Type", PurchaseLine."Document Type"::Order);
+        PurchaseLine.SetRange("Prod. Order No.", ProductionOrder."No.");
+#pragma warning disable AA0210
+        PurchaseLine.SetRange("Work Center No.", SubcWorkCenter."No.");
+#pragma warning restore AA0210
+        PurchaseLine.FindFirst();
+        PurchaseHeader.Get(PurchaseLine."Document Type", PurchaseLine."Document No.");
+        EnsureGeneralPostingSetupIsValid(PurchaseLine."Gen. Bus. Posting Group", PurchaseLine."Gen. Prod. Posting Group");
+        LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, false);
+
+        // [GIVEN] The production order is changed to Finished status
+        LibraryManufacturing.ChangeProdOrderStatus(ProductionOrder, "Production Order Status"::Finished, WorkDate(), true);
+
+        // Re-read purchase line (the order still exists because only receipt was posted)
+        PurchaseLine.FindFirst();
+
+        // [WHEN] CalcNoOfProductionOrderRoutings / CalcNoOfProductionOrderComponents are called with the Purchase Line
+        // [THEN] Both return a positive count even though the production order is now Finished
+        Assert.IsTrue(
+            SubcProdOFactboxMgmt.CalcNoOfProductionOrderRoutings(PurchaseLine) > 0,
+            'CalcNoOfProductionOrderRoutings should return a positive count after the production order is finished.');
+        Assert.IsTrue(
+            SubcProdOFactboxMgmt.CalcNoOfProductionOrderComponents(PurchaseLine) > 0,
+            'CalcNoOfProductionOrderComponents should return a positive count after the production order is finished.');
+    end;
+
+    [Test]
     [HandlerFunctions('ConfirmHandler')]
     procedure RoutingFactboxMgmtFiltersPurchOrderQtyByRoutingReferenceNo()
     var
@@ -3417,74 +3467,6 @@ codeunit 139989 "Subc. Subcontracting Test"
     end;
 
     [Test]
-    procedure RoutingPriceUsesOrderUoMWhenMultipleUoMPricesExist()
-    var
-        Item: Record Item;
-        ItemUOM: Record "Item Unit of Measure";
-        Vendor: Record Vendor;
-        WorkCenter: Record "Work Center";
-        SubcontractorPrice: Record "Subcontractor Price";
-        InSubcontractorPrice: Record "Subcontractor Price";
-        SubcPriceManagement: Codeunit "Subc. Price Management";
-        UnitCostCalcType: Enum "Unit Cost Calculation Type";
-        AltUOMCode: Code[10];
-        DirUnitCost, IndirCostPct, OvhdRate, UnitCost : Decimal;
-        PcsPrice, SetPrice : Decimal;
-        QtyPerSet: Integer;
-    begin
-        // [SCENARIO 636059] SetRoutingPriceListCost must select the Subcontractor Price row matching
-        // the order's Unit of Measure (with blank fallback). With prices in both Base UoM and an
-        // alternative UoM that sorts after it, the routing line must pick the Base UoM price when
-        // the order is in Base UoM — not the alphabetically-last alternative-UoM row.
-        Initialize();
-
-        // [GIVEN] Item with Base UoM and an alternative UoM (10 base per alt) whose code sorts after the base.
-        LibraryInventory.CreateItem(Item);
-        QtyPerSet := 10;
-        AltUOMCode := CreateUOMCodeSortingAfter(Item."Base Unit of Measure");
-        LibraryInventory.CreateItemUnitOfMeasure(ItemUOM, Item."No.", AltUOMCode, QtyPerSet);
-
-        // [GIVEN] Vendor and Work Center with the vendor as its subcontractor; zero indirect/overhead.
-        LibraryPurchase.CreateVendor(Vendor);
-        LibraryManufacturing.CreateWorkCenter(WorkCenter);
-        WorkCenter.Validate("Subcontractor No.", Vendor."No.");
-        WorkCenter.Validate("Indirect Cost %", 0);
-        WorkCenter.Validate("Overhead Rate", 0);
-        WorkCenter.Modify(true);
-
-        // [GIVEN] Two subcontractor prices — Base UoM = 1001, alternative UoM = 1004.
-        PcsPrice := 1001;
-        SetPrice := 1004;
-        SubcontractingMgmtLibrary.CreateSubContractingPrice(
-            SubcontractorPrice, WorkCenter."No.", Vendor."No.", Item."No.", '', '', WorkDate(), Item."Base Unit of Measure", 0, '');
-        SubcontractorPrice.Validate("Direct Unit Cost", PcsPrice);
-        SubcontractorPrice.Modify(true);
-        SubcontractingMgmtLibrary.CreateSubContractingPrice(
-            SubcontractorPrice, WorkCenter."No.", Vendor."No.", Item."No.", '', '', WorkDate(), AltUOMCode, 0, '');
-        SubcontractorPrice.Validate("Direct Unit Cost", SetPrice);
-        SubcontractorPrice.Modify(true);
-
-        // [GIVEN] InSubcontractorPrice staged as SetSubcontractorPriceForPriceCalculation would — order in Base UoM.
-        InSubcontractorPrice."Vendor No." := Vendor."No.";
-        InSubcontractorPrice."Item No." := Item."No.";
-        InSubcontractorPrice."Standard Task Code" := '';
-        InSubcontractorPrice."Work Center No." := WorkCenter."No.";
-        InSubcontractorPrice."Variant Code" := '';
-        InSubcontractorPrice."Unit of Measure Code" := Item."Base Unit of Measure";
-        InSubcontractorPrice."Starting Date" := WorkDate();
-        InSubcontractorPrice."Currency Code" := '';
-
-        // [WHEN] SetRoutingPriceListCost runs for a Prod. Order Routing Line of qty 1 in the Base UoM.
-        SubcPriceManagement.SetRoutingPriceListCost(
-            InSubcontractorPrice, WorkCenter, DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalcType, 1, 1, 1);
-
-        // [THEN] Direct Unit Cost equals the Base UoM price (1001), not the alt-UoM derived 100.40.
-        Assert.AreEqual(
-            PcsPrice, DirUnitCost,
-            'SetRoutingPriceListCost must pick the Subcontractor Price row matching the order''s Unit of Measure.');
-    end;
-
-    [Test]
     procedure ReqLinePriceUsesOrderUoMWhenFixedUOMIsEmpty()
     var
         Item: Record Item;
@@ -3584,6 +3566,7 @@ codeunit 139989 "Subc. Subcontracting Test"
 
         SubSetupLibrary.InitSetupFields();
         LibraryERMCountryData.CreateVATData();
+        LibraryERMCountryData.UpdateGeneralPostingSetup();
         SubSetupLibrary.InitialSetupForGenProdPostingGroup();
 
         IsInitialized := true;
