@@ -2464,6 +2464,7 @@ codeunit 1751 "Data Classification Eval. Data"
         SetFieldToPersonal(8900, 2); // Subject
         SetFieldToPersonal(8900, 3); // Body
         SetFieldToPersonal(8900, 7); // External message id
+        SetFieldToPersonal(8900, 8); // Message Headers
     end;
 
     local procedure ClassifyEmailRetry()
