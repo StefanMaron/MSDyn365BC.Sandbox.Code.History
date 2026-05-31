@@ -731,7 +731,7 @@ table 38 "Purchase Header"
             var
                 IsHandled: Boolean;
             begin
-                OnBeforeValidateLocationCode(Rec, IsHandled);
+                OnBeforeValidateLocationCode(Rec, IsHandled, xRec, CurrFieldNo);
                 if IsHandled then
                     exit;
 
@@ -8816,7 +8816,7 @@ table 38 "Purchase Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateLocationCode(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
+    local procedure OnBeforeValidateLocationCode(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean; xPurchaseHeader: Record "Purchase Header"; CurrFieldNo: Integer)
     begin
     end;
 
