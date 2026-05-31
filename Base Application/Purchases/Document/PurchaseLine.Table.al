@@ -2881,6 +2881,7 @@ table 39 "Purchase Line"
             var
                 Item: Record Item;
                 WMSManagement: Codeunit "WMS Management";
+                IsHandled: Boolean;
             begin
                 if "Bin Code" <> '' then
                     if not IsInbound() and ("Quantity (Base)" <> 0) then
@@ -2890,6 +2891,11 @@ table 39 "Purchase Line"
 
                 if "Drop Shipment" then
                     ShowBinCodeCannotBeChangedError();
+
+                IsHandled := false;
+                OnValidateBinCodeOnBeforeTestFields(Rec, IsHandled);
+                if IsHandled then
+                    exit;
 
                 TestField(Type, Type::Item);
                 TestField("Location Code");
@@ -11599,6 +11605,11 @@ table 39 "Purchase Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateJobNoOnBeforeGetJob(var PurchLine: Record "Purchase Line"; var xPurchLine: Record "Purchase Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateBinCodeOnBeforeTestFields(var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
     begin
     end;
 
