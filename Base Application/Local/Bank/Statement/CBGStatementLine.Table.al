@@ -875,6 +875,8 @@ table 11401 "CBG Statement Line"
                         Name := Employee.FullName();
                 end;
         end;
+
+        OnAfterGetAccountName(Rec, Name);
     end;
 
     procedure CreateGenJournalLine(var GenJnlLine: Record "Gen. Journal Line")
@@ -2086,6 +2088,11 @@ table 11401 "CBG Statement Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnLookupAppliesToDocAnAfterSetVendorLedgerEntryFilters(var VendorLedgerEntry: Record "Vendor Ledger Entry"; var GenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetAccountName(CBGStatementLine: Record "CBG Statement Line"; var AccountName: Text[100])
     begin
     end;
 }
