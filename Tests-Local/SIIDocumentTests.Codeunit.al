@@ -3411,7 +3411,7 @@ codeunit 147520 SIIDocumentTests
         asserterror SIISetup.Validate(InvoicesIssuedEndpointUrl, 'https://evil.com/wlpl/SSII-FACT/ws/fe/SiiFactFEV1SOAP');
 
         // [THEN] An error is thrown about invalid endpoint URL
-        Assert.ExpectedError('The endpoint URL must start with one of the following base URLs');
+        Assert.ExpectedError('is not on the allow-list for this feature');
         Assert.ExpectedErrorCode('Dialog');
     end;
 
@@ -3432,7 +3432,7 @@ codeunit 147520 SIIDocumentTests
         asserterror SIISetup.Validate(InvoicesReceivedEndpointUrl, 'http://www1.agenciatributaria.gob.es/wlpl/SSII-FACT/ws/fr/SiiFactFRV1SOAP');
 
         // [THEN] An error is thrown about invalid endpoint URL
-        Assert.ExpectedError('The endpoint URL must start with one of the following base URLs');
+        Assert.ExpectedError('is not on the allow-list for this feature');
         Assert.ExpectedErrorCode('Dialog');
     end;
 
@@ -3453,7 +3453,7 @@ codeunit 147520 SIIDocumentTests
         asserterror SIISetup.Validate(PaymentsIssuedEndpointUrl, 'https://www1.agenciatributaria.gob.es.evil.com/wlpl/SSII-FACT/ws/fr/SiiFactPAGV1SOAP');
 
         // [THEN] An error is thrown about invalid endpoint URL
-        Assert.ExpectedError('The endpoint URL must start with one of the following base URLs');
+        Assert.ExpectedError('is not on the allow-list for this feature');
         Assert.ExpectedErrorCode('Dialog');
     end;
 
@@ -3474,7 +3474,7 @@ codeunit 147520 SIIDocumentTests
         asserterror SIISetup.Validate(PaymentsReceivedEndpointUrl, 'https://totally-wrong-domain.com/something');
 
         // [THEN] An error is thrown about invalid endpoint URL
-        Assert.ExpectedError('The endpoint URL must start with one of the following base URLs');
+        Assert.ExpectedError('is not on the allow-list for this feature');
         Assert.ExpectedErrorCode('Dialog');
     end;
 
@@ -3495,7 +3495,7 @@ codeunit 147520 SIIDocumentTests
         asserterror SIISetup.Validate(CollectionInCashEndpointUrl, 'https://malicious-site.org/wlpl/SSII-FACT/ws/pm/SiiFactCMV1SOAP');
 
         // [THEN] An error is thrown about invalid endpoint URL
-        Assert.ExpectedError('The endpoint URL must start with one of the following base URLs');
+        Assert.ExpectedError('is not on the allow-list for this feature');
         Assert.ExpectedErrorCode('Dialog');
     end;
 
