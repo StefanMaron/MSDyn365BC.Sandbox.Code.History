@@ -919,7 +919,8 @@ table 39 "Purchase Line"
                 Amount := Round(Amount, Currency."Amount Rounding Precision");
                 case "VAT Calculation Type" of
                     "VAT Calculation Type"::"Normal VAT",
-                    "VAT Calculation Type"::"Reverse Charge VAT":
+                    "VAT Calculation Type"::"Reverse Charge VAT",
+                    "VAT Calculation Type"::"No Taxable VAT":
                         begin
                             "VAT Base Amount" :=
                               Round(Amount * (1 - GetVatBaseDiscountPct(PurchHeader) / 100), Currency."Amount Rounding Precision");
@@ -974,7 +975,8 @@ table 39 "Purchase Line"
                 "Amount Including VAT" := Round("Amount Including VAT", Currency."Amount Rounding Precision");
                 case "VAT Calculation Type" of
                     "VAT Calculation Type"::"Normal VAT",
-                    "VAT Calculation Type"::"Reverse Charge VAT":
+                    "VAT Calculation Type"::"Reverse Charge VAT",
+                    "VAT Calculation Type"::"No Taxable VAT":
                         begin
                             Amount :=
                               Round(
@@ -5623,7 +5625,9 @@ table 39 "Purchase Line"
             TotalQuantityBase := 0;
             if ("VAT Calculation Type" = "VAT Calculation Type"::"Sales Tax") or
                (("VAT Calculation Type" in
-                 ["VAT Calculation Type"::"Normal VAT", "VAT Calculation Type"::"Reverse Charge VAT"]) and ("VAT %" <> 0))
+                 ["VAT Calculation Type"::"Normal VAT",
+                  "VAT Calculation Type"::"Reverse Charge VAT",
+                  "VAT Calculation Type"::"No Taxable VAT"]) and ("VAT %" <> 0))
             then begin
                 PurchLine2.SetFilter("VAT %", '<>0');
                 if not PurchLine2.IsEmpty() then begin
@@ -5646,7 +5650,8 @@ table 39 "Purchase Line"
             if PurchHeader."Prices Including VAT" then
                 case "VAT Calculation Type" of
                     "VAT Calculation Type"::"Normal VAT",
-                    "VAT Calculation Type"::"Reverse Charge VAT":
+                    "VAT Calculation Type"::"Reverse Charge VAT",
+                    "VAT Calculation Type"::"No Taxable VAT":
                         begin
                             Amount :=
                               Round(
@@ -5700,7 +5705,8 @@ table 39 "Purchase Line"
             else
                 case "VAT Calculation Type" of
                     "VAT Calculation Type"::"Normal VAT",
-                    "VAT Calculation Type"::"Reverse Charge VAT":
+                    "VAT Calculation Type"::"Reverse Charge VAT",
+                    "VAT Calculation Type"::"No Taxable VAT":
                         begin
                             Amount := Round(CalcLineAmount(), Currency."Amount Rounding Precision");
                             "VAT Base Amount" :=
