@@ -758,6 +758,8 @@ codeunit 386 "Reverse Payment Rec. Journal"
                         until EmployeeLedgerEntry.Next() = 0;
                 end;
         end;
+
+        OnAfterInsertRelatedAndAppliedEntries(BankAccountNo, StatementNo, StatementLineNo, AccountType, BankAccountLedgerEntry);
     end;
 
     local procedure InsertRelatedAndAppliedEntries(BankAccountNo: Code[20]; StatementNo: Code[20]; StatementLineNo: Integer; AccountType: Enum "Gen. Journal Account Type")
@@ -980,6 +982,11 @@ codeunit 386 "Reverse Payment Rec. Journal"
 
     [IntegrationEvent(false, false)]
     local procedure OnInsertRelatedAndAppliedEntriesOnAfterFilterEmployeeLedgerEntry(var EmployeeLedgerEntry: Record "Employee Ledger Entry"; var BankAccountLedgerEntry: Record "Bank Account Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInsertRelatedAndAppliedEntries(BankAccountNo: Code[20]; StatementNo: Code[20]; StatementLineNo: Integer; AccountType: Enum "Gen. Journal Account Type"; var BankAccountLedgerEntry: Record "Bank Account Ledger Entry")
     begin
     end;
 }
