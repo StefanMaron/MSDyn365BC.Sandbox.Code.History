@@ -911,6 +911,15 @@ table 38 "Purchase Header"
 
                         Currency.Initialize("Currency Code");
 
+                        if not RecalculatePrice and "Prices Including VAT" then begin
+                            PurchLine.FindSet();
+                            repeat
+                                PurchLine.Amount := Round(PurchLine.CalcLineAmount() / (1 + PurchLine."VAT %" / 100), Currency."Amount Rounding Precision");
+                                PurchLine."Amount Including VAT" := Round(PurchLine.CalcLineAmount(), Currency."Amount Rounding Precision");
+                                PurchLine.Modify();
+                            until PurchLine.Next() = 0;
+                        end;
+
                         PurchLine.FindSet();
                         repeat
                             PurchLine.TestField("Quantity Invoiced", 0);
