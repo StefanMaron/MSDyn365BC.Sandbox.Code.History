@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -1887,6 +1887,7 @@ codeunit 90 "Purch.-Post"
             ItemJnlLine2."Shortcut Dimension 1 Code" := ItemChargePurchLine."Shortcut Dimension 1 Code";
             ItemJnlLine2."Shortcut Dimension 2 Code" := ItemChargePurchLine."Shortcut Dimension 2 Code";
             ItemJnlLine2."Dimension Set ID" := ItemChargePurchLine."Dimension Set ID";
+            UpdateItemJnlLineDimSetIDFromAppliedShipmentEntry(ItemJnlLine2);
             ItemJnlLine2."Gen. Prod. Posting Group" := ItemChargePurchLine."Gen. Prod. Posting Group";
 
             OnPostItemChargePerOrderOnAfterCopyToItemJnlLine(
@@ -6508,6 +6509,23 @@ codeunit 90 "Purch.-Post"
             DimensionMgt.GetCombinedDimensionSetID(DimSetID, PurchaseLineToPost."Shortcut Dimension 1 Code", PurchaseLineToPost."Shortcut Dimension 2 Code");
 
         OnAfterUpdatePurchLineDimSetIDFromAppliedEntry(PurchaseLineToPost, PurchaseLine);
+    end;
+
+    local procedure UpdateItemJnlLineDimSetIDFromAppliedShipmentEntry(var ItemJnlLine2: Record "Item Journal Line")
+    var
+        ItemLedgerEntry: Record "Item Ledger Entry";
+        DimensionMgt: Codeunit DimensionManagement;
+        DimSetID: array[10] of Integer;
+    begin
+        if ItemJnlLine2."Item Shpt. Entry No." <> 0 then begin
+            ItemLedgerEntry.SetLoadFields("Dimension Set ID");
+            ItemLedgerEntry.Get(ItemJnlLine2."Item Shpt. Entry No.");
+            DimSetID[1] := ItemLedgerEntry."Dimension Set ID";
+            DimSetID[2] := ItemJnlLine2."Dimension Set ID";
+
+            ItemJnlLine2."Dimension Set ID" :=
+                DimensionMgt.GetCombinedDimensionSetID(DimSetID, ItemJnlLine2."Shortcut Dimension 1 Code", ItemJnlLine2."Shortcut Dimension 2 Code");
+        end;
     end;
 
     local procedure CheckCertificateOfSupplyStatus(ReturnShptHeader: Record "Return Shipment Header"; ReturnShptLine: Record "Return Shipment Line")
