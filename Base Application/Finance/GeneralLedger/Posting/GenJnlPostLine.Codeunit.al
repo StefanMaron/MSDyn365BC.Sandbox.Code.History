@@ -4330,6 +4330,8 @@ codeunit 12 "Gen. Jnl.-Post Line"
             DtldLedgEntryInserted := not DtldCVLedgEntryBuf.IsEmpty();
             DtldCVLedgEntryBuf.DeleteAll();
 
+            ResetDocAmountsForMultiplePostingGroups();
+
             if UseGLBillsAccount(GenJnlLine) then
                 AccNo := CustPostingGr.GetBillsAccount(false)
             else
@@ -4381,6 +4383,19 @@ codeunit 12 "Gen. Jnl.-Post Line"
         PostReceivableDocs(GenJnlLine, CustPostingGr);
 
         DtldCVLedgEntryBuf.DeleteAll();
+    end;
+
+    local procedure ResetDocAmountsForMultiplePostingGroups()
+    begin
+        if MultiplePostingGroups and (IDBillSettlement or FromBillSettlement) then begin
+            DocAmountLCY := 0;
+            DiscDocAmountLCY := 0;
+            CollDocAmountLCY := 0;
+            RejDocAmountLCY := 0;
+            DiscRiskFactAmountLCY := 0;
+            DiscUnriskFactAmountLCY := 0;
+            CollFactAmountLCY := 0;
+        end;
     end;
 
     local procedure PostDtldCustLedgEntry(GenJournalLine: Record "Gen. Journal Line"; DetailedCVLedgEntryBuffer: Record "Detailed CV Ledg. Entry Buffer"; CustPostingGr: Record "Customer Posting Group"; var AdjAmount: array[4] of Decimal)
@@ -5756,6 +5771,8 @@ codeunit 12 "Gen. Jnl.-Post Line"
     begin
         CustLedgerEntry.Get(DetailedCVLedgEntryBuffer."CV Ledger Entry No.");
         CustomerPostingGroup.Get(CustLedgerEntry."Customer Posting Group");
+        if CustLedgerEntry."Document Type" = CustLedgerEntry."Document Type"::Bill then
+            exit(CustomerPostingGroup.GetBillsAccount(false));
         exit(GetCustomerReceivablesAccount(GenJournalLine, CustomerPostingGroup));
     end;
 
