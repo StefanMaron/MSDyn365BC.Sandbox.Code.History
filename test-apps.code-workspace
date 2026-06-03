@@ -1,12 +1,4 @@
 {
-  "settings": {
-    "allint.enabled": false,
-    "al.enableCodeActions": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeAnalysis": false
-  },
   "folders": [
     {
       "path": "./_Exclude_APIV1_ Tests"
@@ -365,5 +357,13 @@
     {
       "path": "./System Application Test Library/Extension Management/testArtifacts"
     }
-  ]
+  ],
+  "settings": {
+    "al.enableCodeActions": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeAnalysis": false,
+    "allint.enabled": false
+  }
 }
