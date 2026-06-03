@@ -8285,6 +8285,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Plan-Req. Wksht - NamedType ProdOrderComponentCommentErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 901776604 - NamedType 3631002675" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Purchase Line must be marked as Drop Shipment]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Plan-Req. Wksht - NamedType PurchaseLineDropShipmentErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 901776604 - NamedType 3471433997" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[is of lower precision than expected]]></Val>
