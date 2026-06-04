@@ -500,15 +500,6 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.QualityManagement)(LookupHint=Codeunit Qlty. Tests - More Tests - NamedType TargetErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 2929021570 - NamedType 2310311432" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[%1Consider replacing this test in the template with a new one, or deleting existing inspections (if allowed). The test was last used on inspection %2.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1 = Error Title, %2 = Quality Inspection No.]D;]A;(Namespace=Microsoft.Test.QualityManagement)(LookupHint=Codeunit Qlty. Tests - More Tests - NamedType TestTypeErrInfoMsg)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 2929021570 - NamedType 26651063" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[test value.]]></Val>
@@ -516,6 +507,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.QualityManagement)(LookupHint=Codeunit Qlty. Tests - More Tests - NamedType TestValueTxt)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2929021570 - NamedType 363084219" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Consider replacing this test in the template with a new one, or deleting existing inspections (if allowed). The test was last used on Inspection %1, Re-inspection %2.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Quality Inspection No., %2 = Re-inspection No.]D;]A;(Namespace=Microsoft.Test.QualityManagement)(LookupHint=Codeunit Qlty. Tests - More Tests - NamedType TestValueTypeChangeErrInfoMsg)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2929021570 - NamedType 3775898355" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -835,7 +835,7 @@
   </Item>
   <Item ItemId=";Codeunit 1163552122 - NamedType 3243716104" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[The test %1 exists on %2 inspections (such as %3 with template %4). The test can not be deleted if it is being used on a Quality Inspection.]]></Val>
+      <Val><![CDATA[The test %1 exists on %2 inspections (such as %3 with template %4). The test cannot be deleted if it is being used on a quality inspection.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
