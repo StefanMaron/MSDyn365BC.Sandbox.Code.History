@@ -6818,6 +6818,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Promising II - NamedType PlannedDeliveryDateErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 570810307 - NamedType 2787192906" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Planned Delivery Date must include shipping time from service order]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Promising II - NamedType PlannedDeliveryDateShippingTimeErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 570810307 - NamedType 1473162410" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Incorrect Quantity on Order Promising Line.]]></Val>
