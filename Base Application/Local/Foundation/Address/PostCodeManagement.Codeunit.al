@@ -42,7 +42,7 @@ codeunit 11401 "Post Code Management"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeFindStreetNameFromAddress(IsHandled);
+        OnBeforeFindStreetNameFromAddress(Address, Address2, PostCode, City, CountryCode, PhoneNo, FaxNo, IsHandled);
         if IsHandled then
             exit;
 
@@ -218,7 +218,7 @@ codeunit 11401 "Post Code Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeFindStreetNameFromAddress(var IsHandled: Boolean)
+    local procedure OnBeforeFindStreetNameFromAddress(var Address: Text[100]; var Address2: Text[50]; var PostCode: Code[20]; var City: Text[30]; var CountryCode: Code[10]; var PhoneNo: Text[30]; var FaxNo: Text[30]; var IsHandled: Boolean)
     begin
     end;
 
