@@ -6,8 +6,6 @@
 namespace System.Integration;
 
 using Microsoft.CRM.Outlook;
-using System.Text;
-using System.Utilities;
 
 /// <summary>
 /// The codeunit to provide internal services for Outlook Add-In code inside BaseApp.
@@ -46,11 +44,8 @@ codeunit 6999 "Outlook Add-In Services"
     [Scope('OnPrem')]
     procedure GetEmailAndAttachments(ItemID: Text[250]; var TempExchangeObject: Record "Exchange Object" temporary; "Action": Option InitiateSendToOCR,InitiateSendToIncomingDocuments,InitiateSendToWorkFlow,IntiateSendToAttachments; RecRef: RecordRef; AccessToken: SecretText)
     var
-        Base64Convert: Codeunit "Base64 Convert";
-        TempBlob: Codeunit "Temp Blob";
         StreamEmailContentText: InStream;
         StreamAttachmentContentText: InStream;
-        ContentOutStream: OutStream;
         AttachmentsArray: JsonArray;
         AttachmentObject: JsonObject;
         MessageJson: JsonObject;
@@ -72,10 +67,7 @@ codeunit 6999 "Outlook Add-In Services"
         BodyJson := JToken.AsObject();
         BodyJson.Get('content', JToken);
         BodyContextText := JToken.AsValue().AsText();
-        Clear(TempBlob);
-        TempBlob.CreateOutStream(ContentOutStream, TextEncoding::UTF8);
-        ContentOutStream.WriteText(BodyContextText);
-        TempBlob.CreateInStream(StreamEmailContentText, TextEncoding::UTF8);
+        StreamEmailContentText.ReadText(BodyContextText);
 
         TempExchangeObject.Init();
         TempExchangeObject.Validate("Item ID", ItemID);
@@ -117,10 +109,7 @@ codeunit 6999 "Outlook Add-In Services"
 
             AttachmentObject.Get('contentBytes', Jtoken);
             AttachmentContextText := Jtoken.AsValue().AsText();
-            Clear(TempBlob);
-            TempBlob.CreateOutStream(ContentOutStream);
-            Base64Convert.FromBase64(AttachmentContextText, ContentOutStream);
-            TempBlob.CreateInStream(StreamAttachmentContentText);
+            StreamAttachmentContentText.ReadText(AttachmentContextText);
             TempExchangeObject.SetContent(StreamAttachmentContentText);
             if not TempExchangeObject.Insert(true) then
                 TempExchangeObject.Modify(true);
