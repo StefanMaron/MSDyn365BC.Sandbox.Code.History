@@ -8090,7 +8090,10 @@ codeunit 12 "Gen. Jnl.-Post Line"
                         GLEntry."Posting Date" := PostDate;
                         GLEntry.Description := SetDeferralDescriptionFromDeferralPostingBuffer(DeferralPostingBuffer, DeferralPostingBuffer."G/L Account");
                         GLEntry.CopyFromDeferralPostBuffer(DeferralPostingBuffer);
-                        GLEntry."Source Code" := DeferralSourceCode;
+                        if IsNonDeferredRemainderEntry(DeferralPostingBuffer) then
+                            GLEntry."Source Code" := GenJournalLine."Source Code"
+                        else
+                            GLEntry."Source Code" := DeferralSourceCode;
                         OnPostDeferralPostBufferOnBeforeInsertGLEntryForGLAccount(GenJournalLine, DeferralPostingBuffer, GLEntry);
                         InsertGLEntry(GenJournalLine, GLEntry, true);
                     end;
@@ -8414,6 +8417,11 @@ codeunit 12 "Gen. Jnl.-Post Line"
     begin
         PayablesAccount := VendorPostingGroup.GetPayablesAccount();
         OnAfterGetVendorPayablesAccount(GenJournalLine, VendorPostingGroup, PayablesAccount);
+    end;
+
+    local procedure IsNonDeferredRemainderEntry(DeferralPostingBuffer: Record "Deferral Posting Buffer"): Boolean
+    begin
+        exit(DeferralPostingBuffer."Partial Deferral" and (DeferralPostingBuffer.Amount = 0) and (DeferralPostingBuffer."Amount (LCY)" = 0));
     end;
 
     /// <summary>
