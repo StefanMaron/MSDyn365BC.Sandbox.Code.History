@@ -3871,8 +3871,6 @@ table 39 "Purchase Line"
     begin
         TestStatusOpen();
 
-        EnsurePositiveLineNo();
-
         if Quantity <> 0 then begin
             OnBeforeVerifyReservedQty(Rec, xRec, 0);
             PurchLineReserve.VerifyQuantity(Rec, xRec);
@@ -3911,19 +3909,12 @@ table 39 "Purchase Line"
         Error(Text000, TableCaption);
     end;
 
-    local procedure EnsurePositiveLineNo()
-    var
-        PurchaseLine: Record "Purchase Line";
-        MaxLineNo: Integer;
+#if not CLEAN28
+    [Obsolete('Not used for anything', '28.0')]
+    procedure SetSkipEnsurePositiveLineNo(NewSkipEnsurePositiveLineNo: Boolean)
     begin
-        if "Line No." < 0 then begin
-            PurchaseLine.SetRange("Document Type", "Document Type");
-            PurchaseLine.SetRange("Document No.", "Document No.");
-            if PurchaseLine.FindLast() then
-                MaxLineNo := PurchaseLine."Line No.";
-            "Line No." := MaxLineNo + 10000;
-        end;
     end;
+#endif    
 
     var
         PurchHeader: Record "Purchase Header";
@@ -9762,7 +9753,7 @@ table 39 "Purchase Line"
         if (CalledByFieldNo = FieldNo("No.")) and (CurrFieldNo = FieldNo(Description)) and (ShouldExit) then
             ShouldExit := false;
     end;
-    
+
     local procedure OverturnExitConditionForDefaultGLAccountQuantityValidation(var ShouldExit: Boolean)
     begin
         if not ShouldExit then
