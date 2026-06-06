@@ -9758,7 +9758,7 @@ table 39 "Purchase Line"
         if (CalledByFieldNo = FieldNo("No.")) and (CurrFieldNo = FieldNo(Description)) and (ShouldExit) then
             ShouldExit := false;
     end;
-
+    
     local procedure OverturnExitConditionForDefaultGLAccountQuantityValidation(var ShouldExit: Boolean)
     begin
         if not ShouldExit then
@@ -11936,6 +11936,16 @@ table 39 "Purchase Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckAcquisitionCost(var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterIsServiceCharge(var PurchaseLine: Record "Purchase Line"; var ServiceCharged: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateGenBusPostingGroupOnBeforeValidateVATBusPostingGroup(var PurchaseLine: Record "Purchase Line"; var ValidateVATBusPostingGroup: Boolean)
     begin
     end;
 }
