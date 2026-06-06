@@ -386,6 +386,7 @@ codeunit 1751 "Data Classification Eval. Data"
         ClassifyAgents();
         ClassifyOrderTakerAgent();
         ClassifySalesValidationAgent();
+        ClassifySalesReturnAgent();
         ClasifyScheduledPerformanceProfiling();
     end;
 
@@ -3820,6 +3821,11 @@ codeunit 1751 "Data Classification Eval. Data"
     local procedure ClassifySalesValidationAgent()
     begin
         SetTableFieldsToNormal(53607); // "Sales Val. Agent KPI"
+    end;
+
+    local procedure ClassifySalesReturnAgent()
+    begin
+        SetTableFieldsToNormal(53701); // "Sales Ret. Agent KPI"
     end;
 
     local procedure ClassifyAgents()
