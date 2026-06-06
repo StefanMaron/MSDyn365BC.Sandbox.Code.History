@@ -6206,4 +6206,14 @@ codeunit 99000854 "Inventory Profile Offsetting"
     local procedure OnPlanItemCalcInitialInventoryOnBeforeChechkIncrementLastProjectedInventory(var SupplyInventoryProfile: Record "Inventory Profile"; var DemandInventoryProfile: Record "Inventory Profile"; var SupplyExists: Boolean; var DemandExists: Boolean; var IncrementLastProjectedInventory: Boolean; var LastProjectedInventory: Decimal)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnDeleteTrackingOnAfterSetReservEntryFilters(var ReservationEntry: Record "Reservation Entry"; StockkeepingUnit: Record "Stockkeeping Unit"; ToDate: Date)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCalcInventoryProfileRemainingQty(var InventoryProfile: Record "Inventory Profile"; DocumentNo: Code[20]; LineNo: Integer; var RemQty: Decimal)
+    begin
+    end;
 }
