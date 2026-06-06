@@ -599,5 +599,15 @@ codeunit 99000808 PlanningRoutingManagement
     local procedure OnBeforeSetRtngLineSequenceBack(RoutingType: Option Serial,Parallel; var PlanningRoutingLine: Record "Planning Routing Line"; MaxSequences: Integer; ActSequences: Integer; TotalCalculation: Boolean)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeSetRtngLineSequenceForward(RoutingType: Option Serial,Parallel; var PlanningRoutingLine: Record "Planning Routing Line"; MaxSequences: Integer; ActSequences: Integer; TotalCalculation: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalcSequenceFromActual(PlanningRoutingLine: Record "Planning Routing Line"; Direction: Option Forward,Backward; var RequisitionLine: Record "Requisition Line")
+    begin
+    end;
 }
 
