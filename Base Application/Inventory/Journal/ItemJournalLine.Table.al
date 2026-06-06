@@ -2393,6 +2393,8 @@ table 83 "Item Journal Line"
                                 CreateNewDimFromDefaultDim(Rec.FieldNo("Item No."));
                             Database::"Salesperson/Purchaser":
                                 CreateNewDimFromDefaultDim(Rec.FieldNo("Salespers./Purch. Code"));
+                            else
+                                OnCreateDimOnTransferOtherTableId(Rec, TableId);
                         end;
                 end;
             end;
@@ -5262,6 +5264,22 @@ table 83 "Item Journal Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterValidateNewShortcutDimCode(var ItemJournalLine: Record "Item Journal Line"; xItemJournalLine: Record "Item Journal Line"; FieldNumber: Integer; var NewShortcutDimCode: Code[20])
+    begin
+    end;
+    
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOpenItemTrackingLines(var ItemJournalLine: Record "Item Journal Line"; IsReclass: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateDimOnTransferOtherTableId(var ItemJournalLine: Record "Item Journal Line"; TableId: Integer)
+    begin
+    end;
+    
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateNewDimOnBeforeUpdateGlobalDimFromDimSetID(var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 }
