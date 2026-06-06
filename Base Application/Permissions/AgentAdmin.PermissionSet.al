@@ -5,16 +5,13 @@
 
 namespace System.Security.AccessControl;
 
-using System.Agents;
+using System.Environment.Consumption;
 
-permissionset 4305 "Agent - Admin"
+permissionset 4306 "Agent - Diagnostics"
 {
     Assignable = true;
-    Caption = 'Agent administrator';
+    Caption = 'Agent Diagnostics';
     IncludedPermissionSets = "D365 Agent";
-    Permissions =
-        tabledata "Access Control" = RIMD,
-        tabledata Agent = RIMD,
-        system "Configure All Agents" = X,
-        system "Create Custom Agent" = X;
+    Permissions = tabledata "User AI Consumption Data" = r,
+                  system "Troubleshoot All Agents" = X;
 }
