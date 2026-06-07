@@ -2102,7 +2102,9 @@ codeunit 5940 ServContractManagement
     var
         ServiceContractHeader2: Record "Service Contract Header";
         PrevCustNo: Code[20];
+        PrevCurrencyCode: Code[10];
         IsHandled: Boolean;
+        IsFirstRecord: Boolean;
     begin
         IsHandled := false;
         OnBeforeCheckMultipleCurrenciesForCustomers(ServiceContractHeader, IsHandled);
@@ -2110,15 +2112,25 @@ codeunit 5940 ServContractManagement
             exit;
 
         PrevCustNo := '';
+        PrevCurrencyCode := '';
+        IsFirstRecord := true;
         ServiceContractHeader2.Copy(ServiceContractHeader);
         ServiceContractHeader2.SetCurrentKey("Bill-to Customer No.", "Contract Type", "Combine Invoices", "Next Invoice Date");
         ServiceContractHeader2.SetRange("Combine Invoices", true);
         if ServiceContractHeader2.FindSet() then
             repeat
-                if PrevCustNo <> ServiceContractHeader2."Bill-to Customer No." then begin
-                    CheckCustomerCurrencyCombination(ServiceContractHeader2);
+                if IsFirstRecord or (PrevCustNo <> ServiceContractHeader2."Bill-to Customer No.") then begin
+                    IsFirstRecord := false;
                     PrevCustNo := ServiceContractHeader2."Bill-to Customer No.";
-                end;
+                    PrevCurrencyCode := ServiceContractHeader2."Currency Code";
+                end else
+                    if PrevCurrencyCode <> ServiceContractHeader2."Currency Code" then
+                        Error(ErrorSplitErr,
+                          StrSubstNo(CombinedCurrenciesErr1,
+                            ServiceContractHeader2."Bill-to Customer No.",
+                            ShownCurrencyText(PrevCurrencyCode),
+                            ShownCurrencyText(ServiceContractHeader2."Currency Code")),
+                          CombinedCurrenciesErr2);
             until ServiceContractHeader2.Next() = 0;
     end;
 
