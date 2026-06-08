@@ -386,6 +386,8 @@ report 292 "Copy Sales Document"
                             FromSalesHeader.TransferFields(FromSalesHeaderArchive);
                         end;
                 end;
+
+                OnValidateDocNoOnAfterCaseFromDocType(FromSalesHeader, FromDocType, FromDocNo, FromDocNoOccurrence, FromDocVersionNo);
             end;
         FromSalesHeader."No." := '';
 
@@ -704,6 +706,11 @@ report 292 "Copy Sales Document"
 
     [IntegrationEvent(false, false)]
     local procedure OnLookupPostedCrMemoOnBeforeRunLookup(var FromSalesCrMemoHeader: Record "Sales Cr.Memo Header"; var SalesHeader: Record "Sales Header");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateDocNoOnAfterCaseFromDocType(var FromSalesHeader: Record "Sales Header"; FromDocType: Enum "Sales Document Type From"; FromDocNo: Code[20]; FromDocNoOccurrence: Integer; FromDocVersionNo: Integer)
     begin
     end;
 }
