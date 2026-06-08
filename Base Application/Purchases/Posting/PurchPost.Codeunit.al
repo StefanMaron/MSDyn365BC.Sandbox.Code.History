@@ -578,6 +578,7 @@ codeunit 90 "Purch.-Post"
         OnBeforeModifyTempLine(TempPurchLineLocal);
         TempPurchLineLocal.Modify();
         PurchLine.Get(TempPurchLineLocal.RecordId);
+        OnModifyTempLineOnBeforeTransferFields(PurchLine, TempPurchLineLocal);
         PurchLine.TransferFields(TempPurchLineLocal, false);
         PurchLine.Modify();
         OnAfterModifyTempLine(PurchLine);
@@ -8584,6 +8585,11 @@ codeunit 90 "Purch.-Post"
         OnAfterGetGeneralPostingSetup(GenPostingSetup, PurchLine);
     end;
 
+    procedure GetGlobalTempItemChargeAssgntPurch(var TempItemChargeAssignmentPurch: Record "Item Charge Assignment (Purch)" temporary)
+    begin
+        TempItemChargeAssignmentPurch.Copy(TempItemChargeAssgntPurch, true);
+    end;
+
     local procedure PostResJnlLine(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line")
     var
         ResJournalLine: Record "Res. Journal Line";
@@ -9506,6 +9512,11 @@ codeunit 90 "Purch.-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeModifyTempLine(var TempPurchaseLine: Record "Purchase Line" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnModifyTempLineOnBeforeTransferFields(var PurchaseLine: Record "Purchase Line"; var TempPurchaseLine: Record "Purchase Line" temporary)
     begin
     end;
 
