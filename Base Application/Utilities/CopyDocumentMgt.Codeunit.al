@@ -2239,7 +2239,7 @@ codeunit 6620 "Copy Document Mgt."
             if IsDeferralToBeCopied("Deferral Document Type"::Purchase, ToPurchLine."Document Type".AsInteger(), FromPurchCommentDocTypeInt) then
                 ToPurchLine.Validate("Deferral Code", FromPurchLine."Deferral Code");
         end else begin
-            SetDefaultValuesToPurchLine(ToPurchLine, ToPurchHeader, FromPurchLine."VAT Difference");
+            SetDefaultValuesToPurchLine(ToPurchLine, ToPurchHeader, FromPurchLine."VAT Difference", FromPurchLine."Non-Deductible VAT Diff.");
             if IsDeferralToBeCopied("Deferral Document Type"::Purchase, ToPurchLine."Document Type".AsInteger(), FromPurchCommentDocTypeInt) then
                 if IsDeferralPosted("Deferral Document Type"::Purchase, FromPurchCommentDocTypeInt) then
                     DoCopyPostedDeferral := true
@@ -6507,7 +6507,7 @@ codeunit 6620 "Copy Document Mgt."
         end;
     end;
 
-    local procedure SetDefaultValuesToPurchLine(var ToPurchLine: Record "Purchase Line"; ToPurchHeader: Record "Purchase Header"; VATDifference: Decimal)
+    local procedure SetDefaultValuesToPurchLine(var ToPurchLine: Record "Purchase Line"; ToPurchHeader: Record "Purchase Header"; VATDifference: Decimal; NonDeductibleVATDifference: Decimal)
     begin
         InitPurchLineFields(ToPurchLine);
 
@@ -6520,6 +6520,7 @@ codeunit 6620 "Copy Document Mgt."
         else
             ToPurchLine.InitQtyToReceive();
         ToPurchLine."VAT Difference" := VATDifference;
+        ToPurchLine."Non-Deductible VAT Diff." := NonDeductibleVATDifference;
         ToPurchLine."Receipt No." := '';
         ToPurchLine."Receipt Line No." := 0;
         if not CreateToHeader then
