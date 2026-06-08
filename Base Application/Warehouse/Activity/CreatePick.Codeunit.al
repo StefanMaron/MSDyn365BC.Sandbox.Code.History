@@ -761,7 +761,7 @@ codeunit 7312 "Create Pick"
                     end;
                     EndLoop := false;
                     IsHandled := false;
-                    OnFindBWPickBinOnBeforeEndLoop(FromBinContent, TotalQtyToPickBase, EndLoop, IsHandled, QtytoPick, QtyToPickBase);
+                    OnFindBWPickBinOnBeforeEndLoop(FromBinContent, TotalQtyToPickBase, EndLoop, IsHandled, QtytoPick, QtyToPickBase, QtyAvailableBase);
                     if not IsHandled then
                         EndLoop := (FromBinContent.Next() = 0) or (TotalQtyToPickBase = 0);
                 until EndLoop;
@@ -4603,7 +4603,7 @@ codeunit 7312 "Create Pick"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnFindBWPickBinOnBeforeEndLoop(var FromBinContent: Record "Bin Content"; var TotalQtyToPickBase: Decimal; var EndLoop: Boolean; var IsHandled: Boolean; QtytoPick: Decimal; QtyToPickBase: Decimal)
+    local procedure OnFindBWPickBinOnBeforeEndLoop(var FromBinContent: Record "Bin Content"; var TotalQtyToPickBase: Decimal; var EndLoop: Boolean; var IsHandled: Boolean; QtytoPick: Decimal; QtyToPickBase: Decimal; QtyAvailableBase: Decimal)
     begin
     end;
 
