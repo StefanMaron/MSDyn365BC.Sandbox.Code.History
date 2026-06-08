@@ -609,6 +609,7 @@ codeunit 6201 "Non-Ded. VAT Impl."
 
         PurchaseLine."Non-Deductible VAT Base" := -PurchaseLine."Non-Deductible VAT Base";
         PurchaseLine."Non-Deductible VAT Amount" := -PurchaseLine."Non-Deductible VAT Amount";
+        PurchaseLine."Non-Deductible VAT Diff." := -PurchaseLine."Non-Deductible VAT Diff.";
     end;
 
     procedure Reverse(var InvoicePostingBuffer: Record "Invoice Posting Buffer")
