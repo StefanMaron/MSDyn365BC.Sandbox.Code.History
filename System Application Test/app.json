@@ -63,8 +63,11 @@
   "target": "OnPrem",
   "idRanges": [
     {
-      "from": 139000,
+      "from": 130000,
       "to": 139999
     }
+  ],
+  "resourceFolders": [
+    "Pdf/.resources"
   ]
 }
