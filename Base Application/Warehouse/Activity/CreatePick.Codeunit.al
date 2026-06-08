@@ -761,7 +761,7 @@ codeunit 7312 "Create Pick"
                     end;
                     EndLoop := false;
                     IsHandled := false;
-                    OnFindBWPickBinOnBeforeEndLoop(FromBinContent, TotalQtyToPickBase, EndLoop, IsHandled, QtytoPick, QtyToPickBase);
+                    OnFindBWPickBinOnBeforeEndLoop(FromBinContent, TotalQtyToPickBase, EndLoop, IsHandled, QtytoPick, QtyToPickBase, QtyAvailableBase);
                     if not IsHandled then
                         EndLoop := (FromBinContent.Next() = 0) or (TotalQtyToPickBase = 0);
                 until EndLoop;
@@ -2435,6 +2435,8 @@ codeunit 7312 "Create Pick"
                             if TotalAvailQtyToPickBase > FromBinContentQty then
                                 TotalAvailQtyToPickBase := FromBinContentQty;
                         end;
+
+                        OnCreateTempItemTrkgLinesOnBeforeCalcQtyAvailInBinsForReplen(CalledFromMoveWksh, CurrWhseWorksheetLine, CurrLocation, TotalAvailQtyToPickBase, WhseItemTrackingLine);
 
                         QtyCanBePicked :=
                             CalcQtyCanBePicked(CurrLocation.Code, ItemNo, VariantCode, EntrySummary, CalledFromMoveWksh);
@@ -4601,7 +4603,7 @@ codeunit 7312 "Create Pick"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnFindBWPickBinOnBeforeEndLoop(var FromBinContent: Record "Bin Content"; var TotalQtyToPickBase: Decimal; var EndLoop: Boolean; var IsHandled: Boolean; QtytoPick: Decimal; QtyToPickBase: Decimal)
+    local procedure OnFindBWPickBinOnBeforeEndLoop(var FromBinContent: Record "Bin Content"; var TotalQtyToPickBase: Decimal; var EndLoop: Boolean; var IsHandled: Boolean; QtytoPick: Decimal; QtyToPickBase: Decimal; QtyAvailableBase: Decimal)
     begin
     end;
 
@@ -4900,4 +4902,10 @@ codeunit 7312 "Create Pick"
     local procedure OnAfterSetFiltersOnReservEntry(var ReservationEntry: Record "Reservation Entry"; SourceType: Integer; SourceSubType: Option; SourceNo: Code[20]; SourceLineNo: Integer; SourceSubLineNo: Integer)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateTempItemTrkgLinesOnBeforeCalcQtyAvailInBinsForReplen(CalledFromMoveWksh: Boolean; CurrWhseWorksheetLine: Record "Whse. Worksheet Line"; CurrLocation: Record Location; var TotalAvailQtyToPickBase: Decimal; WhseItemTrackingLine: Record "Whse. Item Tracking Line")
+    begin
+    end;
+
 }
