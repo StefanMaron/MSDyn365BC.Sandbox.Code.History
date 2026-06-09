@@ -15,7 +15,7 @@ codeunit 5444 "Sales Cr.Memo PDF Doc.Handler" implements IPdfDocumentHandler
 {
     var
         UnpostedSalesCreditMemoErr: Label 'You must post sales credit memo %1 before generating the PDF document.', Comment = '%1 - sales credit memo id';
-        CreditMemoTxt: Label 'Credit Memo';
+        CreditMemoLbl: Label 'Credit Memo';
 
     /// <summary>
     /// Generates a PDF blob for Sales Credit Memo
@@ -46,7 +46,7 @@ codeunit 5444 "Sales Cr.Memo PDF Doc.Handler" implements IPdfDocumentHandler
         SalesCrMemoHeader.SetRange("No.", SalesCrMemoHeader."No.");
         ReportUsage := "Report Selection Usage"::"S.Cr.Memo";
         ReportSelections.GetPdfReportForCust(TempBlob, ReportUsage, SalesCrMemoHeader, SalesCrMemoHeader."Sell-to Customer No.");
-        DocumentMailing.GetAttachmentFileName(Name, SalesCrMemoHeader."No.", CreditMemoTxt, ReportUsage.AsInteger());
+        DocumentMailing.GetAttachmentFileName(Name, SalesCrMemoHeader."No.", CreditMemoLbl, ReportUsage.AsInteger());
         exit(PDFDocumentManagement.AddToTempAttachmentEntityBuffer(DocumentId, DocumentType, TempBlob, Name, TempAttachmentEntityBuffer));
     end;
 }

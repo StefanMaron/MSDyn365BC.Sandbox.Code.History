@@ -13,7 +13,7 @@ using System.Utilities;
 codeunit 5454 "Project PDF Doc.Handler" implements IPdfDocumentHandler
 {
     var
-        ProjectTxt: Label 'Project Quote';
+        ProjectLbl: Label 'Project Quote';
 
     /// <summary>
     /// Generates a PDF blob for Job Quote (Project Quote)
@@ -38,7 +38,7 @@ codeunit 5454 "Project PDF Doc.Handler" implements IPdfDocumentHandler
         Job.SetRange("No.", Job."No.");
         ReportUsage := "Report Selection Usage"::JQ;
         ReportSelections.GetPdfReportForCust(TempBlob, ReportUsage, Job, Job."Bill-to Customer No.");
-        DocumentMailing.GetAttachmentFileName(Name, Job."No.", ProjectTxt, ReportUsage.AsInteger());
+        DocumentMailing.GetAttachmentFileName(Name, Job."No.", ProjectLbl, ReportUsage.AsInteger());
         exit(PDFDocumentManagement.AddToTempAttachmentEntityBuffer(DocumentId, DocumentType, TempBlob, Name, TempAttachmentEntityBuffer));
     end;
 }
