@@ -16,7 +16,7 @@ codeunit 5445 "Cust. St. PDF Doc.Handler" implements IPdfDocumentHandler
 {
     var
         CannotFindContactErr: Label 'The Contact cannot be found with SystemId %1.', Comment = '%1 - Contact System id';
-        CustomerStatementTxt: Label 'Customer Statement';
+        CustomerStatementLbl: Label 'Customer Statement';
 
     /// <summary>
     /// Generates a PDF blob for Customer Statement
@@ -50,7 +50,7 @@ codeunit 5445 "Cust. St. PDF Doc.Handler" implements IPdfDocumentHandler
         Customer.SetRange("No.", Customer."No.");
         ReportUsage := "Report Selection Usage"::"C.Statement";
         ReportSelections.GetPdfReportForCust(TempBlob, ReportUsage, Customer, Customer."No.");
-        DocumentMailing.GetAttachmentFileName(Name, Customer."No.", CustomerStatementTxt, ReportUsage.AsInteger());
+        DocumentMailing.GetAttachmentFileName(Name, Customer."No.", CustomerStatementLbl, ReportUsage.AsInteger());
         exit(PDFDocumentManagement.AddToTempAttachmentEntityBuffer(DocumentId, DocumentType, TempBlob, Name, TempAttachmentEntityBuffer));
     end;
 }
