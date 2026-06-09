@@ -5952,6 +5952,8 @@ table 39 "Purchase Line"
     var
         GenPostingSetup: Record "General Posting Setup";
         GLAcc: Record "G/L Account";
+        VATPostingSetupRetrieved: Boolean;
+        SkipClear: Boolean;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -5974,12 +5976,19 @@ table 39 "Purchase Line"
                     GetGLSetup();
                     if GLSetup.CheckFullGSTonPrepayment("VAT Bus. Posting Group", "VAT Prod. Posting Group") then
                         GLAcc.TestField("VAT Prod. Posting Group", "VAT Prod. Posting Group");
-                    VATPostingSetup.Get("VAT Bus. Posting Group", GLAcc."VAT Prod. Posting Group");
+                    VATPostingSetupRetrieved := false;
+                    OnUpdatePrepmtSetupFieldsOnBeforeGetVATPostingSetup(Rec, GLAcc, VATPostingSetup, VATPostingSetupRetrieved);
+                    if not VATPostingSetupRetrieved then
+                        VATPostingSetup.Get("VAT Bus. Posting Group", GLAcc."VAT Prod. Posting Group");
                 end;
                 VATPostingSetup.TestField("VAT Calculation Type", "VAT Calculation Type");
                 NonDeductibleVAT.CheckPrepmtVATPostingSetup(VATPostingSetup);
-            end else
-                Clear(VATPostingSetup);
+            end else begin
+                SkipClear := false;
+                OnUpdatePrepmtSetupFieldsOnBeforeClearVATPostingSetup(Rec, VATPostingSetup, SkipClear);
+                if not SkipClear then
+                    Clear(VATPostingSetup);
+            end;
             OnAfterGetPostingSetup(Rec, VATPostingSetup);
             if ("Prepayment VAT %" <> 0) and ("Prepayment VAT %" <> VATPostingSetup."VAT %") and ("Prepmt. Amt. Inv." <> 0) then
                 Error(CannotChangePrepmtAmtDiffVAtPctErr);
@@ -11780,6 +11789,16 @@ table 39 "Purchase Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdatePrepmtSetupFields(var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdatePrepmtSetupFieldsOnBeforeGetVATPostingSetup(var PurchaseLine: Record "Purchase Line"; GLAccount: Record "G/L Account"; var VATPostingSetup: Record "VAT Posting Setup"; var VATPostingSetupRetrieved: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdatePrepmtSetupFieldsOnBeforeClearVATPostingSetup(var PurchaseLine: Record "Purchase Line"; var VATPostingSetup: Record "VAT Posting Setup"; var SkipClear: Boolean)
     begin
     end;
 
