@@ -6,17 +6,17 @@ namespace Microsoft.EServices.EDocument;
 
 using Microsoft.Foundation.Reporting;
 using Microsoft.Integration.Graph;
-using Microsoft.Projects.Project.Job;
+using Microsoft.Inventory.Counting.Document;
 using System.EMail;
 using System.Utilities;
 
-codeunit 5454 "Project PDF Doc.Handler" implements IPdfDocumentHandler
+codeunit 5030 "Phys.Inv.Ord. PDF Doc.Handler" implements IPdfDocumentHandler
 {
     var
-        ProjectTxt: Label 'Project Quote';
+        PhysInventoryOrderLbl: Label 'Phys. Inventory Order';
 
     /// <summary>
-    /// Generates a PDF blob for Job Quote (Project Quote)
+    /// Generates a PDF blob for Physical Inventory Order
     /// </summary>
     /// <param name="DocumentId">Document ID</param>
     /// <param name="DocumentType">Document Type</param>
@@ -24,7 +24,7 @@ codeunit 5454 "Project PDF Doc.Handler" implements IPdfDocumentHandler
     /// <returns>True if the generated report successfully added to the buffer, otherwise false.</returns>
     procedure GeneratePdfBlobWithDocumentType(DocumentId: Guid; DocumentType: Enum "Attachment Entity Buffer Document Type"; var TempAttachmentEntityBuffer: Record "Attachment Entity Buffer" temporary): Boolean
     var
-        Job: Record Job;
+        PhysInvtOrderHeader: Record "Phys. Invt. Order Header";
         ReportSelections: Record "Report Selections";
         DocumentMailing: Codeunit "Document-Mailing";
         PDFDocumentManagement: Codeunit "PDF Document Management";
@@ -32,13 +32,13 @@ codeunit 5454 "Project PDF Doc.Handler" implements IPdfDocumentHandler
         Name: Text[250];
         ReportUsage: Enum "Report Selection Usage";
     begin
-        if not Job.GetBySystemId(DocumentId) then
+        if not PhysInvtOrderHeader.GetBySystemId(DocumentId) then
             exit(false);
 
-        Job.SetRange("No.", Job."No.");
-        ReportUsage := "Report Selection Usage"::JQ;
-        ReportSelections.GetPdfReportForCust(TempBlob, ReportUsage, Job, Job."Bill-to Customer No.");
-        DocumentMailing.GetAttachmentFileName(Name, Job."No.", ProjectTxt, ReportUsage.AsInteger());
+        PhysInvtOrderHeader.SetRange("No.", PhysInvtOrderHeader."No.");
+        ReportUsage := "Report Selection Usage"::"Phys.Invt.Order";
+        ReportSelections.GetPdfReportForTable(TempBlob, ReportUsage, PhysInvtOrderHeader, Database::"Phys. Invt. Order Header");
+        DocumentMailing.GetAttachmentFileName(Name, PhysInvtOrderHeader."No.", PhysInventoryOrderLbl, ReportUsage.AsInteger());
         exit(PDFDocumentManagement.AddToTempAttachmentEntityBuffer(DocumentId, DocumentType, TempBlob, Name, TempAttachmentEntityBuffer));
     end;
 }
