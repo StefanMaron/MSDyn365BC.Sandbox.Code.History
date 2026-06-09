@@ -555,6 +555,7 @@ codeunit 90 "Purch.-Post"
         OnBeforeModifyTempLine(TempPurchLineLocal);
         TempPurchLineLocal.Modify();
         PurchLine.Get(TempPurchLineLocal.RecordId);
+        OnModifyTempLineOnBeforeTransferFields(PurchLine, TempPurchLineLocal);
         PurchLine.TransferFields(TempPurchLineLocal, false);
         PurchLine.Modify();
         OnAfterModifyTempLine(PurchLine);
@@ -1513,7 +1514,10 @@ codeunit 90 "Purch.-Post"
         ItemJnlLine.CopyFromPurchHeader(PurchHeader);
         ItemJnlLine.CopyFromPurchLine(PurchLine);
 
-        PostItemJnlLineCopyDocumentFields(ItemJnlLine, PurchHeader, PurchLine, QtyToBeInvoiced, QtyToBeReceived);
+        IsHandled := false;
+        OnPostItemJnlLineOnBeforePostItemJnlLineCopyDocumentFields(ItemJnlLine, PurchHeader, PurchLine, QtyToBeInvoiced, QtyToBeReceived, WhseReceive, WhseShip, InvtPickPutaway, IsHandled);
+        if not IsHandled then
+            PostItemJnlLineCopyDocumentFields(ItemJnlLine, PurchHeader, PurchLine, QtyToBeInvoiced, QtyToBeReceived);
 
         if QtyToBeInvoiced <> 0 then
             ItemJnlLine."Invoice No." := GenJnlLineDocNo;
@@ -9318,6 +9322,11 @@ codeunit 90 "Purch.-Post"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnModifyTempLineOnBeforeTransferFields(var PurchaseLine: Record "Purchase Line"; var TempPurchaseLine: Record "Purchase Line" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnBeforeAdjustQuantityRoundingForReceipt(PurchRcptLine: Record "Purch. Rcpt. Line"; RemQtyToInvoiceCurrLine: Decimal; var QtyToBeInvoiced: Decimal; RemQtyToInvoiceCurrLineBase: Decimal; QtyToBeInvoicedBase: Decimal; var IsHandled: Boolean)
     begin
     end;
@@ -10283,6 +10292,11 @@ codeunit 90 "Purch.-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnPostItemJnlLineOnAfterCopyDocumentFields(var ItemJournalLine: Record "Item Journal Line"; PurchaseLine: Record "Purchase Line"; WarehouseReceiptHeader: Record "Warehouse Receipt Header"; WarehouseShipmentHeader: Record "Warehouse Shipment Header"; PurchRcptHeader: Record "Purch. Rcpt. Header"; GenJnlLineExtDocNo: Code[35]; QtyToBeInvoiced: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPostItemJnlLineOnBeforePostItemJnlLineCopyDocumentFields(var ItemJournalLine: Record "Item Journal Line"; PurchaseHeader: Record "Purchase Header"; PurchaseLine: Record "Purchase Line"; QtyToBeInvoiced: Decimal; QtyToBeReceived: Decimal; WhseReceive: Boolean; WhseShip: Boolean; InvtPickPutaway: Boolean; var IsHandled: Boolean)
     begin
     end;
 
