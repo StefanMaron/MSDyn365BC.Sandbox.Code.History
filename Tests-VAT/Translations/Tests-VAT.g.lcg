@@ -1193,6 +1193,24 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Non-Deductible VAT Statistics - NamedType GLEntryConsistentErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 116159835 - NamedType 2611987699" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Non-Deductible VAT Diff. should not be zero after statistics change]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Non-Deductible VAT Statistics - NamedType NonDeductibleVATDiffErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 116159835 - NamedType 397182783" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Posted Purchase Invoice must be cancelled]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Non-Deductible VAT Statistics - NamedType PostedPurchaseInvoiceCancelledErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 729097190 - NamedType 3551190662" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The country for the address is different than the customer's. Do you want to add an alternative VAT registration for the customer?]]></Val>
