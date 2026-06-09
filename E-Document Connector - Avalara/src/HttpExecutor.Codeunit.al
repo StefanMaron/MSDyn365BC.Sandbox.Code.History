@@ -11,7 +11,6 @@ using System.Telemetry;
 /// </summary>
 codeunit 6377 "Http Executor"
 {
-
     Access = Internal;
 
     /// <summary>
@@ -37,7 +36,10 @@ codeunit 6377 "Http Executor"
         FeatureTelemetry.LogUptake('0000NH9', this.AvalaraProcessing.GetAvalaraTok(), Enum::"Feature Uptake Status"::Used);
         FeatureTelemetry.LogUsage('0000NHA', this.AvalaraProcessing.GetAvalaraTok(), 'Avalara request.');
 
-        HttpClient.Send(Request.GetRequest(), this.HttpResponseMessage);
+        if not HttpClient.Send(Request.GetRequest(), this.HttpResponseMessage) then begin
+            Session.LogMessage('', HttpSendFailedMsg, Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', this.AvalaraProcessing.GetAvalaraTok());
+            Error(HttpSendFailedMsg);
+        end;
         HttpResponse := this.HttpResponseMessage;
         HandleHttpResponse(this.HttpResponseMessage, Response);
     end;
@@ -62,12 +64,12 @@ codeunit 6377 "Http Executor"
         case LocalHttpResponseMessage.HttpStatusCode() of
             200:
                 begin
-                    Session.LogMessage('0000NHB', HTTPSuccessMsg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', this.AvalaraProcessing.GetAvalaraTok());
+                    Session.LogMessage('', HTTPSuccessMsg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', this.AvalaraProcessing.GetAvalaraTok());
                     exit;
                 end;
             201:
                 begin
-                    Session.LogMessage('0000NHC', HTTPSuccessAndCreatedMsg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', this.AvalaraProcessing.GetAvalaraTok());
+                    Session.LogMessage('', HTTPSuccessAndCreatedMsg, Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', this.AvalaraProcessing.GetAvalaraTok());
                     exit;
                 end;
             400:
@@ -86,7 +88,7 @@ codeunit 6377 "Http Executor"
         end;
 
         FriendlyErrorMsg := StrSubstNo(HttpErrorMsg, LocalHttpResponseMessage.HttpStatusCode(), FriendlyErrorMsg);
-        Session.LogMessage('0000NHD', StrSubstNo(HttpErrorMsg, LocalHttpResponseMessage.HttpStatusCode(), Response), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', this.AvalaraProcessing.GetAvalaraTok());
+        Session.LogMessage('', StrSubstNo(HttpErrorMsg, LocalHttpResponseMessage.HttpStatusCode(), Response), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', this.AvalaraProcessing.GetAvalaraTok());
         Error(FriendlyErrorMsg);
     end;
 
@@ -106,19 +108,19 @@ codeunit 6377 "Http Executor"
     [NonDebuggable]
     local procedure GetContent(HttpResponseMsg: HttpResponseMessage; var Response: Text)
     begin
-        HttpResponseMsg.Content.ReadAs(Response);
+        HttpResponseMsg.Content().ReadAs(Response);
     end;
 
     var
         AvalaraProcessing: Codeunit Processing;
         HttpResponseMessage: HttpResponseMessage;
-        HTTPSuccessMsg: Label 'The HTTP request was successful and the body contains the resource fetched.'; // 200
-        HTTPSuccessAndCreatedMsg: Label 'The HTTP request was successful and a new resource was created.'; //201
         HTTPBadRequestMsg: Label 'The HTTP request was incorrectly formed or invalid.'; // 400
-        HTTPUnauthorizedMsg: Label 'The HTTP request is not authorized. Authentication credentials are not valid.'; // 401
-        HTTPInternalServerErrorMsg: Label 'The HTTP request is not successful. An internal server error occurred.'; // 500
-        HTTPServiceUnavailableMsg: Label 'The HTTP request is not successful. The service is unavailable.'; // 503
-        HTTPGeneralErrMsg: Label 'Something went wrong, try again later.';
         HttpErrorMsg: Label 'Error Code: %1, Error Message: %2', Comment = '%1 = Error Code, %2 = Error Message';
-
+        HTTPGeneralErrMsg: Label 'Something went wrong, try again later.';
+        HTTPInternalServerErrorMsg: Label 'The HTTP request is not successful. An internal server error occurred.'; // 500
+        HttpSendFailedMsg: Label 'The HTTP request could not be sent. Verify the connection setup and try again.';
+        HTTPServiceUnavailableMsg: Label 'The HTTP request is not successful. The service is unavailable.'; // 503
+        HTTPSuccessAndCreatedMsg: Label 'The HTTP request was successful and a new resource was created.'; //201
+        HTTPSuccessMsg: Label 'The HTTP request was successful and the body contains the resource fetched.'; // 200
+        HTTPUnauthorizedMsg: Label 'The HTTP request is not authorized. Authentication credentials are not valid.'; // 401
 }
