@@ -133,9 +133,9 @@ codeunit 6117 "E-Doc. Create Purchase Invoice" implements IEDocumentFinishDraft,
         PurchaseHeader."Pay-to Vendor No." := EDocumentPurchaseHeader."[BC] Vendor No.";
         PurchaseHeader.Insert(true);
         if EDocumentPurchaseHeader."Document Date" <> 0D then
-            PurchaseHeader.Validate("Document Date", EDocumentPurchaseHeader."Document Date");
+            EDocPurchaseDocumentHelper.ValidateFieldWithContext(PurchaseHeader, PurchaseHeader.FieldNo("Document Date"), EDocumentPurchaseHeader."Document Date");
         if EDocumentPurchaseHeader."Due Date" <> 0D then
-            PurchaseHeader.Validate("Due Date", EDocumentPurchaseHeader."Due Date");
+            EDocPurchaseDocumentHelper.ValidateFieldWithContext(PurchaseHeader, PurchaseHeader.FieldNo("Due Date"), EDocumentPurchaseHeader."Due Date");
 
         VendorInvoiceNo := CopyStr(EDocumentPurchaseHeader."Sales Invoice No.", 1, MaxStrLen(PurchaseHeader."Vendor Invoice No."));
         VendorLedgerEntry.SetLoadFields("Entry No.");
@@ -156,7 +156,7 @@ codeunit 6117 "E-Doc. Create Purchase Invoice" implements IEDocumentFinishDraft,
         // Validate of currency has to happen after insert.
         GLSetup.GetRecordOnce();
         if EDocumentPurchaseHeader."Currency Code" <> GLSetup.GetCurrencyCode('') then begin
-            PurchaseHeader.Validate("Currency Code", EDocumentPurchaseHeader."Currency Code");
+            EDocPurchaseDocumentHelper.ValidateFieldWithContext(PurchaseHeader, PurchaseHeader.FieldNo("Currency Code"), EDocumentPurchaseHeader."Currency Code");
             PurchaseHeader.Modify();
         end;
         EDocRecordLink.InsertEDocumentHeaderLink(EDocumentPurchaseHeader, PurchaseHeader);
@@ -206,6 +206,7 @@ codeunit 6117 "E-Doc. Create Purchase Invoice" implements IEDocumentFinishDraft,
         EDocRecordLink: Record "E-Doc. Record Link";
         EDocumentPurchaseHistMapping: Codeunit "E-Doc. Purchase Hist. Mapping";
         DimensionManagement: Codeunit DimensionManagement;
+        EDocPurchaseDocumentHelper: Codeunit "E-Doc. Purch. Doc. Helper";
         PurchaseLineCombinedDimensions: array[10] of Integer;
         GlobalDim1, GlobalDim2 : Code[20];
     begin
