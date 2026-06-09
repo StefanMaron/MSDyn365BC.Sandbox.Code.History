@@ -16,7 +16,7 @@ codeunit 5446 "Purch. Invoice PDF Doc.Handler" implements IPdfDocumentHandler
 {
     var
         UnpostedPurchaseInvoiceErr: Label 'You must post purchase invoice %1 before generating the PDF document.', Comment = '%1 - purchase invoice id';
-        PurchaseInvoiceTxt: Label 'Purchase Invoice';
+        PurchaseInvoiceLbl: Label 'Purchase Invoice';
 
     /// <summary>
     /// Generates a PDF blob for Purchase Invoice
@@ -52,7 +52,7 @@ codeunit 5446 "Purch. Invoice PDF Doc.Handler" implements IPdfDocumentHandler
             ReportUsage := "Report Selection Usage"::"P.Invoice";
 
         ReportSelections.GetPdfReportForVend(TempBlob, ReportUsage, PurchInvHeader, PurchInvHeader."Buy-from Vendor No.");
-        DocumentMailing.GetAttachmentFileName(Name, PurchInvHeader."No.", PurchaseInvoiceTxt, ReportUsage.AsInteger());
+        DocumentMailing.GetAttachmentFileName(Name, PurchInvHeader."No.", PurchaseInvoiceLbl, ReportUsage.AsInteger());
         exit(PDFDocumentManagement.AddToTempAttachmentEntityBuffer(DocumentId, DocumentType, TempBlob, Name, TempAttachmentEntityBuffer));
     end;
 }

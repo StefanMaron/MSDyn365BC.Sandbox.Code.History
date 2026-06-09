@@ -6,20 +6,24 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.EServices.EDocumentConnector.Avalara;
 
+/// <summary>
+/// Lookup list page for selecting an Avalara company from the temporary company records.
+/// </summary>
 page 6373 "Company List"
 {
-    PageType = List;
     ApplicationArea = Basic, Suite;
-    UsageCategory = None;
-    SourceTable = "Avalara Company";
-    InsertAllowed = false;
+    Caption = 'Company List';
     DeleteAllowed = false;
     Editable = false;
+    InsertAllowed = false;
+    PageType = List;
+    SourceTable = "Avalara Company";
     SourceTableTemporary = true;
+    UsageCategory = None;
 
     layout
     {
-        area(content)
+        area(Content)
         {
             repeater(CompanyList)
             {
@@ -27,6 +31,11 @@ page 6373 "Company List"
                 {
                     ApplicationArea = All;
                     ToolTip = 'Specifies Avalara company name';
+                }
+                field("Company Id"; Rec."Company Id")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the value of the Company Id field.';
                 }
             }
         }
