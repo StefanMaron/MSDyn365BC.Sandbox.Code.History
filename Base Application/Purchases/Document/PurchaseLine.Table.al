@@ -6003,6 +6003,7 @@ table 39 "Purchase Line"
     /// </summary>
     procedure UpdatePrepmtSetupFields()
     var
+        VATPostingSetupRetrieved: Boolean;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -6014,7 +6015,10 @@ table 39 "Purchase Line"
             TestField("Document Type", "Document Type"::Order);
             TestField("No.");
             NonDeductibleVAT.CheckPrepmtWithNonDeductubleVATInPurchaseLine(Rec);
-            VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
+            VATPostingSetupRetrieved := false;
+            OnUpdatePrepmtSetupFieldsOnBeforeGetVATPostingSetup(Rec, GLAcc, VATPostingSetup, VATPostingSetupRetrieved);
+            if not VATPostingSetupRetrieved then
+                VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
             VATPostingSetup.TestField("VAT Calculation Type", "VAT Calculation Type");
             OnAfterGetPostingSetup(Rec, VATPostingSetup);
             if ("Prepayment VAT %" <> 0) and ("Prepayment VAT %" <> VATPostingSetup."VAT %") and ("Prepmt. Amt. Inv." <> 0) then
@@ -11188,6 +11192,11 @@ table 39 "Purchase Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdatePrepmtSetupFields(var PurchaseLine: Record "Purchase Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdatePrepmtSetupFieldsOnBeforeGetVATPostingSetup(var PurchaseLine: Record "Purchase Line"; GLAccount: Record "G/L Account"; var VATPostingSetup: Record "VAT Posting Setup"; var VATPostingSetupRetrieved: Boolean)
     begin
     end;
 
