@@ -15,7 +15,7 @@ codeunit 5447 "Purch. Cr.Memo PDF Doc.Handler" implements IPdfDocumentHandler
 {
     var
         UnpostedPurchaseCreditMemoErr: Label 'You must post purchase credit memo %1 before generating the PDF document.', Comment = '%1 - purchase credit memo id';
-        CreditMemoTxt: Label 'Credit Memo';
+        CreditMemoLbl: Label 'Credit Memo';
 
     /// <summary>
     /// Generates a PDF blob for Purchase Credit Memo
@@ -46,7 +46,7 @@ codeunit 5447 "Purch. Cr.Memo PDF Doc.Handler" implements IPdfDocumentHandler
         PurchCrMemoHdr.SetRange("No.", PurchCrMemoHdr."No.");
         ReportUsage := "Report Selection Usage"::"P.Cr.Memo";
         ReportSelections.GetPdfReportForVend(TempBlob, ReportUsage, PurchCrMemoHdr, PurchCrMemoHdr."Buy-from Vendor No.");
-        DocumentMailing.GetAttachmentFileName(Name, PurchCrMemoHdr."No.", CreditMemoTxt, ReportUsage.AsInteger());
+        DocumentMailing.GetAttachmentFileName(Name, PurchCrMemoHdr."No.", CreditMemoLbl, ReportUsage.AsInteger());
         exit(PDFDocumentManagement.AddToTempAttachmentEntityBuffer(DocumentId, DocumentType, TempBlob, Name, TempAttachmentEntityBuffer));
     end;
 }
