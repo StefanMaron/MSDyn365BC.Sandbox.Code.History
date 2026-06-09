@@ -85,6 +85,9 @@
       "path": "./Tests-Permissions"
     },
     {
+      "path": "./Tests-Physical Inventory"
+    },
+    {
       "path": "./Tests-Prepayment"
     },
     {
