@@ -11,7 +11,7 @@ using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Manufacturing.Setup;
-#if not CLEAN27
+#if not CLEAN28
 using Microsoft.Manufacturing.WorkCenter;
 #endif
 
@@ -202,7 +202,7 @@ report 5405 "Calc. Consumption"
     procedure CreateConsumpJnlLine(LocationCode: Code[10]; BinCode: Code[20]; OriginalQtyToPost: Decimal)
     var
         Location: Record Location;
-#if not CLEAN27
+#if not CLEAN28
         SubcontractingMgt: Codeunit SubcontractingManagement;
         WorkCenter: Record "Work Center";
         ProdOrdRoutLine: Record "Prod. Order Routing Line";
@@ -259,7 +259,7 @@ report 5405 "Calc. Consumption"
             ValidateItemJnlLineQuantity(QtyToPost, QtyToPost < OriginalQtyToPost);
             ItemJnlLine."Variant Code" := "Prod. Order Component"."Variant Code";
             ItemJnlLine.Validate("Location Code", LocationCode);
-#if not CLEAN27
+#if not CLEAN28
             Clear(WorkCenter);
             ProdOrdRoutLine.SetRange(Status, ProdOrderLine.Status);
             ProdOrdRoutLine.SetRange("Prod. Order No.", ProdOrderLine."Prod. Order No.");

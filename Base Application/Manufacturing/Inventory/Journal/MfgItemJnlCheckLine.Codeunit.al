@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -14,11 +14,11 @@ using Microsoft.Warehouse.Request;
 codeunit 99000760 "Mfg. Item Jnl. Check Line"
 {
     var
-#if not CLEAN27
+#if not CLEAN28
         ItemJnlCheckLine: Codeunit "Item Jnl.-Check Line";
 #endif
         CannotPostTheseLinesErr: Label 'You cannot post these lines because you have not entered a quantity on one or more of the lines. ';
-#if not CLEAN27
+#if not CLEAN28
         CannotPostTheseLinesWIPErr: Label 'You cannot post these lines because you have not entered a WIP quantity on one or more of the lines.';
 #endif
         WarehouseHandlingRequiredErr: Label 'Warehouse handling is required for %1 = %2, %3 = %4, %5 = %6.', Comment = '%1 %3 %5 - field captions, %2 %4 %6 - field values';
@@ -239,7 +239,7 @@ codeunit 99000760 "Mfg. Item Jnl. Check Line"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Check Line", 'OnCheckEmptyQuantity', '', true, true)]
     local procedure OnCheckEmptyQuantity(ItemJournalLine: Record "Item Journal Line");
     begin
-#if not CLEAN27
+#if not CLEAN28
         if (ItemJournalLine."Quantity (Base)" = 0) and (ItemJournalLine."Invoiced Qty. (Base)" = 0) and
            ((ItemJournalLine."Entry Type" = ItemJournalLine."Entry Type"::Output) and
            (ItemJournalLine."Output Quantity (Base)" = 0) and (ItemJournalLine."Scrap Quantity (Base)" = 0) and

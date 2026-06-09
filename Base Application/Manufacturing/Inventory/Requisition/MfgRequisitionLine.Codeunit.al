@@ -12,7 +12,7 @@ using Microsoft.Manufacturing.Journal;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.Setup;
 using Microsoft.Purchases.Document;
-#if not CLEAN27
+#if not CLEAN28
 using Microsoft.Purchases.Vendor;
 #endif
 
@@ -274,7 +274,7 @@ codeunit 99000866 "Mfg. Requisition Line"
         end;
     end;
 
-#if not CLEAN27
+#if not CLEAN28
     [EventSubscriber(ObjectType::Table, Database::"Requisition Line", 'OnValidateVendorNoOnBeforeLookupVendor', '', true, false)]
     local procedure OnValidateVendorNoOnBeforeLookupVendor(var RequisitionLine: Record "Requisition Line"; var IsHandled: Boolean)
     var

@@ -53,7 +53,7 @@ page 99000886 "Subcontracting Worksheet"
                 field(Type; Rec.Type)
                 {
                     ApplicationArea = Manufacturing;
-#if not CLEAN27
+#if not CLEAN28
                     Editable = false;
 #endif
                     ToolTip = 'Specifies the type of requisition worksheet line you are creating.';
@@ -66,7 +66,7 @@ page 99000886 "Subcontracting Worksheet"
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = Manufacturing;
-#if not CLEAN27
+#if not CLEAN28
                     Editable = false;
 #endif
                     ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
@@ -93,7 +93,7 @@ page 99000886 "Subcontracting Worksheet"
                 field("Prod. Order No."; Rec."Prod. Order No.")
                 {
                     ApplicationArea = Manufacturing;
-#if not CLEAN27
+#if not CLEAN28
                     Editable = false;
 #endif
                     ToolTip = 'Specifies the number of the related production order.';
@@ -101,7 +101,7 @@ page 99000886 "Subcontracting Worksheet"
                 field("Operation No."; Rec."Operation No.")
                 {
                     ApplicationArea = Manufacturing;
-#if not CLEAN27
+#if not CLEAN28
                     Editable = false;
 #endif
                     ToolTip = 'Specifies the operation number for this routing line.';
@@ -111,7 +111,7 @@ page 99000886 "Subcontracting Worksheet"
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the work center number of the journal line.';
                 }
-#if not CLEAN27
+#if not CLEAN28
                 field("WIP Item"; Rec."WIP Item")
                 {
                     ApplicationArea = Manufacturing;
@@ -183,7 +183,7 @@ page 99000886 "Subcontracting Worksheet"
                 field("Unit of Measure Code"; Rec."Unit of Measure Code")
                 {
                     ApplicationArea = Manufacturing;
-#if not CLEAN27
+#if not CLEAN28
                     Editable = false;
 #endif
                     ToolTip = 'Specifies how each unit of the item or resource is measured, such as in pieces or hours. By default, the value in the Base Unit of Measure field on the item or resource card is inserted.';
@@ -225,7 +225,7 @@ page 99000886 "Subcontracting Worksheet"
                 {
                     ApplicationArea = Manufacturing;
                     AssistEdit = true;
-#if not CLEAN27
+#if not CLEAN28
                     Editable = false;
 #endif
                     ToolTip = 'Specifies the currency code for the requisition lines.';
@@ -242,7 +242,7 @@ page 99000886 "Subcontracting Worksheet"
                         Clear(ChangeExchangeRate);
                     end;
                 }
-#if not CLEAN27
+#if not CLEAN28
                 field("Pricelist Cost"; Rec."Pricelist Cost")
                 {
                     ApplicationArea = Manufacturing;
@@ -279,7 +279,7 @@ page 99000886 "Subcontracting Worksheet"
                 field("Direct Unit Cost"; Rec."Direct Unit Cost")
                 {
                     ApplicationArea = Manufacturing;
-#if not CLEAN27
+#if not CLEAN28
                     Editable = false;
 #endif
                     ToolTip = 'Specifies the cost of one unit of the selected item or resource.';
@@ -481,7 +481,7 @@ page 99000886 "Subcontracting Worksheet"
         ReqJnlManagement.GetDescriptionAndRcptName(Rec, Description2, BuyFromVendorName);
     end;
 
-#if not CLEAN27
+#if not CLEAN28
     trigger OnInsertRecord(BelowxRec: Boolean): Boolean
     begin
         Error(Text12100);
@@ -522,7 +522,7 @@ page 99000886 "Subcontracting Worksheet"
         ReqJnlManagement: Codeunit ReqJnlManagement;
         CurrentJnlBatchName: Code[10];
         OpenedFromBatch: Boolean;
-#if not CLEAN27
+#if not CLEAN28
         Text12100: Label 'You are not allowed to insert lines manually.';
 #endif
         VariantCodeMandatory: Boolean;
