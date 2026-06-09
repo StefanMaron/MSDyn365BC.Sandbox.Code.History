@@ -26,7 +26,7 @@
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "application": "28.1.0.0",
+  "application": "28.2.0.0",
   "features": [
     "TranslationFile"
   ]
