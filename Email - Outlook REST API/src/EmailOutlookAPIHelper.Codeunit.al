@@ -197,7 +197,6 @@ codeunit 4509 "Email - Outlook API Helper"
         exit(RecipientsJson);
     end;
 
-
     procedure GetClientIDAndSecret(var ClientId: Text; var ClientSecret: SecretText)
     var
         Setup: Record "Email - Outlook API Setup";
@@ -261,7 +260,6 @@ codeunit 4509 "Email - Outlook API Helper"
         if IsolatedStorage.Contains(Rec.ClientSecret, DataScope::Module) then
             IsolatedStorage.Delete(Rec.ClientSecret, DataScope::Module);
     end;
-
 
 #if not CLEAN28
 #pragma warning disable AL0432
@@ -635,7 +633,9 @@ codeunit 4509 "Email - Outlook API Helper"
         Counter: Integer;
         AttachmentName: Text[250];
         ContentType: Text[250];
+        ContentId: Text[40];
         ContentBytesBase64: Text;
+        IsInline: Boolean;
     begin
         if not EmailJsonObject.Get('attachments', JsonToken) then
             exit;
@@ -648,6 +648,11 @@ codeunit 4509 "Email - Outlook API Helper"
             AttachmentName := CopyStr(GetTextFromJsonObject(AttachmentObject, 'name'), 1, MaxStrLen(AttachmentName));
             ContentType := CopyStr(GetTextFromJsonObject(AttachmentObject, 'contentType'), 1, MaxStrLen(ContentType));
             ContentBytesBase64 := GetTextFromJsonObject(AttachmentObject, 'contentBytes');
+            IsInline := GetBooleanFromJsonObject(AttachmentObject, 'isInline');
+            ContentId := '';
+            if AttachmentObject.Get('contentId', JsonToken) then
+                if not JsonToken.AsValue().IsNull() then
+                    ContentId := CopyStr(JsonToken.AsValue().AsText(), 1, MaxStrLen(ContentId));
 
             if MessageAlreadyRetrieved then begin
                 Clear(TempBlob);
