@@ -646,6 +646,7 @@ codeunit 80 "Sales-Post"
     begin
         TempSalesLineLocal.Modify();
         SalesLine.Get(TempSalesLineLocal.RecordId);
+        OnModifyTempLineOnBeforeTransferFields(SalesLine, TempSalesLineLocal);
         SalesLine.TransferFields(TempSalesLineLocal, false);
         OnModifyTempLineOnBeforeSalesLineModify(SalesLine);
         SalesLine.Modify();
@@ -13463,6 +13464,11 @@ codeunit 80 "Sales-Post"
 
     [IntegrationEvent(false, false)]
     local procedure OnModifyTempLineOnAfterSalesLineModify(var SalesLine: Record "Sales Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnModifyTempLineOnBeforeTransferFields(var SalesLine: Record "Sales Line"; var TempSalesLine: Record "Sales Line" temporary)
     begin
     end;
 
