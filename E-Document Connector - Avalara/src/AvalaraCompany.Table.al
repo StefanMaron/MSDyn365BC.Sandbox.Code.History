@@ -4,8 +4,12 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.EServices.EDocumentConnector.Avalara;
 
+/// <summary>
+/// Temporary table holding Avalara company data retrieved from the API for company selection.
+/// </summary>
 table 6373 "Avalara Company"
 {
+    Caption = 'Avalara Company';
     DataClassification = CustomerContent;
     TableType = Temporary;
 
@@ -14,6 +18,7 @@ table 6373 "Avalara Company"
         field(1; Id; Integer)
         {
             AutoIncrement = true;
+            Caption = 'Id';
         }
         field(2; "Company Name"; Text[250])
         {
