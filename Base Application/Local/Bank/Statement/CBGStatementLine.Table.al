@@ -1355,6 +1355,8 @@ table 11401 "CBG Statement Line"
                     PAGE.Run(PAGE::"Bank Account Card", BankAcc);
                 end;
         end;
+
+        OnAfterOpenAccountCard(Rec);
     end;
 
     procedure OpenAccountEntries()
@@ -2088,6 +2090,11 @@ table 11401 "CBG Statement Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnLookupAppliesToDocAnAfterSetVendorLedgerEntryFilters(var VendorLedgerEntry: Record "Vendor Ledger Entry"; var GenJournalLine: Record "Gen. Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterOpenAccountCard(CBGStatementLine: Record "CBG Statement Line")
     begin
     end;
 
