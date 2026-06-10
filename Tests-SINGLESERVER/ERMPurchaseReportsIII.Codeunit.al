@@ -43,6 +43,8 @@ codeunit 134988 "ERM Purchase Reports III"
         RowVisibilityErr: Label 'Analysis row must only be visible in Purchase Analysis Matrix when Show <> No.';
         ColumnVisibilityErr: Label 'Analysis column must only be visible in Purchase Analysis Matrix when Show <> Never.';
         ColumnDoesNotExistErr: Label 'Analysis column does not exist in Analysis Column Template and therefore must not be visible.';
+        ExpectedInvoiceEntryErr: Label 'Expected invoice entry for dimension value %1 in report', Comment = '%1 = Dimension Value Code';
+        UnexpectedEntryOutsideRangeErr: Label 'Report should not contain entry for dimension value outside the range filter';
 
     [Test]
     [HandlerFunctions('RHPurchasePrepmtDocTest')]
@@ -1426,6 +1428,37 @@ codeunit 134988 "ERM Purchase Reports III"
         VerifyVendorTrialBalanceDCAmounts(VendorNo, 0, 0);
     end;
 
+    [Test]
+    [HandlerFunctions('RHVendorBalanceToDate')]
+    procedure VendBalToDateDimRangeFilterIncludesMatchingEntries()
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        VendorNo: Code[20];
+        DimValueCode: array[4] of Code[20];
+        i: Integer;
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO] Vendor Balance to Date report with dimension range filter includes entries within the range and excludes entries outside
+        Initialize();
+
+        // [GIVEN] Create Vendor.
+        GeneralLedgerSetup.Get();
+        VendorNo := CreateVendor();
+
+        // [GIVEN] Create dimension values under Global Dimension 1.
+        CreateSortedDimensionValues(DimValueCode, GeneralLedgerSetup."Global Dimension 1 Code");
+
+        // [GIVEN] Post purchase invoices for each dimension value.
+        for i := 1 to ArrayLen(DimValueCode) do
+            CreateCustomerAndPostGenJnlLinesWithFilters(VendorNo, DimValueCode[i], '', '');
+
+        // [WHEN] Run Vendor - Balance to Date report with Global Dimension 1 Filter.
+        RunVendorBalanceToDateWithDimFilter(VendorNo, StrSubstNo('%1..%2', DimValueCode[1], DimValueCode[3]));
+
+        // [THEN] Verify Report contains entries for correct amounts and excludes entries outside of the range.
+        VerifyVendBalToDateDimRangeEntries(VendorNo, DimValueCode);
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
@@ -2522,6 +2555,55 @@ codeunit 134988 "ERM Purchase Reports III"
         LibraryReportDataset.AssertElementWithValueExists('ExpectedReceiptDate', Format(PurchaseLine."Expected Receipt Date", 0, 4));
         LibraryReportDataset.AssertElementWithValueExists('PromisedReceiptDate', Format(PurchaseLine."Promised Receipt Date", 0, 4));
         LibraryReportDataset.AssertElementWithValueExists('RequestedReceiptDate', Format(PurchaseLine."Requested Receipt Date", 0, 4));
+    end;
+
+    local procedure CreateSortedDimensionValues(var SortedDimValueCode: array[4] of Code[20]; DimensionCode: Code[20])
+    var
+        DimensionValue: Record "Dimension Value";
+        TempCode: Code[20];
+        i: Integer;
+        j: Integer;
+    begin
+        for i := 1 to ArrayLen(SortedDimValueCode) do begin
+            LibraryDimension.CreateDimensionValue(DimensionValue, DimensionCode);
+            SortedDimValueCode[i] := DimensionValue.Code;
+        end;
+        for i := 1 to ArrayLen(SortedDimValueCode) - 1 do
+            for j := i + 1 to ArrayLen(SortedDimValueCode) do
+                if SortedDimValueCode[i] > SortedDimValueCode[j] then begin
+                    TempCode := SortedDimValueCode[i];
+                    SortedDimValueCode[i] := SortedDimValueCode[j];
+                    SortedDimValueCode[j] := TempCode;
+                end;
+    end;
+
+    local procedure RunVendorBalanceToDateWithDimFilter(VendorNo: Code[20]; GlobalDimension1Filter: Text)
+    var
+        Vendor: Record Vendor;
+    begin
+        Vendor.SetRange("No.", VendorNo);
+        Vendor.SetFilter("Global Dimension 1 Filter", GlobalDimension1Filter);
+        Vendor.SetRange("Date Filter", WorkDate());
+        REPORT.Run(REPORT::"Vendor - Balance to Date", true, false, Vendor);
+    end;
+
+    local procedure VerifyVendBalToDateDimRangeEntries(VendorNo: Code[20]; DimValueCode: array[4] of Code[20])
+    var
+        VendorLedgerEntry: Record "Vendor Ledger Entry";
+        GenJournalLine: Record "Gen. Journal Line";
+        i: Integer;
+    begin
+        LibraryReportDataset.LoadDataSetFile();
+        LibraryReportDataset.SetRange('DocType_VendLedgEntry3', Format(GenJournalLine."Document Type"::Invoice));
+        for i := 1 to 3 do begin
+            VendorLedgerEntry.SetRange("Vendor No.", VendorNo);
+            VendorLedgerEntry.SetRange("Global Dimension 1 Code", DimValueCode[i]);
+            VendorLedgerEntry.FindFirst();
+            VendorLedgerEntry.CalcFields(Amount);
+            Assert.IsTrue(LibraryReportDataset.GetNextRow(), StrSubstNo(ExpectedInvoiceEntryErr, DimValueCode[i]));
+            LibraryReportDataset.AssertCurrentRowValueEquals('OriginalAmt', Format(VendorLedgerEntry.Amount));
+        end;
+        Assert.IsFalse(LibraryReportDataset.GetNextRow(), UnexpectedEntryOutsideRangeErr);
     end;
 
     [ModalPageHandler]

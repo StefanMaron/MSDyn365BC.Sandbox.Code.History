@@ -33,6 +33,10 @@ report 5405 "Calc. Consumption"
                     NeededQty: Decimal;
                     IsHandled: Boolean;
                 begin
+                    if ("Flushing Method" = "Flushing Method"::Forward) and
+                       ("Routing Link Code" <> '') then
+                        CurrReport.Skip();
+
                     Window.Update(2, "Item No.");
 
                     Clear(ItemJnlLine);
