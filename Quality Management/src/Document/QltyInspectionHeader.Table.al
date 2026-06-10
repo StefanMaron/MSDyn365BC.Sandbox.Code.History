@@ -20,13 +20,13 @@ using Microsoft.QualityManagement.Integration.Inventory;
 using Microsoft.QualityManagement.Integration.Inventory.Transfer;
 using Microsoft.QualityManagement.Reports;
 using Microsoft.QualityManagement.Setup;
+using Microsoft.QualityManagement.Telemetry;
 using Microsoft.QualityManagement.Utilities;
 using Microsoft.QualityManagement.Workflow;
 using System.Device;
 using System.IO;
 using System.Reflection;
 using System.Security.AccessControl;
-using System.Telemetry;
 using System.Utilities;
 
 table 20405 "Qlty. Inspection Header"
@@ -210,7 +210,7 @@ table 20405 "Qlty. Inspection Header"
             Editable = false;
             TableRelation = "Qlty. Inspection Result".Code;
             Caption = 'Result Code';
-            ToolTip = 'Specifies the result is automatically determined based on the test value and result configuration.';
+            ToolTip = 'Specifies the result automatically calculated from inspection test lines based on their evaluation sequence. The calculation prioritizes lines that failed the acceptable quality level and then lines that have the lowest evaluation sequence.';
 
             trigger OnValidate()
             var
@@ -229,7 +229,7 @@ table 20405 "Qlty. Inspection Header"
         {
             Caption = 'Result';
             Editable = false;
-            ToolTip = 'Specifies the result description for this test result. The result is automatically determined based on the test value and result configuration.';
+            ToolTip = 'Specifies the description of the inspection result. This value is automatically retrieved from the result definition based on the Result Code field.';
             FieldClass = FlowField;
             CalcFormula = lookup("Qlty. Inspection Result"."Description" where("Code" = field("Result Code")));
         }
@@ -237,7 +237,7 @@ table 20405 "Qlty. Inspection Header"
         {
             Caption = 'Evaluation Sequence';
             Editable = false;
-            ToolTip = 'Specifies the associated evaluation sequence for this test result. The result is automatically determined based on the test value and result configuration.';
+            ToolTip = 'Specifies the associated evaluation sequence of the inspection result. The value is automatically determined from the result definition based on the Result Code field.';
         }
         field(35; "Location Code"; Code[10])
         {
@@ -841,9 +841,9 @@ table 20405 "Qlty. Inspection Header"
     /// </summary>
     procedure FinishInspection()
     var
-        FeatureTelemetry: Codeunit "Feature Telemetry";
+        QltyMgmtFeatureTelemetry: Codeunit "Qlty. Mgmt. Feature Telemetry";
     begin
-        FeatureTelemetry.LogUptake('0000QIP', QltyManagementSetup.GetFeatureTelemetryName(), Enum::"Feature Uptake Status"::Used);
+        QltyMgmtFeatureTelemetry.LogFeatureUsage(ObjectType::Table, Database::"Qlty. Inspection Header", 'FinishInspection');
         FinishInspectionAndPrompt(true);
     end;
 

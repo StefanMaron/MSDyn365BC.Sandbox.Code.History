@@ -43,7 +43,7 @@ table 20400 "Qlty. Management Setup"
         field(4; "Inspection Creation Option"; Enum "Qlty. Inspect. Creation Option")
         {
             Caption = 'Inspection Creation Option';
-            ToolTip = 'Specifies whether and how a new quality inspection is created if existing inspections are found.';
+            ToolTip = 'Specifies handling of inspection creation when existing inspections are found.';
             InitValue = "Use existing open inspection if available";
         }
         field(5; "Inspection Search Criteria"; Enum "Qlty. Inspect. Search Criteria")
@@ -95,7 +95,7 @@ table 20400 "Qlty. Management Setup"
         field(27; "Additional Picture Handling"; Enum "Qlty. Add. Picture Handling")
         {
             Caption = 'Additional Picture Handling';
-            ToolTip = 'Specifies what to do with a picture after it has been taken.';
+            ToolTip = 'Specifies additional actions for pictures taken during inspections. By default, pictures are stored in the inspection, and only the most recent version is retained. Previous versions can be preserved with additional options.';
 
             trigger OnValidate()
             begin
@@ -444,17 +444,6 @@ table 20400 "Qlty. Management Setup"
         ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
     begin
         exit(ApplicationAreaMgmtFacade.IsPremiumExperienceEnabled());
-    end;
-
-    /// <summary>
-    /// Returns the telemetry feature name for quality management functionality tracking.
-    /// </summary>
-    /// <returns>Feature name used for telemetry logging</returns>
-    internal procedure GetFeatureTelemetryName(): Text
-    var
-        QualityManagementTok: Label 'Quality Management', Locked = true;
-    begin
-        exit(QualityManagementTok);
     end;
 
     internal procedure GetSetupVideoLink(): Text
