@@ -1031,6 +1031,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.QualityManagement)(LookupHint=Codeunit Qlty. Tests - Workflows - NamedType NewLotTok)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 707746978 - NamedType 1630397272" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[QM response %1 should not be a predecessor of non-QM event %2.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1=response function name, %2=predecessor function name.]D;]A;(Namespace=Microsoft.Test.QualityManagement)(LookupHint=Codeunit Qlty. Tests - Workflows - NamedType QMResponseNotPredecessorOfNonQMEventErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 707746978 - NamedType 3340863248" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Yes]]></Val>
