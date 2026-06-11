@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -573,7 +573,7 @@ codeunit 22 "Item Jnl.-Post Line"
         CapLedgEntry."Global Dimension 2 Code" := ItemJnlLine."Shortcut Dimension 2 Code";
         CapLedgEntry."Dimension Set ID" := ItemJnlLine."Dimension Set ID";
 
-#if not CLEAN27
+#if not CLEAN28
         if ItemJnlLine."WIP Item" then begin
             CapLedgEntry."WIP Item Qty." := ItemJnlLine."WIP Quantity";
             CapLedgEntry."Subcontractor No." := ItemJnlLine."Source No.";
@@ -1965,7 +1965,7 @@ codeunit 22 "Item Jnl.-Post Line"
         ItemLedgEntry."Order Type" := ItemJnlLine."Order Type";
         ItemLedgEntry."Order No." := ItemJnlLine."Order No.";
         ItemLedgEntry."Order Line No." := ItemJnlLine."Order Line No.";
-#if not CLEAN27
+#if not CLEAN28
         ItemLedgEntry."Prod. Order No." := ItemJnlLine."Prod. Order No.";
         ItemLedgEntry."Prod. Order Line No." := ItemJnlLine."Prod. Order Line No.";
 #endif
@@ -2029,7 +2029,7 @@ codeunit 22 "Item Jnl.-Post Line"
         if (ItemLedgEntry.Quantity < 0) and (ItemJnlLine."Entry Type" <> ItemJnlLine."Entry Type"::Transfer) then
             ItemLedgEntry."Shipped Qty. Not Returned" := ItemLedgEntry.Quantity;
 
-#if not CLEAN27
+#if not CLEAN28
         ItemLedgEntry."Prod. Order Comp. Line No." := ItemJnlLine."Prod. Order Comp. Line No.";
         ItemLedgEntry."Subcontr. Purch. Order No." := ItemJnlLine."Subcontr. Purch. Order No.";
         ItemLedgEntry."Subcontr. Purch. Order Line" := ItemJnlLine."Subcontr. Purch. Order Line";
