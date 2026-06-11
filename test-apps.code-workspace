@@ -1,12 +1,4 @@
 {
-  "settings": {
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
-    "al.enableCodeActions": false,
-    "search.exclude": {
-      "**.xlf": true
-    }
-  },
   "folders": [
     {
       "path": "./_Exclude_APIV1_ Tests"
@@ -297,25 +289,28 @@
       "path": "./Withholding Tax Tests"
     },
     {
-      "path": "./Error Messages with Recommendations Tests/DisabledTests"
-    },
-    {
-      "path": "./Shopify Connector Test/DisabledTests"
-    },
-    {
-      "path": "./E-Document Core Tests/DisabledTests"
+      "path": "./System Application Test Library/Extension Management/testArtifacts"
     },
     {
       "path": "./Subscription Billing Tests/DisabledTests"
     },
     {
-      "path": "./System Application Test/DisabledTests"
+      "path": "./E-Document Core Tests/DisabledTests"
     },
     {
-      "path": "./AI Test Toolkit/src/TestSuite"
+      "path": "./Shopify Connector Test/DisabledTests"
+    },
+    {
+      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
     },
     {
       "path": "./Quality Management-Tests/DisabledTests"
+    },
+    {
+      "path": "./Test Runner/src/DataDrivenTest"
+    },
+    {
+      "path": "./Quality Management/src/Configuration/Template/Test"
     },
     {
       "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
@@ -324,19 +319,7 @@
       "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
     },
     {
-      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
-    },
-    {
-      "path": "./Quality Management/src/Configuration/Template/Test"
-    },
-    {
-      "path": "./Business Foundation Tests/DisabledTests"
-    },
-    {
-      "path": "./Test Runner/src/DataDrivenTest"
-    },
-    {
-      "path": "./Performance Toolkit Tests/src/Mock Tests"
+      "path": "./AI Test Toolkit/src/TestSuite"
     },
     {
       "path": "./Sales Lines Suggestions Tests/AI Tests"
@@ -345,16 +328,33 @@
       "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
     },
     {
-      "path": "./Base Application/System/DevTools/CALTest"
+      "path": "./System Application/Email/src/Test Email"
     },
     {
-      "path": "./System Application/Email/src/Test Email"
+      "path": "./Error Messages with Recommendations Tests/DisabledTests"
+    },
+    {
+      "path": "./Business Foundation Tests/DisabledTests"
+    },
+    {
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
+    },
+    {
+      "path": "./System Application Test/DisabledTests"
     },
     {
       "path": "./PowerBI Reports Tests/DisabledTests"
     },
     {
-      "path": "./System Application Test Library/Extension Management/testArtifacts"
+      "path": "./Base Application/System/DevTools/CALTest"
     }
-  ]
+  ],
+  "settings": {
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "allint.enabled": false,
+    "al.enableCodeActions": false,
+    "al.enableCodeAnalysis": false
+  }
 }
