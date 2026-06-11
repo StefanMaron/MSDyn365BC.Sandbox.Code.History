@@ -1044,7 +1044,6 @@ table 5109 "Purchase Header Archive"
             Caption = 'TDD Prepared By';
             DataClassification = EndUserIdentifiableInformation;
         }
-#if not CLEANSCHEMA30
         field(12180; "Subcontracting Order"; Boolean)
         {
             CalcFormula = exist("Purchase Line" where("Document Type" = const(Order),
@@ -1054,29 +1053,12 @@ table 5109 "Purchase Header Archive"
             Caption = 'Subcontracting Order';
             Editable = false;
             FieldClass = FlowField;
-            ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
-            ObsoleteState = Pending;
-            ObsoleteTag = '27.0';
-#else
-            ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
-#endif
         }
         field(12181; "Subcontracting Location Code"; Code[10])
         {
             Caption = 'Subcontracting Location Code';
             TableRelation = Location;
-            ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
-            ObsoleteState = Pending;
-            ObsoleteTag = '27.0';
-#else
-            ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
-#endif
         }
-#endif
     }
 
     keys
