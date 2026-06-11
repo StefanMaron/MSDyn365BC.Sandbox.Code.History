@@ -143,9 +143,7 @@ table 38 "Purchase Header"
                 if not IsHandled then
                     "Responsibility Center" := UserSetupMgt.GetRespCenter(1, Vend."Responsibility Center");
                 ValidateEmptySellToCustomerAndLocation();
-#if not CLEAN27
                 "Subcontracting Location Code" := Vend."Subcontracting Location Code";
-#endif
                 OnAfterCopyBuyFromVendorFieldsFromVendor(Rec, Vend, xRec);
 
                 if "Buy-from Vendor No." = xRec."Pay-to Vendor No." then
@@ -3184,7 +3182,6 @@ table 38 "Purchase Header"
             Caption = 'TDD Prepared By';
             DataClassification = EndUserIdentifiableInformation;
         }
-#if not CLEANSCHEMA30
         field(12180; "Subcontracting Order"; Boolean)
         {
             CalcFormula = exist("Purchase Line" where("Document Type" = const(Order),
@@ -3194,29 +3191,12 @@ table 38 "Purchase Header"
             Caption = 'Subcontracting Order';
             Editable = false;
             FieldClass = FlowField;
-            ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
-            ObsoleteState = Pending;
-            ObsoleteTag = '27.0';
-#else
-            ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
-#endif
         }
         field(12181; "Subcontracting Location Code"; Code[10])
         {
             Caption = 'Subcontracting Location Code';
             TableRelation = Location;
-            ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
-            ObsoleteState = Pending;
-            ObsoleteTag = '27.0';
-#else
-            ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
-#endif
         }
-#endif
     }
 
     keys
