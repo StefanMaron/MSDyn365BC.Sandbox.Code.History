@@ -212,6 +212,24 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.eServices.EDocument.Test)(LookupHint=Codeunit E-Doc. Mapping Test - NamedType TranformationMappingRuleErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1879823713 - NamedType 2996603465" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Incorrect value found]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.eServices.EDocument.Test)(LookupHint=Codeunit E-Doc. Purch. Order Exp. Test - NamedType IncorrectValueErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1879823713 - Method 149638651 - NamedType 383896469" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The actual message is: [%1]5D;, while the expected message is: [%2]5D;.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 - Last error message, %2 - expected message]D;]A;(Namespace=Microsoft.eServices.EDocument.Test)(LookupHint=Codeunit E-Doc. Purch. Order Exp. Test - Method CannotDeletePurchaseOrderWithActiveEDocument - NamedType UnexpectedMessageErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 4143112837 - NamedType 3056160592" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[/Invoice/cac:AccountingSupplierParty/cac:Party/cbc:EndpointID]]></Val>

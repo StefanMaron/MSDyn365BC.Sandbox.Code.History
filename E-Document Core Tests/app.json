@@ -4,7 +4,7 @@
   "publisher": "Microsoft",
   "brief": "E-Document Core Tests",
   "description": "E-Document Core Tests",
-  "version": "29.0.51353.0",
+  "version": "29.0.51369.0",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
   "EULA": "https://go.microsoft.com/fwlink/?linkid=2009120",
   "help": "https://go.microsoft.com/fwlink/?linkid=2204541",
@@ -15,6 +15,12 @@
     {
       "name": "E-Document Core",
       "id": "e1d97edc-c239-46b4-8d84-6368bdf67c8b",
+      "publisher": "Microsoft",
+      "version": "29.0.0.0"
+    },
+    {
+      "id": "e1966889-b5fb-4fda-a84c-ea71b590e1a9",
+      "name": "PEPPOL",
       "publisher": "Microsoft",
       "version": "29.0.0.0"
     },
