@@ -5921,7 +5921,8 @@ table 39 "Purchase Line"
                                   TotalAmountInclVAT + TotalExpenseTax;
                             "Tax To Be Expensed" := SalesTaxCalculate.CalculateExpenseTax(
                                 "Tax Area Code", "Tax Group Code", "Tax Liable", PurchHeader."Posting Date",
-                                CalcLineAmount(), "Quantity (Base)", PurchHeader."Currency Factor");
+                                TotalAmount + Amount, "Quantity (Base)", PurchHeader."Currency Factor")
+                                - TotalExpenseTax;
                             "Amount Including VAT" += "Tax To Be Expensed";
                             OnAfterSalesTaxCalculate(Rec, PurchHeader, Currency);
                             if "VAT Base Amount" <> 0 then
