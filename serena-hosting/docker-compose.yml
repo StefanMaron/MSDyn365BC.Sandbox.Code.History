@@ -1,0 +1,12 @@
+services:
+  serena-host:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/data
+    environment:
+      SERENA_HOST_TOKEN: ${SERENA_HOST_TOKEN:-}
+      SERENA_MAX_INSTANCES: ${SERENA_MAX_INSTANCES:-6}
+      SERENA_IDLE_TIMEOUT: ${SERENA_IDLE_TIMEOUT:-1800}
+    restart: unless-stopped
