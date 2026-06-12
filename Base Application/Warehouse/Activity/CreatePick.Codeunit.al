@@ -2436,6 +2436,8 @@ codeunit 7312 "Create Pick"
                                 TotalAvailQtyToPickBase := FromBinContentQty;
                         end;
 
+                        OnCreateTempItemTrkgLinesOnBeforeCalcQtyAvailInBinsForReplen(CalledFromMoveWksh, CurrWhseWorksheetLine, CurrLocation, TotalAvailQtyToPickBase, WhseItemTrackingLine);
+
                         QtyCanBePicked :=
                             CalcQtyCanBePicked(CurrLocation.Code, ItemNo, VariantCode, EntrySummary, CalledFromMoveWksh);
                         TotalAvailQtyToPickBase := Minimum(TotalAvailQtyToPickBase, QtyCanBePicked);
@@ -4900,4 +4902,10 @@ codeunit 7312 "Create Pick"
     local procedure OnAfterSetFiltersOnReservEntry(var ReservationEntry: Record "Reservation Entry"; SourceType: Integer; SourceSubType: Option; SourceNo: Code[20]; SourceLineNo: Integer; SourceSubLineNo: Integer)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateTempItemTrkgLinesOnBeforeCalcQtyAvailInBinsForReplen(CalledFromMoveWksh: Boolean; CurrWhseWorksheetLine: Record "Whse. Worksheet Line"; CurrLocation: Record Location; var TotalAvailQtyToPickBase: Decimal; WhseItemTrackingLine: Record "Whse. Item Tracking Line")
+    begin
+    end;
+
 }
