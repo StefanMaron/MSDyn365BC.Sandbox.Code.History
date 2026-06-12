@@ -19,9 +19,7 @@ using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Reports;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Inventory.Transfer;
-#if not CLEAN27
 using Microsoft.Manufacturing.Document;
-#endif
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Vendor;
@@ -186,8 +184,6 @@ page 9000 "Whse. WMS Role Center"
             separator(Action1130001)
             {
             }
-
-#if not CLEAN27
             action("Subcontract. Transfer Shipment")
             {
                 ApplicationArea = Warehouse;
@@ -195,13 +191,7 @@ page 9000 "Whse. WMS Role Center"
                 Image = "Report";
                 RunObject = Report "Subcontract. Transfer Shipment";
                 ToolTip = 'Create a subcontracting transfer shipment.';
-                ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-                ObsoleteState = Pending;
-#pragma warning disable AS0072
-                ObsoleteTag = '27.0';
-#pragma warning restore AS0072
             }
-#endif
         }
         area(embedding)
         {
@@ -710,7 +700,6 @@ page 9000 "Whse. WMS Role Center"
                 RunPageMode = Create;
                 ToolTip = 'Move items from one warehouse location to another.';
             }
-#if not CLEAN27
             action("Subcontr. Transfer Order")
             {
                 ApplicationArea = Warehouse;
@@ -718,13 +707,7 @@ page 9000 "Whse. WMS Role Center"
                 RunObject = Page "Transfer Order";
                 RunPageView = where("Subcontracting Order" = const(true));
                 ToolTip = 'Create a subcontracting transfer order.';
-                ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-                ObsoleteState = Pending;
-#pragma warning disable AS0072
-                ObsoleteTag = '27.0';
-#pragma warning restore AS0072
             }
-#endif
             action("&Purchase Order")
             {
                 ApplicationArea = Warehouse;
