@@ -1,5 +1,4 @@
-﻿#if not CLEAN27
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -17,11 +16,6 @@ page 12155 "Subcontr.Transfer Ord. Subform"
     DelayedInsert = true;
     PageType = ListPart;
     SourceTable = "Transfer Line";
-    ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-    ObsoleteState = Pending;
-#pragma warning disable AS0072
-    ObsoleteTag = '27.0';
-#pragma warning restore AS0072
 
     layout
     {
@@ -428,5 +422,4 @@ page 12155 "Subcontr.Transfer Ord. Subform"
         CurrPage.Update(SetSaveRecord);
     end;
 }
-#endif
 
