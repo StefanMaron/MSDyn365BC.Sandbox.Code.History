@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "allint.enabled": false,
+    "al.enableCodeActions": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeAnalysis": false
+  },
   "folders": [
     {
       "path": "./_Exclude_APIV1_ Tests"
@@ -280,13 +288,10 @@
       "path": "./VAT Group Management Tests"
     },
     {
-      "path": "./System Application Test/DisabledTests"
+      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
     },
     {
-      "path": "./System Application Test/Extension Management/testArtifacts"
-    },
-    {
-      "path": "./AI Test Toolkit/src/TestSuite"
+      "path": "./Test Runner/src/DataDrivenTest"
     },
     {
       "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
@@ -295,16 +300,7 @@
       "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
     },
     {
-      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
-    },
-    {
-      "path": "./Business Foundation Tests/DisabledTests"
-    },
-    {
-      "path": "./Test Runner/src/DataDrivenTest"
-    },
-    {
-      "path": "./Performance Toolkit Tests/src/Mock Tests"
+      "path": "./AI Test Toolkit/src/TestSuite"
     },
     {
       "path": "./Sales Lines Suggestions Tests/AI Tests"
@@ -313,18 +309,22 @@
       "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
     },
     {
-      "path": "./Base Application/System/DevTools/CALTest"
+      "path": "./System Application/Email/src/Test Email"
     },
     {
-      "path": "./System Application/Email/src/Test Email"
-    }
-  ],
-  "settings": {
-    "al.enableCodeActions": false,
-    "allint.enabled": false,
-    "search.exclude": {
-      "**.xlf": true
+      "path": "./Business Foundation Tests/DisabledTests"
     },
-    "al.enableCodeAnalysis": false
-  }
+    {
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
+    },
+    {
+      "path": "./System Application Test/DisabledTests"
+    },
+    {
+      "path": "./System Application Test/Extension Management/testArtifacts"
+    },
+    {
+      "path": "./Base Application/System/DevTools/CALTest"
+    }
+  ]
 }
