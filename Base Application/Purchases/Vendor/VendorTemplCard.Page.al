@@ -487,21 +487,38 @@ page 1386 "Vendor Templ. Card"
                     ApplicationArea = All;
                     Visible = false;
                 }
+#if not CLEAN27
                 field(Subcontractor; Rec.Subcontractor)
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the vendor is a subcontractor.';
+                    ObsoleteReason = 'Preparation for replacement by Subcontracting app';
+                    ObsoleteState = Pending;
+#pragma warning disable AS0072
+                    ObsoleteTag = '27.0';
+#pragma warning restore AS0072
                 }
                 field("Subcontracting Location Code"; Rec."Subcontracting Location Code")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies the code for the location where the subcontracted items are stored for pickup and delivery.';
+                    ObsoleteReason = 'Preparation for replacement by Subcontracting app';
+                    ObsoleteState = Pending;
+#pragma warning disable AS0072
+                    ObsoleteTag = '27.0';
+#pragma warning restore AS0072
                 }
                 field("Subcontractor Procurement"; Rec."Subcontractor Procurement")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies if the subcontractor is managing the product stock on the principal company''s behalf.';
+                    ObsoleteReason = 'Preparation for replacement by Subcontracting app';
+                    ObsoleteState = Pending;
+#pragma warning disable AS0072
+                    ObsoleteTag = '27.0';
+#pragma warning restore AS0072
                 }
+#endif
             }
         }
     }
