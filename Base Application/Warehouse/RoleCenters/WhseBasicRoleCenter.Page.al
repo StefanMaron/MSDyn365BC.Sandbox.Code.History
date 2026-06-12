@@ -21,7 +21,9 @@ using Microsoft.Inventory.Reports;
 using Microsoft.Inventory.Requisition;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Inventory.Transfer;
+#if not CLEAN27
 using Microsoft.Manufacturing.Document;
+#endif
 using Microsoft.Purchases.Archive;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
@@ -150,6 +152,8 @@ page 9008 "Whse. Basic Role Center"
             separator(Action1130001)
             {
             }
+
+#if not CLEAN27
             action("Subcontract. Transfer Shipment")
             {
                 ApplicationArea = Basic, Suite;
@@ -157,7 +161,13 @@ page 9008 "Whse. Basic Role Center"
                 Image = "Report";
                 RunObject = Report "Subcontract. Transfer Shipment";
                 ToolTip = 'Create a subcontracting transfer shipment.';
+                ObsoleteReason = 'Preparation for replacement by Subcontracting app';
+                ObsoleteState = Pending;
+#pragma warning disable AS0072
+                ObsoleteTag = '27.0';
+#pragma warning restore AS0072
             }
+#endif
         }
         area(embedding)
         {
