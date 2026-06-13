@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -50,6 +50,7 @@ page 9050 "Whse Ship & Receive Activities"
                         RunPageMode = Create;
                         ToolTip = 'Move items from one warehouse location to another.';
                     }
+#if not CLEAN28
                     action("New Subcontr. Transfer Order")
                     {
                         ApplicationArea = Warehouse;
@@ -58,7 +59,13 @@ page 9050 "Whse Ship & Receive Activities"
                         RunPageMode = Create;
                         RunPageView = where("Subcontracting Order" = const(true));
                         ToolTip = 'Create a new subcontracting transfer order.';
+                        ObsoleteReason = 'Preparation for replacement by Subcontracting app';
+                        ObsoleteState = Pending;
+#pragma warning disable AS0072
+                        ObsoleteTag = '27.0';
+#pragma warning restore AS0072
                     }
+#endif
                 }
             }
             cuegroup("Inbound - Today")

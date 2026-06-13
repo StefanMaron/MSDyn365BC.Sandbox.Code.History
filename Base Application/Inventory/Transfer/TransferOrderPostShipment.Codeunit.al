@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -88,12 +88,14 @@ codeunit 5704 "TransferOrder-Post Shipment"
             TransLine.SetRange("Document No.", TransHeader."No.");
             TransLine.SetRange("Derived From Line No.", 0);
             WipToShip := false;
+#if not CLEAN28
             TransHeader.CalcFields(TransHeader."Subcontracting Order");
             if TransHeader."Subcontracting Order" then begin
                 TransLine.SetFilter("WIP Qty. To Ship", '<>0');
                 WipToShip := not TransLine.IsEmpty();
                 TransLine.SetRange("WIP Qty. To Ship");
             end;
+#endif
             TransLine.SetFilter(Quantity, '<>0');
             TransLine.SetFilter("Qty. to Ship", '<>0');
             HasLinesToShip := not TransLine.IsEmpty();

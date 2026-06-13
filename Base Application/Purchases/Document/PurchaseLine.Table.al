@@ -5919,6 +5919,7 @@ table 39 "Purchase Line"
                             Amount := 0;
                             "VAT Base Amount" := 0;
                             "Amount Including VAT" := ROUND(CalcLineAmount(), Currency."Amount Rounding Precision");
+                            NonDeductibleVAT.Update(Rec, Currency);
                         end;
                     "VAT Calculation Type"::"Sales Tax":
                         begin
@@ -5968,6 +5969,7 @@ table 39 "Purchase Line"
                             Amount := 0;
                             "VAT Base Amount" := 0;
                             "Amount Including VAT" := CalcLineAmount();
+                            NonDeductibleVAT.Update(Rec, Currency);
                         end;
                     "VAT Calculation Type"::"Sales Tax":
                         begin

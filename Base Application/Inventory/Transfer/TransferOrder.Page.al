@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -21,8 +21,12 @@ page 5740 "Transfer Order"
     PageType = Document;
     RefreshOnActivate = true;
     SourceTable = "Transfer Header";
+#if not CLEAN28
     SourceTableView = sorting("No.")
                       where("Subcontracting Order" = const(false));
+#else
+    SourceTableView = sorting("No.");
+#endif
 
     layout
     {
