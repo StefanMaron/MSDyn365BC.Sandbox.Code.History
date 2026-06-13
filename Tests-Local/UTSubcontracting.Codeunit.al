@@ -1,4 +1,4 @@
-#if not CLEAN27
+﻿#if not CLEAN27
 #pragma warning disable AL0801
 codeunit 144082 "UT Subcontracting"
 {
@@ -278,8 +278,10 @@ codeunit 144082 "UT Subcontracting"
         TransferShipmentLine: Record "Transfer Shipment Line";
     begin
         TransferShipmentLine."Document No." := CreateTransferShipmentHeader(SourceType);
+#if not CLEAN28
         TransferShipmentLine."Subcontr. Purch. Order No." := SubcontrPurchOrderNo;
         TransferShipmentLine."Prod. Order No." := ProdOrderNo;
+#endif
         TransferShipmentLine.Quantity := LibraryRandom.RandDec(10, 2);
         TransferShipmentLine.Insert();
         exit(TransferShipmentLine."Document No.");

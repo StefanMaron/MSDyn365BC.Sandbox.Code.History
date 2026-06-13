@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -8896,7 +8896,9 @@ codeunit 137079 "SCM Production Order III"
     local procedure CreateWorkCenter(var WorkCenter: Record "Work Center"; IsSubcontracted: Boolean)
     var
         GeneralPostingSetup: Record "General Posting Setup";
+#if not CLEAN28
         SubcontractLocation: Record Location;
+#endif
         SubcontractVendor: Record Vendor;
     begin
         LibraryERM.FindGenPostingSetupWithDefVAT(GeneralPostingSetup);
@@ -8904,8 +8906,10 @@ codeunit 137079 "SCM Production Order III"
         if IsSubcontracted then begin
             WorkCenter.Validate("Subcontractor No.", LibraryPurchase.CreateVendorNo());
             SubcontractVendor.Get(WorkCenter."Subcontractor No.");
+#if not CLEAN28
             SubcontractVendor.Validate(Subcontractor, true);
             SubcontractVendor.Validate("Subcontracting Location Code", LibraryWarehouse.CreateLocation(SubcontractLocation));
+#endif
             SubcontractVendor.Modify(true);
         end;
         WorkCenter.Validate("Gen. Prod. Posting Group", GeneralPostingSetup."Gen. Prod. Posting Group");
