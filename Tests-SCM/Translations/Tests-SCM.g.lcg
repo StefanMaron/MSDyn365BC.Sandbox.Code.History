@@ -6764,6 +6764,24 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Planning - I - NamedType LineCountError)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1023565518 - NamedType 2508592813" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Production Order %1 is still visible on Order Planning when "Show Demand as" = "Sales Demand". The Sales Line-Planning subscriber is not filtering by Demand Type = Sales Line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Production Order No.]D;]A;(LookupHint=Codeunit SCM Order Planning - I - NamedType ProdDemandStillVisibleErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1023565518 - NamedType 362322026" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Setup error: expected Production demand requisition lines.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Planning - I - NamedType ProductionDemandSetupErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1023565518 - NamedType 3495023613" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Requisition quantity not qual to expected quantity of %1]]></Val>
@@ -6771,6 +6789,24 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[%1 - Requisition Line Expected Quantity]D;]A;(LookupHint=Codeunit SCM Order Planning - I - NamedType RequisitionLineQtyErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1023565518 - NamedType 1298428339" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Sales Order %1 must be visible on Order Planning when "Show Demand as" = "Sales Demand".]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Sales Order No.]D;]A;(LookupHint=Codeunit SCM Order Planning - I - NamedType SalesDemandNotVisibleErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1023565518 - NamedType 3186301335" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Setup error: expected Sales demand requisition lines.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Planning - I - NamedType SalesDemandSetupErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1023565518 - NamedType 2811019982" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
