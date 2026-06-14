@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -41,6 +41,9 @@ using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Setup;
 using Microsoft.Inventory.Tracking;
+#if not CLEAN29
+using Microsoft.Manufacturing.Setup;
+#endif
 using Microsoft.Pricing.Calculation;
 using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Resources.Resource;
@@ -86,6 +89,9 @@ table 38 "Purchase Header"
 
             trigger OnValidate()
             var
+#if not CLEAN29
+                LegacySubcFeatureHandler: Codeunit "Legacy Subc. Feature Handler";
+#endif
                 IsHandled: Boolean;
             begin
                 IsHandled := false;
@@ -144,7 +150,8 @@ table 38 "Purchase Header"
                     "Responsibility Center" := UserSetupMgt.GetRespCenter(1, Vend."Responsibility Center");
                 ValidateEmptySellToCustomerAndLocation();
 #if not CLEAN28
-                "Subcontracting Location Code" := Vend."Subcontracting Location Code";
+                if LegacySubcFeatureHandler.IsLegacySubcontractingEnabled() then
+                    "Subcontracting Location Code" := Vend."Subcontracting Location Code";
 #endif
                 OnAfterCopyBuyFromVendorFieldsFromVendor(Rec, Vend, xRec);
 

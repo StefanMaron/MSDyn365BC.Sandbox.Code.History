@@ -3811,6 +3811,9 @@ codeunit 137063 "SCM Manufacturing 7.0"
         CapacityJournalSetup();
         OutputJournalSetup();
         CreateLocationSetup();
+#if not CLEAN29
+        EnableLegacySubcontracting();
+#endif
         LibrarySetupStorage.SaveInventorySetup();
         LibrarySetupStorage.SaveManufacturingSetup();
 
@@ -3819,6 +3822,18 @@ codeunit 137063 "SCM Manufacturing 7.0"
         LibraryTestInitialize.OnAfterTestSuiteInitialize(CODEUNIT::"SCM Manufacturing 7.0");
     end;
 
+#if not CLEAN29
+    local procedure EnableLegacySubcontracting()
+    var
+        ManufacturingSetup: Record "Manufacturing Setup";
+    begin
+        if ManufacturingSetup.Get() then
+            if not ManufacturingSetup."Legacy Subcontracting" then begin
+                ManufacturingSetup."Legacy Subcontracting" := true;
+                ManufacturingSetup.Modify(true);
+            end;
+    end;
+#endif
     local procedure NoSeriesSetup()
     var
         PurchasesPayablesSetup: Record "Purchases & Payables Setup";

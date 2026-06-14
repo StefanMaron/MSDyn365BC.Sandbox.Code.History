@@ -8331,6 +8331,9 @@ codeunit 137079 "SCM Production Order III"
         ItemJournalSetup();
         ConsumptionJournalSetup();
         OutputJournalSetup();
+#if not CLEAN29
+        EnableLegacySubcontracting();
+#endif
         ShopCalendarMgt.ClearInternals(); // clear single instance codeunit vars to avoid influence of other test codeunits
 
         IsInitialized := true;
@@ -8338,6 +8341,18 @@ codeunit 137079 "SCM Production Order III"
         LibraryTestInitialize.OnAfterTestSuiteInitialize(CODEUNIT::"SCM Production Order III");
     end;
 
+#if not CLEAN29
+    local procedure EnableLegacySubcontracting()
+    var
+        ManufacturingSetup: Record "Manufacturing Setup";
+    begin
+        if ManufacturingSetup.Get() then
+            if not ManufacturingSetup."Legacy Subcontracting" then begin
+                ManufacturingSetup."Legacy Subcontracting" := true;
+                ManufacturingSetup.Modify(true);
+            end;
+    end;
+#endif
     local procedure InitSetupForProdBOMWithMultipleUOM(var Item: Record Item; var ChildItem: Record Item; var QuantityPer: Decimal; var QtyPerUnitOfMeasure: Decimal; var AvailableQty: Decimal)
     var
         ItemUnitOfMeasure: Record "Item Unit of Measure";

@@ -11,6 +11,7 @@ using Microsoft.Foundation.Company;
 using Microsoft.Foundation.Shipping;
 using Microsoft.Inventory.Setup;
 using Microsoft.Inventory.Transfer;
+using Microsoft.Manufacturing.Setup;
 using Microsoft.Purchases.Vendor;
 using System.Utilities;
 
@@ -18,7 +19,7 @@ report 12154 "Subcontract. Transfer Shipment"
 {
     DefaultLayout = RDLC;
     RDLCLayout = './Local/Manufacturing/Document/SubcontractTransferShipment.rdlc';
-    ApplicationArea = Basic, Suite;
+    ApplicationArea = LegacySubcontracting;
     Caption = 'Subcontracting Transfer Shipment';
     UsageCategory = ReportsAndAnalysis;
     ObsoleteReason = 'Preparation for replacement by Subcontracting app';
@@ -602,6 +603,14 @@ report 12154 "Subcontract. Transfer Shipment"
     labels
     {
     }
+
+    trigger OnPreReport()
+    var
+        LegacySubcFeatureHandler: Codeunit "Legacy Subc. Feature Handler";
+    begin
+        if not LegacySubcFeatureHandler.IsLegacySubcontractingEnabled() then
+            CurrReport.Quit();
+    end;
 
     var
         Text1130000: Label 'COPY';

@@ -4511,6 +4511,9 @@ codeunit 137077 "SCM Supply Planning -IV"
         NoSeriesSetup();
         CreateLocationSetup();
         ItemJournalSetup();
+#if not CLEAN29
+        EnableLegacySubcontracting();
+#endif        
         LibrarySetupStorage.SaveManufacturingSetup();
         LibrarySetupStorage.Save(Database::"Inventory Setup");
         ShopCalendarMgt.ClearInternals(); // clear single instance codeunit vars to avoid influence of other test codeunits
@@ -4520,6 +4523,18 @@ codeunit 137077 "SCM Supply Planning -IV"
         LibraryTestInitialize.OnAfterTestSuiteInitialize(CODEUNIT::"SCM Supply Planning -IV");
     end;
 
+#if not CLEAN29
+    local procedure EnableLegacySubcontracting()
+    var
+        ManufacturingSetup: Record "Manufacturing Setup";
+    begin
+        if ManufacturingSetup.Get() then
+            if not ManufacturingSetup."Legacy Subcontracting" then begin
+                ManufacturingSetup."Legacy Subcontracting" := true;
+                ManufacturingSetup.Modify(true);
+            end;
+    end;
+#endif
     local procedure NoSeriesSetup()
     var
         PurchasesPayablesSetup: Record "Purchases & Payables Setup";

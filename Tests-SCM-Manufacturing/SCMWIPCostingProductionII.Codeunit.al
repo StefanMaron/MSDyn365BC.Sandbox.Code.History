@@ -62,6 +62,7 @@ codeunit 137004 "SCM WIP Costing Production-II"
         AmountDoNotMatchErr: Label 'The WIP amount totals must be equal.';
 #if not CLEAN29
         DummyFlushingMethod: Enum "Flushing Method";
+
     [Test]
     [HandlerFunctions('CalcStdCostMenuHandler,ConfirmHandler,MessageHandler')]
     [Scope('OnPrem')]
@@ -69,7 +70,6 @@ codeunit 137004 "SCM WIP Costing Production-II"
     begin
         // [FEATURE] [Cost Standard]
         // [SCENARIO] Test Standard Costing of Subcontracting Order with Flushing method - Manual.
-
         SCMWIPCostingProductionII(
             Enum::"Unit Cost Calculation Type"::Time, "Flushing Method"::Manual, "Flushing Method"::Manual, "Costing Method"::Standard,
             "Production Order Status"::Released, true, false, false, false, false, false, false, false, false, false);
@@ -836,6 +836,9 @@ codeunit 137004 "SCM WIP Costing Production-II"
         LibraryERMCountryData.UpdateGeneralLedgerSetup();
         LibraryERMCountryData.UpdateJournalTemplMandatory(false);
         LibrarySetupStorage.SaveGeneralLedgerSetup();
+#if not CLEAN29
+        EnableLegacySubcontracting();
+#endif
         isInitialized := true;
         Commit();
         LibraryTestInitialize.OnAfterTestSuiteInitialize(CODEUNIT::"SCM WIP Costing Production-II");
@@ -969,7 +972,7 @@ codeunit 137004 "SCM WIP Costing Production-II"
         // Create Subcontracting Worksheet, Make order and Post Subcontracting Purchase Order.
         if Subcontract then begin
 #pragma warning disable AL0432
-        LibraryManufacturing.CalculateSubcontractOrder(WorkCenter);
+            LibraryManufacturing.CalculateSubcontractOrder(WorkCenter);
 #pragma warning restore AL0432
             MakeSubconPurchOrder(ProductionOrder."No.", WorkCenterNo2);
             PostSubconPurchOrder(TempPurchaseLine, ProductionOrder."No.", SubcontractCostDiff);
@@ -1916,6 +1919,18 @@ codeunit 137004 "SCM WIP Costing Production-II"
         exit(Round(ExchangeAmtLCYToFCY(RoundedLCYAmount, CurrencyCode), LibraryERM.GetCurrencyAmountRoundingPrecision(CurrencyCode)));
     end;
 
+#if not CLEAN29
+    local procedure EnableLegacySubcontracting()
+    var
+        ManufacturingSetup: Record "Manufacturing Setup";
+    begin
+        if ManufacturingSetup.Get() then
+            if not ManufacturingSetup."Legacy Subcontracting" then begin
+                ManufacturingSetup."Legacy Subcontracting" := true;
+                ManufacturingSetup.Modify(true);
+            end;
+    end;
+#endif
     [Normal]
     local procedure RaiseConfirmHandler()
     begin

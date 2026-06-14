@@ -6,7 +6,9 @@ namespace Microsoft.Inventory.Transfer;
 
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Setup;
-
+#if not CLEAN29
+using Microsoft.Manufacturing.Setup;
+#endif
 codeunit 5708 "Release Transfer Document"
 {
     TableNo = "Transfer Header";
@@ -110,6 +112,9 @@ codeunit 5708 "Release Transfer Document"
     local procedure CheckTransLines(var TransLine: Record "Transfer Line"; TransHeader: Record "Transfer Header")
     var
         Item: Record Item;
+#if not CLEAN29
+        LegacySubcFeatureHandler: Codeunit "Legacy Subc. Feature Handler";
+#endif
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -125,23 +130,24 @@ codeunit 5708 "Release Transfer Document"
         TransLine.SetRange("Document No.", TransHeader."No.");
         TransLine.SetFilter(Quantity, '<>0');
 #if not CLEAN28
-        TransHeader.CalcFields("Subcontracting Order");
-        case TransHeader."Subcontracting Order" of
-            true:
-                if not TransLine.FindFirst() then begin
-                    TransLine.SetRange(Quantity);
-                    TransLine.SetFilter("WIP Quantity", '<>0');
+        if LegacySubcFeatureHandler.IsLegacySubcontractingEnabled() then begin
+            TransHeader.CalcFields("Subcontracting Order");
+            case TransHeader."Subcontracting Order" of
+                true:
+                    if not TransLine.FindFirst() then begin
+                        TransLine.SetRange(Quantity);
+                        TransLine.SetFilter("WIP Quantity", '<>0');
+                        if TransLine.IsEmpty() then
+                            Error(NothingToReleaseErr, TransHeader."No.");
+                    end;
+                false:
                     if TransLine.IsEmpty() then
                         Error(NothingToReleaseErr, TransHeader."No.");
-                end;
-            false:
-                if TransLine.IsEmpty() then
-                    Error(NothingToReleaseErr, TransHeader."No.");
-        end;
-#else
-        if TransLine.IsEmpty() then
-            Error(NothingToReleaseErr, TransHeader."No.");
+            end;
+        end else
 #endif
+            if TransLine.IsEmpty() then
+                Error(NothingToReleaseErr, TransHeader."No.");
 
         TransLine.SetFilter("Item No.", '<>%1', '');
         if TransLine.FindSet() then

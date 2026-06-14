@@ -124,13 +124,16 @@ page 9009 "Whse. Worker WMS Role Center"
                 RunObject = Report "Customer - Labels";
                 ToolTip = 'View, save, or print mailing labels with the customers'' names and addresses. The report can be used to send sales letters, for example.';
             }
+#if not CLEAN28
             separator(Action1130001)
             {
+                ObsoleteReason = 'Preparation for replacement by Subcontracting app';
+                ObsoleteState = Pending;
+                ObsoleteTag = '29.0';
             }
-#if not CLEAN28
             action("Subcontract. Transfer Shipment")
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = LegacySubcontracting;
                 Caption = 'Subcontract. Transfer Shipment';
                 Image = "Report";
                 RunObject = Report "Subcontract. Transfer Shipment";
@@ -232,7 +235,7 @@ page 9009 "Whse. Worker WMS Role Center"
 #if not CLEAN27
             action("Subcontracting Transfers")
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = LegacySubcontracting;
                 Caption = 'Subcontracting Transfers';
                 RunObject = Page "Subcontracting Transfer List";
                 ToolTip = 'View the list of subcontracting transfers.';
