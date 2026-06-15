@@ -25,7 +25,7 @@
   </Item>
   <Item ItemId=";Codeunit 207529790 - NamedType 3559815807" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Cannot find enough details to make an inspection for your record(s).  Try making sure that there is a source configuration for your record, and then also make sure there is sufficient information in your inspection generation rules.  Two tables involved are %1 and %2.]]></Val>
+      <Val><![CDATA[Cannot find enough details to make an inspection for your record(s). Try making sure that there is a source configuration for your record, and then also make sure there is sufficient information in your inspection generation rules. Two tables involved are %1 and %2.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -34,7 +34,7 @@
   </Item>
   <Item ItemId=";Codeunit 207529790 - NamedType 554815805" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Cannot find enough details to make an inspection for your record(s).  Try making sure that there is a source configuration for your record, and then also make sure there is sufficient information in your inspection generation rules.  The table involved is %1.]]></Val>
+      <Val><![CDATA[Cannot find enough details to make an inspection for your record(s). Try making sure that there is a source configuration for your record, and then also make sure there is sufficient information in your inspection generation rules. The table involved is %1.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
