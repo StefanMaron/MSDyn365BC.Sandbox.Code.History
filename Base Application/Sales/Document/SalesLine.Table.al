@@ -4176,7 +4176,6 @@ table 37 "Sales Line"
         {
             Caption = 'Retention VAT %';
             AutoFormatType = 0;
-            DecimalPlaces = 0 : 5;
             MaxValue = 100;
             MinValue = 0;
         }
