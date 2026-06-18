@@ -524,8 +524,7 @@ table 99000758 "Machine Center"
         }
         field(81; "Overhead Rate"; Decimal)
         {
-            AutoFormatType = 2;
-            AutoFormatExpression = '';
+            AutoFormatType = 0;
             Caption = 'Overhead Rate';
             ToolTip = 'Specifies the overhead rate of this machine center.';
 
