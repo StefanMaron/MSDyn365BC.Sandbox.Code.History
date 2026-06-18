@@ -957,7 +957,6 @@ table 113 "Sales Invoice Line"
         {
             Caption = 'Retention VAT %';
             AutoFormatType = 0;
-            DecimalPlaces = 0 : 5;
         }
         field(10003; "Custom Transit Number"; Text[30])
         {
