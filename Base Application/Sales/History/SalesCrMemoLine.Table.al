@@ -923,7 +923,6 @@ table 115 "Sales Cr.Memo Line"
         {
             Caption = 'Retention VAT %';
             AutoFormatType = 0;
-            DecimalPlaces = 0 : 5;
         }
     }
 
