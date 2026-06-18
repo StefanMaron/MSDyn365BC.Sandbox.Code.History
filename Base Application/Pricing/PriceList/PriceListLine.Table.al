@@ -400,7 +400,6 @@ table 7001 "Price List Line"
         {
             DataClassification = CustomerContent;
             AutoFormatType = 0;
-            DecimalPlaces = 0 : 5;
             Caption = 'Line Discount %';
             ToolTip = 'Specifies the line discount percentage for the product.';
             MaxValue = 100;
