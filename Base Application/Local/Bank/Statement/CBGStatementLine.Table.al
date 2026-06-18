@@ -1510,7 +1510,13 @@ table 11401 "CBG Statement Line"
     var
         VATPostingSetup: Record "VAT Posting Setup";
         GLAccount: Record "G/L Account";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCalculateVAT(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
         "VAT %" := 0;
         "Debit Incl. VAT" := Debit;
         "Debit VAT" := 0;
@@ -2025,6 +2031,11 @@ table 11401 "CBG Statement Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidateVATAmountOnLine(var CBGStatementLine: Record "CBG Statement Line"; var GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalculateVAT(var CBGStatementLine: Record "CBG Statement Line"; var IsHandled: Boolean)
     begin
     end;
 
