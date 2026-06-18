@@ -964,8 +964,7 @@ table 5406 "Prod. Order Line"
         }
         field(99000765; "Overhead Rate"; Decimal)
         {
-            AutoFormatType = 2;
-            AutoFormatExpression = '';
+            AutoFormatType = 0;
             Caption = 'Overhead Rate';
         }
     }
