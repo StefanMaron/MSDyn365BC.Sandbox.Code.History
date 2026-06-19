@@ -1698,7 +1698,13 @@ table 11401 "CBG Statement Line"
     procedure CreateDim(DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     var
         GenJournalTemplate: Record "Gen. Journal Template";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCreateDim(Rec, IsHandled, DefaultDimSource);
+        if IsHandled then
+            exit;
+
         "Shortcut Dimension 1 Code" := '';
         "Shortcut Dimension 2 Code" := '';
         GenJournalTemplate.Get("Journal Template Name");
@@ -2039,6 +2045,11 @@ table 11401 "CBG Statement Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCalculateVAT(var CBGStatementLine: Record "CBG Statement Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateDim(var CBGStatementLine: Record "CBG Statement Line"; var IsHandled: Boolean; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
     begin
     end;
 
