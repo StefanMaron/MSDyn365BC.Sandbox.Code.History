@@ -615,9 +615,12 @@ table 11401 "CBG Statement Line"
                     else
                         Validate(Date, CBGStatementLine.Date);
 
-                    if CBGStatement.Currency <> PaymentHistLine."Currency Code" then
-                        Error(Text1000006,
-                          CBGStatement.Currency, PaymentHistLine."Currency Code");
+                    IsHandled := false;
+                    OnValidateIdentificationOnBeforeCheckCurrency(Rec, CBGStatementLine, PaymentHistLine, CBGStatement, IsHandled);
+                    if not IsHandled then
+                        if CBGStatement.Currency <> PaymentHistLine."Currency Code" then
+                            Error(Text1000006,
+                              CBGStatement.Currency, PaymentHistLine."Currency Code");
                     "Amount Settled" := PaymentHistLine.Amount;
                     "Applies-to ID" := "New Applies-to ID"();
                     SetApplyCVLedgerEntries(PaymentHistLine);
@@ -2081,6 +2084,11 @@ table 11401 "CBG Statement Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnValidateIdentificationOnBeforeCheck(var CBGStatementLine: Record "CBG Statement Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateIdentificationOnBeforeCheckCurrency(var CBGStatementLine: Record "CBG Statement Line"; ParentCBGStatementLine: Record "CBG Statement Line"; PaymentHistLine: Record "Payment History Line"; CBGStatement: Record "CBG Statement"; var IsHandled: Boolean)
     begin
     end;
 
