@@ -647,7 +647,7 @@ table 5407 "Prod. Order Component"
 
                 CalculateQuantity(Quantity);
                 if "Qty. Rounding Precision" < 1 then
-                    Quantity := UOMMgt.RoundQty(Quantity, "Qty. Rounding Precision")
+                    Quantity := UOMMgt.RoundAndValidateQty(Quantity, "Qty. Rounding Precision", FieldCaption(Quantity))
                 else
                     Quantity := UOMMgt.RoundToItemRndPrecision(Quantity, "Qty. Rounding Precision");
 
