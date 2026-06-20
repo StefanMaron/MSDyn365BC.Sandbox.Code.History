@@ -474,7 +474,6 @@ page 9001 "Accounting Manager Role Center"
                 Caption = 'Inventory Valuation';
                 Image = "Report";
                 RunObject = Report "Inventory Valuation";
-                ToolTip = 'View, print, or save a list of the values of the on-hand quantity of each inventory item.';
             }
             action("Item Turnover")
             {
@@ -1174,7 +1173,6 @@ page 9001 "Accounting Manager Role Center"
                 Caption = 'P&ost Inventory Cost to G/L';
                 Image = PostInventoryToGL;
                 RunObject = Report "Post Inventory Cost to G/L";
-                ToolTip = 'Record the quantity and value changes to the inventory in the item ledger entries and the value entries when you post inventory transactions, such as sales shipments or purchase receipts.';
             }
             separator(Action97)
             {
