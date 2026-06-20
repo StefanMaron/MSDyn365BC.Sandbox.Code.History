@@ -6,9 +6,9 @@ namespace Microsoft.eServices.EDocument.Processing.Import;
 
 using Microsoft.eServices.EDocument.Processing.Import.Purchase;
 using Microsoft.Finance.Currency;
-using Microsoft.Finance.Dimension;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Setup;
 
 /// <summary>
 /// Shared logic for creating BC purchase documents (invoices and credit memos) from e-document draft data.
@@ -18,8 +18,49 @@ codeunit 6402 "E-Doc. Purch. Doc. Helper"
     Access = Internal;
     InherentEntitlements = X;
     InherentPermissions = X;
-    Permissions = tabledata "Dimension Set Tree Node" = im,
-                  tabledata "Dimension Set Entry" = im;
+
+    procedure ValidateFieldWithContext(var Rec: Record "Purchase Header"; FieldNo: Integer; Value: Variant)
+    var
+        VariantRec: Variant;
+    begin
+        VariantRec := Rec;
+        ValidateFieldWithContext(VariantRec, FieldNo, Value);
+        Rec := VariantRec;
+    end;
+
+    procedure ValidateFieldWithContext(var Rec: Record "Purchase Line"; FieldNo: Integer; Value: Variant)
+    var
+        VariantRec: Variant;
+    begin
+        VariantRec := Rec;
+        ValidateFieldWithContext(VariantRec, FieldNo, Value);
+        Rec := VariantRec;
+    end;
+
+    local procedure ValidateFieldWithContext(var RecVariant: Variant; FieldNo: Integer; Value: Variant)
+    var
+        EDocImportErrorContext: Codeunit "E-Doc. Import Error Context";
+        RecRef: RecordRef;
+        FldRef: FieldRef;
+    begin
+        RecRef.GetTable(RecVariant);
+        FldRef := RecRef.Field(FieldNo);
+        EDocImportErrorContext.OnValidateFieldWithContext(FldRef.Caption());
+        FldRef.Validate(Value);
+        RecRef.SetTable(RecVariant);
+    end;
+
+    procedure ApplyDefaultPostingDateFromSetup(var PurchaseHeader: Record "Purchase Header"; EDocumentPurchaseHeader: Record "E-Document Purchase Header")
+    var
+        PurchasesPayablesSetup: Record "Purchases & Payables Setup";
+    begin
+        PurchasesPayablesSetup.GetRecordOnce();
+        if (PurchasesPayablesSetup."E-Doc. Def. Posting Date" <> PurchasesPayablesSetup."E-Doc. Def. Posting Date"::"Document Date") then
+            exit;
+        if EDocumentPurchaseHeader."Document Date" = 0D then
+            exit;
+        PurchaseHeader.Validate("Posting Date", EDocumentPurchaseHeader."Document Date");
+    end;
 
     procedure ApplyVATDifferenceToLines(PurchaseHeader: Record "Purchase Header"; EDocumentPurchaseHeader: Record "E-Document Purchase Header")
     var
