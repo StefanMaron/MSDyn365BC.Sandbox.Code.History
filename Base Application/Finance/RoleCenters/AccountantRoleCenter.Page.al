@@ -275,7 +275,6 @@ page 9027 "Accountant Role Center"
                     Caption = 'Inventory Valuation';
                     Image = "Report";
                     RunObject = Report "Inventory Valuation";
-                    ToolTip = 'View, print, or save a list of the values of the on-hand quantity of each inventory item.';
                 }
                 action("Item Turnover")
                 {
