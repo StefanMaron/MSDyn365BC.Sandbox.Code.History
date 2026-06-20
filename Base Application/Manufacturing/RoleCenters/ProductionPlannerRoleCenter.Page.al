@@ -116,7 +116,6 @@ page 9010 "Production Planner Role Center"
                     Caption = 'Routing Sheet';
                     Image = "Report";
                     RunObject = Report "Routing Sheet";
-                    ToolTip = 'View basic information for routings, such as send-ahead quantity, setup time, run time and time unit. This report shows you the operations to be performed in this routing, the work or machine centers to be used, the personnel, the tools, and the description of each operation.';
                 }
 #if not CLEAN28
                 action("Inventory - &Availability Plan")
@@ -186,7 +185,6 @@ page 9010 "Production Planner Role Center"
                     Caption = 'D&etailed Calculation';
                     Image = "Report";
                     RunObject = Report "Detailed Calculation";
-                    ToolTip = 'View a cost list per item taking into account the scrap.';
                 }
 #if not CLEAN27
                 action("P&roduction Order - Calculation")
@@ -231,7 +229,6 @@ page 9010 "Production Planner Role Center"
                     Caption = 'Prod. Order - &Job Card';
                     Image = "Report";
                     RunObject = Report "Prod. Order - Job Card";
-                    ToolTip = 'View a list of the work in progress of a production order. Output, Scrapped Quantity and Production Lead Time are shown or printed depending on the operation.';
                 }
             }
         }
