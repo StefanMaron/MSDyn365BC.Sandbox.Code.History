@@ -161,7 +161,6 @@ page 15 "Location List"
                 Caption = 'Inventory - Inbound Transfer';
                 Image = "Report";
                 RunObject = Report "Inventory - Inbound Transfer";
-                ToolTip = 'View the list of inbound transfers to the location.';
             }
             action(Action1907283206)
             {
@@ -169,7 +168,6 @@ page 15 "Location List"
                 Caption = 'Transfer Order';
                 Image = Document;
                 RunObject = Report "Transfer Order";
-                ToolTip = 'Prepare to transfer items to another location.';
             }
             action("Transfer Shipment")
             {
@@ -179,7 +177,6 @@ page 15 "Location List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Transfer Shipment";
-                ToolTip = 'View the list of posted outbound transfers from the location.';
             }
             action("Transfer Receipt")
             {
@@ -189,7 +186,6 @@ page 15 "Location List"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Transfer Receipt";
-                ToolTip = 'View the list of posted inbound transfers to the location.';
             }
 #if not CLEAN28
             action("Items with Negative Inventory")
