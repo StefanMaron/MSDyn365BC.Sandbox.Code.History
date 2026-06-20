@@ -141,7 +141,6 @@ page 15 "Location List"
                 Caption = 'Convert to Warehouse location';
                 Image = NewWarehouse;
                 RunObject = Report "Create Warehouse Location";
-                ToolTip = 'Enable the inventory location to use zones and bins to operate as a warehouse location. The batch job creates initial warehouse entries for the warehouse adjustment bin for all items that have inventory in the location. It is necessary to perform a physical inventory after this batch job is finished so that these initial entries can be balanced by posting warehouse physical inventory entries.';
             }
             action(CopyLocation)
             {

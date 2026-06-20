@@ -144,7 +144,6 @@ page 9020 "Small Business Owner RC"
                 Caption = 'S&tatement';
                 Image = "Report";
                 RunObject = Report "Customer Statement";
-                ToolTip = 'View all entries for selected customers for a selected period. You can choose to have all overdue balances displayed, regardless of the period specified. You can also choose to include an aging band. For each currency, the report displays open entries and, if specified in the report, overdue entries. The statement can be sent to customers, for example, at the close of an accounting period or as a reminder of overdue balances.';
             }
             action("Account Book Sheet")
             {

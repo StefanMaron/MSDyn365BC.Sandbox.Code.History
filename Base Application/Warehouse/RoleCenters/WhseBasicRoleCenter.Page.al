@@ -132,7 +132,6 @@ page 9008 "Whse. Basic Role Center"
                 Caption = 'Warehouse &Bin List';
                 Image = "Report";
                 RunObject = Report "Warehouse Bin List";
-                ToolTip = 'Get an overview of warehouse bins, their setup, and the quantity of items within the bins.';
             }
             action("Physical &Inventory List")
             {
@@ -148,7 +147,6 @@ page 9008 "Whse. Basic Role Center"
                 Caption = 'Customer &Labels';
                 Image = "Report";
                 RunObject = Report "Customer - Labels";
-                ToolTip = 'View, save, or print mailing labels with the customers'' names and addresses. The report can be used to send sales letters, for example.';
             }
 #if not CLEAN28
             separator(Action1130001)

@@ -1040,7 +1040,6 @@ page 9001 "Accounting Manager Role Center"
                 Ellipsis = true;
                 Image = CreateReminders;
                 RunObject = Report "Create Reminders";
-                ToolTip = 'Create reminders for one or more customers with overdue payments.';
             }
             action("Create Finance Charge &Memos")
             {
@@ -1049,7 +1048,6 @@ page 9001 "Accounting Manager Role Center"
                 Ellipsis = true;
                 Image = CreateFinanceChargememo;
                 RunObject = Report "Create Finance Charge Memos";
-                ToolTip = 'Create finance charge memos for one or more customers with overdue payments.';
             }
             separator(Action73)
             {

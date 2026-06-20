@@ -78,7 +78,6 @@ page 9012 "Shop Supervisor Role Center"
                 Caption = 'Routing &Sheet';
                 Image = "Report";
                 RunObject = Report "Routing Sheet";
-                ToolTip = 'View basic information for routings, such as send-ahead quantity, setup time, run time and time unit. This report shows you the operations to be performed in this routing, the work or machine centers to be used, the personnel, the tools, and the description of each operation.';
             }
             separator(Action51)
             {
@@ -493,7 +492,6 @@ page 9012 "Shop Supervisor Role Center"
                 Caption = 'Update &Unit Cost';
                 Image = UpdateUnitCost;
                 RunObject = Report "Update Unit Cost";
-                ToolTip = 'Recalculate the unit cost of production items on production orders. The value in the Unit Cost field on the production order line is updated according to the selected options.';
             }
             separator(Action84)
             {
