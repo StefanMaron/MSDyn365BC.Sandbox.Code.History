@@ -166,7 +166,6 @@ page 9000 "Whse. WMS Role Center"
                 Caption = 'P&hys. Inventory List';
                 Image = "Report";
                 RunObject = Report "Phys. Inventory List";
-                ToolTip = 'View a list of the lines that you have calculated in the Phys. Inventory Journal window. You can use this report during the physical inventory count to mark down actual quantities on hand in the warehouse and compare them to what is recorded in the program.';
             }
             action("&Customer - Labels")
             {
