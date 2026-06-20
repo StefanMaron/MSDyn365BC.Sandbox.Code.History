@@ -1111,7 +1111,6 @@ page 9027 "Accountant Role Center"
                     Caption = 'P&ost Inventory Cost to G/L';
                     Image = PostInventoryToGL;
                     RunObject = Report "Post Inventory Cost to G/L";
-                    ToolTip = 'Record the quantity and value changes to the inventory in the item ledger entries and the value entries when you post inventory transactions, such as sales shipments or purchase receipts.';
                 }
                 action("Calc. and Pos&t VAT Settlement")
                 {
