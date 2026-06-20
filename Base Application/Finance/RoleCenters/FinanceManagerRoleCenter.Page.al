@@ -214,7 +214,6 @@ page 8901 "Finance Manager Role Center"
                         {
                             Caption = 'Day Book Cust. Ledger Entry';
                             RunObject = report "Day Book Cust. Ledger Entry";
-                            Tooltip = 'Run the Day Book Cust. Ledger Entry report.';
                         }
                         action("Day Book Vendor Ledger Entry")
                         {
@@ -1188,7 +1187,6 @@ page 8901 "Finance Manager Role Center"
                     ApplicationArea = Basic, Suite;
                     Caption = 'Create Recurring Sales Invoices';
                     RunObject = report "Create Recurring Sales Inv.";
-                    Tooltip = 'Run the Create Recurring Sales Invoices report.';
                 }
                 action("Register Customer Payments")
                 {
@@ -1205,14 +1203,12 @@ page 8901 "Finance Manager Role Center"
                         ApplicationArea = Basic, Suite;
                         Caption = 'Combine Shipments...';
                         RunObject = report "Combine Shipments";
-                        Tooltip = 'Run the Combine Shipments report.';
                     }
                     action("Combined Return Receipts")
                     {
                         ApplicationArea = SalesReturnOrder, PurchReturnOrder;
                         Caption = 'Combine Return Receipts...';
                         RunObject = report "Combine Return Receipts";
-                        Tooltip = 'Run the Combine Return Receipts report.';
                     }
                 }
                 group("Group30")
@@ -1366,14 +1362,12 @@ page 8901 "Finance Manager Role Center"
                         ApplicationArea = Basic, Suite;
                         Caption = 'Customer - Balance to Date';
                         RunObject = report "Customer - Balance to Date";
-                        Tooltip = 'Run the Customer - Balance to Date report.';
                     }
                     action("Customer - Detail Trial Bal.")
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Customer - Detail Trial Bal.';
                         RunObject = report "Customer - Detail Trial Bal.";
-                        Tooltip = 'Run the Customer - Detail Trial Bal. report.';
                     }
                     action("Customer - List")
                     {
@@ -1386,7 +1380,6 @@ page 8901 "Finance Manager Role Center"
                         ApplicationArea = Suite;
                         Caption = 'Customer - Summary Aging Simp.';
                         RunObject = report "Customer - Summary Aging Simp.";
-                        Tooltip = 'Run the Customer - Summary Aging Simp. report.';
                     }
                     action("Customer - Order Summary")
                     {
