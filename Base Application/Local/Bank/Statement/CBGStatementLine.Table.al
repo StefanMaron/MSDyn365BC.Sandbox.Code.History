@@ -94,11 +94,9 @@ table 11401 "CBG Statement Line"
                 ValidateApplyRequirements(Rec);
             end;
         }
-        field(12; "Account Type"; Option)
+        field(12; "Account Type"; Enum "CBG Statement Line Account Type")
         {
             Caption = 'Account Type';
-            OptionCaption = 'G/L Account,Customer,Vendor,Bank Account,Employee';
-            OptionMembers = "G/L Account",Customer,Vendor,"Bank Account",Employee;
 
             trigger OnValidate()
             begin
@@ -1950,7 +1948,7 @@ table 11401 "CBG Statement Line"
 
     local procedure InitDefaultDimensionSources(var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; FieldNo: Integer)
     begin
-        DimManagement.AddDimSource(DefaultDimSource, DimManagement.TypeToTableID1(Rec."Account Type"), Rec."Account No.", FieldNo = Rec.FieldNo("Account No."));
+        DimManagement.AddDimSource(DefaultDimSource, DimManagement.TypeToTableID1(Rec."Account Type".AsInteger()), Rec."Account No.", FieldNo = Rec.FieldNo("Account No."));
         DimManagement.AddDimSource(DefaultDimSource, Database::Job, Rec."Job No.", FieldNo = Rec.FieldNo("Job No."));
         DimManagement.AddDimSource(DefaultDimSource, Database::"Salesperson/Purchaser", Rec."Salespers./Purch. Code", FieldNo = Rec.FieldNo("Salespers./Purch. Code"));
         DimManagement.AddDimSource(DefaultDimSource, Database::Campaign, Rec."Campaign No.", FieldNo = Rec.FieldNo("Campaign No."));
