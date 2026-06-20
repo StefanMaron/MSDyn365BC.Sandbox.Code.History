@@ -29,7 +29,7 @@ codeunit 10752 "SII Doc. Upload Management"
         NoDetailedCustLedgerEntryErr: Label 'Detailed Customer Ledger Entry could not be found.';
         NoVendLedgerEntryErr: Label 'Vendor Ledger Entry could not be found.';
         NoDetailedVendLedgerEntryErr: Label 'Detailed Vendor Ledger Entry could not be found.';
-        CommunicationErr: Label 'Communication error: %1.', Comment = '@1 is the error message.';
+        CommunicationErr: Label 'Communication error: %1.', Comment = '%1 is the error message.';
         ParseMatchDocumentErr: Label 'Parse error: couldn''t match the documents.';
         CertificateUsedInSIISetupQst: Label 'A certificate is used in the SII Setup. Do you really want to delete the certificate?';
         // fault model labels

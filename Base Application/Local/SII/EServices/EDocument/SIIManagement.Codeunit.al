@@ -79,15 +79,15 @@ codeunit 10756 "SII Management"
             exit;
 
         SetupNotification.Message := SetupNotificationTxt;
-        SetupNotification.Scope := NOTIFICATIONSCOPE::LocalScope;
-        SetupNotification.AddAction(YesTxt, CODEUNIT::"SII Management", 'OpenSIIVATSetup');
-        SetupNotification.AddAction(DontAskAgainTxt, CODEUNIT::"SII Management", 'DeactivateSIISetupNotification');
+        SetupNotification.Scope := NotificationScope::LocalScope;
+        SetupNotification.AddAction(YesTxt, Codeunit::"SII Management", 'OpenSIIVATSetup');
+        SetupNotification.AddAction(DontAskAgainTxt, Codeunit::"SII Management", 'DeactivateSIISetupNotification');
         SetupNotification.Send();
     end;
 
     procedure OpenSIIVATSetup(SetupNotification: Notification)
     begin
-        PAGE.Run(PAGE::"SII Setup");
+        Page.Run(Page::"SII Setup");
     end;
 
     procedure DeactivateSIISetupNotification(var SetupNotification: Notification)
@@ -137,7 +137,7 @@ codeunit 10756 "SII Management"
 
         GuidedExperience.InsertManualSetup(
           SIIServiceNameTxt, CopyStr(SIIServiceNameTxt, 1, 50), SIIBusinessSetupDescriptionTxt, 5,
-          ObjectType::Page, PAGE::"SII Setup", ManualSetupCategory::Service, SIIBusinessSetupKeywordsTxt);
+          ObjectType::Page, Page::"SII Setup", ManualSetupCategory::Service, SIIBusinessSetupKeywordsTxt);
     end;
 
     procedure GetSIIStyle(SIIState: Option Pending,Incorrect,Accepted,"Accepted With Errors","Communication Error",Failed,"Not Supported") StyleText: Text
@@ -306,7 +306,7 @@ codeunit 10756 "SII Management"
             Error(NoSIIStateErr);
         SIIHistory.SetRange("Document State Id", SIIDocUploadState.Id);
         SIIHistory.FindFirst();
-        PAGE.Run(PAGE::"SII History", SIIHistory);
+        Page.Run(Page::"SII History", SIIHistory);
     end;
 
     procedure IsVATEntryCashFlowBased(VATEntry: Record "VAT Entry"): Boolean

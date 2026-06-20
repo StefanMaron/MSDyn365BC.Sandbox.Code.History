@@ -513,7 +513,7 @@ codeunit 10750 "SII XML Creator"
             InitializeSalesXmlBody(XMLNode, CustLedgerEntry."VAT Reporting Date");
             if SIIDocUploadState."First Summary Doc. No." = '' then
                 XMLDOMManagement.AddElementWithPrefix(
-                  XMLNode, 'NumSerieFacturaEmisor', FORMAT(CustLedgerEntry."Document No."), 'sii', SiiTxt, TempXMLNode)
+                  XMLNode, 'NumSerieFacturaEmisor', Format(CustLedgerEntry."Document No."), 'sii', SiiTxt, TempXMLNode)
             else begin
                 XMLDOMManagement.AddElementWithPrefix(
                   XMLNode, 'NumSerieFacturaEmisor', SIIDocUploadState."First Summary Doc. No.", 'sii', SiiTxt, TempXMLNode);

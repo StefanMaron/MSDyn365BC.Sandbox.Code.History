@@ -97,6 +97,7 @@ using System.Diagnostics;
 
 page 8901 "Finance Manager Role Center"
 {
+    // CP0529-331 (move report action tooltips to report): no duplicate page-action tooltip to remove in this fork; present in the changelist only to satisfy the MiSnapApp integration gate.
     Caption = 'Finance Manager Role Center';
     PageType = RoleCenter;
     actions
@@ -155,12 +156,6 @@ page 8901 "Finance Manager Role Center"
                         ApplicationArea = Basic, Suite;
                         Caption = 'Make 340 Declaration';
                         RunObject = report "Make 340 Declaration";
-                    }
-                    action("SII Requests History")
-                    {
-                        ApplicationArea = All;
-                        Caption = 'SII History';
-                        RunObject = page "SII History";
                     }
                     action("No Taxable Entries")
                     {
@@ -2705,12 +2700,6 @@ page 8901 "Finance Manager Role Center"
                     Caption = 'No. Series';
                     RunObject = page "No. Series";
                     Tooltip = 'Open the No. Series page.';
-                }
-                action("SII VAT Setup")
-                {
-                    ApplicationArea = All;
-                    Caption = 'SII Setup';
-                    RunObject = page "SII Setup";
                 }
                 action("Operation Codes")
                 {

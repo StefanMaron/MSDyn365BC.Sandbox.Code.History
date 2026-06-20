@@ -280,7 +280,6 @@ page 9035 "Data Administration"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Delete Phys. Inventory Ledger';
-                        ToolTip = 'Delete Phys. Inventory Ledger';
 
                         RunObject = report "Delete Phys. Inventory Ledger";
                         Ellipsis = true;
@@ -414,7 +413,6 @@ page 9035 "Data Administration"
                         Image = LedgerBudget;
                         RunObject = Report "Date Comp. Item Budget Entries";
                         Ellipsis = true;
-                        ToolTip = 'Save database space by combining related entries in one new entry. You can compress entries from closed fiscal years only.';
                     }
                 }
                 group(DeleteEmptyRegisters)
@@ -457,7 +455,6 @@ page 9035 "Data Administration"
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'Item Registers';
-                        ToolTip = 'Item Registers';
                         RunObject = report "Delete Empty Item Registers";
                         Ellipsis = true;
                     }
