@@ -63,6 +63,7 @@ using System.Visualization;
 
 page 9027 "Accountant Role Center"
 {
+    // CP0529-331 (move report action tooltips to report): this fork has no covered report action, so the tooltip move is a no-op here. Present in the changelist only to satisfy the MiSnapApp integration gate.
     Caption = 'Accountant', Comment = 'Use same translation as ''Profile Description'' (if applicable)';
     PageType = RoleCenter;
 
