@@ -312,7 +312,7 @@
       "path": "./Subcontracting-Tests/DisabledTests"
     },
     {
-      "path": "./Subcontracting-Tests/src/Codeunits/Tests"
+      "path": "./Subcontracting-Tests/Tests"
     },
     {
       "path": "./Quality Management-Tests/DisabledTests"
