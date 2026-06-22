@@ -928,7 +928,20 @@ page 5740 "Transfer Order"
     end;
 
     trigger OnOpenPage()
+#if not CLEAN28
+    var
+        LegacySubcFeatureHandler: Codeunit Microsoft.Manufacturing.Setup."Legacy Subc. Feature Handler";
+        BackedupFiltergroup: Integer;
+#endif
     begin
+#if not CLEAN28
+        if LegacySubcFeatureHandler.IsLegacySubcontractingEnabled() then begin
+            BackedUpFilterGroup := Rec.FilterGroup();
+            Rec.FilterGroup(2); // Set table view
+            Rec.SetRange("Subcontracting Order", false);
+            Rec.FilterGroup(BackedupFiltergroup);
+        end;
+#endif
         SetDocNoVisible();
         EnableTransferFields := not IsPartiallyShipped();
         ActivateFields();

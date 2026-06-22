@@ -180,6 +180,7 @@ codeunit 144082 "UT Subcontracting"
     local procedure Initialize()
     begin
         LibraryVariableStorage.Clear();
+        ActivateLegacySubcontracting();
     end;
 
     local procedure CreateItem(var Item: Record Item)
@@ -371,6 +372,22 @@ codeunit 144082 "UT Subcontracting"
         LibraryVariableStorage.Dequeue(No);
         SubcontractTransferShipment."Transfer Shipment Header".SetFilter("No.", No);
         SubcontractTransferShipment.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
+    end;
+
+    local procedure ActivateLegacySubcontracting()
+    var
+        ManufacturingSetup: Record "Manufacturing Setup";
+        ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
+        LibraryApplicationArea: Codeunit "Library - Application Area";
+    begin
+        if not ManufacturingSetup.Get() then begin
+            ManufacturingSetup.Init();
+            ManufacturingSetup.Insert();
+        end;
+        ManufacturingSetup."Legacy Subcontracting" := true;
+        ManufacturingSetup.Modify();
+        LibraryApplicationArea.EnablePremiumSetup();
+        ApplicationAreaMgmtFacade.RefreshExperienceTierCurrentCompany();
     end;
 }
 #endif

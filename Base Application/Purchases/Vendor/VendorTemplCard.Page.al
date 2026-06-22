@@ -490,7 +490,7 @@ page 1386 "Vendor Templ. Card"
 #if not CLEAN28
                 field(Subcontractor; Rec.Subcontractor)
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = LegacySubcontracting;
                     ToolTip = 'Specifies if the vendor is a subcontractor.';
                     ObsoleteReason = 'Preparation for replacement by Subcontracting app';
                     ObsoleteState = Pending;
@@ -500,7 +500,7 @@ page 1386 "Vendor Templ. Card"
                 }
                 field("Subcontracting Location Code"; Rec."Subcontracting Location Code")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = LegacySubcontracting;
                     ToolTip = 'Specifies the code for the location where the subcontracted items are stored for pickup and delivery.';
                     ObsoleteReason = 'Preparation for replacement by Subcontracting app';
                     ObsoleteState = Pending;
@@ -510,7 +510,7 @@ page 1386 "Vendor Templ. Card"
                 }
                 field("Subcontractor Procurement"; Rec."Subcontractor Procurement")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = LegacySubcontracting;
                     ToolTip = 'Specifies if the subcontractor is managing the product stock on the principal company''s behalf.';
                     ObsoleteReason = 'Preparation for replacement by Subcontracting app';
                     ObsoleteState = Pending;

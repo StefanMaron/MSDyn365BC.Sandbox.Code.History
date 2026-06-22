@@ -53,7 +53,7 @@ page 9050 "Whse Ship & Receive Activities"
 #if not CLEAN28
                     action("New Subcontr. Transfer Order")
                     {
-                        ApplicationArea = Warehouse;
+                        ApplicationArea = LegacySubcontracting;
                         Caption = 'New Subcontr. Transfer Order';
                         RunObject = Page "Transfer Order";
                         RunPageMode = Create;

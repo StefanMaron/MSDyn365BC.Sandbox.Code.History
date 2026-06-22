@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -40,6 +40,9 @@ using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Setup;
 using Microsoft.Inventory.Tracking;
+#if not CLEAN28
+using Microsoft.Manufacturing.Setup;
+#endif
 using Microsoft.Pricing.Calculation;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Projects.Project.Job;
@@ -4040,7 +4043,11 @@ table 39 "Purchase Line"
 #endif
 #if not CLEAN27
             trigger OnValidate()
+            var
+                LegacySubcFeatureHandler: codeunit "Legacy Subc. Feature Handler";
             begin
+                if not LegacySubcFeatureHandler.IsLegacySubcontractingEnabled() then
+                    exit;
                 CalcFields("WIP Qty at Subc.Loc. (Base)");
                 TestField("WIP Item");
                 if "Not Proc. WIP Qty to Receive" > "WIP Qty at Subc.Loc. (Base)" then
