@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeAnalysis": false,
+    "al.enableCodeActions": false,
+    "allint.enabled": false
+  },
   "folders": [
     {
       "path": "./_Exclude_APIV1_ Tests"
@@ -307,6 +315,12 @@
       "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
     },
     {
+      "path": "./Subcontracting-Tests/DisabledTests"
+    },
+    {
+      "path": "./Subcontracting-Tests/Tests"
+    },
+    {
       "path": "./Quality Management-Tests/DisabledTests"
     },
     {
@@ -351,13 +365,5 @@
     {
       "path": "./Base Application/System/DevTools/CALTest"
     }
-  ],
-  "settings": {
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeActions": false
-  }
+  ]
 }
