@@ -2743,7 +2743,7 @@
   </Item>
   <Item ItemId=";Codeunit 3063528946 - NamedType 965602537" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[The electronic document format PEPPOL does not exist for the document type Sales Invoice.]]></Val>
+      <Val><![CDATA[The electronic document format PEPPOL30 does not exist for the document type Sales Invoice.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
