@@ -22,6 +22,18 @@
       "name": "System Application Test Library",
       "publisher": "Microsoft",
       "version": "$(app_minimumVersion)"
+    },
+    {
+      "id": "e1966889-b5fb-4fda-a84c-ea71b590e1a9",
+      "name": "PEPPOL",
+      "publisher": "Microsoft",
+      "version": "$(app_minimumVersion)"
+    },
+    {
+      "id": "e56642d4-5b38-4de1-8cf4-b2ed9513971a",
+      "name": "PEPPOL BE",
+      "publisher": "Microsoft",
+      "version": "$(app_minimumVersion)"
     }
   ],
   "target": "OnPrem",
