@@ -11,6 +11,7 @@ using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Purchases.Document;
 using System.Apps;
+using System.Environment;
 using System.Environment.Configuration;
 
 codeunit 99008501 "Legacy Subc. Feature Handler"
@@ -26,6 +27,7 @@ codeunit 99008501 "Legacy Subc. Feature Handler"
         SubcontractingAppNotInstalledErr: Label 'The app "Subcontracting App" must be installed before you can disable Legacy Subcontracting. Please install the app first before migrating to the new subcontracting app.';
         OpenSubcontractingTransfersExistErr: Label 'There are still open transfer orders with WIP Items. All subcontracting transfer orders must be completed before disabling Legacy Subcontracting.';
         OpenWIPPurchaseOrdersExistErr: Label 'There are still open subcontracting purchase orders. All subcontracting purchase orders must be completed before disabling Legacy Subcontracting.';
+        MigrationNotAllowedInProductionErr: Label 'To help you migrate safely, disabling Legacy Subcontracting and moving to the Subcontracting app is currently limited to sandbox environments. Test the migration in a sandbox copy of this environment first to validate the transition. Production environments will be enabled in a future release.';
 
     /// <summary>
     /// Returns whether Legacy Subcontracting is enabled in Manufacturing Setup.
@@ -39,11 +41,21 @@ codeunit 99008501 "Legacy Subc. Feature Handler"
         exit(ManufacturingSetup."Legacy Subcontracting");
     end;
 
+    local procedure IsMigrationAllowedInCurrentEnvironment(): Boolean
+    var
+        EnvironmentInformation: Codeunit "Environment Information";
+    begin
+        exit(EnvironmentInformation.IsSandbox());
+    end;
+
     /// <summary>
     /// Checks whether Legacy Subcontracting can be disabled and raises an error if the preconditions are not met.
     /// </summary>
     procedure CheckCanDisableLegacySubcontracting()
     begin
+        if not IsMigrationAllowedInCurrentEnvironment() then
+            Error(MigrationNotAllowedInProductionErr);
+
         if OpenSubcontractingTransfersExist() then
             Error(OpenSubcontractingTransfersExistErr);
 
