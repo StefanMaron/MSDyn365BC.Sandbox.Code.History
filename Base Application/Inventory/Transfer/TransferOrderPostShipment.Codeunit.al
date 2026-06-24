@@ -292,7 +292,7 @@ codeunit 5704 "TransferOrder-Post Shipment"
         TempWhseSplitSpecification: Record "Tracking Specification" temporary;
         TempHandlingSpecification: Record "Tracking Specification" temporary;
         ItemJnlPostLine: Codeunit "Item Jnl.-Post Line";
-#if not CLEAN29
+#if not CLEAN28
         LegacySubcFeatureHandler: Codeunit "Legacy Subc. Feature Handler";
 #endif
         DimMgt: Codeunit DimensionManagement;
@@ -339,7 +339,7 @@ codeunit 5704 "TransferOrder-Post Shipment"
     end;
 
     local procedure CreateItemJnlLine(var ItemJnlLine: Record "Item Journal Line"; TransferLine: Record "Transfer Line"; TransShptHeader2: Record "Transfer Shipment Header"; TransShptLine2: Record "Transfer Shipment Line")
-#if not CLEAN29
+#if not CLEAN28
         var
             LegacySubcFeatureHandler: Codeunit "Legacy Subc. Feature Handler";
 #endif

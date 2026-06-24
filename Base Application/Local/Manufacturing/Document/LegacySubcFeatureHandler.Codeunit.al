@@ -1,4 +1,4 @@
-#if not CLEAN29
+#if not CLEAN28
 // ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -18,7 +18,7 @@ codeunit 99008501 "Legacy Subc. Feature Handler"
 {
     ObsoleteReason = 'Legacy Subcontracting will be discontinued, environments should move to the Subcontracting App.';
     ObsoleteState = Pending;
-    ObsoleteTag = '29.0';
+    ObsoleteTag = '28.0';
 
     var
         ITMigrationAppIdTok: Label '6d51d1f2-2b87-4e3a-bf5e-c27682fa0320', Locked = true;
@@ -157,7 +157,7 @@ codeunit 99008501 "Legacy Subc. Feature Handler"
         exit(not PurchaseLine.IsEmpty());
     end;
 
-#if not CLEAN29
+#if not CLEAN28
     local procedure WIPItemCapacityLedgerEntriesExist(): Boolean
     var
         CapacityLedgerEntry: Record "Capacity Ledger Entry";
