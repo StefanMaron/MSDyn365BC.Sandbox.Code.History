@@ -1,12 +1,4 @@
 {
-  "settings": {
-    "allint.enabled": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeActions": false,
-    "al.enableCodeAnalysis": false
-  },
   "folders": [
     {
       "path": "./_Exclude_APIV1_ Tests"
@@ -323,5 +315,13 @@
     {
       "path": "./Base Application/System/DevTools/CALTest"
     }
-  ]
+  ],
+  "settings": {
+    "al.enableCodeActions": false,
+    "al.enableCodeAnalysis": false,
+    "allint.enabled": false,
+    "search.exclude": {
+      "**.xlf": true
+    }
+  }
 }
