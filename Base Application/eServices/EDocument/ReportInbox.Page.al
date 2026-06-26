@@ -122,13 +122,6 @@ page 680 "Report Inbox"
         }
     }
 
-    trigger OnOpenPage()
-    begin
-        Rec.FilterGroup(2);
-        Rec.SetRange("User ID", UserId());
-        Rec.FilterGroup(0);
-    end;
-
     trigger OnAfterGetCurrRecord()
     var
         DocumentSharing: Codeunit "Document Sharing";
