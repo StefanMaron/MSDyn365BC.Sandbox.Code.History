@@ -113,6 +113,7 @@ table 79 "Company Information"
         {
             Caption = 'Bank Account No.';
             ToolTip = 'Specifies the company''s bank account number.';
+            MaskType = Concealed;
         }
         field(15; "Payment Routing No."; Text[20])
         {
@@ -332,6 +333,7 @@ table 79 "Company Information"
         {
             Caption = 'IBAN';
             ToolTip = 'Specifies the international bank account number of your primary bank account.';
+            MaskType = Concealed;
 
             trigger OnValidate()
             begin
