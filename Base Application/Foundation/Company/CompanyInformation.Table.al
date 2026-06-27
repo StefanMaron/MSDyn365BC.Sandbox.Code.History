@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -99,6 +99,7 @@ table 79 "Company Information"
         field(11; "Giro No."; Text[20])
         {
             Caption = 'Giro No.';
+            MaskType = Concealed;
             ToolTip = 'Specifies the company''s giro number.';
         }
         field(12; "Bank Name"; Text[100])
@@ -114,6 +115,7 @@ table 79 "Company Information"
         field(14; "Bank Account No."; Text[30])
         {
             Caption = 'Bank Account No.';
+            MaskType = Concealed;
             ToolTip = 'Specifies the company''s bank account number.';
         }
         field(15; "Payment Routing No."; Text[20])
@@ -340,6 +342,7 @@ table 79 "Company Information"
         field(38; IBAN; Code[50])
         {
             Caption = 'IBAN';
+            MaskType = Concealed;
             ToolTip = 'Specifies the international bank account number of your primary bank account.';
 
             trigger OnValidate()
