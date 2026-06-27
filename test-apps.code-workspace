@@ -158,6 +158,7 @@
     }
   ],
   "settings": {
+    "al.enableCodeActions": false,
     "search.exclude": {
       "**.xlf": true
     },
