@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -138,6 +138,7 @@ table 288 "Vendor Bank Account"
         field(14; "Bank Account No."; Text[30])
         {
             Caption = 'Bank Account No.';
+            MaskType = Concealed;
             ToolTip = 'Specifies the number used by the bank for the bank account.';
 
             trigger OnValidate()
@@ -216,6 +217,7 @@ table 288 "Vendor Bank Account"
         field(24; IBAN; Code[50])
         {
             Caption = 'IBAN';
+            MaskType = Concealed;
             ToolTip = 'Specifies the bank account''s international bank account number.';
 
             trigger OnValidate()
@@ -316,6 +318,7 @@ table 288 "Vendor Bank Account"
         field(3010544; "Giro Account No."; Code[11])
         {
             Caption = 'Giro Account No.';
+            MaskType = Concealed;
 
             trigger OnValidate()
             begin
@@ -332,6 +335,7 @@ table 288 "Vendor Bank Account"
         field(3010545; "ESR Account No."; Code[11])
         {
             Caption = 'ESR Account No.';
+            MaskType = Concealed;
 
             trigger OnValidate()
             begin
