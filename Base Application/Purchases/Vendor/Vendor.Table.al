@@ -235,6 +235,7 @@ table 23 Vendor
         field(14; "Our Account No."; Text[20])
         {
             Caption = 'Our Account No.';
+            MaskType = Concealed;
             ToolTip = 'Specifies your account number with the vendor, if you have one.';
             OptimizeForTextSearch = true;
         }
