@@ -1209,28 +1209,28 @@ codeunit 149911 "Subc. WIP Trans. Create Test"
         PurchaseHeaderPage.OpenView();
         PurchaseHeaderPage.GoToRecord(PurchaseHeader);
         PurchaseHeaderPage.CreateTransfOrdToSubcontractor.Invoke();
-        
-                // [THEN] The WIP Transfer Line uses the purchase line UOM (BOX), not the base UOM (PCS)
-                TransferLine.SetRange("Subc. Prod. Order No.", ProductionOrder."No.");
-                TransferLine.SetRange("Subc. Return Order", false);
-        #pragma warning disable AA0210
-                TransferLine.SetRange("Transfer WIP Item", true);
-        #pragma warning restore AA0210
-                Assert.RecordCount(TransferLine, 1);
-                TransferLine.FindFirst();
-                Assert.AreEqual(UnitOfMeasure.Code, TransferLine."Unit of Measure Code",
-                    'WIP Transfer Line Unit of Measure must match the purchase line UOM (BOX), not the base UOM (PCS).');
-                Assert.AreEqual(PurchaseLine.Quantity, TransferLine.Quantity,
-                    'WIP Transfer Line quantity must equal the purchase line quantity (in BOX).');
-            end;
-        
+
+        // [THEN] The WIP Transfer Line uses the purchase line UOM (BOX), not the base UOM (PCS)
+        TransferLine.SetRange("Subc. Prod. Order No.", ProductionOrder."No.");
+        TransferLine.SetRange("Subc. Return Order", false);
+#pragma warning disable AA0210
+        TransferLine.SetRange("Transfer WIP Item", true);
+#pragma warning restore AA0210
+        Assert.RecordCount(TransferLine, 1);
+        TransferLine.FindFirst();
+        Assert.AreEqual(UnitOfMeasure.Code, TransferLine."Unit of Measure Code",
+            'WIP Transfer Line Unit of Measure must match the purchase line UOM (BOX), not the base UOM (PCS).');
+        Assert.AreEqual(PurchaseLine.Quantity, TransferLine.Quantity,
+            'WIP Transfer Line quantity must equal the purchase line quantity (in BOX).');
+    end;
+
     [Test]
-            [HandlerFunctions('DoNotConfirmShowCreatedPurchOrderForSubcontracting,HandleTransferOrder')]
+    [HandlerFunctions('DoNotConfirmShowCreatedPurchOrderForSubcontracting,HandleTransferOrder')]
     procedure WIPTransferPartiallyPostedTransfersRemainingQuantity()
     var
         Item: Record Item;
-            MachineCenter: array[2] of Record "Machine Center";
-            ProdOrderLine: Record "Prod. Order Line";
+        MachineCenter: array[2] of Record "Machine Center";
+        ProdOrderLine: Record "Prod. Order Line";
         ProdOrderRoutingLine: Record "Prod. Order Routing Line";
         ProductionOrder: Record "Production Order";
         PurchaseHeader: Record "Purchase Header";
@@ -1392,6 +1392,84 @@ codeunit 149911 "Subc. WIP Trans. Create Test"
 
     [Test]
     [HandlerFunctions('DoNotConfirmShowCreatedPurchOrderForSubcontracting,HandleTransferOrder')]
+    procedure WIPTransferLineDescriptionNotClearedWhenDirectTransferEnabled()
+    var
+        Item: Record Item;
+        MachineCenter: array[2] of Record "Machine Center";
+        ProductionOrder: Record "Production Order";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        TransferHeader: Record "Transfer Header";
+        TransferLine: Record "Transfer Line";
+        Vendor: Record Vendor;
+        WorkCenter: array[2] of Record "Work Center";
+        PurchaseHeaderPage: TestPage "Purchase Order";
+        ItemDescription: Text[100];
+    begin
+        // [SCENARIO] A WIP Transfer Line created without a Transfer Description on the routing line
+
+        // gets its description from the item. When Direct Transfer is enabled on the Transfer Header
+        // afterwards, the description must not be cleared.
+        Initialize();
+
+        // [GIVEN] Work centers, machine centers, and item with routing (Transfer Description left empty)
+        SubcWarehouseLibrary.CreateAndCalculateNeededWorkAndMachineCenter(WorkCenter, MachineCenter, true);
+        SubcWarehouseLibrary.CreateItemForProductionIncludeRoutingAndProdBOM(Item, WorkCenter, MachineCenter);
+        SetTransferWIPItemOnRoutingLine(Item."Routing No.", WorkCenter[2]."No.", true);
+
+        SubcontractingMgmtLibrary.UpdateVendorWithSubcontractingLocationCode(WorkCenter[2]);
+        Vendor.Get(WorkCenter[2]."Subcontractor No.");
+
+        // [GIVEN] Create and refresh released production order at manufacturing components location
+        LibraryManufacturing.CreateProductionOrder(
+            ProductionOrder, "Production Order Status"::Released,
+            ProductionOrder."Source Type"::Item, Item."No.", LibraryRandom.RandInt(10) + 5);
+        SetProdOrderLocationToCompSetupLocationAndRefresh(ProductionOrder);
+
+        // [GIVEN] Transfer route WITH in-transit location so the Transfer Header is created with Direct Transfer = false
+        CreateAndUpdateTransferRoute(GetManufacturingSetupCompLocation(), Vendor."Subc. Location Code");
+
+        // [GIVEN] Create subcontracting purchase order and then a WIP Transfer Order
+        SubcontractingMgmtLibrary.CreateSubcontractingOrderFromProdOrderRtngPage(Item."Routing No.", WorkCenter[2]."No.");
+        PurchaseLine.SetRange("Document Type", PurchaseLine."Document Type"::Order);
+        PurchaseLine.SetRange("Prod. Order No.", ProductionOrder."No.");
+        PurchaseLine.FindFirst();
+        PurchaseHeader.Get(PurchaseLine."Document Type", PurchaseLine."Document No.");
+        PurchaseHeaderPage.OpenView();
+        PurchaseHeaderPage.GoToRecord(PurchaseHeader);
+        PurchaseHeaderPage.CreateTransfOrdToSubcontractor.Invoke();
+
+        // [GIVEN] WIP Transfer Line was created with the item description (Transfer Description is empty)
+        TransferLine.SetRange("Subc. Prod. Order No.", ProductionOrder."No.");
+#pragma warning disable AA0210
+        TransferLine.SetRange("Transfer WIP Item", true);
+#pragma warning restore AA0210
+        TransferLine.SetRange("Subc. Return Order", false);
+        TransferLine.FindFirst();
+
+        Item.Get(TransferLine."Item No.");
+        ItemDescription := Item.Description;
+        Assert.AreNotEqual('', ItemDescription, 'Item description must not be empty for this test to be meaningful.');
+        Assert.AreEqual(ItemDescription, TransferLine.Description,
+            'WIP Transfer Line description must be set from item description when Transfer Description is empty.');
+
+        // [GIVEN] Transfer Header was created with Direct Transfer = false (in-transit route exists)
+        TransferHeader.Get(TransferLine."Document No.");
+        Assert.IsFalse(TransferHeader."Direct Transfer",
+            'Transfer Header must initially have Direct Transfer = false when a transit route exists.');
+
+        // [WHEN] Enable Direct Transfer on the Transfer Header
+        TransferHeader.Validate("Direct Transfer", true);
+        TransferHeader.Modify(true);
+
+        // [THEN] WIP Transfer Line description is preserved and not cleared
+        TransferLine.FindFirst();
+        Assert.AreEqual(ItemDescription, TransferLine.Description,
+            'WIP Transfer Line description must not be cleared when Direct Transfer is enabled on the header.');
+    end;
+
+    [Test]
+    [HandlerFunctions('DoNotConfirmShowCreatedPurchOrderForSubcontracting,HandleTransferOrder')]
     procedure ToggleOffDirectTransferOnWIPTransferOrderDoesNotError()
     var
         Item: Record Item;
@@ -1475,6 +1553,81 @@ codeunit 149911 "Subc. WIP Trans. Create Test"
         Assert.AreEqual(ProductionOrder.Quantity, TransferLine.Quantity,
             'WIP Transfer Line quantity must be preserved after toggling Direct Transfer.');
     end;
+
+    [Test]
+    [HandlerFunctions('DoNotConfirmShowCreatedPurchOrderForSubcontracting,HandleTransferOrder')]
+    procedure NoErrorWhenTogglingOffDirectTransferOnWIPTransferOrder()
+    var
+        Item: Record Item;
+        MachineCenter: array[2] of Record "Machine Center";
+        ProductionOrder: Record "Production Order";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        TransferHeader: Record "Transfer Header";
+        TransferLine: Record "Transfer Line";
+        Vendor: Record Vendor;
+        WorkCenter: array[2] of Record "Work Center";
+        PurchaseHeaderPage: TestPage "Purchase Order";
+    begin
+        // [SCENARIO 638816] Toggling off Direct Transfer on a Subcontracting Transfer Order
+        // with a WIP item line must not throw "No items are currently in transit" error.
+
+        // [GIVEN] Complete setup with subcontracting WIP item
+        Initialize();
+
+        SubcWarehouseLibrary.CreateAndCalculateNeededWorkAndMachineCenter(WorkCenter, MachineCenter, true);
+        SubcWarehouseLibrary.CreateItemForProductionIncludeRoutingAndProdBOM(Item, WorkCenter, MachineCenter);
+        SetTransferWIPItemOnRoutingLine(Item."Routing No.", WorkCenter[2]."No.", true);
+
+        SubcontractingMgmtLibrary.UpdateVendorWithSubcontractingLocationCode(WorkCenter[2]);
+        Vendor.Get(WorkCenter[2]."Subcontractor No.");
+
+        // [GIVEN] Create and refresh released production order at manufacturing components location
+        LibraryManufacturing.CreateProductionOrder(
+            ProductionOrder, "Production Order Status"::Released,
+            ProductionOrder."Source Type"::Item, Item."No.", LibraryRandom.RandInt(10) + 5);
+        SetProdOrderLocationToCompSetupLocationAndRefresh(ProductionOrder);
+
+        // [GIVEN] NO transfer route exists → Transfer Header created with Direct Transfer = true
+        SubcontractingMgmtLibrary.CreateSubcontractingOrderFromProdOrderRtngPage(Item."Routing No.", WorkCenter[2]."No.");
+        PurchaseLine.SetRange("Document Type", PurchaseLine."Document Type"::Order);
+        PurchaseLine.SetRange("Prod. Order No.", ProductionOrder."No.");
+        PurchaseLine.FindFirst();
+        PurchaseHeader.Get(PurchaseLine."Document Type", PurchaseLine."Document No.");
+        PurchaseHeaderPage.OpenView();
+        PurchaseHeaderPage.GoToRecord(PurchaseHeader);
+        PurchaseHeaderPage.CreateTransfOrdToSubcontractor.Invoke();
+
+        // [GIVEN] WIP Transfer Line exists with Direct Transfer = true on the header
+        TransferLine.SetRange("Subc. Prod. Order No.", ProductionOrder."No.");
+#pragma warning disable AA0210
+        TransferLine.SetRange("Transfer WIP Item", true);
+#pragma warning restore AA0210
+        TransferLine.SetRange("Subc. Return Order", false);
+        TransferLine.FindFirst();
+
+        TransferHeader.Get(TransferLine."Document No.");
+        Assert.IsTrue(TransferHeader."Direct Transfer",
+            'Transfer Header must initially have Direct Transfer = true when no transit route exists.');
+
+        // [GIVEN] Create a transit route so toggling off Direct Transfer can set In-Transit Code
+        CreateAndUpdateTransferRoute(TransferHeader."Transfer-from Code", TransferHeader."Transfer-to Code");
+
+        // [WHEN] Toggle off Direct Transfer on the Transfer Header
+        TransferHeader.Validate("Direct Transfer", false);
+        TransferHeader.Modify(true);
+
+        // [THEN] No error is thrown and Direct Transfer is now false
+        TransferHeader.Get(TransferLine."Document No.");
+        Assert.IsFalse(TransferHeader."Direct Transfer",
+            'Direct Transfer must be toggled off successfully without error.');
+
+        // [THEN] WIP Transfer Line still exists and has Transfer WIP Item = true
+        TransferLine.FindFirst();
+        Assert.IsTrue(TransferLine."Transfer WIP Item",
+            'WIP Transfer Line must retain Transfer WIP Item = true after toggling off Direct Transfer.');
+    end;
+
     [PageHandler]
     procedure HandleTransferOrder(var TransfOrderPage: TestPage "Transfer Order")
     begin
@@ -1607,4 +1760,5 @@ codeunit 149911 "Subc. WIP Trans. Create Test"
         SubSetupLibrary: Codeunit "Subc. Setup Library";
         SubcWarehouseLibrary: Codeunit "Subc. Warehouse Library";
         IsInitialized: Boolean;
+
 }
