@@ -160,5 +160,13 @@
     {
       "path": "./Base Application/System/DevTools/CALTest"
     }
-  ]
+  ],
+  "settings": {
+    "allint.enabled": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeAnalysis": false,
+    "al.enableCodeActions": false
+  }
 }
