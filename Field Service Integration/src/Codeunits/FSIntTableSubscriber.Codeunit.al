@@ -2951,4 +2951,19 @@ codeunit 6610 "FS Int. Table Subscriber"
     local procedure OnSetUpNewLineOnNewLine(var JobJournalLine: Record "Job Journal Line"; var JobJournalTemplate: Record "Job Journal Template"; var JobJournalBatch: Record "Job Journal Batch"; var Handled: Boolean);
     begin
     end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"CRM Integration Management", 'OnBeforeFindCoupledToCRMField', '', true, false)]
+    local procedure HandleOnBeforeFindCoupledToCRMField(TableNo: Integer; var IsHandled: Boolean; var CoupledFieldNo: Integer)
+    var
+        ServiceItem: Record "Service Item";
+    begin
+        if IsHandled then
+            exit;
+
+        if TableNo <> Database::"Service Item" then
+            exit;
+
+        CoupledFieldNo := ServiceItem.FieldNo("Coupled to FS");
+        IsHandled := true;
+    end;
 }
