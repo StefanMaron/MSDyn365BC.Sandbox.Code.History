@@ -24,6 +24,31 @@ This is an automated Business Central code history repository that tracks all ve
 
 **To view BC code, switch to a country-version branch. The main branch only has automation scripts.**
 
+### Why country branches only have core apps, not every first-party extension
+
+Country-specific branches (`de-*`, `us-*`, etc.) only contain Base Application,
+System Application, Business Foundation, and test libraries - they do **not**
+contain optional first-party extensions like Subscription Billing,
+Sustainability, Shopify Connector, PEPPOL, the E-Document connectors, or
+language packs, even though those extensions ship in the same sandbox
+artifact and are present in `w1-*` branches.
+
+This was confirmed directly against a live artifact (BC 28.2, country `de`):
+the sandbox artifact's `Applications.<COUNTRY>` folder contains `.Source.zip`
+(real AL source) *and* `.app` (compiled) for only the core apps above. A
+sibling `Extensions` folder in the same artifact contains ~140 additional
+first-party extensions - including Subscription Billing and Sustainability -
+but **only as compiled `.app` binaries, with no `.Source.zip` counterpart**.
+Only the `w1` artifact (built from the `platform` URL) ships full AL source
+for the entire first-party catalog.
+
+`Auto_load_versions.ps1` and `UpdateALRepo.ps1` correctly extract only
+`Applications.<COUNTRY>` for non-w1 countries and intentionally ignore
+`Extensions` - there is no AL source in there to extract, so pulling it in
+would only add binary `.app` files with nothing to diff or read. This is a
+platform limitation of the BC sandbox artifacts, not a bug in the extraction
+scripts.
+
 ## Automation Architecture
 
 ### Workflow Schedule
