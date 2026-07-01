@@ -153,6 +153,7 @@ permissionset 30104 "Shpfy - Objects"
         codeunit "Shpfy GQL AllCustomerIds" = X,
         codeunit "Shpfy GQL ApiKey" = X,
         codeunit "Shpfy GQL BulkOperation" = X,
+        codeunit "Shpfy GQL BulkOperations" = X,
         codeunit "Shpfy GQL BulkOpMutation" = X,
         codeunit "Shpfy GQL Catalog Markets" = X,
         codeunit "Shpfy GQL CatalogPrices" = X,
