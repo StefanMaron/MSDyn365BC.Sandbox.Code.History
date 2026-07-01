@@ -648,6 +648,7 @@ codeunit 139544 "Trial Balance Excel Reports"
         TrialBalanceData: Record "EXR Trial Balance Buffer";
         TrialBalance: Codeunit "Trial Balance";
         ZeroAccount, NonZeroAccount : Code[20];
+        GrossAmount: Decimal;
     begin
         // [SCENARIO] Accounts that have entries are included even when they net to zero. The query only returns
         // accounts with activity, so a zero net change still represents real (offsetting) turnover worth showing.
@@ -658,8 +659,9 @@ codeunit 139544 "Trial Balance Excel Reports"
         LibraryERM.CreateGLAccount(GLAccount);
         NonZeroAccount := GLAccount."No.";
 
-        CreateGLEntryWithAmount(ZeroAccount, '', '', '', WorkDate(), 500);
-        CreateGLEntryWithAmount(ZeroAccount, '', '', '', WorkDate(), -500);
+        GrossAmount := 500;
+        CreateGLEntryWithAmount(ZeroAccount, '', '', '', WorkDate(), GrossAmount);
+        CreateGLEntryWithAmount(ZeroAccount, '', '', '', WorkDate(), -GrossAmount);
         CreateGLEntryWithAmount(NonZeroAccount, '', '', '', WorkDate(), 100);
 
         // [WHEN] Running the trial balance
