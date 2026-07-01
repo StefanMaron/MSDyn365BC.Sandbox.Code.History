@@ -1,0 +1,60 @@
+name: POC - Inspect Country Artifact Structure
+
+on:
+  workflow_dispatch:
+    inputs:
+      country:
+        description: 'Country code to inspect'
+        required: false
+        default: 'de'
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install bccontainerhelper
+        shell: pwsh
+        run: |
+          Install-Module bccontainerhelper -force
+          Import-Module bccontainerhelper
+
+      - name: Get artifact URL and list top-level folders
+        shell: pwsh
+        env:
+          COUNTRY: ${{ github.event.inputs.country }}
+        run: |
+          Import-Module bccontainerhelper
+          $country = $env:COUNTRY
+          if ([string]::IsNullOrEmpty($country)) { $country = 'de' }
+
+          $url = Get-BCArtifactUrl -select Latest -Type Sandbox -country $country
+          Write-Host "Artifact URL ($country): $url"
+
+          $path = Download-Artifacts -artifactUrl $url
+          Write-Host ""
+          Write-Host "=== Top-level folders under downloaded artifact path ($path) ==="
+          Get-ChildItem -Path $path -Directory | ForEach-Object { Write-Host " - $($_.Name)" }
+
+          $appsCountry = Join-Path $path "Applications.$($country.ToUpper())"
+          if (Test-Path $appsCountry) {
+              Write-Host ""
+              Write-Host "=== Subfolders under Applications.$($country.ToUpper()) ==="
+              Get-ChildItem -Path $appsCountry -Directory | Sort-Object Name | ForEach-Object { Write-Host " - $($_.Name)" }
+          }
+
+          $appsBase = Join-Path $path "Applications"
+          if (Test-Path $appsBase) {
+              Write-Host ""
+              Write-Host "=== Subfolders under Applications (base/universal) ==="
+              Get-ChildItem -Path $appsBase -Directory | Sort-Object Name | ForEach-Object { Write-Host " - $($_.Name)" }
+          } else {
+              Write-Host ""
+              Write-Host "No sibling 'Applications' folder found alongside Applications.$($country.ToUpper())"
+          }
+
+          Write-Host ""
+          Write-Host "=== Searching entire artifact tree for 'Subscription Billing' / 'Sustainability' folders ==="
+          Get-ChildItem -Path $path -Recurse -Directory -Filter "*Subscription Billing*" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "FOUND: $($_.FullName)" }
+          Get-ChildItem -Path $path -Recurse -Directory -Filter "*Sustainability*" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "FOUND: $($_.FullName)" }
+
+          Flush-ContainerHelperCache -keepDays 0 -ErrorAction SilentlyContinue
