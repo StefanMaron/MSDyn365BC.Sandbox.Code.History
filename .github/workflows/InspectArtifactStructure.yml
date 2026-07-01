@@ -32,29 +32,39 @@ jobs:
 
           $path = Download-Artifacts -artifactUrl $url
           Write-Host ""
-          Write-Host "=== Top-level folders under downloaded artifact path ($path) ==="
-          Get-ChildItem -Path $path -Directory | ForEach-Object { Write-Host " - $($_.Name)" }
+          Write-Host "=== Top-level entries under downloaded artifact path ($path) ==="
+          Get-ChildItem -Path $path | ForEach-Object { Write-Host " - $($_.Name) [$(if ($_.PSIsContainer) {'dir'} else {'file'})]" }
 
+          Write-Host ""
+          Write-Host "=== Files directly under Applications.$($country.ToUpper()) ==="
           $appsCountry = Join-Path $path "Applications.$($country.ToUpper())"
           if (Test-Path $appsCountry) {
-              Write-Host ""
-              Write-Host "=== Subfolders under Applications.$($country.ToUpper()) ==="
-              Get-ChildItem -Path $appsCountry -Directory | Sort-Object Name | ForEach-Object { Write-Host " - $($_.Name)" }
-          }
-
-          $appsBase = Join-Path $path "Applications"
-          if (Test-Path $appsBase) {
-              Write-Host ""
-              Write-Host "=== Subfolders under Applications (base/universal) ==="
-              Get-ChildItem -Path $appsBase -Directory | Sort-Object Name | ForEach-Object { Write-Host " - $($_.Name)" }
+              Get-ChildItem -Path $appsCountry -Recurse | Sort-Object Name | ForEach-Object { Write-Host " - $($_.FullName.Replace($path,'')) [$(if ($_.PSIsContainer) {'dir'} else {'file'})]" }
           } else {
-              Write-Host ""
-              Write-Host "No sibling 'Applications' folder found alongside Applications.$($country.ToUpper())"
+              Write-Host "  (folder not found)"
           }
 
           Write-Host ""
-          Write-Host "=== Searching entire artifact tree for 'Subscription Billing' / 'Sustainability' folders ==="
-          Get-ChildItem -Path $path -Recurse -Directory -Filter "*Subscription Billing*" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "FOUND: $($_.FullName)" }
-          Get-ChildItem -Path $path -Recurse -Directory -Filter "*Sustainability*" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "FOUND: $($_.FullName)" }
+          Write-Host "=== Files directly under Extensions ==="
+          $extPath = Join-Path $path "Extensions"
+          if (Test-Path $extPath) {
+              Get-ChildItem -Path $extPath -Recurse | Sort-Object Name | ForEach-Object { Write-Host " - $($_.FullName.Replace($path,'')) [$(if ($_.PSIsContainer) {'dir'} else {'file'})]" }
+          } else {
+              Write-Host "  (folder not found)"
+          }
+
+          Write-Host ""
+          Write-Host "=== Files directly under ConfigurationPackages ==="
+          $cfgPath = Join-Path $path "ConfigurationPackages"
+          if (Test-Path $cfgPath) {
+              Get-ChildItem -Path $cfgPath -Recurse | Sort-Object Name | ForEach-Object { Write-Host " - $($_.FullName.Replace($path,'')) [$(if ($_.PSIsContainer) {'dir'} else {'file'})]" }
+          } else {
+              Write-Host "  (folder not found)"
+          }
+
+          Write-Host ""
+          Write-Host "=== Searching entire artifact tree (files+dirs) for 'Subscription Billing' / 'Sustainability' ==="
+          Get-ChildItem -Path $path -Recurse -Filter "*Subscription Billing*" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "FOUND: $($_.FullName) [$(if ($_.PSIsContainer) {'dir'} else {'file'})]" }
+          Get-ChildItem -Path $path -Recurse -Filter "*Sustainability*" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "FOUND: $($_.FullName) [$(if ($_.PSIsContainer) {'dir'} else {'file'})]" }
 
           Flush-ContainerHelperCache -keepDays 0 -ErrorAction SilentlyContinue
