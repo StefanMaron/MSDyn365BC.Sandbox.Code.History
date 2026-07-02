@@ -1,9 +1,9 @@
 {
   "settings": {
+    "al.enableCodeAnalysis": false,
     "search.exclude": {
       "**.xlf": true
     },
-    "al.enableCodeAnalysis": false,
     "allint.enabled": false,
     "al.enableCodeActions": false
   },
@@ -51,6 +51,9 @@
       "path": "./Business Foundation Test Libraries"
     },
     {
+      "path": "./Business Foundation Tests"
+    },
+    {
       "path": "./Contoso Coffee Demo Dataset Tests"
     },
     {
@@ -84,6 +87,9 @@
       "path": "./E-Document Connector - SignUp Tests"
     },
     {
+      "path": "./E-Document Core Tests"
+    },
+    {
       "path": "./Email - Current User Connector Tests"
     },
     {
@@ -103,6 +109,9 @@
     },
     {
       "path": "./Enforced Digital Vouchers Tests"
+    },
+    {
+      "path": "./Error Messages with Recommendations Tests"
     },
     {
       "path": "./Essential Business Headlines Test"
@@ -141,13 +150,22 @@
       "path": "./PayPal Payments Standard Tests"
     },
     {
+      "path": "./PEPPOL Tests"
+    },
+    {
       "path": "./Performance Toolkit Tests"
     },
     {
       "path": "./PowerBI Reports Test Library"
     },
     {
+      "path": "./PowerBI Reports Tests"
+    },
+    {
       "path": "./Quality Management Test Library"
+    },
+    {
+      "path": "./Quality Management-Tests"
     },
     {
       "path": "./Recommended Apps Tests"
@@ -184,6 +202,9 @@
     },
     {
       "path": "./System Application Partner Test"
+    },
+    {
+      "path": "./System Application Test"
     },
     {
       "path": "./System Application Test Library"
@@ -303,16 +324,10 @@
       "path": "./System Application Test Library/Extension Management/testArtifacts"
     },
     {
-      "path": "./E-Document Core Tests/DisabledTests"
-    },
-    {
       "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
     },
     {
       "path": "./Subcontracting-Tests/Tests"
-    },
-    {
-      "path": "./Quality Management-Tests/DisabledTests"
     },
     {
       "path": "./Test Runner/src/DataDrivenTest"
@@ -327,9 +342,6 @@
       "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
     },
     {
-      "path": "./PEPPOL Tests/DisabledTests"
-    },
-    {
       "path": "./AI Test Toolkit/src/TestSuite"
     },
     {
@@ -342,31 +354,10 @@
       "path": "./System Application/Email/src/Test Email"
     },
     {
-      "path": "./Error Messages with Recommendations Tests/DisabledTests"
-    },
-    {
-      "path": "./Business Foundation Tests/DisabledTests"
-    },
-    {
       "path": "./Performance Toolkit Tests/src/Mock Tests"
-    },
-    {
-      "path": "./System Application Test/DisabledTests"
-    },
-    {
-      "path": "./PowerBI Reports Tests/DisabledTests"
     },
     {
       "path": "./Base Application/System/DevTools/CALTest"
     }
-  ],
-  "settings": {
-    "allint.enabled": false,
-    "al.enableCodeActions": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false
-  }
+  ]
 }
