@@ -149,6 +149,7 @@ codeunit 6117 "E-Doc. Create Purchase Invoice" implements IEDocumentFinishDraft,
         PurchaseHeader.Validate("Vendor Invoice No.", VendorInvoiceNo);
 
         PurchaseHeader."Invoice Received Date" := PurchaseHeader."Document Date";
+        EDocPurchaseDocumentHelper.ApplyDefaultPostingDateFromSetup(PurchaseHeader, EDocumentPurchaseHeader);
         if EDocumentPurchaseHeader."Posting Description" <> '' then
             PurchaseHeader."Posting Description" := EDocumentPurchaseHeader."Posting Description";
         PurchaseHeader.Modify();
