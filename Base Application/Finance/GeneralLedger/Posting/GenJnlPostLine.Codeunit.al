@@ -2522,17 +2522,12 @@ codeunit 12 "Gen. Jnl.-Post Line"
     procedure CreateGLEntryBalAcc(GenJnlLine: Record "Gen. Journal Line"; AccNo: Code[20]; Amount: Decimal; AmountAddCurr: Decimal; BalAccType: Enum "Gen. Journal Account Type"; BalAccNo: Code[20])
     var
         GLEntry: Record "G/L Entry";
-        AmountSrcCurr: Decimal;
     begin
         OnBeforeCreateGLEntryBalAcc(GenJnlLine, AccNo, Amount, AmountAddCurr, BalAccType, BalAccNo);
         AmountAddCurr := AmountAddCurr - GenJnlLine."VAT Amount";
-        if GenJnlLine."Source Currency Code" <> '' then
-            AmountSrcCurr := AmountAddCurr
-        else
-            AmountSrcCurr := CalcAmountSrcCurr(GenJnlLine, Amount);
         InitGLEntry(
             GenJnlLine, GLEntry, AccNo, Amount, AmountAddCurr, true, true,
-            AmountSrcCurr);
+            CalcAmountSrcCurr(GenJnlLine, Amount));
         GLEntry."Bal. Account Type" := BalAccType;
         GLEntry."Bal. Account No." := BalAccNo;
         InsertGLEntry(GenJnlLine, GLEntry, true);
@@ -5420,7 +5415,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         DtldVendLedgEntryNoOffset: Integer;
         SaveEntryNo: Integer;
         PayableAccAmtLCY: Decimal;
-        PayableAccAmtAddCurr, AmountSrcCurr : Decimal;
+        PayableAccAmtAddCurr: Decimal;
         ExistDtldCVLedgEntryBuf: Boolean;
         FindBill, FindInvoice, FindApplication : Boolean;
         IsHandled: Boolean;
@@ -5523,13 +5518,9 @@ codeunit 12 "Gen. Jnl.-Post Line"
                     ((PayableAccAmtAddCurr <> 0) and (AddCurrencyCode <> ''))
                     then
                         if LedgEntryInserted or not (MultiplePostingGroups and IDInvoiceSettlement and not IDBillSettlement and (DocAmountLCY <> 0)) then begin
-                            if GenjournalLine."System-Created Entry" then
-                                AmountSrcCurr := CalcAmountSrcCurr(GenJournalLine, PayableAccAmtLCY)
-                            else
-                                AmountSrcCurr := GenJournalLine."Source Currency Amount";
                             InitGLEntry(
                                 GenJournalLine, GLEntry, AccNo, PayableAccAmtLCY, PayableAccAmtAddCurr, true, true,
-                                AmountSrcCurr);
+                                CalcAmountSrcCurr(GenJournalLine, PayableAccAmtLCY));
                             GLEntry."Bal. Account Type" := GenJournalLine."Bal. Account Type";
                             GLEntry."Bal. Account No." := GenJournalLine."Bal. Account No.";
                             UpdateGLEntryNo(GLEntry."Entry No.", SaveEntryNo);
