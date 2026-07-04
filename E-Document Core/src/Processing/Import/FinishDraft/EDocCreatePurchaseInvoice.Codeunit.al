@@ -131,7 +131,6 @@ codeunit 6117 "E-Doc. Create Purchase Invoice" implements IEDocumentFinishDraft,
         PurchaseHeader.SetRange("Buy-from Vendor No.", EDocumentPurchaseHeader."[BC] Vendor No."); // Setting the filter, so that the insert trigger assigns the right vendor to the purchase header
         PurchaseHeader."Document Type" := "Purchase Document Type"::Invoice;
         PurchaseHeader."Pay-to Vendor No." := EDocumentPurchaseHeader."[BC] Vendor No.";
-        PurchaseHeader.Insert(true);
         if EDocumentPurchaseHeader."Document Date" <> 0D then
             EDocPurchaseDocumentHelper.ValidateFieldWithContext(PurchaseHeader, PurchaseHeader.FieldNo("Document Date"), EDocumentPurchaseHeader."Document Date");
         if EDocumentPurchaseHeader."Due Date" <> 0D then
@@ -146,7 +145,8 @@ codeunit 6117 "E-Doc. Create Purchase Invoice" implements IEDocumentFinishDraft,
             Error(InvoiceAlreadyExistsErr, VendorInvoiceNo, EDocumentPurchaseHeader."[BC] Vendor No.");
         end;
 
-        PurchaseHeader.Validate("Vendor Invoice No.", VendorInvoiceNo);
+        EDocPurchaseDocumentHelper.ValidateFieldWithContext(PurchaseHeader, PurchaseHeader.FieldNo("Vendor Invoice No."), VendorInvoiceNo);
+        PurchaseHeader.Insert(true);
 
         PurchaseHeader."Invoice Received Date" := PurchaseHeader."Document Date";
         EDocPurchaseDocumentHelper.ApplyDefaultPostingDateFromSetup(PurchaseHeader, EDocumentPurchaseHeader);
