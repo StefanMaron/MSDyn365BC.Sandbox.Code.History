@@ -233,11 +233,20 @@ codeunit 4410 "Trial Balance"
             TrialBalanceData."Dimension 1 Code" := EXRTrialBalanceQuery.DimensionValue1Code;
             TrialBalanceData."Dimension 2 Code" := EXRTrialBalanceQuery.DimensionValue2Code;
             // The balances at the ending date are filled in from the values returned in this query
-            TrialBalanceData.Validate(Balance, EXRTrialBalanceQuery.Amount);
-            TrialBalanceData.Validate("Balance (ACY)", EXRTrialBalanceQuery.ACYAmount);
-            // And also in Net Change (which will have later the value at the starting date subtracted)
-            TrialBalanceData.Validate("Net Change", EXRTrialBalanceQuery.Amount);
-            TrialBalanceData.Validate("Net Change (ACY)", EXRTrialBalanceQuery.ACYAmount);
+            TrialBalanceData.Balance := EXRTrialBalanceQuery.Amount;
+            TrialBalanceData."Balance (Debit)" := EXRTrialBalanceQuery.DebitAmount;
+            TrialBalanceData."Balance (Credit)" := EXRTrialBalanceQuery.CreditAmount;
+            TrialBalanceData."Balance (ACY)" := EXRTrialBalanceQuery.ACYAmount;
+            TrialBalanceData."Balance (Debit) (ACY)" := EXRTrialBalanceQuery.ACYDebitAmount;
+            TrialBalanceData."Balance (Credit) (ACY)" := EXRTrialBalanceQuery.ACYCreditAmount;
+            // Net Change fields temporarily hold cumulative values up to the ending date,
+            // the starting date values will be subtracted in the second query
+            TrialBalanceData."Net Change" := EXRTrialBalanceQuery.Amount;
+            TrialBalanceData."Net Change (Debit)" := EXRTrialBalanceQuery.DebitAmount;
+            TrialBalanceData."Net Change (Credit)" := EXRTrialBalanceQuery.CreditAmount;
+            TrialBalanceData."Net Change (ACY)" := EXRTrialBalanceQuery.ACYAmount;
+            TrialBalanceData."Net Change (Debit) (ACY)" := EXRTrialBalanceQuery.ACYDebitAmount;
+            TrialBalanceData."Net Change (Credit) (ACY)" := EXRTrialBalanceQuery.ACYCreditAmount;
             // Every combination the query returns has entries, so it represents real activity and is kept even when it
             // nets to zero. The second pass adjusts any that also have an opening balance.
             TrialBalanceData.Insert(true);
@@ -295,10 +304,18 @@ codeunit 4410 "Trial Balance"
             TrialBalanceData."Dimension 1 Code" := EXRTrialBalanceBUQuery.DimensionValue1Code;
             TrialBalanceData."Dimension 2 Code" := EXRTrialBalanceBUQuery.DimensionValue2Code;
             TrialBalanceData."Business Unit Code" := EXRTrialBalanceBUQuery.BusinessUnitCode;
-            TrialBalanceData.Validate(Balance, EXRTrialBalanceBUQuery.Amount);
-            TrialBalanceData.Validate("Balance (ACY)", EXRTrialBalanceBUQuery.ACYAmount);
-            TrialBalanceData.Validate("Net Change", EXRTrialBalanceBUQuery.Amount);
-            TrialBalanceData.Validate("Net Change (ACY)", EXRTrialBalanceBUQuery.ACYAmount);
+            TrialBalanceData.Balance := EXRTrialBalanceBUQuery.Amount;
+            TrialBalanceData."Balance (Debit)" := EXRTrialBalanceBUQuery.DebitAmount;
+            TrialBalanceData."Balance (Credit)" := EXRTrialBalanceBUQuery.CreditAmount;
+            TrialBalanceData."Balance (ACY)" := EXRTrialBalanceBUQuery.ACYAmount;
+            TrialBalanceData."Balance (Debit) (ACY)" := EXRTrialBalanceBUQuery.ACYDebitAmount;
+            TrialBalanceData."Balance (Credit) (ACY)" := EXRTrialBalanceBUQuery.ACYCreditAmount;
+            TrialBalanceData."Net Change" := EXRTrialBalanceBUQuery.Amount;
+            TrialBalanceData."Net Change (Debit)" := EXRTrialBalanceBUQuery.DebitAmount;
+            TrialBalanceData."Net Change (Credit)" := EXRTrialBalanceBUQuery.CreditAmount;
+            TrialBalanceData."Net Change (ACY)" := EXRTrialBalanceBUQuery.ACYAmount;
+            TrialBalanceData."Net Change (Debit) (ACY)" := EXRTrialBalanceBUQuery.ACYDebitAmount;
+            TrialBalanceData."Net Change (Credit) (ACY)" := EXRTrialBalanceBUQuery.ACYCreditAmount;
             // Every combination the query returns has entries, so it represents real activity and is kept even when it
             // nets to zero. The second pass adjusts any that also have an opening balance.
             TrialBalanceData.Insert(true);
