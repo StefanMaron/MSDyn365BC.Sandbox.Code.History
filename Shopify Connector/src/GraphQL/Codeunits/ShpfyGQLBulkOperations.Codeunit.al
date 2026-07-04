@@ -5,10 +5,7 @@
 
 namespace Microsoft.Integration.Shopify;
 
-/// <summary>
-/// Codeunit Shpfy GQL VariantById (ID 30150) implements Interface Shpfy IGraphQL.
-/// </summary>
-codeunit 30150 "Shpfy GQL VariantById" implements "Shpfy IGraphQL"
+codeunit 30277 "Shpfy GQL BulkOperations" implements "Shpfy IGraphQL"
 {
     Access = Internal;
 
@@ -18,7 +15,7 @@ codeunit 30150 "Shpfy GQL VariantById" implements "Shpfy IGraphQL"
     /// <returns>Return value of type Text.</returns>
     internal procedure GetGraphQL(): Text
     begin
-        exit('{"query":"{productVariant(id: \"gid://shopify/ProductVariant/{{VariantId}}\") {createdAt updatedAt availableForSale barcode compareAtPrice displayName inventoryPolicy position price sku taxCode taxable title product{id}selectedOptions{name value} inventoryItem{countryCodeOfOrigin createdAt id inventoryHistoryUrl legacyResourceId measurement { weight { value }} provinceCodeOfOrigin requiresShipping sku tracked updatedAt unitCost { amount currencyCode }} metafields(first: 50) {edges {node {id namespace type legacyResourceId key value}}}}}"}');
+        exit('{"query": "query { currentBulkOperation(type: MUTATION) { id status errorCode createdAt completedAt fileSize url partialDataUrl }}"}');
     end;
 
     /// <summary>
@@ -27,7 +24,6 @@ codeunit 30150 "Shpfy GQL VariantById" implements "Shpfy IGraphQL"
     /// <returns>Return value of type Integer.</returns>
     internal procedure GetExpectedCost(): Integer
     begin
-        exit(25);
+        exit(10);
     end;
-
 }
