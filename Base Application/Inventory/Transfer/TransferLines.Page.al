@@ -1,11 +1,12 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Transfer;
 
-#if not CLEAN27
+#if not CLEAN28
 using Microsoft.Manufacturing.Document;
+using Microsoft.Manufacturing.Setup;
 #endif
 
 page 5749 "Transfer Lines"
@@ -72,10 +73,10 @@ page 5749 "Transfer Lines"
                 {
                     ApplicationArea = Location;
                 }
-#if not CLEAN27
+#if not CLEAN28
                 field("WIP Qty. Shipped"; Rec."WIP Qty. Shipped")
                 {
-                    ApplicationArea = Location;
+                    ApplicationArea = LegacySubcontracting;
                     ToolTip = 'Specifies the number of work in process (WIP) items that have shipped on a subcontractor transfer order.';
                     ObsoleteReason = 'Preparation for replacement by Subcontracting app';
                     ObsoleteState = Pending;
@@ -85,7 +86,7 @@ page 5749 "Transfer Lines"
                 }
                 field("WIP Outstanding Qty."; Rec."WIP Outstanding Qty.")
                 {
-                    ApplicationArea = Location;
+                    ApplicationArea = LegacySubcontracting;
                     ToolTip = 'Specifies the number of work in process (WIP) items that will be shipped on a subcontractor transfer order.';
                     ObsoleteReason = 'Preparation for replacement by Subcontracting app';
                     ObsoleteState = Pending;
@@ -133,13 +134,16 @@ page 5749 "Transfer Lines"
                     trigger OnAction()
                     var
                         TransferHeader: Record "Transfer Header";
+#if not CLEAN28
+                        LegacySubcFeatureHandler: Codeunit "Legacy Subc. Feature Handler";
+#endif
                     begin
                         TransferHeader.Get(Rec."Document No.");
-#if not CLEAN27
-                        TransferHeader.CalcFields("Subcontracting Order");
-                        if TransferHeader."Subcontracting Order" then
-                            PAGE.Run(PAGE::"Subcontr. Transfer Order", TransferHeader)
-                        else
+#if not CLEAN28
+                        if LegacySubcFeatureHandler.IsLegacySubcontractingEnabled() and TransferHeader."Subcontracting Order" then begin
+                            TransferHeader.CalcFields("Subcontracting Order");
+                            PAGE.Run(PAGE::"Subcontr. Transfer Order", TransferHeader);
+                        end else
 #endif
                         PAGE.Run(PAGE::"Transfer Order", TransferHeader);
                     end;
