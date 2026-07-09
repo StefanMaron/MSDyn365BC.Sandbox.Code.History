@@ -1814,11 +1814,7 @@ codeunit 139969 "Qlty. Tests - Workflows"
     var
         Workflow: Record Workflow;
     begin
-        Workflow.FindSet();
-        repeat
-            Workflow.Enabled := false;
-            Workflow.Modify();
-        until Workflow.Next() = 0;
+        Workflow.ModifyAll(Enabled, false);
         Workflow.DeleteAll();
     end;
 
