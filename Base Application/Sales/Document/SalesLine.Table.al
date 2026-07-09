@@ -5749,6 +5749,7 @@ table 37 "Sales Line"
     procedure UpdatePrepmtSetupFields()
     var
         IsHandled: Boolean;
+        VATPostingSetupRetrieved: Boolean;
     begin
         IsHandled := false;
         OnBeforeUpdatePrepmtSetupFields(Rec, IsHandled, CurrFieldNo);
@@ -5764,7 +5765,10 @@ table 37 "Sales Line"
                     FieldError("Prepmt. Line Amount", StrSubstNo(Text045, 0));
             if "System-Created Entry" and not IsServiceChargeLine() and (CurrFieldNo <> 0) then
                 "Prepayment %" := 0;
-            VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
+            VATPostingSetupRetrieved := false;
+            OnUpdatePrepmtSetupFieldsOnBeforeGetVATPostingSetup(Rec, GLAcc, VATPostingSetup, VATPostingSetupRetrieved);
+            if not VATPostingSetupRetrieved then
+                VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group");
             VATPostingSetup.TestField("VAT Calculation Type", "VAT Calculation Type");
             if ("Prepayment VAT %" <> 0) and ("Prepayment VAT %" <> VATPostingSetup."VAT %") and ("Prepmt. Amt. Inv." <> 0) then
                 Error(CannotChangePrepmtAmtDiffVAtPctErr);
@@ -12490,6 +12494,11 @@ table 37 "Sales Line"
     /// <param name="CurrentFieldNo">The current field number.</param>
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdatePrepmtSetupFields(var SalesLine: Record "Sales Line"; var IsHandled: Boolean; CurrentFieldNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdatePrepmtSetupFieldsOnBeforeGetVATPostingSetup(var SalesLine: Record "Sales Line"; GLAccount: Record "G/L Account"; var VATPostingSetup: Record "VAT Posting Setup"; var VATPostingSetupRetrieved: Boolean)
     begin
     end;
 
