@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -1044,7 +1044,7 @@ table 5109 "Purchase Header Archive"
             Caption = 'TDD Prepared By';
             DataClassification = EndUserIdentifiableInformation;
         }
-#if not CLEANSCHEMA30
+#if not CLEANSCHEMA31
         field(12180; "Subcontracting Order"; Boolean)
         {
             CalcFormula = exist("Purchase Line" where("Document Type" = const(Order),
@@ -1055,14 +1055,14 @@ table 5109 "Purchase Header Archive"
             Editable = false;
             FieldClass = FlowField;
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
         field(12181; "Subcontracting Location Code"; Code[10])
@@ -1070,14 +1070,14 @@ table 5109 "Purchase Header Archive"
             Caption = 'Subcontracting Location Code';
             TableRelation = Location;
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
 #endif

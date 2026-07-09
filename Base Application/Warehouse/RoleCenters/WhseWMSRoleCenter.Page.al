@@ -19,7 +19,7 @@ using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Reports;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Inventory.Transfer;
-#if not CLEAN27
+#if not CLEAN28
 using Microsoft.Manufacturing.Document;
 #endif
 using Microsoft.Purchases.Document;
@@ -183,14 +183,16 @@ page 9000 "Whse. WMS Role Center"
                 RunObject = Report "Customer - Labels";
                 ToolTip = 'View, save, or print mailing labels with the customers'' names and addresses. The report can be used to send sales letters, for example.';
             }
+#if not CLEAN28
             separator(Action1130001)
             {
+                ObsoleteReason = 'Preparation for replacement by Subcontracting app';
+                ObsoleteState = Pending;
+                ObsoleteTag = '28.0';
             }
-
-#if not CLEAN27
             action("Subcontract. Transfer Shipment")
             {
-                ApplicationArea = Warehouse;
+                ApplicationArea = LegacySubcontracting;
                 Caption = 'Subcontract. Transfer Shipment';
                 Image = "Report";
                 RunObject = Report "Subcontract. Transfer Shipment";
@@ -285,7 +287,7 @@ page 9000 "Whse. WMS Role Center"
 #if not CLEAN27
             action("Subcontracting Transfers")
             {
-                ApplicationArea = Warehouse;
+                ApplicationArea = LegacySubcontracting;
                 Caption = 'Subcontracting Transfers';
                 RunObject = Page "Subcontracting Transfer List";
                 ToolTip = 'View the list of subcontracting transfers.';
@@ -710,10 +712,10 @@ page 9000 "Whse. WMS Role Center"
                 RunPageMode = Create;
                 ToolTip = 'Move items from one warehouse location to another.';
             }
-#if not CLEAN27
+#if not CLEAN28
             action("Subcontr. Transfer Order")
             {
-                ApplicationArea = Warehouse;
+                ApplicationArea = LegacySubcontracting;
                 Caption = 'Subcontr. Transfer Order';
                 RunObject = Page "Transfer Order";
                 RunPageView = where("Subcontracting Order" = const(true));
