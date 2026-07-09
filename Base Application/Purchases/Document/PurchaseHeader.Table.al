@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -41,6 +41,9 @@ using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Setup;
 using Microsoft.Inventory.Tracking;
+#if not CLEAN28
+using Microsoft.Manufacturing.Setup;
+#endif
 using Microsoft.Pricing.Calculation;
 using Microsoft.Projects.Project.Job;
 using Microsoft.Projects.Resources.Resource;
@@ -86,6 +89,9 @@ table 38 "Purchase Header"
 
             trigger OnValidate()
             var
+#if not CLEAN28
+                LegacySubcFeatureHandler: Codeunit "Legacy Subc. Feature Handler";
+#endif
                 IsHandled: Boolean;
             begin
                 IsHandled := false;
@@ -143,8 +149,9 @@ table 38 "Purchase Header"
                 if not IsHandled then
                     "Responsibility Center" := UserSetupMgt.GetRespCenter(1, Vend."Responsibility Center");
                 ValidateEmptySellToCustomerAndLocation();
-#if not CLEAN27
-                "Subcontracting Location Code" := Vend."Subcontracting Location Code";
+#if not CLEAN28
+                if LegacySubcFeatureHandler.IsLegacySubcontractingEnabled() then
+                    "Subcontracting Location Code" := Vend."Subcontracting Location Code";
 #endif
                 OnAfterCopyBuyFromVendorFieldsFromVendor(Rec, Vend, xRec);
 
@@ -777,7 +784,7 @@ table 38 "Purchase Header"
             var
                 IsHandled: Boolean;
             begin
-                OnBeforeValidateLocationCode(Rec, IsHandled);
+                OnBeforeValidateLocationCode(Rec, IsHandled, xRec, CurrFieldNo);
                 if IsHandled then
                     exit;
 
@@ -929,6 +936,15 @@ table 38 "Purchase Header"
                         PurchLine.SetPurchHeader(Rec);
 
                         Currency.Initialize("Currency Code");
+
+                        if not RecalculatePrice and "Prices Including VAT" then begin
+                            PurchLine.FindSet();
+                            repeat
+                                PurchLine.Amount := Round(PurchLine.CalcLineAmount() / (1 + PurchLine."VAT %" / 100), Currency."Amount Rounding Precision");
+                                PurchLine."Amount Including VAT" := Round(PurchLine.CalcLineAmount(), Currency."Amount Rounding Precision");
+                                PurchLine.Modify();
+                            until PurchLine.Next() = 0;
+                        end;
 
                         PurchLine.FindSet();
                         repeat
@@ -3184,7 +3200,7 @@ table 38 "Purchase Header"
             Caption = 'TDD Prepared By';
             DataClassification = EndUserIdentifiableInformation;
         }
-#if not CLEANSCHEMA30
+#if not CLEANSCHEMA31
         field(12180; "Subcontracting Order"; Boolean)
         {
             CalcFormula = exist("Purchase Line" where("Document Type" = const(Order),
@@ -3195,14 +3211,14 @@ table 38 "Purchase Header"
             Editable = false;
             FieldClass = FlowField;
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
         field(12181; "Subcontracting Location Code"; Code[10])
@@ -3210,14 +3226,14 @@ table 38 "Purchase Header"
             Caption = 'Subcontracting Location Code';
             TableRelation = Location;
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
 #endif
@@ -9345,7 +9361,7 @@ table 38 "Purchase Header"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeValidateLocationCode(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean)
+    local procedure OnBeforeValidateLocationCode(var PurchaseHeader: Record "Purchase Header"; var IsHandled: Boolean; xPurchaseHeader: Record "Purchase Header"; CurrFieldNo: Integer)
     begin
     end;
 
