@@ -1,4 +1,4 @@
-codeunit 101023 "Create Vendor"
+﻿codeunit 101023 "Create Vendor"
 {
 
     trigger OnRun()
@@ -197,7 +197,7 @@ codeunit 101023 "Create Vendor"
         XRaymondHillard: Label 'Raymond Hillard', Comment = 'CELA approved translation: Dino Lucchese';
         X5Porfidia: Label 'Via della Porfidia, 5';
         X57100: Label '57100';
-#if not CLEAN27        
+#if not CLEAN28        
         XGOLD: Label 'GOLD';
 #endif
         XxBANKTRANSF: Label 'BANKTRANSF';
@@ -268,7 +268,7 @@ codeunit 101023 "Create Vendor"
             Evaluate(Vendor."Lead Time Calculation", '<3D>');
             Vendor.Validate("Lead Time Calculation");
         end;
-#if not CLEAN27
+#if not CLEAN28
         if Vendor."No." = '70000' then begin
             Vendor.Subcontractor := true;
             Vendor."Subcontracting Location Code" := XGOLD;
