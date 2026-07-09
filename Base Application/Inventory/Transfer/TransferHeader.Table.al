@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -836,7 +836,7 @@ table 5740 "Transfer Header"
         {
             Caption = 'Shipping Notes';
         }
-#if not CLEANSCHEMA30
+#if not CLEANSCHEMA31
         field(12186; "Subcontracting Order"; Boolean)
         {
             CalcFormula = exist("Transfer Line" where("Document No." = field("No."),
@@ -845,14 +845,14 @@ table 5740 "Transfer Header"
             Editable = false;
             FieldClass = FlowField;
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
 #endif
@@ -1224,7 +1224,7 @@ table 5740 "Transfer Header"
                    (TransLine2."Quantity (Base)" <> TransLine2."Qty. Shipped (Base)") or
                    (TransLine2."Quantity (Base)" <> TransLine2."Qty. Received (Base)") or
                    (TransLine2."Quantity Shipped" <> TransLine2."Quantity Received") or
-#if not CLEAN27
+#if not CLEAN28
                    (TransLine2."WIP Quantity" <> TransLine2."WIP Qty. Shipped") or
 #endif
                    (TransLine2."Qty. Shipped (Base)" <> TransLine2."Qty. Received (Base)")
