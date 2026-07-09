@@ -52,6 +52,7 @@ table 99000758 "Machine Center"
         field(5; "Name 2"; Text[50])
         {
             Caption = 'Name 2';
+            ToolTip = 'Specifies an additional name for the machine center.';
         }
         field(6; Address; Text[100])
         {
