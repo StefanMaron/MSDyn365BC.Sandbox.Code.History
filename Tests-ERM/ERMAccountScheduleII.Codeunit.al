@@ -2923,6 +2923,38 @@
         Assert.IsFalse(ColumnLayoutNames.First(), 'Blocked column definitions are not visible to users without write permission on status.');
     end;
 
+    [Test]
+    procedure FinRepAuditLogOnExcelUpdateExistingTemplate()
+    var
+        AccScheduleName: Record "Acc. Schedule Name";
+        AccScheduleLine: Record "Acc. Schedule Line";
+        FinReportExcelTemplate: Record "Fin. Report Excel Template";
+        FinancialReportAuditLog: Record "Financial Report Audit Log";
+    begin
+        // [FEATURE] [Audit Log]
+        // [SCENARIO 637423] Updating a financial report using an existing Excel template logs the report usage without a transaction error.
+        Initialize();
+
+        // [GIVEN] Create a financial report with a line.
+        LibraryERM.CreateAccScheduleName(AccScheduleName);
+        LibraryERM.CreateAccScheduleLine(AccScheduleLine, AccScheduleName.Name);
+
+        // [GIVEN] Create an existing Excel template for the financial report.
+        CreateExcelTemplateForFinancialReport(FinReportExcelTemplate, AccScheduleName);
+
+        // [GIVEN] No audit log entries exist for the report yet.
+        FinancialReportAuditLog.SetRange("Report Name", AccScheduleName.Name);
+        FinancialReportAuditLog.DeleteAll();
+
+        // [WHEN] The financial report is exported to Excel using the existing template.
+        RunExportAccScheduleWithExistingTemplate(FinReportExcelTemplate, AccScheduleName);
+
+        // [THEN] Verify an audit log entry is created for the action.
+        FinancialReportAuditLog.SetRange(User, UserId);
+        FinancialReportAuditLog.SetRange(Format, FinancialReportAuditLog.Format::Excel);
+        Assert.AreEqual(1, FinancialReportAuditLog.Count(), AuditLogNotCreatedOnTemplateUpdateErr);
+    end;
+    
     local procedure Initialize()
     var
         FinancialReportMgt: Codeunit "Financial Report Mgt.";
@@ -3383,6 +3415,52 @@
         FinRepStatus.Insert(true);
     end;
 
+    local procedure CreateExcelTemplateForFinancialReport(var FinReportExcelTemplate: Record "Fin. Report Excel Template"; AccScheduleName: Record "Acc. Schedule Name")
+    var
+        FinancialReport: Record "Financial Report";
+        AccScheduleLine: Record "Acc. Schedule Line";
+        ExportAccSchedToExcel: Report "Export Acc. Sched. to Excel";
+        TempBlob: Codeunit "Temp Blob";
+        OutStream: OutStream;
+        InStream: InStream;
+    begin
+        FinancialReport.Get(AccScheduleName.Name);
+        AccScheduleLine.SetRange("Schedule Name", AccScheduleName.Name);
+        AccScheduleLine.SetRange("Date Filter", CalcDate('<-CY>', WorkDate()), CalcDate('<CY>', WorkDate()));
+        ExportAccSchedToExcel.SetOptions(AccScheduleLine, FinancialReport."Financial Report Column Group", false, FinancialReport.Name);
+        ExportAccSchedToExcel.SetSaveToStream(true);
+        ExportAccSchedToExcel.UseRequestPage(false);
+        ExportAccSchedToExcel.RunModal();
+
+        TempBlob.CreateOutStream(OutStream);
+        ExportAccSchedToExcel.GetSavedStream(OutStream);
+
+        FinReportExcelTemplate.Init();
+        FinReportExcelTemplate."Financial Report Name" := AccScheduleName.Name;
+        FinReportExcelTemplate.Code := LibraryUtility.GenerateGUID();
+        FinReportExcelTemplate.Description := LibraryUtility.GenerateGUID();
+        TempBlob.CreateInStream(InStream);
+        FinReportExcelTemplate.Template.CreateOutStream(OutStream);
+        CopyStream(OutStream, InStream);
+        FinReportExcelTemplate.Insert();
+    end;
+
+    local procedure RunExportAccScheduleWithExistingTemplate(var FinReportExcelTemplate: Record "Fin. Report Excel Template"; AccScheduleName: Record "Acc. Schedule Name")
+    var
+        FinancialReport: Record "Financial Report";
+        AccScheduleLine: Record "Acc. Schedule Line";
+        ExportAccSchedToExcel: Report "Export Acc. Sched. to Excel";
+    begin
+        FinancialReport.Get(AccScheduleName.Name);
+        AccScheduleLine.SetRange("Schedule Name", AccScheduleName.Name);
+        AccScheduleLine.SetRange("Date Filter", CalcDate('<-CY>', WorkDate()), CalcDate('<CY>', WorkDate()));
+        ExportAccSchedToExcel.SetOptions(AccScheduleLine, FinancialReport."Financial Report Column Group", false, FinancialReport.Name);
+        ExportAccSchedToExcel.SetUseExistingTemplate(FinReportExcelTemplate);
+        ExportAccSchedToExcel.SetTestMode(true);
+        ExportAccSchedToExcel.UseRequestPage(false);
+        ExportAccSchedToExcel.Run();
+    end;
+    
     [RequestPageHandler]
     [Scope('OnPrem')]
     procedure RHAccountSchedule(var AccountSchedule: TestRequestPage "Account Schedule")
