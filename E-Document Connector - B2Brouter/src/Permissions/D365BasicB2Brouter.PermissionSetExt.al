@@ -2,11 +2,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.EServices.EDocumentConnector.B2Brouter;
+namespace Microsoft.Manufacturing.Subcontracting;
 
-using Microsoft.EServices.EDocument;
+using System.Security.AccessControl;
 
-permissionsetextension 6490 "D365 Basic - B2Brouter" extends "E-Doc. Core - Admin"
+permissionsetextension 99001501 "D365 BUS FULL ACCESS - Subcontracting" extends "D365 BUS FULL ACCESS"
 {
-    IncludedPermissionSets = "B2Brouter Edit";
+    IncludedPermissionSets = "Subcontract. - Edit";
 }
