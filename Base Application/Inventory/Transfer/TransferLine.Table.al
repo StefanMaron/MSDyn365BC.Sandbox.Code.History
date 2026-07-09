@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ table 5741 "Transfer Line"
                     exit;
 
                 TestField("Quantity Shipped", 0);
-#if not CLEAN27
+#if not CLEAN28
                 TestField("WIP Qty. Shipped", 0);
 #endif
                 if CurrFieldNo <> 0 then
@@ -488,7 +488,7 @@ table 5741 "Transfer Line"
                 TestField("Qty. Shipped (Base)", 0);
                 TestField("Quantity Received", 0);
                 TestField("Qty. Received (Base)", 0);
-#if not CLEAN27
+#if not CLEAN28
                 TestField("WIP Qty. Shipped", 0);
 #endif
                 TransferLineReserve.VerifyChange(Rec, xRec);
@@ -1025,33 +1025,33 @@ table 5741 "Transfer Line"
                 end;
             end;
         }
-#if not CLEANSCHEMA30
+#if not CLEANSCHEMA31
         field(12180; "Subcontr. Purch. Order No."; Code[20])
         {
             Caption = 'Subcontr. Purch. Order No.';
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
         field(12181; "Subcontr. Purch. Order Line"; Integer)
         {
             Caption = 'Subcontr. Purch. Order Line';
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
         field(12182; "Prod. Order No."; Code[20])
@@ -1059,14 +1059,14 @@ table 5741 "Transfer Line"
             Caption = 'Prod. Order No.';
             TableRelation = "Production Order"."No." where(Status = const(Released));
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
         field(12183; "Prod. Order Line No."; Integer)
@@ -1075,14 +1075,14 @@ table 5741 "Transfer Line"
             TableRelation = "Prod. Order Line"."Line No." where(Status = const(Released),
                                                                  "Prod. Order No." = field("Prod. Order No."));
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
         field(12184; "Prod. Order Comp. Line No."; Integer)
@@ -1092,14 +1092,14 @@ table 5741 "Transfer Line"
                                                                       "Prod. Order No." = field("Prod. Order No."),
                                                                       "Prod. Order Line No." = field("Prod. Order Line No."));
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
         field(12185; "Routing No."; Code[20])
@@ -1107,28 +1107,28 @@ table 5741 "Transfer Line"
             Caption = 'Routing No.';
             TableRelation = "Routing Header";
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
         field(12186; "Routing Reference No."; Integer)
         {
             Caption = 'Routing Reference No.';
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
         field(12187; "Work Center No."; Code[20])
@@ -1136,16 +1136,16 @@ table 5741 "Transfer Line"
             Caption = 'Work Center No.';
             TableRelation = "Work Center";
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
-#if not CLEAN27
+#if not CLEAN28
             trigger OnValidate()
             var
                 WorkCenter: Record "Work Center";
@@ -1165,28 +1165,28 @@ table 5741 "Transfer Line"
                                                                               "Prod. Order No." = field("Prod. Order No."),
                                                                               "Routing No." = field("Routing No."));
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
         field(12190; "WIP Item"; Boolean)
         {
             Caption = 'WIP Item';
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
         field(12191; "WIP Quantity"; Decimal)
@@ -1195,16 +1195,16 @@ table 5741 "Transfer Line"
             Caption = 'WIP Quantity';
             DecimalPlaces = 0 : 5;
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
-#if not CLEAN27
+#if not CLEAN28
             trigger OnValidate()
             begin
                 if CurrFieldNo <> 0 then
@@ -1227,17 +1227,17 @@ table 5741 "Transfer Line"
             Caption = 'WIP Qty. To Ship';
             DecimalPlaces = 0 : 5;
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
 
-#if not CLEAN27
+#if not CLEAN28
             trigger OnValidate()
             begin
                 if "WIP Qty. To Ship" > "WIP Outstanding Qty." then
@@ -1255,17 +1255,17 @@ table 5741 "Transfer Line"
             DecimalPlaces = 0 : 5;
             Editable = false;
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
 
-#if not CLEAN27
+#if not CLEAN28
             trigger OnValidate()
             begin
                 InitWIPOutstandingQty();
@@ -1280,14 +1280,14 @@ table 5741 "Transfer Line"
             DecimalPlaces = 0 : 5;
             Editable = false;
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
         field(12195; "WIP Outstanding Qty. (Base)"; Decimal)
@@ -1297,14 +1297,14 @@ table 5741 "Transfer Line"
             DecimalPlaces = 0 : 5;
             Editable = false;
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
 #endif
@@ -1351,35 +1351,35 @@ table 5741 "Transfer Line"
         key(Key7; "Document No.", "Item No.", "Transfer-from Code", "Transfer-from Bin Code")
         {
         }
-#if not CLEANSCHEMA30
+#if not CLEANSCHEMA31
         key(Key70; "Subcontr. Purch. Order No.", "Subcontr. Purch. Order Line", "Prod. Order No.", "Prod. Order Line No.", "Prod. Order Comp. Line No.", "Return Order", "Derived From Line No.")
         {
             IncludedFields = "Qty. in Transit (Base)", "Outstanding Qty. (Base)";
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
         key(Key80; "Prod. Order No.", "Routing No.", "Routing Reference No.", "Operation No.", "Subcontr. Purch. Order No.", "Derived From Line No.")
         {
-#if not CLEAN27
+#if not CLEAN28
             IncludedFields = "WIP Outstanding Qty. (Base)";
 #endif
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
 #pragma warning disable AS0072
             ObsoleteTag = '27.0';
 #pragma warning restore AS0072
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
 #endif
@@ -2397,7 +2397,7 @@ table 5741 "Transfer Line"
         if IsShippedDimChanged() then
             ConfirmShippedDimChange();
     end;
-#if not CLEAN27
+#if not CLEAN28
     local procedure InitWIPOutstandingQty()
     begin
         "WIP Outstanding Qty." := "WIP Quantity" - "WIP Qty. Shipped";
