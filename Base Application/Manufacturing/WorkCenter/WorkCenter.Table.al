@@ -54,6 +54,7 @@ table 99000754 "Work Center"
         field(5; "Name 2"; Text[50])
         {
             Caption = 'Name 2';
+            ToolTip = 'Specifies an additional name for the work center.';
         }
         field(6; Address; Text[100])
         {
