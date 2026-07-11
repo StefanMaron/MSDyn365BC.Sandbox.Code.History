@@ -5612,6 +5612,24 @@
       <Cmt Name="Dev"><![CDATA[%1: Changed field name; %2: Item No.]D;]A;(LookupHint=Codeunit SCM Item Tracking - NamedType CannotChangeITWhseEntriesExistErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 4274535345 - NamedType 3012380659" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Derived line should have positive quantity.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Item Tracking - NamedType DerivedLinePositiveQtyErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4274535345 - NamedType 29254528" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Derived line should be tracked for the full picked lot quantity.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Item Tracking - NamedType DerivedLineTrackedQtyErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 4274535345 - NamedType 3039557070" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[New Expiration Date must be equal to '%1'  in Tracking Specification]]></Val>
@@ -5763,6 +5781,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Item Tracking - NamedType QtyToHandleMismatchErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4274535345 - NamedType 2492723034" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Received quantity for the picked lot does not match the expected quantity.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Item Tracking - NamedType ReceivedQtyErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 4274535345 - NamedType 1020200779" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -6325,7 +6352,7 @@
   </Item>
   <Item ItemId=";Codeunit 2531980374 - NamedType 2427899679" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Planning Parameters were taken from Item card because %1 is %2 but SKU does not exist for Item %3 at Location %4]]></Val>
+      <Val><![CDATA[Item %3 at Location %4 was planned using the planning parameters from the Item Card, because no stockkeeping unit exists and %1 is set to %2.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -6406,7 +6433,7 @@
   </Item>
   <Item ItemId=";Codeunit 2531980374 - NamedType 1951422520" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Item %1 at Location %2 was not planned because SKU does not exist and %3 at Location is %4]]></Val>
+      <Val><![CDATA[Item %1 at Location %2 was not planned, because no stockkeeping unit exists and %3 is set to %4.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -7689,6 +7716,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Pick Worksheet - NamedType AvailableQtyToPickMsg)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2250745974 - NamedType 234188467" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Expected "Do Not Fill Qty. to Handle" to be true on the pick header.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Pick Worksheet - NamedType DoNotFillQtyToHandleErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2250745974 - NamedType 3700808998" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
