@@ -5585,6 +5585,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Purchase Blanket Order - NamedType VATEditableError)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3400903464 - NamedType 4267005061" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Purchase Order must contain 2 extended-text lines attached to item %1 (order line no %2).]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Item No.; %2 = Purchase Order Line No.]D;]A;(LookupHint=Codeunit ERM Purchase Blanket Order - NamedType WrongAttachedExtTextCountErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3981758858 - NamedType 4226110596" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The quantity that you are trying to invoice is greater than the quantity in return shipment %1.]]></Val>
