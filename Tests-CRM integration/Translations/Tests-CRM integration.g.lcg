@@ -1202,4 +1202,13 @@
       <Cmt Name="Dev"><![CDATA[%1,%2 - tables Ids; %2 - name of the mapping.]D;]A;(LookupHint=Codeunit Integration Table Synch. Test - NamedType TablesDoNotMatchMappingErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";EnumExtension 1683292836 - EnumValue 1774099386 - Property 2879900210" ItemType=";EnumExtension - EnumValue" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Test Sovereign]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Enum 1218241442)(LookupHint=EnumExtension Dataverse Cloud Test - EnumValue TestSovereign - Property Caption)]]></Cmt>
+    </Cmts>
+  </Item>
 </LCX>
