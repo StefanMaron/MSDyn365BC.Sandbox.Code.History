@@ -1499,6 +1499,33 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Apply Unapply - NamedType GLEntryMustBeFound)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3343777107 - NamedType 1604456305" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Invoice ledger entry must be closed.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Apply Unapply - NamedType InvoiceLedgerEntryMustBeClosedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3343777107 - NamedType 1276247021" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Invoice must be fully applied.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Apply Unapply - NamedType InvoiceMustBeFullyAppliedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3343777107 - NamedType 1195484784" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Payables Account %1 must net to zero after the invoice is fully applied by the payment.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Apply Unapply - NamedType PayablesAccountMustBalanceErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3343777107 - NamedType 1520820797" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Entries are  still applied.]]></Val>
