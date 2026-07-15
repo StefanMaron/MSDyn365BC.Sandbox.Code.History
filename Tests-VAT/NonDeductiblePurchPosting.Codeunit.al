@@ -928,7 +928,6 @@ codeunit 134283 "Non-Deductible Purch. Posting"
     begin
         VATEntry.SetRange("Document No.", DocumentNo);
         VATEntry.SetRange("Posting Date", WorkDate());
-        VATEntry.SetRange(Type, VATEntry.Type::Purchase);
         VATEntry.FindFirst();
     end;
 
