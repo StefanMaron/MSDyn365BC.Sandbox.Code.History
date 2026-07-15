@@ -5983,8 +5983,11 @@ table 36 "Sales Header"
                 "Sell-to Contact" := Cust.Contact;
             end;
         if "Sell-to Contact No." <> '' then
-            if OfficeContact.Get("Sell-to Contact No.") then
+            if OfficeContact.Get("Sell-to Contact No.") then begin
                 OfficeContact.CheckIfPrivacyBlockedGeneric();
+                if OfficeContact."E-Mail" <> '' then
+                    Validate("Sell-to E-Mail", OfficeContact."E-Mail");
+            end;
 
         OnAfterUpdateSellToCont(Rec, Cust, OfficeContact, HideValidationDialog);
     end;
