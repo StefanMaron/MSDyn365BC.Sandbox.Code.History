@@ -522,7 +522,7 @@ codeunit 333 "Req. Wksh.-Make Order"
           TempFailedReqLine,
           TempDocumentEntry);
         ReqWkshMakeOrders.SetSuppressCommit(SuppressCommit);
-        
+
         OnTryCarryOutReqLineActionOnBeforeRun(ReqLine);
         if ReqWkshMakeOrders.Run(ReqLine) then begin
             ReqWkshMakeOrders.GetTryParam(
@@ -1396,7 +1396,7 @@ codeunit 333 "Req. Wksh.-Make Order"
         exit(true);
     end;
 
-    local procedure GetTransferHeader(var TransferHeader: Record "Transfer Header"; RequisitionLine: Record "Requisition Line")
+    procedure GetTransferHeader(var TransferHeader: Record "Transfer Header"; RequisitionLine: Record "Requisition Line")
     begin
         TempTransHeader.SetRange("Transfer-from Code", RequisitionLine."Transfer-from Code");
         TempTransHeader.SetRange("Transfer-to Code", RequisitionLine."Location Code");
@@ -1404,7 +1404,7 @@ codeunit 333 "Req. Wksh.-Make Order"
             TransferHeader.Get(TempTransHeader."No.");
     end;
 
-    local procedure SetTransferHeader(TransferHeader: Record "Transfer Header")
+    procedure SetTransferHeader(TransferHeader: Record "Transfer Header")
     begin
         TempTransHeader := TransferHeader;
         if TempTransHeader.Insert() then;
