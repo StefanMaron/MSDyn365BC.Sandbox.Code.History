@@ -132,6 +132,9 @@
       "path": "./OnPrem Permissions Tests"
     },
     {
+      "path": "./Payment Practices Test Library"
+    },
+    {
       "path": "./Payment Practices Tests"
     },
     {
