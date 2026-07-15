@@ -1096,7 +1096,6 @@ codeunit 144251 "Non Ded. VAT Misc. IT"
     begin
         VATEntry.SetRange("Document No.", DocumentNo);
         VATEntry.SetRange("Document Type", VATEntry."Document Type"::Invoice);
-        VATEntry.SetRange(Type, VATEntry.Type::Purchase);
         VATEntry.FindLast();
     end;
 
