@@ -1933,6 +1933,7 @@ page 51 "Purchase Invoice"
         SIIManagement.CombineOperationDescription(Rec."Operation Description", Rec."Operation Description 2", OperationDescription);
         UpdateDocHasRegimeCode();
         StatusStyleTxt := Rec.GetStatusStyleText();
+        Rec.GetContactDetails(BuyFromContact, PayToContact);
     end;
 
     trigger OnAfterGetRecord()
@@ -1941,9 +1942,7 @@ page 51 "Purchase Invoice"
     begin
         RejectICPurchaseInvoiceEnabled := ICInboxOutboxMgt.IsPurchaseHeaderFromIncomingIC(Rec);
         CalculateCurrentShippingAndPayToOption();
-        BuyFromContact.GetOrClear(Rec."Buy-from Contact No.");
-        PayToContact.GetOrClear(Rec."Pay-to Contact No.");
-        UpdateDocHasRegimeCode();
+        Rec.GetContactDetails(BuyFromContact, PayToContact);        UpdateDocHasRegimeCode();
         CurrPage.IncomingDocAttachFactBox.Page.SetCurrentRecordID(Rec.RecordId);
         IsVendorInvoiceEditable := not Rec."Self-Billing Invoice";
 
