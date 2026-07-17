@@ -1,11 +1,11 @@
 {
   "settings": {
+    "allint.enabled": false,
+    "al.enableCodeActions": false,
     "search.exclude": {
       "**.xlf": true
     },
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
-    "al.enableCodeActions": false
+    "al.enableCodeAnalysis": false
   },
   "folders": [
     {
@@ -147,13 +147,13 @@
       "path": "./Test Runner/src/DataDrivenTest"
     },
     {
-      "path": "./AI Test Toolkit/src/TestSuite"
+      "path": "./Base Application/System/DevTools/CALTest"
     },
     {
       "path": "./System Application/Email/src/Test Email"
     },
     {
-      "path": "./Base Application/System/DevTools/CALTest"
+      "path": "./AI Test Toolkit/src/TestSuite"
     }
   ]
 }
