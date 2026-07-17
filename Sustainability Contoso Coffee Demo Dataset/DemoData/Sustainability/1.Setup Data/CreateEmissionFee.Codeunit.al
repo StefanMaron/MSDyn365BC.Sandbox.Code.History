@@ -14,3 +14,4 @@ codeunit 5242 "Create Emission Fee"
         ContosoSustainability.InsertEmissionFee(Enum::"Emission Type"::N2O, Enum::"Emission Scope"::" ", ContosoUtility.AdjustDate(19030101D), 0D, '', '', 0, 289);
     end;
 }
+
