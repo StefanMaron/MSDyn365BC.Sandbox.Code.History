@@ -2786,6 +2786,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Exch. Rate Adjmt. Customer - NamedType AmountMismatchErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2646364736 - NamedType 2546413359" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Expected Unrealized Loss/Gain Detailed Customer Ledger Entry for customer %1.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Customer No.]D;]A;(LookupHint=Codeunit ERM Exch. Rate Adjmt. Customer - NamedType ExpectedUnrealizedDtldCustEntryErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2646364736 - NamedType 2975884559" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Due to how Business Central posts and updates amounts in an additional reporting currency (ACY), you can't use this feature if you use ACY. Business Central converts amounts in local currency to the alternate currency, but doesn't net transactions. If you use ACY, you must manually reverse the amounts.]]></Val>
@@ -2802,6 +2811,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Exch. Rate Adjmt. Customer - NamedType ReversalSuccessfullTxt)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2646364736 - NamedType 1147383972" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[No Unrealized Loss/Gain Detailed Customer Ledger Entry was expected for Posting Group %1.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Posting Group Code]D;]A;(LookupHint=Codeunit ERM Exch. Rate Adjmt. Customer - NamedType UnexpectedAdjustedEntryErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1474904910 - NamedType 2867664679" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -2838,6 +2856,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[%1 = Expected Posting Group Code, %2 = Vendor No.]D;]A;(LookupHint=Codeunit ERM Exch. Rate Adjmt. Vendor - NamedType PostingGroupMismatchErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3692207144 - NamedType 1147383972" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[No Unrealized Loss/Gain Detailed Vendor Ledger Entry was expected for Posting Group %1.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Posting Group Code]D;]A;(LookupHint=Codeunit ERM Exch. Rate Adjmt. Vendor - NamedType UnexpectedAdjustedEntryErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1542747169 - NamedType 952304833" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -11579,6 +11606,33 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Reminder Automation Tests - NamedType FiltersAreNotSavedErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2624800184 - NamedType 1762875068" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Interaction Description must not reference the original unissued reminder number.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Reminder Automation Tests - NamedType InteractionDescriptionMustNotReferenceOriginalNoErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2624800184 - NamedType 3310288979" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Interaction Description must reference the issued reminder number.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Reminder Automation Tests - NamedType InteractionDescriptionMustReferenceIssuedNoErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2624800184 - NamedType 399941414" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The issued reminder number must differ from the pre-assigned (original) reminder number.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Reminder Automation Tests - NamedType IssuedReminderNoMustDifferErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2624800184 - NamedType 2855966592" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Attachment language does not match global language]]></Val>
@@ -11597,6 +11651,24 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Reminder Automation Tests - NamedType NoAttachmentsErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2624800184 - NamedType 2515209674" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[No interaction log entry was created for the issued reminder.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Reminder Automation Tests - NamedType NoInteractionLogEntryCreatedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2624800184 - NamedType 1236078497" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[No issued reminder was created for the customer.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Reminder Automation Tests - NamedType NoIssuedReminderCreatedErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2624800184 - NamedType 3550125399" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The number of attachments must be the same.]]></Val>
@@ -11613,6 +11685,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Reminder Automation Tests - NamedType ReminderLevelNotFoundErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2624800184 - NamedType 643391846" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Reminder %1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Reminder No.]D;]A;(LookupHint=Codeunit Reminder Automation Tests - NamedType ReminderPostingDescriptionLbl)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1475444133 - NamedType 1063273132" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
