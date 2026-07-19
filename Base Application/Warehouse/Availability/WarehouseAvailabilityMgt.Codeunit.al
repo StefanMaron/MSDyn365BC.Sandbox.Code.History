@@ -47,8 +47,11 @@ codeunit 7314 "Warehouse Availability Mgt."
     begin
         // Returns the reserved quantity against ILE for the demand line
         case SourceType of
-            Database::Job:
+            Database::Job, Database::"Job Planning Line":
                 begin
+                    // Both old (Database::Job) and new (Database::"Job Planning Line") formats 
+                    // should look up reservations with Job Planning Line source type
+                    // Reservation entries always have Source Subtype = Order (2), regardless of caller's SourceSubType
                     ReservEntry.SetSourceFilter(
                       Database::"Job Planning Line", "Job Planning Line Status"::Order.AsInteger(), SourceNo, SourceLineNo, true);
                     ReservEntry.SetSourceFilter('', 0);

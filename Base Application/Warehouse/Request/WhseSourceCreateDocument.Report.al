@@ -541,9 +541,9 @@ report 7305 "Whse.-Source - Create Document"
 
                     OnPreDataItemJobPlanningLineOnAfterSetFilters("Job Planning Line", JobHeader);
 
+                    // Check for existing WhseWorksheetLines with both old format (Database::Job) and new format (Database::"Job Planning Line")
                     WhseWkshLine.SetCurrentKey("Source Type", "Source Subtype", "Source No.", "Source Line No.", "Source Subline No.");
-                    WhseWkshLine.SetRange("Source Type", Database::Job);
-                    WhseWkshLine.SetRange("Source Subtype", 0);
+                    WhseWkshLine.SetFilter("Source Type", '%1|%2', Database::Job, Database::"Job Planning Line");
                     WhseWkshLine.SetRange("Source No.", JobHeader."No.");
                 end;
             }
