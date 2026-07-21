@@ -95,6 +95,15 @@
       <Cmt Name="Dev"><![CDATA[%1 = Field Caption, %2 = WHT Business Posting Group Code, %3 = WHT Product Posting Group Code]D;]A;(Namespace=Microsoft.Tests.WithholdingTax)(LookupHint=Codeunit ERM Withholding Tax Tests II - NamedType WHTAccountCodeEmptyErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2899581057 - NamedType 3495036755" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Withholding Tax Prod. Post. Group must be copied from the applied Invoice to the Payment line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Tests.WithholdingTax)(LookupHint=Codeunit ERM Withholding Tax Tests II - NamedType WHTProdPostGroupNotCopiedErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 741840556 - NamedType 1367169603" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Value must be same.]]></Val>
