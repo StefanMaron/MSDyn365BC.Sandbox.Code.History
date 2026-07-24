@@ -2,7 +2,7 @@
   "id": "a5972688-3d9f-44ff-b3f9-71f08bb98c2c",
   "name": "Service Management Tests",
   "publisher": "Microsoft",
-  "version": "29.0.52840.0",
+  "version": "29.0.52853.0",
   "brief": "Tests for the Microsoft Service Management extension.",
   "description": "Tests for the Microsoft Service Management extension.",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
