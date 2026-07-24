@@ -5591,7 +5591,16 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1= Location Code, %2= Bin Code, %3= Item No., %4= Varient Code, %5= Unit of Measure Code]D;]A;(LookupHint=Codeunit SCM Item Journal - NamedType BlockedBinContentErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1= Location Code, %2= Bin Code, %3= Item No., %4= Variant Code, %5= Unit of Measure Code]D;]A;(LookupHint=Codeunit SCM Item Journal - NamedType BlockedBinContentErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 167793459 - NamedType 1004903478" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Block Movement must not be %1 in Bin Content Location Code='%2',Bin Code='%3',Item No.='%4',Variant Code='%5',Unit of Measure Code='%6'.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1= Block Movement, %2= Location Code, %3= Bin Code, %4= Item No., %5= Variant Code, %6= Unit of Measure Code]D;]A;(LookupHint=Codeunit SCM Item Journal - NamedType BlockedBinContentMovementErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 167793459 - NamedType 643940626" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
