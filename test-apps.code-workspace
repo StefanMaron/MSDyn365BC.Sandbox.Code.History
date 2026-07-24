@@ -292,13 +292,10 @@
       "path": "./Withholding Tax Tests"
     },
     {
-      "path": "./Quality Management-Tests/DisabledTests"
+      "path": "./PowerBI Reports Tests/DisabledTests"
     },
     {
-      "path": "./Subscription Billing Tests/DisabledTests"
-    },
-    {
-      "path": "./Business Foundation Tests/DisabledTests"
+      "path": "./System Application Test Library/Extension Management/testArtifacts"
     },
     {
       "path": "./Sales Lines Suggestions Tests/AI Tests"
@@ -307,28 +304,31 @@
       "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
     },
     {
-      "path": "./System Application Test Library/Extension Management/testArtifacts"
+      "path": "./Subscription Billing Tests/DisabledTests"
     },
     {
       "path": "./E-Document Core Tests/DisabledTests"
     },
     {
-      "path": "./Test Runner/src/DataDrivenTest"
-    },
-    {
-      "path": "./Base Application/System/DevTools/CALTest"
-    },
-    {
-      "path": "./System Application/Email/src/Test Email"
-    },
-    {
-      "path": "./Shopify Connector Test/DisabledTests"
+      "path": "./Error Messages with Recommendations Tests/DisabledTests"
     },
     {
       "path": "./System Application Test/DisabledTests"
     },
     {
       "path": "./Performance Toolkit Tests/src/Mock Tests"
+    },
+    {
+      "path": "./Quality Management-Tests/DisabledTests"
+    },
+    {
+      "path": "./Shopify Connector Test/DisabledTests"
+    },
+    {
+      "path": "./Base Application/System/DevTools/CALTest"
+    },
+    {
+      "path": "./Test Runner/src/DataDrivenTest"
     },
     {
       "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
@@ -346,21 +346,21 @@
       "path": "./Subcontracting-Tests/Tests"
     },
     {
-      "path": "./PowerBI Reports Tests/DisabledTests"
-    },
-    {
       "path": "./Quality Management/src/Configuration/Template/Test"
     },
     {
-      "path": "./Error Messages with Recommendations Tests/DisabledTests"
+      "path": "./System Application/Email/src/Test Email"
+    },
+    {
+      "path": "./Business Foundation Tests/DisabledTests"
     }
   ],
   "settings": {
-    "allint.enabled": false,
-    "al.enableCodeActions": false,
     "al.enableCodeAnalysis": false,
     "search.exclude": {
       "**.xlf": true
-    }
+    },
+    "al.enableCodeActions": false,
+    "allint.enabled": false
   }
 }
