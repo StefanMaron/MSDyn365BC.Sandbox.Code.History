@@ -2,7 +2,7 @@
   "id": "d852d5d2-a39d-4179-baeb-f99a19e32510",
   "name": "Application Test Library",
   "publisher": "Microsoft",
-  "version": "29.0.52853.0",
+  "version": "29.0.52863.0",
   "platform": "29.0.0.0",
   "dependencies": [
     {
