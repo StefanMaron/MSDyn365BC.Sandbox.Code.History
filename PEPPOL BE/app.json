@@ -4,7 +4,7 @@
   "publisher": "Microsoft",
   "description": "PEPPOL BIS 3.0 Belgium localization for electronic invoicing with Belgium-specific VAT registration formatting.",
   "brief": "Belgium localization for PEPPOL BIS 3.0 electronic invoicing.",
-  "version": "29.0.52809.0",
+  "version": "29.0.52815.0",
   "logo": "ExtensionLogo.png",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
   "EULA": "https://go.microsoft.com/fwlink/?linkid=2009120",
