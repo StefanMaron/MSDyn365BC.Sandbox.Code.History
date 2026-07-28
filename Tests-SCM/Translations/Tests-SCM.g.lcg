@@ -455,6 +455,15 @@
       <Cmt Name="Dev"><![CDATA[%1 = Document No.]D;]A;(LookupHint=Codeunit SCM Archive Orders - NamedType ArchiveDocMsg)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 909624013 - NamedType 459526938" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Mocked Prod. Order Component not found on "Prod. Order Components" page.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Availability by Event - NamedType ProdOrderComponentNotFoundErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 909624013 - NamedType 593319474" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Wrong reserved quantity in Item Availability by Event]]></Val>
