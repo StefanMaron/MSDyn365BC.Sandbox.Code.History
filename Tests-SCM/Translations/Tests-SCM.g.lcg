@@ -16772,4 +16772,13 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit WFW Requisition Worksheet - NamedType UnexpectedNoOfWorkflowStepInstancesErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3891584768 - NamedType 267109124" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Open Record must show the requisition worksheet batch of the selected approval entry.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit WFW Requisition Worksheet - NamedType WrongBatchShownOnOpenRecordLbl)]]></Cmt>
+    </Cmts>
+  </Item>
 </LCX>
