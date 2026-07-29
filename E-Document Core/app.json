@@ -4,7 +4,7 @@
   "publisher": "Microsoft",
   "brief": "The Dynamics 365 Business Central E-Documents module enables different models of electronic invoicing, available for additional localizations.",
   "description": "Business Central's E-Documents module is the foundation layer for all e-invoicing standards covering most common processes, but it can be used for other electronic documents. The module is easily extendable with the country-based e-invoicing apps. The E-Documents app covers both sales and purchase processes and can have different lifecycles from standard invoices in Business Central.",
-  "version": "29.0.53029.0",
+  "version": "29.0.53039.0",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
   "EULA": "https://go.microsoft.com/fwlink/?linkid=2009120",
   "help": "https://go.microsoft.com/fwlink/?linkid=2204541",
@@ -53,6 +53,11 @@
     {
       "id": "8238f78b-cbe5-4b9c-b247-7771145b7470",
       "name": "E-Document Format for Factura-E Tests",
+      "publisher": "Microsoft"
+    },
+    {
+      "id": "4022897d-41ca-4ae2-a766-a429d0b19273",
+      "name": "E-Document for Germany Tests",
       "publisher": "Microsoft"
     },
     {
