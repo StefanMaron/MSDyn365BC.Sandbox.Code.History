@@ -11867,6 +11867,15 @@
       <Cmt Name="Dev"><![CDATA[%1= Field Value, %2 =Table Caption.]D;]A;(LookupHint=Codeunit SCM Transfer Reservation - NamedType ReservationFromStockErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 550613498 - NamedType 711799781" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Reserved Qty. Outbnd. (Base) is expected to be non-zero before deletion.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Transfer Reservation - NamedType ReservedQtyExpectedErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 550613498 - NamedType 427329643" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Reservation Entry Quantity is different than expected.]]></Val>
@@ -11874,6 +11883,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Transfer Reservation - NamedType ReservEntryQtyIncorrectErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 550613498 - NamedType 1218980651" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Transfer Header should have been deleted.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Transfer Reservation - NamedType TransferHeaderNotDeletedErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 550613498 - NamedType 1366197332" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
