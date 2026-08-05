@@ -95,6 +95,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Subcontracting.Test)(LookupHint=Codeunit Subc. Subcontracting UI Test - NamedType ILEPurchActionsNotEnabledErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1455081095 - NamedType 984350027" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The Subcontracting setup is not complete. Are you sure you want to exit?]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Subcontracting.Test)(LookupHint=Codeunit Subc. Subcontracting UI Test - NamedType SetupNotCompletedQst)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1455081095 - NamedType 1260317749" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Subcontractor Prices action should not be enabled for a non-subcontracting Work Center.]]></Val>
