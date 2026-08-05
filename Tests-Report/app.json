@@ -2,7 +2,7 @@
   "id": "79447c3f-14b4-4c10-8779-03911f30ab26",
   "name": "Tests-Report",
   "publisher": "Microsoft",
-  "version": "29.0.53328.0",
+  "version": "29.0.53347.0",
   "platform": "29.0.0.0",
   "dependencies": [
     {
@@ -26,6 +26,12 @@
     {
       "id": "bee8cf2f-494a-42f4-aabd-650e87934d39",
       "name": "Business Foundation Test Libraries",
+      "publisher": "Microsoft",
+      "version": "29.0.0.0"
+    },
+    {
+      "id": "dd0be2ea-f733-4d65-bb34-a28f4624fb14",
+      "name": "Library Assert",
       "publisher": "Microsoft",
       "version": "29.0.0.0"
     }
