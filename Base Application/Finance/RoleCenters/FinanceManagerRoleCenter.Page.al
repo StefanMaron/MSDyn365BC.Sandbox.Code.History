@@ -933,14 +933,12 @@ page 8901 "Finance Manager Role Center"
                         ApplicationArea = Basic, Suite;
                         Caption = 'Cash Flow Date List';
                         RunObject = report "Cash Flow Date List";
-                        Tooltip = 'Run the Cash Flow Date List report.';
                     }
                     action("Dimensions - Detail1")
                     {
                         ApplicationArea = Dimensions;
                         Caption = 'Cash Flow Dimensions - Detail';
                         RunObject = report "Cash Flow Dimensions - Detail";
-                        Tooltip = 'Run the Cash Flow Dimensions - Detail report.';
                     }
                 }
                 group("Group19")
@@ -1810,7 +1808,6 @@ page 8901 "Finance Manager Role Center"
                         ApplicationArea = Basic, Suite;
                         Caption = 'Vendor - Trial Balance';
                         RunObject = report "Vendor - Trial Balance";
-                        Tooltip = 'Run the Vendor - Trial Balance report.';
                     }
                     action("Vendor/Item Purchases")
                     {
