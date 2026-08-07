@@ -5648,6 +5648,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Item Journal - NamedType RoundingTo0Err)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 167793459 - NamedType 2407838812" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Test error to trigger rollback after Commit() call.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Item Journal - NamedType TestRollbackAfterCommitErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 167793459 - NamedType 1753540882" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Incorrect Item Ledger Entry created.]]></Val>
