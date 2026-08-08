@@ -5881,6 +5881,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         IsHandled: Boolean;
         PayableAccAmtLCY: Decimal;
         PayableAccAmtAddCurr: Decimal;
+        AmountSrcCurr: Decimal;
     begin
         if GenJnlLine."Account Type" <> GenJnlLine."Account Type"::Employee then
             exit;
@@ -5930,9 +5931,17 @@ codeunit 12 "Gen. Jnl.-Post Line"
             if (PayableAccAmtLCY <> 0) or
                ((PayableAccAmtAddCurr <> 0) and (AddCurrencyCode <> ''))
             then begin
+                if (GenJnlLine."Source Currency Code" <> '') and (GenJnlLine."Source Currency Code" = GenJnlLine."Currency Code") and
+                    (GenJnlLine.Amount <> 0) and (GenJnlLine."Amount (LCY)" <> 0) and (Abs(GenJnlLine."Amount (LCY)") = Abs(PayableAccAmtLCY))
+                then begin
+                    AmountSrcCurr := Abs(GenJnlLine.Amount);
+                    if PayableAccAmtLCY < 0 then
+                        AmountSrcCurr := -AmountSrcCurr;
+                end else
+                    AmountSrcCurr := CalcAmountSrcCurr(GenJnlLine, PayableAccAmtLCY);
                 InitGLEntry(
                     GenJnlLine, GLEntry, AccNo, PayableAccAmtLCY, PayableAccAmtAddCurr, true, true,
-                    CalcAmountSrcCurr(GenJnlLine, PayableAccAmtLCY));
+                    AmountSrcCurr);
                 GLEntry."Bal. Account Type" := GenJnlLine."Bal. Account Type";
                 GLEntry."Bal. Account No." := GenJnlLine."Bal. Account No.";
                 UpdateGLEntryNo(GLEntry."Entry No.", SaveEntryNo);
