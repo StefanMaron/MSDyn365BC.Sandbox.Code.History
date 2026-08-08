@@ -325,7 +325,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
 
         OnAfterGLFinishPosting(
             GlobalGLEntry, GenJnlLine, IsTransactionConsistent, FirstTransactionNo, GLReg, TempGLEntryBuf,
-            NextEntryNo, NextTransactionNo);
+            NextEntryNo, NextTransactionNo, NextVATEntryNo);
 
         GLEntryInconsistent := not IsTransactionConsistent;
     end;
@@ -1915,7 +1915,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         GLReg."User ID" := CopyStr(UserId(), 1, MaxStrLen(GLReg."User ID"));
         IsGLRegInserted := false;
 
-        OnAfterInitGLRegister(GLReg, GenJnlLine, NextTaxEntryNo);
+        OnAfterInitGLRegister(GLReg, GenJnlLine, NextTaxEntryNo, NextEntryNo, NextVATEntryNo, NextTransactionNo);
 
         GetCurrencyExchRate(GenJnlLine);
         TempGLEntryBuf.DeleteAll();
@@ -1973,6 +1973,24 @@ codeunit 12 "Gen. Jnl.-Post Line"
         OnNextTransactionNoNeeded(GenJnlLine, LastDocTypeOption, LastDocNo, LastDate, CurrentBalance, TotalAddCurrAmount, NewTransaction);
         LastDocType := "Gen. Journal Document Type".FromInteger(LastDocTypeOption);
         exit(NewTransaction);
+    end;
+
+    /// <summary>
+    /// Invalidates the transaction-scoped caches in this codeunit so the next call to RunWithCheck
+    /// is forced through StartPosting (which re-takes the G/L Entry table lock and re-reads the
+    /// last entry number from disk) instead of taking the ContinuePosting fast path with a stale
+    /// NextEntryNo.
+    /// </summary>
+    procedure ResetTransactionState()
+    begin
+        NextEntryNo := 0;
+        NextTransactionNo := 0;
+        NextVATEntryNo := 0;
+        FirstEntryNo := 0;
+        FirstNewVATEntryNo := 0;
+        IsGLRegInserted := false;
+        TempGLEntryBuf.Reset();
+        TempGLEntryBuf.DeleteAll();
     end;
 
     /// <summary>
@@ -8795,7 +8813,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterInitGLRegister(var GLRegister: Record "G/L Register"; var GenJournalLine: Record "Gen. Journal Line"; NextTaxEntryNo: Integer)
+    local procedure OnAfterInitGLRegister(var GLRegister: Record "G/L Register"; var GenJournalLine: Record "Gen. Journal Line"; NextTaxEntryNo: Integer; var NextEntryNo: Integer; var NextVATEntryNo: Integer; var NextTransactionNo: Integer)
     begin
     end;
 
@@ -9060,7 +9078,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterGLFinishPosting(GLEntry: Record "G/L Entry"; var GenJnlLine: Record "Gen. Journal Line"; var IsTransactionConsistent: Boolean; FirstTransactionNo: Integer; var GLRegister: Record "G/L Register"; var TempGLEntryBuf: Record "G/L Entry" temporary; var NextEntryNo: Integer; var NextTransactionNo: Integer)
+    local procedure OnAfterGLFinishPosting(GLEntry: Record "G/L Entry"; var GenJnlLine: Record "Gen. Journal Line"; var IsTransactionConsistent: Boolean; FirstTransactionNo: Integer; var GLRegister: Record "G/L Register"; var TempGLEntryBuf: Record "G/L Entry" temporary; var NextEntryNo: Integer; var NextTransactionNo: Integer; var NextVATEntryNo: Integer)
     begin
     end;
 
