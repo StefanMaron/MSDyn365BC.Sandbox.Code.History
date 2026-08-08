@@ -17,7 +17,7 @@ codeunit 9015 "Application System Constants"
     procedure OriginalApplicationVersion() ApplicationVersion: Text[248]
     begin
         // Should be 'Build Version' with ! on both sides.
-        ApplicationVersion := 'FR Business Central 27.10';
+        ApplicationVersion := 'FR Business Central 27.11';
     end;
 
     procedure ApplicationVersion() ApplicationVersion: Text[248]
