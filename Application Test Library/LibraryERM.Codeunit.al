@@ -1431,6 +1431,7 @@ codeunit 131300 "Library - ERM"
         // Validating Code as Name because value is not important.
         VATBusinessPostingGroup.Validate(Description, VATBusinessPostingGroup.Code);
 
+        // Set "Default Sales/Purchase operation"s - select first appropriate from "No. Series"
         VATBusinessPostingGroup."Default Sales Operation Type" := CreateNoSeriesSalesCode();
         VATBusinessPostingGroup."Default Purch. Operation Type" := CreateNoSeriesPurchaseCode();
 
