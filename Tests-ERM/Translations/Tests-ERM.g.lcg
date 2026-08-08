@@ -11579,6 +11579,24 @@
       <Cmt Name="Dev"><![CDATA[%1=The item number of the sales transaction line, %2=The Deferral Template Code]D;]A;(LookupHint=Codeunit RED Test Unit for Sales Doc - NamedType ZeroDeferralAmtErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3930067287 - NamedType 2001093832" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Amount (LCY) should be filled before posting.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit RED Test Unit for SalesPurDoc2 - NamedType AmountLCYNotFilledErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3930067287 - NamedType 864821856" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The sum of the deferral line Amount (LCY) values must equal the header Amount to Defer (LCY).]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit RED Test Unit for SalesPurDoc2 - NamedType AmountLCYSumErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3930067287 - NamedType 1981197056" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The deferral schedule falls outside the accounting periods that have been set up for the company.]]></Val>

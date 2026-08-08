@@ -2921,22 +2921,22 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Costing III - NamedType InvoicedChargeItemError)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 3458441551 - NamedType 1315941207" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+  <Item ItemId=";Codeunit 3458441551 - NamedType 3060196636" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[This return shipment has already been reversed.]]></Val>
+      <Val><![CDATA[No lines with a quantity available for reversal were found among the selected lines. Select a line with a quantity that has not already been reversed, and try again.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Costing III - NamedType ReturnShipmentAlreadyReversedErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Costing III - NamedType ReturnShipmentNoLinesToReverseErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 3458441551 - NamedType 2005526673" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+  <Item ItemId=";Codeunit 3458441551 - NamedType 4293687558" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[There are no lines with quantity to reverse.]]></Val>
+      <Val><![CDATA[No lines with a quantity available for reversal were found among the selected lines. Select a line with a quantity that has not already been reversed, and try again.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Costing III - NamedType ShipmentAlreadyReversedErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Costing III - NamedType ShipmentNoLinesToReverseErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3458441551 - NamedType 156185120" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -10238,13 +10238,13 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Revaluation - NamedType ErrorQtyMustBeEqual)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 1953108099 - NamedType 2610236115" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+  <Item ItemId=";Codeunit 1953108099 - NamedType 812393104" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[This return receipt has already been reversed.]]></Val>
+      <Val><![CDATA[No lines with a quantity available for reversal were found among the selected lines. Select a line with a quantity that has not already been reversed, and try again.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Revaluation - NamedType ReturnReceiptAlreadyReversedErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Revaluation - NamedType ReturnReceiptNoLinesToReverseErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1953108099 - NamedType 1869116913" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -11748,6 +11748,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Transfers - NamedType LocationCodeSameErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1950942247 - NamedType 2740697342" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[No lines with a quantity available for reversal were found among the selected lines. Select a line with a quantity that has not already been reversed, and try again.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Transfers - NamedType NoLinesToReverseErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1950942247 - NamedType 3106801776" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
