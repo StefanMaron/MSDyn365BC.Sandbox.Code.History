@@ -51,6 +51,18 @@
       "path": "./Tests-ERM"
     },
     {
+      "path": "./Tests-ERM-Application"
+    },
+    {
+      "path": "./Tests-ERM-Finance"
+    },
+    {
+      "path": "./Tests-ERM-Purchase"
+    },
+    {
+      "path": "./Tests-ERM-Sales"
+    },
+    {
       "path": "./Tests-Fixed Asset"
     },
     {
@@ -117,10 +129,25 @@
       "path": "./Tests-SCM-Assembly"
     },
     {
+      "path": "./Tests-SCM-Costing"
+    },
+    {
       "path": "./Tests-SCM-Manufacturing"
     },
     {
+      "path": "./Tests-SCM-Planning"
+    },
+    {
+      "path": "./Tests-SCM-Reservation"
+    },
+    {
       "path": "./Tests-SCM-Service"
+    },
+    {
+      "path": "./Tests-SCM-Warehouse"
+    },
+    {
+      "path": "./Tests-SCM-Workflow"
     },
     {
       "path": "./Tests-SINGLESERVER"
