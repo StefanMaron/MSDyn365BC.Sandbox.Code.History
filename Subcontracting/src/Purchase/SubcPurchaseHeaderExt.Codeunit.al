@@ -98,3 +98,4 @@ codeunit 20533 "Subc. Purchase Header Ext"
         ToPurchaseHeader."Subc. Location Code" := '';
     end;
 }
+#pragma warning restore AS0072, AS0136
