@@ -20,3 +20,4 @@ pageextension 20554 "Subc. Pstd. Direct Transfers" extends "Posted Direct Transf
         }
     }
 }
+#pragma warning restore AS0072, AS0136

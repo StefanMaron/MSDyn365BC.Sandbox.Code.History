@@ -547,3 +547,4 @@ codeunit 20524 "Subc. Prod. Order Comp. Ext."
         exit(NetStockAtSubcLocation > 0);
     end;
 }
+#pragma warning restore AS0072, AS0136

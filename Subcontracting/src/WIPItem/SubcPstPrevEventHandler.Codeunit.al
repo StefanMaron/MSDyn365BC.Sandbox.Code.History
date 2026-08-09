@@ -61,3 +61,4 @@ codeunit 20567 "Subc. Pst. Prev. Event Handler"
         OutTempSubcontractorWIPLedgerEntry.Copy(TempSubcontractorWIPLedgerEntry, true);
     end;
 }
+#pragma warning restore AS0072, AS0136

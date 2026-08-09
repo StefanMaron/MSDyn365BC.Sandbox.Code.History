@@ -70,3 +70,4 @@ codeunit 20566 "Subc. Posting Preview Subscr."
         SubcPostingPreviewHandler.GetTempSubcontractorWIPLedgerEntry(TempSubcontractorWIPLedgerEntry);
     end;
 }
+#pragma warning restore AS0072, AS0136

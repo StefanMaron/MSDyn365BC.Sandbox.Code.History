@@ -298,3 +298,4 @@ codeunit 20559 "Subc. ProdO. Factbox Mgmt."
             exit(ProdOrderRoutingLine."Routing No.");
     end;
 }
+#pragma warning restore AS0072, AS0136

@@ -47,3 +47,4 @@ codeunit 20571 "Subc. Application Area Mgmt."
 
     end;
 }
+#pragma warning restore AS0072, AS0136
