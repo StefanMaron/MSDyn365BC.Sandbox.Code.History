@@ -20,3 +20,4 @@ pageextension 20553 "Subc. Pstd. Transfer Rcpts." extends "Posted Transfer Recei
         }
     }
 }
+#pragma warning restore AS0072, AS0136

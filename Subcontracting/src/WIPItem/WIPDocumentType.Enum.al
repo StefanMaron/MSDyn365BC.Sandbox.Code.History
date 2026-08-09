@@ -20,3 +20,4 @@ enum 20509 "WIP Document Type"
         Caption = 'Adjustment (Finish Prod Order)';
     }
 }
+#pragma warning restore AS0072, AS0136
