@@ -12,7 +12,7 @@ tableextension 20531 "Subc. Prod BOM Line Ext." extends "Production BOM Line"
     AllowInCustomizations = AsReadOnly;
     fields
     {
-        field(20522; "Component Supply Method"; Enum "Component Supply Method")
+        field(99001522; "Component Supply Method"; Enum "Component Supply Method")
         {
             Caption = 'Component Supply Method';
             DataClassification = CustomerContent;
