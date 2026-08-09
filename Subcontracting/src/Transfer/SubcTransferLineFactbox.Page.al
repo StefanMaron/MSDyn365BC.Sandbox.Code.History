@@ -91,3 +91,4 @@ page 20501 "Subc. Transfer Line Factbox"
         SubcPurchFactboxMgmt.ShowPurchaseOrder(RecRelatedVariant);
     end;
 }
+#pragma warning restore AS0072, AS0136

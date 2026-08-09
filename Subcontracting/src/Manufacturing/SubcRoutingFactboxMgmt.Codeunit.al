@@ -342,3 +342,4 @@ codeunit 20561 "Subc. Routing Factbox Mgmt."
         Page.Run(Page::"Subc. Prod. Order Components", ProdOrderComponent);
     end;
 }
+#pragma warning restore AS0072, AS0136
