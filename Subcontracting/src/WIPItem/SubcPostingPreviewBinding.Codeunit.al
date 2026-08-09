@@ -54,3 +54,4 @@ codeunit 20565 "Subc. Posting Preview Binding"
         exit(UnbindSubscription(SubcPostingPreviewHandler));
     end;
 }
+#pragma warning restore AS0072, AS0136

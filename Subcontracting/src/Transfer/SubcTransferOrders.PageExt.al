@@ -25,3 +25,4 @@ pageextension 20551 "Subc. Transfer Orders" extends "Transfer Orders"
         }
     }
 }
+#pragma warning restore AS0072, AS0136

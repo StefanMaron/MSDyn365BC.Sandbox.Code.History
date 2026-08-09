@@ -85,3 +85,4 @@ pageextension 20525 "Subc. PurchOrderList" extends "Purchase Order List"
         }
     }
 }
+#pragma warning restore AS0072, AS0136
