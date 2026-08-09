@@ -44,9 +44,7 @@ codeunit 20501 "Subcontracting Install"
     local procedure HandleReinstallPerCompany()
     var
         SubcontractingCompInit: Codeunit "Subcontracting Comp. Init.";
-        SubcReqWkshTemplUpgrade: Codeunit "Subc. Req Wksh Templ Upgrade";
     begin
-        SubcReqWkshTemplUpgrade.MigrateReqWkshTemplateTypeFromLegacyValue();
         SubcontractingCompInit.CreateBasicSubcontractingMgtSetup();
         SetSubcontractingFeatureOnInstall();
     end;
