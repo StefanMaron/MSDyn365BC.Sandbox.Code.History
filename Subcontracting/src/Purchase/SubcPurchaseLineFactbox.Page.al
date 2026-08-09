@@ -139,3 +139,4 @@ page 20518 "Subc. Purchase Line Factbox"
     var
         PlaceholderLbl: Label '%1', Locked = true;
 }
+#pragma warning restore AS0072, AS0136

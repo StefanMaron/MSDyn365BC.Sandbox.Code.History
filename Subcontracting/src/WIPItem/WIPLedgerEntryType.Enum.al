@@ -16,3 +16,4 @@ enum 20508 "WIP Ledger Entry Type"
         Caption = 'Negative Adjustment';
     }
 }
+#pragma warning restore AS0072, AS0136

@@ -12,6 +12,7 @@ codeunit 20570 "Subc. Upgrade Tag Def. Ext."
     local procedure RegisterPerCompanyTags(var PerCompanyUpgradeTags: List of [Code[250]])
     begin
         PerCompanyUpgradeTags.Add(GetSubcontractingUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetReqWkshTemplateTypeUpgradeTag());
     end;
 
     internal procedure GetSubcontractingUpgradeTag(): Code[250]

@@ -13,14 +13,14 @@ tableextension 20511 "Subc. Purchase Header Arch" extends "Purchase Header Archi
     AllowInCustomizations = AsReadOnly;
     fields
     {
-        field(99001520; "Subc. Location Code"; Code[10])
+        field(20520; "Subc. Location Code"; Code[10])
         {
             Caption = 'Subcontracting Location Code';
             DataClassification = CustomerContent;
             TableRelation = Location where("Use As In-Transit" = const(false));
             ;
         }
-        field(99001521; "Subc. Order"; Boolean)
+        field(20521; "Subc. Order"; Boolean)
         {
             CalcFormula = exist("Purchase Line" where("Document Type" = const(Order),
                                                        "Document No." = field("No."),

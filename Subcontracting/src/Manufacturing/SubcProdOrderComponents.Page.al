@@ -181,3 +181,4 @@ page 20503 "Subc. Prod. Order Components"
     var
         SubcCompFactboxMgmt: Codeunit "Subc. Comp. Factbox Mgmt.";
 }
+#pragma warning restore AS0072, AS0136
