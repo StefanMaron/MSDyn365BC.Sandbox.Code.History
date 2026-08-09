@@ -11,14 +11,14 @@ tableextension 20526 "Subc. Posted Whse Receipt Line" extends "Posted Whse. Rece
 {
     fields
     {
-        field(20549; "Subc. Purchase Line Type"; Enum "Subc. Purchase Line Type")
+        field(99001549; "Subc. Purchase Line Type"; Enum "Subc. Purchase Line Type")
         {
             Caption = 'Subcontracting Line Type';
             DataClassification = CustomerContent;
             Editable = false;
             ToolTip = 'Specifies the subcontracting purchase line type associated with the warehouse receipt line.';
         }
-        field(20560; "Transfer WIP Item"; Boolean)
+        field(99001560; "Transfer WIP Item"; Boolean)
         {
             Caption = 'Transfer WIP Item';
             DataClassification = CustomerContent;
