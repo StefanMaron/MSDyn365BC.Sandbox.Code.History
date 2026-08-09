@@ -473,3 +473,4 @@ codeunit 20504 "Subc. Transfer Management"
             Error(RoutingOperationNotFoundErr, PurchaseLine."Operation No.", PurchaseLine."Document No.", PurchaseLine."Routing No.", PurchaseLine."Prod. Order No.");
     end;
 }
+#pragma warning restore AS0072, AS0136

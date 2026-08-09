@@ -11,7 +11,7 @@ tableextension 20528 "Subc. Pstd. Whse Shipment Line" extends "Posted Whse. Ship
 {
     fields
     {
-        field(99001560; "Transfer WIP Item"; Boolean)
+        field(20560; "Transfer WIP Item"; Boolean)
         {
             Caption = 'Transfer WIP Item';
             DataClassification = CustomerContent;

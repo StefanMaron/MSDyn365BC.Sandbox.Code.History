@@ -20,3 +20,4 @@ pageextension 20552 "Subc. Pstd. Transfer Shpts." extends "Posted Transfer Shipm
         }
     }
 }
+#pragma warning restore AS0072, AS0136
