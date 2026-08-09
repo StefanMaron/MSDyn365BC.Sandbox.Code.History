@@ -66,3 +66,4 @@ pageextension 20549 "Subc. Shop Super. Activities" extends "Shop Supervisor Acti
         }
     }
 }
+#pragma warning restore AS0072, AS0136

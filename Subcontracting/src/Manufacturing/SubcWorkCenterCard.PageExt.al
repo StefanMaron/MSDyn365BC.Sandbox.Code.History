@@ -97,3 +97,4 @@ pageextension 20506 "Subc. Work Center Card" extends "Work Center Card"
 #endif
         IsSubcontractingWorkCenter: Boolean;
 }
+#pragma warning restore AS0072, AS0136

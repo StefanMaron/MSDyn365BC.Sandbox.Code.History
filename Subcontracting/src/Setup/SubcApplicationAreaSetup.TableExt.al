@@ -10,10 +10,11 @@ tableextension 20571 "Subc. Application Area Setup" extends "Application Area Se
 {
     fields
     {
-        field(99001500; Subcontracting; Boolean)
+        field(20500; Subcontracting; Boolean)
         {
             Caption = 'Subcontracting';
             DataClassification = CustomerContent;
         }
     }
 }
+#pragma warning restore AS0072, AS0136
