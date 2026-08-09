@@ -460,3 +460,4 @@ codeunit 20505 "Subcontracting Management"
     begin
     end;
 }
+#pragma warning restore AS0072, AS0136
