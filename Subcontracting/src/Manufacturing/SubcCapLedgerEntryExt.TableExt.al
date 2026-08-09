@@ -12,18 +12,18 @@ tableextension 20504 "Subc. Cap Ledger Entry Ext." extends "Capacity Ledger Entr
     AllowInCustomizations = AsReadOnly;
     fields
     {
-        field(20500; "Subc. Subcontractor No."; Code[20])
+        field(99001500; "Subc. Subcontractor No."; Code[20])
         {
             Caption = 'Subcontractor No.';
             DataClassification = CustomerContent;
         }
-        field(20512; "Subc. Purch. Order No."; Code[20])
+        field(99001512; "Subc. Purch. Order No."; Code[20])
         {
             Caption = 'Subc. Purch. Order No.';
             DataClassification = CustomerContent;
             TableRelation = "Purchase Header"."No." where("Document Type" = const(Order));
         }
-        field(20513; "Subc. Purch. Order Line No."; Integer)
+        field(99001513; "Subc. Purch. Order Line No."; Integer)
         {
             Caption = 'Subc. Purch. Order Line No.';
             DataClassification = CustomerContent;
