@@ -225,3 +225,4 @@ codeunit 20562 "Subc. Comp. Factbox Mgmt."
         ProdOrderRoutingLine.FindFirst();
     end;
 }
+#pragma warning restore AS0072, AS0136
