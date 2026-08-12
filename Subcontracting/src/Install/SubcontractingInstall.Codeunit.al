@@ -6,6 +6,7 @@ namespace Microsoft.Manufacturing.Subcontracting;
 
 using System.Upgrade;
 
+#pragma warning disable AS0072, AS0136
 codeunit 20501 "Subcontracting Install"
 {
     Subtype = Install;
@@ -73,3 +74,4 @@ codeunit 20501 "Subcontracting Install"
         UpgradeTag.SetUpgradeTag(SubcUpgradeTagDefExt.GetSubcontractingUpgradeTag());
     end;
 }
+#pragma warning restore AS0072, AS0136

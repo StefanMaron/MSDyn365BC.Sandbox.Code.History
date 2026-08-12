@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Manufacturing.Subcontracting;
 
+#pragma warning disable AS0072, AS0136
 enum 20508 "WIP Ledger Entry Type"
 {
     Extensible = true;
