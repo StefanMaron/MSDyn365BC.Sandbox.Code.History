@@ -6,6 +6,7 @@ namespace Microsoft.Manufacturing.Subcontracting;
 
 using Microsoft.Manufacturing.Document;
 
+#pragma warning disable AS0072, AS0136
 page 20503 "Subc. Prod. Order Components"
 {
     ApplicationArea = Subcontracting;
