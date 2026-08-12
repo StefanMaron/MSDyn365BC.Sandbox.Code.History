@@ -8,6 +8,7 @@ using Microsoft.Inventory.Transfer;
 using Microsoft.Manufacturing.RoleCenters;
 using Microsoft.Purchases.Document;
 
+#pragma warning disable AS0072, AS0136
 tableextension 20529 "Subc. Manufacturing Cue" extends "Manufacturing Cue"
 {
     fields
