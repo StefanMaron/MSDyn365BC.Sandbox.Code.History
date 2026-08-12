@@ -6,6 +6,7 @@ namespace Microsoft.Manufacturing.Subcontracting;
 
 using Microsoft.Inventory.Transfer;
 
+#pragma warning disable AS0072, AS0136
 tableextension 20521 "Subc. Trans Rcpt Header Ext." extends "Transfer Receipt Header"
 {
     AllowInCustomizations = AsReadOnly;
