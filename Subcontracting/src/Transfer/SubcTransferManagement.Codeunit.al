@@ -13,6 +13,7 @@ using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Setup;
 using Microsoft.Purchases.Document;
 
+#pragma warning disable AS0072, AS0136
 codeunit 20504 "Subc. Transfer Management"
 {
     var
