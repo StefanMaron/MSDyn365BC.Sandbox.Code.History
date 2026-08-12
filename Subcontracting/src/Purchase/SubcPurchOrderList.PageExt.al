@@ -6,6 +6,7 @@ namespace Microsoft.Manufacturing.Subcontracting;
 
 using Microsoft.Purchases.Document;
 
+#pragma warning disable AS0072, AS0136
 pageextension 20525 "Subc. PurchOrderList" extends "Purchase Order List"
 {
     layout
