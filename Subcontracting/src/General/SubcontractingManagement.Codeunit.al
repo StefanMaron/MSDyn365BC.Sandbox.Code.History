@@ -18,6 +18,7 @@ using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
 using System.Utilities;
 
+#pragma warning disable AS0072, AS0136
 codeunit 20505 "Subcontracting Management"
 {
     var
