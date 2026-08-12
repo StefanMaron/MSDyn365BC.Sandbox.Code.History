@@ -77,7 +77,6 @@ codeunit 6396 "Continia Session Manager"
                 exit(CachedAccessToken);
     end;
 
-    [NonDebuggable]
     local procedure AcquireToken(ShowError: Boolean): Boolean
     var
         ConnectionSetup: Record "Continia Connection Setup";
