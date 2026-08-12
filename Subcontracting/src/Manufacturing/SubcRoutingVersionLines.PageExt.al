@@ -6,6 +6,7 @@ namespace Microsoft.Manufacturing.Subcontracting;
 
 using Microsoft.Manufacturing.Routing;
 
+#pragma warning disable AS0072, AS0136
 pageextension 20509 "Subc. Routing Version Lines" extends "Routing Version Lines"
 {
     layout
