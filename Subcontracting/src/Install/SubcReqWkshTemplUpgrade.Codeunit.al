@@ -7,6 +7,7 @@ namespace Microsoft.Manufacturing.Subcontracting;
 using Microsoft.Inventory.Requisition;
 using System.Upgrade;
 
+#pragma warning disable AS0072, AS0136
 codeunit 20572 "Subc. Req Wksh Templ Upgrade"
 {
     Subtype = Upgrade;
@@ -66,3 +67,4 @@ codeunit 20572 "Subc. Req Wksh Templ Upgrade"
         exit(99001504);
     end;
 }
+#pragma warning restore AS0072, AS0136
