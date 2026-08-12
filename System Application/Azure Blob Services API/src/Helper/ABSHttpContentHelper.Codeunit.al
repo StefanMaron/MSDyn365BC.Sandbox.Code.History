@@ -128,7 +128,6 @@ codeunit 9049 "ABS HttpContent Helper"
         ABSOperationPayload.AddContentHeader('Content-Length', Format(Length));
     end;
 
-    [NonDebuggable]
     procedure ContentSet(HttpContent: HttpContent): Boolean
     var
         VarContent: Text;
