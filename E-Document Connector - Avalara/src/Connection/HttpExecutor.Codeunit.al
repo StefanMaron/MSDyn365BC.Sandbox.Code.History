@@ -16,7 +16,6 @@ codeunit 6377 "Http Executor"
     /// <summary>
     /// Execute http calls. Handle response with error logging.
     /// </summary>
-    [NonDebuggable]
     procedure ExecuteHttpRequest(var Request: Codeunit Requests) Response: Text
     var
         HttpResponse: HttpResponseMessage;
@@ -27,7 +26,6 @@ codeunit 6377 "Http Executor"
     /// <summary>
     /// Execute http calls. Handle response with error logging and store response in HttpResponse
     /// </summary>
-    [NonDebuggable]
     procedure ExecuteHttpRequest(var Request: Codeunit Requests; HttpResponse: HttpResponseMessage) Response: Text
     var
         FeatureTelemetry: Codeunit "Feature Telemetry";
@@ -55,7 +53,6 @@ codeunit 6377 "Http Executor"
     /// <summary>
     /// Throw error for requests not of status 200 and 201.
     /// </summary>
-    [NonDebuggable]
     local procedure HandleHttpResponse(LocalHttpResponseMessage: HttpResponseMessage; var Response: Text)
     var
         FriendlyErrorMsg: Text;
@@ -93,7 +90,6 @@ codeunit 6377 "Http Executor"
     end;
 
     [TryFunction]
-    [NonDebuggable]
     local procedure Parse400Messages(Content: Text; var Message: Text)
     var
         ResponseJson: JsonObject;
@@ -105,7 +101,6 @@ codeunit 6377 "Http Executor"
     end;
 
     [TryFunction]
-    [NonDebuggable]
     local procedure GetContent(HttpResponseMsg: HttpResponseMessage; var Response: Text)
     begin
         HttpResponseMsg.Content().ReadAs(Response);
