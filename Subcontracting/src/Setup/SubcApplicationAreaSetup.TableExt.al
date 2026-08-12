@@ -6,6 +6,7 @@ namespace Microsoft.Manufacturing.Subcontracting;
 
 using System.Environment.Configuration;
 
+#pragma warning disable AS0072, AS0136
 tableextension 20571 "Subc. Application Area Setup" extends "Application Area Setup"
 {
     fields
