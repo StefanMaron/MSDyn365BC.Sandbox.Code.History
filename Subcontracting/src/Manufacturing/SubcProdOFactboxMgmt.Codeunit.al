@@ -12,6 +12,7 @@ using Microsoft.Purchases.History;
 using Microsoft.Utilities;
 using System.Reflection;
 
+#pragma warning disable AS0072, AS0136
 codeunit 20559 "Subc. ProdO. Factbox Mgmt."
 {
 #if not CLEAN28

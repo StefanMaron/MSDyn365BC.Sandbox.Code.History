@@ -13,6 +13,7 @@ using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
 using System.Utilities;
 
+#pragma warning disable AS0072, AS0136
 codeunit 20524 "Subc. Prod. Order Comp. Ext."
 {
     var
