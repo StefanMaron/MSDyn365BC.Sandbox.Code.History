@@ -114,7 +114,6 @@ codeunit 7779 "Azure DI Impl." implements "AI Service Name"
         Result := ALCopilotResponse.Result();
     end;
 
-    [NonDebuggable]
     local procedure GenerateJsonForSingleInput(Base64: Text): Text
     var
         JsonObject: JsonObject;
