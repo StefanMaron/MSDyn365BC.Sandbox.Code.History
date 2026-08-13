@@ -10661,6 +10661,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Non-O365 Shipping Agent - NamedType ModifiedShippingSvcCodeMsg)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3835063973 - NamedType 3765794466" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[must not be greater than %1 because a corrective credit memo can only reverse the original posted invoice, not add quantity.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 - the quantity copied from the posted purchase invoice]D;]A;(LookupHint=Codeunit O365 Correct Purchase Invoice - NamedType CorrectiveCreditMemoQtyIncreaseErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3835063973 - NamedType 2976868375" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The invoice was posted from an order. The order has been deleted, and the invoice will be cancelled. You can create a new invoice or order by using the Copy Document action.\ \Do you want to continue?]]></Val>
