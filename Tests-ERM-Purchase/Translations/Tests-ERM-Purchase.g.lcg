@@ -1616,6 +1616,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Purchase Documents - NamedType SelfBillingInvoiceReportCaptionLbl)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1217376489 - NamedType 3172076768" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Specify a number series for self-billing invoices in the %1 field on vendor %2, or in the %3 field in %4.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Self-Billing Invoice Nos. field caption, %2 = Vendor No., %3 = Posted Self-Billing Inv. Nos. field caption, %4 = Purchases & Payables Setup table caption]D;]A;(LookupHint=Codeunit Purchase Documents - NamedType SelfBillingNoSeriesMissingErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1217376489 - NamedType 1702585329" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[You must update the existing purchase lines manually.]]></Val>
