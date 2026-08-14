@@ -3524,6 +3524,15 @@
       <Cmt Name="Dev"><![CDATA[%1 : Actual location code; %2 : expected location code.]D;]A;(LookupHint=Codeunit SCM Warehouse Pick - NamedType UnexpectedLocationCodeErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3064124675 - NamedType 2702247572" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Unexpected quantity of lot %1 in bin %2.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 - Lot No.; %2 - Bin Code]D;]A;(LookupHint=Codeunit SCM Warehouse Pick - NamedType UnexpectedQtyOfLotInBinErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3064124675 - NamedType 3471199072" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA["Unit of Measure Code" control must not be editable]]></Val>
