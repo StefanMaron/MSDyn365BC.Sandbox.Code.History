@@ -2,7 +2,7 @@
   "id": "f0eb8756-ea72-4ef8-b0de-686d2a44b259",
   "name": "Enforced Digital Vouchers Tests",
   "publisher": "Microsoft",
-  "version": "29.0.53613.0",
+  "version": "29.0.53635.0",
   "brief": "Tests for the Enforced Digital Vouchers extension.",
   "description": "Tests for the Enforced Digital Vouchers extension.",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
@@ -16,6 +16,18 @@
     {
       "id": "e2ae191d-8829-44c3-a373-3749a2742d4e",
       "name": "Enforced Digital Vouchers",
+      "publisher": "Microsoft",
+      "version": "29.0.0.0"
+    },
+    {
+      "id": "e1d97edc-c239-46b4-8d84-6368bdf67c8b",
+      "name": "E-Document Core",
+      "publisher": "Microsoft",
+      "version": "29.0.0.0"
+    },
+    {
+      "id": "e1d97edc-c239-46b4-8d84-6368bdf67c8c",
+      "name": "E-Document Core Tests",
       "publisher": "Microsoft",
       "version": "29.0.0.0"
     },
@@ -48,6 +60,10 @@
     {
       "from": 139515,
       "to": 139516
+    },
+    {
+      "from": 139649,
+      "to": 139649
     }
   ],
   "contextSensitiveHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2141039",
