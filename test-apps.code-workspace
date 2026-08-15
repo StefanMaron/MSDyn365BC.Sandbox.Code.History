@@ -3,9 +3,9 @@
     "search.exclude": {
       "**.xlf": true
     },
-    "allint.enabled": false,
+    "al.enableCodeActions": false,
     "al.enableCodeAnalysis": false,
-    "al.enableCodeActions": false
+    "allint.enabled": false
   },
   "folders": [
     {
@@ -288,19 +288,19 @@
       "path": "./VAT Group Management Tests"
     },
     {
+      "path": "./AI Test Toolkit/src/TestSuite"
+    },
+    {
+      "path": "./Base Application/System/DevTools/CALTest"
+    },
+    {
+      "path": "./System Application/Email/src/Test Email"
+    },
+    {
       "path": "./Sales Lines Suggestions Tests/AI Tests"
     },
     {
       "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
-    },
-    {
-      "path": "./Subscription Billing Tests/DisabledTests"
-    },
-    {
-      "path": "./System Application Test/DisabledTests"
-    },
-    {
-      "path": "./System Application Test/Extension Management/testArtifacts"
     },
     {
       "path": "./Performance Toolkit Tests/src/Mock Tests"
@@ -309,28 +309,28 @@
       "path": "./Shopify Connector Test/DisabledTests"
     },
     {
-      "path": "./Base Application/System/DevTools/CALTest"
-    },
-    {
-      "path": "./Test Runner/src/DataDrivenTest"
-    },
-    {
-      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
-    },
-    {
-      "path": "./AI Test Toolkit/src/TestSuite"
-    },
-    {
       "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
     },
     {
       "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
     },
     {
-      "path": "./System Application/Email/src/Test Email"
+      "path": "./Business Foundation Tests/DisabledTests"
     },
     {
-      "path": "./Business Foundation Tests/DisabledTests"
+      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
+    },
+    {
+      "path": "./System Application Test/DisabledTests"
+    },
+    {
+      "path": "./System Application Test/Extension Management/testArtifacts"
+    },
+    {
+      "path": "./Subscription Billing Tests/DisabledTests"
+    },
+    {
+      "path": "./Test Runner/src/DataDrivenTest"
     }
   ]
 }
