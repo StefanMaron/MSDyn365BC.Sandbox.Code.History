@@ -5,6 +5,1752 @@
     <Cmt Name="LcxAdmin" />
     <Cmt Name="Rccx" />
   </OwnedComments>
+  <Item ItemId=";Codeunit 3126765135 - Method 3540955842 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD1_BOMLoadedFromItemBOM_TwoLines - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 3540955842 - NamedType 3744760950" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOMLinesPart should display exactly 2 lines from the certified BOM]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD1_BOMLoadedFromItemBOM_TwoLines - NamedType BOMLinesShouldDisplay2LinesFromCertifiedBOMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 3540955842 - NamedType 1035750062" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOM component %1 should belong to BOM %2]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = component item No.; %2 = Production BOM No.]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD1_BOMLoadedFromItemBOM_TwoLines - NamedType BOMComponentShouldBelongToBOMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 3540955842 - NamedType 762476326" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOM line for component %1 should have Quantity per > 0]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = component item No.]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD1_BOMLoadedFromItemBOM_TwoLines - NamedType BOMLineQtyPerShouldBeGreaterThanZeroLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 1683384103 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD2_RoutingLoadedFromItemRouting_TwoLines - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 1683384103 - NamedType 246586150" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[RoutingLinesPart should display exactly 2 lines from the certified Routing]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD2_RoutingLoadedFromItemRouting_TwoLines - NamedType RoutingLinesShouldDisplay2LinesFromCertifiedRoutingLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 1683384103 - NamedType 3389933721" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Routing work center %1 should belong to Routing %2]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = work center No.; %2 = Routing No.]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD2_RoutingLoadedFromItemRouting_TwoLines - NamedType RoutingWorkCenterShouldBelongToRoutingLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 1683384103 - NamedType 2080337588" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Routing line operation 10 must exist]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD2_RoutingLoadedFromItemRouting_TwoLines - NamedType RoutingLineOperation10MustExistLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 1683384103 - NamedType 2904452360" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Routing line 10 Setup Time should be 10]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD2_RoutingLoadedFromItemRouting_TwoLines - NamedType RoutingLine10SetupTimeShouldBe10Lbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 1683384103 - NamedType 1757187746" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Routing line 10 Run Time should be 5]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD2_RoutingLoadedFromItemRouting_TwoLines - NamedType RoutingLine10RunTimeShouldBe5Lbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 1683384103 - NamedType 749486517" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Routing line operation 20 must exist]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD2_RoutingLoadedFromItemRouting_TwoLines - NamedType RoutingLineOperation20MustExistLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 1683384103 - NamedType 513342558" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Routing line 20 Setup Time should be 15]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD2_RoutingLoadedFromItemRouting_TwoLines - NamedType RoutingLine20SetupTimeShouldBe15Lbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 1683384103 - NamedType 2177905060" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Routing line 20 Run Time should be 8]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD2_RoutingLoadedFromItemRouting_TwoLines - NamedType RoutingLine20RunTimeShouldBe8Lbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 275085899 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD3_ActiveBOMVersionSelectedByDefault - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 275085899 - NamedType 2098442637" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[SelectedBOMVersion should be V2 (active version as of WorkDate)]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD3_ActiveBOMVersionSelectedByDefault - NamedType SelectedBOMVersionShouldBeV2Lbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 275085899 - NamedType 1945256191" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOM version V2 should be Certified]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD3_ActiveBOMVersionSelectedByDefault - NamedType BOMVersionV2ShouldBeCertifiedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 275085899 - NamedType 3520297756" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOM version V2 Starting Date should equal WorkDate()]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD3_ActiveBOMVersionSelectedByDefault - NamedType BOMVersionV2StartingDateShouldEqualWorkDateLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 1232913422 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD4_ActiveRoutingVersionSelectedByDefault - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 1232913422 - NamedType 1546623729" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[SelectedRoutingVersion should be V2 (active version as of WorkDate)]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD4_ActiveRoutingVersionSelectedByDefault - NamedType SelectedRoutingVersionShouldBeV2Lbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 1232913422 - NamedType 820297867" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Routing version V2 should be Certified]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD4_ActiveRoutingVersionSelectedByDefault - NamedType RoutingVersionV2ShouldBeCertifiedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 1232913422 - NamedType 3116666096" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Routing version V2 Starting Date should equal WorkDate()]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD4_ActiveRoutingVersionSelectedByDefault - NamedType RoutingVersionV2StartingDateShouldEqualWorkDateLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 837482518 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD5_AssistEditBOMNo_ReloadsBOMLines - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 837482518 - NamedType 1806987054" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOMLinesPart should display 3 lines from the newly selected BOM-B]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD5_AssistEditBOMNo_ReloadsBOMLines - NamedType BOMLinesShouldDisplay3LinesFromNewBOMBLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 837482518 - NamedType 1568414452" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOM component %1 should belong to BOM-B %2]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = component item No.; %2 = Production BOM No.]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD5_AssistEditBOMNo_ReloadsBOMLines - NamedType BOMComponentShouldBelongToBOMBLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 837482518 - NamedType 115561152" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Item Production BOM No. should be updated to the new BOM after wizard when Save=true]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD5_AssistEditBOMNo_ReloadsBOMLines - NamedType ItemProdBOMNoShouldBeUpdatedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 127873291 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD6_AssistEditRoutingNo_ReloadsRoutingLines - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 127873291 - NamedType 3267708141" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[RoutingLinesPart should display 2 lines from the newly selected Routing-B]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD6_AssistEditRoutingNo_ReloadsRoutingLines - NamedType RoutingLinesShouldDisplay2LinesFromNewRoutingBLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 127873291 - NamedType 1667278679" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Routing work center %1 should belong to Routing-B %2]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = work center No.; %2 = Routing No.]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD6_AssistEditRoutingNo_ReloadsRoutingLines - NamedType RoutingWorkCenterShouldBelongToRoutingBLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 127873291 - NamedType 941549435" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Item Routing No. should be updated to the new Routing after wizard when Save=true]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD6_AssistEditRoutingNo_ReloadsRoutingLines - NamedType ItemRoutingNoShouldBeUpdatedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 2150625477 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD7_ComponentsAndRoutingPreview_CorrectFromBOMAndRouting - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 2150625477 - NamedType 284011825" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[ComponentsPart should list 2 lines matching the Prod. Order components]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD7_ComponentsAndRoutingPreview_CorrectFromBOMAndRouting - NamedType ComponentsPartShouldListLinesLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 2150625477 - NamedType 3282997014" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Component item %1 should exist in the created Prod. Order]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = item No.]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD7_ComponentsAndRoutingPreview_CorrectFromBOMAndRouting - NamedType ComponentItemShouldExistLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 2150625477 - NamedType 2637579572" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[ProdOrderRoutingPart should list 2 lines matching the Prod. Order routing lines]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD7_ComponentsAndRoutingPreview_CorrectFromBOMAndRouting - NamedType ProdOrderRoutingPartShouldListLinesLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 2150625477 - NamedType 2135216190" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Work center %1 should exist in the created Prod. Order routing]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = work center No.]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD7_ComponentsAndRoutingPreview_CorrectFromBOMAndRouting - NamedType WorkCenterShouldExistLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 129405938 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD8_BOMLineFields_TransferredToProdOrderComponent - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3126765135 - Method 4292785810 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. BOM Rtng Test - Method TestD9_RoutingLineFields_TransferredToProdOrderRoutingLine - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975892440 - Method 1688309152 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Change Test - Method TestH1_ChangeBOMOnStep2_NavigateBackForward_BOMRetained - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975892440 - Method 1688309152 - NamedType 3633549550" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[SelectedBOMNo should be retained after Back/Forward navigation]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Change Test - Method TestH1_ChangeBOMOnStep2_NavigateBackForward_BOMRetained - NamedType SelectedBOMNoRetainedAfterBackForwardLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975892440 - Method 2100542058 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Change Test - Method TestH2_ChangeRoutingOnStep3_BOMSelectionOnStep2Unchanged - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975892440 - Method 2100542058 - NamedType 2173674935" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[SelectedBOMNo should remain unchanged after Routing change on Step 3]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Change Test - Method TestH2_ChangeRoutingOnStep3_BOMSelectionOnStep2Unchanged - NamedType SelectedBOMNoUnchangedAfterRoutingChangeLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975892440 - Method 302636618 - NamedType 3531760523" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOM lines should be editable after user overrides BOMRoutingDisplay to Edit]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Change Test - Method TestH3_ChangeBOMRoutingDisplayToEdit_BOMStepEditable - NamedType BOMLinesEditableAfterOverrideLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975892440 - Method 302636618 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Change Test - Method TestH3_ChangeBOMRoutingDisplayToEdit_BOMStepEditable - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975892440 - Method 293947989 - NamedType 1438049945" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOM step should not be visible after changing BOMRoutingDisplay to Hide]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Change Test - Method TestH4_ChangeBOMRoutingDisplayToHide_BOMStepSkipped - NamedType BOMStepNotVisibleAfterHideLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975892440 - Method 293947989 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Change Test - Method TestH4_ChangeBOMRoutingDisplayToHide_BOMStepSkipped - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975892440 - Method 1005383520 - NamedType 1994668793" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[CreateBOMVersion should be reset to false after selecting existing certified version]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Change Test - Method TestH5_CreateBOMVersionOn_AssistEditSelectsExistingVersion_CreateBOMVersionCleared - NamedType CreateBOMVersionResetAfterVersionSelectLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975892440 - Method 1005383520 - NamedType 1462122060" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOM lines should not be editable when existing certified version is selected]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Change Test - Method TestH5_CreateBOMVersionOn_AssistEditSelectsExistingVersion_CreateBOMVersionCleared - NamedType BOMLinesNotEditableWhenExistingVersionSelectedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975892440 - Method 1005383520 - NamedType 2091437314" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[SelectedBOMVersion should be V001 after AssistEdit selects the existing certified version]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Change Test - Method TestH5_CreateBOMVersionOn_AssistEditSelectsExistingVersion_CreateBOMVersionCleared - NamedType SelectedBOMVersionAfterAssistEditLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975892440 - Method 1005383520 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Change Test - Method TestH5_CreateBOMVersionOn_AssistEditSelectsExistingVersion_CreateBOMVersionCleared - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975892440 - Method 1476293534 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Change Test - Method TestH6_BackNavigateFromComponentsStep_ComponentCountStableAfterReEntry - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1755171885 - Method 980000524 - NamedType 3911476427" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOM %1 version %2: expected %3 lines but found %4]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Production BOM No.; %2 = Version Code; %3 = Expected line count; %4 = Actual line count]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Check Lib. - Method VerifyBOMVersionLineCount - NamedType BOMVersionLineCountMismatchLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1755171885 - Method 3113925439 - NamedType 755946365" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Reservation base quantity should be greater than zero]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Check Lib. - Method VerifyReservationBaseQtyMatchesProdOrderRemainingBase - NamedType ReservationQtyShouldBeGreaterThanZeroLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1755171885 - Method 2505274576 - NamedType 3907997583" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Routing %1 version %2: expected %3 lines but found %4]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Routing No.; %2 = Version Code; %3 = Expected line count; %4 = Actual line count]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Check Lib. - Method VerifyRoutingVersionLineCount - NamedType RoutingVersionLineCountMismatchLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1755171885 - Method 573426425 - NamedType 215253838" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Reservation Entry should exist for Prod. Order Line of item %1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Item No.]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Check Lib. - Method VerifyTrackingSpecExistsForProdOrderLine - NamedType ReservationShouldExistForProdOrderLineLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1755171885 - Method 573426425 - NamedType 2954408420" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Lot No. on Reservation Entry should match expected: %1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Expected Lot No.]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Check Lib. - Method VerifyTrackingSpecExistsForProdOrderLine - NamedType LotNoShouldMatchExpectedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 1557290551 - NamedType 3247266698" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOM step (Step 2) should be visible in DefineItemStructure mode regardless of setup]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC1_BOMRoutingDisplayHide_DefineItemStructureMode_ForcedToEdit - NamedType BOMStepVisibleLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 1557290551 - NamedType 4144063334" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Routing step (Step 3) should be visible in DefineItemStructure mode regardless of setup]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC1_BOMRoutingDisplayHide_DefineItemStructureMode_ForcedToEdit - NamedType RoutingStepVisibleLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 4045866583 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC2_BOMRoutingDisplayShow_DefineItemStructureMode_ForcedToEdit - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 4045866583 - NamedType 2762857256" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOM lines should be editable in DefineItemStructure mode regardless of Show setting]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC2_BOMRoutingDisplayShow_DefineItemStructureMode_ForcedToEdit - NamedType BOMLinesEditableForcedEditLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 4045866583 - NamedType 1499466533" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[CreateBOMVersionField should be enabled in DefineItemStructure mode regardless of Show setting]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC2_BOMRoutingDisplayShow_DefineItemStructureMode_ForcedToEdit - NamedType CreateBOMVersionFieldEnabledLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 3062135777 - NamedType 1160052265" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Components step (Step 4) should not be visible when ProdComp = Hide]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC3_ProdCompDisplayHide_Steps4And5Skipped - NamedType ComponentsStepNotVisibleHideLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 3062135777 - NamedType 3786007730" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Prod. Routing step (Step 5) should not be visible when ProdComp = Hide]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC3_ProdCompDisplayHide_Steps4And5Skipped - NamedType ProdRoutingStepNotVisibleHideLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 3062135777 - NamedType 2708530075" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Production order should be created when ProdComp = Hide]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC3_ProdCompDisplayHide_Steps4And5Skipped - NamedType ProductionOrderShouldBeCreatedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 2399146769 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC4_ProdCompDisplayShow_StepVisibleAndDisplayIsHide - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 2399146769 - NamedType 1859617912" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Components step (Step 4) should not be visible when ProdComp = Show]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC4_ProdCompDisplayShow_StepVisibleAndDisplayIsHide - NamedType ComponentsStepNotVisibleShowLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 2399146769 - NamedType 3915492144" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[ProdCompDisplayField should be Hide]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC4_ProdCompDisplayShow_StepVisibleAndDisplayIsHide - NamedType ProdCompDisplayFieldShouldBeHideLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 2298584871 - NamedType 4087393812" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Show/Edit options group should be enabled when Allow Edit UI Selection = true]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC5_AllowEditUISelectionTrue_GroupEnabled - NamedType ShowEditOptionsEnabledLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 708800124 - NamedType 2721467383" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Show/Edit options group should be disabled when Allow Edit UI Selection = false]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC6_AllowEditUISelectionFalse_GroupDisabled - NamedType ShowEditOptionsDisabledLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 1933288818 - NamedType 326092097" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOMRoutingDisplay should come from ShowRtngBOMSelect_Nothing = Show]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC7_ScenarioNothingAvailable_DisplayFieldsFromNothingSetupFields - NamedType BOMRoutingDisplayFromNothingLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 1933288818 - NamedType 72941629" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[ProdCompDisplay should come from ShowProdCompSelect_Nothing = Show]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC7_ScenarioNothingAvailable_DisplayFieldsFromNothingSetupFields - NamedType ProdCompDisplayFromNothingLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 3726236024 - NamedType 2543282835" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOMRoutingDisplay should come from ShowRtngBOMSelect_Partial = Edit]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC8_ScenarioPartiallyAvailable_DisplayFieldsFromPartialSetupFields - NamedType BOMRoutingDisplayFromPartialLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 3726236024 - NamedType 2205218999" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[ProdCompDisplay should come from ShowProdCompSelect_Partial = Edit]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC8_ScenarioPartiallyAvailable_DisplayFieldsFromPartialSetupFields - NamedType ProdCompDisplayFromPartialLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 278227452 - NamedType 2317793357" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOMRoutingDisplay should come from ShowRtngBOMSelect_Both = Show]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC9_ScenarioBothAvailable_DisplayFieldsFromBothSetupFields - NamedType BOMRoutingDisplayFromBothLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 278227452 - NamedType 230156497" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[ProdCompDisplay should come from ShowProdCompSelect_Both = Show]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC9_ScenarioBothAvailable_DisplayFieldsFromBothSetupFields - NamedType ProdCompDisplayFromBothLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 4260001573 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC_BOMRoutingDisplayEdit_BOMStepEditable - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4166272284 - Method 4260001573 - NamedType 2649208427" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOM lines should be editable when Display = Edit]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Config Test - Method TestC_BOMRoutingDisplayEdit_BOMStepEditable - NamedType BOMLinesEditableWhenEditLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3198758176 - Method 4222096523 - NamedType 2678536894" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[SaveBOMRoutingToSource should be StockkeepingUnit when Save is enabled for SKU source]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. General Test - Method HandleWizardSaveToSKUAndCaptureBOM - NamedType SaveBOMRoutingToSourceShouldBeSKULbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3198758176 - Method 2531654015 - NamedType 3314879459" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished successfully]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. General Test - Method TestA1_OpenFromItemNoBOMRouting_OpensAndFinishes - NamedType WizardShouldHaveFinishedSuccessfullyLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3198758176 - Method 2531654015 - NamedType 1347963026" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have created a new Production BOM]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. General Test - Method TestA1_OpenFromItemNoBOMRouting_OpensAndFinishes - NamedType WizardShouldHaveCreatedNewBOMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3198758176 - Method 2618137261 - NamedType 3649477605" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished successfully from SKU]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. General Test - Method TestA2_OpenFromSKU_OpensAndFinishes - NamedType WizardShouldHaveFinishedFromSKULbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3198758176 - Method 2618137261 - NamedType 1997086236" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have created a new Production BOM for the SKU]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. General Test - Method TestA2_OpenFromSKU_OpensAndFinishes - NamedType WizardShouldHaveCreatedNewBOMForSKULbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3198758176 - Method 2214360910 - NamedType 2458972878" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Back button should be disabled on Step 1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. General Test - Method TestA3_Step1_BackButtonDisabled - NamedType BackButtonShouldBeDisabledStep1Lbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3198758176 - Method 762967909 - NamedType 3767975656" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Back button should be enabled on Step 2]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. General Test - Method TestA4_Step2_BackButtonEnabled - NamedType BackButtonShouldBeEnabledStep2Lbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3198758176 - Method 96874612 - NamedType 2382489141" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Step 4 (Components) should not be visible in DefineItemStructure mode]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. General Test - Method TestA5_DefineItemStructureMode_OnlySteps1To3 - NamedType Step4ShouldNotBeVisibleInDefineItemStructureLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3198758176 - Method 96874612 - NamedType 3367757022" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Step 5 (Prod. Routing) should not be visible in DefineItemStructure mode]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. General Test - Method TestA5_DefineItemStructureMode_OnlySteps1To3 - NamedType Step5ShouldNotBeVisibleInDefineItemStructureLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3198758176 - Method 3254604024 - NamedType 1861172154" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Step 2 (BOM) should be visible in CreateProductionOrder mode]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. General Test - Method TestA6_CreateProductionOrderMode_AllSteps1To5 - NamedType Step2ShouldBeVisibleInCreateProdOrderLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3198758176 - Method 3254604024 - NamedType 2763916633" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Step 3 (Routing) should be visible in CreateProductionOrder mode]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. General Test - Method TestA6_CreateProductionOrderMode_AllSteps1To5 - NamedType Step3ShouldBeVisibleInCreateProdOrderLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3198758176 - Method 3254604024 - NamedType 162351932" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Step 4 (Components) should be visible in CreateProductionOrder mode]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. General Test - Method TestA6_CreateProductionOrderMode_AllSteps1To5 - NamedType Step4ShouldBeVisibleInCreateProdOrderLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3198758176 - Method 3254604024 - NamedType 2933845019" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Step 5 (Prod. Routing) should be visible in CreateProductionOrder mode]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. General Test - Method TestA6_CreateProductionOrderMode_AllSteps1To5 - NamedType Step5ShouldBeVisibleInCreateProdOrderLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3319359408 - Method 3061777370 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Item Str. Test - Method TestK1_DefineItemStructure_SaveFalse_ItemBOMUnchanged - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3319359408 - Method 2158549152 - NamedType 1872291925" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[RunForSource should return false when wizard is cancelled]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Item Str. Test - Method TestK2_DefineItemStructure_UserCancels_ItemUnchanged_NoProdOrder - NamedType RunForSourceShouldReturnFalseLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3319359408 - Method 2158549152 - NamedType 534344244" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[WizardFinished should be false after cancel]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Item Str. Test - Method TestK2_DefineItemStructure_UserCancels_ItemUnchanged_NoProdOrder - NamedType WizardFinishedShouldBeFalseLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3319359408 - Method 1935533547 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Item Str. Test - Method TestK3_DefineItemStructure_SaveTrue_ItemBOMAndRoutingAssigned - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3319359408 - Method 1935533547 - NamedType 1347963026" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have created a new Production BOM]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Item Str. Test - Method TestK3_DefineItemStructure_SaveTrue_ItemBOMAndRoutingAssigned - NamedType WizardShouldHaveCreatedNewBOMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3319359408 - Method 1935533547 - NamedType 1139539214" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have created a new Routing]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Item Str. Test - Method TestK3_DefineItemStructure_SaveTrue_ItemBOMAndRoutingAssigned - NamedType WizardShouldHaveCreatedNewRoutingLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 2925742956 - NamedType 332106875" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[RunForSource should return true when interaction is skipped]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ10_BothHide_WizardSkipped_ProdOrderAutoCreated - NamedType RunForSourceReturnTrueOnSkipLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 2384144821 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ11_SaveItemInCreateProdOrderMode_ItemBOMRoutingUpdated - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 4186760869 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ12_WizardFinishes_ProdOrderLineHasCorrectBOMAndRouting - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 1922667090 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ13_UserSelectsBOMVersion_ProdOrderLineHasThatVersion - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 3197641887 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ14_UserSelectsRoutingVersion_ProdOrderLineHasThatVersion - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 1031388806 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ15_UserModifiesComponentQtyInStep4_ProdOrderComponentHasModifiedQty - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 1603910075 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ16_UserAddsComponentInStep4_AddedComponentInProdOrder - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 164314037 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ17_UserDeletesComponentInStep4_DeletedComponentAbsentFromProdOrder - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 2646567106 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ18_UserModifiesRoutingRunTimeInStep5_ProdOrderRoutingHasModifiedRunTime - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 2753180004 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ19_UserAddsRoutingOperationInStep5_AddedOperationPresentInProdOrder - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 3218355491 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ1_InitFromSalesLine_ProdOrderHeaderCorrect - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 889691886 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ20_UserDeletesRoutingOperationInStep5_DeletedOperationAbsentFromProdOrder - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 2319444309 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ21_WizardCompletes_NotificationSentWithProdOrderNo - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 2319444309 - NamedType 1704865494" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Notification message should contain the Production Order No.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ21_WizardCompletes_NotificationSentWithProdOrderNo - NamedType NotificationContainsProdOrderNoLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 1945454657 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ22_ProdOrderFromSalesLine_ExistingBOM_ComponentFlushingNotOverridden - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 509771533 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ23_BOMLineWithDescription2_ProdOrderComponentHasDescription2 - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 1780459599 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ24_RoutingLineWithDescription2_ProdOrderRoutingLineHasDescription2 - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 3476135617 - NamedType 2784624792" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished without error]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ25_SalesLineWithNoShipmentDate_WizardRunsWithoutError - NamedType WizardShouldHaveFinishedWithoutErrorLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 2948785739 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ26_SalesLineWithBlankLocation_ProdOrderCreatedWithBlankLocation - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 2571431964 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ27_SalesLineWithAlternateUOM_ReservationBaseQtyMatchesProdOrderRemainingBase - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 1224278869 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ28_SalesLineWithLotTracking_TrackingCopiedToProdOrderLine - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 3833109005 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ29_ItemWithScrapPct_ProdOrderLineHasScrapPct - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 3914087250 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ2_InitFromSalesLine_ComponentsCreatedFromBOM - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 2764581361 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ30_SalesLineWithVariantAndMatchingSKU_SKUBOMRoutingUsed - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 3178796022 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ31_ProdOrderFromSalesLine_NoBOM_TemporaryComponentGetsSetupFlushingMethod - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 3178796022 - NamedType 3080188537" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Flushing Method of the first component should match the setup default (Backward)]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ31_ProdOrderFromSalesLine_NoBOM_TemporaryComponentGetsSetupFlushingMethod - NamedType FirstComponentFlushingMethodBackwardLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 3178796022 - NamedType 2332184441" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Flushing Method of the last component should match the setup default (Backward)]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ31_ProdOrderFromSalesLine_NoBOM_TemporaryComponentGetsSetupFlushingMethod - NamedType LastComponentFlushingMethodBackwardLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 845995313 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ32_TempComponentsPreview_ExpectedQuantityNonZero - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 845995313 - NamedType 3528466490" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Temporary component Expected Quantity must be non-zero after Quantity per validation]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ32_TempComponentsPreview_ExpectedQuantityNonZero - NamedType TempComponentExpectedQtyNonZeroLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 845995313 - NamedType 1911348306" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Expected Quantity should equal Sales Qty × Quantity per]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ32_TempComponentsPreview_ExpectedQuantityNonZero - NamedType ExpectedQtyEqualsSalesQtyTimesQtyPerLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 1443236514 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ3_InitFromSalesLine_RoutingLinesCreatedFromRouting - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 3572727994 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ4_InitFromSalesLine_ReservationCreatedForProdOrder - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 3679221439 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ5_InitFromSalesLine_EmptyBOMRouting_OrderStillCreated - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 2634247501 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ6_SalesLineWithSKUMatchingLocation_SKUBOMRoutingUsed - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 2114116260 - NamedType 4284345655" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[RunForSource should return false when wizard is cancelled]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ7_UserCancelsWizard_NoProductionOrderCreated - NamedType RunForSourceReturnFalseOnCancelLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 2114116260 - NamedType 1003874696" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[WizardFinished should be false after cancel]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ7_UserCancelsWizard_NoProductionOrderCreated - NamedType WizardFinishedFalseAfterCancelLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 767113852 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ8_PlannedStatusVia3ArgOverload_ProdOrderHasPlannedStatus - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 2313955433 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ9_PartiallyReservedSalesLine_ProdOrderQtyEqualsOutstandingMinusReserved - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3975753926 - Method 4087633216 - NamedType 2259941516" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Cannot create a production order]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Sales Test - Method TestJ_FullyReservedSalesLine_ErrorOnRun - NamedType ProductionOrderQtyZeroOrNegativeErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1263771309 - Method 1185023177 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Save Test - Method TestF1_SaveOff_ItemBOMRoutingUnchanged - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1263771309 - Method 1723406595 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Save Test - Method TestF2_SaveToItem_ItemBOMRoutingUpdated - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1263771309 - Method 1723406595 - NamedType 1347963026" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have created a new Production BOM]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Save Test - Method TestF2_SaveToItem_ItemBOMRoutingUpdated - NamedType WizardShouldHaveCreatedNewBOMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1263771309 - Method 1723406595 - NamedType 1139539214" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have created a new Routing]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Save Test - Method TestF2_SaveToItem_ItemBOMRoutingUpdated - NamedType WizardShouldHaveCreatedNewRoutingLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1263771309 - Method 3032919833 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Save Test - Method TestF3_SaveToSKU_SKUUpdated_ItemUnchanged - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1263771309 - Method 3032919833 - NamedType 1139539214" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have created a new Routing]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Save Test - Method TestF3_SaveToSKU_SKUUpdated_ItemUnchanged - NamedType WizardShouldHaveCreatedNewRoutingLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1263771309 - Method 852883799 - NamedType 4291337549" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Stockkeeping Unit is not allowed when the source is Item.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Save Test - Method TestF4_SaveSKU_SourceIsItem_Error - NamedType SaveBOMRtngSKUNotAllowedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1263771309 - Method 194990975 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Save Test - Method TestF5_SaveOnThenOff_SaveTargetCleared - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1263771309 - Method 194990975 - NamedType 3665395312" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[SaveBOMRoutingToSource should be cleared (Empty) after Save toggle off]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Save Test - Method TestF5_SaveOnThenOff_SaveTargetCleared - NamedType SaveTargetShouldBeClearedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1263771309 - Method 3180354486 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Save Test - Method TestF6_DefineItemStructure_NoSave_NoProdOrderCreated - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1529359137 - Method 1736216182 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Source Test - Method TestB1_NeitherHasData_EmptySource_PlaceholderCreated - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1529359137 - Method 1736216182 - NamedType 3029880776" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Source should be empty when item has no BOM or Routing]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Source Test - Method TestB1_NeitherHasData_EmptySource_PlaceholderCreated - NamedType SourceShouldBeEmptyLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1529359137 - Method 1736216182 - NamedType 552292003" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Item BOM should have 1 placeholder line]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Source Test - Method TestB1_NeitherHasData_EmptySource_PlaceholderCreated - NamedType ItemBOMShouldHavePlaceholderLineLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1529359137 - Method 1847498548 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Source Test - Method TestB2_ItemHasBOMOnly_PartialScenario_RoutingPlaceholder - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1529359137 - Method 1847498548 - NamedType 3639916640" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Source should be Item]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Source Test - Method TestB2_ItemHasBOMOnly_PartialScenario_RoutingPlaceholder - NamedType SourceShouldBeItemLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1529359137 - Method 1847498548 - NamedType 2577519323" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOM-A should have 2 lines]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Source Test - Method TestB2_ItemHasBOMOnly_PartialScenario_RoutingPlaceholder - NamedType BOMAShouldHaveTwoLinesLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1529359137 - Method 2209680267 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Source Test - Method TestB3_ItemHasRoutingOnly_PartialScenario_BOMPlaceholder - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1529359137 - Method 2209680267 - NamedType 3639916640" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Source should be Item]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Source Test - Method TestB3_ItemHasRoutingOnly_PartialScenario_BOMPlaceholder - NamedType SourceShouldBeItemLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1529359137 - Method 2209680267 - NamedType 552292003" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Item BOM should have 1 placeholder line]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Source Test - Method TestB3_ItemHasRoutingOnly_PartialScenario_BOMPlaceholder - NamedType ItemBOMShouldHavePlaceholderLineLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1529359137 - Method 1268060391 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Source Test - Method TestB4_InitFromSalesLine_NoSKUForLocation_ItemUsed - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1529359137 - Method 1268060391 - NamedType 658497218" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Source should be Item (no SKU for location)]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Source Test - Method TestB4_InitFromSalesLine_NoSKUForLocation_ItemUsed - NamedType SourceShouldBeItemNoSKUForLocationLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1529359137 - Method 1323640653 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Source Test - Method TestB5_SKUHasBOMOnly_ItemHasRoutingOnly_BothResolved - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1529359137 - Method 1323640653 - NamedType 3647303952" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOM No. in wizard should be the SKU BOM (not empty); mixed-source resolution failed]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Source Test - Method TestB5_SKUHasBOMOnly_ItemHasRoutingOnly_BothResolved - NamedType BOMNoInWizardShouldBeSKUBOMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1529359137 - Method 1323640653 - NamedType 4115935071" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Routing No. in wizard should come from Item even though SKU has no Routing; GetBOMAndRoutingFromBestSource must not exit early]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Source Test - Method TestB5_SKUHasBOMOnly_ItemHasRoutingOnly_BothResolved - NamedType RoutingNoInWizardShouldComeFromItemLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4001755415 - Method 2898154676 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Variant Test - Method TestI2_SKUWithVariant_WizardInitializesFromCorrectSKU - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4001755415 - Method 2898154676 - NamedType 1905832388" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Source should be Stockkeeping Unit (matched by variant)]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Variant Test - Method TestI2_SKUWithVariant_WizardInitializesFromCorrectSKU - NamedType SourceShouldBeStockkeepingUnitVariantMatchLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4001755415 - Method 2898154676 - NamedType 4077387365" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have shown BOM lines from SKU BOM-B]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Variant Test - Method TestI2_SKUWithVariant_WizardInitializesFromCorrectSKU - NamedType WizardShouldHaveShownBOMLinesFromSKUBOMBLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4001755415 - Method 2898154676 - NamedType 3614049459" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard BOM line count should match SKU BOM-B line count (not Item BOM-A)]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Variant Test - Method TestI2_SKUWithVariant_WizardInitializesFromCorrectSKU - NamedType WizardBOMLineCountShouldMatchSKUBOMBLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4001755415 - Method 2898154676 - NamedType 2760182699" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOM line item %1 should belong to SKU BOM-B, not Item BOM-A]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = BOM line item No.]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Variant Test - Method TestI2_SKUWithVariant_WizardInitializesFromCorrectSKU - NamedType BOMLineItemShouldBelongToSKUBOMBLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4001755415 - Method 3032952047 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Variant Test - Method TestI3_SKULookupConsidersLocationAndVariant_ExactVariantMatch - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4001755415 - Method 3032952047 - NamedType 2131124525" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Source should be StockkeepingUnit (exact variant match)]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Variant Test - Method TestI3_SKULookupConsidersLocationAndVariant_ExactVariantMatch - NamedType SourceShouldBeStockkeepingUnitExactVariantMatchLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4001755415 - Method 3032952047 - NamedType 1956051745" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have shown at least one BOM line]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Variant Test - Method TestI3_SKULookupConsidersLocationAndVariant_ExactVariantMatch - NamedType WizardShouldHaveShownAtLeastOneBOMLineLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4001755415 - Method 3032952047 - NamedType 997430643" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard BOM line count should match SKU2's BOM line count]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Variant Test - Method TestI3_SKULookupConsidersLocationAndVariant_ExactVariantMatch - NamedType WizardBOMLineCountShouldMatchSKU2BOMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4001755415 - Method 3032952047 - NamedType 3789444907" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOM line item %1 should belong to SKU2's BOM (exact variant match), not SKU1's]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = BOM line item No.]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Variant Test - Method TestI3_SKULookupConsidersLocationAndVariant_ExactVariantMatch - NamedType BOMLineItemShouldBelongToSKU2BOMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 3758963687 - NamedType 3641525960" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Version Nos. must have a value]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method HandleWizardToggleCreateBOMVersionError - NamedType VersionNosRequiredErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 2732581635 - NamedType 3641525960" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Version Nos. must have a value]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method HandleWizardToggleCreateRoutingVersionError - NamedType VersionNosRequiredErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 1163430006 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE10_BackForwardNavigation_BOMVersionLineCountStable - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 2163825682 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE11_AlwaysSaveModifiedVersions_True_RoutingVersionKept - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 2163825682 - NamedType 204234696" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[AlwaysSaveModifiedVersions must be true in Manufacturing Setup before the wizard runs]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE11_AlwaysSaveModifiedVersions_True_RoutingVersionKept - NamedType AlwaysSaveModifiedVersionsMustBeTrueLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 4090892808 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE12_BackForwardNavigation_RoutingVersionLineCountStable - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 3841371599 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE1_CreateNewBOMVersionToggleOn_BOMEditable - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 3841371599 - NamedType 3521284857" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOM lines should be editable after toggling Create New BOM Version]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE1_CreateNewBOMVersionToggleOn_BOMEditable - NamedType BOMLinesShouldBeEditableLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 3841371599 - NamedType 3042813130" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[SelectedBOMVersion should start with TEMP]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE1_CreateNewBOMVersionToggleOn_BOMEditable - NamedType SelectedBOMVersionShouldStartWithTempLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 3020025235 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE2_CreateNewBOMVersionToggleOff_LinesRevert - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 3020025235 - NamedType 1298900465" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[SelectedBOMVersion should be cleared after turning off Create New BOM Version]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE2_CreateNewBOMVersionToggleOff_LinesRevert - NamedType SelectedBOMVersionShouldBeClearedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 391788369 - NamedType 2244057727" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should not have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE3_CreateNewRoutingVersionToggleOn_RoutingEditable - NamedType WizardShouldNotHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 391788369 - NamedType 1926661701" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Routing lines should be editable after toggling Create New Routing Version]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE3_CreateNewRoutingVersionToggleOn_RoutingEditable - NamedType RoutingLinesShouldBeEditableLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 391788369 - NamedType 2309722342" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[SelectedRoutingVersion should start with TEMP]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE3_CreateNewRoutingVersionToggleOn_RoutingEditable - NamedType SelectedRoutingVersionShouldStartWithTempLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 1005536319 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE4_FinishWithNewBOMVersion_VersionCertified - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 135871388 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE5_FinishWithNewRoutingVersion_VersionCertified - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 135871388 - NamedType 2373752637" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[New Routing version Type should match the source Routing Header Type (Serial/Parallel), not remain blank]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE5_FinishWithNewRoutingVersion_VersionCertified - NamedType RoutingVersionTypeShouldMatchSourceLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 135871388 - NamedType 2605520909" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[New Routing version Starting Date should be WorkDate()]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE5_FinishWithNewRoutingVersion_VersionCertified - NamedType RoutingVersionStartingDateShouldBeWorkDateLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 1791517096 - NamedType 540194435" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Turning on Create New BOM Version without Version Nos. should raise an error]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE6_BOMWithoutVersionNos_ToggleRaisesError - NamedType CreateBOMVersionWithoutVersionNosShouldErrorLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 3098059943 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE7_AlwaysSaveModifiedVersions_True_VersionKept - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 3098059943 - NamedType 204234696" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[AlwaysSaveModifiedVersions must be true in Manufacturing Setup before the wizard runs]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE7_AlwaysSaveModifiedVersions_True_VersionKept - NamedType AlwaysSaveModifiedVersionsMustBeTrueLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 1252766017 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE8_CreateNewRoutingVersionToggleOff_LinesRevert - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 1252766017 - NamedType 4243187181" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[SelectedRoutingVersion should be cleared after turning off Create New Routing Version]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE8_CreateNewRoutingVersionToggleOff_LinesRevert - NamedType SelectedRoutingVersionShouldBeClearedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 1499808537 - NamedType 1372191479" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Turning on Create New Routing Version without Version Nos. should raise an error]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE9_RoutingWithoutVersionNos_ToggleRaisesError - NamedType CreateRoutingVersionWithoutVersionNosShouldErrorLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 3936035908 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Wizard should have finished]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE_BOMVersionLinesHaveCorrectVersionCode - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 3936035908 - NamedType 3179227803" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[New BOM version %1 must have at least one line]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Production BOM Version Code]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE_BOMVersionLinesHaveCorrectVersionCode - NamedType NewBOMVersionMustHaveAtLeastOneLineLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 3936035908 - NamedType 3844296930" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BOM line "Version Code" must equal the new version code; expected %1, got %2]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = expected Version Code; %2 = actual Version Code]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE_BOMVersionLinesHaveCorrectVersionCode - NamedType BOMLineVersionCodeMustEqualNewVersionLbl)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 4197415477 - NamedType 308739501" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Version Count Must Match.]]></Val>
@@ -2937,6 +4683,42 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit SCM WIP Costing Production-II - NamedType NotFoundZeroAmtErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";PageExtension 1864608116 - Action 1493101241 - Property 1295455071" ItemType=";PageExtension - Action" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Deletes the record for testing purposes.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Page 315793204)(Namespace=Microsoft.Manufacturing.Test)(LookupHint=PageExtension Temp ProdOrdCompList Ext. - Action TestDelete - Property ToolTip)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";PageExtension 1864608116 - Action 1493101241 - Property 2879900210" ItemType=";PageExtension - Action" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Test Delete]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Page 315793204)(Namespace=Microsoft.Manufacturing.Test)(LookupHint=PageExtension Temp ProdOrdCompList Ext. - Action TestDelete - Property Caption)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";PageExtension 2392371898 - Action 1493101241 - Property 1295455071" ItemType=";PageExtension - Action" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Deletes the record for testing purposes.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Page 2985979851)(Namespace=Microsoft.Manufacturing.Test)(LookupHint=PageExtension Temp ProdOrdRtngList Ext. - Action TestDelete - Property ToolTip)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";PageExtension 2392371898 - Action 1493101241 - Property 2879900210" ItemType=";PageExtension - Action" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Test Delete]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Page 2985979851)(Namespace=Microsoft.Manufacturing.Test)(LookupHint=PageExtension Temp ProdOrdRtngList Ext. - Action TestDelete - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
 </LCX>
