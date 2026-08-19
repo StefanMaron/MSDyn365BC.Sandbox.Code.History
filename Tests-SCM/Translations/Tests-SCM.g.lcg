@@ -437,6 +437,15 @@
       <Cmt Name="Dev"><![CDATA[%1: Changed field name]D;]A;(LookupHint=Codeunit SCM - Warehouse UT - NamedType WhseEntriesExistErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 235490379 - NamedType 4016797544" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Cost Amount (Expected) is %1, expected %2.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Actual Amount, %2 = Expected Amount]D;]A;(LookupHint=Codeunit SCM Adjmt. of Expected Cost - NamedType ExpectedCostMismatchErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 235490379 - NamedType 2244840592" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[GL Entry total for account %1 is %2, expected %3.]]></Val>
@@ -5934,6 +5943,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Planning - I - NamedType FinishOrderMessage)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1023565518 - NamedType 280682152" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[All items are available and no planning lines are created.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Planning - I - NamedType ItemNotAvailableErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1023565518 - NamedType 830554127" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
