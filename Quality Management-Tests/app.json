@@ -2,7 +2,7 @@
   "id": "aa5fc5d3-ef4e-4b03-8512-9c584cdc1ceb",
   "name": "Quality Management-Tests",
   "publisher": "Microsoft",
-  "version": "28.5.53760.0",
+  "version": "28.5.53763.0",
   "brief": "Quality Management Tests",
   "description": "Quality Management Tests",
   "contextSensitiveHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2338953",
@@ -40,6 +40,12 @@
       "id": "dd0be2ea-f733-4d65-bb34-a28f4624fb14",
       "publisher": "Microsoft",
       "name": "Library Assert",
+      "version": "28.5.0.0"
+    },
+    {
+      "id": "5095f467-0a01-4b99-99d1-9ff1237d286f",
+      "publisher": "Microsoft",
+      "name": "Library Variable Storage",
       "version": "28.5.0.0"
     },
     {
