@@ -39,6 +39,7 @@
         WrongValueErr: Label 'Wrong value of the field %1 in table %2.', Comment = '%1 = Field name, %2 = Table name';
         MissingSheetDataErr: Label 'Sheet %1 is either missing or does not contain the correct data.', Comment = '%1 = Sheet number';
         AuditLogNotCreatedOnTemplateUpdateErr: Label 'Audit log entry was not created after updating the financial report Excel template.';
+        TextValueDuplicateErr: Label 'Text value %1 should appear exactly once in Excel export, but found %2 occurrences', Comment = '%1 = Text value, %2 = Occurrence count';
         IsInitialized: Boolean;
 
     [Test]
