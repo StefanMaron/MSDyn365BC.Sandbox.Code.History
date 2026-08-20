@@ -99,9 +99,6 @@
       "path": "./Tests-NewObjects-Internal"
     },
     {
-      "path": "./Tests-Performance-Internal"
-    },
-    {
       "path": "./Tests-Permissions"
     },
     {
