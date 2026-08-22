@@ -4,7 +4,7 @@
   "publisher": "Microsoft",
   "brief": "Tests for the Field Service Integration extension.",
   "description": "Tests for the Field Service Integration extension.",
-  "version": "29.0.53867.0",
+  "version": "29.0.53875.0",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
   "EULA": "https://go.microsoft.com/fwlink/?linkid=2182906",
   "help": "https://go.microsoft.com/fwlink/?linkid=2206519",
@@ -39,6 +39,12 @@
     {
       "id": "5095f467-0a01-4b99-99d1-9ff1237d286f",
       "name": "Library Variable Storage",
+      "publisher": "Microsoft",
+      "version": "29.0.0.0"
+    },
+    {
+      "id": "e7320ebb-08b3-4406-b1ec-b4927d3e280b",
+      "name": "Any",
       "publisher": "Microsoft",
       "version": "29.0.0.0"
     }

@@ -2,7 +2,7 @@
   "id": "c1c247aa-7026-4dc3-9e1b-1671ac5d7525",
   "name": "External Storage - Document Attachments Tests",
   "publisher": "Microsoft",
-  "version": "29.0.53867.0",
+  "version": "29.0.53875.0",
   "brief": "Tests for External Storage processor for document attachments",
   "description": "Tests for External Storage processor for Business Central document attachments",
   "privacyStatement": "https://go.microsoft.com/fwlink/?linkid=724009",
