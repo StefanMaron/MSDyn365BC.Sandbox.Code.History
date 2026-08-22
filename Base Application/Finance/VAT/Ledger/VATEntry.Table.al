@@ -862,7 +862,7 @@ table 254 "VAT Entry"
         {
             SumIndexFields = Base, Amount, "Unrealized Amount", "Unrealized Base", "Remaining Unrealized Amount";
         }
-        key(Key4; Type, "Country/Region Code", "VAT Registration No.", "VAT Bus. Posting Group", "VAT Prod. Posting Group", "Posting Date", "EU Service")
+        key(Key4; Type, "Country/Region Code", "VAT Registration No.", "VAT Bus. Posting Group", "VAT Prod. Posting Group", "Posting Date")
         {
             SumIndexFields = Base, "Additional-Currency Base";
         }
