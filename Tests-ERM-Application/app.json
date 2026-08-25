@@ -2,8 +2,9 @@
   "id": "f469f78f-a0ec-4469-b312-7a25fcab8357",
   "name": "Tests-ERM-Application",
   "publisher": "Microsoft",
-  "version": "29.0.53924.0",
+  "version": "29.0.53940.0",
   "platform": "29.0.0.0",
+  "url": "https://go.microsoft.com/fwlink/?LinkId=724011",
   "dependencies": [
     {
       "id": "5d86850b-0d76-4eca-bd7b-951ad998e997",
