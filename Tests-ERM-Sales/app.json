@@ -2,8 +2,9 @@
   "id": "973f745d-a630-4a01-874e-1c454470bffd",
   "name": "Tests-ERM-Sales",
   "publisher": "Microsoft",
-  "version": "29.0.53924.0",
+  "version": "29.0.53940.0",
   "platform": "29.0.0.0",
+  "url": "https://go.microsoft.com/fwlink/?LinkId=724011",
   "dependencies": [
     {
       "id": "5d86850b-0d76-4eca-bd7b-951ad998e997",
