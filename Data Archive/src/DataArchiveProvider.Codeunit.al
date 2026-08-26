@@ -47,6 +47,7 @@ codeunit 605 "Data Archive Provider" implements "Data Archive Provider"
     procedure Open(ID: Integer)
     begin
         DataArchive.Get(ID);
+
         CurrentDataArchiveEntryNo := ID;
     end;
 
