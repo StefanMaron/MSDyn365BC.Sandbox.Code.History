@@ -230,6 +230,15 @@
       <Cmt Name="Dev"><![CDATA[%1 = Item No.]D;]A;(LookupHint=Codeunit SCM Costing Batch - NamedType SingleLevelMaterialCostMustNotMatchErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1549229238 - NamedType 3069252655" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[SKU Standard Cost should not be updated when Load SKU Cost on Manufacturing is enabled for Item No. %1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Item No.]D;]A;(LookupHint=Codeunit SCM Costing Batch - NamedType SKUCostShouldNotBeUpdatedErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1549229238 - NamedType 1467493531" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Standard Cost of Item and SKU must match for Item No. %1]]></Val>
