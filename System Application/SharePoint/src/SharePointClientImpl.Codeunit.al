@@ -370,7 +370,7 @@ codeunit 9101 "SharePoint Client Impl."
         Request.Add('Title', ListTitle);
 
         SharePointHttpContent.FromJson(Request);
-        SharePointHttpContent.SetRequestDigest(GetRequestDigest(SharePointUriBuilder.GetSiteUrl()));
+        SharePointHttpContent.SetRequestDigest(GetRequestDigest(SharePointUriBuilder.GetHost()));
 
         SharePointRequestHelper.SetAuthorization(Authorization);
         SharePointOperationResponse := SharePointRequestHelper.Post(SharePointUriBuilder, SharePointHttpContent);
@@ -399,7 +399,7 @@ codeunit 9101 "SharePoint Client Impl."
         Request.Add('Title', ListItemTitle);
 
         SharePointHttpContent.FromJson(Request);
-        SharePointHttpContent.SetRequestDigest(GetRequestDigest(SharePointUriBuilder.GetSiteUrl()));
+        SharePointHttpContent.SetRequestDigest(GetRequestDigest(SharePointUriBuilder.GetHost()));
 
         SharePointRequestHelper.SetAuthorization(Authorization);
         SharePointOperationResponse := SharePointRequestHelper.Post(SharePointUriBuilder, SharePointHttpContent);
@@ -427,7 +427,7 @@ codeunit 9101 "SharePoint Client Impl."
         Request.Add('Title', ListItemTitle);
 
         SharePointHttpContent.FromJson(Request);
-        SharePointHttpContent.SetRequestDigest(GetRequestDigest(SharePointUriBuilder.GetSiteUrl()));
+        SharePointHttpContent.SetRequestDigest(GetRequestDigest(SharePointUriBuilder.GetHost()));
 
         SharePointRequestHelper.SetAuthorization(Authorization);
         SharePointOperationResponse := SharePointRequestHelper.Post(SharePointUriBuilder, SharePointHttpContent);
@@ -710,7 +710,7 @@ codeunit 9101 "SharePoint Client Impl."
         Request.Add('ServerRelativeUrl', ServerRelativeUrl);
 
         SharePointHttpContent.FromJson(Request);
-        SharePointHttpContent.SetRequestDigest(GetRequestDigest(SharePointUriBuilder.GetSiteUrl()));
+        SharePointHttpContent.SetRequestDigest(GetRequestDigest(SharePointUriBuilder.GetHost()));
 
         SharePointRequestHelper.SetAuthorization(Authorization);
         SharePointOperationResponse := SharePointRequestHelper.Post(SharePointUriBuilder, SharePointHttpContent);
@@ -935,7 +935,7 @@ codeunit 9101 "SharePoint Client Impl."
 
         SharePointHttpContent.GetContent().ReadAs(Txt);
 
-        SharePointHttpContent.SetRequestDigest(GetRequestDigest(SharePointUriBuilder.GetSiteUrl()));
+        SharePointHttpContent.SetRequestDigest(GetRequestDigest(SharePointUriBuilder.GetHost()));
         SharePointHttpContent.SetXHttpMethod('MERGE');
         SharePointHttpContent.SetIfMatch('*');
 
