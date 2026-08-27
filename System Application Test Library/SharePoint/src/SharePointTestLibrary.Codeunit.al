@@ -51,7 +51,6 @@ codeunit 132973 "SharePoint Test Library"
         LastRequestUri := Uri;
 
         if Uri.EndsWith('/_api/contextinfo/') then begin
-            LastContextInfoRequestUri := Uri;
             GetContextDigestTestResponse(SharePointOperationResponse, BaseUrl, ParentUrl);
             exit;
         end;
