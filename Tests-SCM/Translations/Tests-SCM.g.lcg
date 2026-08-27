@@ -5351,13 +5351,22 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Item Budget - NamedType PostingDescription)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2735608874 - NamedType 3702181580" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[You must enter a value for the Option attribute %1. Blank values are not allowed for Option-type attributes.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 - attribute name]D;]A;(LookupHint=Codeunit SCM Item Categories - NamedType BlankOptionAttributeErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2735608874 - NamedType 378217055" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Item Category '%1' should have been deleted.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Item Categories - NamedType CategoryNotDeletedErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1 - item category code]D;]A;(LookupHint=Codeunit SCM Item Categories - NamedType CategoryNotDeletedErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2735608874 - NamedType 1295890757" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -5375,7 +5384,7 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Item Categories - NamedType CategoryWithChildrenDeleteErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1 - item category code]D;]A;(LookupHint=Codeunit SCM Item Categories - NamedType CategoryWithChildrenDeleteErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2735608874 - NamedType 2524101590" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -5384,7 +5393,7 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Item Categories - NamedType ChangingDefaultValueMsg)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1 - item category code]D;]A;(LookupHint=Codeunit SCM Item Categories - NamedType ChangingDefaultValueMsg)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2735608874 - NamedType 1670298906" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -5411,7 +5420,7 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1 - item category code]D;]A;(LookupHint=Codeunit SCM Item Categories - NamedType DeleteItemInheritedParentCategoryAttributesQst)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1 - child item category code, %2 - parent item category code]D;]A;(LookupHint=Codeunit SCM Item Categories - NamedType DeleteItemInheritedParentCategoryAttributesQst)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2735608874 - NamedType 2367821945" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -5429,7 +5438,7 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Item Categories - NamedType IncorrectParentErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1 - category code, %2 - current parent code, %3 - expected parent code]D;]A;(LookupHint=Codeunit SCM Item Categories - NamedType IncorrectParentErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2735608874 - NamedType 557845548" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -5438,7 +5447,7 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Item Categories - NamedType RenamingErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1 - original item category code, %2 - expected renamed code]D;]A;(LookupHint=Codeunit SCM Item Categories - NamedType RenamingErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 167793459 - NamedType 1434876051" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
