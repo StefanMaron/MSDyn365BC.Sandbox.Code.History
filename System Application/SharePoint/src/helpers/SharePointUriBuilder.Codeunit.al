@@ -31,11 +31,6 @@ codeunit 9110 "SharePoint Uri Builder"
         exit(NewUri.GetHost());
     end;
 
-    procedure GetSiteUrl(): Text
-    begin
-        exit(ServerName.TrimStart('/').TrimEnd('/'));
-    end;
-
     procedure AddQueryParameter(ParameterName: Text; ParameterValue: Text)
     begin
         QueryParameters.Add(ParameterName, ParameterValue);
