@@ -33,6 +33,12 @@
         CodeErr: Label '%1 must be %2 in %3.', Comment = '%1 = Code, %2 = Next No. from No. Series, %3 = Sales/Purchase Price List';
         CustDiscountGroupDeleteErr: Label 'You cannot delete the Customer Discount Group %1 because it is used in Customer.', Comment = '%1= Customer Discount Group Code.';
         CustDiscountGroupCodeDeleteErr: Label 'The field Customer Disc. Group of table Sales Line contains a value (%1) that cannot be found in the related table (Customer Discount Group).', Comment = '%1= Customer Discount Group Code.';
+        AllCustomersLinesNotShownErr: Label 'All Customers lines are not all shown';
+        MixedSourceLinesNotShownErr: Label 'Not all applicable price lines are shown for the customer';
+        UnrelatedLinesShownErr: Label 'Unrelated price lines are shown for the customer';
+        CustomerPriceListCaptionTxt: Label 'Price List Lines - Customer %1 %2', Comment = '%1 = Customer No., %2 = Customer Name';
+        VendorPriceListCaptionTxt: Label 'Price List Lines - Vendor %1 %2', Comment = '%1 = Vendor No., %2 = Vendor Name';
+        UnexpectedPageCaptionErr: Label 'Unexpected page caption';
 
     [Test]
     procedure T000_SalesPriceListsPageIsNotEditable()
@@ -217,11 +223,13 @@
         PriceListLineReview.Trap();
         CustomerCard.PriceLines.Invoke();
 
-        // [THEN] There is 1 price line - #2, "Price List Description" is '002'
+        // [THEN] There are 2 price lines - #1 (All Customers) and #2 (Customer 'A')
         Assert.IsTrue(PriceListLineReview.First(), 'not found first');
+        PriceListLineReview."Price List Code".AssertEquals(PriceListLine[1]."Price List Code");
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found second');
         PriceListLineReview."Price List Code".AssertEquals(PriceListLine[2]."Price List Code");
         PriceListLineReview.PriceListDescription.AssertEquals(PriceListLine[2].FieldName(Description) + PriceListLine[2]."Price List Code");
-        Assert.IsFalse(PriceListLineReview.Next(), 'found 2th');
+        Assert.IsFalse(PriceListLineReview.Next(), 'found 3rd');
     end;
 
     [Test]
@@ -252,11 +260,13 @@
         PriceListLineReview.Trap();
         CustomerList.DiscountLines.Invoke();
 
-        // [THEN] There is 1 price line - #4
+        // [THEN] There are 2 discount lines - #1 (All Customers) and #4 (Customer 'A')
         Assert.IsTrue(PriceListLineReview.First(), 'not found first');
+        PriceListLineReview."Price List Code".AssertEquals(PriceListLine[1]."Price List Code");
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found second');
         PriceListLineReview."Price List Code".AssertEquals(PriceListLine[4]."Price List Code");
         PriceListLineReview.PriceListDescription.AssertEquals(PriceListLine[4].FieldName(Description) + PriceListLine[4]."Price List Code");
-        Assert.IsFalse(PriceListLineReview.Next(), 'found 2th');
+        Assert.IsFalse(PriceListLineReview.Next(), 'found 3rd');
     end;
 
     [Test]
@@ -1948,16 +1958,18 @@
         PriceListLineReview.Trap();
         VendorCard.PriceLines.Invoke();
 
-        // [THEN] "Source Type", "Source No." are hidden, "Asset Type", "Asset No." are visible
-        Assert.IsFalse(PriceListLineReview."Source Type".Visible(), 'Source Type.Visible');
-        Assert.IsFalse(PriceListLineReview."Source No.".Visible(), 'Source No.Visible');
+        // [THEN] "Source Type", "Source No.", "Asset Type", "Asset No." are visible
+        Assert.IsTrue(PriceListLineReview."Source Type".Visible(), 'Source Type.Visible');
+        Assert.IsTrue(PriceListLineReview."Source No.".Visible(), 'Source No.Visible');
         Assert.IsTrue(PriceListLineReview."Asset Type".Visible(), 'Asset Type.Visible');
         Assert.IsTrue(PriceListLineReview."Asset No.".Visible(), 'Asset No.Visible');
-        // [THEN] PriceListLineReview page open, where are 1 price line - #2, PriceListDescription is <blank>
+        // [THEN] PriceListLineReview page open, where are 2 price lines - #1 (All Vendors) and #2 (Vendor 'A')
         Assert.IsTrue(PriceListLineReview.First(), 'not found first price');
+        PriceListLineReview."Price List Code".AssertEquals('001');
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found second price');
         PriceListLineReview."Price List Code".AssertEquals('002');
         PriceListLineReview.PriceListDescription.AssertEquals('');
-        Assert.IsFalse(PriceListLineReview.Next(), 'found second price');
+        Assert.IsFalse(PriceListLineReview.Next(), 'found third price');
         PriceListLineReview.Close();
     end;
 
@@ -1989,10 +2001,12 @@
         PriceListLineReview.Trap();
         VendorList.DiscountLines.Invoke();
 
-        // [THEN] PriceListLineReview page open, where are 1 discount line - #4
+        // [THEN] PriceListLineReview page open, where are 2 discount lines - #1 (All Vendors) and #4 (Vendor 'A')
         Assert.IsTrue(PriceListLineReview.First(), 'not found first discount');
+        PriceListLineReview."Price List Code".AssertEquals('001');
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found second discount');
         PriceListLineReview."Price List Code".AssertEquals('004');
-        Assert.IsFalse(PriceListLineReview.Next(), 'found second discount');
+        Assert.IsFalse(PriceListLineReview.Next(), 'found third discount');
         PriceListLineReview.Close();
     end;
 
@@ -2749,12 +2763,14 @@
         PriceListLineReview.Trap();
         JobCard.SalesPriceLines.Invoke();
 
-        // [THEN] There are 2 price lines - #2, #5
+        // [THEN] There are 3 price lines - #1 (All Jobs), #2, #5
         Assert.IsTrue(PriceListLineReview.First(), 'not found first');
+        PriceListLineReview."Price List Code".AssertEquals('001');
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found second');
         PriceListLineReview."Price List Code".AssertEquals('002');
-        Assert.IsTrue(PriceListLineReview.Next(), 'not found 2th');
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found third');
         PriceListLineReview."Price List Code".AssertEquals('005');
-        Assert.IsFalse(PriceListLineReview.Next(), 'found 3rd');
+        Assert.IsFalse(PriceListLineReview.Next(), 'found 4th');
     end;
 
     [Test]
@@ -2788,12 +2804,14 @@
         PriceListLineReview.Trap();
         JobList.SalesDiscountLines.Invoke();
 
-        // [THEN] There are 2 price lines - #4, #5
+        // [THEN] There are 3 discount lines - #1 (All Jobs), #4, #5
         Assert.IsTrue(PriceListLineReview.First(), 'not found first');
+        PriceListLineReview."Price List Code".AssertEquals('001');
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found second');
         PriceListLineReview."Price List Code".AssertEquals('004');
-        Assert.IsTrue(PriceListLineReview.Next(), 'not found 2th');
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found third');
         PriceListLineReview."Price List Code".AssertEquals('005');
-        Assert.IsFalse(PriceListLineReview.Next(), 'found 3rd');
+        Assert.IsFalse(PriceListLineReview.Next(), 'found 4th');
     end;
 
     [Test]
@@ -3235,12 +3253,14 @@
         PriceListLineReview.Trap();
         JobCard.PurchPriceLines.Invoke();
 
-        // [THEN] There are 2 price lines - #2, #5
+        // [THEN] There are 3 price lines - #1 (All Jobs), #2, #5
         Assert.IsTrue(PriceListLineReview.First(), 'not found first');
+        PriceListLineReview."Price List Code".AssertEquals('001');
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found second');
         PriceListLineReview."Price List Code".AssertEquals('002');
-        Assert.IsTrue(PriceListLineReview.Next(), 'not found 2th');
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found third');
         PriceListLineReview."Price List Code".AssertEquals('005');
-        Assert.IsFalse(PriceListLineReview.Next(), 'found 3rd');
+        Assert.IsFalse(PriceListLineReview.Next(), 'found 4th');
     end;
 
     [Test]
@@ -3274,12 +3294,14 @@
         PriceListLineReview.Trap();
         JobList.PurchDiscountLines.Invoke();
 
-        // [THEN] There are 2 price lines - #4, #5
+        // [THEN] There are 3 discount lines - #1 (All Jobs), #4, #5
         Assert.IsTrue(PriceListLineReview.First(), 'not found first');
+        PriceListLineReview."Price List Code".AssertEquals('001');
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found second');
         PriceListLineReview."Price List Code".AssertEquals('004');
-        Assert.IsTrue(PriceListLineReview.Next(), 'not found 2th');
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found third');
         PriceListLineReview."Price List Code".AssertEquals('005');
-        Assert.IsFalse(PriceListLineReview.Next(), 'found 3rd');
+        Assert.IsFalse(PriceListLineReview.Next(), 'found 4th');
     end;
 
     [Test]
@@ -4464,6 +4486,584 @@
                 CustDiscountGroupCodeDeleteErr,
                 CustomerDiscountGroup[1].Code,
                 CustomerDiscountGroup[1].TableCaption()));
+    end;
+
+    [Test]
+    procedure T209_SalesPriceLinesFromCustomerCardShowAllCustomersLines()
+    var
+        Customer: Record Customer;
+        Item: array[2] of Record Item;
+        PriceListHeader: array[2] of Record "Price List Header";
+        PriceListLine: array[2] of Record "Price List Line";
+        CustomerCard: TestPage "Customer Card";
+        PriceListLineReview: TestPage "Price List Line Review";
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO] Sales Price lines from Customer Card include "All Customers" price lines
+        Initialize(true);
+
+        // [GIVEN] Customer "C"
+        LibrarySales.CreateCustomer(Customer);
+
+        // [GIVEN] Item "I1" with price list for All Customers
+        LibraryInventory.CreateItem(Item[1]);
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader[1], "Price Type"::Sale, "Price Source Type"::"All Customers", '');
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine[1], PriceListHeader[1], "Price Amount Type"::Price, "Price Asset Type"::Item, Item[1]."No.");
+
+        // [GIVEN] Item "I2" with price list for Customer "C"
+        LibraryInventory.CreateItem(Item[2]);
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader[2], "Price Type"::Sale, "Price Source Type"::Customer, Customer."No.");
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine[2], PriceListHeader[2], "Price Amount Type"::Price, "Price Asset Type"::Item, Item[2]."No.");
+
+        // [GIVEN] Open Customer Card for Customer "C"
+        CustomerCard.OpenEdit();
+        CustomerCard.Filter.SetFilter("No.", Customer."No.");
+
+        // [WHEN] Run action "Sales Prices"
+        PriceListLineReview.Trap();
+        CustomerCard.PriceLines.Invoke();
+
+        // [THEN] Both price lines are shown: All Customers line and Customer-specific line
+        Assert.IsTrue(PriceListLineReview.First(), 'not found first');
+        PriceListLineReview."Price List Code".AssertEquals(PriceListHeader[1].Code);
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found second');
+        PriceListLineReview."Price List Code".AssertEquals(PriceListHeader[2].Code);
+        Assert.IsFalse(PriceListLineReview.Next(), 'found 3rd');
+    end;
+
+    [Test]
+    procedure T210_SalesDiscountLinesFromCustomerCardShowAllCustomersLines()
+    var
+        Customer: Record Customer;
+        Item: array[2] of Record Item;
+        PriceListHeader: array[2] of Record "Price List Header";
+        PriceListLine: array[2] of Record "Price List Line";
+        CustomerCard: TestPage "Customer Card";
+        PriceListLineReview: TestPage "Price List Line Review";
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO] Sales Discount lines from Customer Card include "All Customers" discount lines
+        Initialize(true);
+
+        // [GIVEN] Customer "C"
+        LibrarySales.CreateCustomer(Customer);
+
+        // [GIVEN] Item "I1" with discount for All Customers
+        LibraryInventory.CreateItem(Item[1]);
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader[1], "Price Type"::Sale, "Price Source Type"::"All Customers", '');
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine[1], PriceListHeader[1], "Price Amount Type"::Discount, "Price Asset Type"::Item, Item[1]."No.");
+
+        // [GIVEN] Item "I2" with discount for Customer "C"
+        LibraryInventory.CreateItem(Item[2]);
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader[2], "Price Type"::Sale, "Price Source Type"::Customer, Customer."No.");
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine[2], PriceListHeader[2], "Price Amount Type"::Discount, "Price Asset Type"::Item, Item[2]."No.");
+
+        // [GIVEN] Open Customer Card for Customer "C"
+        CustomerCard.OpenEdit();
+        CustomerCard.Filter.SetFilter("No.", Customer."No.");
+
+        // [WHEN] Run action "Sales Discounts"
+        PriceListLineReview.Trap();
+        CustomerCard.DiscountLines.Invoke();
+
+        // [THEN] Both discount lines are shown: All Customers line and Customer-specific line
+        Assert.IsTrue(PriceListLineReview.First(), 'not found first');
+        PriceListLineReview."Price List Code".AssertEquals(PriceListHeader[1].Code);
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found second');
+        PriceListLineReview."Price List Code".AssertEquals(PriceListHeader[2].Code);
+        Assert.IsFalse(PriceListLineReview.Next(), 'found 3rd');
+    end;
+
+    [Test]
+    procedure T211_PurchPriceLinesFromVendorCardShowAllVendorsLines()
+    var
+        Vendor: Record Vendor;
+        Item: array[2] of Record Item;
+        PriceListHeader: array[2] of Record "Price List Header";
+        PriceListLine: array[2] of Record "Price List Line";
+        VendorCard: TestPage "Vendor Card";
+        PriceListLineReview: TestPage "Price List Line Review";
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO] Purchase Price lines from Vendor Card include "All Vendors" price lines
+        Initialize(true);
+
+        // [GIVEN] Vendor "V"
+        LibraryPurchase.CreateVendor(Vendor);
+
+        // [GIVEN] Item "I1" with price list for All Vendors
+        LibraryInventory.CreateItem(Item[1]);
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader[1], "Price Type"::Purchase, "Price Source Type"::"All Vendors", '');
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine[1], PriceListHeader[1], "Price Amount Type"::Price, "Price Asset Type"::Item, Item[1]."No.");
+
+        // [GIVEN] Item "I2" with price list for Vendor "V"
+        LibraryInventory.CreateItem(Item[2]);
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader[2], "Price Type"::Purchase, "Price Source Type"::Vendor, Vendor."No.");
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine[2], PriceListHeader[2], "Price Amount Type"::Price, "Price Asset Type"::Item, Item[2]."No.");
+
+        // [GIVEN] Open Vendor Card for Vendor "V"
+        VendorCard.OpenEdit();
+        VendorCard.Filter.SetFilter("No.", Vendor."No.");
+
+        // [WHEN] Run action "Purchase Prices"
+        PriceListLineReview.Trap();
+        VendorCard.PriceLines.Invoke();
+
+        // [THEN] Both price lines are shown: All Vendors line and Vendor-specific line
+        Assert.IsTrue(PriceListLineReview.First(), 'not found first');
+        PriceListLineReview."Price List Code".AssertEquals(PriceListHeader[1].Code);
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found second');
+        PriceListLineReview."Price List Code".AssertEquals(PriceListHeader[2].Code);
+        Assert.IsFalse(PriceListLineReview.Next(), 'found 3rd');
+    end;
+
+    [Test]
+    procedure T212_PurchDiscountLinesFromVendorCardShowAllVendorsLines()
+    var
+        Vendor: Record Vendor;
+        Item: array[2] of Record Item;
+        PriceListHeader: array[2] of Record "Price List Header";
+        PriceListLine: array[2] of Record "Price List Line";
+        VendorCard: TestPage "Vendor Card";
+        PriceListLineReview: TestPage "Price List Line Review";
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO] Purchase Discount lines from Vendor Card include "All Vendors" discount lines
+        Initialize(true);
+
+        // [GIVEN] Vendor "V"
+        LibraryPurchase.CreateVendor(Vendor);
+
+        // [GIVEN] Item "I1" with discount for All Vendors
+        LibraryInventory.CreateItem(Item[1]);
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader[1], "Price Type"::Purchase, "Price Source Type"::"All Vendors", '');
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine[1], PriceListHeader[1], "Price Amount Type"::Discount, "Price Asset Type"::Item, Item[1]."No.");
+
+        // [GIVEN] Item "I2" with discount for Vendor "V"
+        LibraryInventory.CreateItem(Item[2]);
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader[2], "Price Type"::Purchase, "Price Source Type"::Vendor, Vendor."No.");
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine[2], PriceListHeader[2], "Price Amount Type"::Discount, "Price Asset Type"::Item, Item[2]."No.");
+
+        // [GIVEN] Open Vendor Card for Vendor "V"
+        VendorCard.OpenEdit();
+        VendorCard.Filter.SetFilter("No.", Vendor."No.");
+
+        // [WHEN] Run action "Purchase Discounts"
+        PriceListLineReview.Trap();
+        VendorCard.DiscountLines.Invoke();
+
+        // [THEN] Both discount lines are shown: All Vendors line and Vendor-specific line
+        Assert.IsTrue(PriceListLineReview.First(), 'not found first');
+        PriceListLineReview."Price List Code".AssertEquals(PriceListHeader[1].Code);
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found second');
+        PriceListLineReview."Price List Code".AssertEquals(PriceListHeader[2].Code);
+        Assert.IsFalse(PriceListLineReview.Next(), 'found 3rd');
+    end;
+
+    [Test]
+    procedure T213_SalesPriceLinesFromJobCardShowAllJobsLines()
+    var
+        Job: Record Job;
+        Item: array[2] of Record Item;
+        PriceListHeader: array[2] of Record "Price List Header";
+        PriceListLine: array[2] of Record "Price List Line";
+        JobCard: TestPage "Job Card";
+        PriceListLineReview: TestPage "Price List Line Review";
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO] Sales Price lines from Job Card include "All Jobs" price lines
+        Initialize(true);
+
+        // [GIVEN] Job "J"
+        LibraryJob.CreateJob(Job);
+
+        // [GIVEN] Item "I1" with sales price list for All Jobs
+        LibraryInventory.CreateItem(Item[1]);
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader[1], "Price Type"::Sale, "Price Source Type"::"All Jobs", '');
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine[1], PriceListHeader[1], "Price Amount Type"::Price, "Price Asset Type"::Item, Item[1]."No.");
+
+        // [GIVEN] Item "I2" with sales price list for Job "J"
+        LibraryInventory.CreateItem(Item[2]);
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader[2], "Price Type"::Sale, "Price Source Type"::Job, Job."No.");
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine[2], PriceListHeader[2], "Price Amount Type"::Price, "Price Asset Type"::Item, Item[2]."No.");
+
+        // [GIVEN] Open Job Card for Job "J"
+        JobCard.OpenEdit();
+        JobCard.Filter.SetFilter("No.", Job."No.");
+
+        // [WHEN] Run action "Sales Prices"
+        PriceListLineReview.Trap();
+        JobCard.SalesPriceLines.Invoke();
+
+        // [THEN] Both price lines are shown: All Jobs line and Job-specific line
+        Assert.IsTrue(PriceListLineReview.First(), 'not found first');
+        PriceListLineReview."Price List Code".AssertEquals(PriceListHeader[1].Code);
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found second');
+        PriceListLineReview."Price List Code".AssertEquals(PriceListHeader[2].Code);
+        Assert.IsFalse(PriceListLineReview.Next(), 'found 3rd');
+    end;
+
+    [Test]
+    procedure T214_SalesDiscountLinesFromJobCardShowAllJobsLines()
+    var
+        Job: Record Job;
+        Item: array[2] of Record Item;
+        PriceListHeader: array[2] of Record "Price List Header";
+        PriceListLine: array[2] of Record "Price List Line";
+        JobCard: TestPage "Job Card";
+        PriceListLineReview: TestPage "Price List Line Review";
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO] Sales Discount lines from Job Card include "All Jobs" discount lines
+        Initialize(true);
+
+        // [GIVEN] Job "J"
+        LibraryJob.CreateJob(Job);
+
+        // [GIVEN] Item "I1" with sales discount for All Jobs
+        LibraryInventory.CreateItem(Item[1]);
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader[1], "Price Type"::Sale, "Price Source Type"::"All Jobs", '');
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine[1], PriceListHeader[1], "Price Amount Type"::Discount, "Price Asset Type"::Item, Item[1]."No.");
+
+        // [GIVEN] Item "I2" with sales discount for Job "J"
+        LibraryInventory.CreateItem(Item[2]);
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader[2], "Price Type"::Sale, "Price Source Type"::Job, Job."No.");
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine[2], PriceListHeader[2], "Price Amount Type"::Discount, "Price Asset Type"::Item, Item[2]."No.");
+
+        // [GIVEN] Open Job Card for Job "J"
+        JobCard.OpenEdit();
+        JobCard.Filter.SetFilter("No.", Job."No.");
+
+        // [WHEN] Run action "Sales Discounts"
+        PriceListLineReview.Trap();
+        JobCard.SalesDiscountLines.Invoke();
+
+        // [THEN] Both discount lines are shown: All Jobs line and Job-specific line
+        Assert.IsTrue(PriceListLineReview.First(), 'not found first');
+        PriceListLineReview."Price List Code".AssertEquals(PriceListHeader[1].Code);
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found second');
+        PriceListLineReview."Price List Code".AssertEquals(PriceListHeader[2].Code);
+        Assert.IsFalse(PriceListLineReview.Next(), 'found 3rd');
+    end;
+
+    [Test]
+    procedure T215_PurchPriceLinesFromJobCardShowAllJobsLines()
+    var
+        Job: Record Job;
+        Item: array[2] of Record Item;
+        PriceListHeader: array[2] of Record "Price List Header";
+        PriceListLine: array[2] of Record "Price List Line";
+        JobCard: TestPage "Job Card";
+        PriceListLineReview: TestPage "Price List Line Review";
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO] Purchase Price lines from Job Card include "All Jobs" price lines
+        Initialize(true);
+
+        // [GIVEN] Job "J"
+        LibraryJob.CreateJob(Job);
+
+        // [GIVEN] Item "I1" with purchase price list for All Jobs
+        LibraryInventory.CreateItem(Item[1]);
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader[1], "Price Type"::Purchase, "Price Source Type"::"All Jobs", '');
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine[1], PriceListHeader[1], "Price Amount Type"::Price, "Price Asset Type"::Item, Item[1]."No.");
+
+        // [GIVEN] Item "I2" with purchase price list for Job "J"
+        LibraryInventory.CreateItem(Item[2]);
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader[2], "Price Type"::Purchase, "Price Source Type"::Job, Job."No.");
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine[2], PriceListHeader[2], "Price Amount Type"::Price, "Price Asset Type"::Item, Item[2]."No.");
+
+        // [GIVEN] Open Job Card for Job "J"
+        JobCard.OpenEdit();
+        JobCard.Filter.SetFilter("No.", Job."No.");
+
+        // [WHEN] Run action "Purchase Prices"
+        PriceListLineReview.Trap();
+        JobCard.PurchPriceLines.Invoke();
+
+        // [THEN] Both price lines are shown: All Jobs line and Job-specific line
+        Assert.IsTrue(PriceListLineReview.First(), 'not found first');
+        PriceListLineReview."Price List Code".AssertEquals(PriceListHeader[1].Code);
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found second');
+        PriceListLineReview."Price List Code".AssertEquals(PriceListHeader[2].Code);
+        Assert.IsFalse(PriceListLineReview.Next(), 'found 3rd');
+    end;
+
+    [Test]
+    procedure T216_PurchDiscountLinesFromJobCardShowAllJobsLines()
+    var
+        Job: Record Job;
+        Item: array[2] of Record Item;
+        PriceListHeader: array[2] of Record "Price List Header";
+        PriceListLine: array[2] of Record "Price List Line";
+        JobCard: TestPage "Job Card";
+        PriceListLineReview: TestPage "Price List Line Review";
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO] Purchase Discount lines from Job Card include "All Jobs" discount lines
+        Initialize(true);
+
+        // [GIVEN] Job "J"
+        LibraryJob.CreateJob(Job);
+
+        // [GIVEN] Item "I1" with purchase discount for All Jobs
+        LibraryInventory.CreateItem(Item[1]);
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader[1], "Price Type"::Purchase, "Price Source Type"::"All Jobs", '');
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine[1], PriceListHeader[1], "Price Amount Type"::Discount, "Price Asset Type"::Item, Item[1]."No.");
+
+        // [GIVEN] Item "I2" with purchase discount for Job "J"
+        LibraryInventory.CreateItem(Item[2]);
+        LibraryPriceCalculation.CreatePriceHeader(PriceListHeader[2], "Price Type"::Purchase, "Price Source Type"::Job, Job."No.");
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine[2], PriceListHeader[2], "Price Amount Type"::Discount, "Price Asset Type"::Item, Item[2]."No.");
+
+        // [GIVEN] Open Job Card for Job "J"
+        JobCard.OpenEdit();
+        JobCard.Filter.SetFilter("No.", Job."No.");
+
+        // [WHEN] Run action "Purchase Discounts"
+        PriceListLineReview.Trap();
+        JobCard.PurchDiscountLines.Invoke();
+
+        // [THEN] Both discount lines are shown: All Jobs line and Job-specific line
+        Assert.IsTrue(PriceListLineReview.First(), 'not found first');
+        PriceListLineReview."Price List Code".AssertEquals(PriceListHeader[1].Code);
+        Assert.IsTrue(PriceListLineReview.Next(), 'not found second');
+        PriceListLineReview."Price List Code".AssertEquals(PriceListHeader[2].Code);
+        Assert.IsFalse(PriceListLineReview.Next(), 'found 3rd');
+    end;
+
+    [Test]
+    procedure T220_SalesPriceLinesFromCustomerCardManyAllCustomersLinesAreNotMarked()
+    var
+        Customer: Record Customer;
+        PriceListLine: Record "Price List Line";
+        CustomerCard: TestPage "Customer Card";
+        PriceListLineReview: TestPage "Price List Line Review";
+        ItemNo: Code[20];
+        Index: Integer;
+        AllCustomersCount: Integer;
+        ShownCount: Integer;
+    begin
+        // [SCENARIO 641061] Sales Price Review page opened from the Customer Card returns every "All Customers" price line.
+        Initialize(true);
+        AllCustomersCount := LibraryRandom.RandIntInRange(10, 25);
+
+        // [GIVEN] Create a Customer.
+        LibrarySales.CreateCustomer(Customer);
+
+        // [GIVEN] Many "All Customers" sales price lines (one per new item)
+        for Index := 1 to AllCustomersCount do begin
+            ItemNo := LibraryInventory.CreateItemNo();
+            LibraryPriceCalculation.CreateSalesPriceLine(
+                PriceListLine, LibraryUtility.GenerateGUID(), "Price Source Type"::"All Customers", '',
+                "Price Asset Type"::Item, ItemNo);
+        end;
+
+        // [GIVEN] Open Customer Card for Customer "C".
+        CustomerCard.OpenEdit();
+        CustomerCard.Filter.SetFilter("No.", Customer."No.");
+
+        // [WHEN] Run action "Sales Prices".
+        PriceListLineReview.Trap();
+        CustomerCard.PriceLines.Invoke();
+
+        // [THEN] All "All Customers" price lines are shown on the Price List Line Review page
+        if PriceListLineReview.First() then
+            repeat
+                ShownCount += 1;
+            until not PriceListLineReview.Next();
+        Assert.AreEqual(AllCustomersCount, ShownCount, AllCustomersLinesNotShownErr);
+    end;
+
+    [Test]
+    procedure T221_SalesPriceLinesFromCustomerCardMultipleSourceTypesSharingEmptyParent()
+    var
+        Customer: Record Customer;
+        CustomerPriceGroup: Record "Customer Price Group";
+        CustomerDiscountGroup: Record "Customer Discount Group";
+        PriceListLine: array[3] of Record "Price List Line";
+        CustomerCard: TestPage "Customer Card";
+        PriceListLineReview: TestPage "Price List Line Review";
+        ShownCount: Integer;
+    begin
+        // [SCENARIO 641061] Sales Price Review page opened from the Customer Card returns lines for every applicable price
+        // Source Type (Customer, All Customers, Customer Price Group) sharing an empty Parent Source No., exercising the
+        // marking fallback path in BuildSourceFilters when sources have mixed Source Types.
+        Initialize(true);
+
+        // [GIVEN] A Customer Price Group "X" and a Customer Discount Group "Y".
+        LibrarySales.CreateCustomerPriceGroup(CustomerPriceGroup);
+        LibraryERM.CreateCustomerDiscountGroup(CustomerDiscountGroup);
+
+        // [GIVEN] A Customer "C" assigned to price group "X" and discount group "Y".
+        // "Customer Disc. Group" is added to the price source list by the Customer Card, but that source type only
+        // supports Discount amount type and is therefore filtered out by the Sales Prices action.
+        LibrarySales.CreateCustomer(Customer);
+        Customer."Customer Price Group" := CustomerPriceGroup.Code;
+        Customer."Customer Disc. Group" := CustomerDiscountGroup.Code;
+        Customer.Modify();
+
+        // [GIVEN] One sales price line for each source type applicable to Customer "C" that supports Price amount type:
+        // [GIVEN] "All Customers", Customer "C", and Customer Price Group "X".
+        LibraryPriceCalculation.CreateSalesPriceLine(
+            PriceListLine[1], LibraryUtility.GenerateGUID(), "Price Source Type"::"All Customers", '',
+            "Price Asset Type"::Item, LibraryInventory.CreateItemNo());
+        LibraryPriceCalculation.CreateSalesPriceLine(
+            PriceListLine[2], LibraryUtility.GenerateGUID(), "Price Source Type"::Customer, Customer."No.",
+            "Price Asset Type"::Item, LibraryInventory.CreateItemNo());
+        LibraryPriceCalculation.CreateSalesPriceLine(
+            PriceListLine[3], LibraryUtility.GenerateGUID(), "Price Source Type"::"Customer Price Group", CustomerPriceGroup.Code,
+            "Price Asset Type"::Item, LibraryInventory.CreateItemNo());
+
+        // [GIVEN] Open Customer Card for Customer "C".
+        CustomerCard.OpenEdit();
+        CustomerCard.Filter.SetFilter("No.", Customer."No.");
+
+        // [WHEN] Run action "Sales Prices".
+        PriceListLineReview.Trap();
+        CustomerCard.PriceLines.Invoke();
+
+        // [THEN] All three applicable price lines are shown on the Price List Line Review page.
+        if PriceListLineReview.First() then
+            repeat
+                ShownCount += 1;
+            until not PriceListLineReview.Next();
+        Assert.AreEqual(3, ShownCount, MixedSourceLinesNotShownErr);
+    end;
+
+    [Test]
+    procedure T222_SalesPriceLinesFromCustomerCardNoMatchingSourceLinesShowsEmpty()
+    var
+        Customer: Record Customer;
+        OtherCustomer: Record Customer;
+        CustomerPriceGroup: Record "Customer Price Group";
+        PriceListLine: Record "Price List Line";
+        CustomerCard: TestPage "Customer Card";
+        PriceListLineReview: TestPage "Price List Line Review";
+        ShownCount: Integer;
+    begin
+        // [SCENARIO 641061] Sales Price Review page opened from a Customer Card whose sources have no matching price lines
+        // returns zero lines, even when unrelated sales price lines exist in the database.
+        Initialize(true);
+
+        // [GIVEN] A Customer Price Group "X" and two Customers: "C1" (assigned to no price group) and "C2" (assigned to "X").
+        LibrarySales.CreateCustomerPriceGroup(CustomerPriceGroup);
+        LibrarySales.CreateCustomer(Customer);
+        LibrarySales.CreateCustomer(OtherCustomer);
+        OtherCustomer."Customer Price Group" := CustomerPriceGroup.Code;
+        OtherCustomer.Modify();
+
+        // [GIVEN] Sales price lines exist only for the other customer's sources (Customer "C2" and Price Group "X").
+        // [GIVEN] No price line exists for "All Customers", for Customer "C1", or for any price group Customer "C1" belongs to.
+        LibraryPriceCalculation.CreateSalesPriceLine(
+            PriceListLine, LibraryUtility.GenerateGUID(), "Price Source Type"::Customer, OtherCustomer."No.",
+            "Price Asset Type"::Item, LibraryInventory.CreateItemNo());
+        LibraryPriceCalculation.CreateSalesPriceLine(
+            PriceListLine, LibraryUtility.GenerateGUID(), "Price Source Type"::"Customer Price Group", CustomerPriceGroup.Code,
+            "Price Asset Type"::Item, LibraryInventory.CreateItemNo());
+
+        // [GIVEN] Open Customer Card for Customer "C1".
+        CustomerCard.OpenEdit();
+        CustomerCard.Filter.SetFilter("No.", Customer."No.");
+
+        // [WHEN] Run action "Sales Prices".
+        PriceListLineReview.Trap();
+        CustomerCard.PriceLines.Invoke();
+
+        // [THEN] No price lines are shown on the Price List Line Review page.
+        if PriceListLineReview.First() then
+            repeat
+                ShownCount += 1;
+            until not PriceListLineReview.Next();
+        Assert.AreEqual(0, ShownCount, UnrelatedLinesShownErr);
+    end;
+
+    [Test]
+    procedure T217_SalesPriceLinesFromCustomerCardShowCustomerInCaption()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        PriceListHeader: Record "Price List Header";
+        PriceListLine: Record "Price List Line";
+        CustomerCard: TestPage "Customer Card";
+        PriceListLineReview: TestPage "Price List Line Review";
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO 647261] Sales Price lines opened from a Customer Card identify the customer in the page caption.
+        Initialize(true);
+
+        // [GIVEN] Customer "C" with a sales price for Item "I".
+        LibrarySales.CreateCustomer(Customer);
+        LibraryInventory.CreateItem(Item);
+        LibraryPriceCalculation.CreatePriceHeader(
+            PriceListHeader, "Price Type"::Sale, "Price Source Type"::Customer, Customer."No.");
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine, PriceListHeader, "Price Amount Type"::Price, "Price Asset Type"::Item, Item."No.");
+
+        // [GIVEN] Open Customer Card for Customer "C".
+        CustomerCard.OpenEdit();
+        CustomerCard.Filter.SetFilter("No.", Customer."No.");
+
+        // [WHEN] Run action "Sales Prices".
+        PriceListLineReview.Trap();
+        CustomerCard.PriceLines.Invoke();
+
+        // [THEN] The page caption identifies Customer "C".
+        Assert.AreEqual(
+            StrSubstNo(CustomerPriceListCaptionTxt, Customer."No.", Customer.Name),
+            PriceListLineReview.Caption, UnexpectedPageCaptionErr);
+    end;
+
+    [Test]
+    procedure T218_PurchPriceLinesFromVendorCardShowVendorInCaption()
+    var
+        Vendor: Record Vendor;
+        Item: Record Item;
+        PriceListHeader: Record "Price List Header";
+        PriceListLine: Record "Price List Line";
+        VendorCard: TestPage "Vendor Card";
+        PriceListLineReview: TestPage "Price List Line Review";
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO 647261] Purchase Price lines opened from a Vendor Card identify the vendor in the page caption.
+        Initialize(true);
+
+        // [GIVEN] Vendor "V" with a purchase price for Item "I".
+        LibraryPurchase.CreateVendor(Vendor);
+        LibraryInventory.CreateItem(Item);
+        LibraryPriceCalculation.CreatePriceHeader(
+            PriceListHeader, "Price Type"::Purchase, "Price Source Type"::Vendor, Vendor."No.");
+        LibraryPriceCalculation.CreatePriceListLine(
+            PriceListLine, PriceListHeader, "Price Amount Type"::Price, "Price Asset Type"::Item, Item."No.");
+
+        // [GIVEN] Open Vendor Card for Vendor "V".
+        VendorCard.OpenEdit();
+        VendorCard.Filter.SetFilter("No.", Vendor."No.");
+
+        // [WHEN] Run action "Purchase Prices".
+        PriceListLineReview.Trap();
+        VendorCard.PriceLines.Invoke();
+
+        // [THEN] The page caption identifies Vendor "V".
+        Assert.AreEqual(
+            StrSubstNo(VendorPriceListCaptionTxt, Vendor."No.", Vendor.Name),
+            PriceListLineReview.Caption, UnexpectedPageCaptionErr);
     end;
 
     local procedure Initialize(Enable: Boolean)

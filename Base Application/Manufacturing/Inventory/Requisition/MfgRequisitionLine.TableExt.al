@@ -459,7 +459,9 @@ tableextension 99000860 "Mfg. Requisition Line" extends "Requisition Line"
 
     procedure UpdateWorkCenterDescription(): Boolean
     var
+        ProdOrderRoutingLine: Record "Prod. Order Routing Line";
         WorkCenterForDescription: Record "Work Center";
+        RoutingLineFound: Boolean;
     begin
         if ("Ref. Order Type" <> "Ref. Order Type"::"Prod. Order") or ("Work Center No." = '') then
             exit(false);
@@ -470,8 +472,18 @@ tableextension 99000860 "Mfg. Requisition Line" extends "Requisition Line"
         if WorkCenterForDescription."Subcontractor No." = '' then
             exit(false);
 
-        Description := WorkCenterForDescription.Name;
-        "Description 2" := WorkCenterForDescription."Name 2";
+        ProdOrderRoutingLine.SetLoadFields(Description, "Description 2", "Work Center No.");
+        RoutingLineFound := ProdOrderRoutingLine.Get(
+            "Ref. Order Status", "Ref. Order No.", "Routing Reference No.", "Routing No.", "Operation No.");
+        if RoutingLineFound and (ProdOrderRoutingLine."Work Center No." = "Work Center No.") then begin
+            Description := ProdOrderRoutingLine.Description;
+            "Description 2" := ProdOrderRoutingLine."Description 2";
+            if "Description 2" = '' then
+                "Description 2" := WorkCenterForDescription."Name 2";
+        end else begin
+            Description := WorkCenterForDescription.Name;
+            "Description 2" := WorkCenterForDescription."Name 2";
+        end;
 
         exit(true);
     end;
@@ -481,7 +493,13 @@ tableextension 99000860 "Mfg. Requisition Line" extends "Requisition Line"
         Item: Record Item;
         ProdOrder: Record "Production Order";
         ProdOrderLine: Record "Prod. Order Line";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeValidateProdOrderOnReqLine(ReqLine, IsHandled);
+        if IsHandled then
+            exit;
+
         ReqLine.TestField(Type, ReqLine.Type::Item);
 
         if ProdOrder.Get(ProdOrder.Status::Released, ReqLine."Prod. Order No.") then begin
@@ -498,6 +516,11 @@ tableextension 99000860 "Mfg. Requisition Line" extends "Requisition Line"
             Item.Get(ReqLine."No.");
             ReqLine.Validate("Unit of Measure Code", Item."Base Unit of Measure");
         end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateProdOrderOnReqLine(var RequisitionLine: Record "Requisition Line"; var IsHandled: Boolean)
+    begin
     end;
 
     [IntegrationEvent(false, false)]
