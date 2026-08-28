@@ -26,7 +26,6 @@ codeunit 101312 "Create Purchases & Payables S."
         "Purchases & Payables Setup"."Credit Memo Nos." := "Purchases & Payables Setup"."Posted Credit Memo Nos.";
         "Purchases & Payables Setup"."Appln. between Currencies" := "Purchases & Payables Setup"."Appln. between Currencies"::All;
         "Purchases & Payables Setup"."Document Default Line Type" := "Purchases & Payables Setup"."Document Default Line Type"::Item;
-        "Purchases & Payables Setup"."Check Doc. Total Amounts" := false;
         "Purchases & Payables Setup".Modify();
     end;
 
@@ -98,7 +97,6 @@ codeunit 101312 "Create Purchases & Payables S."
         "Purchases & Payables Setup"."Credit Memo Nos." := XPCR;
         "Purchases & Payables Setup"."Posted Prepmt. Inv. Nos." := XPINVPLUS;
         "Purchases & Payables Setup"."Posted Prepmt. Cr. Memo Nos." := XPCRPLUS;
-        "Purchases & Payables Setup"."Check Doc. Total Amounts" := true;
         "Purchases & Payables Setup".Modify();
     end;
 }

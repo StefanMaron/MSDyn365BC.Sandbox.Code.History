@@ -309,6 +309,7 @@ table 11000000 "Proposal Line"
         {
             CalcFormula = lookup("Bank Account"."Bank Account No." where("No." = field("Our Bank No.")));
             Caption = 'Our Bank Account No.';
+            MaskType = Concealed;
             Editable = false;
             FieldClass = FlowField;
         }
@@ -712,6 +713,7 @@ table 11000000 "Proposal Line"
         if "Transaction Date" = 0D then
             "Transaction Date" := WorkDate() + 1;
 
+        OnInitRecordOnBeforeFindProposalLine(ProposalLine, Rec);
         if ProposalLine.FindFirst() then
             "Header Dimension Set ID" := ProposalLine."Header Dimension Set ID";
     end;
@@ -778,7 +780,38 @@ table 11000000 "Proposal Line"
     [Scope('OnPrem')]
     procedure ValidateShortcutDimCode(FieldNo: Integer; var ShortcutDimCode: Code[20])
     begin
+        OnBeforeValidateShortcutDimCode(Rec, xRec, FieldNo, ShortcutDimCode);
         DimManagement.ValidateShortcutDimValues(FieldNo, ShortcutDimCode, "Dimension Set ID");
+    end;
+
+    /// <summary>
+    /// Integration event raised before validating a shortcut dimension code for proposal line.
+    /// Enables custom dimension validation logic or preprocessing before standard validation.
+    /// </summary>
+    /// <param name="ProposalLine">Proposal line record being validated</param>
+    /// <param name="xProposalLine">Previous proposal line record state</param>
+    /// <param name="FieldNo">Field number of the dimension being validated</param>
+    /// <param name="ShortcutDimCode">Dimension code being validated</param>
+    /// <remarks>
+    /// Raised from ValidateShortcutDimCode procedure before standard dimension validation.
+    /// </remarks>
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeValidateShortcutDimCode(var ProposalLine: Record "Proposal Line"; var xProposalLine: Record "Proposal Line"; FieldNo: Integer; var ShortcutDimCode: Code[20])
+    begin
+    end;
+
+    /// <summary>
+    /// Integration event raised in InitRecord before searching for an existing proposal line to copy the header dimension set.
+    /// Enables custom filtering on the proposal line lookup before the FindFirst call.
+    /// </summary>
+    /// <param name="ProposalLine">Proposal line record used to look up an existing proposal line; filters can be adjusted before the lookup.</param>
+    /// <param name="ProposalLineRec">Current proposal line record being initialized.</param>
+    /// <remarks>
+    /// Raised from InitRecord procedure before the ProposalLine.FindFirst call.
+    /// </remarks>
+    [IntegrationEvent(false, false)]
+    local procedure OnInitRecordOnBeforeFindProposalLine(var ProposalLine: Record "Proposal Line"; ProposalLineRec: Record "Proposal Line")
+    begin
     end;
 
     [Scope('OnPrem')]
@@ -819,7 +852,8 @@ table 11000000 "Proposal Line"
     begin
         "Dimension Set ID" :=
           DimManagement.EditDimensionSet(
-            "Dimension Set ID", StrSubstNo('%1 %2', "Our Bank No.", "Line No."));
+            Rec, "Dimension Set ID", StrSubstNo('%1 %2', "Our Bank No.", "Line No."),
+            "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
     end;
 
     [Scope('OnPrem')]
@@ -830,7 +864,7 @@ table 11000000 "Proposal Line"
     begin
         "Header Dimension Set ID" :=
           DimManagement.EditDimensionSet(
-            "Header Dimension Set ID", StrSubstNo('%1 %2', "Our Bank No.", "Line No."),
+            Rec, "Header Dimension Set ID", StrSubstNo('%1 %2', "Our Bank No.", "Line No."),
             HeaderGlobalDim1, HeaderGlobalDim2);
     end;
 

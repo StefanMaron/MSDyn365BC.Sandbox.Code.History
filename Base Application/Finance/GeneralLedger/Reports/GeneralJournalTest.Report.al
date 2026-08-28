@@ -48,10 +48,9 @@ using System.Utilities;
 /// </remarks>
 report 2 "General Journal - Test"
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './Finance/GeneralLedger/Reports/GeneralJournalTest.rdlc';
     Caption = 'General Journal - Test';
     PreviewMode = PrintLayout;
+    DefaultRenderingLayout = RDLCLayout;
 
     dataset
     {
@@ -829,6 +828,16 @@ report 2 "General Journal - Test"
         }
     }
 
+    rendering
+    {
+        layout(RDLCLayout)
+        {
+            Type = RDLC;
+            LayoutFile = './Finance/GeneralLedger/Reports/GeneralJournalTest.rdlc';
+            Summary = 'Report layout made in the legacy RDLC format. Use an RDLC editor to modify the layout.';
+        }
+    }
+
     labels
     {
     }
@@ -1518,7 +1527,7 @@ report 2 "General Journal - Test"
         if not Employee.Get(GenJnlLine."Account No.") then
             AddError(StrSubstNo(Text031, Employee.TableCaption(), GenJnlLine."Account No."))
         else begin
-            AccName := Employee."No.";
+            AccName := Employee.FullName();
             if Employee."Privacy Blocked" then
                 AddError(StrSubstNo(Text032, Employee.FieldCaption("Privacy Blocked"), false, Employee.TableCaption(), AccName))
         end;

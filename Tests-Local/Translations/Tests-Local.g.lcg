@@ -41,22 +41,13 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Digipoort - NamedType DigipoortStatusURLSetupErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 1784119079 - NamedType 1006622696" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+  <Item ItemId=";Codeunit 1784119079 - NamedType 62408219" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Invalid URI: The format of the URI could not be determined.]]></Val>
+      <Val><![CDATA[The Digipoort URL host must end with .digipoort.logius.nl.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Digipoort - NamedType InvalidDeliverUriFormatErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 1784119079 - NamedType 1874449917" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Invalid URI: The format of the URI could not be determined.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Digipoort - NamedType InvalidGetStatusUriFormatErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Digipoort - NamedType InvalidDigipoortHostErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 757409969 - NamedType 455107495" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -320,6 +311,24 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM EVAT - NamedType AgentConAddressErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3742388408 - NamedType 2881641095" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[xmlns:bd-dim-dim]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM EVAT - NamedType AttrBdDimDimTok)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3742388408 - NamedType 3952498397" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[xmlns:bd-dim-dom]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM EVAT - NamedType AttrBdDimDomTok)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3742388408 - NamedType 2679649536" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[xmlns:bd-i]]></Val>
@@ -345,6 +354,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM EVAT - NamedType AttrBdTTok)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3742388408 - NamedType 1486263878" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[xmlns:xbrldi]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM EVAT - NamedType AttrXbrldiTok)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3742388408 - NamedType 3759239440" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -392,15 +410,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM EVAT - NamedType NoSubmissionMessageAvailableErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 3742388408 - NamedType 2545144465" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Parent of element %1 is wrong]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM EVAT - NamedType ParentElementErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 3742388408 - NamedType 1681035323" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Row must not exists for Row No %1]]></Val>
@@ -417,24 +426,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM EVAT - NamedType StatusMustBeCreatedErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 3742388408 - NamedType 491209049" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Element bd-ob-tuple:IntraCommunitySupplies should have 3 subelements]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM EVAT - NamedType SubElementErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 3742388408 - NamedType 2756569562" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Element %1 with Data zero exsits]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM EVAT - NamedType SuppliesAmountZeroErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3742388408 - NamedType 912543664" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -1175,15 +1166,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test SEPA PAIN 008.001.02 - NamedType WrongSymbolFoundErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 1895493354 - NamedType 672891634" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Cancelled]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test SEPA PAIN 008.001.08 - NamedType CancelTok)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 1895493354 - NamedType 1707647923" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The Valid To date must be after the Valid From date.]]></Val>
@@ -1211,13 +1193,13 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test SEPA PAIN 008.001.08 - NamedType ForeignCurrencyErrorTok)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 1895493354 - NamedType 803741109" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+  <Item ItemId=";Codeunit 1895493354 - NamedType 2138591613" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[EndToEndId]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test SEPA PAIN 008.001.08 - NamedType IdentificationElementName)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test SEPA PAIN 008.001.08 - NamedType IdentificationElementNameTok)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1895493354 - NamedType 3305750957" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -1254,24 +1236,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test SEPA PAIN 008.001.08 - NamedType PartnerTypeMismatchErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 1895493354 - NamedType 2440261675" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[%1 payment line appears in the exported file!]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test SEPA PAIN 008.001.08 - NamedType PaymentLineErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 1895493354 - NamedType 3826474065" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Rejected]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Test SEPA PAIN 008.001.08 - NamedType RejectTok)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1895493354 - NamedType 4252704064" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">

@@ -27,6 +27,7 @@ reportextension 7305 "Mfg. WhseSourceCreateDocument" extends "Whse.-Source - Cre
                     WMSMgt: Codeunit "WMS Management";
                     QtyToPick: Decimal;
                     QtyToPickBase: Decimal;
+                    GroupingNumber: Integer;
                     SkipProdOrderComp: Boolean;
                     EmptyGuid: Guid;
                 begin
@@ -64,8 +65,10 @@ reportextension 7305 "Mfg. WhseSourceCreateDocument" extends "Whse.-Source - Cre
                         QtyToPickBase := UOMMgt.CalcBaseQty("Item No.", "Variant Code", "Unit of Measure Code", QtyToPick, "Qty. per Unit of Measure");
 
                         if QtyToPick > 0 then begin
+                            GroupingNumber := 1;
+                            OnAfterGetRecordProdOrderComponentOnBeforeSetCustomWhseSourceLine("Prod. Order Component", GroupingNumber);
                             CreatePick.SetCustomWhseSourceLine(
-                                "Prod. Order Component", 1,
+                                "Prod. Order Component", GroupingNumber,
                                 Database::"Prod. Order Component", Status.AsInteger(), "Prod. Order No.", "Prod. Order Line No.", "Line No.");
                             CreatePick.SetTempWhseItemTrkgLine(
                                 "Prod. Order No.", Database::"Prod. Order Component", '', "Prod. Order Line No.", "Line No.", "Location Code");
@@ -82,10 +85,6 @@ reportextension 7305 "Mfg. WhseSourceCreateDocument" extends "Whse.-Source - Cre
                 end;
 
                 trigger OnPreDataItem()
-#if not CLEAN26
-                var
-                    ManufacturingSetup: Record Microsoft.Manufacturing.Setup."Manufacturing Setup";
-#endif
                 begin
                     if WhseDoc <> WhseDoc::Production then
                         CurrReport.Break();
@@ -108,18 +107,7 @@ reportextension 7305 "Mfg. WhseSourceCreateDocument" extends "Whse.-Source - Cre
 
                     SetRange("Prod. Order No.", ProdOrderHeader."No.");
                     SetRange(Status, Status::Released);
-#if not CLEAN26
-                    if not ManufacturingSetup.IsFeatureKeyFlushingMethodManualWithoutPickEnabled() then
-                        SetFilter(
-                        "Flushing Method", '%1|%2|%3|%4',
-                        "Flushing Method"::Manual,
-                        "Flushing Method"::"Pick + Manual",
-                        "Flushing Method"::"Pick + Forward",
-                        "Flushing Method"::"Pick + Backward")
-                    else
-#endif
-                        SetFilter(
-                        "Flushing Method", '%1|%2|%3',
+                    SetFilter("Flushing Method", '%1|%2|%3',
                         "Flushing Method"::"Pick + Manual",
                         "Flushing Method"::"Pick + Forward",
                         "Flushing Method"::"Pick + Backward");
@@ -165,6 +153,11 @@ reportextension 7305 "Mfg. WhseSourceCreateDocument" extends "Whse.-Source - Cre
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGetRecordProdOrderComponent(var ProdOrderComponent: Record "Prod. Order Component"; var SkipProdOrderComp: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetRecordProdOrderComponentOnBeforeSetCustomWhseSourceLine(var ProdOrderComponent: Record "Prod. Order Component"; var GroupingNumber: Integer)
     begin
     end;
 

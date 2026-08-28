@@ -281,12 +281,19 @@ page 8903 "Manufacturing Manager RC"
                         Caption = 'Requisition Worksheets';
                         RunObject = page "Req. Worksheet";
                     }
+#if not CLEAN28
                     action("Subcontracting Worksheet")
                     {
                         ApplicationArea = Manufacturing;
-                        Caption = 'Subcontracting Worksheets';
+                        Caption = 'Subcontracting Worksheets (Obsolete)';
+#pragma warning disable AL0432
                         RunObject = page "Subcontracting Worksheet";
+#pragma warning restore AL0432
+                        ObsoleteReason = 'Will be replaced by the Subcontracting App.';
+                        ObsoleteState = Pending;
+                        ObsoleteTag = '28.0';
                     }
+#endif
                     action("Recurring Req. Worksheet")
                     {
                         ApplicationArea = Planning;
@@ -750,26 +757,6 @@ page 8903 "Manufacturing Manager RC"
                         ObsoleteReason = 'This report will be removed in a future release.';
                         ObsoleteTag = '27.0';
                     }
-#if not CLEAN26
-                    action("Work Center List")
-                    {
-                        ApplicationArea = Manufacturing;
-                        Caption = 'Work Center List';
-                        RunObject = report "Work Center List";
-                        ObsoleteState = Pending;
-                        ObsoleteReason = 'This report has been replaced by the page Work Center List and will be removed in a future release.';
-                        ObsoleteTag = '26.0';
-                    }
-                    action("Machine Center List")
-                    {
-                        ApplicationArea = Manufacturing;
-                        Caption = 'Machine Center List';
-                        RunObject = report "Machine Center List";
-                        ObsoleteState = Pending;
-                        ObsoleteReason = 'This report has been replaced by the page Machine Center List and will be removed in a future release.';
-                        ObsoleteTag = '26.0';
-                    }
-#endif
                     action("Work Center Load1")
                     {
                         ApplicationArea = Manufacturing;

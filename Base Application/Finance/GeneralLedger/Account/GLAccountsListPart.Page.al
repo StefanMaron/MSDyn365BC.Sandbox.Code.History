@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -25,7 +25,6 @@ page 791 "G/L Accounts ListPart"
                 field("No."; Rec."No.")
                 {
                     ApplicationArea = Basic, Suite;
-                    ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
                 }
                 field(Name; Rec.Name)
                 {
@@ -36,6 +35,17 @@ page 791 "G/L Accounts ListPart"
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies is the general ledger account is an income statement account or a balance sheet account.';
+                }
+                field("Account Category"; Rec."Account Category")
+                {
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the category of the G/L account.';
+                }
+                field("Account Subcategory Descript."; Rec."Account Subcategory Descript.")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Caption = 'Account Subcategory';
+                    ToolTip = 'Specifies the subcategory of the account category of the G/L account.';
                 }
             }
         }

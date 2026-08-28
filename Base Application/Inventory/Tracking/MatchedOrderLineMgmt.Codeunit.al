@@ -11,11 +11,12 @@ using Microsoft.Inventory.Location;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Purchases.Posting;
+using System.Telemetry;
 using System.Text;
 
 codeunit 5826 "Matched Order Line Mgmt."
 {
-    Access = Internal;
+    Access = Public;
     Permissions = TableData "Posted Matched Order Line" = RIMD;
 
     internal procedure ProcessMatchedReceiptOnInvoice(var PurchaseLine: Record "Purchase Line")
@@ -64,6 +65,8 @@ codeunit 5826 "Matched Order Line Mgmt."
                 PurchaseLineOrder.SetRange("Document No.", TempPurchaseHeader."No.");
                 PurchaseLineOrder.ModifyAll("Invoicing From Line SystemId", NullGuid);
             until TempPurchaseHeader.Next() = 0;
+
+        FeatureTelemetry.LogUsage('0000SIY', MatchedOrderLinesTok, ReceiptOnInvoiceLbl);
         PurchaseLine.SetLoadFields();
     end;
 
@@ -131,13 +134,26 @@ codeunit 5826 "Matched Order Line Mgmt."
     var
         MatchedOrderLine: Record "Matched Order Line";
         PurchRcptLineSysIDFilter: Text;
+        UseMarking: Boolean;
     begin
         MatchedOrderLine.SetRange("Document Line SystemId", PurchaseLineInvoice.SystemId);
         MatchedOrderLine.SetFilter("Matched Rcpt./Shpt. Line SysId", '<> %1', NullGuid);
+        MatchedOrderLine.SetLoadFields("Matched Rcpt./Shpt. Line SysId");
+        UseMarking := MatchedOrderLine.Count() > MaxFilterValues();
+
         if MatchedOrderLine.FindSet() then begin
             repeat
-                PurchRcptLineSysIDFilter += Format(MatchedOrderLine."Matched Rcpt./Shpt. Line SysId") + '|';
+                if UseMarking then begin
+                    if PurchRcptLine.GetBySystemId(MatchedOrderLine."Matched Rcpt./Shpt. Line SysId") then
+                        PurchRcptLine.Mark(true);
+                end else
+                    PurchRcptLineSysIDFilter += Format(MatchedOrderLine."Matched Rcpt./Shpt. Line SysId") + '|';
             until MatchedOrderLine.Next() = 0;
+
+            if UseMarking then begin
+                PurchRcptLine.MarkedOnly(true);
+                exit;
+            end;
 
             if StrLen(PurchRcptLineSysIDFilter) = 0 then
                 exit;
@@ -215,11 +231,16 @@ codeunit 5826 "Matched Order Line Mgmt."
                     PostedMatchedOrderLine."Qty. Invoiced" := MatchedOrderLine2."Qty. to Invoice";
                     PostedMatchedOrderLine."Qty. Invoiced (Base)" := MatchedOrderLine2."Qty. to Invoice (Base)";
                 end;
-                if PostedMatchedOrderLine."Qty. Invoiced" <> 0 then
+                if PostedMatchedOrderLine."Qty. Invoiced" <> 0 then begin
+                    OnInsertPostedMatchedOrderLinesOnBeforeInsertPostedMatchedOrderLine(PostedMatchedOrderLine, MatchedOrderLine, PurchInvLine, PurchaseLine);
                     PostedMatchedOrderLine.Insert();
+                end;
             until MatchedOrderLine.Next() = 0;
 
         MatchedOrderLine.DeleteAll();
+
+        FeatureTelemetry.LogUptake('0000SIW', MatchedOrderLinesTok, Enum::"Feature Uptake Status"::Used);
+        FeatureTelemetry.LogUsage('0000SIZ', MatchedOrderLinesTok, PostedMatchedInvoiceLbl);
     end;
 
     internal procedure IsLineMatchedToReceiptShipment(PurchaseLine: Record "Purchase Line"): Boolean
@@ -267,26 +288,37 @@ codeunit 5826 "Matched Order Line Mgmt."
 
     internal procedure DeleteAllMatchedOrderLines(var PurchaseHeader: Record "Purchase Header")
     var
-        MatchedOrderLine: Record "Matched Order Line";
         PurchaseLine: Record "Purchase Line";
         PurchaseLineSystemIDFilter: Text;
+        FilterValueCount: Integer;
     begin
-        if PurchaseHeader."Document Type" = PurchaseHeader."Document Type"::Order then begin
-            PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
-            PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
-            if PurchaseLine.FindSet() then begin
-                repeat
-                    PurchaseLineSystemIDFilter += Format(PurchaseLine.SystemId) + '|';
-                until PurchaseLine.Next() = 0;
+        if PurchaseHeader."Document Type" <> PurchaseHeader."Document Type"::Order then
+            exit;
 
-                if StrLen(PurchaseLineSystemIDFilter) = 0 then
-                    exit;
+        PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
+        PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
+        PurchaseLine.SetLoadFields(SystemId);
+        if PurchaseLine.FindSet() then
+            repeat
+                PurchaseLineSystemIDFilter += Format(PurchaseLine.SystemId) + '|';
+                FilterValueCount += 1;
+                if FilterValueCount = MaxFilterValues() then begin
+                    DeleteMatchedOrderLinesBatch(PurchaseLineSystemIDFilter);
+                    Clear(PurchaseLineSystemIDFilter);
+                    FilterValueCount := 0;
+                end;
+            until PurchaseLine.Next() = 0;
 
-                PurchaseLineSystemIDFilter := CopyStr(PurchaseLineSystemIDFilter, 1, StrLen(PurchaseLineSystemIDFilter) - 1);
-                MatchedOrderLine.SetFilter("Matched Order Line SystemId", PurchaseLineSystemIDFilter);
-                MatchedOrderLine.DeleteAll();
-            end;
-        end;
+        if PurchaseLineSystemIDFilter <> '' then
+            DeleteMatchedOrderLinesBatch(PurchaseLineSystemIDFilter);
+    end;
+
+    local procedure DeleteMatchedOrderLinesBatch(SystemIDFilter: Text)
+    var
+        MatchedOrderLine: Record "Matched Order Line";
+    begin
+        MatchedOrderLine.SetFilter("Matched Order Line SystemId", CopyStr(SystemIDFilter, 1, StrLen(SystemIDFilter) - 1));
+        MatchedOrderLine.DeleteAll();
     end;
 
     internal procedure DeleteMatchedLinesForPurchReceipt(var PurchRcptLine: Record "Purch. Rcpt. Line")
@@ -495,6 +527,8 @@ codeunit 5826 "Matched Order Line Mgmt."
                 end;
             until MatchedOrderLine.Next() = 0;
         end;
+
+        OnAfterLoadOneLineForPurchaseInvoice(DetailedMatchedOrderLine, SourceLineSystemId, PurchaseLineInvoice);
     end;
 
     internal procedure LoadOneLineForPostedPurchaseInvoice(var DetailedMatchedOrderLine: Record "Detailed Matched Order Line"; SourceLineSystemId: Guid)
@@ -586,6 +620,8 @@ codeunit 5826 "Matched Order Line Mgmt."
                 end;
             until PostedMatchedOrderLine.Next() = 0;
         end;
+
+        OnAfterLoadOneLineForPostedPurchaseInvoice(DetailedMatchedOrderLine, SourceLineSystemId, PurchaseLineInvoice);
     end;
 
     internal procedure GetOrderLines(MatchedOrderLineSource: Enum "Matched Order Line Source"; DetailedMatchedOrderLine: Record "Detailed Matched Order Line")
@@ -611,6 +647,7 @@ codeunit 5826 "Matched Order Line Mgmt."
         PurchaseLineOrder.SetRange("Document Type", PurchaseLineOrder."Document Type"::Order);
         PurchaseLineOrder.SetRange("Buy-from Vendor No.", PurchaseLineInvoice."Buy-from Vendor No.");
         PurchaseLineOrder.SetRange("Pay-to Vendor No.", PurchaseLineInvoice."Pay-to Vendor No.");
+        PurchaseLineOrder.SetRange("Currency Code", PurchaseLineInvoice."Currency Code");
         PurchaseLineOrder.SetRange(Type, PurchaseLineInvoice.Type);
         PurchaseLineOrder.SetRange("No.", PurchaseLineInvoice."No.");
         PurchaseLineOrder.SetRange("Location Code", PurchaseLineInvoice."Location Code");
@@ -652,6 +689,8 @@ codeunit 5826 "Matched Order Line Mgmt."
                                 false);
                         until PurchRcptLine.Next() = 0;
                 until PurchaseLineOrder.Next() = 0;
+
+            FeatureTelemetry.LogUsage('0000SJ0', MatchedOrderLinesTok, GetOrderLinesLbl);
         end;
     end;
 
@@ -712,6 +751,8 @@ codeunit 5826 "Matched Order Line Mgmt."
                             false),
                         false);
                 until PurchRcptLine.Next() = 0;
+
+            FeatureTelemetry.LogUsage('0000SJ1', MatchedOrderLinesTok, GetReceiptLinesLbl);
         end;
     end;
 
@@ -806,9 +847,11 @@ codeunit 5826 "Matched Order Line Mgmt."
         if MatchedOrderLine.FindFirst() then begin
             MatchedOrderLine."Qty. to Invoice" := DetailedMatchedOrderLine."Qty. to Invoice";
             MatchedOrderLine."Qty. to Invoice (Base)" := DetailedMatchedOrderLine."Qty. to Invoice (Base)";
+            OnValidateQtyToInvoiceOnBeforeModifyMatchedOrderLine(MatchedOrderLine, DetailedMatchedOrderLine);
             MatchedOrderLine.Modify();
         end;
 
+        OnValidateQtyToInvoiceOnBeforeUpdateQtyOnParentLines(MatchedOrderLine, DetailedMatchedOrderLine, xDetailedMatchedOrderLine);
         UpdateQtyOnParentLines(DetailedMatchedOrderLine, false, DetailedMatchedOrderLine."Qty. to Invoice" - xDetailedMatchedOrderLine."Qty. to Invoice", DetailedMatchedOrderLine."Qty. to Invoice (Base)" - xDetailedMatchedOrderLine."Qty. to Invoice (Base)");
         UpdateQtyOnParentLines(DetailedMatchedOrderLine, true, DetailedMatchedOrderLine."Qty. to Invoice" - xDetailedMatchedOrderLine."Qty. to Invoice", DetailedMatchedOrderLine."Qty. to Invoice (Base)" - xDetailedMatchedOrderLine."Qty. to Invoice (Base)");
     end;
@@ -829,6 +872,7 @@ codeunit 5826 "Matched Order Line Mgmt."
         if TempDetailedMatchedOrderLine.FindFirst() then begin
             TempDetailedMatchedOrderLine."Qty. to Invoice" += QtyToInvoiceDiff;
             TempDetailedMatchedOrderLine."Qty. to Invoice (Base)" += QtyToInvoiceBaseDiff;
+            OnUpdateQtyOnParentLinesOnBeforeModifyTempDetailedMatchedOrderLine(TempDetailedMatchedOrderLine, DetailedMatchedOrderLine, UpdateInvoiceLine, QtyToInvoiceDiff, QtyToInvoiceBaseDiff);
             TempDetailedMatchedOrderLine.Modify();
         end;
     end;
@@ -857,7 +901,7 @@ codeunit 5826 "Matched Order Line Mgmt."
         end;
     end;
 
-    internal procedure GetPurchaseOrderLines(PurchaseLine: Record "Purchase Line")
+    procedure GetPurchaseOrderLines(PurchaseLine: Record "Purchase Line")
     var
         PurchaseHeaderInvoice, PurchaseHeaderOrder : Record "Purchase Header";
         PurchaseLineInvoice, PurchaseLineOrder : Record "Purchase Line";
@@ -882,6 +926,8 @@ codeunit 5826 "Matched Order Line Mgmt."
         PurchaseLineOrder.SetRange("Document Type", PurchaseHeaderInvoice."Document Type"::Order);
         PurchaseLineOrder.SetRange("Buy-from Vendor No.", PurchaseHeaderInvoice."Buy-from Vendor No.");
         PurchaseLineOrder.SetRange("Pay-to Vendor No.", PurchaseHeaderInvoice."Pay-to Vendor No.");
+        PurchaseLineOrder.SetRange("Currency Code", PurchaseHeaderInvoice."Currency Code");
+        OnGetPurchaseOrderLinesOnAfterSetPurchaseLineOrderFilters(PurchaseLineOrder, PurchaseHeaderInvoice);
         if PurchaseLineOrder.FindSet() then
             repeat
                 PurchaseLineOrder.Mark(true);
@@ -907,6 +953,7 @@ codeunit 5826 "Matched Order Line Mgmt."
                     PurchaseLineInvoice."Description 2" := PurchaseLineOrder."Description 2";
                     PurchaseLineInvoice.Validate("Direct Unit Cost", PurchaseLineOrder."Direct Unit Cost");
                     PurchaseLineInvoice.Validate("Location Code", PurchaseLineOrder."Location Code");
+                    OnGetPurchaseOrderLinesOnBeforeInsertPurchaseLineInvoice(PurchaseLineInvoice, PurchaseLineOrder);
                     PurchaseLineInvoice.Insert(true);
 
                     if PurchaseHeaderOrder."No." <> PurchaseLineOrder."Document No." then
@@ -942,8 +989,11 @@ codeunit 5826 "Matched Order Line Mgmt."
 
                     // Late update quantity to avoid WMS errors
                     PurchaseLineInvoice.Validate(Quantity, Qty);
+                    OnGetPurchaseOrderLinesOnBeforeModifyPurchaseLineInvoice(PurchaseLineInvoice, PurchaseLineOrder);
                     PurchaseLineInvoice.Modify(true);
                 until PurchaseLineOrder.Next() = 0;
+
+            FeatureTelemetry.LogUsage('0000SJ2', MatchedOrderLinesTok, GetPurchaseOrderLinesLbl);
         end;
     end;
 
@@ -976,9 +1026,9 @@ codeunit 5826 "Matched Order Line Mgmt."
 
     internal procedure RefreshMatchedOrderLineReceipt(PurchaseHeader: Record "Purchase Header")
     var
-        MatchedOrderLine: Record "Matched Order Line";
         PurchaseLine: Record "Purchase Line";
         PurchaseLineSystemIDFilter: Text;
+        FilterValueCount: Integer;
     begin
         PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
         PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
@@ -986,14 +1036,24 @@ codeunit 5826 "Matched Order Line Mgmt."
         if PurchaseLine.FindSet() then
             repeat
                 PurchaseLineSystemIDFilter += Format(PurchaseLine.SystemId) + '|';
+                FilterValueCount += 1;
+                if FilterValueCount = MaxFilterValues() then begin
+                    RefreshMatchedOrderLinesBatch(PurchaseLineSystemIDFilter, PurchaseHeader."Receipt on Invoice");
+                    Clear(PurchaseLineSystemIDFilter);
+                    FilterValueCount := 0;
+                end;
             until PurchaseLine.Next() = 0;
 
-        if PurchaseLineSystemIDFilter = '' then
-            exit;
+        if PurchaseLineSystemIDFilter <> '' then
+            RefreshMatchedOrderLinesBatch(PurchaseLineSystemIDFilter, PurchaseHeader."Receipt on Invoice");
+    end;
 
-        PurchaseLineSystemIDFilter := CopyStr(PurchaseLineSystemIDFilter, 1, StrLen(PurchaseLineSystemIDFilter) - 1);
-        MatchedOrderLine.SetFilter("Matched Order Line SystemId", PurchaseLineSystemIDFilter);
-        MatchedOrderLine.ModifyAll("Receipt on Invoice", PurchaseHeader."Receipt on Invoice");
+    local procedure RefreshMatchedOrderLinesBatch(SystemIDFilter: Text; ReceiptOnInvoice: Boolean)
+    var
+        MatchedOrderLine: Record "Matched Order Line";
+    begin
+        MatchedOrderLine.SetFilter("Matched Order Line SystemId", CopyStr(SystemIDFilter, 1, StrLen(SystemIDFilter) - 1));
+        MatchedOrderLine.ModifyAll("Receipt on Invoice", ReceiptOnInvoice);
     end;
 
     internal procedure CheckReceiptOnInvoiceAllowedForItem(Item: Record Item; PurchHeader: Record "Purchase Header")
@@ -1039,18 +1099,32 @@ codeunit 5826 "Matched Order Line Mgmt."
         exit(true);
     end;
 
-    internal procedure ShowMatchedInvoiceLines(PurchaseLineOrder: Record "Purchase Line")
+    procedure ShowMatchedInvoiceLines(PurchaseLineOrder: Record "Purchase Line")
     var
         MatchedOrderLine: Record "Matched Order Line";
         PurchaseLine: Record "Purchase Line";
         PurchInvSystemIDFilter: Text;
+        UseMarking: Boolean;
     begin
         MatchedOrderLine.SetRange("Matched Order Line SystemId", PurchaseLineOrder.SystemId);
         MatchedOrderLine.SetFilter("Matched Rcpt./Shpt. Line SysId", NullGuid);
+        MatchedOrderLine.SetLoadFields("Document Line SystemId");
+        UseMarking := MatchedOrderLine.Count() > MaxFilterValues();
+
         if MatchedOrderLine.FindSet() then
             repeat
-                PurchInvSystemIDFilter += Format(MatchedOrderLine."Document Line SystemId") + '|';
+                if UseMarking then begin
+                    if PurchaseLine.GetBySystemId(MatchedOrderLine."Document Line SystemId") then
+                        PurchaseLine.Mark(true);
+                end else
+                    PurchInvSystemIDFilter += Format(MatchedOrderLine."Document Line SystemId") + '|';
             until MatchedOrderLine.Next() = 0;
+
+        if UseMarking then begin
+            PurchaseLine.MarkedOnly(true);
+            Page.RunModal(0, PurchaseLine);
+            exit;
+        end;
 
         if PurchInvSystemIDFilter <> '' then
             PurchInvSystemIDFilter := CopyStr(PurchInvSystemIDFilter, 1, StrLen(PurchInvSystemIDFilter) - 1)
@@ -1076,10 +1150,21 @@ codeunit 5826 "Matched Order Line Mgmt."
         MatchedOrderLine."Qty. to Invoice" := QtyToInvoice;
         MatchedOrderLine."Qty. to Invoice (Base)" := QtyToInvoiceBase;
         MatchedOrderLine."Receipt on Invoice" := ReceiptOnInvoice;
+        OnInsertMatchedOrderLineOnBeforeInsert(MatchedOrderLine);
         MatchedOrderLine.Insert();
+
+        FeatureTelemetry.LogUptake('0000SIX', MatchedOrderLinesTok, Enum::"Feature Uptake Status"::"Set up");
+    end;
+
+    local procedure MaxFilterValues(): Integer
+    begin
+        // Business Central supports up to about 2000 filter values in a single request.
+        // Use a conservative threshold to stay clear of both the value-count and filter-string-length limits.
+        exit(1000);
     end;
 
     var
+        FeatureTelemetry: Codeunit "Feature Telemetry";
         ItemTrackingMgt: Codeunit "Item Tracking Management";
         InvoiceMoreThanReceivedErr: Label 'You cannot invoice order %1 for more than you have received.', Comment = '%1 = Order No.';
         ItemTrackingExistsErr: Label 'You cannot change %1 for this line because item tracking exists.', Comment = ' %1 = Qty. To Invoice field name';
@@ -1103,4 +1188,60 @@ codeunit 5826 "Matched Order Line Mgmt."
         DeletePostedLinesErr: Label 'You cannot delete posted document lines.';
         LocationRequiresReceiveErr: Label 'You cannot delete the last matched order line because %1 location requires Directed Put-away and Pick. Please delete the document line.', Comment = '%1 - Location Code';
         NullGuid: Guid;
+        MatchedOrderLinesTok: Label 'Matched Order Lines', Locked = true;
+        PostedMatchedInvoiceLbl: Label 'Posted purchase invoice with matched order lines', Locked = true;
+        ReceiptOnInvoiceLbl: Label 'Posted receipt on invoice from matched order lines', Locked = true;
+        GetOrderLinesLbl: Label 'Used Get Order Lines to match order lines to invoice line', Locked = true;
+        GetPurchaseOrderLinesLbl: Label 'Used Get Purchase Order Lines to create invoice lines from order lines', Locked = true;
+        GetReceiptLinesLbl: Label 'Used Get Receipt Lines to match receipt lines', Locked = true;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertMatchedOrderLineOnBeforeInsert(var MatchedOrderLine: Record "Matched Order Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetPurchaseOrderLinesOnBeforeInsertPurchaseLineInvoice(var PurchaseLineInvoice: Record "Purchase Line"; PurchaseLineOrder: Record "Purchase Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetPurchaseOrderLinesOnAfterSetPurchaseLineOrderFilters(var PurchaseLineOrder: Record "Purchase Line"; PurchaseHeaderInvoice: Record "Purchase Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetPurchaseOrderLinesOnBeforeModifyPurchaseLineInvoice(var PurchaseLineInvoice: Record "Purchase Line"; PurchaseLineOrder: Record "Purchase Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateQtyToInvoiceOnBeforeModifyMatchedOrderLine(var MatchedOrderLine: Record "Matched Order Line"; DetailedMatchedOrderLine: Record "Detailed Matched Order Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateQtyToInvoiceOnBeforeUpdateQtyOnParentLines(MatchedOrderLine: Record "Matched Order Line"; DetailedMatchedOrderLine: Record "Detailed Matched Order Line"; xDetailedMatchedOrderLine: Record "Detailed Matched Order Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertPostedMatchedOrderLinesOnBeforeInsertPostedMatchedOrderLine(var PostedMatchedOrderLine: Record "Posted Matched Order Line"; MatchedOrderLine: Record "Matched Order Line"; var PurchInvLine: Record "Purch. Inv. Line"; PurchaseLine: Record "Purchase Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterLoadOneLineForPurchaseInvoice(var DetailedMatchedOrderLine: Record "Detailed Matched Order Line"; SourceLineSystemId: Guid; PurchaseLineInvoice: Record "Purchase Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateQtyOnParentLinesOnBeforeModifyTempDetailedMatchedOrderLine(var TempDetailedMatchedOrderLine: Record "Detailed Matched Order Line" temporary; var DetailedMatchedOrderLine: Record "Detailed Matched Order Line"; UpdateInvoiceLine: Boolean; QtyToInvoiceDiff: Decimal; QtyToInvoiceBaseDiff: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterLoadOneLineForPostedPurchaseInvoice(var DetailedMatchedOrderLine: Record "Detailed Matched Order Line"; SourceLineSystemId: Guid; PurchInvLine: Record "Purch. Inv. Line")
+    begin
+    end;
 }

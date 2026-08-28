@@ -301,7 +301,10 @@ codeunit 11000000 "Process Proposal Lines"
             if CheckRecord."Account Holder City" = '' then begin
                 Errortext := StrSubstNo(Text1000027,
                     CheckRecord.FieldCaption("Account Holder City"));
-                exit(false);
+                res := false;
+                OnCheckAProposalLineOnAfterCheckAccountHolderCity(CheckRecord, Warningstext, Errortext, res);
+                if not res then
+                    exit(false);
             end;
         end;
 
@@ -315,6 +318,11 @@ codeunit 11000000 "Process Proposal Lines"
                     );
                 exit(false);
             end;
+
+        res := true;
+        OnCheckAProposalLineOnBeforeCheckDetailLine(CheckRecord, Warningstext, Errortext, res);
+        if not res then
+            exit(false);
 
         // /////////////////////////////////////////////////////////////////////
         // Per detail line
@@ -367,7 +375,7 @@ codeunit 11000000 "Process Proposal Lines"
         OnAfterCheckAProposalLine(CheckRecord, Errortext, Warningstext, res);
     end;
 
-    local procedure CheckOurBank(var ProposalLine: Record "Proposal Line"; var BankAccount: Record "Bank Account"): Boolean
+    local procedure CheckOurBank(var ProposalLine: Record "Proposal Line"; var BankAccount: Record "Bank Account") Result: Boolean
     begin
         if not BankAccount.Get(ProposalLine."Our Bank No.") then begin
             Errortext := StrSubstNo(Text1000010, ProposalLine.FieldCaption("Our Bank No."));
@@ -403,7 +411,9 @@ codeunit 11000000 "Process Proposal Lines"
             exit(false);
         end;
 
-        exit(true);
+        Result := true;
+        OnAfterCheckOurBank(ProposalLine, BankAccount, Errortext, Warningstext, Result);
+        exit(Result);
     end;
 
     local procedure CheckLedgerEntries(var ProposalLine: Record "Proposal Line") Result: Boolean
@@ -490,8 +500,8 @@ codeunit 11000000 "Process Proposal Lines"
         TranMode.TestField("Run No. Series");
 
         PaymentHistory."Our Bank" := ProposalLine."Our Bank No.";
-            PaymentHistory."No. Series" := TranMode."Run No. Series";
-            PaymentHistory."Run No." := NoSeries.GetNextNo(PaymentHistory."No. Series", Today());
+        PaymentHistory."No. Series" := TranMode."Run No. Series";
+        PaymentHistory."Run No." := NoSeries.GetNextNo(PaymentHistory."No. Series", Today());
 
 
         PaymentHistory.Init();
@@ -599,6 +609,7 @@ codeunit 11000000 "Process Proposal Lines"
             (PaymentHistoryLine."Account Type" = PaymentHistoryLine."Account Type"::Customer))
         then
             UpdateDirectDebitMandate(PaymentHistoryLine);
+        OnCreatePaymentHistoryLineOnBeforeInsert(ProposalLine, PaymentHistoryLine);
         PaymentHistoryLine.Insert(true);
 
         DetailLine.SetCurrentKey("Our Bank", Status, "Connect Batches", "Connect Lines");
@@ -615,7 +626,7 @@ codeunit 11000000 "Process Proposal Lines"
 
         FinancialInterfaceTelebank.PostPaymReceived(GenJnlLine, PaymentHistoryLine, PaymentHistory);
 
-        OnAfterCreatePaymentHistoryLine(ProposalLine, PaymentHistory, PaymentHistoryLine);
+        OnAfterCreatePaymentHistoryLine(ProposalLine, PaymentHistory, PaymentHistoryLine, GenJnlLine);
     end;
 
     [Scope('OnPrem')]
@@ -655,6 +666,11 @@ codeunit 11000000 "Process Proposal Lines"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnCheckAProposalLineOnBeforeCheckDetailLine(CheckRecord: Record "Proposal Line"; var Warningstext: Text[125]; var ErrorText: Text[125]; var Result: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnAfterCheckLedgerEntries(ProposalLine: Record "Proposal Line"; var WarningsText: Text[125]; var ErrorText: Text[125]; var Result: Boolean)
     begin
     end;
@@ -665,7 +681,17 @@ codeunit 11000000 "Process Proposal Lines"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreatePaymentHistoryLine(var ProposalLine: Record "Proposal Line"; var PaymentHistory: Record "Payment History"; PaymentHistoryLine: Record "Payment History Line")
+    local procedure OnAfterCheckOurBank(ProposalLine: Record "Proposal Line"; BankAccount: Record "Bank Account"; var ErrorText: Text[125]; var WarningsText: Text[125]; var Result: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCheckAProposalLineOnAfterCheckAccountHolderCity(ProposalLine: Record "Proposal Line"; var WarningsText: Text[125]; var ErrorText: Text[125]; var Result: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCreatePaymentHistoryLine(var ProposalLine: Record "Proposal Line"; var PaymentHistory: Record "Payment History"; PaymentHistoryLine: Record "Payment History Line"; var TempGenJournalLine: Record "Gen. Journal Line" temporary)
     begin
     end;
 
@@ -686,6 +712,11 @@ codeunit 11000000 "Process Proposal Lines"
 
     [IntegrationEvent(false, false)]
     local procedure OnUpdateDirectDebitMandateOnBeforeModify(var SEPADirectDebitMandate: Record "SEPA Direct Debit Mandate"; PaymentHistoryLine: Record "Payment History Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreatePaymentHistoryLineOnBeforeInsert(ProposalLine: Record "Proposal Line"; var PaymentHistoryLine: Record "Payment History Line")
     begin
     end;
 }
