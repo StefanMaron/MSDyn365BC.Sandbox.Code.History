@@ -9,6 +9,7 @@ using Microsoft.CRM.Team;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SalesTax;
 using Microsoft.Finance.VAT.Ledger;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Reporting;
@@ -39,6 +40,7 @@ codeunit 136108 "Service Posting - Invoice"
 {
     Subtype = Test;
     TestPermissions = Disabled;
+    EventSubscriberInstance = Manual;
 
     trigger OnRun()
     begin
@@ -71,6 +73,11 @@ codeunit 136108 "Service Posting - Invoice"
         PostingDateBlankError: Label 'Enter the posting date.';
         ConfirmCreateEmptyPostedInvMsg: Label 'Deleting this document will cause a gap in the number series for posted invoices. An empty posted invoice %1 will be created', Comment = '%1 - Invoice No.';
         ReservationEntryNotFoundErr: Label 'Reservation Entry should be deleted.';
+        AmountInclVATNotRecalculatedErr: Label 'Amount Including VAT should be recalculated after applying Line Discount';
+        TestRollbackAfterCommitErr: Label 'Test error to trigger rollback after Commit() call.', Locked = true;
+        SetIgnoreCommitToFalse: Boolean;
+        RaiseErrorAfterCommit: Boolean;
+        CommitTestMarkerID: Guid;
 
     [Test]
     [HandlerFunctions('ExpectedCostConfirmHandler,ExpectedCostMsgHandler')]
@@ -2635,7 +2642,7 @@ codeunit 136108 "Service Posting - Invoice"
         CustomerNo: Code[20];
     begin
         // [FEATURE] [External Document No.]
-        // [SCENARIO 287958] External Document No. processing does not depend on SalesSetup.Ext. Doc. No. Mandatory
+        // [SCENARIO 287958] External Document No. is left blank when Ext. Doc. No. Mandatory is disabled and no External Document No. was entered
         Initialize();
 
         // [GIVEN] Set SalesSetup.Ext. Doc. No. Mandatory = No
@@ -2649,10 +2656,10 @@ codeunit 136108 "Service Posting - Invoice"
         // [WHEN] Service invoice is being posted
         LibraryService.PostServiceOrder(ServiceHeader, true, false, true);
 
-        // [THEN] Created customer ledger entry has External Document No. = ServiceHeader."No."
+        // [THEN] Created customer ledger entry has External Document No. = ''
         CustLedgerEntry.SetRange("Customer No.", CustomerNo);
         CustLedgerEntry.FindFirst();
-        CustLedgerEntry.TestField("External Document No.", ServiceHeader."No.");
+        CustLedgerEntry.TestField("External Document No.", '');
     end;
 
     [Test]
@@ -3048,12 +3055,246 @@ codeunit 136108 "Service Posting - Invoice"
             'Your Reference should be transferred from Service Credit Memo to Customer Ledger Entry');
     end;
 
+    [Test]
+    procedure AmountRecalculatedOnLineDiscountWithTaxAreaCode()
+    var
+        Customer: Record Customer;
+        ServiceHeader: Record "Service Header";
+        ServiceLine: Record "Service Line";
+        TaxArea: Record "Tax Area";
+        ExpectedAmount: Decimal;
+        LineDiscountPct: Decimal;
+        Quantity: Decimal;
+        UnitPrice: Decimal;
+    begin
+        // [FEATURE] [Invoice] [Tax Area Code]
+        // [SCENARIO 624499] Amount and Amount Incl. Tax fields are recalculated on Service Invoice line when Line Discount % changes and Tax Area Code is not blank
+        Initialize();
+
+        // [GIVEN] Tax Area with a code
+        LibraryERM.CreateTaxArea(TaxArea);
+
+        // [GIVEN] Customer with "Tax Area Code"
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Tax Area Code", TaxArea.Code);
+        Customer.Modify(true);
+
+        // [GIVEN] Service Invoice for the Customer with one line: Item with random Quantity and Unit Price
+        LibraryService.CreateServiceHeader(ServiceHeader, ServiceHeader."Document Type"::Invoice, Customer."No.");
+        LibraryService.CreateServiceLine(ServiceLine, ServiceHeader, ServiceLine.Type::Item, LibraryInventory.CreateItemNo());
+        Quantity := LibraryRandom.RandIntInRange(1, 10);
+        UnitPrice := LibraryRandom.RandDecInRange(100, 200, 2);
+        ServiceLine.Validate(Quantity, Quantity);
+        ServiceLine.Validate("Unit Price", UnitPrice);
+        ServiceLine.Modify(true);
+
+        // [WHEN] Set Line Discount % to a random value.
+        LineDiscountPct := LibraryRandom.RandDecInRange(5, 20, 2);
+        ServiceLine.Validate("Line Discount %", LineDiscountPct);
+        ServiceLine.Modify(true);
+
+        // [THEN] Amount is recalculated as Quantity * Unit Price * (1 - Line Discount % / 100)
+        ExpectedAmount := Round(Quantity * UnitPrice * (1 - LineDiscountPct / 100));
+        ServiceLine.TestField(Amount, ExpectedAmount);
+
+        // [THEN] "Amount Including VAT" is recalculated (should not remain equal to Quantity * Unit Price)
+        Assert.AreNotEqual(Quantity * UnitPrice, ServiceLine."Amount Including VAT", AmountInclVATNotRecalculatedErr);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure PostServiceOrderCommitBySubscriberIsSuppressed()
+    var
+        ServiceHeader: Record "Service Header";
+        ServiceItemLine: Record "Service Item Line";
+        ServiceLine: Record "Service Line";
+        ServiceItem: Record "Service Item";
+        ActivityLog: Record "Activity Log";
+        Type: Option " ",Item,Resource,Both;
+    begin
+        // [FEATURE] [Service] [Posting] [CommitBehavior]
+        // [SCENARIO] When posting a service order, Commit() inside the guard is suppressed by default,
+        // so an error after the Commit() call rolls back all changes including the ActivityLog marker.
+
+        // [GIVEN] A service order with an item line.
+        Initialize();
+        CreateServiceOrder(ServiceHeader, ServiceItemLine, ServiceLine, ServiceItem, Type::Item);
+        ServiceLine.Validate("Qty. to Invoice", ServiceLine.Quantity);
+        ServiceLine.Modify(true);
+
+        // [GIVEN] The test hook is armed to insert a marker, call Commit(), then raise an error.
+        CommitTestMarkerID := CreateGuid();
+        RaiseErrorAfterCommit := true;
+
+        // [WHEN] Post the service order (Ship=true to allow posting a fresh order) — the error raised inside the guard triggers a rollback.
+        BindSubscription(this);
+        asserterror LibraryService.PostServiceOrder(ServiceHeader, true, false, true);
+        UnbindSubscription(this);
+
+        // [THEN] The ActivityLog marker was rolled back (Commit was suppressed inside the guard).
+        ActivityLog.SetRange(Context, CopyStr(Format(CommitTestMarkerID), 1, MaxStrLen(ActivityLog.Context)));
+        Assert.RecordIsEmpty(ActivityLog);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure PostServiceOrderCommitBehaviorOptOutRestoresCommit()
+    var
+        ServiceHeader: Record "Service Header";
+        ServiceItemLine: Record "Service Item Line";
+        ServiceLine: Record "Service Line";
+        ServiceItem: Record "Service Item";
+        ActivityLog: Record "Activity Log";
+        Type: Option " ",Item,Resource,Both;
+    begin
+        // [FEATURE] [Service] [Posting] [CommitBehavior]
+        // [SCENARIO] When a subscriber sets IgnoreCommit to false, Commit() inside the guard fires,
+        // so the ActivityLog marker persists even after the error triggers a rollback.
+
+        // [GIVEN] A service order with an item line.
+        Initialize();
+        CreateServiceOrder(ServiceHeader, ServiceItemLine, ServiceLine, ServiceItem, Type::Item);
+        ServiceLine.Validate("Qty. to Invoice", ServiceLine.Quantity);
+        ServiceLine.Modify(true);
+
+        // [GIVEN] The subscriber opts out of commit suppression, and the hook is armed.
+        CommitTestMarkerID := CreateGuid();
+        RaiseErrorAfterCommit := true;
+        SetIgnoreCommitToFalse := true;
+
+        // [WHEN] Post the service order (Ship=true to allow posting a fresh order) — the error raised inside the guard triggers a rollback.
+        BindSubscription(this);
+        asserterror LibraryService.PostServiceOrder(ServiceHeader, true, false, true);
+        UnbindSubscription(this);
+
+        // [THEN] The ActivityLog marker was NOT rolled back (Commit fired before the error).
+        ActivityLog.SetRange(Context, CopyStr(Format(CommitTestMarkerID), 1, MaxStrLen(ActivityLog.Context)));
+        Assert.RecordIsNotEmpty(ActivityLog);
+
+        // Cleanup
+        ActivityLog.DeleteAll();
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure PostServiceOrderWithoutExternalDocNoLeavesGLEntriesBlank()
+    var
+        ServiceHeader: Record "Service Header";
+        ServiceItemLine: Record "Service Item Line";
+        ServiceLine: Record "Service Line";
+        ServiceItem: Record "Service Item";
+        ServiceInvoiceHeader: Record "Service Invoice Header";
+        GLEntry: Record "G/L Entry";
+        Customer: Record Customer;
+        ServiceMgtSetup: Record "Service Mgt. Setup";
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO 638182] GL entries have blank External Document No. when service order is posted without External Document No.
+        Initialize();
+
+        // [GIVEN] Service Mgt. Setup with "Ext. Doc. No. Mandatory" disabled
+        ServiceMgtSetup.Get();
+        ServiceMgtSetup.Validate("Ext. Doc. No. Mandatory", false);
+        ServiceMgtSetup.Modify(true);
+
+        // [GIVEN] Service Order "SO" for Customer "C" with blank External Document No.
+        LibrarySales.CreateCustomer(Customer);
+        LibraryService.CreateServiceItem(ServiceItem, Customer."No.");
+        LibraryService.CreateServiceHeader(ServiceHeader, ServiceHeader."Document Type"::Order, Customer."No.");
+        LibraryService.CreateServiceItemLine(ServiceItemLine, ServiceHeader, ServiceItem."No.");
+        CreateServiceLineWithItem(ServiceLine, ServiceHeader, ServiceItem."No.");
+        ServiceHeader.Validate("External Document No.", '');
+        ServiceHeader.Modify(true);
+
+        // [WHEN] Post service order with Ship and Invoice
+        LibraryService.PostServiceOrder(ServiceHeader, true, false, true);
+
+        // [THEN] GL entries for posted service invoice have blank External Document No.
+        ServiceInvoiceHeader.SetRange("Order No.", ServiceHeader."No.");
+        ServiceInvoiceHeader.FindFirst();
+        GLEntry.SetRange("Document Type", GLEntry."Document Type"::Invoice);
+        GLEntry.SetRange("Document No.", ServiceInvoiceHeader."No.");
+        Assert.RecordIsNotEmpty(GLEntry);
+        GLEntry.FindSet();
+        repeat
+            Assert.AreEqual('', GLEntry."External Document No.", 'External Document No. should be blank on G/L Entry when not specified on Service Order');
+        until GLEntry.Next() = 0;
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure PostServiceCreditMemoWithoutExternalDocNoLeavesGLEntriesBlank()
+    var
+        ServiceHeader: Record "Service Header";
+        ServiceLine: Record "Service Line";
+        ServiceCrMemoHeader: Record "Service Cr.Memo Header";
+        GLEntry: Record "G/L Entry";
+        Customer: Record Customer;
+        ServiceMgtSetup: Record "Service Mgt. Setup";
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO 638182] GL entries have blank External Document No. when service credit memo is posted without External Document No.
+        Initialize();
+
+        // [GIVEN] Service Mgt. Setup with "Ext. Doc. No. Mandatory" disabled
+        ServiceMgtSetup.Get();
+        ServiceMgtSetup.Validate("Ext. Doc. No. Mandatory", false);
+        ServiceMgtSetup.Modify(true);
+
+        // [GIVEN] Service Credit Memo for Customer "C" with blank External Document No.
+        LibrarySales.CreateCustomer(Customer);
+        LibraryService.CreateServiceHeader(ServiceHeader, ServiceHeader."Document Type"::"Credit Memo", Customer."No.");
+        LibraryService.CreateServiceLine(ServiceLine, ServiceHeader, ServiceLine.Type::"G/L Account", LibraryERM.CreateGLAccountWithSalesSetup());
+        ServiceLine.Validate(Quantity, LibraryRandom.RandInt(100));
+        ServiceLine.Validate("Unit Price", LibraryRandom.RandDec(100, 2));
+        ServiceLine.Modify(true);
+        ServiceHeader.Validate("External Document No.", '');
+        ServiceHeader.Modify(true);
+
+        // [WHEN] Post service credit memo
+        LibraryService.PostServiceOrder(ServiceHeader, true, false, true);
+
+        // [THEN] GL entries for posted service credit memo have blank External Document No.
+        FindServiceCreditMemoHeader(ServiceCrMemoHeader, ServiceHeader."No.");
+        GLEntry.SetRange("Document Type", GLEntry."Document Type"::"Credit Memo");
+        GLEntry.SetRange("Document No.", ServiceCrMemoHeader."No.");
+        Assert.RecordIsNotEmpty(GLEntry);
+        GLEntry.FindSet();
+        repeat
+            Assert.AreEqual('', GLEntry."External Document No.", 'External Document No. should be blank on G/L Entry when not specified on Service Credit Memo');
+        until GLEntry.Next() = 0;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Service-Post", OnSetCommitBehavior, '', false, false)]
+    local procedure OnSetCommitBehaviorHandler(var IgnoreCommit: Boolean)
+    begin
+        if SetIgnoreCommitToFalse then
+            IgnoreCommit := false;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Service-Post", OnAfterFinalizePostingOnBeforeCommit, '', false, false)]
+    local procedure OnAfterFinalizePostingOnBeforeCommitHandler(var ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line"; var ServDocumentsMgt: Codeunit "Serv-Documents Mgt."; var PassedShip: Boolean; var PassedConsume: Boolean; var PassedInvoice: Boolean; ServInvoiceNo: Code[20]; ServCrMemoNo: Code[20]; ServShipmentNo: Code[20])
+    var
+        ActivityLog: Record "Activity Log";
+    begin
+        if not RaiseErrorAfterCommit then
+            exit;
+        ActivityLog.Init();
+        ActivityLog.Context := CopyStr(Format(CommitTestMarkerID), 1, MaxStrLen(ActivityLog.Context));
+        ActivityLog.Insert();
+        Commit();
+        Error(TestRollbackAfterCommitErr);
+    end;
+
     local procedure Initialize()
     var
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
     begin
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"Service Posting - Invoice");
         LibrarySetupStorage.Restore();
+        SetIgnoreCommitToFalse := false;
+        RaiseErrorAfterCommit := false;
+        Clear(CommitTestMarkerID);
         if isInitialized then
             exit;
         LibraryTestInitialize.OnBeforeTestSuiteInitialize(CODEUNIT::"Service Posting - Invoice");

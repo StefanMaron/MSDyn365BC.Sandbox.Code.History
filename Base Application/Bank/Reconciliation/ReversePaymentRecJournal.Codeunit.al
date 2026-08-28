@@ -476,6 +476,8 @@ codeunit 386 "Reverse Payment Rec. Journal"
                 StatementLineNo += 10000;
                 InsertRelatedAndAppliedEntries(PostedPaymentReconHdr."Bank Account No.", PostedPaymentReconHdr."Statement No.", StatementLineNo, EmployeeLedgerEntry);
             until EmployeeLedgerEntry.Next() = 0;
+
+        OnAfterInsertRelatedAndAppliedEntriesOfGLRegister(GLRegister, PostedPaymentReconHdr, StatementLineNo);
     end;
 
     local procedure RefreshRelatedEntryReversalStatus(var PaymentRecRelatedEntry: Record "Payment Rec. Related Entry")
@@ -725,6 +727,7 @@ codeunit 386 "Reverse Payment Rec. Journal"
                     CustLedgerEntry.SetRange(Reversed, false);
                     CustLedgerEntry.SetRange("Transaction No.", BankAccountLedgerEntry."Transaction No.");
                     CustLedgerEntry.SetRange("Customer No.", BankAccountLedgerEntry."Bal. Account No.");
+                    OnInsertRelatedAndAppliedEntriesOnAfterFilterCustLedgerEntry(CustLedgerEntry, BankAccountLedgerEntry);
                     if CustLedgerEntry.FindSet() then
                         repeat
                             InsertRelatedAndAppliedEntries(BankAccountNo, StatementNo, StatementLineNo, CustLedgerEntry);
@@ -737,6 +740,7 @@ codeunit 386 "Reverse Payment Rec. Journal"
                     VendorLedgerEntry.SetRange(Reversed, false);
                     VendorLedgerEntry.SetRange("Transaction No.", BankAccountLedgerEntry."Transaction No.");
                     VendorLedgerEntry.SetRange("Vendor No.", BankAccountLedgerEntry."Bal. Account No.");
+                    OnInsertRelatedAndAppliedEntriesOnAfterFilterVendorLedgerEntry(VendorLedgerEntry, BankAccountLedgerEntry);
                     if VendorLedgerEntry.FindSet() then
                         repeat
                             InsertRelatedAndAppliedEntries(BankAccountNo, StatementNo, StatementLineNo, VendorLedgerEntry);
@@ -749,12 +753,15 @@ codeunit 386 "Reverse Payment Rec. Journal"
                     EmployeeLedgerEntry.SetRange(Reversed, false);
                     EmployeeLedgerEntry.SetRange("Transaction No.", BankAccountLedgerEntry."Transaction No.");
                     EmployeeLedgerEntry.SetRange("Employee No.", BankAccountLedgerEntry."Bal. Account No.");
+                    OnInsertRelatedAndAppliedEntriesOnAfterFilterEmployeeLedgerEntry(EmployeeLedgerEntry, BankAccountLedgerEntry);
                     if EmployeeLedgerEntry.FindSet() then
                         repeat
                             InsertRelatedAndAppliedEntries(BankAccountNo, StatementNo, StatementLineNo, EmployeeLedgerEntry);
                         until EmployeeLedgerEntry.Next() = 0;
                 end;
         end;
+
+        OnAfterInsertRelatedAndAppliedEntries(BankAccountNo, StatementNo, StatementLineNo, AccountType, BankAccountLedgerEntry);
     end;
 
     local procedure InsertRelatedAndAppliedEntries(BankAccountNo: Code[20]; StatementNo: Code[20]; StatementLineNo: Integer; AccountType: Enum "Gen. Journal Account Type")
@@ -962,6 +969,31 @@ codeunit 386 "Reverse Payment Rec. Journal"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeEntryIsReversable(JournalBatchName: Code[10]; DocumentType: Enum "Gen. Journal Document Type"; AmountToApply: Decimal; AppliesToDocNo: Code[20]; AppliesToID: Code[50]; SourceCode: Code[10]; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertRelatedAndAppliedEntriesOnAfterFilterCustLedgerEntry(var CustLedgerEntry: Record "Cust. Ledger Entry"; var BankAccountLedgerEntry: Record "Bank Account Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertRelatedAndAppliedEntriesOnAfterFilterVendorLedgerEntry(var VendorLedgerEntry: Record "Vendor Ledger Entry"; var BankAccountLedgerEntry: Record "Bank Account Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertRelatedAndAppliedEntriesOnAfterFilterEmployeeLedgerEntry(var EmployeeLedgerEntry: Record "Employee Ledger Entry"; var BankAccountLedgerEntry: Record "Bank Account Ledger Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInsertRelatedAndAppliedEntriesOfGLRegister(var GLRegister: Record "G/L Register"; var PostedPaymentReconHdr: Record "Posted Payment Recon. Hdr"; var StatementLineNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterInsertRelatedAndAppliedEntries(BankAccountNo: Code[20]; StatementNo: Code[20]; StatementLineNo: Integer; AccountType: Enum "Gen. Journal Account Type"; var BankAccountLedgerEntry: Record "Bank Account Ledger Entry")
     begin
     end;
 }

@@ -208,10 +208,13 @@ codeunit 99000822 "Mfg. Item Jnl.-Post Line"
 #if not CLEAN27
         sender.RunOnPostConsumptionOnRemQtyToPostOnBeforeInsertConsumpEntry(ItemJnlLine, ProdOrderComp);
 #endif
-        if RemQtyToPost <> 0 then
-            InsertConsumpEntry(
-                ItemJnlLine, ProdOrderComp, ItemJnlLine."Prod. Order Comp. Line No.", RemQtyToPost, false,
-                ItemLedgEntryNo, TempSplitItemJnlLine, sender);
+        IsHandled := false;
+        OnPostConsumptionOnBeforeInsertRemainingConsumpEntry(ItemJnlLine, ProdOrderComp, IsHandled);
+        if not IsHandled then
+            if RemQtyToPost <> 0 then
+                InsertConsumpEntry(
+                    ItemJnlLine, ProdOrderComp, ItemJnlLine."Prod. Order Comp. Line No.", RemQtyToPost, false,
+                    ItemLedgEntryNo, TempSplitItemJnlLine, sender);
 
         ProdOrderCompModified := false;
 
@@ -369,6 +372,11 @@ codeunit 99000822 "Mfg. Item Jnl.-Post Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnPostConsumptionOnRemQtyToPostOnBeforeInsertConsumpEntry(var ItemJnlLine: Record "Item Journal Line"; var ProdOrderComponent: Record "Prod. Order Component")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPostConsumptionOnBeforeInsertRemainingConsumpEntry(var ItemJournalLine: Record "Item Journal Line"; var ProdOrderComponent: Record "Prod. Order Component"; var IsHandled: Boolean)
     begin
     end;
 
@@ -1523,6 +1531,16 @@ codeunit 99000822 "Mfg. Item Jnl.-Post Line"
     local procedure OnAfterInitItemLedgEntry(var NewItemLedgEntry: Record "Item Ledger Entry"; var ItemJournalLine: Record "Item Journal Line"; var ItemLedgEntryNo: Integer)
     begin
         NewItemLedgEntry."Prod. Order Comp. Line No." := ItemJournalLine."Prod. Order Comp. Line No.";
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnBeforeInsertCapValueEntry', '', true, false)]
+    local procedure CopyLocationCodeToCapValueEntry(var ValueEntry: Record "Value Entry"; ItemJnlLine: Record "Item Journal Line")
+    begin
+        if (ValueEntry.Type = ValueEntry.Type::"Work Center") and (ValueEntry."Order Type" = ValueEntry."Order Type"::Production) then begin
+            ManufacturingSetup.GetRecordOnce();
+            if ManufacturingSetup."Copy Loc. to Cap. Val. Entries" then
+                ValueEntry."Location Code" := ItemJnlLine."Location Code";
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Post Line", 'OnInsertCapValueEntryOnBeforeCapLedgEntryModify', '', true, false)]

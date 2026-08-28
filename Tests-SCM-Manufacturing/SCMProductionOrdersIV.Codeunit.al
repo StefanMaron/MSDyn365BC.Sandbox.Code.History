@@ -6,7 +6,9 @@ namespace Microsoft.Manufacturing.Test;
 
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Attachment;
 using Microsoft.Foundation.NoSeries;
+using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.BOM;
 using Microsoft.Inventory.Costing;
 using Microsoft.Inventory.Item;
@@ -26,7 +28,9 @@ using Microsoft.Manufacturing.WorkCenter;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.History;
 using Microsoft.Sales.Document;
+using System.Environment.Configuration;
 using System.TestLibraries.Utilities;
+using System.Utilities;
 
 codeunit 137083 "SCM Production Orders IV"
 {
@@ -88,6 +92,8 @@ codeunit 137083 "SCM Production Orders IV"
         FieldMustBeVisibleErr: Label '%1 must be visible in Page %2', Comment = '%1 = Field Caption , %2 = Page Caption';
         FieldMustBeEnabledErr: Label '%1 must be enabled in Page %2', Comment = '%1 = Field Caption , %2 = Page Caption';
         ItemMustBeEqualErr: Label '%1 must be equal to %2 for Item No. %3 in the %4.', Comment = '%1 = Field Caption , %2 = Expected Value, %3 = Item No., %4 = Table Caption';
+        QtyPerNotRoundedToItemPrecisionErr: Label 'Quantity per must be %1 (unrounded BOM value), not coarsely rounded to item precision %2.', Comment = '%1 = Expected Quantity Per, %2 = Item Rounding Precision';
+        ExpectedQtyRoundingErr: Label 'Expected Quantity must be %1 (= Round(%2 x %3, %4)).', Comment = ' %1 = Expected Quantity, %2 = Quantity Per, %3 = Prod. Order Qty, %4 = Rounding Precision';
 
     [Test]
     [HandlerFunctions('ConfirmHandlerTrue,MessageHandler')]
@@ -4404,6 +4410,157 @@ codeunit 137083 "SCM Production Orders IV"
         // [THEN] Verify "Variance Type" - "Material - Non Inventory" value for Output item in Page "Inventory - G/L Reconciliation" through InvtGLReconciliationHandler.
     end;
 
+    [Test]
+    [HandlerFunctions('ConfirmHandlerTrue,ReleasedProdOrderPageHandler')]
+    procedure AttachmentsAreCopiedWhenReopeningFinishedProdOrder()
+    var
+        CompItem, ProdItem : Record Item;
+        DocumentAttachment: Record "Document Attachment";
+        FinishedProdOrder, ProductionOrder, ReopenedProdOrder : Record "Production Order";
+        ProdOrderStatusMgt: Codeunit "Prod. Order Status Management";
+        AttachmentDocumentType: Enum "Attachment Document Type";
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO] Attachments are preserved when a finished production order is reopened.
+        Initialize();
+
+        // [GIVEN] Create Item Setup with Production BOM.
+        CreateItemsSetup(ProdItem, CompItem, LibraryRandom.RandIntInRange(1, 1));
+
+        // [GIVEN] Create and Refresh Released Production Order.
+        CreateAndRefreshReleasedProductionOrder(ProductionOrder, ProdItem."No.", LibraryRandom.RandInt(5), '', '');
+
+        // [GIVEN] Create a document attachment on Production Order.
+        CreateDocumentAttachmentForProdOrder(ProductionOrder);
+
+        // [GIVEN] Post output and change status of Released Production Order to Finished.
+        CreateAndPostOutputJournalWithRunTimeAndUnitCost(ProductionOrder."No.", ProductionOrder.Quantity, 0, 0);
+        ProdOrderStatusMgt.ChangeProdOrderStatus(ProductionOrder, ProductionOrder.Status::Finished, WorkDate(), true);
+
+        // [GIVEN] Verify attachment exists on the Finished Production Order.
+        FinishedProdOrder.Get(FinishedProdOrder.Status::Finished, ProductionOrder."No.");
+        AttachmentDocumentType := AttachmentDocumentType::"Finished Production Order";
+        DocumentAttachment.SetRange("Table ID", Database::"Production Order");
+        DocumentAttachment.SetRange("No.", FinishedProdOrder."No.");
+        DocumentAttachment.SetRange("Document Type", AttachmentDocumentType);
+        Assert.RecordIsNotEmpty(DocumentAttachment);
+
+        // [WHEN] Reopen the Finished Production Order.
+        ProdOrderStatusMgt.ReopenFinishedProdOrder(FinishedProdOrder);
+
+        // [THEN] The reopened Released Production Order has the attachment.
+        ReopenedProdOrder.Get(ReopenedProdOrder.Status::Released, ProductionOrder."No.");
+        Assert.IsTrue(ReopenedProdOrder.Reopened, 'Production Order should be marked as reopened.');
+        AttachmentDocumentType := AttachmentDocumentType::"Released Production Order";
+
+        // [THEN] The Document Attachment table has the attachment record for the reopened production order.
+        DocumentAttachment.Reset();
+        DocumentAttachment.SetRange("Table ID", Database::"Production Order");
+        DocumentAttachment.SetRange("No.", ReopenedProdOrder."No.");
+        DocumentAttachment.SetRange("Document Type", AttachmentDocumentType);
+        Assert.RecordIsNotEmpty(DocumentAttachment);
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerTrue,ReleasedProdOrderPageHandler')]
+    procedure NotesAreTransferredWhenReopeningFinishedProdOrder()
+    var
+        CompItem, ProdItem : Record Item;
+        FinishedProdOrder, ProductionOrder, ReopenedProdOrder : Record "Production Order";
+        RecordLink: Record "Record Link";
+        ProdOrderStatusMgt: Codeunit "Prod. Order Status Management";
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO] Notes (Record Links) are preserved when a finished production order is reopened.
+        Initialize();
+
+        // [GIVEN] Create Item Setup with Production BOM.
+        CreateItemsSetup(ProdItem, CompItem, LibraryRandom.RandIntInRange(1, 1));
+
+        // [GIVEN] Create and Refresh Released Production Order.
+        CreateAndRefreshReleasedProductionOrder(ProductionOrder, ProdItem."No.", LibraryRandom.RandInt(5), '', '');
+
+        // [GIVEN] Create a note on Released Production Order.
+        CreateNoteForProdOrder(ProductionOrder);
+
+        // [GIVEN] Post output and change status of Released Production Order to Finished.
+        CreateAndPostOutputJournalWithRunTimeAndUnitCost(ProductionOrder."No.", ProductionOrder.Quantity, 0, 0);
+        ProdOrderStatusMgt.ChangeProdOrderStatus(ProductionOrder, ProductionOrder.Status::Finished, WorkDate(), true);
+
+        // [GIVEN] Verify note exists on the Finished Production Order.
+        FinishedProdOrder.Get(FinishedProdOrder.Status::Finished, ProductionOrder."No.");
+        RecordLink.SetRange("Record ID", FinishedProdOrder.RecordId());
+        RecordLink.SetRange(Type, RecordLink.Type::Note);
+        Assert.RecordIsNotEmpty(RecordLink);
+
+        // [WHEN] Reopen the Finished Production Order.
+        ProdOrderStatusMgt.ReopenFinishedProdOrder(FinishedProdOrder);
+
+        // [THEN] The reopened Released Production Order has the note.
+        ReopenedProdOrder.Get(ReopenedProdOrder.Status::Released, ProductionOrder."No.");
+        RecordLink.Reset();
+        RecordLink.SetRange("Record ID", ReopenedProdOrder.RecordId());
+        RecordLink.SetRange(Type, RecordLink.Type::Note);
+        Assert.RecordIsNotEmpty(RecordLink);
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandlerTrue,ReleasedProdOrderPageHandler')]
+    procedure ProdOrderLineAttachmentsAreCopiedWhenReopeningFinishedProdOrder()
+    var
+        CompItem, ProdItem : Record Item;
+        FinishedProdOrder, ProductionOrder : Record "Production Order";
+        ProdOrderLine: Record "Prod. Order Line";
+        ReopenedProdOrderLine: Record "Prod. Order Line";
+        DocumentAttachment: Record "Document Attachment";
+        ProdOrderStatusMgt: Codeunit "Prod. Order Status Management";
+        AttachmentDocumentType: Enum "Attachment Document Type";
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO] Production order line attachments are preserved when a finished production order is reopened.
+        Initialize();
+
+        // [GIVEN] Create Item Setup with Production BOM.
+        CreateItemsSetup(ProdItem, CompItem, LibraryRandom.RandIntInRange(1, 1));
+
+        // [GIVEN] Create and Refresh Released Production Order.
+        CreateAndRefreshReleasedProductionOrder(ProductionOrder, ProdItem."No.", LibraryRandom.RandInt(5), '', '');
+
+        // [GIVEN] Create a document attachment on Production Order Line.
+        ProdOrderLine.SetRange(Status, ProductionOrder.Status);
+        ProdOrderLine.SetRange("Prod. Order No.", ProductionOrder."No.");
+        ProdOrderLine.FindFirst();
+        CreateDocumentAttachmentForProdOrderLine(ProdOrderLine);
+
+        // [GIVEN] Post output and change status of Released Production Order to Finished.
+        CreateAndPostOutputJournalWithRunTimeAndUnitCost(ProductionOrder."No.", ProductionOrder.Quantity, 0, 0);
+        ProdOrderStatusMgt.ChangeProdOrderStatus(ProductionOrder, ProductionOrder.Status::Finished, WorkDate(), true);
+
+        // [GIVEN] Verify attachment exists on the Finished Production Order Line.
+        AttachmentDocumentType := AttachmentDocumentType::"Finished Production Order";
+        DocumentAttachment.SetRange("Table ID", Database::"Prod. Order Line");
+        DocumentAttachment.SetRange("No.", ProductionOrder."No.");
+        DocumentAttachment.SetRange("Document Type", AttachmentDocumentType);
+        Assert.RecordIsNotEmpty(DocumentAttachment);
+
+        // [WHEN] Reopen the Finished Production Order.
+        FinishedProdOrder.Get(FinishedProdOrder.Status::Finished, ProductionOrder."No.");
+        ProdOrderStatusMgt.ReopenFinishedProdOrder(FinishedProdOrder);
+
+        // [THEN] The reopened Production Order Line has the attachment.
+        ReopenedProdOrderLine.SetRange(Status, ReopenedProdOrderLine.Status::Released);
+        ReopenedProdOrderLine.SetRange("Prod. Order No.", ProductionOrder."No.");
+        ReopenedProdOrderLine.FindFirst();
+        AttachmentDocumentType := AttachmentDocumentType::"Released Production Order";
+
+        // [THEN] The Document Attachment table has the attachment record for the reopened production order line.
+        DocumentAttachment.Reset();
+        DocumentAttachment.SetRange("Table ID", Database::"Prod. Order Line");
+        DocumentAttachment.SetRange("No.", ReopenedProdOrderLine."Prod. Order No.");
+        DocumentAttachment.SetRange("Document Type", AttachmentDocumentType);
+        Assert.RecordIsNotEmpty(DocumentAttachment);
+    end;
+
     local procedure Initialize()
     begin
         LibraryTestInitialize.OnTestInitialize(Codeunit::"SCM Production Orders IV");
@@ -5183,6 +5340,51 @@ codeunit 137083 "SCM Production Orders IV"
         GetInventoryReport.Run(InventoryReportEntry);
     end;
 
+    local procedure CreateDocumentAttachmentForProdOrder(ProductionOrder: Record "Production Order")
+    var
+        DocumentAttachment: Record "Document Attachment";
+        TempBlob: Codeunit "Temp Blob";
+        RecRef: RecordRef;
+        OutStream: OutStream;
+    begin
+        TempBlob.CreateOutStream(OutStream);
+        OutStream.WriteText(ItemNoLbl);
+        RecRef.GetTable(ProductionOrder);
+        DocumentAttachment.SaveAttachment(RecRef, 'TestAttachment.txt', TempBlob);
+    end;
+
+    local procedure CreateDocumentAttachmentForProdOrderLine(ProdOrderLine: Record "Prod. Order Line")
+    var
+        DocumentAttachment: Record "Document Attachment";
+        TempBlob: Codeunit "Temp Blob";
+        RecRef: RecordRef;
+        OutStream: OutStream;
+    begin
+        TempBlob.CreateOutStream(OutStream);
+        OutStream.WriteText(ItemNoLbl);
+        RecRef.GetTable(ProdOrderLine);
+        DocumentAttachment.SaveAttachment(RecRef, 'TestLineAttachment.txt', TempBlob);
+    end;
+
+    local procedure CreateNoteForProdOrder(ProductionOrder: Record "Production Order")
+    var
+        RecordLink: Record "Record Link";
+        NoteOutStream: OutStream;
+    begin
+        RecordLink.Init();
+        RecordLink.Validate("Record ID", ProductionOrder.RecordId());
+        RecordLink.Validate("Type", RecordLink.Type::Note);
+        RecordLink.Validate("Description", CopyStr(LibraryUtility.GenerateRandomText(50), 1, MaxStrLen(RecordLink.Description)));
+        RecordLink.Validate("Created", CurrentDateTime());
+        RecordLink.Validate("Company", CompanyName());
+        RecordLink.Validate("Notify", false);
+        RecordLink.Insert(true);
+
+        RecordLink.Note.CreateOutStream(NoteOutStream, TextEncoding::UTF8);
+        NoteOutStream.WriteText(TotalCostLbl);
+        RecordLink.Modify(true);
+    end;
+
     [ConfirmHandler]
     [Scope('OnPrem')]
     procedure ConfirmHandlerTrue(Question: Text[1024]; var Reply: Boolean)
@@ -5310,5 +5512,88 @@ codeunit 137083 "SCM Production Orders IV"
                     InventoryGLReconMatrix.Field1.AsDecimal(),
                     StrSubstNo(ValueMustBeEqualErr, InventoryGLReconMatrix.Field1.Caption(), MaterialVariance + MaterialNonInventoryVariance, InventoryGLReconMatrix.Caption));
         until not InventoryGLReconMatrix.Next();
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure QuantityPerNotRoundedToItemPrecisionOnRefreshProdOrder()
+    var
+        CompItem: Record Item;
+        FGItem: Record Item;
+        CompItemUOM: Record "Item Unit of Measure";
+        FGItemUOM: Record "Item Unit of Measure";
+        UnitOfMeasure: Record "Unit of Measure";
+        ProductionBOMHeader: Record "Production BOM Header";
+        ProductionBOMLine: Record "Production BOM Line";
+        ProductionOrder: Record "Production Order";
+        ProdOrderComp: Record "Prod. Order Component";
+        QuantityPer: Decimal;
+        ProdOrderQty: Decimal;
+        ItemRoundingPrecision: Decimal;
+        ExpectedQty: Decimal;
+    begin
+        // [FEATURE] [Production Order Component] [Quantity Per] [Rounding Precision]
+        Initialize();
+        // [SCENARIO 632440] Quantity Per on Prod. Order Component preserves BOM value and is not rounded to the item's Qty. Rounding Precision when refreshing a production order.
+
+        LibraryInventory.CreateUnitOfMeasureCode(UnitOfMeasure);
+        ItemRoundingPrecision := 0.001;
+        QuantityPer := 0.0025;
+        ProdOrderQty := 515;
+
+        // [GIVEN] Component item with Qty. Rounding Precision = 0.001
+        LibraryInventory.CreateItem(CompItem);
+        LibraryInventory.CreateItemUnitOfMeasure(CompItemUOM, CompItem."No.", UnitOfMeasure.Code, 1, ItemRoundingPrecision);
+        CompItem.Validate("Base Unit of Measure", UnitOfMeasure.Code);
+        CompItem.Validate("Rounding Precision", ItemRoundingPrecision);
+        CompItem.Validate("Replenishment System", CompItem."Replenishment System"::Purchase);
+        CompItem.Modify(true);
+
+        // [GIVEN] FG item with Replenishment System = Prod. Order
+        LibraryInventory.CreateItem(FGItem);
+        LibraryInventory.CreateItemUnitOfMeasure(FGItemUOM, FGItem."No.", UnitOfMeasure.Code, 1, 1);
+        FGItem.Validate("Base Unit of Measure", UnitOfMeasure.Code);
+        FGItem.Validate("Replenishment System", FGItem."Replenishment System"::"Prod. Order");
+        FGItem.Validate("Rounding Precision", 1);
+        FGItem.Modify(true);
+
+        // [GIVEN] Certified Production BOM with Component Quantity Per = 0.0025
+        LibraryManufacturing.CreateProductionBOMHeader(ProductionBOMHeader, UnitOfMeasure.Code);
+        LibraryManufacturing.CreateProductionBOMLine(
+            ProductionBOMHeader, ProductionBOMLine, '', ProductionBOMLine.Type::Item, CompItem."No.", QuantityPer);
+        ProductionBOMHeader.Validate(Status, ProductionBOMHeader.Status::Certified);
+        ProductionBOMHeader.Modify(true);
+        FGItem.Validate("Production BOM No.", ProductionBOMHeader."No.");
+        FGItem.Modify(true);
+
+        // [WHEN] A Released Production Order for 515 is created and refreshed
+        LibraryManufacturing.CreateAndRefreshProductionOrder(
+            ProductionOrder,
+            ProductionOrder.Status::Released,
+            ProductionOrder."Source Type"::Item,
+            FGItem."No.",
+            ProdOrderQty);
+
+        // [THEN] Prod. Order Component "Quantity per" = 0.0025 (not rounded to item precision 0.003)
+        FindProdOrderCompByItemNo(ProdOrderComp, ProductionOrder, CompItem."No.");
+        Assert.AreEqual(
+            QuantityPer,
+            ProdOrderComp."Quantity per",
+            StrSubstNo(QtyPerNotRoundedToItemPrecisionErr, QuantityPer, ItemRoundingPrecision));
+
+        // [THEN] Expected Quantity = Round(0.0025 x 515, 0.001) = 1.288
+        ExpectedQty := Round(QuantityPer * ProdOrderQty, ItemRoundingPrecision);
+        Assert.AreEqual(
+            ExpectedQty,
+            ProdOrderComp."Expected Quantity",
+            StrSubstNo(ExpectedQtyRoundingErr, ExpectedQty, QuantityPer, ProdOrderQty, ItemRoundingPrecision));
+    end;
+
+    local procedure FindProdOrderCompByItemNo(var ProdOrderComp: Record "Prod. Order Component"; ProductionOrder: Record "Production Order"; ItemNo: Code[20])
+    begin
+        ProdOrderComp.SetRange(Status, ProductionOrder.Status);
+        ProdOrderComp.SetRange("Prod. Order No.", ProductionOrder."No.");
+        ProdOrderComp.SetRange("Item No.", ItemNo);
+        ProdOrderComp.FindFirst();
     end;
 }

@@ -903,7 +903,6 @@ page 291 "Req. Worksheet"
                 Caption = 'Inventory Availability';
                 Image = "Report";
                 RunObject = Report "Inventory Availability";
-                ToolTip = 'View, print, or save a summary of historical inventory transactions with selected items, for example, to decide when to purchase the items. The report specifies quantity on sales order, quantity on purchase order, back orders from vendors, minimum inventory, and whether there are reorders.';
             }
             action(Status)
             {
@@ -932,7 +931,6 @@ page 291 "Req. Worksheet"
                 Caption = 'Inventory - Availability Plan (Excel)';
                 Image = ItemAvailability;
                 RunObject = Report "Inv. Availability Plan";
-                ToolTip = 'View a list of the quantity of each item in customer, purchase, and transfer orders and the quantity available in inventory. The list is divided into columns that cover six periods with starting and ending dates as well as the periods before and after those periods. The list is useful when you are planning your inventory purchases.';
             }
             action("Inventory Order Details")
             {
@@ -942,7 +940,6 @@ page 291 "Req. Worksheet"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Inventory Order Details";
-                ToolTip = 'View a list of the orders that have not yet been shipped or received and the items in the orders. It shows the order number, customer''s name, shipment date, order quantity, quantity on back order, outstanding quantity and unit price, as well as possible discount percentage and amount. The quantity on back order and outstanding quantity and amount are totaled for each item. The list can be used to find out whether there are currently shipment problems or any can be expected.';
             }
             action("Inventory Purchase Orders")
             {
@@ -950,7 +947,6 @@ page 291 "Req. Worksheet"
                 Caption = 'Inventory Purchase Orders';
                 Image = "Report";
                 RunObject = Report "Inventory Purchase Orders";
-                ToolTip = 'View a list of items on order from vendors. It also shows the expected receipt date and the quantity and amount on back orders. The report can be used, for example, to see when items should be received and whether a reminder of a back order should be issued.';
             }
         }
         area(Promoted)
@@ -1102,10 +1098,11 @@ page 291 "Req. Worksheet"
         RequisitionWkshName: Record "Requisition Wksh. Name";
     begin
         ReqJnlManagement.GetDescriptionAndRcptName(Rec, Description2, BuyFromVendorName);
-        if RequisitionWkshName.Get(Rec.GetRangeMax("Worksheet Template Name"), CurrentJnlBatchName) then begin
-            RequisitionWkshName.SetApprovalStateForWkshBatch(RequisitionWkshName, Rec, OpenApprovalEntriesExistForCurrUser, OpenApprovalEntriesOnWkshBatchExist, CanCancelApprovalForWkshBatch, CanRequestFlowApprovalForWkshBatch, CanCancelFlowApprovalForWkshBatch, ApprovalEntriesExistSentByCurrentUser, EnabledWkshBatchWorkflowsExist);
-            ShowWorkflowStatusOnBatch := CurrPage.WorkflowStatusBatch.Page.SetFilterOnWorkflowRecord(RequisitionWkshName.RecordId());
-        end;
+        if Rec.GetFilter("Worksheet Template Name") <> '' then
+            if RequisitionWkshName.Get(Rec.GetRangeMax("Worksheet Template Name"), CurrentJnlBatchName) then begin
+                RequisitionWkshName.SetApprovalStateForWkshBatch(RequisitionWkshName, Rec, OpenApprovalEntriesExistForCurrUser, OpenApprovalEntriesOnWkshBatchExist, CanCancelApprovalForWkshBatch, CanRequestFlowApprovalForWkshBatch, CanCancelFlowApprovalForWkshBatch, ApprovalEntriesExistSentByCurrentUser, EnabledWkshBatchWorkflowsExist);
+                ShowWorkflowStatusOnBatch := CurrPage.WorkflowStatusBatch.Page.SetFilterOnWorkflowRecord(RequisitionWkshName.RecordId());
+            end;
 
         ApprovalMgmt.GetRequisitionWkshBatchApprovalStatus(Rec, RequisitionWkshBatchApprovalStatus, EnabledWkshBatchWorkflowsExist);
     end;
@@ -1161,6 +1158,10 @@ page 291 "Req. Worksheet"
             SetControlAppearanceFromWkshBatch();
             exit;
         end;
+
+        if GetCurrentJnlBatchName() then
+            exit;
+
         OnBeforeTemplateSelection(Rec, CurrentJnlBatchName);
         ReqJnlManagement.WkshTemplateSelection(
             PAGE::"Req. Worksheet", false, Enum::"Req. Worksheet Template Type"::"Req.", Rec, JnlSelected);
@@ -1239,6 +1240,20 @@ page 291 "Req. Worksheet"
 
         ShowWorkflowStatusOnBatch := CurrPage.WorkflowStatusBatch.Page.SetFilterOnWorkflowRecord(RequisitionWkshName.RecordId());
         RequisitionWkshName.SetApprovalStateForWkshBatch(RequisitionWkshName, Rec, OpenApprovalEntriesExistForCurrUser, OpenApprovalEntriesOnWkshBatchExist, CanCancelApprovalForWkshBatch, CanRequestFlowApprovalForWkshBatch, CanCancelFlowApprovalForWkshBatch, ApprovalEntriesExistSentByCurrentUser, EnabledWkshBatchWorkflowsExist);
+    end;
+
+    local procedure GetCurrentJnlBatchName(): boolean
+    begin
+        if (Rec."Journal Batch Name" = '') or (Rec."Worksheet Template Name" = '') then
+            exit(false);
+
+        CurrentJnlBatchName := Rec."Journal Batch Name";
+        Rec.FilterGroup := 2;
+        Rec.SetRange("Worksheet Template Name", Rec."Worksheet Template Name");
+        Rec.FilterGroup := 0;
+        ReqJnlManagement.OpenJnl(CurrentJnlBatchName, Rec);
+        SetControlAppearanceFromWkshBatch();
+        exit(true);
     end;
 
     [IntegrationEvent(false, false)]
