@@ -13,14 +13,14 @@ using System.Utilities;
 
 report 321 "Vendor - Balance to Date"
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './Purchases/Reports/VendorBalancetoDate.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Vendor - Balance to Date';
+    ToolTip = 'View, print, or save a detail balance to date for selected vendors.';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     DataAccessIntent = ReadOnly;
     WordMergeDataItem = Vendor;
+    DefaultRenderingLayout = RDLCLayout;
 
     dataset
     {
@@ -362,6 +362,16 @@ report 321 "Vendor - Balance to Date"
         }
     }
 
+    rendering
+    {
+        layout(RDLCLayout)
+        {
+            Type = RDLC;
+            LayoutFile = './Purchases/Reports/VendorBalancetoDate.rdlc';
+            Summary = 'Report layout made in the legacy RDLC format. Use an RDLC editor to modify the layout.';
+        }
+    }
+
     labels
     {
     }
@@ -441,11 +451,11 @@ report 321 "Vendor - Balance to Date"
     local procedure AddVendorDimensionFilter(var VendorLedgerEntry: Record "Vendor Ledger Entry")
     begin
         if Vendor.GetFilter("Global Dimension 1 Filter") <> '' then
-            VendorLedgerEntry.SetRange("Global Dimension 1 Code", Vendor.GetFilter("Global Dimension 1 Filter"));
+            VendorLedgerEntry.SetFilter("Global Dimension 1 Code", Vendor.GetFilter("Global Dimension 1 Filter"));
         if Vendor.GetFilter("Global Dimension 2 Filter") <> '' then
-            VendorLedgerEntry.SetRange("Global Dimension 2 Code", Vendor.GetFilter("Global Dimension 2 Filter"));
+            VendorLedgerEntry.SetFilter("Global Dimension 2 Code", Vendor.GetFilter("Global Dimension 2 Filter"));
         if Vendor.GetFilter("Currency Filter") <> '' then
-            VendorLedgerEntry.SetRange("Currency Code", Vendor.GetFilter("Currency Filter"));
+            VendorLedgerEntry.SetFilter("Currency Code", Vendor.GetFilter("Currency Filter"));
     end;
 
     local procedure CalcTotalVendorAmount()

@@ -68,6 +68,7 @@ codeunit 99000850 "Sales Line-Planning"
     begin
         if UnplannedDemand."Demand Type" = UnplannedDemand."Demand Type"::Sales then begin
             SalesLine.Get(UnplannedDemand."Demand SubType", UnplannedDemand."Demand Order No.", UnplannedDemand."Demand Line No.");
+            // Use new overload to set Reservation status instead of default Prospect to match Calculate Plan behavior
             ItemTrackingManagement.CopyItemTracking(SalesLine.RowID1(), RequisitionLine.RowID1(), true);
         end;
     end;
@@ -89,7 +90,7 @@ codeunit 99000850 "Sales Line-Planning"
     [EventSubscriber(ObjectType::Page, Page::"Order Planning", 'OnSetRecDemandFilter', '', false, false)]
     local procedure OnSetRecDemandFilter(var RequisitionLine: Record "Requisition Line"; DemandOrderFilter: Enum "Demand Order Source Type")
     begin
-        if DemandOrderFilter = DemandOrderFilter::"Service Demand" then begin
+        if DemandOrderFilter = DemandOrderFilter::"Sales Demand" then begin
             RequisitionLine.SetRange("Demand Type", Database::"Sales Line");
             RequisitionLine.SetCurrentKey("User ID", "Demand Type", "Worksheet Template Name", "Journal Batch Name", "Line No.");
         end;

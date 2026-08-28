@@ -46,8 +46,10 @@ using System.Privacy;
 using System.Text;
 
 #pragma warning disable AS0106 // Protected variable ItemReferenceVisible was removed before AS0106 was introduced.
+#pragma warning disable AS0031 // Action Ref Update Variant Attributes_Promoted was removed before AS0031 was introduced.
 page 30 "Item Card"
 #pragma warning restore AS0106
+#pragma warning restore AS0031
 {
     Caption = 'Item Card';
     PageType = Card;
@@ -1597,9 +1599,10 @@ page 30 "Item Card"
                     action("Export Item Data")
                     {
                         ApplicationArea = Basic, Suite;
-                        Caption = 'Export Item Data';
+                        Caption = 'Export item data';
                         Image = ExportFile;
                         ToolTip = 'Use this function to export item related data to text file (you can attach this file to support requests in case you may have issues with costing calculation).';
+                        Visible = not ManufacturingEnabled;
 
                         trigger OnAction()
                         var
@@ -2262,9 +2265,6 @@ page 30 "Item Card"
                 actionref(ApplyTemplate_Promoted; ApplyTemplate)
                 {
                 }
-                actionref("Update Variant Attributes_Promoted"; "Update Variant Attributes")
-                {
-                }
             }
             group(Category_Category7)
             {
@@ -2529,6 +2529,7 @@ page 30 "Item Card"
         EnableShowShowEnforcePositivInventory();
         EnableShowVariantMandatory();
         EntityTextEnabled := MarketingText.IsMarketingTextVisible();
+        ManufacturingEnabled := ApplicationAreaMgmtFacade.IsManufacturingEnabled();
     end;
 
     var
@@ -2540,6 +2541,7 @@ page 30 "Item Card"
         PrivacyNotice: Codeunit "Privacy Notice";
         FlowServiceManagement: Codeunit "Flow Service Management";
         IsInventoryAdjmtAllowed: Boolean;
+        ManufacturingEnabled: Boolean;
         ShowStockoutWarningDefaultYes: Boolean;
         ShowStockoutWarningDefaultNo: Boolean;
         ShowPreventNegInventoryDefaultYes: Boolean;

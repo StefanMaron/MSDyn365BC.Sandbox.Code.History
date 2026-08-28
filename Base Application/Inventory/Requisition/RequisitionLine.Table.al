@@ -2948,6 +2948,16 @@ table 246 "Requisition Line"
         exit(TempPlanningErrorLog.GetError(PlanningErrorLog));
     end;
 
+    /// <summary>
+    /// Gets all resiliency errors from the planning error log.
+    /// </summary>
+    /// <param name="PlanningErrorLog">The planning error log record to populate with errors.</param>
+    /// <returns>True if there are errors, otherwise false.</returns>
+    procedure GetResiliencyErrors(var PlanningErrorLog: Record "Planning Error Log"): Boolean
+    begin
+        exit(TempPlanningErrorLog.GetErrors(PlanningErrorLog));
+    end;
+
     procedure SetResiliencyError(TheError: Text[250]; TheTableID: Integer; TheTablePosition: Text[250])
     begin
         TempPlanningErrorLog.SetError(TheError, TheTableID, TheTablePosition);
@@ -3318,7 +3328,13 @@ table 246 "Requisition Line"
     local procedure UpdateReplenishmentSystem()
     var
         StockkeepingUnit: Record "Stockkeeping Unit";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeUpdateReplenishmentSystem(Rec, IsHandled);
+        if IsHandled then
+            exit;
+
         GetItem();
         StockkeepingUnit := Item.GetSKU("Location Code", "Variant Code");
         if Subcontracting then
@@ -3437,6 +3453,7 @@ table 246 "Requisition Line"
 
     local procedure UpdateSalesOrderDetailForDropShipment()
     var
+        SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
     begin
         if Rec."Demand Type" <> Database::"Sales Line" then
@@ -3452,6 +3469,10 @@ table 246 "Requisition Line"
         Rec."Sales Order No." := SalesLine."Document No.";
         Rec."Sales Order Line No." := SalesLine."Line No.";
         Rec."Sell-to Customer No." := SalesLine."Sell-to Customer No.";
+
+        SalesHeader.SetLoadFields("Ship-to Code");
+        if SalesHeader.Get(SalesLine."Document Type", SalesLine."Document No.") then
+            Rec."Ship-to Code" := SalesHeader."Ship-to Code";
     end;
 
     procedure ReserveBindingOrder(TrackingSpecification: Record "Tracking Specification"; SourceDescription: Text[100]; ExpectedDate: Date; ReservQty: Decimal; ReservQtyBase: Decimal; UpdateReserve: Boolean)
@@ -3515,7 +3536,7 @@ table 246 "Requisition Line"
         RequisitionWkshName: Record "Requisition Wksh. Name";
     begin
         if RequisitionWkshName.Get("Worksheet Template Name", "Journal Batch Name") then
-            ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExistForCurrentUser(RequisitionWkshName);
+            ApprovalsMgmt.PreventModifyRecIfOpenApprovalEntryExist(RequisitionWkshName);
     end;
 
     procedure CheckRequisitionWkshLineRestriction()
@@ -3750,6 +3771,11 @@ table 246 "Requisition Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidateUnitCost(var RequisitionLine: Record "Requisition Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateReplenishmentSystem(var RequisitionLine: Record "Requisition Line"; var IsHandled: Boolean)
     begin
     end;
 

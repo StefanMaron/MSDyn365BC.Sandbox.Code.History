@@ -40,6 +40,12 @@ page 5711 "Copy Location"
                         ValidateTargetLocationCode();
                     end;
                 }
+                field(TargetLocationName; Rec."Target Location Name")
+                {
+                    ApplicationArea = Location;
+                    Caption = 'Target Location Name';
+                    ToolTip = 'Specifies the name of the new location that you want to copy the data to.';
+                }
                 field(CopyAllInformation; ShouldCopyAllInformation)
                 {
                     ApplicationArea = Location;
@@ -150,7 +156,7 @@ page 5711 "Copy Location"
         Rec."Inventory Posting Setup" := true;
         Rec.Dimensions := true;
         Rec."Transfer Routes" := true;
-        Rec."Source Location Code" := TempLocation.Code;
+        Rec.Validate("Source Location Code", TempLocation.Code);
         Rec.Insert();
 
         OnAfterInitCopyLocationBuffer(Rec);

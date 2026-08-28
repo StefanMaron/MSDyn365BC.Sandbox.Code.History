@@ -1199,35 +1199,70 @@ table 115 "Sales Cr.Memo Line"
 
     internal procedure GetSalesInvoiceLine(var SalesInvoiceLine: Record "Sales Invoice Line")
     var
+        TempUsedSalesInvoiceLine: Record "Sales Invoice Line" temporary;
+    begin
+        GetSalesInvoiceLine(SalesInvoiceLine, TempUsedSalesInvoiceLine);
+    end;
+
+    internal procedure GetSalesInvoiceLine(var SalesInvoiceLine: Record "Sales Invoice Line"; var TempUsedSalesInvoiceLine: Record "Sales Invoice Line" temporary)
+    var
         ItemLedgerEntry: Record "Item Ledger Entry";
         SalesCreditMemoHeader: Record "Sales Cr.Memo Header";
         ValueEntry: Record "Value Entry";
     begin
-        CheckApplFromItemLedgEntry(ItemLedgerEntry);
-        
-        if ItemLedgerEntry."Entry No." = 0 then
-            FindItemLedgerEntryFromItemApplicationEntry(ItemLedgerEntry);
+        if Rec.Type = Rec.Type::Item then begin
+            CheckApplFromItemLedgEntry(ItemLedgerEntry);
 
-        ValueEntry.SetLoadFields("Item Ledger Entry No.", "Item Ledger Entry Type", "Document Type", "Document No.", "Document Line No.");
-        ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntry."Entry No.");
-        ValueEntry.SetRange("Item Ledger Entry Type", ItemLedgerEntry."Entry Type");
-        ValueEntry.SetRange("Document Type", ValueEntry."Document Type"::"Sales Invoice");
-        if ValueEntry.FindFirst() then begin
-            SalesInvoiceLine.Get(ValueEntry."Document No.", ValueEntry."Document Line No.");
-            exit;
+            if ItemLedgerEntry."Entry No." = 0 then
+                FindItemLedgerEntryFromItemApplicationEntry(ItemLedgerEntry);
+
+            if ItemLedgerEntry."Entry No." <> 0 then begin
+                ValueEntry.SetLoadFields("Item Ledger Entry No.", "Item Ledger Entry Type", "Document Type", "Document No.", "Document Line No.");
+                ValueEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntry."Entry No.");
+                ValueEntry.SetRange("Item Ledger Entry Type", ItemLedgerEntry."Entry Type");
+                ValueEntry.SetRange("Document Type", ValueEntry."Document Type"::"Sales Invoice");
+                if ValueEntry.FindFirst() then begin
+                    SalesInvoiceLine.Get(ValueEntry."Document No.", ValueEntry."Document Line No.");
+                    exit;
+                end;
+            end;
         end;
 
         if ItemLedgerEntry."Entry No." = 0 then begin
             SalesCreditMemoHeader.Get("Document No.");
             if SalesCreditMemoHeader."Applies-to Doc. Type" <> SalesCrMemoHeader."Applies-to Doc. Type"::Invoice then
                 exit;
+            if SalesCreditMemoHeader."Applies-to Doc. No." = '' then
+                exit;
 
             SalesInvoiceLine.Reset();
             SalesInvoiceLine.SetRange("Document No.", SalesCreditMemoHeader."Applies-to Doc. No.");
             SalesInvoiceLine.SetRange(Type, Type);
             SalesInvoiceLine.SetRange("No.", "No.");
-            if SalesInvoiceLine.FindFirst() then;
+            SalesInvoiceLine.SetRange("Variant Code", "Variant Code");
+
+            SalesInvoiceLine.SetRange(Quantity, Quantity);
+            if FindUnusedSalesInvoiceLine(SalesInvoiceLine, TempUsedSalesInvoiceLine) then
+                exit;
+            SalesInvoiceLine.SetFilter(Quantity, '>=%1', Quantity);
+            if FindUnusedSalesInvoiceLine(SalesInvoiceLine, TempUsedSalesInvoiceLine) then
+                exit;
+            SalesInvoiceLine.SetRange(Quantity);
+            if FindUnusedSalesInvoiceLine(SalesInvoiceLine, TempUsedSalesInvoiceLine) then
+                exit;
+
+            Clear(SalesInvoiceLine);
         end;
+    end;
+
+    local procedure FindUnusedSalesInvoiceLine(var SalesInvoiceLine: Record "Sales Invoice Line"; var TempUsedSalesInvoiceLine: Record "Sales Invoice Line" temporary): Boolean
+    begin
+        if SalesInvoiceLine.FindSet() then
+            repeat
+                if not TempUsedSalesInvoiceLine.Get(SalesInvoiceLine."Document No.", SalesInvoiceLine."Line No.") then
+                    exit(true);
+            until SalesInvoiceLine.Next() = 0;
+        exit(false);
     end;
 
     local procedure CheckApplFromItemLedgEntry(var ItemLedgerEntry: Record "Item Ledger Entry")
@@ -1354,7 +1389,7 @@ table 115 "Sales Cr.Memo Line"
         SalesLine: Record "Sales Line";
     begin
         if Type = Type::" " then
-            exit(SalesLine.FormatType());
+            exit(SalesLine.FormatTypeAsText());
 
         exit(Format(Type));
     end;
@@ -1386,7 +1421,7 @@ table 115 "Sales Cr.Memo Line"
         ItemTrackingDocMgmt: Codeunit "Item Tracking Doc. Management";
     begin
         ItemTrackingDocMgmt.RetrieveEntriesFromPostedInvoice(TempItemLedEntry, RowID1());
-        if TempItemLedEntry.IsEmpty then
+        if TempItemLedEntry.IsEmpty() then
             exit;
 
         TempItemLedEntry.FindFirst();

@@ -185,7 +185,8 @@ page 97 "Purchase Quote Subform"
                         Rec.RestoreLookupSelection();
                         Rec.ShowShortcutDimCode(ShortcutDimCode);
                         DeltaUpdateTotals();
-                        NoOnAfterValidate();
+                        if Rec."No." <> xRec."No." then
+                            NoOnAfterValidate();
                     end;
 
                     trigger OnAfterLookup(Selected: RecordRef)
@@ -613,6 +614,11 @@ page 97 "Purchase Quote Subform"
                 {
                     ApplicationArea = Jobs;
                     ToolTip = 'Specifies the line discount amount of the project ledger entry that is related to the purchase line.';
+                    Visible = false;
+                }
+                field("Spend Request No."; Rec."Spend Request No.")
+                {
+                    ApplicationArea = Basic, Suite;
                     Visible = false;
                 }
             }
@@ -1066,7 +1072,6 @@ page 97 "Purchase Quote Subform"
         TempOptionLookupBuffer: Record "Option Lookup Buffer" temporary;
         TransferExtendedText: Codeunit "Transfer Extended Text";
         PurchAvailabilityMgt: Codeunit "Purch. Availability Mgt.";
-        CannotUseBOMErr: Label 'You cannot use the Explode BOM function because a prepayment of the related purchase order has been invoiced.';
         PurchCalcDiscByType: Codeunit "Purch - Calc Disc. By Type";
         DocumentTotals: Codeunit "Document Totals";
         AmountWithDiscountAllowed: Decimal;
@@ -1082,6 +1087,7 @@ page 97 "Purchase Quote Subform"
         UseAllocationAccountNumber: Boolean;
         ActionOnlyAllowedForAllocationAccountsErr: Label 'This action is only available for lines that have Allocation Account set as Type.';
         ExcelFileNameTxt: Label 'Purchase Quote %1 - Lines', Comment = '%1 = document number, ex. 10000';
+        CannotUseBOMErr: Label 'You cannot use the Explode BOM function because a prepayment of the related purchase order has been invoiced.';
 
     protected var
         TotalPurchaseHeader: Record "Purchase Header";
@@ -1149,6 +1155,9 @@ page 97 "Purchase Quote Subform"
     var
         IsHandled: Boolean;
     begin
+        if not Unconditionally and (Rec."No." = xRec."No.") then
+            exit;
+
         IsHandled := false;
         OnBeforeInsertExtendedText(Rec, IsHandled);
         if IsHandled then

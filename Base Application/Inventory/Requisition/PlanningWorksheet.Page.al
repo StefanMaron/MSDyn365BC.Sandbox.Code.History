@@ -311,7 +311,6 @@ page 99000852 "Planning Worksheet"
                 field("Location Code"; Rec."Location Code")
                 {
                     ApplicationArea = Location;
-                    Visible = false;
                 }
                 field("Original Quantity"; Rec."Original Quantity")
                 {
@@ -1141,10 +1140,11 @@ page 99000852 "Planning Worksheet"
         RequisitionWkshName: Record "Requisition Wksh. Name";
     begin
         PlanningWkshManagement.GetDescriptionAndRcptName(Rec, ItemDescription, RoutingDescription);
-        if RequisitionWkshName.Get(Rec.GetRangeMax("Worksheet Template Name"), CurrentWkshBatchName) then begin
-            RequisitionWkshName.SetApprovalStateForWkshBatch(RequisitionWkshName, Rec, OpenApprovalEntriesExistForCurrUser, OpenApprovalEntriesOnWkshBatchExist, CanCancelApprovalForWkshBatch, CanRequestFlowApprovalForWkshBatch, CanCancelFlowApprovalForWkshBatch, ApprovalEntriesExistSentByCurrentUser, EnabledWkshBatchWorkflowsExist);
-            ShowWorkflowStatusOnBatch := CurrPage.WorkflowStatusBatch.Page.SetFilterOnWorkflowRecord(RequisitionWkshName.RecordId());
-        end;
+        if Rec.GetFilter("Worksheet Template Name") <> '' then
+            if RequisitionWkshName.Get(Rec.GetRangeMax("Worksheet Template Name"), CurrentWkshBatchName) then begin
+                RequisitionWkshName.SetApprovalStateForWkshBatch(RequisitionWkshName, Rec, OpenApprovalEntriesExistForCurrUser, OpenApprovalEntriesOnWkshBatchExist, CanCancelApprovalForWkshBatch, CanRequestFlowApprovalForWkshBatch, CanCancelFlowApprovalForWkshBatch, ApprovalEntriesExistSentByCurrentUser, EnabledWkshBatchWorkflowsExist);
+                ShowWorkflowStatusOnBatch := CurrPage.WorkflowStatusBatch.Page.SetFilterOnWorkflowRecord(RequisitionWkshName.RecordId());
+            end;
 
         ApprovalMgmt.GetRequisitionWkshBatchApprovalStatus(Rec, RequisitionWkshBatchApprovalStatus, EnabledWkshBatchWorkflowsExist);
     end;

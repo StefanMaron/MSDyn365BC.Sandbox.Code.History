@@ -16,11 +16,11 @@ using System.Utilities;
 
 report 104 "Customer - Detail Trial Bal."
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './Sales/Reports/CustomerDetailTrialBal.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Customer - Detail Trial Bal.';
+    ToolTip = 'View the balance for customers with balances on a specified date. The report can be used at the close of an accounting period, for example, or for an audit.';
     UsageCategory = ReportsAndAnalysis;
+    DefaultRenderingLayout = RDLCLayout;
 
     dataset
     {
@@ -180,6 +180,8 @@ report 104 "Customer - Detail Trial Bal."
                 }
 
                 trigger OnAfterGetRecord()
+                var
+                    DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
                 begin
                     CustLedgEntryExists := true;
                     if PrintAmountsInLCY then begin
@@ -201,6 +203,14 @@ report 104 "Customer - Detail Trial Bal."
                     CustTotalCreditAmount += CustCreditAmount;
 
                     CustBalanceLCY := CustBalanceLCY + "Amount (LCY)";
+                    DetailedCustLedgEntry.SetCurrentKey("Cust. Ledger Entry No.", "Entry Type", "Posting Date");
+                    DetailedCustLedgEntry.SetRange("Cust. Ledger Entry No.", "Entry No.");
+                    DetailedCustLedgEntry.SetFilter("Entry Type", '%1|%2',
+                        DetailedCustLedgEntry."Entry Type"::"Correction of Remaining Amount",
+                        DetailedCustLedgEntry."Entry Type"::"Appln. Rounding");
+                    DetailedCustLedgEntry.SetFilter("Posting Date", CustDateFilter);
+                    DetailedCustLedgEntry.CalcSums("Amount (LCY)");
+                    CustBalanceLCY := CustBalanceLCY + DetailedCustLedgEntry."Amount (LCY)";
                     if ("Document Type" = "Document Type"::Payment) or ("Document Type" = "Document Type"::Refund) then
                         CustEntryDueDate := 0D
                     else
@@ -249,11 +259,15 @@ report 104 "Customer - Detail Trial Bal."
             }
 
             trigger OnAfterGetRecord()
+            var
+                CustLedgerEntry: Record "Cust. Ledger Entry";
+                DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
             begin
                 if PrintOnlyOnePerPage then
                     PageGroupNo := PageGroupNo + 1;
 
                 StartBalanceLCY := 0;
+                StartBalAdjLCY := 0;
                 if CustDateFilter <> '' then begin
                     if GetRangeMin("Date Filter") <> 0D then begin
                         SetRange("Date Filter", 0D, GetRangeMin("Date Filter") - 1);
@@ -261,15 +275,38 @@ report 104 "Customer - Detail Trial Bal."
                         StartBalanceLCY := "Net Change (LCY)";
                     end;
                     SetFilter("Date Filter", CustDateFilter);
+                    CalcFields("Net Change (LCY)");
+                    StartBalAdjLCY := "Net Change (LCY)";
+                    CustLedgerEntry.SetCurrentKey("Customer No.", "Posting Date");
+                    CustLedgerEntry.SetRange("Customer No.", "No.");
+                    CustLedgerEntry.SetFilter("Posting Date", CustDateFilter);
+                    if CustLedgerEntry.Find('-') then
+                        repeat
+                            CustLedgerEntry.SetFilter("Date Filter", CustDateFilter);
+                            CustLedgerEntry.CalcFields("Amount (LCY)");
+                            StartBalAdjLCY := StartBalAdjLCY - CustLedgerEntry."Amount (LCY)";
+                            DetailedCustLedgEntry.SetCurrentKey("Cust. Ledger Entry No.", "Entry Type", "Posting Date");
+                            DetailedCustLedgEntry.SetRange("Cust. Ledger Entry No.", CustLedgerEntry."Entry No.");
+                            DetailedCustLedgEntry.SetFilter("Entry Type", '%1|%2',
+                                DetailedCustLedgEntry."Entry Type"::"Correction of Remaining Amount",
+                                DetailedCustLedgEntry."Entry Type"::"Appln. Rounding");
+                            DetailedCustLedgEntry.SetFilter("Posting Date", CustDateFilter);
+                            if DetailedCustLedgEntry.Find('-') then
+                                repeat
+                                    StartBalAdjLCY := StartBalAdjLCY - DetailedCustLedgEntry."Amount (LCY)";
+                                until DetailedCustLedgEntry.Next() = 0;
+                            DetailedCustLedgEntry.Reset();
+                        until CustLedgerEntry.Next() = 0;
                 end;
                 CurrReport.PrintOnlyIfDetail := ExcludeBalanceOnly or (StartBalanceLCY = 0);
-                CustBalanceLCY := StartBalanceLCY;
+                CustBalanceLCY := StartBalanceLCY + StartBalAdjLCY;
             end;
 
             trigger OnPreDataItem()
             begin
                 PageGroupNo := 1;
                 Clear(StartBalanceLCY);
+                Clear(StartBalAdjLCY);
             end;
         }
     }
@@ -315,6 +352,16 @@ report 104 "Customer - Detail Trial Bal."
         }
     }
 
+    rendering
+    {
+        layout(RDLCLayout)
+        {
+            Type = RDLC;
+            LayoutFile = './Sales/Reports/CustomerDetailTrialBal.rdlc';
+            Summary = 'Report layout made in the legacy RDLC format. Use an RDLC editor to modify the layout.';
+        }
+    }
+
     labels
     {
     }
@@ -355,6 +402,7 @@ report 104 "Customer - Detail Trial Bal."
         CustCurrencyCode: Code[10];
         CustEntryDueDate: Date;
         StartBalanceLCY: Decimal;
+        StartBalAdjLCY: Decimal;
         CustLedgEntryExists: Boolean;
         PageGroupNo: Integer;
 

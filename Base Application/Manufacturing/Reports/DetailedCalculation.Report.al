@@ -15,11 +15,11 @@ using System.Utilities;
 
 report 99000756 "Detailed Calculation"
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/Reports/DetailedCalculation.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Detailed Calculation';
+    ToolTip = 'View the list of all costs for the item taking into account any scrap during production.';
     UsageCategory = ReportsAndAnalysis;
+    DefaultRenderingLayout = RDLCLayout;
 
     dataset
     {
@@ -130,11 +130,17 @@ report 99000756 "Detailed Calculation"
                 trigger OnAfterGetRecord()
                 var
                     UnitCostCalculation: Enum "Unit Cost Calculation Type";
+                    IsHandled: Boolean;
                 begin
                     ProdUnitCost := "Unit Cost per";
 
-                    MfgCostCalcMgt.CalcRoutingCostPerUnit(
-                      Type, "No.", DirectUnitCost, IndirectCostPct, OverheadRate, ProdUnitCost, UnitCostCalculation);
+                    IsHandled := false;
+                    OnAfterGetRecordRoutingLineOnBeforeCalcRoutingCostPerUnit(
+                      "Routing Line", Item."No.", Item."Base Unit of Measure", "Routing Line"."Standard Task Code",
+                      CalculateDate, DirectUnitCost, IndirectCostPct, OverheadRate, ProdUnitCost, UnitCostCalculation, IsHandled);
+                    if not IsHandled then
+                        MfgCostCalcMgt.CalcRoutingCostPerUnit(
+                          Type, "No.", DirectUnitCost, IndirectCostPct, OverheadRate, ProdUnitCost, UnitCostCalculation);
                     CostTime :=
                       MfgCostCalcMgt.CalculateCostTime(
                         MfgCostCalcMgt.CalcQtyAdjdForBOMScrap(Item."Lot Size", Item."Scrap %"),
@@ -400,6 +406,16 @@ report 99000756 "Detailed Calculation"
         end;
     }
 
+    rendering
+    {
+        layout(RDLCLayout)
+        {
+            Type = RDLC;
+            LayoutFile = './Manufacturing/Reports/DetailedCalculation.rdlc';
+            Summary = 'Report layout made in the legacy RDLC format. Use an RDLC editor to modify the layout.';
+        }
+    }
+
     labels
     {
         ProdUnitCostCaption = 'Unit Cost';
@@ -474,6 +490,11 @@ report 99000756 "Detailed Calculation"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeOnPreReport(var Item: Record Item)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetRecordRoutingLineOnBeforeCalcRoutingCostPerUnit(var RoutingLine: Record "Routing Line"; ItemNo: Code[20]; BaseUnitOfMeasure: Code[10]; StandardTaskCode: Code[10]; CalculationDate: Date; var DirectUnitCost: Decimal; var IndirectCostPct: Decimal; var OverheadRate: Decimal; var ProdUnitCost: Decimal; var UnitCostCalculation: Enum "Unit Cost Calculation Type"; var IsHandled: Boolean)
     begin
     end;
 }
