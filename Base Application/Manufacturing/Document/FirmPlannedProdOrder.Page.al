@@ -6,6 +6,7 @@ namespace Microsoft.Manufacturing.Document;
 
 using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Attachment;
+using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Requisition;
 using Microsoft.Manufacturing.Reports;
 
@@ -59,11 +60,28 @@ page 99000829 "Firm Planned Prod. Order"
                 {
                     ApplicationArea = Manufacturing;
                     ToolTip = 'Specifies the item number or number of the source document that the entry originates from.';
+
+                    trigger OnValidate()
+                    var
+                        Item: Record "Item";
+                    begin
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec."Source Type" = Rec."Source Type"::Item, Rec."Source No.");
+                    end;
                 }
                 field("Variant Code"; Rec."Variant Code")
                 {
                     ApplicationArea = Manufacturing;
                     Visible = false;
+                    ShowMandatory = VariantCodeMandatory;
+
+                    trigger OnValidate()
+                    var
+                        Item: Record "Item";
+                    begin
+                        if Rec."Variant Code" = '' then
+                            VariantCodeMandatory := Item.IsVariantMandatory(Rec."Source Type" = Rec."Source Type"::Item, Rec."Source No.");
+                    end;
                 }
                 field("Search Description"; Rec."Search Description")
                 {
@@ -419,7 +437,6 @@ page 99000829 "Firm Planned Prod. Order"
                 //The property 'PromotedCategory' can only be set if the property 'Promoted' is set to 'true'
                 //PromotedCategory = "Report";
                 RunObject = Report "Subcontractor - Dispatch List";
-                ToolTip = 'View the list of material to be sent to manufacturing subcontractors.';
             }
         }
         area(Promoted)
@@ -477,7 +494,11 @@ page 99000829 "Firm Planned Prod. Order"
     }
 
     trigger OnAfterGetRecord()
+    var
+        Item: Record Item;
     begin
+        if Rec."Variant Code" = '' then
+            VariantCodeMandatory := Item.IsVariantMandatory(Rec."Source Type" = Rec."Source Type"::Item, Rec."Source No.");
     end;
 
     trigger OnInit()
@@ -491,6 +512,7 @@ page 99000829 "Firm Planned Prod. Order"
     var
         CopyProdOrderDoc: Report "Copy Production Order Document";
         ManuPrintReport: Codeunit "Manu. Print Report";
+        VariantCodeMandatory: Boolean;
 
     local procedure ShortcutDimension1CodeOnAfterV()
     begin

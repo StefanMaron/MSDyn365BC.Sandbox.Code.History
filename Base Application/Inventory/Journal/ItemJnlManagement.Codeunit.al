@@ -16,9 +16,6 @@ codeunit 240 ItemJnlManagement
     end;
 
     var
-#if not CLEAN26
-        MfgItemJournalMgt: Codeunit "Mfg. Item Journal Mgt.";
-#endif
 #pragma warning disable AA0074
 #pragma warning disable AA0470
         Text000: Label '%1 journal';
@@ -74,14 +71,15 @@ codeunit 240 ItemJnlManagement
             else
                 JnlSelected := PAGE.RunModal(0, ItemJnlTemplate) = ACTION::LookupOK;
         end;
-        if JnlSelected then begin
-            ItemJnlLine.FilterGroup := 2;
-            ItemJnlLine.SetRange("Journal Template Name", ItemJnlTemplate.Name);
-            ItemJnlLine.FilterGroup := 0;
-            if OpenFromBatch then begin
-                ItemJnlLine."Journal Template Name" := '';
-                PAGE.Run(ItemJnlTemplate."Page ID", ItemJnlLine);
-            end;
+        OnTemplateSelectionOnAfterSelectItemJnlTemplate(ItemJnlTemplate, ItemJnlLine, JnlSelected);
+        if JnlSelected then begin                        
+                ItemJnlLine.FilterGroup := 2;
+                ItemJnlLine.SetRange("Journal Template Name", ItemJnlTemplate.Name);
+                ItemJnlLine.FilterGroup := 0;
+                if OpenFromBatch then begin
+                    ItemJnlLine."Journal Template Name" := '';
+                    PAGE.Run(ItemJnlTemplate."Page ID", ItemJnlLine);
+                end;            
         end;
     end;
 
@@ -174,6 +172,7 @@ codeunit 240 ItemJnlManagement
         if not JnlSelected then
             Error('');
 
+        OnOpenJnlBatchOnAfterSelectItemJnlTemplate(ItemJnlTemplate, ItemJnlBatch);
         ItemJnlBatch.FilterGroup(0);
         ItemJnlBatch.SetRange("Journal Template Name", ItemJnlTemplate.Name);
         ItemJnlBatch.FilterGroup(2);
@@ -256,30 +255,6 @@ codeunit 240 ItemJnlManagement
         OnAfterGetItem(Item, ItemDescription);
     end;
 
-#if not CLEAN26
-    [Obsolete('Moved to codeunit Mfg. Item Journal Management', '26.0')]
-    procedure GetConsump(var ItemJnlLine: Record "Item Journal Line"; var ProdOrderDescription: Text[100])
-    begin
-        MfgItemJournalMgt.GetConsump(ItemJnlLine, ProdOrderDescription);
-    end;
-#endif
-
-#if not CLEAN26
-    [Obsolete('Moved to codeunit Mfg. Item Journal Management', '26.0')]
-    procedure GetOutput(var ItemJnlLine: Record "Item Journal Line"; var ProdOrderDescription: Text[100]; var OperationDescription: Text[100])
-    begin
-        MfgItemJournalMgt.GetOutput(ItemJnlLine, ProdOrderDescription, OperationDescription);
-    end;
-#endif
-
-#if not CLEAN26
-    [Obsolete('Moved to codeunit Mfg. Item Journal Management', '26.0')]
-    procedure GetCapacity(CapType: Enum Microsoft.Manufacturing.Capacity."Capacity Type"; CapNo: Code[20]; var CapDescription: Text[100])
-    begin
-        MfgItemJournalMgt.GetCapacity(CapType, CapNo, CapDescription);
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckName(CurrentJnlBatchName: Code[10]; var ItemJnlLine: Record "Item Journal Line"; var IsHandled: Boolean)
     begin
@@ -327,6 +302,16 @@ codeunit 240 ItemJnlManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTemplateSelection(var ItemJnlLine: Record "Item Journal Line"; var JnlSelected: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnTemplateSelectionOnAfterSelectItemJnlTemplate(var ItemJournalTemplate: Record "Item Journal Template"; var ItemJournalLine: Record "Item Journal Line"; var JnlSelected: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnOpenJnlBatchOnAfterSelectItemJnlTemplate(var ItemJournalTemplate: Record "Item Journal Template"; var ItemJournalBatch: Record "Item Journal Batch")
     begin
     end;
 }

@@ -11,11 +11,11 @@ using System.Utilities;
 
 report 5801 "Invt. Valuation - Cost Spec."
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './Inventory/Reports/InvtValuationCostSpec.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Invt. Valuation - Cost Spec.';
+    ToolTip = 'View an overview of the current inventory value of selected items and specifies the cost of these items as of the date specified in the Valuation Date field. The report includes all costs, both those posted as invoiced and those posted as expected. For each of the items that you specify when setting up the report, the printed report shows quantity on stock, the cost per unit and the total amount. For each of these columns, the report specifies the cost as the various value entry types.';
     UsageCategory = ReportsAndAnalysis;
+    DefaultRenderingLayout = RDLCLayout;
 
     dataset
     {
@@ -200,6 +200,16 @@ report 5801 "Invt. Valuation - Cost Spec."
         end;
     }
 
+    rendering
+    {
+        layout(RDLCLayout)
+        {
+            Type = RDLC;
+            LayoutFile = './Inventory/Reports/InvtValuationCostSpec.rdlc';
+            Summary = 'Report layout made in the legacy RDLC format. Use an RDLC editor to modify the layout.';
+        }
+    }
+
     labels
     {
         InventoryValuationCostSpecificationCaption = 'Inventory Valuation - Cost Specification';
@@ -265,7 +275,13 @@ report 5801 "Invt. Valuation - Cost Spec."
     local procedure CalcRemainingQty(ItemLedgerEntry: Record "Item Ledger Entry")
     var
         ItemApplnEntry: Record "Item Application Entry";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCalcRemainingQty(ItemLedgerEntry, RemainingQty, PosQty, IsPositive, ValuationDate, IsHandled);
+        if IsHandled then
+            exit;
+
         RemainingQty := ItemLedgerEntry.Quantity;
         if IsPositive then
             PosQty := ItemLedgerEntry.Quantity;
@@ -299,11 +315,13 @@ report 5801 "Invt. Valuation - Cost Spec."
     local procedure SumQty(var RemainingQty: Decimal; var PosQty: Decimal; EntryNo: Integer; AppliedQty: Decimal)
     var
         ItemLedgEntry: Record "Item Ledger Entry";
+        ShouldExit: Boolean;
     begin
         ItemLedgEntry.Get(EntryNo);
-        if (ItemLedgEntry.Quantity * AppliedQty < 0) or
-           (ItemLedgEntry."Posting Date" > ValuationDate)
-        then
+        ShouldExit := (ItemLedgEntry.Quantity * AppliedQty < 0) or (ItemLedgEntry."Posting Date" > ValuationDate);
+
+        OnSumQtyOnAfterCheckExitCondition(ItemLedgEntry, AppliedQty, ValuationDate, ShouldExit);
+        if ShouldExit then
             exit;
 
         RemainingQty := RemainingQty + AppliedQty;
@@ -404,6 +422,16 @@ report 5801 "Invt. Valuation - Cost Spec."
         ResultForTotalRemAvg += TotalRemAvg;
         ResultForTotalCost += TotalCost;
         ResultForRemainingQty += RemainingQty;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCalcRemainingQty(ItemLedgerEntry: Record "Item Ledger Entry"; var RemainingQty: Decimal; var PosQty: Decimal; IsPositive: Boolean; ValuationDate: Date; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSumQtyOnAfterCheckExitCondition(ItemLedgerEntry: Record "Item Ledger Entry"; AppliedQuantity: Decimal; ValuationDate: Date; var ShouldExit: Boolean)
+    begin
     end;
 }
 

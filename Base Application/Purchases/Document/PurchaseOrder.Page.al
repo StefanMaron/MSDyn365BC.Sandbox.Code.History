@@ -287,6 +287,12 @@ page 50 "Purchase Order"
                 {
                     ApplicationArea = Suite;
                     ShowMandatory = VendorInvoiceNoMandatory;
+                    Editable = IsVendorInvoiceEditable;
+                }
+                field("Spend Request No."; Rec."Spend Request No.")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Importance = Additional;
                 }
                 field("Your Reference"; Rec."Your Reference")
                 {
@@ -1153,25 +1159,6 @@ page 50 "Purchase Order"
                         CurrPage.SaveRecord();
                     end;
                 }
-#if not CLEAN26
-                action(Statistics)
-                {
-                    ApplicationArea = Suite;
-                    Caption = 'Statistics';
-                    Image = Statistics;
-                    ShortCutKey = 'F7';
-                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '26.0';
-
-                    trigger OnAction()
-                    begin
-                        Rec.OpenPurchaseOrderStatistics();
-                        CurrPage.PurchLines.Page.ForceTotalsCalculation();
-                    end;
-                }
-#endif
                 action(PurchaseOrderStatistics)
                 {
                     ApplicationArea = Basic, Suite;
@@ -1179,11 +1166,7 @@ page 50 "Purchase Order"
                     Enabled = Rec."No." <> '';
                     Image = Statistics;
                     ShortCutKey = 'F7';
-#if CLEAN26
                     Visible = true;
-#else
-                    Visible = false;
-#endif                    
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Purchase Order Statistics";
                     RunPageOnRec = true;
@@ -1716,7 +1699,8 @@ page 50 "Purchase Order"
                             IncomingDocument: Record "Incoming Document";
                         begin
                             if IncomingDocument.Get(Rec."Incoming Document Entry No.") then
-                                IncomingDocument.RemoveLinkToRelatedRecord();
+                                if not IncomingDocument.Posted then
+                                    IncomingDocument.RemoveLinkToRelatedRecord();
                             Rec."Incoming Document Entry No." := 0;
                             Rec.Modify(true);
                         end;
@@ -2237,18 +2221,9 @@ page 50 "Purchase Order"
                 actionref(Dimensions_Promoted; Dimensions)
                 {
                 }
-#if not CLEAN26
-                actionref(Statistics_Promoted; Statistics)
-                {
-                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '26.0';
-                }
-#else                
                 actionref(PurchaseOrderStatistics_Promoted; PurchaseOrderStatistics)
                 {
                 }
-#endif
                 actionref("Co&mments_Promoted"; "Co&mments")
                 {
                 }
@@ -2295,6 +2270,7 @@ page 50 "Purchase Order"
         CurrPage.ApprovalFactBox.PAGE.UpdateApprovalEntriesFromSourceRecord(Rec.RecordId());
         ShowWorkflowStatus := CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(Rec.RecordId());
         StatusStyleTxt := Rec.GetStatusStyleText();
+        Rec.GetContactDetails(BuyFromContact, PayToContact);
     end;
 
     trigger OnAfterGetRecord()
@@ -2304,9 +2280,9 @@ page 50 "Purchase Order"
         RejectICPurchaseOrderEnabled := ICInboxOutboxMgt.IsPurchaseHeaderFromIncomingIC(Rec);
         CalculateCurrentShippingAndPayToOption();
         ShowOverReceiptNotification();
-        BuyFromContact.GetOrClear(Rec."Buy-from Contact No.");
-        PayToContact.GetOrClear(Rec."Pay-to Contact No.");
+        Rec.GetContactDetails(BuyFromContact, PayToContact);
         CurrPage.IncomingDocAttachFactBox.Page.SetCurrentRecordID(Rec.RecordId);
+        IsVendorInvoiceEditable := not Rec."Self-Billing Invoice";
 
         OnAfterOnAfterGetRecord(Rec);
     end;
@@ -2380,6 +2356,7 @@ page 50 "Purchase Order"
                 ICInboxOutboxMgt.ShowDuplicateICDocumentWarning(PurchaseHeader, ICIncomingInvoiceFromOriginalOrderMsg);
         end;
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
+        IsVendorInvoiceEditable := not Rec."Self-Billing Invoice";
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -2441,6 +2418,7 @@ page 50 "Purchase Order"
         IsRemitToCountyVisible: Boolean;
         RejectICPurchaseOrderEnabled: Boolean;
         VATDateEnabled: Boolean;
+        IsVendorInvoiceEditable: Boolean;
 
     protected var
         ShipToOptions: Enum "Purchase Order Ship-to Options";

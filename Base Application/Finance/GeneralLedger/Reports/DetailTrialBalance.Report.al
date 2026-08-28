@@ -19,14 +19,13 @@ using System.Utilities;
 /// </remarks>
 report 4 "Detail Trial Balance"
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './Finance/GeneralLedger/Reports/DetailTrialBalance.rdlc';
     AdditionalSearchTerms = 'payment due,order status';
     ApplicationArea = Basic, Suite;
     Caption = 'Detail Trial Balance';
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
     DataAccessIntent = ReadOnly;
+    DefaultRenderingLayout = RDLCLayout;
 
     dataset
     {
@@ -158,18 +157,12 @@ report 4 "Detail Trial Balance"
                         if not PrintReversedEntries and Reversed then
                             CurrReport.Skip();
 
-                        GLBalance := GLBalance + Amount;
-                        if ("Posting Date" = ClosingDate("Posting Date")) and
-                           not PrintClosingEntries
-                        then begin
-                            "Debit Amount" := 0;
-                            "Credit Amount" := 0;
-                        end;
+                        ClosingEntry := "Posting Date" = ClosingDate("Posting Date");
 
-                        if "Posting Date" = ClosingDate("Posting Date") then
-                            ClosingEntry := true
-                        else
-                            ClosingEntry := false;
+                        if ClosingEntry and not PrintClosingEntries then
+                            CurrReport.Skip();
+
+                        GLBalance := GLBalance + Amount;
 
                         NumberOfGLEntryLines += 1;
                     end;
@@ -274,6 +267,16 @@ report 4 "Detail Trial Balance"
         }
     }
 
+    rendering
+    {
+        layout(RDLCLayout)
+        {
+            Type = RDLC;
+            LayoutFile = './Finance/GeneralLedger/Reports/DetailTrialBalance.rdlc';
+            Summary = 'Report layout made in the legacy RDLC format. Use an RDLC editor to modify the layout.';
+        }
+    }
+
     labels
     {
         PostingDateCaption = 'Posting Date';
@@ -286,6 +289,8 @@ report 4 "Detail Trial Balance"
     trigger OnPreReport()
     begin
         StartDateTime := CurrentDateTime();
+        "G/L Account".SecurityFiltering(SecurityFilter::Filtered);
+        "G/L Entry".SecurityFiltering(SecurityFilter::Filtered);
         GLFilter := "G/L Account".GetFilters();
         GLDateFilter := "G/L Account".GetFilter("Date Filter");
 

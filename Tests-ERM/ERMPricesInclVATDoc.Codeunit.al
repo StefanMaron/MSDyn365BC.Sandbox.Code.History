@@ -814,33 +814,6 @@ codeunit 134046 "ERM Prices Incl VAT Doc"
         PurchaseHeader.Delete(true);
     end;
 
-#if not CLEAN26
-    [Obsolete('The statistics action will be replaced with the SalesOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '26.0')]
-    [Test]
-    [HandlerFunctions('SalesOrderStatisticsModalPageHandler')]
-    [Scope('OnPrem')]
-    procedure SalesRetOrdStatisticsVATAmount()
-    var
-        Currency: Record Currency;
-        SalesHeader: Record "Sales Header";
-        SalesLine: Record "Sales Line";
-        SalesReturnOrder: TestPage "Sales Return Order";
-    begin
-        // Verify Total Incl. VAT of Sales Return Order on Sales Invoice Statistics page.
-
-        // Setup: Create Sales Return Order with Random Quantity and Unit Price.
-        Initialize();
-        LibraryERM.FindCurrency(Currency);
-        CreateSingleLineSalesDoc(SalesHeader, SalesLine, Currency, LibraryRandom.RandInt(10), SalesHeader."Document Type"::"Return Order");  // Random value for Unit Price.
-        LibraryVariableStorage.Enqueue(SalesLine."Amount Including VAT"); // Enqueue value for SalesOrderStatisticsModalPageHandler.
-        OpenSalesRetOrdPage(SalesReturnOrder, SalesHeader."No.");
-
-        // Exercise: Open Sales Order Statistics page.
-        SalesReturnOrder.Statistics.Invoke();
-
-        // Verify: Verify Total Incl. VAT of Sales Return Order on Sales Invoice Statistics page, Verification done in SalesOrderStatisticsModalPageHandler.
-    end;
-#endif
     [HandlerFunctions('SalesOrderStatisticsPageHandler')]
     [Scope('OnPrem')]
     procedure SalesRetOrdStatisticsVATAmountNM()
@@ -891,36 +864,6 @@ codeunit 134046 "ERM Prices Incl VAT Doc"
 
         // Verify: Verify Amount Including VAT on Apply Customer Entries page, Verification done in SalesOrderStatisticsHandler.
     end;
-
-#if not CLEAN26
-    [Obsolete('The statistics action will be replaced with the PurchaseOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '26.0')]
-    [Test]
-    [HandlerFunctions('PurchaseOrderStatisticsHandler')]
-    [Scope('OnPrem')]
-    procedure PurchRetOrdStatisticsVATAmount()
-    var
-        Currency: Record Currency;
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        PurchaseReturnOrder: TestPage "Purchase Return Order";
-    begin
-        // Verify Total Incl. VAT of Purchase Return Order on Purchase Invoice Statistics.
-
-        // Setup: Create Purchase Return Order with Random Direct Unit Cost.
-        Initialize();
-        LibraryERM.FindCurrency(Currency);
-        CreateSingleLinePurchaseDoc(
-          PurchaseHeader, PurchaseLine, Currency, LibraryRandom.RandInt(10), PurchaseHeader."Document Type"::"Return Order");
-        LibraryVariableStorage.Enqueue(PurchaseLine."Amount Including VAT");  // Enqueue value for PurchaseOrderStatisticsHandler.
-        OpenPurchRetOrdPage(PurchaseReturnOrder, PurchaseHeader."No.");
-
-        // Exercise: Open Purchase Order Statistics page.
-        PurchaseReturnOrder.Statistics.Invoke();
-
-        // Verify: Verify Amount Including VAT on Purchase Order Statistics page.
-        // Verification done in handler.
-    end;
-#endif
 
     [Test]
     [HandlerFunctions('PurchaseOrderStatisticsPageHandler')]
@@ -1027,6 +970,53 @@ codeunit 134046 "ERM Prices Incl VAT Doc"
         ServiceLine.Validate("VAT Prod. Posting Group", VATPostingSetup."VAT Prod. Posting Group");
         ServiceLine.TestField("Line Discount Amount", Round(Round(ServiceLine.Quantity * ServiceLine."Unit Price") * ServiceLine."Line Discount %" / 100));
         ServiceLine.TestField("Line Amount", Round(ServiceLine.Quantity * ServiceLine."Unit Price") - ServiceLine."Line Discount Amount");
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure DirectUnitCostInclVATUpdatesWhenVATProdPostGrpChangedForGLAccount()
+    var
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        NewVATPostingSetup: Record "VAT Posting Setup";
+        GLAccountNo: Code[20];
+        DirectUnitCost: Decimal;
+        ExpectedDirectUnitCost: Decimal;
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO] Direct Unit Cost Incl. VAT is recalculated when VAT Prod. Posting Group is changed on a G/L Account line with Prices Including VAT enabled
+
+        Initialize();
+
+        // [GIVEN] VAT Posting Setup "VS1" with VAT % = 21
+        LibraryERM.CreateVATPostingSetupWithAccounts(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT", 21);
+
+        // [GIVEN] A second VAT Posting Setup "VS2" with same VAT Bus. Posting Group and VAT % = 0
+        LibraryERM.CreateVATPostingSetupWithAccounts(NewVATPostingSetup, NewVATPostingSetup."VAT Calculation Type"::"Normal VAT", 0);
+        NewVATPostingSetup.Rename(VATPostingSetup."VAT Bus. Posting Group", NewVATPostingSetup."VAT Prod. Posting Group");
+
+        // [GIVEN] G/L Account "G" with VAT Prod. Posting Group from "VS1"
+        GLAccountNo := LibraryERM.CreateGLAccountWithVATPostingSetup(VATPostingSetup, "General Posting Type"::Purchase);
+
+        // [GIVEN] Purchase Invoice with Prices Including VAT enabled
+        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::Invoice, LibraryPurchase.CreateVendorNo());
+        PurchaseHeader.Validate("VAT Bus. Posting Group", VATPostingSetup."VAT Bus. Posting Group");
+        PurchaseHeader.Validate("Prices Including VAT", true);
+        PurchaseHeader.Modify(true);
+
+        // [GIVEN] Purchase line with Type = G/L Account, Direct Unit Cost = 1000 (incl. VAT at 21%)
+        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::"G/L Account", GLAccountNo, 1);
+        PurchaseLine.Validate("Direct Unit Cost", 1000);
+        PurchaseLine.Modify(true);
+        DirectUnitCost := PurchaseLine."Direct Unit Cost";
+
+        // [WHEN] VAT Prod. Posting Group is changed to "VS2" (0% VAT)
+        PurchaseLine.Validate("VAT Prod. Posting Group", NewVATPostingSetup."VAT Prod. Posting Group");
+
+        // [THEN] Direct Unit Cost is recalculated: 1000 * (100 + 0) / (100 + 21) = 826.45 (approx)
+        ExpectedDirectUnitCost := Round(DirectUnitCost * (100 + NewVATPostingSetup."VAT %") / (100 + VATPostingSetup."VAT %"), LibraryERM.GetUnitAmountRoundingPrecision());
+        Assert.AreEqual(ExpectedDirectUnitCost, PurchaseLine."Direct Unit Cost", 'Direct Unit Cost should be recalculated when VAT Prod. Posting Group changes on G/L Account line');
     end;
 
     local procedure Initialize()
@@ -1570,18 +1560,6 @@ codeunit 134046 "ERM Prices Incl VAT Doc"
         Assert.AreEqual(VATAmount, VATAmountLine."VAT Amount", StrSubstNo(AmountErr, VATAmountLine.FieldCaption("VAT Amount"), VATAmount, VATAmountLine.TableCaption()));
     end;
 
-#if not CLEAN26
-    [Obsolete('The statistics action will be replaced with the SalesOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '26.0')]
-    [ModalPageHandler]
-    [Scope('OnPrem')]
-    procedure SalesOrderStatisticsModalPageHandler(var SalesOrderStatistics: TestPage "Sales Order Statistics")
-    var
-        TotalInclVAT: Variant;
-    begin
-        LibraryVariableStorage.Dequeue(TotalInclVAT);
-        SalesOrderStatistics."TotalAmount1[1]".AssertEquals(TotalInclVAT);
-    end;
-#endif
     [PageHandler]
     [Scope('OnPrem')]
     procedure SalesOrderStatisticsPageHandler(var SalesOrderStatistics: TestPage "Sales Order Statistics")
@@ -1601,19 +1579,6 @@ codeunit 134046 "ERM Prices Incl VAT Doc"
         LibraryVariableStorage.Dequeue(Balance);
         ApplyCustomerEntries.ControlBalance.AssertEquals(Balance);
     end;
-
-#if not CLEAN26
-    [Obsolete('The statistics action will be replaced with the PurchaseOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '26.0')]
-    [ModalPageHandler]
-    [Scope('OnPrem')]
-    procedure PurchaseOrderStatisticsHandler(var PurchaseOrderStatistics: TestPage "Purchase Order Statistics")
-    var
-        TotalInclVAT: Variant;
-    begin
-        LibraryVariableStorage.Dequeue(TotalInclVAT);
-        PurchaseOrderStatistics."TotalAmount1[3]".AssertEquals(TotalInclVAT);
-    end;
-#endif
 
     [PageHandler]
     [Scope('OnPrem')]

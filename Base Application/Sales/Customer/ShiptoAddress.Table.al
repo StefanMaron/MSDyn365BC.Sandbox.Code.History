@@ -360,6 +360,15 @@ table 222 "Ship-to Address"
         Name := Cust.Name;
     end;
 
+    trigger OnDelete()
+    begin
+        if Cust.Get("Customer No.") then
+            if Cust."Ship-to Code" = Code then begin
+                Cust.Validate("Ship-to Code", '');
+                Cust.Modify(true);
+            end;
+    end;
+
     trigger OnModify()
     begin
         "Last Date Modified" := Today;
@@ -372,12 +381,13 @@ table 222 "Ship-to Address"
 
     var
         Cust: Record Customer;
-        PostCode: Record "Post Code";
         AltCustVATRegFacade: Codeunit "Alt. Cust. VAT. Reg. Facade";
-
 #pragma warning disable AA0074
         Text000: Label 'untitled';
 #pragma warning restore AA0074
+
+    protected var
+        PostCode: Record "Post Code";
 
     /// <summary>
     /// Generates a caption text for the ship-to address including customer and address information.
@@ -407,6 +417,7 @@ table 222 "Ship-to Address"
     /// <returns>The filtered customer number or empty if not applicable.</returns>
     procedure GetFilterCustNo(): Code[20]
     begin
+        OnBeforeGetFilterCustNo(Rec);
         if GetFilter("Customer No.") <> '' then
             if GetRangeMin("Customer No.") = GetRangeMax("Customer No.") then
                 exit(GetRangeMax("Customer No."));
@@ -534,6 +545,15 @@ table 222 "Ship-to Address"
     /// <param name="IsHandled">Set to true to skip the default validation.</param>
     [IntegrationEvent(false, false)]
     local procedure OnBeforeValidatePostCode(var ShipToAddress: Record "Ship-to Address"; var PostCodeRec: Record "Post Code"; CurrentFieldNo: Integer; var IsHandled: Boolean);
+    begin
+    end;
+
+    /// <summary>
+    /// Raised before retrieving the filtered customer number.
+    /// </summary>
+    /// <param name="ShipToAddress">The ship-to address record.</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetFilterCustNo(var ShipToAddress: Record "Ship-to Address")
     begin
     end;
 }
