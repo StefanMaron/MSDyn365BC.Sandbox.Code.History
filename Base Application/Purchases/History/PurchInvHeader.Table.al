@@ -16,6 +16,7 @@ using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.SpendRequest;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.AuditCodes;
@@ -569,6 +570,19 @@ table 122 "Purch. Inv. Header"
         {
             Caption = 'Prepayment Order No.';
         }
+        field(146; "Spend Request No."; Code[20])
+        {
+            Caption = 'Spend Request No.';
+            ToolTip = 'Specifies the spend request that this purchase document relates to.';
+            TableRelation = "Spend Request";
+            DataClassification = CustomerContent;
+        }
+        field(147; "Spend Request Close"; Boolean)
+        {
+            Caption = 'Spend Request Close';
+            ToolTip = 'Specifies that the spend request will be closed when the purchase document is posted.';
+            DataClassification = CustomerContent;
+        }
         field(151; "Quote No."; Code[20])
         {
             Caption = 'Quote No.';
@@ -670,6 +684,13 @@ table 122 "Purch. Inv. Header"
             ToolTip = 'Specifies if the posted purchase invoice is a corrective document.';
             Editable = false;
             FieldClass = FlowField;
+        }
+        field(1340; "Dispute Status"; Code[10])
+        {
+            Caption = 'Dispute Status';
+            ToolTip = 'Specifies if there is an ongoing dispute for this document.';
+            TableRelation = "Dispute Status";
+            DataClassification = CustomerContent;
         }
         field(5050; "Campaign No."; Code[20])
         {
@@ -795,8 +816,12 @@ table 122 "Purch. Inv. Header"
         OnBeforePrintRecords(Rec, ShowRequestPage, IsHandled);
         if not IsHandled then begin
             PurchInvHeader.Copy(Rec);
-            ReportSelection.PrintWithDialogForVend(
-              ReportSelection.Usage::"P.Invoice", PurchInvHeader, ShowRequestPage, PurchInvHeader.FieldNo("Buy-from Vendor No."));
+            if PurchInvHeader."Self-Billing Invoice" then
+                ReportSelection.PrintWithDialogForVend(
+                  ReportSelection.Usage::"P.Self Billing Invoice", PurchInvHeader, ShowRequestPage, PurchInvHeader.FieldNo("Buy-from Vendor No."))
+            else
+                ReportSelection.PrintWithDialogForVend(
+                  ReportSelection.Usage::"P.Invoice", PurchInvHeader, ShowRequestPage, PurchInvHeader.FieldNo("Buy-from Vendor No."));
         end;
     end;
 
@@ -819,8 +844,12 @@ table 122 "Purch. Inv. Header"
             exit;
 
         PurchInvHeaderLocal.SetRecFilter();
-        ReportSelections.SaveAsDocumentAttachment(
-            ReportSelections.Usage::"P.Invoice".AsInteger(), PurchInvHeaderLocal, PurchInvHeaderLocal."No.", PurchInvHeaderLocal."Buy-from Vendor No.", true);
+        if PurchInvHeaderLocal."Self-Billing Invoice" then
+            ReportSelections.SaveAsDocumentAttachment(
+                ReportSelections.Usage::"P.Self Billing Invoice".AsInteger(), PurchInvHeaderLocal, PurchInvHeaderLocal."No.", PurchInvHeaderLocal."Buy-from Vendor No.", true)
+        else
+            ReportSelections.SaveAsDocumentAttachment(
+                ReportSelections.Usage::"P.Invoice".AsInteger(), PurchInvHeaderLocal, PurchInvHeaderLocal."No.", PurchInvHeaderLocal."Buy-from Vendor No.", true);
     end;
 
     procedure Navigate()

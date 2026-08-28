@@ -1001,6 +1001,9 @@ table 5050 Contact
         key(Key16; "E-Mail")
         {
         }
+        key(Key17; "E-Mail 2")
+        {
+        }
     }
 
     fieldgroups
@@ -1318,7 +1321,7 @@ table 5050 Contact
 
         if "No." <> '' then
             if IsUpdateNeeded(ContactBeforeModify) then
-                UpdateCustVendBank.Run(Rec);
+                UpdateRelatedRecordsPreservingCustomerSIREN();
 
         if Type = Type::Company then begin
             RMSetup.Get();
@@ -2098,6 +2101,7 @@ table 5050 Contact
         AppendFilter(CodeFilter, '|', MarketingSetup."Bus. Rel. Code for Vendors");
         AppendFilter(CodeFilter, '|', MarketingSetup."Bus. Rel. Code for Bank Accs.");
         AppendFilter(CodeFilter, '|', MarketingSetup."Bus. Rel. Code for Employees");
+        OnAfterGetSelectedRelationCodes(CodeFilter);
         SelectedBusRelationCodes := CodeFilter;
     end;
 
@@ -3155,6 +3159,8 @@ table 5050 Contact
     var
         PurchaseHeader: Record "Purchase Header";
     begin
+        OnBeforeCreatePurchaseQuoteFromContact(Rec);
+
         CheckIfPrivacyBlockedGeneric();
 
         PurchaseHeader.Init();
@@ -3175,6 +3181,16 @@ table 5050 Contact
         ContBusRel.SetRange("Contact No.", "No.");
         ContBusRel.SetRange("Link to Table", ContBusRel."Link to Table"::Customer);
         exit(ContBusRel.FindFirst())
+    end;
+
+    procedure ContactToVendBusinessRelationExist(): Boolean
+    var
+        ContactBusinessRelation: Record "Contact Business Relation";
+    begin
+        ContactBusinessRelation.Reset();
+        ContactBusinessRelation.SetRange("Contact No.", "No.");
+        ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Vendor);
+        exit(ContactBusinessRelation.FindFirst())
     end;
 
     procedure CheckIfMinorForProfiles()
@@ -3605,6 +3621,39 @@ table 5050 Contact
           WarningMessage);
     end;
 
+    local procedure UpdateRelatedRecordsPreservingCustomerSIREN()
+    var
+        Customer: Record Customer;
+        ContactBusinessRelation: Record "Contact Business Relation";
+        SIRENNo: Code[9];
+        CustomerFound: Boolean;
+    begin
+        ContactBusinessRelation.SetRange("Contact No.", "No.");
+        ContactBusinessRelation.SetRange("Link to Table", ContactBusinessRelation."Link to Table"::Customer);
+        if ContactBusinessRelation.FindFirst() then begin
+            Customer.LockTable();
+            CustomerFound := Customer.Get(ContactBusinessRelation."No.");
+            if CustomerFound then
+                SIRENNo := Customer."SIREN No.";
+        end;
+
+        UpdateCustVendBank.Run(Rec);
+        if CustomerFound then
+            UpdateSIRENNoInCustomer(ContactBusinessRelation."No.", SIRENNo);
+    end;
+
+    local procedure UpdateSIRENNoInCustomer(CustomerNo: Code[20]; SIRENNo: Code[9])
+    var
+        Customer: Record Customer;
+    begin
+        if not Customer.Get(CustomerNo) then
+            exit;
+        if Customer."SIREN No." = SIRENNo then
+            exit;
+        Customer."SIREN No." := SIRENNo;
+        Customer.Modify();
+    end;
+
     internal procedure LookupNewVendorTemplate(): Code[20]
     var
         VendorTemplate: Record "Vendor Templ.";
@@ -3917,6 +3966,11 @@ table 5050 Contact
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreatePurchaseQuoteFromContact(var Contact: Record Contact)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateVendor(var Contact: Record Contact; var VendorNo: Code[20]; var IsHandled: Boolean)
     begin
     end;
@@ -4218,6 +4272,11 @@ table 5050 Contact
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateCustomer(var Contact: Record Contact; var CustomerNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetSelectedRelationCodes(var CodeFilter: Text)
     begin
     end;
 }

@@ -72,10 +72,7 @@ table 83 "Item Journal Line"
 
             trigger OnValidate()
             var
-#if not CLEAN26
-                DummyMachineCenter: Record Microsoft.Manufacturing.MachineCenter."Machine Center";
-                DummyWorkCenter: Record Microsoft.Manufacturing.WorkCenter."Work Center";
-#endif
+                SkipInventoryValueZeroCheck: Boolean;
             begin
                 if "Item No." <> xRec."Item No." then begin
                     "Variant Code" := '';
@@ -108,11 +105,12 @@ table 83 "Item Journal Line"
                 end;
 
                 GetItem();
-                OnValidateItemNoOnAfterGetItem(Rec, Item);
+                SkipInventoryValueZeroCheck := false;
+                OnValidateItemNoOnAfterGetItem(Rec, Item, SkipInventoryValueZeroCheck);
                 DisplayErrorIfItemIsBlocked(Item);
                 ValidateTypeWithItemNo();
 
-                if "Value Entry Type" = "Value Entry Type"::Revaluation then
+                if ("Value Entry Type" = "Value Entry Type"::Revaluation) and not SkipInventoryValueZeroCheck then
                     Item.TestField("Inventory Value Zero", false);
                 OnValidateItemNoOnBeforeSetDescription(Rec, Item);
                 Description := Item.Description;
@@ -164,9 +162,6 @@ table 83 "Item Journal Line"
                         end;
                 end;
                 OnValidateItemNoOnSetCostAndPrice(Rec, UnitCost);
-#if not CLEAN26
-                OnValidateItemNoOnAfterCalcUnitAmount(Rec, DummyWorkCenter, DummyMachineCenter);
-#endif
 
                 case "Entry Type" of
                     "Entry Type"::Purchase:
@@ -3288,6 +3283,8 @@ table 83 "Item Journal Line"
         DimMgt.EditReclasDimensionSet(
           "Dimension Set ID", "New Dimension Set ID", StrSubstNo('%1 %2 %3', "Journal Template Name", "Journal Batch Name", "Line No."),
           "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", "New Shortcut Dimension 1 Code", "New Shortcut Dimension 2 Code");
+
+        OnAfterShowReclasDimensions(Rec, xRec);
     end;
 
     /// <summary>
@@ -3672,6 +3669,7 @@ table 83 "Item Journal Line"
     /// <param name="ItemTrackingSetup">Item tracking setup to use.</param>
     procedure CheckTrackingIfRequired(ItemTrackingSetup: Record "Item Tracking Setup")
     begin
+        OnBeforeCheckTrackingIfRequired(Rec, ItemTrackingSetup);
         if ItemTrackingSetup."Serial No. Required" then
             TestField("Serial No.");
         if ItemTrackingSetup."Lot No. Required" then
@@ -3736,7 +3734,7 @@ table 83 "Item Journal Line"
             Item.TestField(Type, Item.Type::Inventory);
     end;
 
-    local procedure IsEntryTypeConsumption() Result: Boolean
+    procedure IsEntryTypeConsumption() Result: Boolean
     begin
         OnAfterIsEntryTypeConsumption(Rec, Result);
     end;
@@ -3746,12 +3744,12 @@ table 83 "Item Journal Line"
         OnAfterIsEntryTypeOutput(Rec, Result);
     end;
 
-    local procedure IsEntryTypeProduction() Result: Boolean
+    procedure IsEntryTypeProduction() Result: Boolean
     begin
         OnAfterIsEntryTypeProduction(Rec, Result);
     end;
 
-    local procedure IsOrderTypeAsmOrProd() Result: Boolean
+    procedure IsOrderTypeAsmOrProd() Result: Boolean
     begin
         OnAfterIsOrderTypeAsmOrProd(Rec, Result);
     end;
@@ -3836,6 +3834,7 @@ table 83 "Item Journal Line"
             "New Shortcut Dimension 1 Code", "New Shortcut Dimension 2 Code", 0, 0);
         OnCreateNewDimOnBeforeUpdateGlobalDimFromDimSetID(Rec);
         DimMgt.UpdateGlobalDimFromDimSetID("New Dimension Set ID", "New Shortcut Dimension 1 Code", "New Shortcut Dimension 2 Code");
+        OnAfterCreateNewDimFromDefaultDim(Rec, xRec);
     end;
 
     local procedure GetTableValuePair(FieldNo: Integer) TableValuePair: Dictionary of [Integer, Code[20]]
@@ -4732,7 +4731,7 @@ table 83 "Item Journal Line"
     /// <param name="ItemJournalLine">The current item journal line record being processed.</param>
     /// <param name="Item">The retrived "Item" record.</param>
     [IntegrationEvent(false, false)]
-    local procedure OnValidateItemNoOnAfterGetItem(var ItemJournalLine: Record "Item Journal Line"; Item: Record Item)
+    local procedure OnValidateItemNoOnAfterGetItem(var ItemJournalLine: Record "Item Journal Line"; Item: Record Item; var SkipInventoryValueZeroCheck: Boolean)
     begin
     end;
 
@@ -4748,14 +4747,6 @@ table 83 "Item Journal Line"
     local procedure OnValidateAppliestoEntryOnAfterCalcShouldCheckItemLedgEntryFieldsForOutput(var ItemJournalLine: Record "Item Journal Line"; var ItemLedgerEntry: Record "Item Ledger Entry"; var ShouldCheckItemLedgEntryFieldsForOutput: Boolean)
     begin
     end;
-
-#if not CLEAN26
-    [Obsolete('Replaced by event OnValidateOrderNoOnAfterCopyFromAssemblyHeader in codeunit Asm. Item Journal Mgt.', '26.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateOrderNoOnAfterProcessOrderTypeAssembly(var ItemJournalLine: Record "Item Journal Line"; ProductionOrder: Record Microsoft.Manufacturing.Document."Production Order"; AssemblyHeader: Record Microsoft.Assembly.Document."Assembly Header")
-    begin
-    end;
-#endif
 
     /// <summary>
     /// Event triggered when the "Order Type" is recognized as an unhandled case during the validation of the "Order No." field.
@@ -4907,14 +4898,6 @@ table 83 "Item Journal Line"
     begin
     end;
 
-#if not CLEAN26
-    [Obsolete('Replaced by event OnValidateItemNoOnSetCostAndPrice', '26.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnValidateItemNoOnAfterCalcUnitAmount(var ItemJournalLine: Record "Item Journal Line"; WorkCenter: Record Microsoft.Manufacturing.WorkCenter."Work Center"; MachineCenter: Record Microsoft.Manufacturing.MachineCenter."Machine Center")
-    begin
-    end;
-#endif
-
     [IntegrationEvent(false, false)]
     local procedure OnValidateItemNoOnSetCostAndPrice(var ItemJournalLine: Record "Item Journal Line"; UnitCost: Decimal)
     begin
@@ -4969,6 +4952,11 @@ table 83 "Item Journal Line"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckTrackingIfRequired(ItemJournalLine: Record "Item Journal Line"; ItemTrackingSetup: Record "Item Tracking Setup");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnAfterCheckNewTrackingIfRequired(ItemJournalLine: Record "Item Journal Line"; ItemTrackingSetup: Record "Item Tracking Setup");
     begin
     end;
@@ -5012,6 +5000,11 @@ table 83 "Item Journal Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterShowDimensions(var ItemJournalLine: Record "Item Journal Line"; var xItemJournalLine: Record "Item Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterShowReclasDimensions(var ItemJournalLine: Record "Item Journal Line"; var xItemJournalLine: Record "Item Journal Line")
     begin
     end;
 
@@ -5304,6 +5297,11 @@ table 83 "Item Journal Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateNewDimOnBeforeUpdateGlobalDimFromDimSetID(var ItemJournalLine: Record "Item Journal Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCreateNewDimFromDefaultDim(var ItemJournalLine: Record "Item Journal Line"; xItemJournalLine: Record "Item Journal Line")
     begin
     end;
 

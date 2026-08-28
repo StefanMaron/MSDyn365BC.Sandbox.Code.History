@@ -31,7 +31,12 @@ codeunit 10860 "Payment Management"
     ObsoleteTag = '28.0';
 
     trigger OnRun()
+    var
+        IsHandled: Boolean;
     begin
+        OnBeforeRun(IsHandled);
+        if IsHandled then
+            exit;
         CreatePaymentHeaders();
     end;
 
@@ -1111,7 +1116,7 @@ codeunit 10860 "Payment Management"
         GenJnlLine."Shortcut Dimension 2 Code" := InvPostingBuffer[1]."Global Dimension 2 Code";
         GenJnlLine."Dimension Set ID" := InvPostingBuffer[1]."Dimension Set ID";
 
-        OnPostInvPostingBufferOnBeforeGenJnlPostLineRunWithCheck(GenJnlLine, PaymentHeader, PaymentClass, PaymentLine);
+        OnPostInvPostingBufferOnBeforeGenJnlPostLineRunWithCheck(GenJnlLine, PaymentHeader, PaymentClass, PaymentLine, InvPostingBuffer[1]);
         GenJnlPostLine.RunWithCheck(GenJnlLine);
         GLEntry.SetRange("Document Type", GenJnlLine."Document Type");
         GLEntry.SetRange("Document No.", GenJnlLine."Document No.");
@@ -1176,7 +1181,7 @@ codeunit 10860 "Payment Management"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnPostInvPostingBufferOnBeforeGenJnlPostLineRunWithCheck(var GenJnlLine: Record "Gen. Journal Line"; var PaymentHeader: Record "Payment Header"; var PaymentClass: Record "Payment Class"; PaymentLine: Record "Payment Line")
+    local procedure OnPostInvPostingBufferOnBeforeGenJnlPostLineRunWithCheck(var GenJnlLine: Record "Gen. Journal Line"; var PaymentHeader: Record "Payment Header"; var PaymentClass: Record "Payment Class"; PaymentLine: Record "Payment Line"; InvPostingBuffer: Record "Payment Post. Buffer" temporary)
     begin
     end;
 
@@ -1192,6 +1197,11 @@ codeunit 10860 "Payment Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnSetPostingGroupOnBeforeCheckPostingGroup(var PaymentLine: Record "Payment Line"; var StepLedger: record "Payment Step Ledger"; var PostingGroup: Code[20])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeRun(var IsHandled: Boolean)
     begin
     end;
 }

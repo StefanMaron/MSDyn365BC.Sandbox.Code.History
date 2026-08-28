@@ -14,6 +14,7 @@ using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Posting;
 using Microsoft.Inventory.Setup;
 using Microsoft.Purchases.Document;
+using Microsoft.Sales.History;
 using Microsoft.Utilities;
 using Microsoft.Warehouse.History;
 using Microsoft.Warehouse.Journal;
@@ -58,6 +59,7 @@ codeunit 5813 "Undo Purchase Receipt Line"
         ItemsToAdjust: List of [Code[20]];
         HideDialog: Boolean;
         JobItem: Boolean;
+        UndoSalesShptLineExists: Boolean;
         NextLineNo: Integer;
 
 #pragma warning disable AA0074
@@ -67,8 +69,9 @@ codeunit 5813 "Undo Purchase Receipt Line"
         Text003: Label 'Checking lines...';
         Text004: Label 'This receipt has already been invoiced. Undo Receipt can be applied only to posted, but not invoiced receipts.';
 #pragma warning restore AA0074
-        NoLinesForCorrectionErr: Label 'There is no lines with quantity to process.';
+        NoLinesToReverseErr: Label 'No lines with a quantity available for reversal were found among the selected lines. Select a line with a quantity that has not already been reversed, and try again.';
         AlreadyReversedErr: Label 'This receipt has already been reversed.';
+        AmbiguousDropShipmentLinkErr: Label 'The posted sales shipment line for drop shipment line %1 in posted purchase receipt %2 cannot be identified, because sales order %3 has more than one matching posted shipment line. Undo the shipment from the posted sales shipment instead.', Comment = '%1 - Purch. Rcpt. Line No., %2 - Purch. Rcpt. Header No., %3 - Sales Order No.';
 
     procedure SetHideDialog(NewHideDialog: Boolean)
     begin
@@ -83,6 +86,7 @@ codeunit 5813 "Undo Purchase Receipt Line"
         ItemRcptEntryNo: Integer;
         DocLineNo: Integer;
         PostedWhseRcptLineFound: Boolean;
+        ShouldFindPostedWhseRcptLine: Boolean;
     begin
         OnBeforeCode(PurchRcptLine, UndoPostingMgt);
 
@@ -102,7 +106,11 @@ codeunit 5813 "Undo Purchase Receipt Line"
             if not HideDialog then
                 Window.Open(Text001);
 
-            if PurchRcptLine.Type = PurchRcptLine.Type::Item then begin
+            UndoDropShipmentPurchRcptLine(PurchRcptLine);
+
+            ShouldFindPostedWhseRcptLine := PurchRcptLine.Type = PurchRcptLine.Type::Item;
+            OnCodeOnBeforeFindPostedWhseRcptLine(PurchRcptLine, ShouldFindPostedWhseRcptLine);
+            if ShouldFindPostedWhseRcptLine then begin
                 PostedWhseRcptLineFound :=
                 WhseUndoQty.FindPostedWhseRcptLine(
                     PostedWhseRcptLine,
@@ -165,7 +173,7 @@ codeunit 5813 "Undo Purchase Receipt Line"
         PurchRcptLine.SetRange(Correction, false);
         OnCheckPurchRcptLinesAfterPurchRcptLineSetFilters(PurchRcptLine);
         if PurchRcptLine.IsEmpty() then
-            Error(NoLinesForCorrectionErr);
+            Error(NoLinesToReverseErr);
 
         PurchRcptLine.FindFirst();
         repeat
@@ -202,6 +210,8 @@ codeunit 5813 "Undo Purchase Receipt Line"
                     if UndoPostingMgt.CollectOutputItemLedgEntriesForSubcontructingPurcReceiptLine(TempItemLedgEntry, PurchRcptLine) then
                         UndoPostingMgt.CheckItemLedgEntries(TempItemLedgEntry, PurchRcptLine."Line No.", PurchRcptLine."Qty. Rcd. Not Invoiced" <> PurchRcptLine.Quantity);
                 end else begin
+                    if (PurchRcptLine."Sales Order No." <> '') and (PurchRcptLine."Sales Order Line No." <> 0) then
+                        exit;
                     UndoPostingMgt.CollectItemLedgEntries(TempItemLedgEntry, DATABASE::"Purch. Rcpt. Line",
                       PurchRcptLine."Document No.", PurchRcptLine."Line No.", PurchRcptLine."Quantity (Base)", PurchRcptLine."Item Rcpt. Entry No.");
                     UndoPostingMgt.CheckItemLedgEntries(TempItemLedgEntry, PurchRcptLine."Line No.", PurchRcptLine."Qty. Rcd. Not Invoiced" <> PurchRcptLine.Quantity);
@@ -283,6 +293,7 @@ codeunit 5813 "Undo Purchase Receipt Line"
         ItemJnlLine."Shortcut Dimension 1 Code" := PurchRcptLine."Shortcut Dimension 1 Code";
         ItemJnlLine."Shortcut Dimension 2 Code" := PurchRcptLine."Shortcut Dimension 2 Code";
         ItemJnlLine."Dimension Set ID" := PurchRcptLine."Dimension Set ID";
+        ItemJnlLine.Description := PurchRcptLine.Description;
 
         if PurchRcptLine."Job No." = '' then begin
             ItemJnlLine.Correction := true;
@@ -580,6 +591,80 @@ codeunit 5813 "Undo Purchase Receipt Line"
             ItemsToAdjust.Add(Item2."No.");
     end;
 
+    local procedure UndoDropShipmentPurchRcptLine(var PurchRcptLine: Record "Purch. Rcpt. Line")
+    var
+        SalesShipmentLine: Record "Sales Shipment Line";
+        UndoSalesShipmentLine: Codeunit "Undo Sales Shipment Line";
+    begin
+        if (PurchRcptLine."Sales Order No." = '') and (PurchRcptLine."Sales Order Line No." = 0) then
+            exit;
+
+        if UndoSalesShptLineExists then
+            exit;
+
+        FindSalesShipmentLine(SalesShipmentLine, PurchRcptLine);
+
+        UndoSalesShipmentLine.SetHideDialog(true);
+        UndoSalesShipmentLine.SetCalledFromUndoPurchaseReceiptLine(true);
+        UndoSalesShipmentLine.Run(SalesShipmentLine);
+    end;
+
+    local procedure FindSalesShipmentLine(var SalesShipmentLine: Record "Sales Shipment Line"; PurchRcptLine: Record "Purch. Rcpt. Line")
+    var
+        InboundItemLedgerEntry, OutboundItemLedgerEntry : Record "Item Ledger Entry";
+        ItemApplicationEntry: Record "Item Application Entry";
+    begin
+        InboundItemLedgerEntry.SetLoadFields("Document No.", "Document Line No.", "Entry No.");
+        InboundItemLedgerEntry.SetRange("Document No.", PurchRcptLine."Document No.");
+        InboundItemLedgerEntry.SetRange("Document Line No.", PurchRcptLine."Line No.");
+        if InboundItemLedgerEntry.FindFirst() then begin
+            ItemApplicationEntry.SetLoadFields("Inbound Item Entry No.", "Outbound Item Entry No.");
+            ItemApplicationEntry.SetRange("Inbound Item Entry No.", InboundItemLedgerEntry."Entry No.");
+            ItemApplicationEntry.SetFilter("Outbound Item Entry No.", '<>%1', 0);
+            if ItemApplicationEntry.FindFirst() then begin
+                OutboundItemLedgerEntry.Get(ItemApplicationEntry."Outbound Item Entry No.");
+
+                SalesShipmentLine.SetRange("Document No.", OutboundItemLedgerEntry."Document No.");
+                SalesShipmentLine.SetRange("Line No.", OutboundItemLedgerEntry."Document Line No.");
+
+                if (OutboundItemLedgerEntry."Lot No." = '') and (OutboundItemLedgerEntry."Serial No." = '') then begin
+                    SalesShipmentLine.SetRange("Item Shpt. Entry No.", OutboundItemLedgerEntry."Entry No.");
+                    if SalesShipmentLine.FindFirst() then
+                        exit;
+
+                    SalesShipmentLine.SetRange("Item Shpt. Entry No.");
+                end;
+
+                if SalesShipmentLine.FindFirst() then
+                    exit;
+            end;
+        end;
+
+        FindSalesShipmentLineByDropShipmentLink(SalesShipmentLine, PurchRcptLine);
+    end;
+
+    local procedure FindSalesShipmentLineByDropShipmentLink(var SalesShipLine: Record "Sales Shipment Line"; PurchReceiptLine: Record "Purch. Rcpt. Line")
+    begin
+        SalesShipLine.Reset();
+        SalesShipLine.SetRange("Order No.", PurchReceiptLine."Sales Order No.");
+        SalesShipLine.SetRange("Order Line No.", PurchReceiptLine."Sales Order Line No.");
+        SalesShipLine.SetRange("Purchase Order No.", PurchReceiptLine."Order No.");
+        SalesShipLine.SetRange("Purch. Order Line No.", PurchReceiptLine."Order Line No.");
+        SalesShipLine.SetRange("Drop Shipment", true);
+        SalesShipLine.SetRange(Correction, false);
+        SalesShipLine.SetRange(Quantity, PurchReceiptLine.Quantity);
+
+        if SalesShipLine.Count() > 1 then
+            Error(AmbiguousDropShipmentLinkErr, PurchReceiptLine."Line No.", PurchReceiptLine."Document No.", PurchReceiptLine."Sales Order No.");
+
+        SalesShipLine.FindFirst();
+    end;
+
+    procedure IsUndoSalesShipmentLineForDropShipment(NewUndoSalesShptLineExists: Boolean)
+    begin
+        UndoSalesShptLineExists := NewUndoSalesShptLineExists;
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnAfterCode(var PurchRcptLine: Record "Purch. Rcpt. Line"; var UndoPostingManagement: Codeunit "Undo Posting Management")
     begin
@@ -592,6 +677,11 @@ codeunit 5813 "Undo Purchase Receipt Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInsertNewReceiptLine(var PurchRcptLine: Record "Purch. Rcpt. Line"; PostedWhseReceiptLine: Record "Posted Whse. Receipt Line"; var PostedWhseRcptLineFound: Boolean; DocLineNo: Integer; var PostedWhseRcptLine: Record "Posted Whse. Receipt Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCodeOnBeforeFindPostedWhseRcptLine(var PurchRcptLine: Record "Purch. Rcpt. Line"; var ShouldFindPostedWhseRcptLine: Boolean)
     begin
     end;
 

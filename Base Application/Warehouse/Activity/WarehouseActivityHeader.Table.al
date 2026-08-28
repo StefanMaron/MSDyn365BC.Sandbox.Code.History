@@ -11,7 +11,7 @@ using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Setup;
 using Microsoft.Inventory.Transfer;
-using Microsoft.Projects.Project.Job;
+using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
@@ -349,7 +349,10 @@ table 5766 "Warehouse Activity Header"
                             "Source Subtype" := AssemblyLine."Document Type"::Order.AsInteger();
                         end;
                     "Source Document"::"Job Usage":
-                        "Source Type" := Database::Job;
+                        begin
+                            "Source Type" := Database::"Job Planning Line";
+                            "Source Subtype" := 2; // Job Planning Line Status::Order
+                        end;
                     else
                         OnValidateSourceDocumentOnAssignSourceType(Rec);
                 end;
@@ -1049,6 +1052,24 @@ table 5766 "Warehouse Activity Header"
     internal procedure ProdWhseHandlingIsInventoryPutaway(Location: Record Location) Result: Boolean
     begin
         OnProdWhseHandlingIsInventoryPutaway(Location, Result);
+    end;
+
+    /// <summary>
+    /// Determines whether the inbound transfer should be posted in one step.
+    /// </summary>
+    /// <returns>True if the transfer should post shipment and receipt together; otherwise, false.</returns>
+    internal procedure PostInboundTransferInOneStep(): Boolean
+    var
+        TransferHeader: Record "Transfer Header";
+    begin
+        if Rec."Source Type" <> Database::"Transfer Line" then
+            exit(false);
+        if Rec.Type = "Warehouse Activity Type"::"Invt. Put-away" then
+            exit(false);
+
+        TransferHeader.SetLoadFields("Direct Transfer", "Transfer-to Code");
+        if TransferHeader.Get(Rec."Source No.") then
+            exit(TransferHeader.ShouldPostReceiptWithShipment());
     end;
 
     [IntegrationEvent(false, false)]

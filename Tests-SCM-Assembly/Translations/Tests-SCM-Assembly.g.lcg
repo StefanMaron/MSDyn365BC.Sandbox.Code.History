@@ -212,6 +212,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Assembly.Test)(LookupHint=Codeunit SCM Assembly Item Tracking - NamedType MessageWhsePickCreatedMsg)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 4118839715 - NamedType 3552982996" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Qty. to Handle (Base) in the item tracking]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Assembly.Test)(LookupHint=Codeunit SCM Assembly Item Tracking - NamedType QtyToHandleErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 4118839715 - NamedType 155376432" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[You must assign a serial number for item]]></Val>
@@ -264,6 +273,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Assembly.Test)(LookupHint=Codeunit SCM Assembly Order - NamedType CnfmRefreshLinesQst)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3611501519 - NamedType 1527931532" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Component %1 Quantity should be %2 but was %3]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Assembly.Test)(LookupHint=Codeunit SCM Assembly Order - NamedType ComponentQuantityshouldErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3611501519 - NamedType 134290712" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -606,6 +624,24 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Assembly.Test)(LookupHint=Codeunit SCM Assembly Whse. Handling - Method AssemblyConsumpAsNoWhseHandling_ThrowsNothingToCreateMsg - NamedType NothingToHandleErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1640954912 - NamedType 2805531367" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Running Calc. Assembly Std. Cost distorted the assembly output Cost Amount (Actual); a spurious Manufacturing Overhead variance was posted.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Assembly.Test)(LookupHint=Codeunit SCM Calculate Assembly Cost - NamedType AssemblyOutputCostDistortedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1640954912 - NamedType 2732855831" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Running Calc. Assembly Std. Cost distorted the assembly output indirect (Manufacturing Overhead) cost; the Cost Amount (Actual) no longer matches the rolled standard overhead.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Assembly.Test)(LookupHint=Codeunit SCM Calculate Assembly Cost - NamedType AssemblyOutputIndirectCostErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1640954912 - NamedType 2786924276" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -1643,6 +1679,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Assembly.Test)(LookupHint=Codeunit SCM Kitting - Undo - NamedType ATO_MUST_BE_NO)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2198777358 - NamedType 1631003675" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Number of Invt. Movement activities]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Assembly.Test)(LookupHint=Codeunit SCM Kitting - Undo - NamedType INVT_MVMT_CREATED_Msg)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2198777358 - NamedType 2477368592" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[has been created.]]></Val>
@@ -1740,6 +1785,24 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Assembly.Test)(LookupHint=Codeunit SCM Kitting - Undo - NamedType MSG_WANT_UNDO)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2198777358 - NamedType 201321100" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Whse. Item Tracking Lines should be deleted after undo and recreate]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Assembly.Test)(LookupHint=Codeunit SCM Kitting - Undo - NamedType WhseItemTrackingLinesShouldBeDeletedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2198777358 - NamedType 2943079835" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Whse. Item Tracking Lines should exist after registering inventory movement]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Assembly.Test)(LookupHint=Codeunit SCM Kitting - Undo - NamedType WhseItemTrackingLinesShouldExistErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1583753357 - NamedType 1769477864" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">

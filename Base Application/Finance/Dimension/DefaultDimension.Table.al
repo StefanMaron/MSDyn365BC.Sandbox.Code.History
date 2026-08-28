@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -44,6 +44,7 @@ table 352 "Default Dimension"
         field(1; "Table ID"; Integer)
         {
             Caption = 'Table ID';
+            ToolTip = 'Specifies a table ID for the account type if you are specifying default dimensions for an entire account type.';
             NotBlank = true;
             TableRelation = AllObjWithCaption."Object ID" where("Object Type" = const(Table));
 
@@ -84,6 +85,7 @@ table 352 "Default Dimension"
         field(2; "No."; Code[20])
         {
             Caption = 'No.';
+            ToolTip = 'Specifies the account number you wish to define a default dimension for.';
 
             trigger OnValidate()
             var
@@ -111,6 +113,7 @@ table 352 "Default Dimension"
         field(3; "Dimension Code"; Code[20])
         {
             Caption = 'Dimension Code';
+            ToolTip = 'Specifies the code for the default dimension.';
             NotBlank = true;
             TableRelation = Dimension;
 
@@ -130,6 +133,7 @@ table 352 "Default Dimension"
         field(4; "Dimension Value Code"; Code[20])
         {
             Caption = 'Dimension Value Code';
+            ToolTip = 'Specifies the dimension value code to suggest as the default dimension.';
             TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code"),
                                                          Blocked = const(false));
 
@@ -146,6 +150,7 @@ table 352 "Default Dimension"
         field(5; "Value Posting"; Enum "Default Dimension Value Posting Type")
         {
             Caption = 'Value Posting';
+            ToolTip = 'Specifies how default dimensions and their values must be used.';
 
             trigger OnValidate()
             var
@@ -166,6 +171,7 @@ table 352 "Default Dimension"
             CalcFormula = lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Table),
                                                                            "Object ID" = field("Table ID")));
             Caption = 'Table Caption';
+            ToolTip = 'Specifies the table name for the account type you wish to define a default dimension for.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -208,6 +214,7 @@ table 352 "Default Dimension"
         field(10; "Allowed Values Filter"; Text[250])
         {
             Caption = 'Allowed Values Filter';
+            ToolTip = 'Specifies the dimension values that can be used for the selected account.';
 
             trigger OnValidate()
             var
@@ -233,6 +240,7 @@ table 352 "Default Dimension"
         {
             CalcFormula = lookup("Dimension Value".Name where("Dimension Code" = field("Dimension Code"), Code = field("Dimension Value Code")));
             Caption = 'Dimension Value Name';
+            ToolTip = 'Specifies the name of selected dimension value.';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -871,25 +879,55 @@ table 352 "Default Dimension"
     end;
 
     /// <summary>
-    /// Creates a dimension value per account record from a dimension value.
-    /// Used to populate allowed dimension values for account-specific dimension restrictions.
+    /// Creates or updates a dimension value per account record from a dimension value.
+    /// Sets the Allowed flag to the value of ShouldUpdateAllowed.
     /// </summary>
     /// <param name="DimValue">The dimension value to create the account-specific record from.</param>
-    /// <param name="ShouldUpdateAllowed">Indicates whether to mark the dimension value as allowed.</param>
+    /// <param name="ShouldUpdateAllowed">The value to set on the Allowed field of the dimension value per account record.</param>
     procedure CreateDimValuePerAccountFromDimValue(DimValue: Record "Dimension Value"; ShouldUpdateAllowed: Boolean)
     var
         DimValuePerAccount: Record "Dim. Value per Account";
     begin
+        if DimValuePerAccount.Get("Table ID", "No.", DimValue."Dimension Code", DimValue.Code) then begin
+            if DimValuePerAccount.Allowed <> ShouldUpdateAllowed then begin
+                DimValuePerAccount.Allowed := ShouldUpdateAllowed;
+                DimValuePerAccount.Modify();
+            end;
+            exit;
+        end;
         DimValuePerAccount.Init();
         DimValuePerAccount."Dimension Code" := DimValue."Dimension Code";
         DimValuePerAccount."Dimension Value Code" := DimValue.Code;
         DimValuePerAccount."Table ID" := "Table ID";
         DimValuePerAccount."No." := "No.";
-        if not ShouldUpdateAllowed then
-            DimValuePerAccount.Allowed := false
-        else
-            DimValuePerAccount.Allowed := IncludedInAllowedValuesFilter(DimValuePerAccount);
+        DimValuePerAccount.Allowed := ShouldUpdateAllowed;
         DimValuePerAccount.Insert();
+    end;
+
+    /// <summary>
+    /// Adds a dimension value to the allowed values filter without rebuilding from Dim. Value per Account records.
+    /// Appends the value code to the filter text if not already covered by the existing filter.
+    /// </summary>
+    /// <param name="DimValueCode">The dimension value code to add to the allowed values filter.</param>
+    procedure AddDimensionValueToAllowedFilter(DimValueCode: Code[20])
+    var
+        TempDimValuePerAccount: Record "Dim. Value per Account" temporary;
+    begin
+        if "Allowed Values Filter" = '' then
+            exit;
+        TempDimValuePerAccount.Init();
+        TempDimValuePerAccount."Table ID" := "Table ID";
+        TempDimValuePerAccount."No." := "No.";
+        TempDimValuePerAccount."Dimension Code" := "Dimension Code";
+        TempDimValuePerAccount."Dimension Value Code" := DimValueCode;
+        TempDimValuePerAccount.Insert();
+        TempDimValuePerAccount.SetFilter("Dimension Value Code", "Allowed Values Filter");
+        if not TempDimValuePerAccount.IsEmpty() then
+            exit;
+        if StrLen("Allowed Values Filter") + 1 + StrLen(DimValueCode) <= MaxStrLen("Allowed Values Filter") then begin
+            "Allowed Values Filter" := CopyStr("Allowed Values Filter" + '|' + DimValueCode, 1, MaxStrLen("Allowed Values Filter"));
+            Modify();
+        end;
     end;
 
     /// <summary>
@@ -1854,25 +1892,6 @@ table 352 "Default Dimension"
     local procedure OnUpdateVendorTemplGlobalDimCodeCaseElse(GlobalDimCodeNo: Integer; VendorTemplCode: Code[20]; NewDimValue: Code[20])
     begin
     end;
-
-#if not CLEAN26
-    internal procedure RunOnUpdateWorkCenterGlobalDimCodeCaseElse(GlobalDimCodeNo: Integer; WorkCenterNo: Code[20]; NewDimValue: Code[20])
-    begin
-        OnUpdateWorkCenterGlobalDimCodeCaseElse(GlobalDimCodeNo, WorkCenterNo, NewDimValue);
-    end;
-
-    /// <summary>
-    /// Integration event raised when updating work center global dimension code for cases not handled by standard processing.
-    /// </summary>
-    /// <param name="GlobalDimCodeNo">Global dimension code number being updated</param>
-    /// <param name="WorkCenterNo">Work center number being updated</param>
-    /// <param name="NewDimValue">New dimension value to assign</param>
-    [Obsolete('Moved to codeunit Mfg. Dimension Management', '26.0')]
-    [IntegrationEvent(false, false)]
-    local procedure OnUpdateWorkCenterGlobalDimCodeCaseElse(GlobalDimCodeNo: Integer; WorkCenterNo: Code[20]; NewDimValue: Code[20])
-    begin
-    end;
-#endif
 
     /// <summary>
     /// Integration event raised before setting range filter to the last field in primary key during default dimension validation.

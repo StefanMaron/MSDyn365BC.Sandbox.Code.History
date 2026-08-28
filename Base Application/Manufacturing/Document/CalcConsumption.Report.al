@@ -33,11 +33,18 @@ report 5405 "Calc. Consumption"
                     NeededQty: Decimal;
                     IsHandled: Boolean;
                 begin
+                    if ("Flushing Method" = "Flushing Method"::Forward) and
+                       ("Routing Link Code" <> '') then
+                        CurrReport.Skip();
+
                     Window.Update(2, "Item No.");
 
                     Clear(ItemJnlLine);
                     Item.Get("Item No.");
-                    ProdOrderLine.Get(Status, "Prod. Order No.", "Prod. Order Line No.");
+                    IsHandled := false;
+                    OnAfterGetRecordProdOrderCompOnBeforeGetProdOrderLine(Status, "Prod. Order No.", "Prod. Order Line No.", ProdOrderLine, IsHandled);
+                    if not IsHandled then
+                        ProdOrderLine.Get(Status, "Prod. Order No.", "Prod. Order Line No.");
 
                     IsHandled := false;
                     OnBeforeGetNeededQty(NeededQty, CalcBasedOn, "Prod. Order Component", "Production Order", PostingDate, IsHandled);
@@ -196,9 +203,6 @@ report 5405 "Calc. Consumption"
     procedure CreateConsumpJnlLine(LocationCode: Code[10]; BinCode: Code[20]; OriginalQtyToPost: Decimal)
     var
         Location: Record Location;
-#if not CLEAN26
-        ManufacturingSetup: Record Microsoft.Manufacturing.Setup."Manufacturing Setup";
-#endif
         QtyToPost: Decimal;
         ShouldModifyItemJnlLine: Boolean;
         ShouldAdjustQty: Boolean;
@@ -208,12 +212,7 @@ report 5405 "Calc. Consumption"
 
         Window.Update(3, QtyToPost);
 
-#if not CLEAN26
-        if not ManufacturingSetup.IsFeatureKeyFlushingMethodManualWithoutPickEnabled() then
-            ShouldAdjustQty := "Prod. Order Component"."Flushing Method" in ["Prod. Order Component"."Flushing Method"::Manual, "Prod. Order Component"."Flushing Method"::"Pick + Manual", "Prod. Order Component"."Flushing Method"::Forward, "Prod. Order Component"."Flushing Method"::"Pick + Forward"]
-        else
-#endif
-            ShouldAdjustQty := "Prod. Order Component"."Flushing Method" in ["Prod. Order Component"."Flushing Method"::"Pick + Manual", "Prod. Order Component"."Flushing Method"::Forward, "Prod. Order Component"."Flushing Method"::"Pick + Forward"];
+        ShouldAdjustQty := "Prod. Order Component"."Flushing Method" in ["Prod. Order Component"."Flushing Method"::"Pick + Manual", "Prod. Order Component"."Flushing Method"::Forward, "Prod. Order Component"."Flushing Method"::"Pick + Forward"];
         if ShouldAdjustQty then begin
             Location.SetLoadFields("Prod. Consump. Whse. Handling");
             if Location.Get(LocationCode) and (Location."Prod. Consump. Whse. Handling" = Location."Prod. Consump. Whse. Handling"::"Warehouse Pick (mandatory)") then
@@ -413,6 +412,11 @@ report 5405 "Calc. Consumption"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeGetNeededQty(var NeededQty: Decimal; CalcBasedOn: Option "Actual Output","Expected Output"; ProdOrderComponent: Record "Prod. Order Component"; ProductionOrder: Record "Production Order"; PostingDate: Date; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetRecordProdOrderCompOnBeforeGetProdOrderLine(ProductionOrderStatus: Enum "Production Order Status"; ProductionOrderNo: Code[20]; ProductionOrderLineNo: Integer; var ProdOrderLine: Record "Prod. Order Line"; var IsHandled: Boolean)
     begin
     end;
 }
