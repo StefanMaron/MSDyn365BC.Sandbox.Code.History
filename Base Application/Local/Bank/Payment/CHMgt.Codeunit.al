@@ -239,6 +239,29 @@ codeunit 11503 CHMgt
         exit(CopyStr(DtaMgt.IBANDELCHR(IBAN), 1, 2) in ['CH', 'LI']);
     end;
 
+    /// <summary>
+    /// Extracts the Swiss bank clearing number (IID) from a domestic (CH/LI) IBAN.
+    /// </summary>
+    /// <param name="IBAN">The IBAN to read the clearing number from.</param>
+    /// <returns>The clearing number from IBAN positions 5-9 with leading zeros stripped, or an empty code if the IBAN is not a domestic IBAN or is too short.</returns>
+    internal procedure GetClearingNoFromIBAN(IBAN: Code[50]) ClearingNo: Code[5]
+    var
+        DtaMgt: Codeunit DtaMgt;
+        PureIBAN: Text;
+    begin
+        // Swiss/Liechtenstein IBANs carry the 5-digit bank clearing number (IID) in positions 5-9,
+        // so it can be derived from the IBAN without a separately maintained Clearing No.
+        if not IsDomesticIBAN(IBAN) then
+            exit('');
+
+        // IBANDELCHR expects Code[37]; IBANs are at most 34 characters, so this never truncates real data.
+        PureIBAN := DtaMgt.IBANDELCHR(CopyStr(IBAN, 1, 37));
+        if StrLen(PureIBAN) < 9 then
+            exit('');
+
+        ClearingNo := CopyStr(DelChr(CopyStr(PureIBAN, 5, 5), '<', '0'), 1, 5);
+    end;
+
     procedure IsDomesticCurrency(CurrencyCode: Code[10]): Boolean
     var
         DtaMgt: Codeunit DtaMgt;
@@ -333,10 +356,13 @@ codeunit 11503 CHMgt
         exit('957D62D7-3D00-4C8F-A3B0-D14DBC9EC4FD');
     end;
 
+#if not CLEAN29
+    [Obsolete('The batch booking behavior is now configurable per bank account via the SEPA CT Batch Booking field.', '29.0')]
     procedure NoOfPaymentsForBatchBooking(): Integer
     begin
         exit(50);
     end;
+#endif
 
     [EventSubscriber(ObjectType::Report, Report::"Suggest Vendor Payments", 'OnBeforeUpdateGnlJnlLineDimensionsFromVendorPaymentBuffer', '', false, false)]
     local procedure SuggestVendorPaymentFromBufferUpdatePaymentLine(var GenJournalLine: Record "Gen. Journal Line"; TempVendorPaymentBuffer: Record "Vendor Payment Buffer" temporary)

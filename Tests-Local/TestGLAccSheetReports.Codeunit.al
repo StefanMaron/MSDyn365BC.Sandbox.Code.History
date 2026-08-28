@@ -11,14 +11,14 @@ codeunit 144035 "Test G/L Acc Sheet Reports"
 
     var
         Assert: Codeunit Assert;
-        LibraryVariableStorage: Codeunit "Library - Variable Storage";
-        LibrarySales: Codeunit "Library - Sales";
-        LibraryPurchase: Codeunit "Library - Purchase";
-        LibraryERM: Codeunit "Library - ERM";
         LibraryCH: Codeunit "Library - CH";
+        LibraryERM: Codeunit "Library - ERM";
         LibraryFixedAsset: Codeunit "Library - Fixed Asset";
-        LibraryReportDataset: Codeunit "Library - Report Dataset";
+        LibraryPurchase: Codeunit "Library - Purchase";
         LibraryRandom: Codeunit "Library - Random";
+        LibraryReportDataset: Codeunit "Library - Report Dataset";
+        LibrarySales: Codeunit "Library - Sales";
+        LibraryVariableStorage: Codeunit "Library - Variable Storage";
         isInitialised: Boolean;
 
     [Test]
@@ -1057,9 +1057,9 @@ codeunit 144035 "Test G/L Acc Sheet Reports"
 
         // [GIVEN] Get a Receivable Account.
         GLAccount.Get(CustomerPostingGroup."Receivables Account");
-        GLAccount.Validate("Source Currency Posting", GLAccount."Source Currency Posting"::"Same Currency");
-        GLAccount.Validate("Source Currency Code", CurrencyCode);
-        GLAccount.Modify(true);
+        // GLAccount.Validate("Source Currency Posting", GLAccount."Source Currency Posting"::"Same Currency");
+        // GLAccount.Validate("Source Currency Code", CurrencyCode);
+        // GLAccount.Modify(true);
 
         // [GIVEN] Create a General Journal Batch.
         CreateGeneralJournalBatch(GenJournalBatch, GenJournalTemplateType);
@@ -1079,6 +1079,152 @@ codeunit 144035 "Test G/L Acc Sheet Reports"
 
         // [THEN] Verify Foreign Currency Amounts.
         // VerifyGLAccForeignCurrReportValues(GLAccount, CurrencyCode, DocumentNo, AmountFCY) - skip verifivcation
+    end;
+
+    [Test]
+    [HandlerFunctions('GLAccSheetFCYWithDateFilterRPH')]
+    procedure GLSheetForeignCurrNoErrorWhenSourceCurrCodeBlank()
+    var
+        GLAccount: Record "G/L Account";
+        BalGLAccount: Record "G/L Account";
+        GenJournalLine: Record "Gen. Journal Line";
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO 633662] Report does not error when G/L Account has blank Source Currency Code and date filter is set
+        Initialize();
+
+        // [GIVEN] Create a  new G/L Account with blank Source Currency Code and posted entries.
+        LibraryERM.CreateGLAccount(GLAccount);
+        GLAccount.Validate("Account Type", GLAccount."Account Type"::Posting);
+        GLAccount.Validate("Income/Balance", GLAccount."Income/Balance"::"Balance Sheet");
+        GLAccount.Modify(true);
+        SetupVAT(GLAccount, 0);
+
+        // [GIVEN] Posted G/L Entry for G/L Account.
+        LibraryERM.CreateGLAccount(BalGLAccount);
+        SetupVAT(BalGLAccount, 0);
+        CreateGenJournalLine(
+            GenJournalLine, GLAccount, GenJournalLine."Bal. Account Type"::"G/L Account", BalGLAccount."No.",
+            LibraryRandom.RandIntInRange(1000, 2000), '');
+        LibraryERM.PostGeneralJnlLine(GenJournalLine);
+
+        // [WHEN] Run G/L Acc Sheet Foreign Currency report with date filter.
+        GLAccount.SetRange("No.", GLAccount."No.");
+        LibraryVariableStorage.Enqueue(GLAccount."No.");
+        LibraryVariableStorage.Enqueue(Format(WorkDate()) + '..' + Format(WorkDate()));
+        LibraryVariableStorage.Enqueue(false);
+        RunSRGLAccSheetForeignCurrReport(GLAccount);
+
+        // [THEN] Report runs without error and account is shown with zero FCY balance.
+        LibraryReportDataset.LoadDataSetFile();
+        LibraryReportDataset.SetRange('No_GLAccount', GLAccount."No.");
+        LibraryReportDataset.GetNextRow();
+        LibraryReportDataset.AssertCurrentRowValueEquals('CurrencyCode_GLAccount', '');
+        LibraryVariableStorage.AssertEmpty();
+    end;
+
+    [Test]
+    [HandlerFunctions('GLAccSheetFCYWithDateFilterRPH')]
+    procedure GLSheetForeignCurrNoErrorBlankCurrShowAllAccounts()
+    var
+        GLAccount: Record "G/L Account";
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO 633662] Report does not error for account with no balance, blank Source Currency Code and ShowAllAccounts
+        Initialize();
+
+        // [GIVEN] Create a new G/L Account with blank Source Currency Code and no posted entries.
+        LibraryERM.CreateGLAccount(GLAccount);
+        GLAccount.Validate("Account Type", GLAccount."Account Type"::Posting);
+        GLAccount.Validate("Income/Balance", GLAccount."Income/Balance"::"Balance Sheet");
+        GLAccount.Modify(true);
+
+        // [WHEN] Run G/L Acc Sheet Foreign Currency report with ShowAllAccounts and date filter.
+        GLAccount.SetRange("No.", GLAccount."No.");
+        LibraryVariableStorage.Enqueue(GLAccount."No.");
+        LibraryVariableStorage.Enqueue(Format(WorkDate()) + '..' + Format(WorkDate()));
+        LibraryVariableStorage.Enqueue(true);
+        RunSRGLAccSheetForeignCurrReport(GLAccount);
+
+        // [THEN] Report runs without error and account appears with zero balances
+        LibraryReportDataset.LoadDataSetFile();
+        LibraryReportDataset.SetRange('No_GLAccount', GLAccount."No.");
+        Assert.AreNotEqual(0, LibraryReportDataset.RowCount(), 'Account should appear when ShowAllAccounts is enabled.');
+        LibraryReportDataset.GetNextRow();
+        LibraryReportDataset.AssertCurrentRowValueEquals('CurrencyCode_GLAccount', '');
+        LibraryReportDataset.AssertCurrentRowValueEquals('FcyAcyBalance', 0);
+        LibraryReportDataset.AssertCurrentRowValueEquals('GlBalance', 0);
+        LibraryVariableStorage.AssertEmpty();
+    end;
+
+    [Test]
+    [HandlerFunctions('GLAccSheetFCYReqPageHandler,GenJournalBatchesPageHandler')]
+    [Scope('OnPrem')]
+    procedure GLSheetForeignCurrExcludesMismatchedCurrencyEntries()
+    var
+        GenJournalTemplate: Record "Gen. Journal Template";
+        GLAccount: Record "G/L Account";
+        BalGLAccount: Record "G/L Account";
+        GenJournalLine: Record "Gen. Journal Line";
+        GLAccountSourceCurrency: Record "G/L Account Source Currency";
+        GLEntry: Record "G/L Entry";
+        CurrencyCode: Code[10];
+    begin
+        // [FEATURE] [SR G/L Acc Sheet Foreign Curr]
+        // [SCENARIO 642513] Report 11564 must not mix amounts posted in a currency other than the
+        // G/L Account's Source Currency Code (including LCY-originated entries) into the foreign currency totals.
+        Initialize();
+
+        // [GIVEN] G/L Account set up for "Multiple Currencies" source currency posting with "CurrencyCode" registered as a source currency.
+        LibraryERM.CreateGenJournalTemplate(GenJournalTemplate);
+        GenJournalTemplate.Validate(Type, GenJournalTemplate.Type::General);
+        GenJournalTemplate.Modify(true);
+
+        CurrencyCode := LibraryERM.CreateCurrencyWithExchangeRate(WorkDate(), LibraryRandom.RandDec(100, 2), LibraryRandom.RandDec(100, 2));
+
+        LibraryERM.CreateGLAccount(GLAccount);
+        GLAccount.Validate("Account Type", GLAccount."Account Type"::Posting);
+        GLAccount.Validate("Income/Balance", GLAccount."Income/Balance"::"Balance Sheet");
+        GLAccount.Validate("Source Currency Posting", GLAccount."Source Currency Posting"::"Multiple Currencies");
+        GLAccount.Modify(true);
+        GLAccount.SetRange("No.", GLAccount."No.");
+        GLAccount.SetRange("Date Filter", WorkDate(), WorkDate());
+
+        GLAccountSourceCurrency.Init();
+        GLAccountSourceCurrency."G/L Account No." := GLAccount."No.";
+        GLAccountSourceCurrency."Currency Code" := CurrencyCode;
+        GLAccountSourceCurrency.Insert();
+
+        LibraryERM.CreateGLAccount(BalGLAccount);
+
+        // [GIVEN] An entry posted in "CurrencyCode" (a registered source currency for the G/L Account).
+        CreateGenJournalLine(GenJournalLine, GLAccount,
+          GenJournalLine."Bal. Account Type"::"G/L Account", BalGLAccount."No.", LibraryRandom.RandIntInRange(1000, 2000), CurrencyCode);
+        LibraryERM.PostGeneralJnlLine(GenJournalLine);
+
+        // [GIVEN] An LCY-originated entry (blank currency code) posted to the same G/L Account.
+        CreateGenJournalLine(GenJournalLine, GLAccount,
+          GenJournalLine."Bal. Account Type"::"G/L Account", BalGLAccount."No.", LibraryRandom.RandIntInRange(1000, 2000), '');
+        LibraryERM.PostGeneralJnlLine(GenJournalLine);
+
+        // [WHEN] Run report 11564 "SR G/L Acc Sheet Foreign Curr"
+        RunSRGLAccSheetForeignCurrReport(GLAccount);
+
+        // [THEN] Only the entry posted in the registered source currency contributes to the foreign currency
+        // amount column; the LCY-originated entry is excluded (FcyAcyAmt = 0).
+        LibraryReportDataset.LoadDataSetFile();
+        GLEntry.SetRange("G/L Account No.", GLAccount."No.");
+        GLEntry.FindSet();
+        repeat
+            LibraryReportDataset.Reset();
+            LibraryReportDataset.SetRange('No_GLAccount', GLAccount."No.");
+            LibraryReportDataset.SetRange('DocumentNo_GLEntry', GLEntry."Document No.");
+            LibraryReportDataset.GetNextRow();
+            if GLEntry."Source Currency Code" = CurrencyCode then
+                LibraryReportDataset.AssertCurrentRowValueEquals('FcyAcyAmt', GLEntry."Source Currency Amount")
+            else
+                LibraryReportDataset.AssertCurrentRowValueEquals('FcyAcyAmt', 0);
+        until GLEntry.Next() = 0;
     end;
 
     local procedure Initialize()
@@ -1729,5 +1875,19 @@ codeunit 144035 "Test G/L Acc Sheet Reports"
     procedure DepreciationCalcConfirmHandler(Message: Text[1024]; var Reply: Boolean)
     begin
         Reply := false;
+    end;
+
+    [RequestPageHandler]
+    procedure GLAccSheetFCYWithDateFilterRPH(var SRGLAccSheetForeignCurr: TestRequestPage "SR G/L Acc Sheet Foreign Curr")
+    var
+        DateFilter: Variant;
+        GLAccountNo: Variant;
+    begin
+        LibraryVariableStorage.Dequeue(GLAccountNo);
+        LibraryVariableStorage.Dequeue(DateFilter);
+        SRGLAccSheetForeignCurr."G/L Account".SetFilter("No.", GLAccountNo);
+        SRGLAccSheetForeignCurr."G/L Account".SetFilter("Date Filter", DateFilter);
+        SRGLAccSheetForeignCurr.ShowAllAccounts.SetValue(LibraryVariableStorage.DequeueBoolean());
+        SRGLAccSheetForeignCurr.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
     end;
 }

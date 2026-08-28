@@ -277,6 +277,13 @@ page 51 "Purchase Invoice"
                 {
                     ApplicationArea = Basic, Suite;
                     ShowMandatory = VendorInvoiceNoMandatory;
+                    Editable = IsVendorInvoiceEditable;
+                }
+                field("Spend Request No."; Rec."Spend Request No.")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Importance = Additional;
+                    ToolTip = 'Specifies the spend request that this purchase document relates to.';
                 }
                 field("Purchaser Code"; Rec."Purchaser Code")
                 {
@@ -1102,25 +1109,6 @@ page 51 "Purchase Invoice"
             {
                 Caption = '&Invoice';
                 Image = Invoice;
-#if not CLEAN26
-                action(Statistics)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Caption = 'Statistics';
-                    Image = Statistics;
-                    ShortCutKey = 'F7';
-                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '26.0';
-
-                    trigger OnAction()
-                    begin
-                        Rec.OpenDocumentStatistics();
-                        CurrPage.PurchLines.Page.ForceTotalsCalculation();
-                    end;
-                }
-#endif
                 action(PurchaseStatistics)
                 {
                     ApplicationArea = Basic, Suite;
@@ -1128,11 +1116,7 @@ page 51 "Purchase Invoice"
                     Enabled = Rec."No." <> '';
                     Image = Statistics;
                     ShortCutKey = 'F7';
-#if CLEAN26
                     Visible = true;
-#else
-                    Visible = false;
-#endif
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Purchase Statistics";
                     RunPageOnRec = true;
@@ -1799,18 +1783,9 @@ page 51 "Purchase Invoice"
                 actionref(Dimensions_Promoted; Dimensions)
                 {
                 }
-#if not CLEAN26
-                actionref(Statistics_Promoted; Statistics)
-                {
-                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '26.0';
-                }
-#else
                 actionref(PurchaseStatistics_Promoted; PurchaseStatistics)
                 {
                 }
-#endif
                 actionref("Co&mments_Promoted"; "Co&mments")
                 {
                 }
@@ -1854,6 +1829,7 @@ page 51 "Purchase Invoice"
         CurrPage.ApprovalFactBox.PAGE.UpdateApprovalEntriesFromSourceRecord(Rec.RecordId);
         ShowWorkflowStatus := CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(Rec.RecordId);
         StatusStyleTxt := Rec.GetStatusStyleText();
+        Rec.GetContactDetails(BuyFromContact, PayToContact);
     end;
 
     trigger OnAfterGetRecord()
@@ -1862,9 +1838,9 @@ page 51 "Purchase Invoice"
     begin
         RejectICPurchaseInvoiceEnabled := ICInboxOutboxMgt.IsPurchaseHeaderFromIncomingIC(Rec);
         CalculateCurrentShippingAndPayToOption();
-        BuyFromContact.GetOrClear(Rec."Buy-from Contact No.");
-        PayToContact.GetOrClear(Rec."Pay-to Contact No.");
+        Rec.GetContactDetails(BuyFromContact, PayToContact);
         CurrPage.IncomingDocAttachFactBox.Page.SetCurrentRecordID(Rec.RecordId);
+        IsVendorInvoiceEditable := not Rec."Self-Billing Invoice";
 
         OnAfterOnAfterGetRecord(Rec);
     end;
@@ -1885,6 +1861,7 @@ page 51 "Purchase Invoice"
 
     trigger OnNewRecord(BelowxRec: Boolean)
     begin
+        Rec."Document Type" := Rec."Document Type"::Invoice;
         Rec."Responsibility Center" := UserMgt.GetPurchasesFilter();
 
         if (not DocNoVisible) and (Rec."No." = '') then begin
@@ -1928,13 +1905,15 @@ page 51 "Purchase Invoice"
         FillRemitToFields();
         RejectICPurchaseInvoiceEnabled := ICInboxOutboxMgt.IsPurchaseHeaderFromIncomingIC(Rec);
         if RejectICPurchaseInvoiceEnabled then begin
-            PurchaseHeader.SetRange("IC Direction", PurchaseHeader."IC Direction"::Incoming);
-            PurchaseHeader.SetRange("IC Reference Document No.", Rec."Vendor Order No.");
-            PurchaseHeader.SetRange("Buy-from IC Partner Code", Rec."Buy-from IC Partner Code");
-            PurchaseHeader.SetRange("Document Type", PurchaseHeader."Document Type"::Order);
-            if PurchaseHeader.FindFirst() then
-                ICInboxOutboxMgt.ShowDuplicateICDocumentWarning(PurchaseHeader);
-            PurchaseHeader.Reset();
+            if StrLen(Rec."Vendor Order No.") <= MaxStrLen(PurchaseHeader."IC Reference Document No.") then begin
+                PurchaseHeader.SetRange("IC Direction", PurchaseHeader."IC Direction"::Incoming);
+                PurchaseHeader.SetRange("IC Reference Document No.", Rec."Vendor Order No.");
+                PurchaseHeader.SetRange("Buy-from IC Partner Code", Rec."Buy-from IC Partner Code");
+                PurchaseHeader.SetRange("Document Type", PurchaseHeader."Document Type"::Order);
+                if PurchaseHeader.FindFirst() then
+                    ICInboxOutboxMgt.ShowDuplicateICDocumentWarning(PurchaseHeader);
+                PurchaseHeader.Reset();
+            end;
             if PurchaseHeader.Get(PurchaseHeader."Document Type"::Order, CopyStr(Rec."Your Reference", 1, MaxStrLen(Rec."No."))) then
                 if (PurchaseHeader."IC Direction" = PurchaseHeader."IC Direction"::Outgoing) and
                    (PurchaseHeader."Buy-from IC Partner Code" = Rec."Buy-from IC Partner Code") and
@@ -1942,6 +1921,7 @@ page 51 "Purchase Invoice"
                     ICInboxOutboxMgt.ShowDuplicateICDocumentWarning(PurchaseHeader, ICIncomingInvoiceFromOriginalOrderMsg);
         end;
         VATDateEnabled := VATReportingDateMgt.IsVATDateEnabled();
+        IsVendorInvoiceEditable := not Rec."Self-Billing Invoice";
     end;
 
     trigger OnQueryClosePage(CloseAction: Action): Boolean
@@ -2004,6 +1984,7 @@ page 51 "Purchase Invoice"
         RejectICPurchaseInvoiceEnabled: Boolean;
         VATDateEnabled: Boolean;
         DocAmountEnable, DocAmountsEditable : Boolean;
+        IsVendorInvoiceEditable: Boolean;
 
     protected var
         ShipToOptions: Option "Default (Company Address)",Location,"Custom Address";

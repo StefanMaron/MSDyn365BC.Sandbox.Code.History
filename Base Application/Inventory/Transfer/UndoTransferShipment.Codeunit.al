@@ -64,6 +64,7 @@ codeunit 9030 "Undo Transfer Shipment"
         AlreadyReceivedErr: Label 'This shipment has already been received. Undo Shipment can only be applied to posted, but not received Transfer Lines.';
         NoDerivedTransOrderLineNoErr: Label 'The Transfer Shipment Line is missing a value in the field Derived Trans. Order Line No. This is automatically populated when posting new Transfer Shipments';
         NoTransOrderLineNoErr: Label 'The Transfer Shipment Line is missing a value in the field Trans. Order Line No. This is automatically populated when posting new Transfer Shipments';
+        NoLinesToReverseErr: Label 'No lines with a quantity available for reversal were found among the selected lines. Select a line with a quantity that has not already been reversed, and try again.';
 
     procedure SetHideDialog(NewHideDialog: Boolean)
     begin
@@ -86,9 +87,9 @@ codeunit 9030 "Undo Transfer Shipment"
         TransShptLine.SetFilter(Quantity, '<>0');
         TransShptLine.SetRange("Correction Line", false);
         OnCodeOnAfterTransShptLineSetFilters(TransShptLine);
-
         if TransShptLine.IsEmpty() then
-            Error(AlreadyReversedErr);
+            Error(NoLinesToReverseErr);
+
         TransShptLine.FindSet();
         repeat
             if not HideDialog then
@@ -160,6 +161,9 @@ codeunit 9030 "Undo Transfer Shipment"
             Error(AlreadyReversedErr);
 
         UndoPostingMgt.TestTransferShptLine(TransShptLine);
+
+        if NoItemLedgerEntriesCheckIsNeeded(TransShptLine) then // At posting transfer order line for WIP Items no Item Ledger Entries are created. Therefore no Item Ledger Entries could be collected (and checked) for undoing a transfer shipment.
+            exit;
 
         UndoPostingMgt.CollectItemLedgEntries(
             TempItemLedgEntry, Database::"Transfer Shipment Line", TransShptLine."Document No.", TransShptLine."Line No.", TransShptLine."Quantity (Base)", TransShptLine."Item Shpt. Entry No.");
@@ -371,6 +375,11 @@ codeunit 9030 "Undo Transfer Shipment"
         end;
     end;
 
+    local procedure NoItemLedgerEntriesCheckIsNeeded(TransferShipmentLine: Record "Transfer Shipment Line") NoCheckNeeded: Boolean
+    begin
+        OnNoItemLedgerEntriesCheckIsNeeded(TransferShipmentLine, NoCheckNeeded);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeOnRun(var TransferShipmentLine: Record "Transfer Shipment Line"; var IsHandled: Boolean; var HideDialog: Boolean)
     begin
@@ -443,6 +452,11 @@ codeunit 9030 "Undo Transfer Shipment"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforePostCorrectiveItemLedgEntries(var ItemJournalLine: Record "Item Journal Line"; var ItemLedgerEntry: Record "Item Ledger Entry"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnNoItemLedgerEntriesCheckIsNeeded(TransShptLine: Record "Transfer Shipment Line"; var NoCheckNeeded: Boolean)
     begin
     end;
 }

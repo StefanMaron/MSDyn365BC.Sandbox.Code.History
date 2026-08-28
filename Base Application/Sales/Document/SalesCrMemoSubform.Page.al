@@ -241,7 +241,8 @@ page 96 "Sales Cr. Memo Subform"
                         UpdateEditableOnRow();
 
                         Rec.RestoreLookupSelection();
-                        NoOnAfterValidate();
+                        if Rec."No." <> xRec."No." then
+                            NoOnAfterValidate();
 
                         if Rec."No." = xRec."No." then
                             exit;
@@ -1291,6 +1292,9 @@ page 96 "Sales Cr. Memo Subform"
     /// <param name="Unconditionally">Whether to insert text without checking conditions.</param>
     procedure InsertExtendedText(Unconditionally: Boolean)
     begin
+        if not Unconditionally and (Rec."No." = xRec."No.") then
+            exit;
+
         OnBeforeInsertExtendedText(Rec, xRec);
         if TransferExtendedText.SalesCheckIfAnyExtText(Rec, Unconditionally) then begin
             CurrPage.SaveRecord();

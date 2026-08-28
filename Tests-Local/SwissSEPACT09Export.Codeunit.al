@@ -33,8 +33,6 @@ codeunit 144354 "Swiss SEPA CT 09 Export"
         MessageToRecipientMsg: Label 'Payment of %1 %2 to vendor %3', Comment = '%1 document type, %2 Document No., %3 Vendor No.';
         GetPaymentTypeErr: Label 'Wrong result of GetPaymentType';
         IBANTypeErr: Label 'The IBAN type on the recipient bank account must match the payment reference type.';
-        QRIBANErr: Label 'The recipient bank account has an IBAN that is of type QR-IBAN. This type requires that the recipient bank account has a SEPA CT export payment type that is type 3.';
-        QRRefErr: Label 'The payment reference is a QR reference. This type requires that the recipient bank account has a SEPA CT export payment type that is type 3.';
 
     [Test]
     [Scope('OnPrem')]
@@ -71,6 +69,27 @@ codeunit 144354 "Swiss SEPA CT 09 Export"
         Assert.IsTrue(CHMgt.IsDomesticIBAN('CH12345'), '');
         Assert.IsTrue(CHMgt.IsDomesticIBAN('LI12345'), '');
         Assert.IsFalse(CHMgt.IsDomesticIBAN('DE12345'), '');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure CHMgt_GetClearingNoFromIBAN()
+    var
+        CHMgt: Codeunit CHMgt;
+    begin
+        // [FEATURE] [AI test 0.3] [UT]
+        // [SCENARIO] COD 11503 "CHMgt".GetClearingNoFromIBAN() extracts the bank clearing number (IID) from positions 5-9 of a domestic IBAN, strips leading zeros, and returns blank when it cannot be derived
+        // [THEN] Domestic CH IBAN: clearing number from positions 5-9 with leading zeros stripped
+        Assert.AreEqual('8888', CHMgt.GetClearingNoFromIBAN('CH3808888123456789012'), 'CH IBAN with a leading zero in the clearing slice');
+        Assert.AreEqual('12345', CHMgt.GetClearingNoFromIBAN('CH9312345678901234567'), 'CH IBAN with a full 5-digit clearing number');
+        // [THEN] Domestic LI IBAN is also supported
+        Assert.AreEqual('8800', CHMgt.GetClearingNoFromIBAN('LI2108800123456789012'), 'LI IBAN clearing slice');
+        // [THEN] Non-domestic IBAN returns blank
+        Assert.AreEqual('', CHMgt.GetClearingNoFromIBAN('DE62007620110623852957'), 'Non-domestic IBAN');
+        // [THEN] Domestic IBAN too short to contain positions 5-9 returns blank
+        Assert.AreEqual('', CHMgt.GetClearingNoFromIBAN('CH1234'), 'Too-short domestic IBAN');
+        // [THEN] Domestic IBAN with all-zero clearing digits returns blank
+        Assert.AreEqual('', CHMgt.GetClearingNoFromIBAN('CH9300000123456789012'), 'All-zero clearing slice');
     end;
 
     [Test]
@@ -872,6 +891,48 @@ codeunit 144354 "Swiss SEPA CT 09 Export"
 
         // [THEN] XML File has been exported with correct Swiss SEPA CT scheme for "Payment Type" = "2.2"
         VerifyXMLFile(GenJournalLine, FileName, MessageID, PaymentTypeGbl::"2.2");
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure XMLExport_PaymentType22_CHF_BlankClearingNo()
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+        LibraryXPathXMLReader: Codeunit "Library - XPath XML Reader";
+        ExportFile: File;
+        XMLInStream: InStream;
+        FileName: Text;
+        VendorNo: Code[20];
+        ExpectedMmbId: Code[5];
+    begin
+        // [FEATURE] [AI test 0.3] [XML] [Export]
+        // [SCENARIO] Swiss SEPA CT (pain.001.001.09) export for "Payment Type" = "2.2" derives the clearing member id (MmbId) from the domestic IBAN when "Clearing No." is blank
+        Initialize();
+
+        // [GIVEN] Vendor with bank account having "Payment Form" = "Bank Payment Domestic", blank "Clearing No." and "SWIFT Code", and a domestic IBAN
+        VendorNo := CreateVendorWithBankAccount(PaymentFormGbl::"Bank Payment Domestic", '', '', '', GetIBAN(true));
+        // [GIVEN] Positions 5-9 of the domestic IBAN 'CH3808888123456789012' yield clearing member id '8888'
+        ExpectedMmbId := '8888';
+
+        // [GIVEN] Vendor payment journal line with "Currency Code" = ""
+        CreatePaymentJournalLine(GenJournalLine, VendorNo, '', '',
+          GenJournalLine."Account Type"::Vendor, GenJournalLine."Document Type"::Payment);
+
+        // [WHEN] Export payments to file
+        FileName := GenJournalLine_XMLExport(GenJournalLine);
+
+        // [THEN] The payment is classified as Swiss Payment Type "2.2" (LclInstrm/Prtry = "CH03")
+        ExportFile.Open(FileName);
+        ExportFile.CreateInStream(XMLInStream);
+        LibraryXPathXMLReader.InitializeXml(XMLInStream, 'urn:iso:std:iso:20022:tech:xsd:pain.001.001.09');
+        ExportFile.Close();
+        LibraryXPathXMLReader.VerifyXmlNodeValue('//ns:PmtTpInf//ns:LclInstrm/ns:Prtry', 'CH03');
+        // [THEN] The creditor agent uses the CHBCC clearing system with MmbId = the IID derived from the IBAN, and no BICFI
+        LibraryXPathXMLReader.VerifyXmlNodeAbsence('//ns:CdtrAgt//ns:BICFI');
+        LibraryXPathXMLReader.VerifyXmlNodeValue('//ns:CdtrAgt//ns:Cd', 'CHBCC');
+        LibraryXPathXMLReader.VerifyXmlNodeValue('//ns:CdtrAgt//ns:MmbId', ExpectedMmbId);
+        // [THEN] The creditor account holds the IBAN
+        LibraryXPathXMLReader.VerifyXmlNodeValue('//ns:CdtrAcct//ns:IBAN', GetIBAN(true));
     end;
 
     [Test]
@@ -1835,58 +1896,6 @@ codeunit 144354 "Swiss SEPA CT 09 Export"
 
     [Test]
     [Scope('OnPrem')]
-    procedure XMLExport_BatchBooking_49Payments()
-    var
-        GenJournalLine: Record "Gen. Journal Line";
-        CHMgt: Codeunit CHMgt;
-        FileName: Text;
-        VendorNo: Code[20];
-    begin
-        // [FEATURE] [XML] [Export]
-        // [SCENARIO 253444] Batch Booking is false when xml is exported with payment's quantity less than 'No Of Payments For BatchBooking' value (50)
-        Initialize();
-
-        // [GIVEN] Vendor with bank account of "Payment Form" = "ESR"
-        VendorNo := CreateVendorWithBankAccount_ESR();
-
-        // [GIVEN] Vendor payment journal lines of 49 payments
-        CreateSetOfPaymentJournalLine(GenJournalLine, VendorNo, CHMgt.NoOfPaymentsForBatchBooking() - 1);
-
-        // [WHEN] Export payments to file
-        FileName := GenJournalLine_XMLExport(GenJournalLine);
-
-        // [THEN] XML File has been exported with tags 'NbOfTxs' = 49, 'BtchBookg' = false
-        VerifyXMLFileBatchBooking(FileName, CHMgt.NoOfPaymentsForBatchBooking() - 1, false);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure XMLExport_BatchBooking_50Payments()
-    var
-        GenJournalLine: Record "Gen. Journal Line";
-        CHMgt: Codeunit CHMgt;
-        FileName: Text;
-        VendorNo: Code[20];
-    begin
-        // [FEATURE] [XML] [Export]
-        // [SCENARIO 253444] Batch Booking is true when xml is exported with payment's quantity equals to 'No Of Payments For BatchBooking' value (50)
-        Initialize();
-
-        // [GIVEN] Vendor with bank account of "Payment Form" = "ESR"
-        VendorNo := CreateVendorWithBankAccount_ESR();
-
-        // [GIVEN] Vendor payment journal lines of 50 payments
-        CreateSetOfPaymentJournalLine(GenJournalLine, VendorNo, CHMgt.NoOfPaymentsForBatchBooking());
-
-        // [WHEN] Export payments to file
-        FileName := GenJournalLine_XMLExport(GenJournalLine);
-
-        // [THEN] XML File has been exported with tags 'NbOfTxs' = 50, 'BtchBookg' = true
-        VerifyXMLFileBatchBooking(FileName, CHMgt.NoOfPaymentsForBatchBooking(), true);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
     procedure PaymentExportData_SetCustomerAsRecipient_PaymentType22()
     var
         PaymentExportData: Record "Payment Export Data";
@@ -2064,6 +2073,38 @@ codeunit 144354 "Swiss SEPA CT 09 Export"
 
     [Test]
     [Scope('OnPrem')]
+    procedure VendorBankAccountGetPaymentTypeType22WhenClearingNoDerivedFromIBAN()
+    var
+        VendorBankAccount: Record "Vendor Bank Account";
+    begin
+        // [FEATURE] [AI test 0.3] [UT]
+        // [SCENARIO] "Vendor Bank Account".GetPaymentType returns Swiss Payment Type 2.2 when "Clearing No." and "SWIFT Code" are blank but the clearing number can be derived from a domestic IBAN
+        VendorBankAccount.Init();
+        VendorBankAccount."Payment Form" := VendorBankAccount."Payment Form"::"Bank Payment Domestic";
+        VendorBankAccount."SWIFT Code" := '';
+        VendorBankAccount.IBAN := GetIBAN(true);
+        Assert.IsTrue(VendorBankAccount.GetPaymentType(PaymentTypeGbl, GetCurrencyCode('')), GetPaymentTypeErr);
+        Assert.AreEqual(PaymentTypeGbl::"2.2", PaymentTypeGbl, GetPaymentTypeErr);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure VendorBankAccountGetPaymentTypeType3WhenBlankClearingNoAndSWIFTSet()
+    var
+        VendorBankAccount: Record "Vendor Bank Account";
+    begin
+        // [FEATURE] [AI test 0.3] [UT]
+        // [SCENARIO] "Vendor Bank Account".GetPaymentType keeps Swiss Payment Type 3 (not 2.2) when "Clearing No." is blank but a "SWIFT Code" is provided, so the IBAN-derived clearing does not reclassify SWIFT-routed accounts
+        VendorBankAccount.Init();
+        VendorBankAccount."Payment Form" := VendorBankAccount."Payment Form"::"Bank Payment Domestic";
+        VendorBankAccount."SWIFT Code" := GetSWIFT(true);
+        VendorBankAccount.IBAN := GetIBAN(true);
+        Assert.IsTrue(VendorBankAccount.GetPaymentType(PaymentTypeGbl, GetCurrencyCode('')), GetPaymentTypeErr);
+        Assert.AreEqual(PaymentTypeGbl::"3", PaymentTypeGbl, GetPaymentTypeErr);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
     procedure XMLExport_PaymentType6_Negative_BlankedSWIFTCode()
     var
         GenJournalLine: Record "Gen. Journal Line";
@@ -2231,8 +2272,8 @@ codeunit 144354 "Swiss SEPA CT 09 Export"
         // [WHEN] Export payment to file.
         asserterror GenJournalLine_XMLExport(GenJournalLine);
 
-        // [THEN] XML File was not exported, an error is thrown: Payment Reference of QR type must only be used with Payment Type 3.
-        VerifyPaymentJnlExportErrorText(GenJournalLine, QRRefErr);
+        // [THEN] XML File was not exported, an error is thrown: IBAN type on recipient bank account must match payment reference type.
+        VerifyPaymentJnlExportErrorText(GenJournalLine, IBANTypeErr);
     end;
 
     [Test]
@@ -2254,19 +2295,20 @@ codeunit 144354 "Swiss SEPA CT 09 Export"
         // [WHEN] Export payment to file.
         asserterror GenJournalLine_XMLExport(GenJournalLine);
 
-        // [THEN] XML File was not exported, an error is thrown: IBAN of QR-IBAN type must only be used with Payment Type 3.
-        VerifyPaymentJnlExportErrorText(GenJournalLine, QRIBANErr);
+        // [THEN] XML File was not exported, an error is thrown: IBAN type on recipient bank account must match payment reference type.
+        VerifyPaymentJnlExportErrorText(GenJournalLine, IBANTypeErr);
     end;
 
     [Test]
     procedure XMLExport_PaymentType22_QRReferenceQRIBAN()
     var
         GenJournalLine: Record "Gen. Journal Line";
-        PaymentJnlExportErrorText: Record "Payment Jnl. Export Error Text";
+        FileName: Text;
+        MessageID: Text;
         VendorNo: Code[20];
     begin
-        // [FEATURE] [XML] [Export] [Payment Reference]
-        // [SCENARIO 423342] Swiss SEPA CT export for "Payment Type" = "2.2" in case of QR-IBAN and QR Payment Reference.
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 621106] Swiss SEPA CT export for "Payment Type" = "2.2" in case of QR-IBAN and QR Payment Reference.
         Initialize();
 
         // [GIVEN] Vendor payment journal line for Payment Type = "2.2" and filled-in QR Payment Reference.
@@ -2276,17 +2318,11 @@ codeunit 144354 "Swiss SEPA CT 09 Export"
         CreateVendPmtJnlLineWithPaymentReference(GenJournalLine, VendorNo, '', GetQRReferenceNo());
 
         // [WHEN] Export payment to file.
-        asserterror GenJournalLine_XMLExport(GenJournalLine);
+        MessageID := GetMessageID(GenJournalLine."Bal. Account No.");
+        FileName := GenJournalLine_XMLExport(GenJournalLine);
 
-        // [THEN] XML File was not exported, two errors are thrown: Payment Reference of QR type and IBAN of QR-IBAN type must only be used with Payment Type 3.
-        PaymentJnlExportErrorText.SetRange("Journal Template Name", GenJournalLine."Journal Template Name");
-        PaymentJnlExportErrorText.SetRange("Journal Batch Name", GenJournalLine."Journal Batch Name");
-        PaymentJnlExportErrorText.SetRange("Journal Line No.", GenJournalLine."Line No.");
-        Assert.RecordCount(PaymentJnlExportErrorText, 2);
-        PaymentJnlExportErrorText.FindFirst();
-        PaymentJnlExportErrorText.TestField("Error Text", QRRefErr);
-        PaymentJnlExportErrorText.Next();
-        PaymentJnlExportErrorText.TestField("Error Text", QRIBANErr);
+        // [THEN] XML File has been exported with correct Swiss SEPA CT scheme for "Payment Type" = "2.2".
+        VerifyXMLFile(GenJournalLine, FileName, MessageID, PaymentTypeGbl::"2.2");
     end;
 
     [Test]
@@ -2887,6 +2923,214 @@ codeunit 144354 "Swiss SEPA CT 09 Export"
         // [WHEN] Run IsSwissSEPACTExport() of codeunit 11503 CHMgt.
         // [THEN] The function returns false.
         Assert.IsFalse(CHMgt.IsSwissSEPACTExport(GenJournalLine), '');
+    end;
+
+    [Test]
+    procedure XMLExport_BatchBooking_Auto_1Payment()
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+        VendorNo: Code[20];
+        FileName: Text;
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 621781] Batch Booking is false when SEPA CT Batch Booking is Auto and payment count is below 50.
+        Initialize();
+
+        // [GIVEN] SEPA CT Batch Booking is set to "Auto" on the Bank Export/Import Setup.
+        UpdateSEPACTBatchBooking(Enum::"SEPA CT Batch Booking"::Auto);
+
+        // [GIVEN] Vendor "V" with bank account of "Payment Form" = "ESR"
+        VendorNo := CreateVendorWithBankAccount_ESR();
+
+        // [GIVEN] Vendor payment journal line of 1 payment
+        CreateSetOfPaymentJournalLine(GenJournalLine, VendorNo, 1);
+
+        // [WHEN] Export payments to file
+        FileName := GenJournalLine_XMLExport(GenJournalLine);
+
+        // [THEN] XML File has been exported with 'BtchBookg' = false
+        VerifyXMLFileBatchBooking(FileName, 1, false);
+    end;
+
+    [Test]
+    procedure XMLExport_BatchBooking_Auto_50Payment()
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+        VendorNo: Code[20];
+        FileName: Text;
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 621781] Batch Booking is true when SEPA CT Batch Booking is Auto and payment count is 50 or more.
+        Initialize();
+
+        // [GIVEN] SEPA CT Batch Booking is set to "Auto" on the Bank Export/Import Setup.
+        UpdateSEPACTBatchBooking(Enum::"SEPA CT Batch Booking"::Auto);
+
+        // [GIVEN] Vendor "V" with bank account of "Payment Form" = "ESR"
+        VendorNo := CreateVendorWithBankAccount_ESR();
+
+        // [GIVEN] Vendor payment journal line of 50 payments
+        CreateSetOfPaymentJournalLine(GenJournalLine, VendorNo, 50);
+
+        // [WHEN] Export payments to file
+        FileName := GenJournalLine_XMLExport(GenJournalLine);
+
+        // [THEN] XML File has been exported with 'BtchBookg' = true
+        VerifyXMLFileBatchBooking(FileName, 50, true);
+    end;
+
+    [Test]
+    procedure XMLExport_BatchBooking_Always_1Payment()
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+        VendorNo: Code[20];
+        FileName: Text;
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 621781] Batch Booking is true when SEPA CT Batch Booking is set to Always, regardless of payment count.
+        Initialize();
+
+        // [GIVEN] SEPA CT Batch Booking is set to "Always" on the Bank Export/Import Setup.
+        UpdateSEPACTBatchBooking(Enum::"SEPA CT Batch Booking"::Always);
+
+        // [GIVEN] Vendor "V" with bank account of "Payment Form" = "ESR"
+        VendorNo := CreateVendorWithBankAccount_ESR();
+
+        // [GIVEN] Vendor payment journal line of 1 payment
+        CreateSetOfPaymentJournalLine(GenJournalLine, VendorNo, 1);
+
+        // [WHEN] Export payments to file
+        FileName := GenJournalLine_XMLExport(GenJournalLine);
+
+        // [THEN] XML File has been exported with 'BtchBookg' = true
+        VerifyXMLFileBatchBooking(FileName, 1, true);
+    end;
+
+    [Test]
+    procedure XMLExport_BatchBooking_Always_50Payments()
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+        VendorNo: Code[20];
+        FileName: Text;
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 621781] Batch Booking is true when SEPA CT Batch Booking is set to Always with 50 payments.
+        Initialize();
+
+        // [GIVEN] SEPA CT Batch Booking is set to "Always" on the Bank Export/Import Setup.
+        UpdateSEPACTBatchBooking(Enum::"SEPA CT Batch Booking"::Always);
+
+        // [GIVEN] Vendor "V" with bank account of "Payment Form" = "ESR"
+        VendorNo := CreateVendorWithBankAccount_ESR();
+
+        // [GIVEN] Vendor payment journal lines of 50 payments
+        CreateSetOfPaymentJournalLine(GenJournalLine, VendorNo, 50);
+
+        // [WHEN] Export payments to file
+        FileName := GenJournalLine_XMLExport(GenJournalLine);
+
+        // [THEN] XML File has been exported with 'BtchBookg' = true
+        VerifyXMLFileBatchBooking(FileName, 50, true);
+    end;
+
+    [Test]
+    procedure XMLExport_BatchBooking_Never_1Payment()
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+        VendorNo: Code[20];
+        FileName: Text;
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 621781] Batch Booking is false when SEPA CT Batch Booking is set to Never, regardless of payment count.
+        Initialize();
+
+        // [GIVEN] SEPA CT Batch Booking is set to "Never" on the Bank Export/Import Setup.
+        UpdateSEPACTBatchBooking(Enum::"SEPA CT Batch Booking"::Never);
+
+        // [GIVEN] Vendor "V" with bank account of "Payment Form" = "ESR"
+        VendorNo := CreateVendorWithBankAccount_ESR();
+
+        // [GIVEN] Vendor payment journal line of 1 payment
+        CreateSetOfPaymentJournalLine(GenJournalLine, VendorNo, 1);
+
+        // [WHEN] Export payments to file
+        FileName := GenJournalLine_XMLExport(GenJournalLine);
+
+        // [THEN] XML File has been exported with 'BtchBookg' = false
+        VerifyXMLFileBatchBooking(FileName, 1, false);
+    end;
+
+    [Test]
+    procedure XMLExport_BatchBooking_Never_50Payments()
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+        VendorNo: Code[20];
+        FileName: Text;
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 621781] Batch Booking is false when SEPA CT Batch Booking is set to Never, even with 50 or more payments.
+        Initialize();
+
+        // [GIVEN] SEPA CT Batch Booking is set to "Never" on the Bank Export/Import Setup.
+        UpdateSEPACTBatchBooking(Enum::"SEPA CT Batch Booking"::Never);
+
+        // [GIVEN] Vendor "V" with bank account of "Payment Form" = "ESR"
+        VendorNo := CreateVendorWithBankAccount_ESR();
+
+        // [GIVEN] Vendor payment journal lines of 50 payments
+        CreateSetOfPaymentJournalLine(GenJournalLine, VendorNo, 50);
+
+        // [WHEN] Export payments to file
+        FileName := GenJournalLine_XMLExport(GenJournalLine);
+
+        // [THEN] XML File has been exported with 'BtchBookg' = false
+        VerifyXMLFileBatchBooking(FileName, 50, false);
+    end;
+
+    [Test]
+    procedure XMLExport_PaymentType22_UstrdReferenceQRIBAN()
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+        VendorNo: Code[20];
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 621106] Swiss SEPA CT export for "Payment Type" = "2.2" in case of unstructured Payment Reference and QR-IBAN.
+        Initialize();
+
+        // [GIVEN] Vendor payment journal line for Payment Type = "2.2" and filled-in unstructured Payment Reference.
+        // [GIVEN] Vendor Bank Account has QR-IBAN.
+        VendorNo := CreateVendorWithBankAccount_Clearing();
+        UpdateVendorBankAccIBAN(VendorNo, GetQRIBAN());
+        CreateVendPmtJnlLineWithPaymentReference(GenJournalLine, VendorNo, '', LibraryUtility.GenerateGUID());
+
+        // [WHEN] Export payment to file.
+        asserterror GenJournalLine_XMLExport(GenJournalLine);
+
+        // [THEN] XML File was not exported, an error about matching Payment Reference type and IBAN type is thrown.
+        VerifyPaymentJnlExportErrorText(GenJournalLine, IBANTypeErr);
+    end;
+
+    [Test]
+    procedure XMLExport_PaymentType22_BlankReferenceQRIBAN()
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+        VendorNo: Code[20];
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 621106] Swiss SEPA CT export for "Payment Type" = "2.2" in case of blank Payment Reference and QR-IBAN.
+        Initialize();
+
+        // [GIVEN] Vendor payment journal line for Payment Type = "2.2" and blank Payment Reference.
+        // [GIVEN] Vendor Bank Account has QR-IBAN.
+        VendorNo := CreateVendorWithBankAccount_Clearing();
+        UpdateVendorBankAccIBAN(VendorNo, GetQRIBAN());
+        CreateVendPmtJnlLineWithPaymentReference(GenJournalLine, VendorNo, '', '');
+
+        // [WHEN] Export payment to file.
+        asserterror GenJournalLine_XMLExport(GenJournalLine);
+
+        // [THEN] XML File was not exported, an error about matching Payment Reference type and IBAN type is thrown.
+        VerifyPaymentJnlExportErrorText(GenJournalLine, IBANTypeErr);
     end;
 
     local procedure Initialize()
@@ -3935,6 +4179,15 @@ codeunit 144354 "Swiss SEPA CT 09 Export"
         Assert.AreEqual(ArrayLen(VendorNo) - 1, LibraryXMLRead.GetNodesCount('CdOrPrtry'), '<CdOrPrtry> node count');
         LibraryXMLRead.VerifyNodeValueInSubtree('CdOrPrtry', 'Prtry', 'QRR');
         LibraryXMLRead.VerifyNodeValueInSubtree('CdOrPrtry', 'Cd', 'SCOR');
+    end;
+
+    local procedure UpdateSEPACTBatchBooking(SEPACTBatchBooking: Enum "SEPA CT Batch Booking")
+    var
+        BankExportImportSetup: Record "Bank Export/Import Setup";
+    begin
+        BankExportImportSetup.Get(FindSwissSEPACTBankExpImpCode());
+        BankExportImportSetup.Validate("SEPA CT Batch Booking", SEPACTBatchBooking);
+        BankExportImportSetup.Modify(true);
     end;
 
     [RequestPageHandler]

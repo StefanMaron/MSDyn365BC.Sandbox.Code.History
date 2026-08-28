@@ -37,6 +37,12 @@ page 99000760 "Machine Center Card"
                     ApplicationArea = Manufacturing;
                     Importance = Promoted;
                 }
+                field("Name 2"; Rec."Name 2")
+                {
+                    ApplicationArea = Manufacturing;
+                    Importance = Additional;
+                    Visible = false;
+                }
                 field("Work Center No."; Rec."Work Center No.")
                 {
                     ApplicationArea = Manufacturing;
@@ -110,6 +116,12 @@ page 99000760 "Machine Center Card"
                 field("Queue Time Unit of Meas. Code"; Rec."Queue Time Unit of Meas. Code")
                 {
                     ApplicationArea = Manufacturing;
+                }
+                field("Calendar Entries Available Until"; Rec."Calendar Entries Avail. Until")
+                {
+                    ApplicationArea = Manufacturing;
+                    Editable = false;
+                    StyleExpr = CalendarHorizonStyleTxt;
                 }
             }
             group("Routing Setup")
@@ -291,12 +303,35 @@ page 99000760 "Machine Center Card"
                 }
             }
         }
+        area(processing)
+        {
+            action("Calculate Machine Center Calendar")
+            {
+                ApplicationArea = Manufacturing;
+                Caption = 'Calculate Machine Center Calendar';
+                Image = CalcWorkCenterCalendar;
+                ToolTip = 'Create new calendar entries for the machine center to define the available daily capacity.';
+
+                trigger OnAction()
+                var
+                    MachineCenter: Record "Machine Center";
+                    CalcMachineCenterCalendar: Report "Calc. Machine Center Calendar";
+                begin
+                    MachineCenter.SetRange("No.", Rec."No.");
+                    CalcMachineCenterCalendar.SetTableView(MachineCenter);
+                    CalcMachineCenterCalendar.RunModal();
+                end;
+            }
+        }
         area(Promoted)
         {
             group(Category_Process)
             {
                 Caption = 'Process', Comment = 'Generated from the PromotedActionCategories property index 1.';
 
+                actionref("Calculate Machine Center Calendar_Promoted"; "Calculate Machine Center Calendar")
+                {
+                }
                 actionref("Lo&ad_Promoted"; "Lo&ad")
                 {
                 }
@@ -330,6 +365,14 @@ page 99000760 "Machine Center Card"
         UpdateEnabled();
     end;
 
+    trigger OnAfterGetRecord()
+    begin
+        Rec.CalcFields("Calendar Entries Avail. Until");
+        CalendarHorizonStyleTxt := '';
+        if (Rec."Calendar Entries Avail. Until" <> 0D) and (Rec."Calendar Entries Avail. Until" < WorkDate()) then
+            CalendarHorizonStyleTxt := 'Unfavorable';
+    end;
+
     trigger OnInit()
     begin
         FromProductionBinCodeEnable := true;
@@ -346,6 +389,7 @@ page 99000760 "Machine Center Card"
         OpenShopFloorBinCodeEnable: Boolean;
         ToProductionBinCodeEnable: Boolean;
         FromProductionBinCodeEnable: Boolean;
+        CalendarHorizonStyleTxt: Text;
 
     local procedure UpdateEnabled()
     var

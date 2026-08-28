@@ -843,6 +843,7 @@ page 2900 "Demand Forecast Variant Matrix"
         ItemWithVariantsQuery: Query "Item With Variants";
         ItemWithLocationsQuery: Query "Item With Locations";
         EntryNo: Integer;
+        IsHandled: Boolean;
     begin
         Rec.DeleteAll();
         EntryNo := 0;
@@ -850,6 +851,11 @@ page 2900 "Demand Forecast Variant Matrix"
         ShowLocations := UseLocation;
         Item.SetView(ItemFilter);
         if Item.IsEmpty() then
+            exit;
+
+        IsHandled := false;
+        OnBeforeLoadData(Rec, Item, ItemFilter, LocationFilter, UseLocation, UseVariant, VariantFilter, MaxRowsToLoadVal, IsHandled);
+        if IsHandled then
             exit;
 
         case GetQueryForMatrix(UseVariant, UseLocation) of
@@ -1079,7 +1085,7 @@ page 2900 "Demand Forecast Variant Matrix"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeEnterBaseQty(Rec, ColumnID, IsHandled);
+        OnBeforeEnterBaseQty(Rec, ColumnID, IsHandled, MatrixRecords, ForecastType, ProductionForecastName, DateFilter, QtyType, MATRIX_CellData);
         if not IsHandled then begin
             Item.SetRange("No.", Rec."No.");
             Item.FindFirst();
@@ -1188,7 +1194,7 @@ page 2900 "Demand Forecast Variant Matrix"
     end;
 
     [IntegrationEvent(true, false)]
-    local procedure OnBeforeEnterBaseQty(var Item: Record "Forecast Item Variant Loc"; ColumnID: Integer; var IsHandled: Boolean);
+    local procedure OnBeforeEnterBaseQty(var Item: Record "Forecast Item Variant Loc"; ColumnID: Integer; var IsHandled: Boolean; MatrixRecords: array[32] of Record Date; ForecastType: Enum "Demand Forecast Type"; ProductionForecastName: Code[10]; DateFilter: Text; QtyType: Enum "Analysis Amount Type"; var MATRIX_CellData: array[32] of Decimal);
     begin
     end;
 
@@ -1199,6 +1205,11 @@ page 2900 "Demand Forecast Variant Matrix"
 
     [IntegrationEvent(false, false)]
     local procedure OnEnterBaseQtyOnBeforeValidateProdForecastQty(var Item: Record Item; var ForecastItemVariantLoc: Record "Forecast Item Variant Loc"; ColumnID: Integer; MatrixRecords: array[32] of Record Date)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeLoadData(var ForecastItemVariantLoc: Record "Forecast Item Variant Loc"; var Item: Record Item; ItemFilter: Text; LocationFilter: Text; UseLocation: Boolean; UseVariant: Boolean; VariantFilter: Text; MaxRowsToLoad: Integer; var IsHandled: Boolean)
     begin
     end;
 
