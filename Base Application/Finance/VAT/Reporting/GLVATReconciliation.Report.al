@@ -15,11 +15,10 @@ using Microsoft.Finance.VAT.Ledger;
 /// </summary>
 report 11 "G/L - VAT Reconciliation"
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './Finance/VAT/Reporting/GLVATReconciliation.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'G/L - VAT Reconciliation';
     UsageCategory = ReportsAndAnalysis;
+    DefaultRenderingLayout = RDLCLayout;
 
     dataset
     {
@@ -437,6 +436,16 @@ report 11 "G/L - VAT Reconciliation"
         }
     }
 
+    rendering
+    {
+        layout(RDLCLayout)
+        {
+            Type = RDLC;
+            LayoutFile = './Finance/VAT/Reporting/GLVATReconciliation.rdlc';
+            Summary = 'Report layout made in the legacy RDLC format. Use an RDLC editor to modify the layout.';
+        }
+    }
+
     labels
     {
     }
@@ -553,6 +562,8 @@ report 11 "G/L - VAT Reconciliation"
         VATEntryLocal: Record "VAT Entry";
     begin
         VATEntryLocal.Copy(VATEntry2);
+        VATEntryLocal.ReadIsolation := IsolationLevel::ReadCommitted;
+        VATEntryLocal.SetCurrentKey("G/L Acc. No.");
         VATEntryLocal.SetRange("G/L Acc. No.", '');
 
         if not VATEntryLocal.IsEmpty() then

@@ -11,6 +11,7 @@ report 99001043 "Exchange Production BOM Item"
 {
     ApplicationArea = Manufacturing;
     Caption = 'Exchange Production BOM Item';
+    ToolTip = 'Replace items that are no longer used in production BOMs. You can exchange an item, for example, with a new item or a new production BOM. You can create new versions while exchanging an item in the production BOMs.';
     ProcessingOnly = true;
     UsageCategory = Tasks;
 
@@ -106,7 +107,8 @@ report 99001043 "Exchange Production BOM Item"
                                         until ProductionBOMLine3.Next() = 0
                                     else
                                         FirstVersion := false;
-                                end;
+                                end else
+                                    FirstVersion := false;
 
                             if (ToProductionBOMNo <> '') and FirstVersion then
                                 if CreateNewVersion then begin

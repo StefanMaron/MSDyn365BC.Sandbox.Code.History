@@ -15,9 +15,9 @@ using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.Address;
 using Microsoft.Foundation.Company;
 using Microsoft.Foundation.PaymentTerms;
+using Microsoft.Foundation.Reporting;
 using Microsoft.Foundation.Shipping;
 using Microsoft.Inventory.Location;
-using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Remittance;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Utilities;
@@ -105,9 +105,6 @@ report 406 "Purchase - Invoice"
                     column(DocumentCaption; StrSubstNo(DocumentCaption(), CopyText))
                     {
                     }
-                    column(SelfBillingCaption; StrSubstNo(SelfBillingCaptionLbl, CopyText))
-                    {
-                    }
                     column(VendAddr1; VendAddr[1])
                     {
                     }
@@ -154,15 +151,6 @@ report 406 "Purchase - Invoice"
                     {
                     }
                     column(CompanyInfoBankAccountNo; CompanyInfo."Bank Account No.")
-                    {
-                    }
-                    column(CompanyInfoSwiftCode; CompanyInfo."SWIFT Code")
-                    {
-                    }
-                    column(CompanyInfoIBAN; CompanyInfo.IBAN)
-                    {
-                    }
-                    column(CompanyInfoBankBranchNo; CompanyInfo."Bank Branch No.")
                     {
                     }
                     column(VendAddr7; VendAddr[7])
@@ -328,12 +316,6 @@ report 406 "Purchase - Invoice"
                     {
                     }
                     column(TotalCaption; TotalCaptionLbl)
-                    {
-                    }
-                    column(SwiftCodeCaption; SwiftCodeCaptionLbl)
-                    {
-                    }
-                    column(CompanyIBAN_Lbl; CompanyInfo.FieldCaption(IBAN))
                     {
                     }
                     dataitem(DimensionLoop1; "Integer")
@@ -929,11 +911,11 @@ report 406 "Purchase - Invoice"
                   Round(
                     CurrExchRate.ExchangeAmtFCYToLCY(
                       WorkDate(), "Currency Code", "Amount Including VAT", "Currency Factor"));
-                PurchaseLine.InitTextVariable();
-                PurchaseLine.FormatNoText(AmountLangA, "Amount Including VAT", "Currency Code");
+                ReportManagementAPAC.InitTextVariable();
+                ReportManagementAPAC.FormatNoText(AmountLangA, "Amount Including VAT", "Currency Code");
                 if ShowTHFormatting then begin
-                    PurchaseLine.InitTextVariableTH();
-                    PurchaseLine.FormatNoTextTH(AmountLangB, "Amount Including VAT", "Currency Code");
+                    ReportManagementAPAC.InitTextVariableTH();
+                    ReportManagementAPAC.FormatNoTextTH(AmountLangB, "Amount Including VAT", "Currency Code");
                 end else begin
                     AmountLangB[1] := '';
                     AmountLangB[2] := '';
@@ -1024,13 +1006,6 @@ report 406 "Purchase - Invoice"
             Caption = 'Purchase Invoice (RDLC)';
             Summary = 'The Purchase Invoice (RDLC) is the most detailed layout and provides most flexible layout options.';
         }
-        layout("SelfBillingInvoice.rdlc")
-        {
-            Type = RDLC;
-            LayoutFile = './Purchases/History/SelfBillingInvoice.rdlc';
-            Caption = 'Self-Billing Invoice (RDLC)';
-            Summary = 'The Self-Billing Invoice (RDLC) is the most detailed layout and provides most flexible layout options.';
-        }
     }
 
     labels
@@ -1073,6 +1048,7 @@ report 406 "Purchase - Invoice"
         FormatAddr: Codeunit "Format Address";
         FormatDocument: Codeunit "Format Document";
         SegManagement: Codeunit SegManagement;
+        ReportManagementAPAC: Codeunit "Report Management APAC";
         VendAddr: array[8] of Text[100];
         ShipToAddr: array[8] of Text[100];
         CompanyAddr: array[8] of Text[100];
@@ -1105,7 +1081,6 @@ report 406 "Purchase - Invoice"
         AmountInWords: Boolean;
         AmountLangA: array[2] of Text[80];
         AmountLangB: array[2] of Text[80];
-        PurchaseLine: Record "Purchase Line";
         ShowTHFormatting: Boolean;
         OutputNo: Integer;
         PricesInclVATtxt: Text[30];
@@ -1175,8 +1150,6 @@ report 406 "Purchase - Invoice"
         PayToContactPhoneNoLbl: Label 'Pay-to Contact Phone No.';
         PayToContactMobilePhoneNoLbl: Label 'Pay-to Contact Mobile Phone No.';
         PayToContactEmailLbl: Label 'Pay-to Contact E-Mail';
-        SelfBillingCaptionLbl: Label 'Self Billing Invoice %1', Comment = '%1 = Document No.';
-        SwiftCodeCaptionLbl: Label 'SWIFT Code';
 
     protected var
         CompanyInfo: Record "Company Information";

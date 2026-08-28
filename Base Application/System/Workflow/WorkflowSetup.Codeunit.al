@@ -124,6 +124,9 @@ codeunit 1502 "Workflow Setup"
         FinCategoryDescTxt: Label 'Finance';
         JobQueueEntryApprWorkflowCodeTxt: Label 'JQEAPW', Locked = true;
         JobQueueEntryApprWorkflowDescTxt: Label 'Job Queue Entry Approval Workflow';
+        VendorBankAccountApprWorkflowCodeTxt: Label 'VENDBANKACCAPW', Locked = true;
+        VendorBankAccountApprWorkflowDescTxt: Label 'Vendor Bank Account Approval Workflow';
+        VendorBankAccountTypeCondnTxt: Label '<?xml version="1.0" encoding="utf-8" standalone="yes"?><ReportParameters><DataItems><DataItem name="Vendor Bank Account">%1</DataItem></DataItems></ReportParameters>', Locked = true;
         JobQueueEntryCondnTxt: Label '<?xml version="1.0" encoding="utf-8" standalone="yes"?><ReportParameters><DataItems><DataItem name="Job Queue Entry">%1</DataItem></DataItems></ReportParameters>', Locked = true;
         RequisitionWkshTypeCondnTxt: Label '<?xml version="1.0" encoding="utf-8" standalone="yes"?><ReportParameters><DataItems><DataItem name="Requisition Wksh. Name">%1</DataItem></DataItems></ReportParameters>', Locked = true;
         RequisitionWkshBatchApprWorkflowCodeTxt: Label 'RWBAPW', Locked = true;
@@ -201,6 +204,8 @@ codeunit 1502 "Workflow Setup"
 
         InsertJobQueueEntryApprovalWorkflowTemplate();
 
+        InsertVendorBankAccountApprovalWorkflowTemplate();
+
         OnInsertWorkflowTemplates();
     end;
 
@@ -256,16 +261,21 @@ codeunit 1502 "Workflow Setup"
     begin
         Workflow.SetRange(Template, true);
         Workflow.SetFilter(Code, '%1', GetWorkflowTemplateToken() + '*');
-        Workflow.DeleteAll();
-
-        WorkflowStep.SetFilter("Workflow Code", '%1', GetWorkflowTemplateToken() + '*');
-        if WorkflowStep.FindSet() then begin
+        if Workflow.FindSet() then
             repeat
-                WorkflowStepArgument.SetRange(ID, WorkflowStep.Argument);
-                WorkflowStepArgument.DeleteAll();
-            until WorkflowStep.Next() = 0;
-            WorkflowStep.DeleteAll();
-        end;
+                // Only delete the steps that belong to the template itself. Workflows created from a
+                // template keep the template token prefix in their code (e.g. MS-XYZ-01) but are not
+                // templates, so filtering steps by the token wildcard would also delete their steps.
+                WorkflowStep.SetRange("Workflow Code", Workflow.Code);
+                if WorkflowStep.FindSet() then begin
+                    repeat
+                        WorkflowStepArgument.SetRange(ID, WorkflowStep.Argument);
+                        WorkflowStepArgument.DeleteAll();
+                    until WorkflowStep.Next() = 0;
+                    WorkflowStep.DeleteAll();
+                end;
+            until Workflow.Next() = 0;
+        Workflow.DeleteAll();
 
         InitWorkflow();
     end;
@@ -285,6 +295,8 @@ codeunit 1502 "Workflow Setup"
         InsertTableRelation(DATABASE::Customer, 0,
           DATABASE::"Approval Entry", ApprovalEntry.FieldNo("Record ID to Approve"));
         InsertTableRelation(DATABASE::Vendor, 0,
+          DATABASE::"Approval Entry", ApprovalEntry.FieldNo("Record ID to Approve"));
+        InsertTableRelation(DATABASE::"Vendor Bank Account", 0,
           DATABASE::"Approval Entry", ApprovalEntry.FieldNo("Record ID to Approve"));
         InsertTableRelation(DATABASE::Item, 0,
           DATABASE::"Approval Entry", ApprovalEntry.FieldNo("Record ID to Approve"));
@@ -1081,6 +1093,15 @@ codeunit 1502 "Workflow Setup"
           true, true);
     end;
 
+    local procedure InsertVendorBankAccountApprovalWorkflowTemplate()
+    var
+        Workflow: Record Workflow;
+    begin
+        InsertWorkflowTemplate(Workflow, VendorBankAccountApprWorkflowCodeTxt, VendorBankAccountApprWorkflowDescTxt, PurchPayCategoryTxt);
+        InsertVendorBankApprovalWorkflowDetails(Workflow);
+        MarkWorkflowAsTemplate(Workflow);
+    end;
+
     local procedure InsertVendorApprovalWorkflowTemplate()
     var
         Workflow: Record Workflow;
@@ -1097,6 +1118,25 @@ codeunit 1502 "Workflow Setup"
         InsertWorkflow(Workflow, GetWorkflowCode(VendorApprWorkflowCodeTxt), VendorApprWorkflowDescTxt, PurchPayCategoryTxt);
         InsertVendorApprovalWorkflowDetails(Workflow);
     end;
+
+    local procedure InsertVendorBankApprovalWorkflowDetails(var Workflow: Record Workflow)
+    var
+        WorkflowStepArgument: Record "Workflow Step Argument";
+    begin
+        InitWorkflowStepArgument(
+            WorkflowStepArgument, WorkflowStepArgument."Approver Type"::Approver,
+            WorkflowStepArgument."Approver Limit Type"::"Direct Approver",
+            0, '', BlankDateFormula, true);
+
+        InsertRecApprovalWorkflowSteps(Workflow, BuildVendorBankTypeConditions(),
+          WorkflowEventHandling.RunWorkflowOnSendVendorBankAccountForApprovalCode(),
+          WorkflowResponseHandling.CreateApprovalRequestsCode(),
+          WorkflowResponseHandling.SendApprovalRequestForApprovalCode(),
+          WorkflowEventHandling.RunWorkflowOnCancelVendorBankAccountApprovalRequestCode(),
+          WorkflowStepArgument,
+          true, true);
+    end;
+
 
     local procedure InsertVendorApprovalWorkflowDetails(var Workflow: Record Workflow)
     var
@@ -1446,6 +1486,11 @@ codeunit 1502 "Workflow Setup"
     procedure VendorWorkflowCode(): Code[17]
     begin
         exit(VendorApprWorkflowCodeTxt);
+    end;
+
+    procedure VendorBankWorkflowCode(): Code[17]
+    begin
+        exit(VendorBankAccountApprWorkflowCodeTxt)
     end;
 
     procedure ItemWorkflowCode(): Code[17]
@@ -2496,6 +2541,13 @@ codeunit 1502 "Workflow Setup"
         Customer: Record Customer;
     begin
         exit(StrSubstNo(CustomerTypeCondnTxt, Encode(Customer.GetView(false))));
+    end;
+
+    procedure BuildVendorBankTypeConditions(): Text
+    var
+        VendorBank: Record "Vendor Bank Account";
+    begin
+        exit(StrSubstNo(VendorBankAccountTypeCondnTxt, Encode(VendorBank.GetView(false))));
     end;
 
     procedure BuildVendorTypeConditions(): Text

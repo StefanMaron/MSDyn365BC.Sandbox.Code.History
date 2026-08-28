@@ -14,6 +14,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Inventory.Tracking)(LookupHint=Codeunit BarcodeScannerItemTrackTest - NamedType ScanQtyExceedMaximumMsg)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3459267938 - NamedType 2921617701" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Serial with parentheses should have been found by exact match]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Inventory.Tracking)(LookupHint=Codeunit BarcodeScannerItemTrackTest - NamedType SerialWithParenthesesErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1863825474 - NamedType 229276628" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The expected value is false but now is true!]]></Val>
@@ -48,6 +57,33 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.Foundation.NoSeries)(LookupHint=Codeunit No. Series Check Tests - NamedType StartingNumberTxt)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";EnumExtension 2720473303 - EnumValue 3208847217 - Property 2879900210" ItemType=";EnumExtension - EnumValue" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Test Caption Longer Than 20]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Enum 691140679)(Namespace=Microsoft.Test.Utilities)(LookupHint=EnumExtension Mock Purch. Line Type Custom - EnumValue Test_Custom_Long - Property Caption)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";EnumExtension 4000267206 - EnumValue 1634683813 - Property 2879900210" ItemType=";EnumExtension - EnumValue" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Test Caption Longer Than 20]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Enum 1710557762)(Namespace=Microsoft.Test.Utilities)(LookupHint=EnumExtension Mock Sales Line Type - Custom - EnumValue Test_Custom1 - Property Caption)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";EnumExtension 4000267206 - EnumValue 996987196 - Property 2879900210" ItemType=";EnumExtension - EnumValue" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Test_Custom2]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Enum 1710557762)(Namespace=Microsoft.Test.Utilities)(LookupHint=EnumExtension Mock Sales Line Type - Custom - EnumValue Test_Custom2 - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Table 2310708758 - Property 2879900210" ItemType=";Table - Table" PsrId="63" InstFlg="true" Leaf="true">
@@ -3875,6 +3911,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Document Attachment Tests - NamedType TwoAttachmentsExpectedErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2785749549 - NamedType 590722512" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Unexpected visibility for field %1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1=FieldCaption]D;]A;(LookupHint=Codeunit Document Attachment Tests - NamedType UnexpectedFieldVisibilityErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2785749549 - NamedType 176304992" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Unexpected field visible! %1]]></Val>
@@ -3940,7 +3985,7 @@
   </Item>
   <Item ItemId=";Codeunit 3063528946 - NamedType 965602537" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[The electronic document format PEPPOL does not exist for the document type Sales Invoice.]]></Val>
+      <Val><![CDATA[The electronic document format PEPPOL30 does not exist for the document type Sales Invoice.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -4395,6 +4440,177 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtendedTxt)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1240596346 - NamedType 512824483" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended text lines were deleted after editing description on the purchase credit memo line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtTextDeletedOnPurchaseCreditMemoErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1240596346 - NamedType 3004417001" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended text lines were deleted after editing description on the purchase invoice line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtTextDeletedOnPurchaseInvoiceErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1240596346 - NamedType 408211484" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended text lines were deleted after editing description on the purchase order line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtTextDeletedOnPurchaseOrderErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1240596346 - NamedType 2181811400" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended text lines were deleted after editing description on the purchase quote line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtTextDeletedOnPurchaseQuoteErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1240596346 - NamedType 1946194406" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended text lines were deleted after editing description on the sales credit memo line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtTextDeletedOnSalesCreditMemoErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1240596346 - NamedType 3044879424" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended text lines were deleted after editing description on the sales invoice line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtTextDeletedOnSalesInvoiceErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1240596346 - NamedType 3003190789" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended text lines were deleted after editing description on the sales order line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtTextDeletedOnSalesOrderErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1240596346 - NamedType 2530676657" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended text lines were deleted after editing description on the sales quote line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtTextDeletedOnSalesQuoteErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1240596346 - NamedType 1888628587" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended text lines were deleted after editing description on the sales return order line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtTextDeletedOnSalesReturnOrderErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1240596346 - NamedType 3294327772" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended text lines were not loaded when setting an item on the sales quote line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtTextNotLoadedOnSalesQuoteErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1240596346 - NamedType 2738793875" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended text lines were updated after editing description on the purchase credit memo line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtTextUpdatedOnPurchaseCreditMemoErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1240596346 - NamedType 3405574905" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended text lines were updated after editing description on the purchase invoice line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtTextUpdatedOnPurchaseInvoiceErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1240596346 - NamedType 1131235212" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended text lines were updated after editing description on the purchase order line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtTextUpdatedOnPurchaseOrderErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1240596346 - NamedType 3689960024" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended text lines were updated after editing description on the purchase quote line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtTextUpdatedOnPurchaseQuoteErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1240596346 - NamedType 437456342" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended text lines were updated after editing description on the sales credit memo line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtTextUpdatedOnSalesCreditMemoErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1240596346 - NamedType 4279744080" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended text lines were updated after editing description on the sales invoice line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtTextUpdatedOnSalesInvoiceErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1240596346 - NamedType 3690052277" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended text lines were updated after editing description on the sales order line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtTextUpdatedOnSalesOrderErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1240596346 - NamedType 2157158401" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended text lines were updated after editing description on the sales quote line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtTextUpdatedOnSalesQuoteErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1240596346 - NamedType 1936637403" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended text lines were updated after editing description on the sales return order line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Extended Text Documents - NamedType ExtTextUpdatedOnSalesReturnOrderErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1240596346 - NamedType 3351274" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -4908,6 +5124,24 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Option Lookup Buffer Test - NamedType InvalidTypeErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 146690505 - NamedType 1384985653" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Legacy Format Type]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Option Lookup Buffer Test - NamedType LegacyFormattedTypeTxt)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 146690505 - NamedType 3493915328" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Formatted Type Longer Than 20]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Option Lookup Buffer Test - NamedType LongFormattedTypeTxt)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2652031983 - NamedType 487990981" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -6573,24 +6807,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Report Sales Processing Only - Property Caption)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";EnumExtension 4000267206 - EnumValue 1634683813 - Property 2879900210" ItemType=";EnumExtension - EnumValue" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Test_Custom1]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Enum 1710557762)(LookupHint=EnumExtension Mock Sales Line Type - Custom - EnumValue Test_Custom1 - Property Caption)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";EnumExtension 4000267206 - EnumValue 996987196 - Property 2879900210" ItemType=";EnumExtension - EnumValue" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Test_Custom2]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Enum 1710557762)(LookupHint=EnumExtension Mock Sales Line Type - Custom - EnumValue Test_Custom2 - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";EnumExtension 1891076778 - EnumValue 1230801577 - Property 2879900210" ItemType=";EnumExtension - EnumValue" PsrId="63" InstFlg="true" Leaf="true">

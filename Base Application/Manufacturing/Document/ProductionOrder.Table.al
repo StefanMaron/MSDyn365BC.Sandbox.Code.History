@@ -126,6 +126,7 @@ table 5405 "Production Order"
                 Item: Record Item;
                 Family: Record Family;
                 SalesHeader: Record "Sales Header";
+                StockkeepingUnit: Record "Stockkeeping Unit";
             begin
                 if "Source No." <> xRec."Source No." then begin
                     CheckProdOrderStatus(FieldCaption("Source No."));
@@ -143,6 +144,10 @@ table 5405 "Production Order"
                             InitFromSourceNo(
                               Item.Description, Item."Description 2", Item."Routing No.",
                               Item."Inventory Posting Group", Item."Gen. Prod. Posting Group", '', Item."Unit Cost");
+                            if StockkeepingUnit.Get("Location Code", "Source No.", "Variant Code") and
+                               (StockkeepingUnit."Routing No." <> '')
+                            then
+                                "Routing No." := StockkeepingUnit."Routing No.";
                             CreateDimFromDefaultDim();
                             OnBeforeAssignItemNo(Rec, xRec, Item, CurrFieldNo);
                         end;
@@ -1145,7 +1150,7 @@ table 5405 "Production Order"
                 Rec, CurrFieldNo, DefaultDimSource, '', "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", 0, 0);
         end;
 
-        OnAfterCreateDim(Rec, DefaultDimSource);
+        OnAfterCreateDim(Rec, DefaultDimSource, xRec);
     end;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
@@ -1207,9 +1212,6 @@ table 5405 "Production Order"
     procedure CreatePick(AssignedUserID: Code[50]; SortingMethod: Option; SetBreakBulkFilter: Boolean; DoNotFillQtyToHandle: Boolean; PrintDocument: Boolean)
     var
         ProdOrderComponent: Record "Prod. Order Component";
-#if not CLEAN26
-        ManufacturingSetup: Record "Manufacturing Setup";
-#endif
         ItemTrackingManagement: Codeunit "Item Tracking Management";
     begin
         ProdOrderComponent.Reset();
@@ -1234,22 +1236,10 @@ table 5405 "Production Order"
         ProdOrderComponent.Reset();
         ProdOrderComponent.SetRange(Status, Status);
         ProdOrderComponent.SetRange("Prod. Order No.", "No.");
-
-#if not CLEAN26
-        if not ManufacturingSetup.IsFeatureKeyFlushingMethodManualWithoutPickEnabled() then
-            ProdOrderComponent.SetFilter(
-              "Flushing Method", '%1|%2|%3|%4',
-              ProdOrderComponent."Flushing Method"::Manual,
-              ProdOrderComponent."Flushing Method"::"Pick + Manual",
-              ProdOrderComponent."Flushing Method"::"Pick + Forward",
-              ProdOrderComponent."Flushing Method"::"Pick + Backward")
-        else
-#endif
-            ProdOrderComponent.SetFilter(
-              "Flushing Method", '%1|%2|%3',
-              ProdOrderComponent."Flushing Method"::"Pick + Manual",
-              ProdOrderComponent."Flushing Method"::"Pick + Forward",
-              ProdOrderComponent."Flushing Method"::"Pick + Backward");
+        ProdOrderComponent.SetFilter("Flushing Method", '%1|%2|%3',
+            ProdOrderComponent."Flushing Method"::"Pick + Manual",
+            ProdOrderComponent."Flushing Method"::"Pick + Forward",
+            ProdOrderComponent."Flushing Method"::"Pick + Backward");
         ProdOrderComponent.SetRange("Planning Level Code", 0);
         ProdOrderComponent.SetFilter("Expected Quantity", '>0');
         OnCreatePickOnBeforeRunCreatePickFromWhseSource(ProdOrderComponent);
@@ -1616,6 +1606,9 @@ table 5405 "Production Order"
     var
         DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
     begin
+        if Rec.IsTemporary() then
+            exit;
+
         InitDefaultDimensionSources(DefaultDimSource);
         CreateDim(DefaultDimSource);
     end;
@@ -1720,7 +1713,7 @@ table 5405 "Production Order"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDim(var ProductionOrder: Record "Production Order"; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
+    local procedure OnAfterCreateDim(var ProductionOrder: Record "Production Order"; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; xProductionOrder: Record "Production Order")
     begin
     end;
 

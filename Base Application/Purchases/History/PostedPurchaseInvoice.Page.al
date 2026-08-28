@@ -196,6 +196,12 @@ page 138 "Posted Purchase Invoice"
                     Editable = false;
                     Importance = Promoted;
                 }
+                field("Spend Request No."; Rec."Spend Request No.")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Editable = false;
+                    Importance = Additional;
+                }
                 field("Vendor Order No."; Rec."Vendor Order No.")
                 {
                     ApplicationArea = Basic, Suite;
@@ -255,6 +261,14 @@ page 138 "Posted Purchase Invoice"
                     begin
                         Rec.ShowCancelledCreditMemo();
                     end;
+                }
+                field("Dispute Status"; Rec."Dispute Status")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Editable = false;
+                    Visible = false;
+                    Importance = Additional;
+                    ToolTip = 'Specifies if there is an ongoing dispute for this document.';
                 }
             }
             part(PurchInvLines; "Posted Purch. Invoice Subform")

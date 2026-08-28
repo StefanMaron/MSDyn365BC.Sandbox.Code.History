@@ -48,6 +48,7 @@ using Microsoft.Finance.Payroll;
 using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.Finance.RoleCenters;
 using Microsoft.Finance.SalesTax;
+using Microsoft.Finance.SpendRequest;
 using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Finance.VAT.Clause;
 using Microsoft.Finance.VAT.Ledger;
@@ -189,6 +190,13 @@ codeunit 1751 "Data Classification Eval. Data"
         OnCreateEvaluationDataOnAfterClassifyTablesToNormal();
 
         DataClassEvalDataCountry.ClassifyCountrySpecificTables();
+
+        // All unclassified CustomerContent fields on system tables default to Company Confidential
+        DataSensitivity.SetRange("Data Sensitivity", DataSensitivity."Data Sensitivity"::Unclassified);
+        DataSensitivity.SetFilter("Table No", '%1..', 2000000000);
+        DataSensitivity.SetRange("Data Classification", DataSensitivity."Data Classification"::CustomerContent);
+        DataSensitivity.ModifyAll("Data Sensitivity", DataSensitivity."Data Sensitivity"::"Company Confidential");
+        DataSensitivity.Reset();
 
         // All EUII and EUPI Fields are set to Personal
         DataSensitivity.SetFilter("Data Classification", '%1|%2',
@@ -381,10 +389,26 @@ codeunit 1751 "Data Classification Eval. Data"
         ClassifyPermissionSetInPlan();
         ClassifyFinancialReports();
         ClassifyICBankAccount();
+        ClassifyICAPILog();
         ClassifyAllocationAccounts();
         ClassifyAgents();
         ClassifyOrderTakerAgent();
+        ClassifySalesValidationAgent();
+        ClassifySalesReturnAgent();
         ClasifyScheduledPerformanceProfiling();
+        ClassifySpendRequests();
+    end;
+
+    local procedure ClassifySpendRequests()
+    var
+        SpendRequest: Record "Spend Request";
+    begin
+        SetTableFieldsToNormal(Database::"Spend Request");
+        SetTableFieldsToNormal(Database::"Spend Request Detail");
+        SetTableFieldsToNormal(Database::"Spend Request To G/L Link");
+        SetFieldToPersonal(Database::"Spend Request", SpendRequest.FieldNo("Requested By"));
+        SetFieldToPersonal(Database::"Spend Request", SpendRequest.FieldNo("Approved/Rejected by User ID"));
+        SetFieldToPersonal(Database::"Spend Request", SpendRequest.FieldNo("Approved/Rejected by User Name"));
     end;
 
     local procedure ClassifyFinancialReports()
@@ -404,6 +428,11 @@ codeunit 1751 "Data Classification Eval. Data"
         SetTableFieldsToNormal(Database::"Financial Report Audit Log");
         SetTableFieldsToNormal(Database::"Financial Report Status");
         SetFieldToPersonal(Database::"Financial Report User Filters", FinancialReportUserFilters.FieldNo("User ID"));
+        SetTableFieldsToNormal(Database::"Financial Report Package");
+        SetTableFieldsToNormal(Database::"Fin. Report Package Report");
+        SetTableFieldsToNormal(Database::"Fin. Report Package Schedule");
+        SetTableFieldsToNormal(Database::"Fin. Report Package Recipient");
+        SetTableFieldsToNormal(Database::"Fin. Rep. Package Export Log");
         SetFieldToPersonal(Database::"Financial Report Audit Log", FinancialReportAuditLog.FieldNo("User"));
     end;
 
@@ -763,6 +792,7 @@ codeunit 1751 "Data Classification Eval. Data"
         SetTableFieldsToNormal(DATABASE::"Aged Report Entity");
         SetTableFieldsToNormal(DATABASE::"Acc. Schedule Line Entity");
         SetTableFieldsToNormal(DATABASE::"Fixed Asset");
+        SetTableFieldsToNormal(DATABASE::"Adv. Bonus Depreciation Setup");
         SetTableFieldsToNormal(DATABASE::"FA Setup");
         SetTableFieldsToNormal(DATABASE::"FA Posting Type Setup");
         SetTableFieldsToNormal(DATABASE::"FA Posting Group");
@@ -2456,6 +2486,7 @@ codeunit 1751 "Data Classification Eval. Data"
         SetFieldToPersonal(8900, 2); // Subject
         SetFieldToPersonal(8900, 3); // Body
         SetFieldToPersonal(8900, 7); // External message id
+        SetFieldToPersonal(8900, 8); // Message Headers
     end;
 
     local procedure ClassifyEmailRetry()
@@ -3779,6 +3810,17 @@ codeunit 1751 "Data Classification Eval. Data"
         SetFieldToPersonal(TableNo, RemitAddress.FieldNo(IBAN));
     end;
 
+    local procedure ClassifyICAPILog()
+    var
+        DummyICAPILog: Record "IC API Log";
+        TableNo: Integer;
+    begin
+        TableNo := Database::"IC API Log";
+        SetTableFieldsToNormal(TableNo);
+        SetFieldToPersonal(TableNo, DummyICAPILog.FieldNo("Request Body"));
+        SetFieldToPersonal(TableNo, DummyICAPILog.FieldNo("Response Body"));
+    end;
+
     local procedure ClassifyOrderTakerAgent()
     begin
         SetTableFieldsToNormal(4305); // "SOA Instruction Template"
@@ -3797,6 +3839,16 @@ codeunit 1751 "Data Classification Eval. Data"
         SetFieldToPersonal(4592, 10); // Sender Name
     end;
 
+    local procedure ClassifySalesValidationAgent()
+    begin
+        SetTableFieldsToNormal(53607); // "Sales Val. Agent KPI"
+    end;
+
+    local procedure ClassifySalesReturnAgent()
+    begin
+        SetTableFieldsToNormal(53701); // "Sales Ret. Agent KPI"
+    end;
+
     local procedure ClassifyAgents()
     var
         DummyAgent: Record "Agent";
@@ -3809,6 +3861,7 @@ codeunit 1751 "Data Classification Eval. Data"
         DummyAgentTaskTimelineStepDetail: Record "Agent Task Timeline Step Det.";
         DummyAgentTaskTimeline: Record "Agent Task Timeline";
         DummyAgentTaskLogEntry: Record "Agent Task Log Entry";
+        DummyAgentCreationControl: Record "Agent Creation Control";
         TableNo: Integer;
     begin
         TableNo := DATABASE::"Agent";
@@ -3866,6 +3919,10 @@ codeunit 1751 "Data Classification Eval. Data"
         SetFieldToCompanyConfidential(TableNo, DummyAgentTaskLogEntry.FieldNo("Details"));
         SetFieldToCompanyConfidential(TableNo, DummyAgentTaskLogEntry.FieldNo("Description"));
         SetFieldToCompanyConfidential(TableNo, DummyAgentTaskLogEntry.FieldNo("Page Caption"));
+
+        TableNo := DATABASE::"Agent Creation Control";
+        SetTableFieldsToNormal(TableNo);
+        SetFieldToPersonal(TableNo, DummyAgentCreationControl.FieldNo("User Security ID"));
 
         // Agent Designer
         SetTableFieldsToNormal(4350); // "Custom Agent Setup"

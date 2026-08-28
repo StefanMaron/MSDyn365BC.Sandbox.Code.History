@@ -43,6 +43,18 @@
       "path": "./Tests-ERM"
     },
     {
+      "path": "./Tests-ERM-Application"
+    },
+    {
+      "path": "./Tests-ERM-Finance"
+    },
+    {
+      "path": "./Tests-ERM-Purchase"
+    },
+    {
+      "path": "./Tests-ERM-Sales"
+    },
+    {
       "path": "./Tests-Fixed Asset"
     },
     {
@@ -79,9 +91,6 @@
       "path": "./Tests-NewObjects-Internal"
     },
     {
-      "path": "./Tests-Performance-Internal"
-    },
-    {
       "path": "./Tests-Permissions"
     },
     {
@@ -109,10 +118,25 @@
       "path": "./Tests-SCM-Assembly"
     },
     {
+      "path": "./Tests-SCM-Costing"
+    },
+    {
       "path": "./Tests-SCM-Manufacturing"
     },
     {
+      "path": "./Tests-SCM-Planning"
+    },
+    {
+      "path": "./Tests-SCM-Reservation"
+    },
+    {
       "path": "./Tests-SCM-Service"
+    },
+    {
+      "path": "./Tests-SCM-Warehouse"
+    },
+    {
+      "path": "./Tests-SCM-Workflow"
     },
     {
       "path": "./Tests-SINGLESERVER"
@@ -139,19 +163,19 @@
       "path": "./Tests-Workflow"
     },
     {
-      "path": "./Base Application/System/DevTools/CALTest"
+      "path": "./AI Test Toolkit/src/TestSuite"
     },
     {
-      "path": "./Test Runner/src/DataDrivenTest"
+      "path": "./System Application Test Library/Extension Management/testArtifacts"
+    },
+    {
+      "path": "./Base Application/System/DevTools/CALTest"
     },
     {
       "path": "./System Application/Email/src/Test Email"
     },
     {
-      "path": "./AI Test Toolkit/src/TestSuite"
-    },
-    {
-      "path": "./System Application Test Library/Extension Management/testArtifacts"
+      "path": "./Test Runner/src/DataDrivenTest"
     }
   ],
   "settings": {
