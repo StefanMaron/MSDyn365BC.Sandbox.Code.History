@@ -213,6 +213,7 @@ codeunit 87 "Blanket Sales Order to Order"
                     SalesLineOrder."Qty. to Asm. to Order (Base)" := SalesLineOrder."Quantity (Base)";
                 end;
                 SalesLineOrder.DefaultDeferralCode();
+                RemapAttachedToLineNo(SalesLineBlanketOrder, SalesLineOrder);
                 if IsSalesOrderLineToBeInserted(SalesLineOrder) then begin
                     OnBeforeInsertSalesOrderLine(SalesLineOrder, SalesHeaderOrder, SalesLineBlanketOrder, SalesHeaderBlanketOrder);
                     SalesLineOrder.Insert();
@@ -451,6 +452,8 @@ codeunit 87 "Blanket Sales Order to Order"
                         SalesLine."Qty. to Asm. to Order (Base)" := SalesLine."Quantity (Base)";
                         SalesLine."Outstanding Quantity" -= SalesLine."Qty. to Assemble to Order";
                         SalesLine."Outstanding Qty. (Base)" -= SalesLine."Qty. to Asm. to Order (Base)";
+
+                        RefreshBlanketAssemblyBOMIfEmpty(BlanketOrderSalesLine, ATOLink);
                     end;
 
                     ShouldCheckSalesLineItemAvailability := not HideValidationDialog;
@@ -475,6 +478,20 @@ codeunit 87 "Blanket Sales Order to Order"
             ItemCheckAvail.RaiseUpdateInterruptedError();
     end;
 
+    local procedure RefreshBlanketAssemblyBOMIfEmpty(var BlanketOrderSalesLine: Record "Sales Line"; ATOLink: Record "Assemble-to-Order Link")
+    var
+        AssemblyHeader: Record "Assembly Header";
+        AssemblyLine: Record "Assembly Line";
+    begin
+        AssemblyLine.SetRange("Document No.", ATOLink."Assembly Document No.");
+        AssemblyLine.SetRange("Document Type", ATOLink."Assembly Document Type");
+        if not AssemblyLine.IsEmpty() then
+            exit;
+
+        if BlanketOrderSalesLine.AsmToOrderExists(AssemblyHeader) then
+            AssemblyHeader.RefreshBOM();
+    end;
+
     local procedure IsSalesOrderLineToBeInserted(SalesOrderLine: Record "Sales Line"): Boolean
     var
         AttachedToSalesLine: Record "Sales Line";
@@ -485,6 +502,23 @@ codeunit 87 "Blanket Sales Order to Order"
         exit(
           AttachedToSalesLine.Get(
             SalesOrderLine."Document Type", SalesOrderLine."Document No.", SalesOrderLine."Attached to Line No."));
+    end;
+
+    local procedure RemapAttachedToLineNo(SalesLineBlanketOrder: Record "Sales Line"; var SalesLineOrder: Record "Sales Line")
+    var
+        ParentSalesLine: Record "Sales Line";
+    begin
+        if SalesLineOrder."Attached to Line No." = 0 then
+            exit;
+
+        ParentSalesLine.SetCurrentKey("Document Type", "Blanket Order No.", "Blanket Order Line No.");
+        ParentSalesLine.SetLoadFields("Line No.");
+        ParentSalesLine.SetRange("Document Type", SalesLineOrder."Document Type");
+        ParentSalesLine.SetRange("Document No.", SalesLineOrder."Document No.");
+        ParentSalesLine.SetRange("Blanket Order No.", SalesLineBlanketOrder."Document No.");
+        ParentSalesLine.SetRange("Blanket Order Line No.", SalesLineBlanketOrder."Attached to Line No.");
+        if ParentSalesLine.FindFirst() then
+            SalesLineOrder."Attached to Line No." := ParentSalesLine."Line No.";
     end;
 
     [IntegrationEvent(false, false)]

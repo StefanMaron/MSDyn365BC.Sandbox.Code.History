@@ -108,7 +108,6 @@ page 46 "Sales Order Subform"
                         UpdateEditableOnRow();
                         Rec.ShowShortcutDimCode(ShortcutDimCode);
 
-                        QuantityOnAfterValidate();
                         UpdateTypeText();
                         DeltaUpdateTotals();
 
@@ -246,18 +245,24 @@ page 46 "Sales Order Subform"
                     ToolTip = 'Specifies a description of what you’re selling. Based on your choices in the Type and No. fields, the field may show suggested text that you can change it for this document. To add a comment, set the Type field to Comment and write the comment itself here.';
 
                     trigger OnValidate()
+                    var
+                        LookupSelectionRestored: Boolean;
                     begin
                         UpdateEditableOnRow();
 
-                        Rec.RestoreLookupSelection();
-                        NoOnAfterValidate();
-
-                        if Rec."No." = xRec."No." then
+                        LookupSelectionRestored := Rec.RestoreLookupSelectionWithResult();
+                        if (Rec."No." <> xRec."No.") or LookupSelectionRestored then
+                            NoOnAfterValidateInternal(LookupSelectionRestored);
+                        if Rec."No." <> xRec."No." then begin
+                            ResetxRecAmountValues();
+                            CalculateTotals();
+                            DeltaUpdateTotals();
+                        end;
+                        if (Rec."No." = xRec."No.") and not LookupSelectionRestored then
                             exit;
 
                         Rec.ShowShortcutDimCode(ShortcutDimCode);
                         UpdateTypeText();
-                        DeltaUpdateTotals();
                         OnAfterValidateDescription(Rec, xRec);
                     end;
 
@@ -1994,6 +1999,9 @@ page 46 "Sales Order Subform"
     /// <param name="Unconditionally">Whether to insert text without conditions.</param>
     procedure InsertExtendedText(Unconditionally: Boolean)
     begin
+        if not Unconditionally and (Rec."No." = xRec."No.") then
+            exit;
+
         OnBeforeInsertExtendedText(Rec);
         if TransferExtendedText.SalesCheckIfAnyExtText(Rec, Unconditionally) then begin
             CurrPage.SaveRecord();
@@ -2078,7 +2086,16 @@ page 46 "Sales Order Subform"
     /// </summary>
     procedure NoOnAfterValidate()
     begin
+        NoOnAfterValidateInternal(false);
+    end;
+
+    local procedure NoOnAfterValidateInternal(AutoReserveFromLookup: Boolean)
+    var
+        NoHasChanged: Boolean;
+    begin
         OnBeforeNoOnAfterValidate(Rec, xRec);
+
+        NoHasChanged := (Rec."No." <> xRec."No.") or AutoReserveFromLookup;
 
         InsertExtendedText(false);
         if (Rec.Type = Rec.Type::"Charge (Item)") and (Rec."No." <> xRec."No.") and
@@ -2094,7 +2111,7 @@ page 46 "Sales Order Subform"
 
         if Rec.Reserve = Rec.Reserve::Always then begin
             CurrPage.SaveRecord();
-            if (Rec."Outstanding Qty. (Base)" <> 0) and (Rec."No." <> xRec."No.") then begin
+            if (Rec."Outstanding Qty. (Base)" <> 0) and NoHasChanged then begin
                 Rec.AutoReserve();
                 CurrPage.Update(false);
             end;
@@ -2396,6 +2413,16 @@ page 46 "Sales Order Subform"
         AssembleToOrderLink.UpdateAsmDimFromSalesLine(Rec);
 
         OnAfterValidateShortcutDimCode(Rec, ShortcutDimCode, DimIndex);
+    end;
+
+    local procedure ResetxRecAmountValues()
+    begin
+        xRec."Line Amount" := 0;
+        xRec."Amount Including VAT" := 0;
+        xRec.Amount := 0;
+        xRec."Inv. Discount Amount" := 0;
+        xRec."VAT Base Amount" := 0;
+        xRec."VAT Difference" := 0;
     end;
 
     [IntegrationEvent(true, false)]

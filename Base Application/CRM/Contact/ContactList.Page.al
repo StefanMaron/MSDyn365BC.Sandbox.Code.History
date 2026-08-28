@@ -9,6 +9,7 @@ using Microsoft.CRM.BusinessRelation;
 using Microsoft.CRM.Comment;
 using Microsoft.CRM.Interaction;
 using Microsoft.CRM.Opportunity;
+using Microsoft.CRM.Outlook;
 using Microsoft.CRM.Profiling;
 using Microsoft.CRM.Reports;
 using Microsoft.CRM.Segment;
@@ -946,6 +947,21 @@ page 5052 "Contact List"
                     WordTemplateSelectionWizard.RunModal();
                 end;
             }
+            action(SynchronizeWithOutlookAndTeams)
+            {
+                ApplicationArea = Basic, Suite;
+                Caption = 'Synchronize with Outlook';
+                Image = Refresh;
+                Ellipsis = true;
+                ToolTip = 'Synchronize this list with your contacts stored in Microsoft 365, so that you can get to them easily from your Outlook or Teams apps. You will be able to choose which specific contacts are synchronized.';
+
+                trigger OnAction()
+                var
+                    ContactSyncPage: Page "Contact Sync";
+                begin
+                    ContactSyncPage.RunModal();
+                end;
+            }
             action(Email)
             {
                 ApplicationArea = All;
@@ -1001,7 +1017,6 @@ page 5052 "Contact List"
                 Caption = 'Contact Labels';
                 Image = "Report";
                 RunObject = Report "Contact - Labels";
-                ToolTip = 'View mailing labels with names and addresses of your contacts. For example, you can use the report to review contact information before you send sales and marketing campaign letters.';
             }
             action("Questionnaire Handout")
             {
@@ -1009,7 +1024,6 @@ page 5052 "Contact List"
                 Caption = 'Questionnaire Handout';
                 Image = "Report";
                 RunObject = Report "Questionnaire - Handouts";
-                ToolTip = 'View your profile questionnaire for the contact. You can print this report to have a printed copy of the questions that are within the profile questionnaire.';
             }
             action("Sales Cycle Analysis")
             {
@@ -1017,7 +1031,6 @@ page 5052 "Contact List"
                 Caption = 'Sales Cycle Analysis';
                 Image = "Report";
                 RunObject = Report "Sales Cycle - Analysis";
-                ToolTip = 'View information about your sales cycles. The report includes details about the sales cycle, such as the number of opportunities currently at that stage, the estimated and calculated current values of opportunities created using the sales cycle, and so on.';
             }
         }
         area(Promoted)
@@ -1155,6 +1168,19 @@ page 5052 "Contact List"
         StyleIsStrong := Rec.Type = Rec.Type::Company;
     end;
 
+    trigger OnFindRecord(Which: Text): Boolean
+    var
+        Found: Boolean;
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnBeforeFindRecord(Rec, Which, Found, IsHandled);
+        if IsHandled then
+            exit(Found);
+
+        exit(Rec.Find(Which));
+    end;
+
     trigger OnOpenPage()
     var
         CRMIntegrationManagement: Codeunit "CRM Integration Management";
@@ -1212,6 +1238,11 @@ page 5052 "Contact List"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateContactBusinessRelationOnContacts(Contact: Record Contact; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeFindRecord(var Contact: Record Contact; Which: Text; var Found: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

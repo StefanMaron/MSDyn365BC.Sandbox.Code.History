@@ -400,6 +400,7 @@ codeunit 7313 "Create Put-away"
             WhseActivLine."Qty. Rounding Precision" := PutAwayItemUnitOfMeasure."Qty. Rounding Precision";
             WhseActivLine."Qty. Rounding Precision (Base)" := BasePutAwayItemUnitOfMeasure."Qty. Rounding Precision";
         end;
+        OnCreateNewWhseActivityOnBeforeValidateQuantity(WhseActivLine, BreakPackage, ActionType, CurrLocation, PutAwayItemUnitOfMeasure, PostedWhseRcptLine);
         WhseActivLine.Validate(
           Quantity, UnitOfMeasureManagement.RoundQty(QtyToHandleBase / WhseActivLine."Qty. per Unit of Measure", WhseActivLine."Qty. Rounding Precision"));
         if QtyToHandleBase <> 0 then begin
@@ -562,6 +563,7 @@ codeunit 7313 "Create Put-away"
     procedure CalcQtyToPutAway(EmptyZoneBin: Boolean; NewBinContent: Boolean)
     var
         ActionType: Enum "Warehouse Action Type";
+        IsHandled: Boolean;
     begin
         if CurrLocation."Bin Mandatory" then begin
             ActionType := ActionType::Place;
@@ -575,12 +577,16 @@ codeunit 7313 "Create Put-away"
             PostedWhseReceiptLine, CurrLocation, CurrBin, CrossDockInfo, EmptyZoneBin, QtyToPutAwayBase, EverythingHandled, RemQtyToPutAwayBase, NewBinContent);
         QtyToPickBase := QtyToPickBase + QtyToPutAwayBase;
         if QtyToPutAwayBase > 0 then begin
-            LineNo := LineNo + 10000;
-            if NewBinContent and CurrLocation."Directed Put-away and Pick" then
-                CreateBinContent(PostedWhseReceiptLine);
-            CreateNewWhseActivity(
-              PostedWhseReceiptLine, CurrWarehouseActivityLine, ActionType, LineNo,
-              0, QtyToPutAwayBase, true, false, EmptyZoneBin, false)
+            IsHandled := false;
+            OnCalcQtyToPutAwayOnBeforeCreateBinContent(CurrLocation, PostedWhseReceiptLine, CurrBin, QtyToPutAwayBase, IsHandled);
+            if not IsHandled then begin
+                LineNo := LineNo + 10000;
+                if NewBinContent and CurrLocation."Directed Put-away and Pick" then
+                    CreateBinContent(PostedWhseReceiptLine);
+                CreateNewWhseActivity(
+                  PostedWhseReceiptLine, CurrWarehouseActivityLine, ActionType, LineNo,
+                  0, QtyToPutAwayBase, true, false, EmptyZoneBin, false);
+            end;
         end
     end;
 
@@ -1256,6 +1262,11 @@ codeunit 7313 "Create Put-away"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnCalcQtyToPutAwayOnBeforeCreateBinContent(Location: Record Location; PostedWhseReceiptLine: Record "Posted Whse. Receipt Line"; Bin: Record Bin; QtyToPutAwayBase: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnCodeOnAfterCreateNewWhseActivity(var WarehouseActivityLine: Record "Warehouse Activity Line")
     begin
     end;
@@ -1272,6 +1283,11 @@ codeunit 7313 "Create Put-away"
 
     [IntegrationEvent(false, false)]
     local procedure OnCreateNewWhseActivityOnAfterAssignBinZone(var WhseActivLine: Record "Warehouse Activity Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateNewWhseActivityOnBeforeValidateQuantity(var WarehouseActivityLine: Record "Warehouse Activity Line"; BreakPackage: Boolean; ActionType: Enum "Warehouse Action Type"; var Location: Record Location; var ItemUnitOfMeasure: Record "Item Unit of Measure"; var PostedWhseReceiptLine: Record "Posted Whse. Receipt Line")
     begin
     end;
 

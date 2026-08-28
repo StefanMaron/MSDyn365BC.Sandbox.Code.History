@@ -98,6 +98,9 @@ codeunit 10145 "E-Invoice Mgt."
         NumeroPedimentoFormatTxt: Label '%1  %2  %3  %4', Comment = '%1 year; %2 - customs office; %3 patent number; %4 progressive number.';
         // fault model labels
         MXElectronicInvoicingTok: Label 'MXElectronicInvoicingTelemetryCategoryTok', Locked = true;
+        CFDIServiceNameTxt: Label 'CFDI', Locked = true;
+        SecurityAuditPACRejectedTxt: Label 'PAC rejected %1 request: %2', Locked = true, Comment = '%1 - document type, %2 - PAC error description';
+        SecurityAuditCFDICancelRequestedTxt: Label 'CFDI cancellation request submitted to PAC for %1 (Cancellation ID %2).', Locked = true, Comment = '%1 - document type, %2 - CFDI Cancellation ID';
         SATCertificateNotValidErr: Label 'The SAT certificate is not valid: %1', Comment = '%1 - last error.', Locked = true;
         StampReqMsg: Label 'Sending stamp request for document: %1', Locked = true;
         StampReqSuccessMsg: Label 'Stamp request successful for document: %1', Locked = true;
@@ -116,6 +119,7 @@ codeunit 10145 "E-Invoice Mgt."
         ProcessPaymentErr: Label 'Cannot process payment %2', Locked = true;
         SendPaymentMsg: Label 'Sending payment', Locked = true;
         SendPaymentSuccessMsg: Label 'Payment successfully sent', Locked = true;
+        StampAttemptsTelemetryMsg: Label 'Stamp request completed for document type: %1. Attempts: %2, Rounding model: %3, Succeeded: %4, Error code: %5.', Locked = true;
         SpecialCharsTxt: Label 'áéíñóúüÁÉÍÑÓÚÜ', Locked = true;
         SchemaLocation1xsdTxt: Label '%1  %2', Comment = '%1 - namespase; %2 - xsd location.';
         SchemaLocation2xsdTxt: Label '%1  %2  %3  %4', Comment = '%1 - namespase1; %2 - xsd location1; %3 - namespase2; %4 - xsd location2.';
@@ -151,10 +155,7 @@ codeunit 10145 "E-Invoice Mgt."
             1:// Request Stamp
                 begin
                     EDocActionValidation(EDocAction::"Request Stamp", ElectronicDocumentStatus);
-                    RequestStamp(RecRef, Prepayment, false);
-                    RequestStampOnRoundingError(RecRef, Prepayment, false, RoundingModel::"Model2-Recalc-NoDiscountRounding");
-                    RequestStampOnRoundingError(RecRef, Prepayment, false, RoundingModel::"Model3-NoRecalculation");
-                    RequestStampOnRoundingError(RecRef, Prepayment, false, RoundingModel::"Model4-DecimalBased");
+                    RequestStampWithRoundingFallback(RecRef, Prepayment, false);
                 end;
             2:// Send
                 begin
@@ -164,10 +165,7 @@ codeunit 10145 "E-Invoice Mgt."
             3:// Request Stamp and Send
                 begin
                     EDocActionValidation(EDocAction::"Request Stamp", ElectronicDocumentStatus);
-                    RequestStamp(RecRef, Prepayment, false);
-                    RequestStampOnRoundingError(RecRef, Prepayment, false, RoundingModel::"Model2-Recalc-NoDiscountRounding");
-                    RequestStampOnRoundingError(RecRef, Prepayment, false, RoundingModel::"Model3-NoRecalculation");
-                    RequestStampOnRoundingError(RecRef, Prepayment, false, RoundingModel::"Model4-DecimalBased");
+                    RequestStampWithRoundingFallback(RecRef, Prepayment, false);
                     Commit();
                     ElectronicDocumentStatus := RecRef.Field(10030).Value();
                     EDocActionValidation(EDocAction::Send, ElectronicDocumentStatus);
@@ -467,7 +465,8 @@ codeunit 10145 "E-Invoice Mgt."
                         if GetUUIDFromOriginalPrepayment(SalesInvoiceHeader, SalesInvoiceNumber) = '' then
                             Error(UnableToStampAppliedErr, SalesInvoiceNumber);
                     CreateTempDocument(
-                      SalesInvoiceHeader, TempDocumentHeader, TempDocumentLine, TempDocumentLineRetention, TempVATAmountLine,
+                      SalesInvoiceHeader, TempDocumentHeader, TempDocumentLine, TempDocumentLineRetention,
+                      TempVATAmountLine,
                       SubTotal, TotalTax, TotalRetention, TotalDiscount, AdvanceSettle);
                     if not Reverse and not AdvanceSettle then
                         GetRelationDocumentsInvoice(TempCFDIRelationDocument, TempDocumentHeader, DATABASE::"Sales Invoice Header");
@@ -541,6 +540,29 @@ codeunit 10145 "E-Invoice Mgt."
         Session.LogMessage(
             '0000C72', StrSubstNo(StampReqMsg, GetDocTypeTextFromDatabaseId(DocumentHeaderRecordRef.Number)), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', MXElectronicInvoicingTok);
         CurrencyDecimalPlaces := GetCurrencyDecimalPlaces(TempDocumentHeader."Currency Code");
+
+        // Recalculate SubTotal to match Σ(Importe) as written in XML (CFDI40108 compliance)
+        // Each line's Importe is rounded to 6 decimals; SubTotal must equal their sum.
+        // NOTE: Exclude AdvanceSettle because the advance-settle XML/original-string paths currently derive Total using
+        // a different TotalRetention sign convention.
+        if (not IsTransfer) and (not AdvanceSettle) then begin
+            SubTotal := 0;
+            TotalDiscount := 0;
+            TempDocumentLine.Reset();
+            if TempDocumentLine.FindSet() then
+                repeat
+                    if TempDocumentLine."Retention Attached to Line No." = 0 then begin
+                        SubTotal += Round(GetReportedLineAmount(TempDocumentLine), 0.000001);
+                        TotalDiscount += Round(TempDocumentLine."Line Discount Amount", 0.000001);
+                    end;
+                until TempDocumentLine.Next() = 0;
+            // Keep header amounts consistent for downstream consumers (e.g., ComercioExterior uses TempDocumentHeader.Amount).
+            TempDocumentHeader.Amount := RoundCurrencyDecimal(SubTotal - TotalDiscount);
+            // Recalculate Total for CFDI40119 consistency: Total = SubTotal - Descuento + Trasladados - |Retenidos|
+            // TotalRetention is stored as negative (from CalcDocumentTotalAmounts), so we ADD it to effectively subtract.
+            TempDocumentHeader."Amount Including VAT" := RoundCurrencyDecimal(SubTotal - TotalDiscount + TotalTax + TotalRetention);
+            TempDocumentHeader.Modify();
+        end;
 
         // Create Digital Stamp
         if IsTransfer then
@@ -720,13 +742,13 @@ codeunit 10145 "E-Invoice Mgt."
         case DocumentHeaderRecordRef.Number of
             DATABASE::"Sales Invoice Header":
                 begin
-                    ProcessResponseESalesInvoice(SalesInvoiceHeader, EDocAction::"Request Stamp", Reverse);
+                    ProcessResponseESalesInvoice(SalesInvoiceHeader, EDocAction::"Request Stamp", Reverse, TempDocumentHeader."Amount Including VAT");
                     SalesInvoiceHeader.Modify();
                     DocumentHeaderRecordRef.GetTable(SalesInvoiceHeader);
                 end;
             DATABASE::"Sales Cr.Memo Header":
                 begin
-                    ProcessResponseESalesCrMemo(SalesCrMemoHeader, EDocAction::"Request Stamp");
+                    ProcessResponseESalesCrMemo(SalesCrMemoHeader, EDocAction::"Request Stamp", TempDocumentHeader."Amount Including VAT");
                     SalesCrMemoHeader.Modify();
                     DocumentHeaderRecordRef.GetTable(SalesCrMemoHeader);
                 end;
@@ -1092,9 +1114,9 @@ codeunit 10145 "E-Invoice Mgt."
             SalesInvHeader.Modify();
             case MethodType of
                 MethodTypeRef::Cancel:
-                    ProcessResponseESalesInvoice(SalesInvHeader, EDocAction::Cancel, false);
+                    ProcessResponseESalesInvoice(SalesInvHeader, EDocAction::Cancel, false, 0);
                 MethodTypeRef::CancelRequest:
-                    ProcessResponseESalesInvoice(SalesInvHeader, EDocAction::CancelRequest, false);
+                    ProcessResponseESalesInvoice(SalesInvHeader, EDocAction::CancelRequest, false, 0);
             end;
             SalesInvHeader.Modify();
         end;
@@ -1149,9 +1171,9 @@ codeunit 10145 "E-Invoice Mgt."
             SalesCrMemoHeader.Modify();
             case MethodType of
                 MethodTypeRef::Cancel:
-                    ProcessResponseESalesCrMemo(SalesCrMemoHeader, EDocAction::Cancel);
+                    ProcessResponseESalesCrMemo(SalesCrMemoHeader, EDocAction::Cancel, 0);
                 MethodTypeRef::CancelRequest:
-                    ProcessResponseESalesCrMemo(SalesCrMemoHeader, EDocAction::CancelRequest);
+                    ProcessResponseESalesCrMemo(SalesCrMemoHeader, EDocAction::CancelRequest, 0);
             end;
             SalesCrMemoHeader.Modify();
         end;
@@ -1502,7 +1524,7 @@ codeunit 10145 "E-Invoice Mgt."
         XMLDoc.Save(OutStr);
     end;
 
-    local procedure ProcessResponseESalesInvoice(var SalesInvoiceHeader: Record "Sales Invoice Header"; "Action": Option; Reverse: Boolean)
+    local procedure ProcessResponseESalesInvoice(var SalesInvoiceHeader: Record "Sales Invoice Header"; "Action": Option; Reverse: Boolean; AmountInclVAT: Decimal)
     var
         Customer: Record Customer;
         CFDIDocuments: Record "CFDI Documents";
@@ -1604,6 +1626,7 @@ codeunit 10145 "E-Invoice Mgt."
 
             Session.LogMessage(
                 '0000C7M', StrSubstNo(ProcessResponseErr, GetDocTypeTextFromDatabaseId(Database::"Sales Invoice Header"), TelemetryError), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', MXElectronicInvoicingTok);
+            LogPACRejectionAudit(GetDocTypeTextFromDatabaseId(Database::"Sales Invoice Header"), TelemetryError);
 
             exit;
         end;
@@ -1614,6 +1637,7 @@ codeunit 10145 "E-Invoice Mgt."
             if Action = EDocAction::Cancel then begin
                 SalesInvoiceHeader."Electronic Document Status" := SalesInvoiceHeader."Electronic Document Status"::"Cancel In Progress";
                 SalesInvoiceHeader."CFDI Cancellation ID" := GetResponseValueCancellationID(XMLCurrNode, XMLDOMNamedNodeMap);
+                LogCFDICancelRequestedAudit(GetDocTypeTextFromDatabaseId(Database::"Sales Invoice Header"), SalesInvoiceHeader."CFDI Cancellation ID");
                 exit;
             end;
             if Action = EDocAction::CancelRequest then begin
@@ -1691,16 +1715,15 @@ codeunit 10145 "E-Invoice Mgt."
         end;
 
         // Create QRCode
-        SalesInvoiceHeader.CalcFields("Amount Including VAT");
         if not Reverse then begin
-            QRCodeInput := CreateQRCodeInput(CompanyInfo."RFC Number", Customer."RFC No.", SalesInvoiceHeader."Amount Including VAT",
+            QRCodeInput := CreateQRCodeInput(CompanyInfo."RFC Number", Customer."RFC No.", AmountInclVAT,
                 Format(SalesInvoiceHeader."Fiscal Invoice Number PAC"));
             CreateQRCode(QRCodeInput, TempBlob);
             RecordRef.GetTable(SalesInvoiceHeader);
             TempBlob.ToRecordRef(RecordRef, SalesInvoiceHeader.FieldNo("QR Code"));
             RecordRef.SetTable(SalesInvoiceHeader);
         end else begin
-            QRCodeInput := CreateQRCodeInput(CompanyInfo."RFC Number", Customer."RFC No.", SalesInvoiceHeader."Amount Including VAT",
+            QRCodeInput := CreateQRCodeInput(CompanyInfo."RFC Number", Customer."RFC No.", AmountInclVAT,
                 Format(CFDIDocuments."Fiscal Invoice Number PAC"));
             CreateQRCode(QRCodeInput, TempBlob);
             RecordRef.GetTable(CFDIDocuments);
@@ -1709,7 +1732,7 @@ codeunit 10145 "E-Invoice Mgt."
         end;
     end;
 
-    local procedure ProcessResponseESalesCrMemo(var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; "Action": Option)
+    local procedure ProcessResponseESalesCrMemo(var SalesCrMemoHeader: Record "Sales Cr.Memo Header"; "Action": Option; AmountInclVAT: Decimal)
     var
         Customer: Record Customer;
         PACWebService: Record "PAC Web Service";
@@ -1777,6 +1800,7 @@ codeunit 10145 "E-Invoice Mgt."
 
             Session.LogMessage(
                 '0000C7M', StrSubstNo(ProcessResponseErr, GetDocTypeTextFromDatabaseId(Database::"Sales Cr.Memo Header"), TelemetryError), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', MXElectronicInvoicingTok);
+            LogPACRejectionAudit(GetDocTypeTextFromDatabaseId(Database::"Sales Cr.Memo Header"), TelemetryError);
 
             exit;
         end;
@@ -1786,6 +1810,7 @@ codeunit 10145 "E-Invoice Mgt."
         if Action = EDocAction::Cancel then begin
             SalesCrMemoHeader."Electronic Document Status" := SalesCrMemoHeader."Electronic Document Status"::"Cancel In Progress";
             SalesCrMemoHeader."CFDI Cancellation ID" := GetResponseValueCancellationID(XMLCurrNode, XMLDOMNamedNodeMap);
+            LogCFDICancelRequestedAudit(GetDocTypeTextFromDatabaseId(Database::"Sales Cr.Memo Header"), SalesCrMemoHeader."CFDI Cancellation ID");
             exit;
         end;
         if Action = EDocAction::CancelRequest then begin
@@ -1836,8 +1861,7 @@ codeunit 10145 "E-Invoice Mgt."
         SalesCrMemoHeader."Electronic Document Status" := SalesCrMemoHeader."Electronic Document Status"::"Stamp Received";
 
         // Create QRCode
-        SalesCrMemoHeader.CalcFields("Amount Including VAT");
-        QRCodeInput := CreateQRCodeInput(CompanyInfo."RFC Number", Customer."RFC No.", SalesCrMemoHeader."Amount Including VAT",
+        QRCodeInput := CreateQRCodeInput(CompanyInfo."RFC Number", Customer."RFC No.", AmountInclVAT,
             Format(SalesCrMemoHeader."Fiscal Invoice Number PAC"));
         CreateQRCode(QRCodeInput, TempBlob);
         RecordRef.GetTable(SalesCrMemoHeader);
@@ -1913,6 +1937,7 @@ codeunit 10145 "E-Invoice Mgt."
 
             Session.LogMessage(
                 '0000C7M', StrSubstNo(ProcessResponseErr, GetDocTypeTextFromDatabaseId(Database::"Service Invoice Header"), TelemetryError), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', MXElectronicInvoicingTok);
+            LogPACRejectionAudit(GetDocTypeTextFromDatabaseId(Database::"Service Invoice Header"), TelemetryError);
 
             exit;
         end;
@@ -1922,6 +1947,7 @@ codeunit 10145 "E-Invoice Mgt."
         if Action = EDocAction::Cancel then begin
             ServInvoiceHeader."Electronic Document Status" := ServInvoiceHeader."Electronic Document Status"::"Cancel In Progress";
             ServInvoiceHeader."CFDI Cancellation ID" := GetResponseValueCancellationID(XMLCurrNode, XMLDOMNamedNodeMap);
+            LogCFDICancelRequestedAudit(GetDocTypeTextFromDatabaseId(Database::"Service Invoice Header"), ServInvoiceHeader."CFDI Cancellation ID");
             exit;
         end;
         if Action = EDocAction::CancelRequest then begin
@@ -2048,6 +2074,7 @@ codeunit 10145 "E-Invoice Mgt."
 
             Session.LogMessage(
                 '0000C7M', StrSubstNo(ProcessResponseErr, GetDocTypeTextFromDatabaseId(Database::"Service Cr.Memo Header"), TelemetryError), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', MXElectronicInvoicingTok);
+            LogPACRejectionAudit(GetDocTypeTextFromDatabaseId(Database::"Service Cr.Memo Header"), TelemetryError);
 
             exit;
         end;
@@ -2057,6 +2084,7 @@ codeunit 10145 "E-Invoice Mgt."
         if Action = EDocAction::Cancel then begin
             ServCrMemoHeader."Electronic Document Status" := ServCrMemoHeader."Electronic Document Status"::"Cancel In Progress";
             ServCrMemoHeader."CFDI Cancellation ID" := GetResponseValueCancellationID(XMLCurrNode, XMLDOMNamedNodeMap);
+            LogCFDICancelRequestedAudit(GetDocTypeTextFromDatabaseId(Database::"Service Cr.Memo Header"), ServCrMemoHeader."CFDI Cancellation ID");
             exit;
         end;
         if Action = EDocAction::CancelRequest then begin
@@ -2182,6 +2210,7 @@ codeunit 10145 "E-Invoice Mgt."
 
             Session.LogMessage(
                 '0000MF2', StrSubstNo(ProcessResponseErr, GetDocTypeTextFromDatabaseId(Database::"Sales Shipment Header"), TelemetryError), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', MXElectronicInvoicingTok);
+            LogPACRejectionAudit(GetDocTypeTextFromDatabaseId(Database::"Sales Shipment Header"), TelemetryError);
 
             exit;
         end;
@@ -2191,6 +2220,7 @@ codeunit 10145 "E-Invoice Mgt."
         if Action = EDocAction::Cancel then begin
             SalesShipmentHeader."Electronic Document Status" := SalesShipmentHeader."Electronic Document Status"::"Cancel In Progress";
             SalesShipmentHeader."CFDI Cancellation ID" := GetResponseValueCancellationID(XMLCurrNode, XMLDOMNamedNodeMap);
+            LogCFDICancelRequestedAudit(GetDocTypeTextFromDatabaseId(Database::"Sales Shipment Header"), SalesShipmentHeader."CFDI Cancellation ID");
             exit;
         end;
         if Action = EDocAction::CancelRequest then begin
@@ -2315,6 +2345,7 @@ codeunit 10145 "E-Invoice Mgt."
 
             Session.LogMessage(
                 '0000MF3', StrSubstNo(ProcessResponseErr, GetDocTypeTextFromDatabaseId(Database::"Transfer Shipment Header"), TelemetryError), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', MXElectronicInvoicingTok);
+            LogPACRejectionAudit(GetDocTypeTextFromDatabaseId(Database::"Transfer Shipment Header"), TelemetryError);
 
             exit;
         end;
@@ -2325,6 +2356,7 @@ codeunit 10145 "E-Invoice Mgt."
             TransferShipmentHeader."Electronic Document Status" :=
               TransferShipmentHeader."Electronic Document Status"::"Cancel In Progress";
             TransferShipmentHeader."CFDI Cancellation ID" := GetResponseValueCancellationID(XMLCurrNode, XMLDOMNamedNodeMap);
+            LogCFDICancelRequestedAudit(GetDocTypeTextFromDatabaseId(Database::"Transfer Shipment Header"), TransferShipmentHeader."CFDI Cancellation ID");
             exit;
         end;
         if Action = EDocAction::CancelRequest then begin
@@ -2425,6 +2457,22 @@ codeunit 10145 "E-Invoice Mgt."
     begin
         XMLCurrNode := XMLDOMNamedNodeMap.GetNamedItem('ConsultaCancelacionId');
         exit(XMLCurrNode.Value);
+    end;
+
+    local procedure LogPACRejectionAudit(DocTypeText: Text; ErrorDescription: Text)
+    begin
+        Session.LogSecurityAudit(
+            CFDIServiceNameTxt, SecurityOperationResult::Failure,
+            StrSubstNo(SecurityAuditPACRejectedTxt, DocTypeText, ErrorDescription),
+            AuditCategory::CustomerFacing);
+    end;
+
+    local procedure LogCFDICancelRequestedAudit(DocTypeText: Text; CancellationID: Text)
+    begin
+        Session.LogSecurityAudit(
+            CFDIServiceNameTxt, SecurityOperationResult::Success,
+            StrSubstNo(SecurityAuditCFDICancelRequestedTxt, DocTypeText, CancellationID),
+            AuditCategory::CustomerFacing);
     end;
 
     local procedure GetFieldIDElectronicDocumentStatus(): Integer
@@ -3749,7 +3797,7 @@ codeunit 10145 "E-Invoice Mgt."
 
     local procedure SendEmail(var TempBlobPDF: codeunit "Temp Blob"; SendToAddress: Text; Subject: Text; MessageBody: Text; FilePathEDoc: Text; FileNamePDF: Text; XMLInstream: InStream)
     var
-        EmailAccount: Record "Email Account";
+        TempEmailAccount: Record "Email Account";
         Email: Codeunit Email;
         Message: Codeunit "Email Message";
         EmailScenario: Codeunit "Email Scenario";
@@ -3769,9 +3817,9 @@ codeunit 10145 "E-Invoice Mgt."
             TempBlobPDF.CreateInStream(PDFInStream);
             Message.AddAttachment(CopyStr(FileNamePDF, 1, 250), 'PDF', PDFInStream);
         end;
-        EmailScenario.GetEmailAccount(Enum::"Email Scenario"::Default, EmailAccount);
+        EmailScenario.GetEmailAccount(Enum::"Email Scenario"::Default, TempEmailAccount);
         ClearLastError();
-        SendOK := Email.Send(Message, EmailAccount."Account Id", EmailAccount.Connector);
+        SendOK := Email.Send(Message, TempEmailAccount."Account Id", TempEmailAccount.Connector);
 
         if not SendOK then begin
             Session.LogMessage('0000C7R', StrSubstNo(SendEmailErr, GetLastErrorText()), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', MXElectronicInvoicingTok);
@@ -3997,6 +4045,11 @@ codeunit 10145 "E-Invoice Mgt."
           Format(Abs(InAmount), 0, '<Precision,' + Format(DecimalPlacesFrom) + ':' + Format(DecimalPlacesTo) + '><Standard Format,1>'));
     end;
 
+    local procedure RoundCurrencyDecimal(InAmount: Decimal): Decimal
+    begin
+        exit(Round(InAmount, Power(10, -CurrencyDecimalPlaces)));
+    end;
+
     local procedure FormatPeriod(Period: Option "Diario","Semanal","Quincenal","Mensual"): Text
     begin
         case Period of
@@ -4018,13 +4071,11 @@ codeunit 10145 "E-Invoice Mgt."
         exit('0' + Month);
     end;
 
-    local procedure FormatEquivalenciaDR(ExchangeRate: Decimal; DocsCount: Integer): Text
+    local procedure FormatEquivalenciaDR(ExchangeRate: Decimal): Text
     begin
         if ExchangeRate = 1 then
-            if DocsCount = 1 then
-                exit('1')
-            else
-                exit('1.0000000000'); // 10 decimal places
+            exit('1');
+
         exit(FormatDecimal(ExchangeRate, 10));
     end;
 
@@ -4255,6 +4306,8 @@ codeunit 10145 "E-Invoice Mgt."
         if not IsPACEnvironmentEnabled() then
             Error(Text014);
 
+        Clear(EInvoiceCommunication);
+
         if MXElectronicInvoicingSetup.Get() then
             if MXElectronicInvoicingSetup."Download XML with Requests" then begin
                 TempBlob.CreateOutStream(DocOutStream);
@@ -4382,7 +4435,7 @@ codeunit 10145 "E-Invoice Mgt."
             exit(CustLedgerEntry."Date/Time First Req. Sent");
 
         CustLedgerEntry."Date/Time First Req. Sent" :=
-          FormatAsDateTime(CustLedgerEntry."Document Date", Time, GetTimeZoneFromCustomer(CustLedgerEntry."Customer No."));
+            FormatDateTime(ConvertCurrentDateTimeToTimeZone(GetTimeZoneFromCustomer(CustLedgerEntry."Customer No.")));
         exit(CustLedgerEntry."Date/Time First Req. Sent");
     end;
 
@@ -5168,7 +5221,7 @@ codeunit 10145 "E-Invoice Mgt."
                                 if CustLedgerEntryLoc2."Source Code" = ServiceSourceCode then
                                     if ServiceCrMemoHeader.Get(CustLedgerEntryLoc2."Document No.") then
                                         if ServiceCrMemoHeader."Fiscal Invoice Number PAC" <> '' then
-                                    exit(true);
+                                            exit(true);
                                 if SalesCrMemoHeader.Get(CustLedgerEntryLoc2."Document No.") then
                                     if SalesCrMemoHeader."Fiscal Invoice Number PAC" <> '' then
                                         exit(true);
@@ -5326,6 +5379,7 @@ codeunit 10145 "E-Invoice Mgt."
             end;
 
             Session.LogMessage('0000C82', StrSubstNo(ProcessPaymentErr, TelemetryError), Verbosity::Error, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', MXElectronicInvoicingTok);
+            LogPACRejectionAudit(GetDocTypeTextFromDatabaseId(Database::"Cust. Ledger Entry"), TelemetryError);
 
             exit;
         end;
@@ -5335,6 +5389,7 @@ codeunit 10145 "E-Invoice Mgt."
         if Action = EDocAction::Cancel then begin
             CustLedgerEntry."Electronic Document Status" := CustLedgerEntry."Electronic Document Status"::"Cancel In Progress";
             CustLedgerEntry."CFDI Cancellation ID" := GetResponseValueCancellationID(XMLCurrNode, XMLDOMNamedNodeMap);
+            LogCFDICancelRequestedAudit(GetDocTypeTextFromDatabaseId(Database::"Cust. Ledger Entry"), CustLedgerEntry."CFDI Cancellation ID");
             exit;
         end;
         if Action = EDocAction::CancelRequest then begin
@@ -5526,7 +5581,7 @@ codeunit 10145 "E-Invoice Mgt."
                 AddAttribute(XMLDoc, XMLCurrNode, 'MonedaDR', ConvertCurrency(CustLedgerEntry2."Currency Code"));
 
                 EquivalenciaDR := TempDetailedCustLedgEntry."Remaining Pmt. Disc. Possible";
-                AddAttribute(XMLDoc, XMLCurrNode, 'EquivalenciaDR', FormatEquivalenciaDR(EquivalenciaDR, TempDetailedCustLedgEntry.Count()));
+                AddAttribute(XMLDoc, XMLCurrNode, 'EquivalenciaDR', FormatEquivalenciaDR(EquivalenciaDR));
 
                 SumStampedPayments(CustLedgerEntry2, SumOfStamped, PaymentNo);
                 AddAttribute(XMLDoc, XMLCurrNode, 'NumParcialidad', Format(PaymentNo));
@@ -5658,7 +5713,7 @@ codeunit 10145 "E-Invoice Mgt."
                 WriteOutStr(OutStream, ConvertCurrency(CustLedgerEntry2."Currency Code") + '|');
                 // MonedaDR
                 EquivalenciaDR := TempDetailedCustLedgEntry."Remaining Pmt. Disc. Possible";
-                WriteOutStr(OutStream, FormatEquivalenciaDR(EquivalenciaDR, TempDetailedCustLedgEntry.Count()) + '|');
+                WriteOutStr(OutStream, FormatEquivalenciaDR(EquivalenciaDR) + '|');
 
                 SumStampedPayments(CustLedgerEntry2, SumOfStamped, PaymentNo);
                 WriteOutStr(OutStream, Format(PaymentNo) + '|');// NumParcialidad
@@ -7707,21 +7762,165 @@ codeunit 10145 "E-Invoice Mgt."
         exit(NumeroPedimento);
     end;
 
-    local procedure RequestStampOnRoundingError(var DocumentHeaderRecordRef: RecordRef; Prepayment: Boolean; Reverse: Boolean; NewRoundingModel: Option)
+    local procedure FindValidRoundingModel(DocumentHeaderVariant: Variant; AdvanceSettle: Boolean): Integer
     var
-        ErrorCode: Code[10];
+        TempDocumentHeader: Record "Document Header" temporary;
+        TempDocumentLine: Record "Document Line" temporary;
+        TempDocumentLineRetention: Record "Document Line" temporary;
+        TempVATAmountLine: Record "VAT Amount Line" temporary;
+        SavedRoundingModel: Integer;
+        SavedCurrencyDecimalPlaces: Integer;
+        ModelIndex: Integer;
+        SubTotal: Decimal;
+        TotalTax: Decimal;
+        TotalRetention: Decimal;
+        TotalDiscount: Decimal;
+        LocalValidationPassed: Boolean;
     begin
-        ErrorCode := DocumentHeaderRecordRef.Field(10035).Value();
-        // CFDI40108 – El TipoDeComprobante es I,E o N, el importe registrado en el campo no es igual a la suma de los importes de los conceptos registrados.
-        // CFDI40110 – El valor registrado en el campo Descuento no es menor o igual que el campo Subtotal.
-        // CFDI40111 – El TipoDeComprobante NO es I,E o N, y un concepto incluye el campo descuento.
-        // CFDI40119 – El campo Total no corresponde con la suma del subtotal, menos los descuentos aplicables, más las contribuciones recibidas 
-        // (impuestos trasladados – federales o locales, derechos, productos, aprovechamientos, aportaciones de seguridad social, contribuciones de mejoras) menos los impuestos retenidos.
-        if not (ErrorCode in ['CFDI40108', 'CFDI40110', 'CFDI40111', 'CFDI40119', 'CFDI40167']) then
-            exit;
+        SavedRoundingModel := RoundingModel;
+        SavedCurrencyDecimalPlaces := CurrencyDecimalPlaces;
+        for ModelIndex := 0 to 3 do begin
+            RoundingModel := ModelIndex;
+            TempDocumentHeader.DeleteAll();
+            TempDocumentLine.DeleteAll();
+            TempDocumentLineRetention.DeleteAll();
+            TempVATAmountLine.DeleteAll();
+            SubTotal := 0;
+            TotalTax := 0;
+            TotalRetention := 0;
+            TotalDiscount := 0;
 
-        RoundingModel := NewRoundingModel;
+            CreateTempDocument(
+                DocumentHeaderVariant, TempDocumentHeader, TempDocumentLine,
+                TempDocumentLineRetention, TempVATAmountLine,
+                SubTotal, TotalTax, TotalRetention, TotalDiscount, AdvanceSettle);
+
+            CurrencyDecimalPlaces := GetCurrencyDecimalPlaces(TempDocumentHeader."Currency Code");
+
+            LocalValidationPassed := ValidateDocumentAmountsLocal(TempDocumentLine);
+
+            if LocalValidationPassed then begin
+                RoundingModel := SavedRoundingModel;
+                CurrencyDecimalPlaces := SavedCurrencyDecimalPlaces;
+                exit(ModelIndex);
+            end;
+        end;
+
+        RoundingModel := SavedRoundingModel;
+        CurrencyDecimalPlaces := SavedCurrencyDecimalPlaces;
+        exit(0);
+    end;
+
+    local procedure ValidateDocumentAmountsLocal(var TempDocumentLine: Record "Document Line" temporary): Boolean
+    var
+        VATPostingSetup: Record "VAT Posting Setup";
+        LineBase: Decimal;
+        LineTaxImporte: Decimal;
+        ExpectedTaxImporte: Decimal;
+    begin
+        // CFDI40108 (SubTotal = Σ Importe) is now guaranteed by RequestStamp recalculation.
+        // Focus on CFDI40167: per-line tax Importe must equal Round(Base * TasaOCuota, 6).
+        // Validate only lines where a 'Traslado' with TipoFactor='Tasa' is actually emitted to the XML.
+        TempDocumentLine.Reset();
+        if TempDocumentLine.FindSet() then
+            repeat
+                if TempDocumentLine."Retention Attached to Line No." = 0 then
+                    if VATPostingSetup.Get(TempDocumentLine."VAT Bus. Posting Group", TempDocumentLine."VAT Prod. Posting Group") then
+                        if not VATPostingSetup."CFDI Non-Taxable" then
+                            if not VATPostingSetup."CFDI VAT Exemption" then
+                                if VATPostingSetup."CFDI Subject to Tax" in ['', '02'] then begin
+                                    LineBase := TempDocumentLine.Amount;
+                                    LineTaxImporte := Round(TempDocumentLine."Amount Including VAT" - TempDocumentLine.Amount, 0.000001);
+                                    ExpectedTaxImporte := Round(LineBase * TempDocumentLine."VAT %" / 100, 0.000001);
+                                    if LineTaxImporte <> ExpectedTaxImporte then
+                                        exit(false);
+                                end;
+            until TempDocumentLine.Next() = 0;
+
+        exit(true);
+    end;
+
+    local procedure RequestStampWithRoundingFallback(var DocumentHeaderRecordRef: RecordRef; Prepayment: Boolean; Reverse: Boolean)
+    var
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        ErrorCode: Code[10];
+        InitialModel: Integer;
+        ModelIndex: Integer;
+        StampAttempts: Integer;
+        AdvanceAmount: Decimal;
+        AdvanceSettle: Boolean;
+        Succeeded: Boolean;
+    begin
+        AdvanceSettle := false;
+        if (DocumentHeaderRecordRef.Number = DATABASE::"Sales Invoice Header") and (not Reverse) then begin
+            DocumentHeaderRecordRef.SetTable(SalesInvoiceHeader);
+            AdvanceSettle := IsInvoicePrepaymentSettle(SalesInvoiceHeader."No.", AdvanceAmount);
+        end;
+
+        // Try default model first (avoids extra CreateTempDocument when model 0 works)
+        RoundingModel := 0;
         RequestStamp(DocumentHeaderRecordRef, Prepayment, Reverse);
+        StampAttempts := 1;
+
+        ErrorCode := DocumentHeaderRecordRef.Field(10035).Value();
+        // Rounding-related CFDI errors:
+        // CFDI40108 - SubTotal <> sum of line Importes
+        // CFDI40110 - Descuento > SubTotal
+        // CFDI40111 - Descuento on non-I/E/N voucher type
+        // CFDI40119 - Total <> SubTotal - Descuento + Traslados - Retenciones
+        // CFDI40167 - Per-line tax Importe <> Round(Base * Rate, 6)
+        if not (ErrorCode in ['CFDI40108', 'CFDI40110', 'CFDI40111', 'CFDI40119', 'CFDI40167']) then begin
+            Succeeded := ErrorCode = '';
+            LogStampAttemptsTelemetry(DocumentHeaderRecordRef, StampAttempts, RoundingModel, Succeeded, ErrorCode);
+            exit;
+        end;
+
+        // Pre-validate locally to find the best rounding model only after default model failed
+        InitialModel := FindValidRoundingModel(DocumentHeaderRecordRef, AdvanceSettle);
+        if InitialModel > 0 then begin
+            RoundingModel := InitialModel;
+            StampAttempts += 1;
+            RequestStamp(DocumentHeaderRecordRef, Prepayment, Reverse);
+            ErrorCode := DocumentHeaderRecordRef.Field(10035).Value();
+            if not (ErrorCode in ['CFDI40108', 'CFDI40110', 'CFDI40111', 'CFDI40119', 'CFDI40167']) then begin
+                Succeeded := ErrorCode = '';
+                LogStampAttemptsTelemetry(DocumentHeaderRecordRef, StampAttempts, RoundingModel, Succeeded, ErrorCode);
+                exit;
+            end;
+        end;
+
+        // If still failing, try remaining models
+        for ModelIndex := 1 to 3 do
+            if ModelIndex <> InitialModel then begin
+                RoundingModel := ModelIndex;
+                StampAttempts += 1;
+                RequestStamp(DocumentHeaderRecordRef, Prepayment, Reverse);
+                ErrorCode := DocumentHeaderRecordRef.Field(10035).Value();
+                if not (ErrorCode in ['CFDI40108', 'CFDI40110', 'CFDI40111', 'CFDI40119', 'CFDI40167']) then begin
+                    Succeeded := ErrorCode = '';
+                    LogStampAttemptsTelemetry(DocumentHeaderRecordRef, StampAttempts, RoundingModel, Succeeded, ErrorCode);
+                    exit;
+                end;
+            end;
+
+        LogStampAttemptsTelemetry(DocumentHeaderRecordRef, StampAttempts, RoundingModel, false, ErrorCode);
+    end;
+
+    local procedure LogStampAttemptsTelemetry(var DocumentHeaderRecordRef: RecordRef; StampAttempts: Integer; UsedRoundingModel: Integer; Succeeded: Boolean; ErrorCode: Code[10])
+    var
+        DocTypeText: Text;
+        Severity: Verbosity;
+    begin
+        DocTypeText := GetDocTypeTextFromDatabaseId(DocumentHeaderRecordRef.Number);
+        if Succeeded then
+            Severity := Verbosity::Normal
+        else
+            Severity := Verbosity::Error;
+
+        Session.LogMessage(
+            '0000NQ1',
+            StrSubstNo(StampAttemptsTelemetryMsg, DocTypeText, StampAttempts, UsedRoundingModel, Succeeded, ErrorCode),
+            Severity, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', MXElectronicInvoicingTok);
     end;
 
     local procedure UpdatePartialPaymentAmounts(var TempDetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry" temporary; var CustLedgerEntry: Record "Cust. Ledger Entry"; var TempVATAmountLine: Record "VAT Amount Line" temporary)

@@ -898,13 +898,21 @@ table 901 "Assembly Line"
     end;
 
     procedure MaxQtyToConsume(): Decimal
+    var
+        NewMaxQtyToConsume: Decimal;
     begin
-        exit("Remaining Quantity");
+        NewMaxQtyToConsume := "Remaining Quantity";
+        OnAfterMaxQtyToConsume(Rec, NewMaxQtyToConsume);
+        exit(NewMaxQtyToConsume);
     end;
 
     local procedure MaxQtyToConsumeBase(): Decimal
+    var
+        NewMaxQtyToConsumeBase: Decimal;
     begin
-        exit("Remaining Quantity (Base)");
+        NewMaxQtyToConsumeBase := "Remaining Quantity (Base)";
+        OnAfterMaxQtyToConsumeBase(Rec, NewMaxQtyToConsumeBase);
+        exit(NewMaxQtyToConsumeBase);
     end;
 
     local procedure GetSKU()
@@ -2218,14 +2226,20 @@ table 901 "Assembly Line"
         if (Item2."Rounding Precision" = 0) or (UOMQtyRoundPrecision = 0) then
             exit;
 
-        if Item2."Base Unit of Measure" <> Rec."Unit of Measure Code" then begin
-            Rec."Qty. Rounding Precision" := UOMQtyRoundPrecision;
-            Rec."Qty. Rounding Precision (Base)" := Item2."Rounding Precision";
-            exit;
-        end;
-
-        Rec."Qty. Rounding Precision" := Item2."Rounding Precision";
+        Rec."Qty. Rounding Precision" := UOMQtyRoundPrecision;
         Rec."Qty. Rounding Precision (Base)" := Item2."Rounding Precision";
+    end;
+
+    procedure UpdateAndPersistAvailWarning()
+    var
+        AssemblyLineExists: Record "Assembly Line";
+        PrevValue: Boolean;
+    begin
+        PrevValue := "Avail. Warning";
+        UpdateAvailWarning();
+        if (PrevValue <> "Avail. Warning") and not IsTemporary then
+            if AssemblyLineExists.Get("Document Type", "Document No.", "Line No.") then
+                Modify();
     end;
 
     [IntegrationEvent(false, false)]
@@ -2280,6 +2294,16 @@ table 901 "Assembly Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitQtyToConsume(var AssemblyLine: Record "Assembly Line"; xAssemblyLine: Record "Assembly Line"; CurrentFieldNo: Integer);
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterMaxQtyToConsume(var AssemblyLine: Record "Assembly Line"; var MaxQuantityToConsume: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterMaxQtyToConsumeBase(var AssemblyLine: Record "Assembly Line"; var MaxQuantityToConsumeBase: Decimal)
     begin
     end;
 

@@ -85,7 +85,7 @@ table 169 "Job Ledger Entry"
         }
         field(11; "Direct Unit Cost (LCY)"; Decimal)
         {
-            AutoFormatType = 0;
+            AutoFormatType = 2;
             AutoFormatExpression = '';
             Caption = 'Direct Unit Cost (LCY)';
         }
@@ -568,6 +568,7 @@ table 169 "Job Ledger Entry"
         }
         key(Key4; "Job No.", "Posting Date")
         {
+            IncludedFields = "Amt. to Post to G/L";
         }
         key(Key5; "Entry Type", Type, "No.", "Posting Date")
         {

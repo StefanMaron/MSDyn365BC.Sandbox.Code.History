@@ -447,8 +447,11 @@ codeunit 99000875 "Prod. Order Availability Mgt."
                 if ItemAvailabilityFormsMgt.ShowItemAvailabilityByLocation(Item, GetFieldCaption(ProdOrderLine.FieldCaption(ProdOrderLine."Location Code")), ProdOrderLine."Location Code", NewLocationCode) then
                     ProdOrderLine.Validate(ProdOrderLine."Location Code", NewLocationCode);
             AvailabilityType::"Event":
-                if ItemAvailabilityFormsMgt.ShowItemAvailabilityByEvent(Item, GetFieldCaption(ProdOrderLine.FieldCaption(ProdOrderLine."Due Date")), ProdOrderLine."Due Date", NewDate, false) then
-                    ProdOrderLine.Validate(ProdOrderLine."Due Date", NewDate);
+                begin
+                    Item.SetRange("Date Filter");
+                    if ItemAvailabilityFormsMgt.ShowItemAvailabilityByEvent(Item, GetFieldCaption(ProdOrderLine.FieldCaption(ProdOrderLine."Due Date")), ProdOrderLine."Due Date", NewDate, false) then
+                        ProdOrderLine.Validate(ProdOrderLine."Due Date", NewDate);
+                end;
             AvailabilityType::BOM:
                 if ShowCustomProdItemAvailByBOMLevel(ProdOrderLine, GetFieldCaption(ProdOrderLine.FieldCaption(ProdOrderLine."Due Date")), ProdOrderLine."Due Date", NewDate) then
                     ProdOrderLine.Validate(ProdOrderLine."Due Date", NewDate);
@@ -467,6 +470,7 @@ codeunit 99000875 "Prod. Order Availability Mgt."
         ItemAvailByBOMLevel.InitDate(OldDate);
         if FieldCaption <> '' then
             ItemAvailByBOMLevel.LookupMode(true);
+        OnShowCustomProdItemAvailByBOMLevelOnBeforeRunModal(ItemAvailByBOMLevel, ProdOrderLine, FieldCaption, OldDate);
         if ItemAvailByBOMLevel.RunModal() = ACTION::LookupOK then begin
             NewDate := ItemAvailByBOMLevel.GetSelectedDate();
             if OldDate <> NewDate then
@@ -501,8 +505,11 @@ codeunit 99000875 "Prod. Order Availability Mgt."
                 if ItemAvailabilityFormsMgt.ShowItemAvailabilityByLocation(Item, GetFieldCaption(ProdOrderComp.FieldCaption(ProdOrderComp."Location Code")), ProdOrderComp."Location Code", NewLocationCode) then
                     ProdOrderComp.Validate(ProdOrderComp."Location Code", NewLocationCode);
             AvailabilityType::"Event":
-                if ItemAvailabilityFormsMgt.ShowItemAvailabilityByEvent(Item, GetFieldCaption(ProdOrderComp.FieldCaption(ProdOrderComp."Due Date")), ProdOrderComp."Due Date", NewDate, false) then
-                    ProdOrderComp.Validate(ProdOrderComp."Due Date", NewDate);
+                begin
+                    Item.SetRange("Date Filter");
+                    if ItemAvailabilityFormsMgt.ShowItemAvailabilityByEvent(Item, GetFieldCaption(ProdOrderComp.FieldCaption(ProdOrderComp."Due Date")), ProdOrderComp."Due Date", NewDate, false) then
+                        ProdOrderComp.Validate(ProdOrderComp."Due Date", NewDate);
+                end;
             AvailabilityType::BOM:
                 if ItemAvailabilityFormsMgt.ShowItemAvailabilityByBOMLevel(Item, GetFieldCaption(ProdOrderComp.FieldCaption(ProdOrderComp."Due Date")), ProdOrderComp."Due Date", NewDate) then
                     ProdOrderComp.Validate(ProdOrderComp."Due Date", NewDate);
@@ -956,6 +963,11 @@ codeunit 99000875 "Prod. Order Availability Mgt."
 
     [IntegrationEvent(false, false)]
     local procedure OnReassignRefOrderNosOnAfterRequisitionLineModifyAll(var RequisitionLine: Record "Requisition Line");
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnShowCustomProdItemAvailByBOMLevelOnBeforeRunModal(var ItemAvailabilityByBOMLevel: Page "Item Availability by BOM Level"; var ProdOrderLine: Record "Prod. Order Line"; FieldCaption: Text[80]; OldDate: Date)
     begin
     end;
 
