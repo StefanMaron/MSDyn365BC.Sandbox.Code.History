@@ -70,6 +70,7 @@ codeunit 1901 "Report Selection Mgt."
         InitReportSelection("Report Selection Usage"::"P.Blanket");
         InitReportSelection("Report Selection Usage"::"P.Order");
         InitReportSelection("Report Selection Usage"::"P.Invoice");
+        InitReportSelection("Report Selection Usage"::"P.Self Billing Invoice");
         InitReportSelection("Report Selection Usage"::"P.Return");
         InitReportSelection("Report Selection Usage"::"P.Cr.Memo");
         InitReportSelection("Report Selection Usage"::"P.Receipt");
@@ -80,6 +81,7 @@ codeunit 1901 "Report Selection Mgt."
         InitReportSelection("Report Selection Usage"::"P.Arch.Order");
         InitReportSelection("Report Selection Usage"::"P.Arch.Return");
         InitReportSelection("Report Selection Usage"::"P.Arch.Blanket");
+        InitReportSelection("Report Selection Usage"::"P.V.Remit.");
 
         OnAfterInitReportSelectionPurch();
     end;
@@ -204,6 +206,8 @@ codeunit 1901 "Report Selection Mgt."
                 InsertRepSelection("Report Selection Usage"::"P.Order", '1', REPORT::"Purchase Order");
             "Report Selection Usage"::"P.Invoice":
                 InsertRepSelection("Report Selection Usage"::"P.Invoice", '1', REPORT::"Purchase Invoice NA");
+            "Report Selection Usage"::"P.Self Billing Invoice":
+                InsertRepSelection("Report Selection Usage"::"P.Self Billing Invoice", '1', REPORT::"Self Billing Invoice");
             "Report Selection Usage"::"P.Return":
                 InsertRepSelection("Report Selection Usage"::"P.Return", '1', REPORT::"Return Order");
             "Report Selection Usage"::"P.Cr.Memo":
@@ -270,6 +274,8 @@ codeunit 1901 "Report Selection Mgt."
                 InsertRepSelection("Report Selection Usage"::"S.Arch.Blanket", '1', REPORT::"Archived Blanket Sales Order");
             "Report Selection Usage"::"P.Arch.Blanket":
                 InsertRepSelection("Report Selection Usage"::"P.Arch.Blanket", '1', REPORT::"Archived Blanket Purch. Order");
+            "Report Selection Usage"::"P.V.Remit.":
+                InsertRepSelectionForEmailAttachment("Report Selection Usage"::"P.V.Remit.", '1', REPORT::"Remittance Advice - Entries");
             "Report Selection Usage"::"S.Order Pick Instruction":
                 InsertRepSelection("Report Selection Usage"::"S.Order Pick Instruction", '1', REPORT::"Pick Instruction");
             "Report Selection Usage"::"C.Statement":
@@ -326,6 +332,31 @@ codeunit 1901 "Report Selection Mgt."
             ReportSelections."Report ID" := ReportID;
             ReportSelections.Insert();
         end;
+    end;
+
+    local procedure InsertRepSelectionForEmailAttachment(ReportUsage: Enum "Report Selection Usage"; Sequence: Code[10]; ReportID: Integer)
+    var
+        ReportSelections: Record "Report Selections";
+    begin
+        if ReportSelections.Get(ReportUsage, Sequence) then
+            exit;
+
+        InsertRepSelection(ReportUsage, Sequence, ReportID);
+
+        if ReportSelections.Get(ReportUsage, Sequence) then begin
+            ReportSelections."Use for Email Attachment" := true;
+            ReportSelections."Use for Email Body" := false;
+            ReportSelections.Modify();
+        end;
+    end;
+
+    procedure ReportSelectionsExist(ReportSelectionUsage: Enum "Report Selection Usage"; ReportID: Integer): Boolean
+    var
+        ReportSelections: Record "Report Selections";
+    begin
+        if ReportSelections.Get(ReportSelectionUsage, '1') then
+            exit(ReportSelections."Report ID" = ReportID);
+        exit(false);
     end;
 
     procedure UpdateReportSelection(ReportUsage: Enum "Report Selection Usage"; Sequence: Code[10]; ReportID: Integer)
@@ -461,4 +492,3 @@ codeunit 1901 "Report Selection Mgt."
     begin
     end;
 }
-

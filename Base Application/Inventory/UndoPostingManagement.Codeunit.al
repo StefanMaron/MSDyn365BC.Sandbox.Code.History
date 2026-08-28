@@ -667,12 +667,16 @@ codeunit 5817 "Undo Posting Management"
 
             UndoValuePostingFromJob(ItemJnlLine, ItemApplicationEntry, TempApplyToItemLedgEntry);
 
-            TempItemEntryRelation."Item Entry No." := ItemJnlLine."Item Shpt. Entry No.";
+            if ItemJnlLine.Subcontracting and (ItemJnlPostLine.GetItemLedgerEntryNo() <> 0) then
+                TempItemEntryRelation."Item Entry No." := ItemJnlPostLine.GetItemLedgerEntryNo()
+            else
+                TempItemEntryRelation."Item Entry No." := ItemJnlLine."Item Shpt. Entry No.";
             TempItemEntryRelation.CopyTrackingFromItemJnlLine(ItemJnlLine);
             OnPostItemJnlLineAppliedToListOnBeforeTempItemEntryRelationInsert(TempItemEntryRelation, ItemJnlLine);
             TempItemEntryRelation.Insert();
             TempItemLedgEntry := TempApplyToItemLedgEntry;
             TempItemLedgEntry.Insert();
+            OnPostItemJnlLineAppliedToListOnAfterInsertTempItemLedgEntry(ItemJnlLine, TempApplyToItemLedgEntry);
         until TempApplyToItemLedgEntry.Next() = 0;
     end;
 
@@ -707,7 +711,13 @@ codeunit 5817 "Undo Posting Management"
     procedure CollectItemLedgEntries(var TempItemLedgEntry: Record "Item Ledger Entry" temporary; SourceType: Integer; DocumentNo: Code[20]; LineNo: Integer; BaseQty: Decimal; EntryRef: Integer)
     var
         ItemLedgEntry: Record "Item Ledger Entry";
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeCollectItemLedgEntries(TempItemLedgEntry, SourceType, DocumentNo, LineNo, BaseQty, EntryRef, IsHandled);
+        if IsHandled then
+            exit;
+
         TempItemLedgEntry.Reset();
         if not TempItemLedgEntry.IsEmpty() then
             TempItemLedgEntry.DeleteAll();
@@ -1293,6 +1303,11 @@ codeunit 5817 "Undo Posting Management"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnBeforeCollectItemLedgEntries(var TempItemLedgEntry: Record "Item Ledger Entry" temporary; SourceType: Integer; DocumentNo: Code[20]; LineNo: Integer; BaseQty: Decimal; EntryReference: Integer; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckMissingItemLedgers(var TempItemLedgEntry: Record "Item Ledger Entry" temporary; SourceType: Integer; DocumentNo: Code[20]; LineNo: Integer; BaseQty: Decimal; var IsHandled: Boolean)
     begin
     end;
@@ -1548,6 +1563,11 @@ codeunit 5817 "Undo Posting Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnCollectOutputItemLedgEntriesForSubcontructingPurcReceiptLine(var TempItemLedgerEntry: Record "Item Ledger Entry" temporary; PurchRcptLine: Record "Purch. Rcpt. Line"; var Result: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPostItemJnlLineAppliedToListOnAfterInsertTempItemLedgEntry(var ItemJournalLine: Record "Item Journal Line"; TempApplyToItemLedgerEntry: Record "Item Ledger Entry" temporary)
     begin
     end;
 }

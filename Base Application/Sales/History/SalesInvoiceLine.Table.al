@@ -957,6 +957,7 @@ table 113 "Sales Invoice Line"
         {
             Caption = 'Retention VAT %';
             AutoFormatType = 0;
+            DecimalPlaces = 0 : 5;
         }
         field(10003; "Custom Transit Number"; Text[30])
         {
@@ -1403,7 +1404,7 @@ table 113 "Sales Invoice Line"
         SalesLine: Record "Sales Line";
     begin
         if Type = Type::" " then
-            exit(SalesLine.FormatType());
+            exit(SalesLine.FormatTypeAsText());
 
         exit(Format(Type));
     end;

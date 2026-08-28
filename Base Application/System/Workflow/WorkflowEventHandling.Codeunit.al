@@ -71,6 +71,8 @@ codeunit 1520 "Workflow Event Handling"
         ItemChangedTxt: Label 'An item record is changed.';
         CreateGenJnlLineFromIncDocSuccessfulEventDescTxt: Label 'The creation of a general journal line from the incoming document was successful.';
         CreateGenJnlLineFromIncDocFailsEventDescTxt: Label 'The creation of a general journal line from the incoming document failed.';
+        VendorBankAccountSendForApprovalEventDescTxt: Label 'Approval of a vendor bank account is requested.';
+        VendorBankAccountApprovalRequestCancelEventDescTxt: Label 'An approval request for a vendor bank account is canceled.';
         JobQueueEntryApprovalEventDescTxt: Label 'Approval of a job queue entry is requested.';
         JobQueueEntryApprReqCancelledEventDescTxt: Label 'Approval of a job queue entry is cancelled.';
         RequisitionWkshBatchSendForApprovalEventDescTxt: Label 'An Approval request of a requisition worksheet batch is created.';
@@ -191,6 +193,13 @@ codeunit 1520 "Workflow Event Handling"
           RunWorkflowOnAfterCreateGenJnlLineFromIncomingDocFailCode(), DATABASE::"Incoming Document",
           CreateGenJnlLineFromIncDocFailsEventDescTxt, 0, false);
 
+        AddEventToLibrary(
+          RunWorkflowOnSendVendorBankAccountForApprovalCode(), DATABASE::"Vendor Bank Account",
+          VendorBankAccountSendForApprovalEventDescTxt, 0, false);
+        AddEventToLibrary(
+          RunWorkflowOnCancelVendorBankAccountApprovalRequestCode(), DATABASE::"Vendor Bank Account",
+          VendorBankAccountApprovalRequestCancelEventDescTxt, 0, false);
+
         AddEventToLibrary(RunWorkflowOnSendJobQueueEntryForApprovalCode(), Database::"Job Queue Entry", JobQueueEntryApprovalEventDescTxt, 0, false);
         AddEventToLibrary(RunWorkflowOnCancelJobQueueEntryApprovalRequestCode(), Database::"Job Queue Entry", JobQueueEntryApprReqCancelledEventDescTxt, 0, false);
 
@@ -213,6 +222,8 @@ codeunit 1520 "Workflow Event Handling"
                 AddEventPredecessor(RunWorkflowOnCancelCustomerApprovalRequestCode(), RunWorkflowOnSendCustomerForApprovalCode());
             RunWorkflowOnCancelVendorApprovalRequestCode():
                 AddEventPredecessor(RunWorkflowOnCancelVendorApprovalRequestCode(), RunWorkflowOnSendVendorForApprovalCode());
+            RunWorkflowOnCancelVendorBankAccountApprovalRequestCode():
+                AddEventPredecessor(RunWorkflowOnCancelVendorBankAccountApprovalRequestCode(), RunWorkflowOnSendVendorBankAccountForApprovalCode());
             RunWorkflowOnCancelItemApprovalRequestCode():
                 AddEventPredecessor(RunWorkflowOnCancelItemApprovalRequestCode(), RunWorkflowOnSendItemForApprovalCode());
             RunWorkflowOnCancelGeneralJournalBatchApprovalRequestCode():
@@ -294,6 +305,19 @@ codeunit 1520 "Workflow Event Handling"
         end;
 
         OnAddWorkflowEventPredecessorsToLibrary(EventFunctionName);
+    end;
+    
+    local procedure HandleEventWithxRecAndRefreshRec(FunctionName: Code[128]; var Rec: Variant; xRec: Variant)
+    var
+        RecRef: RecordRef;
+    begin
+        /// Wraps HandleEventWithxRec and re-fetches Rec from the database afterwards.
+        /// Workflow responses may modify the record and call
+        /// RecRef.Modify(true), which bumps the system version stamp
+        WorkflowManagement.HandleEventWithxRec(FunctionName, Rec, xRec);
+        RecRef.GetTable(Rec);
+        if RecRef.Get(RecRef.RecordId) then
+            RecRef.SetTable(Rec);
     end;
 
     procedure AddEventToLibrary(FunctionName: Code[128]; TableID: Integer; Description: Text[250]; RequestPageID: Integer; UsedForRecordChange: Boolean)
@@ -579,6 +603,16 @@ codeunit 1520 "Workflow Event Handling"
     procedure RunWorkflowOnAfterCreateGenJnlLineFromIncomingDocFailCode(): Code[128]
     begin
         exit('RUNWORKFLOWONAFTERCREATEGENJNLLINEFROMINCOMINGDOFAILCODE');
+    end;
+
+    procedure RunWorkflowOnSendVendorBankAccountForApprovalCode(): Code[128]
+    begin
+        exit('RUNWORKFLOWONSENDVENDORBANKACCOUNTFORAPPROVAL');
+    end;
+
+    procedure RunWorkflowOnCancelVendorBankAccountApprovalRequestCode(): Code[128]
+    begin
+        exit('RUNWORKFLOWONCANCELVENDORBANKACCOUNTAPPROVALREQUEST');
     end;
 
     procedure RunWorkflowOnSendJobQueueEntryForApprovalCode(): Code[128]
@@ -868,48 +902,69 @@ codeunit 1520 "Workflow Event Handling"
 
     [EventSubscriber(ObjectType::Table, Database::"Customer", 'OnAfterModifyEvent', '', false, false)]
     procedure RunWorkflowOnCustomerChanged(var Rec: Record Customer; var xRec: Record Customer; RunTrigger: Boolean)
+    var
+        RecVariant: Variant;
     begin
         if Rec.IsTemporary() then
             exit;
 
-        if Format(xRec) <> Format(Rec) then
-            WorkflowManagement.HandleEventWithxRec(RunWorkflowOnCustomerChangedCode(), Rec, xRec);
+        if Format(xRec) <> Format(Rec) then begin
+            RecVariant := Rec;
+            HandleEventWithxRecAndRefreshRec(RunWorkflowOnCustomerChangedCode(), RecVariant, xRec);
+            Rec := RecVariant;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Customer", 'OnAfterRenameEvent', '', false, false)]
     local procedure RunWorkflowOnCustomerRenamed(var Rec: Record Customer; var xRec: Record Customer; RunTrigger: Boolean)
+    var
+        RecVariant: Variant;
     begin
         if Rec.IsTemporary() then
             exit;
 
-        if Format(xRec) <> Format(Rec) then
-            WorkflowManagement.HandleEventWithxRec(RunWorkflowOnCustomerChangedCode(), Rec, xRec);
+        if Format(xRec) <> Format(Rec) then begin
+            RecVariant := Rec;
+            HandleEventWithxRecAndRefreshRec(RunWorkflowOnCustomerChangedCode(), RecVariant, xRec);
+            Rec := RecVariant;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Vendor", 'OnAfterModifyEvent', '', false, false)]
     procedure RunWorkflowOnVendorChanged(var Rec: Record Vendor; var xRec: Record Vendor; RunTrigger: Boolean)
+    var
+        RecVariant: Variant;
     begin
         if Rec.IsTemporary() then
             exit;
 
-        if Format(xRec) <> Format(Rec) then
-            WorkflowManagement.HandleEventWithxRec(RunWorkflowOnVendorChangedCode(), Rec, xRec);
+        if Format(xRec) <> Format(Rec) then begin
+            RecVariant := Rec;
+            HandleEventWithxRecAndRefreshRec(RunWorkflowOnVendorChangedCode(), RecVariant, xRec);
+            Rec := RecVariant;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Vendor", 'OnAfterRenameEvent', '', false, false)]
     local procedure RunWorkflowOnVendorRenamed(var Rec: Record Vendor; var xRec: Record Vendor; RunTrigger: Boolean)
+    var
+        RecVariant: Variant;
     begin
         if Rec.IsTemporary() then
             exit;
 
-        if Format(xRec) <> Format(Rec) then
-            WorkflowManagement.HandleEventWithxRec(RunWorkflowOnVendorChangedCode(), Rec, xRec);
+        if Format(xRec) <> Format(Rec) then begin
+            RecVariant := Rec;
+            HandleEventWithxRecAndRefreshRec(RunWorkflowOnVendorChangedCode(), RecVariant, xRec);
+            Rec := RecVariant;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Item", 'OnAfterModifyEvent', '', false, false)]
     procedure RunWorkflowOnItemChanged(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
     var
         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
+        RecVariant: Variant;
     begin
         if Rec.IsTemporary() then
             exit;
@@ -917,14 +972,18 @@ codeunit 1520 "Workflow Event Handling"
         if GenJnlPostPreview.IsActive() then
             exit;
 
-        if Format(xRec) <> Format(Rec) then
-            WorkflowManagement.HandleEventWithxRec(RunWorkflowOnItemChangedCode(), Rec, xRec);
+        if Format(xRec) <> Format(Rec) then begin
+            RecVariant := Rec;
+            HandleEventWithxRecAndRefreshRec(RunWorkflowOnItemChangedCode(), RecVariant, xRec);
+            Rec := RecVariant;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Item", 'OnAfterRenameEvent', '', false, false)]
     local procedure RunWorkflowOnItemRenamed(var Rec: Record Item; var xRec: Record Item; RunTrigger: Boolean)
     var
         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
+        RecVariant: Variant;
     begin
         if Rec.IsTemporary() then
             exit;
@@ -932,8 +991,11 @@ codeunit 1520 "Workflow Event Handling"
         if GenJnlPostPreview.IsActive() then
             exit;
 
-        if Format(xRec) <> Format(Rec) then
-            WorkflowManagement.HandleEventWithxRec(RunWorkflowOnItemChangedCode(), Rec, xRec);
+        if Format(xRec) <> Format(Rec) then begin
+            RecVariant := Rec;
+            HandleEventWithxRecAndRefreshRec(RunWorkflowOnItemChangedCode(), RecVariant, xRec);
+            Rec := RecVariant;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Table, Database::"Incoming Document", 'OnAfterCreateGenJnlLineFromIncomingDocSuccess', '', false, false)]
@@ -946,6 +1008,18 @@ codeunit 1520 "Workflow Event Handling"
     procedure RunWorkflowOnAfterCreateGenJnlLineFromIncomingDocFail(var IncomingDocument: Record "Incoming Document")
     begin
         WorkflowManagement.HandleEvent(RunWorkflowOnAfterCreateGenJnlLineFromIncomingDocFailCode(), IncomingDocument);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Approvals Mgmt.", 'OnSendVendorBankAccountForApproval', '', false, false)]
+    procedure RunWorkflowOnSendVendorBankAccountForApproval(VendorBankAccount: Record "Vendor Bank Account")
+    begin
+        WorkflowManagement.HandleEvent(RunWorkflowOnSendVendorBankAccountForApprovalCode(), VendorBankAccount);
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Approvals Mgmt.", 'OnCancelVendorBankAccountApprovalRequest', '', false, false)]
+    procedure RunWorkflowOnCancelVendorBankAccountApprovalRequest(VendorBankAccount: Record "Vendor Bank Account")
+    begin
+        WorkflowManagement.HandleEvent(RunWorkflowOnCancelVendorBankAccountApprovalRequestCode(), VendorBankAccount);
     end;
 
     [IntegrationEvent(false, false)]
