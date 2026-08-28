@@ -67,6 +67,7 @@ codeunit 135160 "Cloud Migration Property Test"
     var
         CloudMigCountryTables: Codeunit "Cloud Mig Country Tables";
     begin
+        ListOfTablesToMigrate.Add(Database::"Adv. Bonus Depreciation Setup");
         ListOfTablesToMigrate.Add(Database::"Alloc. Acc. Manual Override");
         ListOfTablesToMigrate.Add(Database::"Alloc. Account Distribution");
         ListOfTablesToMigrate.Add(Database::"Allocation Account");
@@ -97,6 +98,8 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Job WIP Warning");
         ListOfTablesToMigrate.Add(Database::"Job");
         ListOfTablesToMigrate.Add(Database::"Job Archive");
+        ListOfTablesToMigrate.Add(Database::"Job Assigned Resource");
+        ListOfTablesToMigrate.Add(Database::"Job Assigned Resource Archive");
         ListOfTablesToMigrate.Add(Database::"Jobs Setup");
         ListOfTablesToMigrate.Add(Database::"Language");
         ListOfTablesToMigrate.Add(Database::"Last Used Chart");
@@ -187,6 +190,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Payment Term Translation");
         ListOfTablesToMigrate.Add(Database::"Payment Terms");
         ListOfTablesToMigrate.Add(Database::"Payroll Setup");
+        ListOfTablesToMigrate.Add(37202); // PEPPOL 3.0 Setup
         ListOfTablesToMigrate.Add(Database::"Phys. Inventory Ledger Entry");
         ListOfTablesToMigrate.Add(Database::"Phys. Invt. Comment Line");
         ListOfTablesToMigrate.Add(Database::"Phys. Invt. Count Buffer");
@@ -468,6 +472,9 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Source Code Setup");
         ListOfTablesToMigrate.Add(Database::"Source Code");
         ListOfTablesToMigrate.Add(Database::"Special Equipment");
+        ListOfTablesToMigrate.Add(Database::"Spend Request");
+        ListOfTablesToMigrate.Add(Database::"Spend Request Detail");
+        ListOfTablesToMigrate.Add(Database::"Spend Request To G/L Link");
         ListOfTablesToMigrate.Add(Database::"Standard Address");
         ListOfTablesToMigrate.Add(Database::"Standard Cost Worksheet Name");
         ListOfTablesToMigrate.Add(Database::"Standard Cost Worksheet");
@@ -685,6 +692,10 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Tenant Media");
         ListOfTablesToMigrate.Add(Database::"Tenant Media Set");
         ListOfTablesToMigrate.Add(Database::"Tenant Media Thumbnails");
+        ListOfTablesToMigrate.Add(Database::"Tenant Report Layout");
+        ListOfTablesToMigrate.Add(Database::"Tenant Report Layout Cfg");
+        ListOfTablesToMigrate.Add(Database::"Tenant Report Layout Override");
+        ListOfTablesToMigrate.Add(Database::"Tenant Report Layout Selection");
 
         // internal tables
         ListOfTablesToMigrate.Add(8703); // Database::"Feature Uptake"
@@ -802,9 +813,14 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(9987); // Database::"Word Templates Table"
 
         // E-Document
-        ListOfTablesToMigrate.Add(7013);
+        ListOfTablesToMigrate.Add(7013); // Database::"Contact Sync Queue"
+        ListOfTablesToMigrate.Add(7121); // Database::"Contact Sync User"
+        ListOfTablesToMigrate.Add(7122); // Database::"Outlook Contacts"
         ListOfTablesToMigrate.Add(6121); // Database::"E-Document"
         ListOfTablesToMigrate.Add(6103); // Database::"E-Document Service"
+
+        // PEPPOL (pulled into the Internal group as a dependency of E-Document Core)
+        ListOfTablesToMigrate.Add(37202); // Database::"PEPPOL 3.0 Setup"
 
         // Other tables
         ListOfTablesToMigrate.Add(Database::"Acc. Sched. Cell Value");
@@ -1138,6 +1154,10 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Filed Contract Service Hour");
         ListOfTablesToMigrate.Add(Database::"Filed Contract/Serv. Discount");
         ListOfTablesToMigrate.Add(Database::"Fin. Charge Comment Line");
+        ListOfTablesToMigrate.Add(Database::"Fin. Report Package Recipient");
+        ListOfTablesToMigrate.Add(Database::"Fin. Report Package Report");
+        ListOfTablesToMigrate.Add(Database::"Fin. Report Package Schedule");
+        ListOfTablesToMigrate.Add(Database::"Fin. Rep. Package Export Log");
         ListOfTablesToMigrate.Add(Database::"Finance Charge Interest Rate");
         ListOfTablesToMigrate.Add(Database::"Finance Charge Memo Header");
         ListOfTablesToMigrate.Add(Database::"Finance Charge Memo Line");
@@ -1152,6 +1172,11 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"Financial Report User Filters");
         ListOfTablesToMigrate.Add(Database::"Financial Report Audit Log");
         ListOfTablesToMigrate.Add(Database::"Fin. Report Excel Template");
+        ListOfTablesToMigrate.Add(Database::"Financial Report Package");
+        ListOfTablesToMigrate.Add(Database::"Fin. Report Package Report");
+        ListOfTablesToMigrate.Add(Database::"Fin. Report Package Schedule");
+        ListOfTablesToMigrate.Add(Database::"Fin. Report Package Recipient");
+        ListOfTablesToMigrate.Add(Database::"Fin. Rep. Package Export Log");
         ListOfTablesToMigrate.Add(Database::"Financial Report Status");
         ListOfTablesToMigrate.Add(Database::"Fixed Asset");
         ListOfTablesToMigrate.Add(Database::"G/L - Item Ledger Relation");
@@ -1167,6 +1192,7 @@ codeunit 135160 "Cloud Migration Property Test"
         ListOfTablesToMigrate.Add(Database::"G/L Entry - VAT Entry Link");
         ListOfTablesToMigrate.Add(Database::"G/L Entry");
         ListOfTablesToMigrate.Add(Database::"G/L Register");
+        ListOfTablesToMigrate.Add(Database::"G/L Transaction");
         ListOfTablesToMigrate.Add(Database::"Gen. Business Posting Group");
         ListOfTablesToMigrate.Add(Database::"Gen. Jnl. Allocation");
         ListOfTablesToMigrate.Add(Database::"Gen. Jnl. Dim. Filter");

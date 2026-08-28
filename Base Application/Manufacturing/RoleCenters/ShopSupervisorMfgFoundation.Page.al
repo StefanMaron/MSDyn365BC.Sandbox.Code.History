@@ -80,7 +80,6 @@ page 9011 "Shop Supervisor Mfg Foundation"
                 Caption = 'Production Order - &Shortage List';
                 Image = "Report";
                 RunObject = Report "Prod. Order - Shortage List";
-                ToolTip = 'View a list of the missing quantity per production order. The report shows how the inventory development is planned from today until the set day - for example whether orders are still open.';
             }
             action("Subcontractor - Dis&patch List")
             {
@@ -88,7 +87,6 @@ page 9011 "Shop Supervisor Mfg Foundation"
                 Caption = 'Subcontractor - Dis&patch List';
                 Image = "Report";
                 RunObject = Report "Subcontractor - Dispatch List";
-                ToolTip = 'View the list of material to be sent to manufacturing subcontractors.';
             }
             separator(Action42)
             {
@@ -112,7 +110,6 @@ page 9011 "Shop Supervisor Mfg Foundation"
                 Caption = 'Production Order Statistics';
                 Image = "Report";
                 RunObject = report "Production Order Statistics";
-                ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
             }
             action("S&tatus")
             {
@@ -128,7 +125,6 @@ page 9011 "Shop Supervisor Mfg Foundation"
                 Caption = '&Item Registers - Quantity';
                 Image = "Report";
                 RunObject = Report "Item Register - Quantity";
-                ToolTip = 'View all item ledger entries.';
             }
             action("Inventory Valuation &WIP")
             {
@@ -136,7 +132,6 @@ page 9011 "Shop Supervisor Mfg Foundation"
                 Caption = 'Inventory Valuation &WIP';
                 Image = "Report";
                 RunObject = Report "Inventory Valuation - WIP";
-                ToolTip = 'View inventory valuation for selected production orders in your WIP inventory. The report also shows information about the value of consumption, capacity usage and output in WIP. The printed report only shows invoiced amounts, that is, the cost of entries that have been posted as invoiced.';
             }
         }
         area(embedding)
@@ -292,15 +287,22 @@ page 9011 "Shop Supervisor Mfg Foundation"
                 RunObject = Page "Standard Cost Worksheet Names";
                 ToolTip = 'Review or update standard costs. Purchasers, production or assembly managers can use the worksheet to simulate the effect on the cost of the manufactured or assembled item if the standard cost for consumption, production capacity usage, or assembly resource usage is changed. You can set a cost change to take effect on a specified date.';
             }
+#if not CLEAN28
             action(SubcontractingWorksheets)
             {
                 ApplicationArea = Manufacturing;
-                Caption = 'Subcontracting Worksheets';
+                Caption = 'Subcontracting Worksheets (Obsolete)';
                 RunObject = Page "Req. Wksh. Names";
+#pragma warning disable AL0432
                 RunPageView = where("Template Type" = const("For. Labor"),
                                     Recurring = const(false));
+#pragma warning restore AL0432
+                ObsoleteReason = 'Will be replaced by the Subcontracting App.';
+                ObsoleteState = Pending;
+                ObsoleteTag = '28.0';
                 ToolTip = 'Calculate the needed production supply, find the production orders that have material ready to send to a subcontractor, and automatically create purchase orders for subcontracted operations from production order routings.';
             }
+#endif
             action(RequisitionWorksheets)
             {
                 ApplicationArea = Planning;
