@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Sales.History;
 
+using Microsoft.EServices.EDocument;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
@@ -62,6 +63,7 @@ codeunit 1303 "Correct Posted Sales Invoice"
             CODEUNIT.Run(CODEUNIT::"Sales-Post", SalesHeader);
             SetTrackInfoForCancellation(Rec);
             UpdateSalesOrderLinesFromCancelledInvoice(Rec."No.");
+            ResetIncomingDocumentForCancelledInvoice(Rec."No.");
         end;
         OnOnRunOnAfterUpdateSalesOrderLinesFromCancelledInvoice(Rec, SalesHeader);
 
@@ -208,6 +210,7 @@ codeunit 1303 "Correct Posted Sales Invoice"
     procedure CreateCreditMemoCopyDocument(var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesHeader: Record "Sales Header"): Boolean
     var
         SalesHdr: Record "Sales Header";
+        ConfirmQuestion: Text;
     begin
         OnBeforeCreateCreditMemoCopyDocument(SalesInvoiceHeader);
         TestNoFixedAssetInSalesInvoice(SalesInvoiceHeader);
@@ -219,9 +222,12 @@ codeunit 1303 "Correct Posted Sales Invoice"
         end;
         SalesHdr.SetRange("Document Type", SalesHdr."Document Type"::Order);
         SalesHdr.SetRange("No.", SalesInvoiceHeader."Order No.");
-        if not SalesHdr.IsEmpty then
-            if not Confirm(CreateCreditMemoQst) then
+        if not SalesHdr.IsEmpty then begin
+            ConfirmQuestion := CreateCreditMemoQst;
+            OnCreateCreditMemoCopyDocumentOnBeforeConfirm(SalesInvoiceHeader, SalesHdr, ConfirmQuestion);
+            if not Confirm(ConfirmQuestion) then
                 exit(false);
+        end;
 
         CreateCopyDocument(SalesInvoiceHeader, SalesHeader, SalesHeader."Document Type"::"Credit Memo", false);
 
@@ -1022,6 +1028,7 @@ codeunit 1303 "Correct Posted Sales Invoice"
     var
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
         SalesInvoiceLine: Record "Sales Invoice Line";
+        TempUsedSalesInvoiceLine: Record "Sales Invoice Line" temporary;
     begin
         SalesCrMemoLine.SetLoadFields("Document No.", "No.", "Appl.-from Item Entry", Quantity, "Variant Code");
         SalesCrMemoLine.SetRange("Document No.", SalesCreditMemoNo);
@@ -1030,9 +1037,12 @@ codeunit 1303 "Correct Posted Sales Invoice"
         if SalesCrMemoLine.FindSet() then
             repeat
                 Clear(SalesInvoiceLine);
-                SalesCrMemoLine.GetSalesInvoiceLine(SalesInvoiceLine);
-                if SalesInvoiceLine."Line No." <> 0 then
+                SalesCrMemoLine.GetSalesInvoiceLine(SalesInvoiceLine, TempUsedSalesInvoiceLine);
+                if SalesInvoiceLine."Line No." <> 0 then begin
                     UpdateSalesOrderLinesFromCreditMemo(SalesInvoiceLine, SalesCrMemoLine);
+                    TempUsedSalesInvoiceLine := SalesInvoiceLine;
+                    if TempUsedSalesInvoiceLine.Insert() then;
+                end;
             until SalesCrMemoLine.Next() = 0;
     end;
 
@@ -1041,16 +1051,70 @@ codeunit 1303 "Correct Posted Sales Invoice"
         TempItemLedgerEntry: Record "Item Ledger Entry" temporary;
         SalesLine: Record "Sales Line";
         UndoPostingManagement: Codeunit "Undo Posting Management";
+        IsHandled: Boolean;
     begin
-        if SalesLine.Get(SalesLine."Document Type"::Order, SalesInvoiceLine."Order No.", SalesInvoiceLine."Order Line No.") then begin
+        IsHandled := false;
+        OnBeforeUpdateSalesOrderLinesFromCreditMemo(SalesInvoiceLine, SalesCrMemoLine, IsHandled);
+        if IsHandled then
+            exit;
+
+        if not SalesLine.Get(SalesLine."Document Type"::Order, SalesInvoiceLine."Order No.", SalesInvoiceLine."Order Line No.") then
+            exit;
+
+        if SalesLine.Type = SalesLine.Type::Item then
             SalesInvoiceLine.GetItemLedgEntries(TempItemLedgerEntry, false);
-            UpdateSalesOrderLineInvoicedQuantity(SalesLine, SalesCrMemoLine.Quantity, SalesCrMemoLine."Quantity (Base)");
-            UpdateSalesOrderLinePrepmtAmount(SalesInvoiceLine);
+
+        UpdateSalesOrderLineInvoicedQuantity(SalesLine, SalesCrMemoLine.Quantity, SalesCrMemoLine."Quantity (Base)");
+        UpdateSalesOrderLinePrepmtAmount(SalesInvoiceLine);
+
+        if SalesLine.Type = SalesLine.Type::Item then begin
             if SalesLine."Qty. to Ship" = 0 then
                 UpdateWhseRequest(Database::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Location Code");
+
             TempItemLedgerEntry.SetFilter("Item Tracking", '<>%1', TempItemLedgerEntry."Item Tracking"::None.AsInteger());
             UndoPostingManagement.RevertPostedItemTracking(TempItemLedgerEntry, SalesInvoiceLine."Shipment Date", true);
         end;
+    end;
+
+    local procedure ResetIncomingDocumentForCancelledInvoice(SalesInvoiceHeaderNo: Code[20])
+    var
+        SalesInvoiceLine: Record "Sales Invoice Line";
+        SalesHeader: Record "Sales Header";
+        IncomingDocument: Record "Incoming Document";
+        IncomingDocumentAttachment: Record "Incoming Document Attachment";
+        DummyRecordID: RecordID;
+    begin
+        SalesInvoiceLine.SetLoadFields("Order No.");
+        SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeaderNo);
+        SalesInvoiceLine.SetFilter("Order No.", '<>%1', '');
+        if not SalesInvoiceLine.FindFirst() then
+            exit;
+
+        if not SalesHeader.Get(SalesHeader."Document Type"::Order, SalesInvoiceLine."Order No.") then
+            exit;
+
+        if SalesHeader."Incoming Document Entry No." = 0 then
+            exit;
+
+        if not IncomingDocument.Get(SalesHeader."Incoming Document Entry No.") then
+            exit;
+
+        if not IncomingDocument.Posted then
+            exit;
+
+        IncomingDocument.Posted := false;
+        IncomingDocument.Processed := false;
+        IncomingDocument.Status := IncomingDocument.Status::Released;
+        IncomingDocument."Posted Date-Time" := 0DT;
+        IncomingDocument."Related Record ID" := DummyRecordID;
+        IncomingDocument."Document No." := '';
+        IncomingDocument."Document Type" := IncomingDocument."Document Type"::" ";
+        IncomingDocument."Posting Date" := 0D;
+        IncomingDocument.Modify(true);
+
+        IncomingDocumentAttachment.SetRange("Incoming Document Entry No.", IncomingDocument."Entry No.");
+        IncomingDocumentAttachment.ModifyAll("Document No.", '');
+        IncomingDocumentAttachment.ModifyAll("Posting Date", 0D);
     end;
 
     local procedure UpdateSalesOrderLinesFromCancelledInvoice(SalesInvoiceHeaderNo: Code[20])
@@ -1242,7 +1306,13 @@ codeunit 1303 "Correct Posted Sales Invoice"
     var
         SalesInvoiceLine: Record "Sales Invoice Line";
         TempSalesShipmentLine: Record "Sales Shipment Line" temporary;
+        IsHandled: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeTestIfDropShipmentDocument(SalesInvoiceHeader, IsHandled);
+        if IsHandled then
+            exit;
+
         SalesInvoiceLine.SetRange("Document No.", SalesInvoiceHeader."No.");
         SalesInvoiceLine.SetRange("Drop Shipment", true);
         if SalesInvoiceLine.FindFirst() then begin
@@ -1258,6 +1328,16 @@ codeunit 1303 "Correct Posted Sales Invoice"
     /// <param name="SalesInvoiceHeader">The posted sales invoice being copied from.</param>
     [IntegrationEvent(false, false)]
     local procedure OnAfterCreateCopyDocument(var SalesHeader: Record "Sales Header"; var SalesInvoiceHeader: Record "Sales Invoice Header")
+    begin
+    end;
+
+    /// <summary>
+    /// Raised before testing whether to drop shipment document exists for the posted sales invoice.
+    /// </summary>
+    /// <param name="SalesInvoiceHeader">The posted sales invoice being validated.</param>
+    /// <param name="IsHandled">Set to true to skip default drop shipment document validation.</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeTestIfDropShipmentDocument(var SalesInvoiceHeader: Record "Sales Invoice Header"; var IsHandled: Boolean)
     begin
     end;
 
@@ -1343,6 +1423,17 @@ codeunit 1303 "Correct Posted Sales Invoice"
     /// <param name="SalesInvoiceHeader">The posted sales invoice to copy from.</param>
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateCreditMemoCopyDocument(var SalesInvoiceHeader: Record "Sales Invoice Header")
+    begin
+    end;
+
+    /// <summary>
+    /// Raised before confirming the creation of a corrective credit memo for an invoice posted from a sales order.
+    /// </summary>
+    /// <param name="SalesInvoiceHeader">The posted sales invoice being corrected.</param>
+    /// <param name="SalesHeader">The originating sales order the invoice was posted from.</param>
+    /// <param name="ConfirmQuestion">The confirmation text to be shown. Subscribers can modify it.</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnCreateCreditMemoCopyDocumentOnBeforeConfirm(var SalesInvoiceHeader: Record "Sales Invoice Header"; var SalesHeader: Record "Sales Header"; var ConfirmQuestion: Text)
     begin
     end;
 
@@ -1573,6 +1664,17 @@ codeunit 1303 "Correct Posted Sales Invoice"
     /// <param name="IsHandled">Set to true to skip default order line update.</param>
     [IntegrationEvent(false, false)]
     local procedure OnBeforeUpdateSalesOrderLinesFromCancelledInvoice(SalesInvoiceHeaderNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
+
+    /// <summary>
+    /// Raised before updating sales order lines from a credit memo.
+    /// </summary>
+    /// <param name="SalesInvoiceLine">The sales invoice line being processed.</param>
+    /// <param name="SalesCrMemoLine">The sales credit memo line that triggered the update.</param>
+    /// <param name="IsHandled">Set to true to skip default order line update.</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeUpdateSalesOrderLinesFromCreditMemo(var SalesInvoiceLine: Record "Sales Invoice Line"; var SalesCrMemoLine: Record "Sales Cr.Memo Line"; var IsHandled: Boolean)
     begin
     end;
 

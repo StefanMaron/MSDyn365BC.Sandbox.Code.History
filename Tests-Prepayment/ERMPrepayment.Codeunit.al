@@ -2621,6 +2621,30 @@
 
     [Test]
     [Scope('OnPrem')]
+    procedure CannotReducePurchaseOrderQuantityToInvoicedQuantityAfterPrepayment()
+    var
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+    begin
+        // [SCENARIO 646136] Reduce Purchase Order quantity after prepayment and partial invoicing
+        // [GIVEN] Posted 50% Prepayment Invoice for Purchase Order
+        InitPurchasePrepaymentScenario(PurchaseHeader, PurchaseLine, false, 50, '');
+        LibraryPurchase.PostPurchasePrepaymentInvoice(PurchaseHeader);
+
+        // [GIVEN] Order is partially received and invoiced
+        PostPartialPurchaseInvoice(PurchaseHeader, PurchaseLine);
+        LibraryPurchase.ReopenPurchaseDocument(PurchaseHeader);
+        PurchaseLine.Find();
+
+        // [WHEN] Reduce Quantity to the invoiced quantity
+        asserterror PurchaseLine.Validate(Quantity, PurchaseLine."Quantity Invoiced");
+
+        // [THEN] Error occurs because the posted prepayment exceeds the new line amount
+        Assert.ExpectedError(PurchaseLine.FieldCaption("Prepmt. Line Amount"));
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
     procedure DeletePurchaseOrderAfterPrepaymentCrMemo()
     var
         PurchaseHeader: Record "Purchase Header";
@@ -3865,55 +3889,6 @@
         Assert.IsFalse(not CashFlowWorksheetLine.IsEmpty(), SalesOrderNotCreatedWorksheetLineMsg);
     end;
 
-#if not CLEAN26
-    [Obsolete('The statistics action will be replaced with the SalesOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '26.0')]
-    [Test]
-    [Scope('OnPrem')]
-    [HandlerFunctions('SalesOrderStatisticsModalHandler')]
-    procedure AmountExclPrepaymentInSOStatisticsShowsDiffOfAmountExclVATAndPrepaymentAmountExclVAT()
-    var
-        SalesLine: Record "Sales Line";
-        SalesHeader: Record "Sales Header";
-        GLAccount: Record "G/L Account";
-        SalesOrder: TestPage "Sales Order";
-    begin
-        // [SCENARIO 539477] Amount Excl. Prepayment in Sales Order Statistics shows 
-        // Difference between Amount Excl. VAT and Prepayment Amount Excl. VAT.
-        Initialize();
-
-        // [GIVEN] Create Prepayment VAT Setup.
-        CreatePrepmtVATSetup(GLAccount, GLAccount."Gen. Posting Type"::Sale);
-
-        // [GIVEN] Create a Sales Header and Validate Prepayment %.
-        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, CreateCustomerWithPostingSetup(GLAccount));
-        SalesHeader.Validate("Prepayment %", LibraryRandom.RandIntInRange(50, 50));
-        SalesHeader.Modify(true);
-
-        // [GIVEN] Create a Sales Line.
-        LibrarySales.CreateSalesLine(
-            SalesLine,
-            SalesHeader,
-            SalesLine.Type::Item,
-            CreateItemWithPostingSetup(GLAccount),
-            LibraryRandom.RandInt(0));
-
-        // [GIVEN] Validate Unit Price and Prepayment % in Sales Line.
-        SalesLine.Validate("Unit Price", LibraryRandom.RandIntInRange(500, 500));
-        SalesLine.Validate("Prepayment %", SalesHeader."Prepayment %");
-        SalesLine.Modify(true);
-
-        // [GIVEN] Post Sales Prepayment Invoice.
-        LibrarySales.PostSalesPrepaymentInvoice(SalesHeader);
-
-        // [WHEN] Open Sales Order page and run Statistics action.
-        SalesOrder.OpenEdit();
-        SalesOrder.GoToRecord(SalesHeader);
-        LibraryVariableStorage.Enqueue(SalesLine."Unit Price" * SalesLine."Prepayment %" / LibraryRandom.RandIntInRange(100, 100));
-        SalesOrder.Statistics.Invoke();
-
-        // [THEN] Amount Excl. Prepayment is equal to Amount Excl. VAT - Prepayment Amount Excl. VAT in SalesOrderStatisticsModalHandler.
-    end;
-#endif
     [Test]
     [Scope('OnPrem')]
     [HandlerFunctions('SalesOrderStatisticsHandler')]
@@ -4147,6 +4122,93 @@
         // Tear down
         TearDownVATPostingSetup(SalesHeader."VAT Bus. Posting Group");
         NotificationLifecycleMgt.RecallAllNotifications();
+    end;
+
+    [Test]
+    procedure SalesPrepmtInvAndFinalInvUseSameGenBusPostingGroup()
+    var
+        GenBusPostingGroup: Record "Gen. Business Posting Group";
+        GenPostingSetup: Record "General Posting Setup";
+        GLEntry: Record "G/L Entry";
+        LineGLAccount: Record "G/L Account";
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceHeader: Record "Sales Invoice Header";
+        SalesLine: Record "Sales Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+        FinalInvNo: Code[20];
+        PrepmtAccountNo: Code[20];
+        PrepmtInvNo: Code[20];
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 631454] Prepayment invoice and final sales invoice G/L entries on prepayment account use the same Gen. Bus. Posting Group from the line
+        Initialize();
+
+        // [GIVEN] Sales Order "SO" with Prepayment % and a sales line with G/L Account "GA"
+        CreatePrepmtVATSetup(LineGLAccount, LineGLAccount."Gen. Posting Type"::Sale);
+        CustomerNo := CreateCustomerWithPostingSetup(LineGLAccount);
+        CreateSalesHeaderWithPrepaymentPercentage(SalesHeader, CustomerNo);
+        CreateSalesLinesWithQtyToShip(SalesLine, SalesHeader, LineGLAccount);
+
+        // [GIVEN] Create a different Gen. Bus. Posting Group "GB" with General Posting Setup and VAT Posting Setup
+        LibraryERM.FindVATPostingSetup(VATPostingSetup, VATPostingSetup."VAT Calculation Type"::"Normal VAT");
+        LibraryERM.CreateGenBusPostingGroup(GenBusPostingGroup);
+        GenBusPostingGroup."Def. VAT Bus. Posting Group" := VATPostingSetup."VAT Bus. Posting Group";
+        GenBusPostingGroup.Modify();
+        LibraryERM.CreateGeneralPostingSetup(GenPostingSetup, GenBusPostingGroup.Code, LineGLAccount."Gen. Prod. Posting Group");
+        LibraryERM.SetGeneralPostingSetupInvtAccounts(GenPostingSetup);
+        LibraryERM.SetGeneralPostingSetupSalesAccounts(GenPostingSetup);
+        GenPostingSetup."Sales Prepayments Account" := LineGLAccount."No.";
+        GenPostingSetup.Modify();
+        LibraryERM.CreateVATPostingSetup(VATPostingSetup, GenBusPostingGroup."Def. VAT Bus. Posting Group", LineGLAccount."VAT Prod. Posting Group");
+
+        // [GIVEN] Gen. Bus. Posting Group on sales line is changed to "GB"
+        SalesLine.Validate("Gen. Bus. Posting Group", GenBusPostingGroup.Code);
+        SalesLine.Modify(true);
+
+        // [WHEN] Post Prepayment Invoice and then post the Sales Order
+        PrepmtInvNo := LibrarySales.PostSalesPrepaymentInvoice(SalesHeader);
+        FinalInvNo := LibrarySales.PostSalesDocument(SalesHeader, true, true);
+
+        // [THEN] G/L Entry from prepayment invoice has Gen. Bus. Posting Group = "GB" and G/L Account No. = prepayment account
+        GenPostingSetup.Get(SalesLine."Gen. Bus. Posting Group", SalesLine."Gen. Prod. Posting Group");
+        PrepmtAccountNo := GenPostingSetup.GetSalesPrepmtAccount();
+        FindGLEntryByBusPostingGroup(GLEntry, PrepmtInvNo, GenBusPostingGroup.Code);
+        Assert.AreEqual(PrepmtAccountNo, GLEntry."G/L Account No.", StrSubstNo(AmountErr, GLEntry.FieldCaption("G/L Account No."), PrepmtAccountNo, GLEntry.TableCaption()));
+
+        // [THEN] G/L Entry from final invoice for prepayment reversal has Gen. Bus. Posting Group = "GB"
+        SalesInvoiceHeader.Get(FinalInvNo);
+        FindGLEntryByBusPostingGroup(GLEntry, SalesInvoiceHeader."No.", GenBusPostingGroup.Code);
+        GLEntry.SetRange("G/L Account No.", PrepmtAccountNo);
+        GLEntry.FindFirst();
+        Assert.AreEqual(GenBusPostingGroup.Code, GLEntry."Gen. Bus. Posting Group", StrSubstNo(AmountErr, GLEntry.FieldCaption("Gen. Bus. Posting Group"), GenBusPostingGroup.Code, GLEntry.TableCaption()));
+
+        // Tear down
+        TearDownVATPostingSetup(SalesHeader."VAT Bus. Posting Group");
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure CannotReduceSalesOrderQuantityToInvoicedQuantityAfterPrepayment()
+    var
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+    begin
+        // [SCENARIO 646136] Reduce Sales Order quantity after prepayment and partial invoicing
+
+        // [GIVEN] Posted 50% Prepayment Invoice for Sales Order
+        InitSalesPrepaymentScenario(SalesHeader, SalesLine, false, 50, '');
+        LibrarySales.PostSalesPrepaymentInvoice(SalesHeader);
+
+        // [GIVEN] Order is partially shipped and invoiced
+        PostPartialSalesInvoice(SalesHeader, SalesLine);
+        LibrarySales.ReopenSalesDocument(SalesHeader);
+        SalesLine.Find();
+
+        // [WHEN] Reduce Quantity to the invoiced quantity
+        asserterror SalesLine.Validate(Quantity, SalesLine."Quantity Invoiced");
+
+        // [THEN] Error occurs because the posted prepayment exceeds the new line amount
+        Assert.ExpectedError(SalesLine.FieldCaption("Prepmt. Line Amount"));
     end;
 
     local procedure Initialize()
@@ -6717,15 +6779,6 @@
         Response := ACTION::OK;
     end;
 
-#if not CLEAN26
-    [Obsolete('The statistics action will be replaced with the SalesOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.', '26.0')]
-    [ModalPageHandler]
-    [Scope('OnPrem')]
-    procedure SalesOrderStatisticsModalHandler(var SalesOrderStatistics: TestPage "Sales Order Statistics")
-    begin
-        SalesOrderStatistics."Amount Excl. Prepayment".AssertEquals(SalesOrderStatistics.AmountInclVAT_Invoicing.AsDecimal() - SalesOrderStatistics.PrepmtTotalAmount.AsDecimal());
-    end;
-#endif
     [PageHandler]
     [Scope('OnPrem')]
     procedure SalesOrderStatisticsHandler(var SalesOrderStatistics: TestPage "Sales Order Statistics")

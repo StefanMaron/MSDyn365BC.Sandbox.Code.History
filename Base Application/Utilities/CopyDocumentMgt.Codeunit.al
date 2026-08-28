@@ -485,7 +485,7 @@ codeunit 6620 "Copy Document Mgt."
                          ConvertToSalesDocumentTypeFrom(FromSalesHeader."Document Type"),
                          CopyPostedDeferral, FromSalesLine."Line No.")
                     then begin
-                        OnCopySalesDocSalesLineOnBeforeCopyFromSalesDocAssgntToLine(FromSalesLine, ToSalesLine, RecalculateLines, NextLineNo);
+                        OnCopySalesDocSalesLineOnBeforeCopyFromSalesDocAssgntToLine(FromSalesLine, ToSalesLine, RecalculateLines, NextLineNo, LinesNotCopied);
                         if FromSalesLine.Type = FromSalesLine.Type::"Charge (Item)" then
                             CopyFromSalesDocAssgntToLine(
                               ToSalesLine, FromSalesLine."Document Type", FromSalesLine."Document No.", FromSalesLine."Line No.",
@@ -518,7 +518,12 @@ codeunit 6620 "Copy Document Mgt."
         end;
     end;
 
-    local procedure ConvertToPurchaseDocumentTypeFrom(PurchaseDocType: Enum "Purchase Document Type") PurchaseDocTypeFrom: Enum "Purchase Document Type From"
+    /// <summary>
+    /// Converts a Purchase Document Type enum value to the corresponding Purchase Document Type From enum value.
+    /// </summary>
+    /// <param name="PurchaseDocType">The purchase document type to convert.</param>
+    /// <returns>The corresponding Purchase Document Type From value.</returns>
+    procedure ConvertToPurchaseDocumentTypeFrom(PurchaseDocType: Enum "Purchase Document Type") PurchaseDocTypeFrom: Enum "Purchase Document Type From"
     begin
         case PurchaseDocType of
             PurchaseDocType::Quote:
@@ -608,6 +613,7 @@ codeunit 6620 "Copy Document Mgt."
                 if CopyArchSalesLine(
                      ToSalesHeader, ToSalesLine, FromSalesHeaderArchive, FromSalesLineArchive, NextLineNo, LinesNotCopied, false)
                 then begin
+                    OnCopyArchSalesLineOnBeforeCopyFromArchSalesDocDimToLine(ToSalesHeader, ToSalesLine, FromSalesHeaderArchive, FromSalesLineArchive, RecalculateLines, LinesNotCopied);
                     if ToSalesLine."Qty. to Assemble to Order" <> 0 then
                         ToSalesLine.AutoAsmToOrder();
                     CopyFromArchSalesDocDimToLine(ToSalesLine, FromSalesLineArchive);
@@ -758,6 +764,8 @@ codeunit 6620 "Copy Document Mgt."
         FromSalesShptHeader.CalcFields("Work Description");
         ToSalesHeader.Validate("Sell-to Customer No.", FromSalesShptHeader."Sell-to Customer No.");
         OnCopySalesDocOnBeforeTransferPostedShipmentFields(ToSalesHeader, FromSalesShptHeader);
+        if ToSalesHeader."Sell-to Customer No." <> FromSalesShptHeader."Sell-to Customer No." then
+            exit;
         ToSalesHeader.TransferFields(FromSalesShptHeader, false);
         UpdateShipToAddress(ToSalesHeader);
         SetReceivedFromCountryCode(FromSalesShptHeader, ToSalesHeader);
@@ -774,6 +782,8 @@ codeunit 6620 "Copy Document Mgt."
             FromSalesInvHeader.CalcFields("Work Description");
             ToSalesHeader.Validate("Sell-to Customer No.", FromSalesInvHeader."Sell-to Customer No.");
             OnCopySalesDocOnBeforeTransferPostedInvoiceFields(ToSalesHeader, FromSalesInvHeader, CopyJobData);
+            if ToSalesHeader."Sell-to Customer No." <> FromSalesInvHeader."Sell-to Customer No." then
+                exit;
             ToSalesHeader.TransferFields(FromSalesInvHeader, false);
             UpdateShipToAddress(ToSalesHeader);
             SetReceivedFromCountryCode(FromSalesInvHeader, ToSalesHeader);
@@ -785,6 +795,8 @@ codeunit 6620 "Copy Document Mgt."
     begin
         ToSalesHeader.Validate("Sell-to Customer No.", FromReturnRcptHeader."Sell-to Customer No.");
         OnCopySalesDocOnBeforeTransferPostedReturnReceiptFields(ToSalesHeader, FromReturnRcptHeader);
+        if ToSalesHeader."Sell-to Customer No." <> FromReturnRcptHeader."Sell-to Customer No." then
+            exit;
         ToSalesHeader.TransferFields(FromReturnRcptHeader, false);
         SetReceivedFromCountryCode(ToSalesHeader);
         OnAfterCopyPostedReturnReceipt(ToSalesHeader, OldSalesHeader, FromReturnRcptHeader);
@@ -794,6 +806,8 @@ codeunit 6620 "Copy Document Mgt."
     begin
         FromSalesHeaderArchive.CalcFields("Work Description");
         ToSalesHeader.Validate("Sell-to Customer No.", FromSalesHeaderArchive."Sell-to Customer No.");
+        if ToSalesHeader."Sell-to Customer No." <> FromSalesHeaderArchive."Sell-to Customer No." then
+            exit;
         ToSalesHeader.TransferFields(FromSalesHeaderArchive, false);
         OnCopySalesDocOnAfterTransferArchSalesHeaderFields(ToSalesHeader, FromSalesHeaderArchive);
         UpdateSalesHeaderWhenCopyFromSalesHeaderArchive(ToSalesHeader);
@@ -1611,6 +1625,8 @@ codeunit 6620 "Copy Document Mgt."
         ToSalesLine."Document Type" := ToSalesHeader."Document Type";
         ToSalesLine."Document No." := ToSalesHeader."No.";
         ToSalesLine."Line No." := NextLineNo;
+        if ToSalesHeader."Document Type" = ToSalesHeader."Document Type"::Quote then
+            ToSalesLine."Promised Delivery Date" := 0D;
         if not IncludeHeader then
             CheckSalesVATBusPostingGroup(ToSalesHeader, ToSalesLine);
         ToSalesLine."Copied From Posted Doc." := FromSalesLine."Copied From Posted Doc.";
@@ -1825,7 +1841,9 @@ codeunit 6620 "Copy Document Mgt."
             if not (ToSalesLine."Document Type" in ["Sales Document Type"::Order, "Sales Document Type"::Quote, "Sales Document Type"::"Blanket Order"]) then begin
                 ToSalesLine."Drop Shipment" := false;
                 ToSalesLine."Special Order" := false;
-            end;
+            end else
+                if FromSalesLine."Purchasing Code" <> '' then
+                    ToSalesLine.Validate("Purchasing Code", FromSalesLine."Purchasing Code");
             OnUpdateSalesLineBeforeRecalculateAmount(ToSalesLine, FromSalesLine);
             if RecalculateAmount and (FromSalesLine."Appl.-from Item Entry" = 0) then begin
                 if (ToSalesLine.Type <> ToSalesLine.Type::" ") and (ToSalesLine."No." <> '') then begin
@@ -1935,7 +1953,7 @@ codeunit 6620 "Copy Document Mgt."
                 OnRecalculateSalesLineOnBeforeValidateWorkTypeCode(ToSalesLine, FromSalesLine);
 
                 ToSalesLine.Validate("Work Type Code", FromSalesLine."Work Type Code");
-                if (ToSalesLine."Document Type" = ToSalesLine."Document Type"::Order) and
+                if (ToSalesLine."Document Type" in [ToSalesLine."Document Type"::Order, ToSalesLine."Document Type"::Quote, ToSalesLine."Document Type"::"Blanket Order"]) and
                    (FromSalesLine."Purchasing Code" <> '')
                 then
                     ToSalesLine.Validate("Purchasing Code", FromSalesLine."Purchasing Code");
@@ -2201,7 +2219,7 @@ codeunit 6620 "Copy Document Mgt."
             if IsDeferralToBeCopied("Deferral Document Type"::Purchase, ToPurchLine."Document Type".AsInteger(), FromPurchCommentDocTypeInt) then
                 ToPurchLine.Validate("Deferral Code", FromPurchLine."Deferral Code");
         end else begin
-            SetDefaultValuesToPurchLine(ToPurchLine, ToPurchHeader, FromPurchLine."VAT Difference");
+            SetDefaultValuesToPurchLine(ToPurchLine, ToPurchHeader, FromPurchLine."VAT Difference", FromPurchLine."Non-Deductible VAT Diff.");
             if IsDeferralToBeCopied("Deferral Document Type"::Purchase, ToPurchLine."Document Type".AsInteger(), FromPurchCommentDocTypeInt) then
                 if IsDeferralPosted("Deferral Document Type"::Purchase, FromPurchCommentDocTypeInt) then
                     DoCopyPostedDeferral := true
@@ -3054,7 +3072,7 @@ codeunit 6620 "Copy Document Mgt."
                                   FromSalesHeader."Prices Including VAT", ToSalesHeader."Prices Including VAT", true);
                             end;
                             OnAfterCopySalesLineFromSalesShptLineBuffer(
-                              ToSalesLine, FromSalesShptLine, IncludeHeader, RecalculateLines, TempDocSalesLine, ToSalesHeader, TempFromSalesLineBuf, ExactCostRevMandatory);
+                              ToSalesLine, FromSalesShptLine, IncludeHeader, RecalculateLines, TempDocSalesLine, ToSalesHeader, TempFromSalesLineBuf, ExactCostRevMandatory, FromSalesHeader, LinesNotCopied);
                         end;
                         OnCopySalesShptLinesToDocOnAfterCopySalesLine(ToSalesHeader, ToSalesLine, FromSalesShptLine);
                     until TempFromSalesLineBuf.Next() = 0;
@@ -3291,9 +3309,10 @@ codeunit 6620 "Copy Document Mgt."
 
                     OnAfterCopySalesLineFromSalesLineBuffer(
                       ToSalesLine, FromSalesInvLine, IncludeHeader, RecalculateLines, TempDocSalesLine, ToSalesHeader, TempSalesLineBuf,
-                      FromSalesLine2, FromSalesLine, ExactCostRevMandatory, FromSalesInvHeader);
+                      FromSalesLine2, FromSalesLine, ExactCostRevMandatory, FromSalesInvHeader, LinesNotCopied);
                 end;
                 OnCopySalesInvLinesToDocOnAfterCopySalesDocLine(ToSalesLine, FromSalesInvLine);
+                OnCopySalesInvLinesToDocOnEndOfCopyLineIteration(ToSalesHeader, ToSalesLine, FromSalesInvLine, TempSalesLineBuf, LinesNotCopied, NextLineNo);
             until TempSalesLineBuf.Next() = 0;
         end;
         CloseWindow();
@@ -3382,7 +3401,7 @@ codeunit 6620 "Copy Document Mgt."
                     CopySalesLinesToBuffer(
                       FromSalesHeader, FromSalesLine, FromSalesLine2, TempFromSalesLineBuf,
                       ToSalesHeader, TempDocSalesLine, FromSalesCrMemoLine."Document No.", NextLineNo);
-                OnAfterCopySalesCrMemoLine(TempDocSalesLine, ToSalesHeader, TempFromSalesLineBuf, FromSalesCrMemoLine, FromSalesLine);
+                OnAfterCopySalesCrMemoLine(TempDocSalesLine, ToSalesHeader, TempFromSalesLineBuf, FromSalesCrMemoLine, FromSalesLine, SplitLine);
             until FromSalesCrMemoLine.Next() = 0;
 
         OnCopySalesCrMemoLinesToDocOnAfterFillSalesLineBuffer(ToSalesHeader, TempFromSalesLineBuf);
@@ -3794,9 +3813,10 @@ codeunit 6620 "Copy Document Mgt."
                 CalcReversibleQtyBaseSalesDoc(ItemLedgEntry, FromSalesLine, SalesLineBuf, TempItemTrkgEntry, ReversibleQtyBase, SignFactor);
 
                 if ReversibleQtyBase <> 0 then begin
-                    if not ItemLedgEntry.Positive then
-                        if IsSplitItemLedgEntry(ItemLedgEntry) then
-                            i := 2;
+                    if not FromShptOrRcpt then
+                        if not ItemLedgEntry.Positive then
+                            if IsSplitItemLedgEntry(ItemLedgEntry) then
+                                i := 2;
 
                     UpdateSalesLineQtyBaseFromReversibleQtyBase(FromSalesLine, SalesLineBuf[i], ReversibleQtyBase);
                     // Fill buffer with exact cost reversing link
@@ -3811,7 +3831,7 @@ codeunit 6620 "Copy Document Mgt."
                 if SalesLineBuf[i]."Quantity (Base)" <> 0 then begin
                     TempSalesLineBuf := SalesLineBuf[i];
                     TempSalesLineBuf.Insert();
-                    AddSalesDocLine(TempDocSalesLine, TempSalesLineBuf."Line No.", ItemLedgEntry."Document No.", FromSalesLine."Line No.");
+                    AddSalesDocLine(TempDocSalesLine, TempSalesLineBuf."Line No.", ItemLedgEntry."Document No.", TempSalesLineBuf."Line No.");
                     NextLineNo := SalesLineBuf[i]."Line No." + 1;
                 end;
 
@@ -3934,7 +3954,7 @@ codeunit 6620 "Copy Document Mgt."
                 FromPurchLine."Appl.-to Item Entry" := 0;
                 FromPurchLine."Copied From Posted Doc." := true;
 
-                OnCopyPurchRcptLinesToDocOnAfterTransferFields(FromPurchLine, FromPurchHeader, ToPurchHeader, FromPurchRcptHeader, FromPurchRcptLine);
+                OnCopyPurchRcptLinesToDocOnAfterTransferFields(FromPurchLine, FromPurchHeader, ToPurchHeader, FromPurchRcptHeader, FromPurchRcptLine, RecalculateLines);
 
                 CheckUpdateOldDocumentNoFromPurchRcptLine(FromPurchRcptLine, OldDocNo, InsertDocNoLine);
 
@@ -4085,7 +4105,7 @@ codeunit 6620 "Copy Document Mgt."
                 FromPurchLine."Return Shipment Line No." := FromPurchInvLine."Line No.";
                 FromPurchLine."Copied From Posted Doc." := true;
 
-                OnCopyPurchInvLinesToDocOnAfterTransferFields(FromPurchLine, FromPurchHeader, ToPurchHeader, FromPurchInvHeader, FromPurchInvLine);
+                OnCopyPurchInvLinesToDocOnAfterTransferFields(FromPurchLine, FromPurchHeader, ToPurchHeader, FromPurchInvHeader, FromPurchInvLine, RecalculateLines);
 
                 SplitLine := true;
                 FromPurchInvLine.GetItemLedgEntries(TempItemLedgEntryBuf, true);
@@ -4268,7 +4288,7 @@ codeunit 6620 "Copy Document Mgt."
                 FromPurchLine."Return Shipment Line No." := FromPurchCrMemoLine."Line No.";
                 FromPurchLine."Copied From Posted Doc." := true;
 
-                OnCopyPurchCrMemoLinesToDocOnAfterTransferFields(FromPurchLine, FromPurchHeader, ToPurchHeader, FromPurchCrMemoHeader, FromPurchCrMemoLine);
+                OnCopyPurchCrMemoLinesToDocOnAfterTransferFields(FromPurchLine, FromPurchHeader, ToPurchHeader, FromPurchCrMemoHeader, FromPurchCrMemoLine, RecalculateLines);
 
                 SplitLine := true;
                 FromPurchCrMemoLine.GetItemLedgEntries(TempItemLedgEntryBuf, true);
@@ -4434,7 +4454,7 @@ codeunit 6620 "Copy Document Mgt."
                 FromPurchLine."Appl.-to Item Entry" := 0;
                 FromPurchLine."Copied From Posted Doc." := true;
 
-                OnCopyPurchReturnShptLinesToDocOnAfterTransferFields(FromPurchLine, FromPurchHeader, ToPurchHeader, FromReturnShptHeader, FromReturnShptLine);
+                OnCopyPurchReturnShptLinesToDocOnAfterTransferFields(FromPurchLine, FromPurchHeader, ToPurchHeader, FromReturnShptHeader, FromReturnShptLine, RecalculateLines);
 
                 CheckUpdateOldDocumentNoFromReturnShptLine(FromReturnShptLine, OldDocNo, InsertDocNoLine);
 
@@ -6463,7 +6483,7 @@ codeunit 6620 "Copy Document Mgt."
         end;
     end;
 
-    local procedure SetDefaultValuesToPurchLine(var ToPurchLine: Record "Purchase Line"; ToPurchHeader: Record "Purchase Header"; VATDifference: Decimal)
+    local procedure SetDefaultValuesToPurchLine(var ToPurchLine: Record "Purchase Line"; ToPurchHeader: Record "Purchase Header"; VATDifference: Decimal; NonDeductibleVATDifference: Decimal)
     begin
         InitPurchLineFields(ToPurchLine);
 
@@ -6476,6 +6496,7 @@ codeunit 6620 "Copy Document Mgt."
         else
             ToPurchLine.InitQtyToReceive();
         ToPurchLine."VAT Difference" := VATDifference;
+        ToPurchLine."Non-Deductible VAT Diff." := NonDeductibleVATDifference;
         ToPurchLine."Receipt No." := '';
         ToPurchLine."Receipt Line No." := 0;
         if not CreateToHeader then
@@ -7966,6 +7987,8 @@ codeunit 6620 "Copy Document Mgt."
         OnBeforeTransferFieldsFromCrMemoToInv(ToSalesHeader, FromSalesCrMemoHeader, IsHandled);
         if not IsHandled then begin
             ToSalesHeader.Validate("Sell-to Customer No.", FromSalesCrMemoHeader."Sell-to Customer No.");
+            if ToSalesHeader."Sell-to Customer No." <> FromSalesCrMemoHeader."Sell-to Customer No." then
+                exit;
             OnTransferFieldsFromCrMemoToInvOnBeforeTransferFields(ToSalesHeader, FromSalesCrMemoHeader);
             ToSalesHeader.TransferFields(FromSalesCrMemoHeader, false);
             if (ToSalesHeader."Document Type" = ToSalesHeader."Document Type"::Invoice) and IncludeHeader then begin
@@ -8435,6 +8458,7 @@ codeunit 6620 "Copy Document Mgt."
     local procedure OnBeforeCopySalesShptLinesToBuffer(var FromSalesLine: Record "Sales Line"; var FromSalesShptLine: Record "Sales Shipment Line"; var ToSalesHeader: Record "Sales Header")
     begin
     end;
+
 
     /// <summary>
     /// Event triggered before handling zero-amount posted invoices during the sales document copy process.
@@ -9096,6 +9120,11 @@ codeunit 6620 "Copy Document Mgt."
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnCopyArchSalesLineOnBeforeCopyFromArchSalesDocDimToLine(ToSalesHeader: Record "Sales Header"; var ToSalesLine: Record "Sales Line"; FromSalesHeaderArchive: Record "Sales Header Archive"; FromSalesLineArchive: Record "Sales Line Archive"; RecalculateLines: Boolean; var LinesNotCopied: Integer)
+    begin
+    end;
+
     /// <summary>
     /// Event triggered after a purchase line has been copied from the archived source to the target purchase document.
     /// Subscribing to this event allows developers to implement additional logic, validations,
@@ -9393,7 +9422,7 @@ codeunit 6620 "Copy Document Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCopySalesCrMemoLine(var TempDocSalesLine: Record "Sales Line" temporary; var ToSalesHeader: Record "Sales Header"; var FromSalesLineBuf: Record "Sales Line"; var FromSalesCrMemoLine: Record "Sales Cr.Memo Line"; FromSalesLine: Record "Sales Line")
+    local procedure OnAfterCopySalesCrMemoLine(var TempDocSalesLine: Record "Sales Line" temporary; var ToSalesHeader: Record "Sales Header"; var FromSalesLineBuf: Record "Sales Line"; var FromSalesCrMemoLine: Record "Sales Cr.Memo Line"; FromSalesLine: Record "Sales Line"; SplitLine: Boolean)
     begin
     end;
 
@@ -10060,7 +10089,7 @@ codeunit 6620 "Copy Document Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCopySalesLineFromSalesLineBuffer(var ToSalesLine: Record "Sales Line"; FromSalesInvLine: Record "Sales Invoice Line"; IncludeHeader: Boolean; RecalculateLines: Boolean; var TempDocSalesLine: Record "Sales Line" temporary; ToSalesHeader: Record "Sales Header"; var FromSalesLineBuf: Record "Sales Line"; var FromSalesLine2: Record "Sales Line"; FromSalesLine: Record "Sales Line"; ExactCostRevMandatory: Boolean; FromSalesInvHeader: Record "Sales Invoice Header")
+    local procedure OnAfterCopySalesLineFromSalesLineBuffer(var ToSalesLine: Record "Sales Line"; FromSalesInvLine: Record "Sales Invoice Line"; IncludeHeader: Boolean; RecalculateLines: Boolean; var TempDocSalesLine: Record "Sales Line" temporary; ToSalesHeader: Record "Sales Header"; var FromSalesLineBuf: Record "Sales Line"; var FromSalesLine2: Record "Sales Line"; FromSalesLine: Record "Sales Line"; ExactCostRevMandatory: Boolean; FromSalesInvHeader: Record "Sales Invoice Header"; var LinesNotCopied: Integer)
     begin
     end;
 
@@ -10070,7 +10099,7 @@ codeunit 6620 "Copy Document Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCopySalesLineFromSalesShptLineBuffer(var ToSalesLine: Record "Sales Line"; FromSalesShipmentLine: Record "Sales Shipment Line"; IncludeHeader: Boolean; RecalculateLines: Boolean; var TempDocSalesLine: Record "Sales Line" temporary; ToSalesHeader: Record "Sales Header"; FromSalesLineBuf: Record "Sales Line"; ExactCostRevMandatory: Boolean)
+    local procedure OnAfterCopySalesLineFromSalesShptLineBuffer(var ToSalesLine: Record "Sales Line"; FromSalesShipmentLine: Record "Sales Shipment Line"; IncludeHeader: Boolean; RecalculateLines: Boolean; var TempDocSalesLine: Record "Sales Line" temporary; ToSalesHeader: Record "Sales Header"; FromSalesLineBuf: Record "Sales Line"; ExactCostRevMandatory: Boolean; FromSalesHeader: Record "Sales Header"; var LinesNotCopied: Integer)
     begin
     end;
 
@@ -10527,7 +10556,7 @@ codeunit 6620 "Copy Document Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopyPurchCrMemoLinesToDocOnAfterTransferFields(var FromPurchaseLine: Record "Purchase Line"; var FromPurchaseHeader: Record "Purchase Header"; var ToPurchaseHeader: Record "Purchase Header"; var FromPurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; var FromPurchCrMemoLine: Record "Purch. Cr. Memo Line")
+    local procedure OnCopyPurchCrMemoLinesToDocOnAfterTransferFields(var FromPurchaseLine: Record "Purchase Line"; var FromPurchaseHeader: Record "Purchase Header"; var ToPurchaseHeader: Record "Purchase Header"; var FromPurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; var FromPurchCrMemoLine: Record "Purch. Cr. Memo Line"; RecalculateLines: Boolean)
     begin
     end;
 
@@ -10555,17 +10584,17 @@ codeunit 6620 "Copy Document Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopyPurchInvLinesToDocOnAfterTransferFields(var FromPurchaseLine: Record "Purchase Line"; var FromPurchaseHeader: Record "Purchase Header"; var ToPurchaseHeader: Record "Purchase Header"; FromPurchInvHeader: Record "Purch. Inv. Header"; var FromPurchInvLine: Record "Purch. Inv. Line")
+    local procedure OnCopyPurchInvLinesToDocOnAfterTransferFields(var FromPurchaseLine: Record "Purchase Line"; var FromPurchaseHeader: Record "Purchase Header"; var ToPurchaseHeader: Record "Purchase Header"; FromPurchInvHeader: Record "Purch. Inv. Header"; var FromPurchInvLine: Record "Purch. Inv. Line"; RecalculateLines: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopyPurchRcptLinesToDocOnAfterTransferFields(var FromPurchaseLine: Record "Purchase Line"; var FromPurchaseHeader: Record "Purchase Header"; var ToPurchaseHeader: Record "Purchase Header"; var PurchRcptHeader: Record "Purch. Rcpt. Header"; var FromPurchRcptLine: Record "Purch. Rcpt. Line")
+    local procedure OnCopyPurchRcptLinesToDocOnAfterTransferFields(var FromPurchaseLine: Record "Purchase Line"; var FromPurchaseHeader: Record "Purchase Header"; var ToPurchaseHeader: Record "Purchase Header"; var PurchRcptHeader: Record "Purch. Rcpt. Header"; var FromPurchRcptLine: Record "Purch. Rcpt. Line"; RecalculateLines: Boolean)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopyPurchReturnShptLinesToDocOnAfterTransferFields(var FromPurchaseLine: Record "Purchase Line"; var FromPurchaseHeader: Record "Purchase Header"; var ToPurchaseHeader: Record "Purchase Header"; var FromReturnShipmentHeader: Record "Return Shipment Header"; var FromReturnShipmentLine: Record "Return Shipment Line")
+    local procedure OnCopyPurchReturnShptLinesToDocOnAfterTransferFields(var FromPurchaseLine: Record "Purchase Line"; var FromPurchaseHeader: Record "Purchase Header"; var ToPurchaseHeader: Record "Purchase Header"; var FromReturnShipmentHeader: Record "Return Shipment Header"; var FromReturnShipmentLine: Record "Return Shipment Line"; RecalculateLines: Boolean)
     begin
     end;
 
@@ -11297,6 +11326,11 @@ codeunit 6620 "Copy Document Mgt."
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnCopySalesInvLinesToDocOnEndOfCopyLineIteration(var ToSalesHeader: Record "Sales Header"; var ToSalesLine: Record "Sales Line"; var FromSalesInvLine: Record "Sales Invoice Line"; var TempSalesLineBuf: Record "Sales Line" temporary; var LinesNotCopied: Integer; NextLineNo: Integer)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnCopySalesInvLinesToDocOnBeforeCopySalesLine(var ToSalesHeader: Record "Sales Header"; var FromSalesLine: Record "Sales Line"; var TempSalesLineBuf: Record "Sales Line" temporary; var ToSalesLine: Record "Sales Line"; FromSalesInvLine: Record "Sales Invoice Line"; IncludeHeader: Boolean; RecalculateLines: Boolean; var TempDocSalesLine: Record "Sales Line" temporary; var FromSalesLine1: Record "Sales Line"; ExactCostRevMandatory: Boolean)
     begin
     end;
@@ -11674,7 +11708,7 @@ codeunit 6620 "Copy Document Mgt."
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCopySalesDocSalesLineOnBeforeCopyFromSalesDocAssgntToLine(FromSalesLine: Record "Sales Line"; ToSalesLine: Record "Sales Line"; RecalculateLines: Boolean; NextLineNo: Integer)
+    local procedure OnCopySalesDocSalesLineOnBeforeCopyFromSalesDocAssgntToLine(FromSalesLine: Record "Sales Line"; ToSalesLine: Record "Sales Line"; RecalculateLines: Boolean; NextLineNo: Integer; var LinesNotCopied: Integer)
     begin
     end;
 
