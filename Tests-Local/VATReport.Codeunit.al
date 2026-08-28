@@ -45,8 +45,10 @@ codeunit 144001 "VAT Report"
         ValidCompanyCityTok: Label 'City - Labe';
         KeyAlreadyExistsErr: Label 'When you run the Suggest Lines action, it will add a VAT Report line for VAT Reg. No', Comment = 'A line of type = Correction already exists in the VAT Report. Remove the line to continue. Filters: VAT Registration No. = 12345';
         UnacceptableValueErr: Label 'Your entry of ''%1'' is not an acceptable value for ''%2''', Comment = '%1 = field value, %2 = field caption';
-        VIESELMAFileNamePatternTxt: Label 'ZMDO_DE%1_%2%3_%4', Locked = true, Comment = '%1 = VAT Registration No. digits, %2 = Report Period No. + 20, %3 = Report Year, %4 = Date';
+        VIESELMAFileNamePatternTxt: Label 'ZMDO.%1.%2.xml', Locked = true, Comment = '%1 = BOP User Account ID, %2 = FileID (UUID)';
         FileNamePatternMismatchErr: Label 'File name should match pattern %1*.xml, actual: %2', Comment = '%1 = expected file name pattern, %2 = actual file name';
+        BOPUserAccountIDLengthErr: Label 'The BOP User Account ID must be exactly 10 digits.';
+        BOPUserAccountIDMissingErr: Label 'The BOP User Account ID must be specified in the VAT Report Setup before generating the ELMA XML file.';
         IsInitialized: Boolean;
 
     [Test]
@@ -2512,34 +2514,426 @@ codeunit 144001 "VAT Report"
     end;
 
     [Test]
-    procedure ExportVATReportVerifyFileName()
+    procedure BOPUserAccountID_Valid10Digits()
+    var
+        VATReportSetup: Record "VAT Report Setup";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 623220] Setting BOP User Account ID to a valid 10-digit value succeeds
+        Initialize();
+
+        // [GIVEN] VAT Report Setup exists
+        VATReportSetup.Get();
+
+        // [WHEN] BOP User Account ID is set to a valid 10-digit value
+        VATReportSetup.Validate("BOP User Account ID", '0987654321');
+
+        // [THEN] No error is thrown and value is stored
+        Assert.AreEqual('0987654321', VATReportSetup."BOP User Account ID", 'BOP User Account ID should be stored.');
+    end;
+
+    [Test]
+    procedure BOPUserAccountID_ClearValue()
+    var
+        VATReportSetup: Record "VAT Report Setup";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 623220] Clearing BOP User Account ID after setting it is allowed
+        Initialize();
+
+        // [GIVEN] VAT Report Setup with a valid BOP User Account ID
+        VATReportSetup.Get();
+        VATReportSetup.Validate("BOP User Account ID", '0987654321');
+        VATReportSetup.Modify();
+
+        // [WHEN] BOP User Account ID is cleared
+        VATReportSetup.Validate("BOP User Account ID", '');
+
+        // [THEN] No error is thrown and value is empty
+        Assert.AreEqual('', VATReportSetup."BOP User Account ID", 'BOP User Account ID should be cleared.');
+    end;
+
+    [Test]
+    procedure BOPUserAccountID_TooShort()
+    var
+        VATReportSetup: Record "VAT Report Setup";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 623220] Setting BOP User Account ID to fewer than 10 digits raises an error
+        Initialize();
+
+        // [GIVEN] VAT Report Setup
+        VATReportSetup.Get();
+
+        // [WHEN] BOP User Account ID is set to 5 digits
+        asserterror VATReportSetup.Validate("BOP User Account ID", '12345');
+
+        // [THEN] Error about length is raised
+        Assert.ExpectedError(BOPUserAccountIDLengthErr);
+        Assert.ExpectedErrorCode('Dialog');
+    end;
+
+    [Test]
+    procedure BOPUserAccountID_TooLong()
+    var
+        VATReportSetup: Record "VAT Report Setup";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 623220] Setting BOP User Account ID to more than 10 digits raises an error
+        Initialize();
+
+        // [GIVEN] VAT Report Setup
+        VATReportSetup.Get();
+
+        // [WHEN] BOP User Account ID is set to 11 digits
+        asserterror VATReportSetup.Validate("BOP User Account ID", '12345678901');
+
+        // [THEN] Error about length is raised
+        Assert.ExpectedError(BOPUserAccountIDLengthErr);
+        Assert.ExpectedErrorCode('Dialog');
+    end;
+
+    [Test]
+    procedure CreateVIESELMA_BOPUserAccountIDMissing()
+    var
+        VATReportHeader: Record "VAT Report Header";
+        VATReportSetup: Record "VAT Report Setup";
+        VATReportExport: Codeunit "VAT Report Export";
+        TempBlob: Codeunit "Temp Blob";
+        TestPeriodStart: Date;
+        TestPeriodEnd: Date;
+        FileID: Text;
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 623220] Creating VIES ELMA XML without BOP User Account ID raises an error
+        Initialize();
+
+        // [GIVEN] Released VAT Report "VR" with BOP User Account ID cleared
+        SetupVATReportScenario(VATReportHeader, TestPeriodStart, TestPeriodEnd);
+        VATReportSetup.Get();
+        VATReportSetup."BOP User Account ID" := '';
+        VATReportSetup.Modify();
+
+        // [WHEN] CreateVIESELMAXml is called
+        asserterror VATReportExport.CreateVIESELMAXml(VATReportHeader, FileID, TempBlob);
+
+        // [THEN] Error about missing BOP User Account ID is raised
+        Assert.ExpectedError(BOPUserAccountIDMissingErr);
+        Assert.ExpectedErrorCode('Dialog');
+    end;
+
+    [Test]
+    procedure CreateVIESELMA_BenutzerkontoIDInXml()
+    var
+        VATReportHeader: Record "VAT Report Header";
+        VATReportSetup: Record "VAT Report Setup";
+        TempBlob: Codeunit "Temp Blob";
+        TestPeriodStart: Date;
+        TestPeriodEnd: Date;
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 623220] VIES ELMA XML contains BenutzerkontoID matching the configured BOP User Account ID
+        Initialize();
+
+        // [GIVEN] VAT Report with BOP User Account ID configured
+        // [WHEN] VAT Report is exported into XML
+        CreateVATReport(VATReportHeader, TestPeriodStart, TestPeriodEnd, TempBlob);
+
+        // [THEN] BenutzerkontoID node contains the configured BOP User Account ID
+        InitXMLReaderForVIESReport(TempBlob);
+        VATReportSetup.Get();
+        LibraryXPathXMLReader.VerifyXmlNodeValue('//elan:ELMAHeader/elan:BenutzerkontoID', VATReportSetup."BOP User Account ID");
+
+        Cleanup(VATReportHeader."No.", TestPeriodStart, TestPeriodEnd);
+    end;
+
+    [Test]
+    procedure CreateVIESELMA_FileIDMatchesEingangsID()
     var
         VATReportHeader: Record "VAT Report Header";
         VATReportExport: Codeunit "VAT Report Export";
+        TempBlob: Codeunit "Temp Blob";
+        TestPeriodStart: Date;
+        TestPeriodEnd: Date;
+        FileID: Text;
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 623220] FileID returned from Create matches EingangsID in the generated XML
+        Initialize();
+
+        // [GIVEN] Released VAT Report "VR" with VAT Registration No. and period data
+        SetupVATReportScenario(VATReportHeader, TestPeriodStart, TestPeriodEnd);
+
+        // [WHEN] CreateVIESELMAXml is called
+        VATReportExport.CreateVIESELMAXml(VATReportHeader, FileID, TempBlob);
+
+        // [THEN] EingangsID in ELMA header matches the returned FileID
+        InitXMLReaderForVIESReport(TempBlob);
+        LibraryXPathXMLReader.VerifyXmlNodeValue('//elan:ELMAHeader/elan:Identifizierung/elan:EingangsID', FileID);
+
+        Cleanup(VATReportHeader."No.", TestPeriodStart, TestPeriodEnd);
+    end;
+
+    [Test]
+    procedure CreateVIESELMA_FileIDInFileName()
+    var
+        VATReportHeader: Record "VAT Report Header";
+        VATReportSetup: Record "VAT Report Setup";
+        VATReportExport: Codeunit "VAT Report Export";
+        TempBlob: Codeunit "Temp Blob";
         TestPeriodStart: Date;
         TestPeriodEnd: Date;
         FileName: Text;
+        FileID: Text;
+        ExpectedFileName: Text;
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 623220] FileID from Create is used in file name from GetVIESELMAFileName
+        Initialize();
+
+        // [GIVEN] Released VAT Report "VR" with VAT Registration No. and period data
+        SetupVATReportScenario(VATReportHeader, TestPeriodStart, TestPeriodEnd);
+
+        // [WHEN] CreateVIESELMAXml returns FileID and GetVIESELMAFileName uses it
+        VATReportExport.CreateVIESELMAXml(VATReportHeader, FileID, TempBlob);
+        FileName := VATReportExport.GetVIESELMAFileName(VATReportHeader, FileID);
+
+        // [THEN] File name is ZMDO.<BOPUserAccountID>.<FileID>.xml
+        VATReportSetup.Get();
+        ExpectedFileName := StrSubstNo(VIESELMAFileNamePatternTxt, VATReportSetup."BOP User Account ID", FileID);
+        Assert.AreEqual(ExpectedFileName, FileName, 'File name must contain the FileID from Create.');
+
+        Cleanup(VATReportHeader."No.", TestPeriodStart, TestPeriodEnd);
+    end;
+
+    [Test]
+    procedure ExportVATReportVerifyFileName()
+    var
+        VATReportHeader: Record "VAT Report Header";
+        VATReportSetup: Record "VAT Report Setup";
+        VATReportExport: Codeunit "VAT Report Export";
+        TempBlob: Codeunit "Temp Blob";
+        TestPeriodStart: Date;
+        TestPeriodEnd: Date;
+        FileName: Text;
+        FileID: Text;
         ExpectedFileName: Text;
     begin
         // [FEATURE] [AI test] [UT]
-        // [SCENARIO 613377] GetVIESELMAFileName returns file name ZMDO_DE<vatregno>_<periodno+20><reportyear>_<datetime>.xml
+        // [SCENARIO 613377] GetVIESELMAFileName returns file name ZMDO.<BenutzerkontoID>.<FileID>.xml
         Initialize();
 
         // [GIVEN] VAT Report "VR" with VAT Registration No. and period data
         SetupVATReportScenario(VATReportHeader, TestPeriodStart, TestPeriodEnd);
 
-        // [WHEN] GetVIESELMAFileName is called
-        FileName := VATReportExport.GetVIESELMAFileName(VATReportHeader);
+        // [WHEN] CreateVIESELMAXml is called to get the FileID, then GetVIESELMAFileName is called
+        VATReportExport.CreateVIESELMAXml(VATReportHeader, FileID, TempBlob);
+        FileName := VATReportExport.GetVIESELMAFileName(VATReportHeader, FileID);
 
-        // [THEN] File name matches expected format ZMDO_DE<vatregno>_<periodno+20><reportyear>_<date>_<time>.xml
-        ExpectedFileName := StrSubstNo(VIESELMAFileNamePatternTxt,
-            GetDigitsFromVATRegNo(VATReportHeader."VAT Registration No."),
-            VATReportHeader."Report Period No." + 20,
-            VATReportHeader."Report Year",
-            Format(Today(), 0, '<Year4><Month,2><Day,2>'));
-        Assert.IsTrue(StrPos(FileName, ExpectedFileName) = 1, StrSubstNo(FileNamePatternMismatchErr, ExpectedFileName, FileName));
+        // [THEN] File name matches expected format ZMDO.<BenutzerkontoID>.<FileID>.xml
+        VATReportSetup.Get();
+        ExpectedFileName := StrSubstNo(VIESELMAFileNamePatternTxt, VATReportSetup."BOP User Account ID", FileID);
+        Assert.AreEqual(ExpectedFileName, FileName, StrSubstNo(FileNamePatternMismatchErr, ExpectedFileName, FileName));
 
         Cleanup(VATReportHeader."No.", TestPeriodStart, TestPeriodEnd);
+    end;
+
+    [Test]
+    procedure ExportVATReportTrimsSpacesFromVATRegNo()
+    var
+        VATReportHeader: Record "VAT Report Header";
+        TempBlob: Codeunit "Temp Blob";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 630344] VIES ELMA XML trims leading and trailing spaces from VAT Registration No. in auslUStIdNrOhneLKZ node
+        Initialize();
+
+        // [GIVEN] A mock VAT report with a line where VAT Registration No. has leading and trailing spaces
+        CreateMockVATReportWithLines(VATReportHeader, VATReportHeader."VAT Report Type"::Standard, VATReportHeader."Report Period Type"::Month, 1);
+        UpdateVATRegNoOnVATReportLine(VATReportHeader."No.", ' U1234567 ');
+
+        // [WHEN] Export VIES report
+        ExportVATReportIntoTempBlob(VATReportHeader, TempBlob);
+
+        // [THEN] auslUStIdNrOhneLKZ node value has no leading or trailing spaces
+        InitXMLReaderForVIESReport(TempBlob);
+        LibraryXPathXMLReader.VerifyXmlNodeValue('//zm:zms/zm:unternehmer/zm:zm/zm:zmZeile/zm:auslUStIdNrOhneLKZ', 'U1234567');
+    end;
+
+    [Test]
+    procedure ExportVATReportTrimsSpacesFromAddressFields()
+    var
+        VATReportHeader: Record "VAT Report Header";
+        TempBlob: Codeunit "Temp Blob";
+        TestPeriodStart: Date;
+        TestPeriodEnd: Date;
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 630344] VIES ELMA XML trims leading/trailing spaces from address fields
+        Initialize();
+
+        // [GIVEN] Company information with leading/trailing spaces in name, address, and city
+        UpdateCompanyInformation(' Test Company ', ' Main Street ', ' Berlin ');
+
+        // [WHEN] Export VIES report
+        CreateVATReport(VATReportHeader, TestPeriodStart, TestPeriodEnd, TempBlob);
+
+        // [THEN] Address fields in XML are trimmed
+        InitXMLReaderForVIESReport(TempBlob);
+        LibraryXPathXMLReader.VerifyXmlNodeValue('//zm:zms/zm:unternehmer/zm:anschrift/zm:name', 'Test Company');
+        LibraryXPathXMLReader.VerifyXmlNodeValue('//zm:zms/zm:unternehmer/zm:anschrift/zm:strasse', 'Main Street');
+        LibraryXPathXMLReader.VerifyXmlNodeValue('//zm:zms/zm:unternehmer/zm:anschrift/zm:ort', 'Berlin');
+
+        Cleanup(VATReportHeader."No.", TestPeriodStart, TestPeriodEnd);
+    end;
+
+    [Test]
+    procedure ExportVATReportSanitizesDotsFromVATRegNo()
+    var
+        VATReportHeader: Record "VAT Report Header";
+        TempBlob: Codeunit "Temp Blob";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 631025] VAT Registration No. with dots is sanitized in ELMA XML export
+        Initialize();
+
+        // [GIVEN] A VAT Report Line with VAT Registration No. containing dots
+        CreateMockVATReportWithLines(VATReportHeader, VATReportHeader."VAT Report Type"::Standard, VATReportHeader."Report Period Type"::Month, 1);
+        UpdateVATRegNoOnVATReportLine(VATReportHeader."No.", '0476.746.783');
+
+        // [WHEN] Export VIES report
+        ExportVATReportIntoTempBlob(VATReportHeader, TempBlob);
+
+        // [THEN] Dots are removed from VAT Registration No. in XML
+        InitXMLReaderForVIESReport(TempBlob);
+        LibraryXPathXMLReader.VerifyXmlNodeValue('//zm:zms/zm:unternehmer/zm:zm/zm:zmZeile/zm:auslUStIdNrOhneLKZ', '0476746783');
+    end;
+
+    [Test]
+    procedure ExportVATReportSanitizesSpacesFromVATRegNo()
+    var
+        VATReportHeader: Record "VAT Report Header";
+        TempBlob: Codeunit "Temp Blob";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 631025] VAT Registration No. with spaces is sanitized in ELMA XML export
+        Initialize();
+
+        // [GIVEN] A VAT Report Line with VAT Registration No. containing spaces
+        CreateMockVATReportWithLines(VATReportHeader, VATReportHeader."VAT Report Type"::Standard, VATReportHeader."Report Period Type"::Month, 1);
+        UpdateVATRegNoOnVATReportLine(VATReportHeader."No.", '0781 612 241');
+
+        // [WHEN] Export VIES report
+        ExportVATReportIntoTempBlob(VATReportHeader, TempBlob);
+
+        // [THEN] Spaces are removed from VAT Registration No. in XML
+        InitXMLReaderForVIESReport(TempBlob);
+        LibraryXPathXMLReader.VerifyXmlNodeValue('//zm:zms/zm:unternehmer/zm:zm/zm:zmZeile/zm:auslUStIdNrOhneLKZ', '0781612241');
+    end;
+
+    [Test]
+    procedure ExportVATReportSanitizesLeadingSpaceFromVATRegNo()
+    var
+        VATReportHeader: Record "VAT Report Header";
+        TempBlob: Codeunit "Temp Blob";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 631025] VAT Registration No. with leading space is sanitized in ELMA XML export
+        Initialize();
+
+        // [GIVEN] A VAT Report Line with VAT Registration No. containing a leading space
+        CreateMockVATReportWithLines(VATReportHeader, VATReportHeader."VAT Report Type"::Standard, VATReportHeader."Report Period Type"::Month, 1);
+        UpdateVATRegNoOnVATReportLine(VATReportHeader."No.", ' 190 368 86');
+
+        // [WHEN] Export VIES report
+        ExportVATReportIntoTempBlob(VATReportHeader, TempBlob);
+
+        // [THEN] Leading space and inner spaces are removed from VAT Registration No. in XML
+        InitXMLReaderForVIESReport(TempBlob);
+        LibraryXPathXMLReader.VerifyXmlNodeValue('//zm:zms/zm:unternehmer/zm:zm/zm:zmZeile/zm:auslUStIdNrOhneLKZ', '19036886');
+    end;
+
+    [Test]
+    procedure ExportVATReportKeepsCleanVATRegNoUnchanged()
+    var
+        VATReportHeader: Record "VAT Report Header";
+        TempBlob: Codeunit "Temp Blob";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 631025] Clean VAT Registration No. is not modified by sanitization
+        Initialize();
+
+        // [GIVEN] A VAT Report Line with clean VAT Registration No. (no invalid characters)
+        CreateMockVATReportWithLines(VATReportHeader, VATReportHeader."VAT Report Type"::Standard, VATReportHeader."Report Period Type"::Month, 1);
+        UpdateVATRegNoOnVATReportLine(VATReportHeader."No.", 'U12386700');
+
+        // [WHEN] Export VIES report
+        ExportVATReportIntoTempBlob(VATReportHeader, TempBlob);
+
+        // [THEN] VAT Registration No. remains unchanged after sanitization
+        InitXMLReaderForVIESReport(TempBlob);
+        LibraryXPathXMLReader.VerifyXmlNodeValue('//zm:zms/zm:unternehmer/zm:zm/zm:zmZeile/zm:auslUStIdNrOhneLKZ', 'U12386700');
+    end;
+
+    [Test]
+    procedure ExportVATReportSkipsDomesticDELine()
+    var
+        VATReportHeader: Record "VAT Report Header";
+        VATReportLine: Record "VAT Report Line";
+        CountryRegion: Record "Country/Region";
+        TempBlob: Codeunit "Temp Blob";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 631025] Lines with domestic country code DE are not exported to VIES XML
+        Initialize();
+
+        // [GIVEN] A VAT Report with only a DE country line
+        CreateMockVATReportWithLines(VATReportHeader, VATReportHeader."VAT Report Type"::Standard, VATReportHeader."Report Period Type"::Month, 1);
+        VATReportLine.SetRange("VAT Report No.", VATReportHeader."No.");
+        VATReportLine.FindFirst();
+        CountryRegion.Get(VATReportLine."Country/Region Code");
+        CountryRegion.Validate("EU Country/Region Code", 'DE');
+        CountryRegion.Modify(true);
+        VATReportLine."VAT Registration No." := 'DE123456789';
+        VATReportLine.Modify();
+
+        // [WHEN] Export VIES report
+        ExportVATReportIntoTempBlob(VATReportHeader, TempBlob);
+
+        // [THEN] No zmZeile nodes exist in the exported XML (DE line is skipped)
+        InitXMLReaderForVIESReport(TempBlob);
+        LibraryXPathXMLReader.VerifyXmlNodeCountByXPath('//zm:zms/zm:unternehmer/zm:zm/zm:zmZeile', 0);
+    end;
+
+    [Test]
+    procedure ExportVATReportSkipsDomesticDECorrectionLine()
+    var
+        VATReportHeader: Record "VAT Report Header";
+        VATReportLine: Record "VAT Report Line";
+        CountryRegion: Record "Country/Region";
+        TempBlob: Codeunit "Temp Blob";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 631025] Correction lines with domestic country code DE are also not exported to VIES XML
+        Initialize();
+
+        // [GIVEN] A corrective VAT Report with only a DE country correction line
+        CreateMockVATReportWithLines(VATReportHeader, VATReportHeader."VAT Report Type"::Corrective, VATReportHeader."Report Period Type"::Month, 1);
+        VATReportLine.SetRange("VAT Report No.", VATReportHeader."No.");
+        VATReportLine.FindFirst();
+        CountryRegion.Get(VATReportLine."Country/Region Code");
+        CountryRegion.Validate("EU Country/Region Code", 'DE');
+        CountryRegion.Modify(true);
+        VATReportLine."VAT Registration No." := 'DE987654321';
+        VATReportLine."Line Type" := VATReportLine."Line Type"::Correction;
+        VATReportLine.Modify();
+
+        // [WHEN] Export VIES report
+        ExportVATReportIntoTempBlob(VATReportHeader, TempBlob);
+
+        // [THEN] No zmZeile nodes exist in the exported XML (DE correction line is skipped)
+        InitXMLReaderForVIESReport(TempBlob);
+        LibraryXPathXMLReader.VerifyXmlNodeCountByXPath('//zm:zms/zm:unternehmer/zm:zm/zm:zmZeile', 0);
     end;
 
     local procedure Initialize()
@@ -2553,6 +2947,7 @@ codeunit 144001 "VAT Report"
         InitializeCompanyInformation();
         LibrarySetupStorage.Save(DATABASE::"Company Information");
         LibrarySetupStorage.Save(DATABASE::"VAT Report Setup");
+        Commit();
         IsInitialized := true;
     end;
 
@@ -2565,6 +2960,7 @@ codeunit 144001 "VAT Report"
 
         VATReportSetup.Validate("No. Series", LibraryERM.CreateNoSeriesCode());
         VATReportSetup.Validate("Modify Submitted Reports", false);
+        VATReportSetup."BOP User Account ID" := '1234567890';
         VATReportSetup.Modify();
     end;
 
@@ -2587,6 +2983,18 @@ codeunit 144001 "VAT Report"
         LibraryXPathXMLReader.InitializeXml(TempBlob, 'n1', 'http://www.itzbund.de/elan');
         LibraryXPathXMLReader.AddAdditionalXmlNamespace('elan', 'http://www.itzbund.de/elan/elemente');
         LibraryXPathXMLReader.AddAdditionalXmlNamespace('zm', 'http://www.itzbund.de/ZM/01');
+    end;
+
+    local procedure UpdateVATRegNoOnVATReportLine(VATReportNo: Code[20]; VATRegNoSuffix: Text)
+    var
+        VATReportLine: Record "VAT Report Line";
+        CountryRegion: Record "Country/Region";
+    begin
+        VATReportLine.SetRange("VAT Report No.", VATReportNo);
+        VATReportLine.FindFirst();
+        CountryRegion.Get(VATReportLine."Country/Region Code");
+        VATReportLine."VAT Registration No." := CountryRegion."EU Country/Region Code" + CopyStr(VATRegNoSuffix, 1, MaxStrLen(VATReportLine."VAT Registration No.") - StrLen(CountryRegion."EU Country/Region Code"));
+        VATReportLine.Modify();
     end;
 
     local procedure UpdateCompanyInformation(CompanyName: Text[100]; CompanyAddress: Text[30]; CompanyCity: Text[30])
@@ -3179,8 +3587,9 @@ codeunit 144001 "VAT Report"
     local procedure ExportVATReportIntoTempBlob(var VATReportHeader: Record "VAT Report Header"; var TempBlob: Codeunit "Temp Blob")
     var
         VATReportExport: Codeunit "VAT Report Export";
+        FileID: Text;
     begin
-        VATReportExport.CreateVIESELMAXml(VATReportHeader, TempBlob);
+        VATReportExport.CreateVIESELMAXml(VATReportHeader, FileID, TempBlob);
     end;
 
     local procedure CorrectionLineExists(VATReportNo: Code[20]; LineType: Option New,Cancellation,Correction): Boolean
@@ -3301,17 +3710,6 @@ codeunit 144001 "VAT Report"
         CompanyInformation.Get();
         CompanyInformation.Address := NewAddress;
         CompanyInformation.Modify();
-    end;
-
-    local procedure GetDigitsFromVATRegNo(VATRegNo: Code[20]): Text
-    var
-        ResultTB: TextBuilder;
-        Ch: Char;
-    begin
-        foreach Ch in VATRegNo do
-            if (Ch >= '0') and (Ch <= '9') then
-                ResultTB.Append(Ch);
-        exit(ResultTB.ToText());
     end;
 
     local procedure RunCorrectVATReportLines(VATReportNo: Code[20])

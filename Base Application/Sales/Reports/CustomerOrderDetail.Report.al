@@ -18,7 +18,8 @@ report 108 "Customer - Order Detail"
 {
     ApplicationArea = Basic, Suite;
     Caption = 'Customer - Order Detail';
-    DefaultRenderingLayout = Word;
+    ToolTip = 'View a list of orders divided by customer. The order amounts are totaled for each customer and for the entire list. The report can be used, for example, to obtain an overview of sales over the short term or to analyze possible shipment problems.';
+    DefaultRenderingLayout = Excel;
     PreviewMode = PrintLayout;
     UsageCategory = ReportsAndAnalysis;
 
@@ -185,8 +186,15 @@ report 108 "Customer - Order Detail"
                     {
                     }
                     trigger OnAfterGetRecord()
+                    var
+                        IsHandled: Boolean;
                     begin
+                        ReportHasData := true;
                         OrderNoAndDate := StrSubstNo(OrderNoAndDateLbl, "Sales Header"."No.", Format("Sales Header"."Order Date", 0, '<Closing><Day> <Month Text> <Year4>'));
+                        IsHandled := false;
+                        OnSalesLineOnAfterGetRecordOnBeforeNewOrder("Sales Line", IsHandled);
+                        if IsHandled then
+                            CurrReport.Skip();
                         NewOrder := "Document No." <> SalesHeader."No.";
                         if NewOrder then
                             SalesHeader.Get(Enum::"Sales Document Type"::Order, "Document No.");
@@ -252,13 +260,7 @@ report 108 "Customer - Order Detail"
                 trigger OnAfterGetRecord()
                 begin
                     CustomerNoAndName := Customer."No." + ' - ' + Customer.Name;
-                    "Sales Line".Reset();
-                    "Sales Line".SetRange("Document Type", "Sales Line"."Document Type"::Order);
-                    "Sales Line".SetRange("Document No.", "Sales Header"."No.");
-                    "Sales Line".SetFilter("Shortcut Dimension 1 Code", Customer."Global Dimension 1 Code");
-                    "Sales Line".SetFilter("Shortcut Dimension 2 Code", Customer."Global Dimension 2 Code");
-                    "Sales Line".SetFilter("Outstanding Quantity", '<>%1', 0);
-                    if "Sales Line".IsEmpty() then
+                    if not SalesOrderHasMatchingLines("Sales Header"."No.") then
                         CurrReport.Skip();
                 end;
             }
@@ -296,11 +298,13 @@ report 108 "Customer - Order Detail"
                 end;
             }
 
+#if not CLEAN28
             trigger OnAfterGetRecord()
             begin
                 if PrintOnlyOnePerPage then
                     PageGroupNo := PageGroupNo + 1;
             end;
+#endif
 
             trigger OnPreDataItem()
             begin
@@ -364,12 +368,20 @@ report 108 "Customer - Order Detail"
                         Caption = 'Show Amounts in LCY';
                         ToolTip = 'Specifies if the reported amounts are shown in the local currency.';
                     }
+#if not CLEAN28
                     field(NewPagePerCustomer; PrintOnlyOnePerPage)
                     {
                         ApplicationArea = Basic, Suite;
                         Caption = 'New Page per Customer';
                         ToolTip = 'Specifies if each customer''s information is printed on a new page if you have chosen two or more customers to be included in the report.';
+                        ObsoleteState = Pending;
+                        ObsoleteReason = 'The New Page per Customer option is only supported by the RDLC layout which has been deprecated.';
+                        ObsoleteTag = '28.0';
+#if CLEAN27
+                        Visible = false;
+#endif
                     }
+#endif
                     field(PostingDateFilter; PostingDateFilter)
                     {
                         ApplicationArea = Basic, Suite;
@@ -398,12 +410,14 @@ report 108 "Customer - Order Detail"
             Caption = 'Customer - Order Detail Word';
             Type = Word;
             LayoutFile = './Sales/Reports/CustomerOrderDetail.docx';
+            Summary = 'Report layout made for print. Use a Word editor to modify the layout.';
         }
         layout(Excel)
         {
             Caption = 'Customer - Order Detail Excel';
             Type = Excel;
             LayoutFile = './Sales/Reports/CustomerOrderDetail.xlsx';
+            Summary = 'Report layout primarily made for data analysis. Use an Excel editor to modify the layout.';
         }
 #if not CLEAN27
         layout(RDLC)
@@ -414,6 +428,7 @@ report 108 "Customer - Order Detail"
             ObsoleteState = Pending;
             ObsoleteReason = 'The RDLC layout has been replaced by the Excel layout and will be removed in a future release.';
             ObsoleteTag = '27.0';
+            Summary = 'Report layout made in the legacy RDLC format. Use an RDLC editor to modify the layout.';
         }
 #endif
     }
@@ -442,6 +457,12 @@ report 108 "Customer - Order Detail"
         TotalLbl = 'Total';
     }
 
+    trigger OnPreRendering(var RenderingPayload: JsonObject)
+    begin
+        if not ReportHasData then
+            Error(EmptyReportDatasetErr);
+    end;
+
     trigger OnPreReport()
     var
         FormatDocument: Codeunit "Format Document";
@@ -449,6 +470,7 @@ report 108 "Customer - Order Detail"
         CustFilter := FormatDocument.GetRecordFiltersWithCaptions(Customer);
         SalesLineFilter := "Sales Line".GetFilters();
         PeriodText := "Sales Line".GetFilter("Shipment Date");
+        SalesLineRequestFilter.CopyFilters("Sales Line");
         if PrintAmountsInLCY then
             AllAmtAreInLCY := AllAmtAreInLCYCaptionLbl;
 
@@ -476,13 +498,17 @@ report 108 "Customer - Order Detail"
         SalesOrderAmountLCY: Decimal;
         PrintAmountsInLCY: Boolean;
         PeriodText: Text;
+#if not CLEAN28
         PrintOnlyOnePerPage: Boolean;
+#endif
         BackOrderQty: Decimal;
         NewOrder: Boolean;
         OK: Boolean;
         Counter1: Integer;
         CurrencyCode2: Code[10];
         PageGroupNo: Integer;
+        ReportHasData: Boolean;
+        EmptyReportDatasetErr: Label 'The report couldn''t be generated, because it was empty. Adjust your filters and try again.';
 
 #pragma warning disable AA0074
 #pragma warning disable AA0470
@@ -504,16 +530,47 @@ report 108 "Customer - Order Detail"
 
     protected var
         SalesHeader: Record "Sales Header";
+        SalesLineRequestFilter: Record "Sales Line";
 
+#if not CLEAN28
+#pragma warning disable AS0072
     /// <summary>
     /// Initializes the report request options for the Customer Order Detail report.
     /// </summary>
     /// <param name="ShowAmountInLCY">True to show amounts in local currency.</param>
     /// <param name="NewPagePerCustomer">True to start a new page per customer.</param>
+    [Obsolete('The New Page per Customer option is only supported by the RDLC layout which has been deprecated.', '28.0')]
     procedure InitializeRequest(ShowAmountInLCY: Boolean; NewPagePerCustomer: Boolean)
     begin
         PrintAmountsInLCY := ShowAmountInLCY;
         PrintOnlyOnePerPage := NewPagePerCustomer;
+    end;
+#pragma warning restore AS0072
+#endif
+
+    /// <summary>
+    /// Initializes the report request options for the Customer Order Detail report.
+    /// </summary>
+    /// <param name="ShowAmountInLCY">True to show amounts in local currency.</param>
+    procedure InitializeRequest(ShowAmountInLCY: Boolean)
+    begin
+        PrintAmountsInLCY := ShowAmountInLCY;
+    end;
+
+    local procedure SalesOrderHasMatchingLines(SalesHeaderNo: Code[20]): Boolean
+    var
+        SalesLine: Record "Sales Line";
+    begin
+        SalesLine.CopyFilters(SalesLineRequestFilter);
+        SalesLine.SetRange("Document Type", SalesLine."Document Type"::Order);
+        SalesLine.SetRange("Document No.", SalesHeaderNo);
+        SalesLine.SetFilter("Outstanding Quantity", '<>%1', 0);
+        exit(not SalesLine.IsEmpty());
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSalesLineOnAfterGetRecordOnBeforeNewOrder(var SalesLine: Record "Sales Line"; var IsHandled: Boolean)
+    begin
     end;
 }
 

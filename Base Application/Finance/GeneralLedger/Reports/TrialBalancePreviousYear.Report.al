@@ -18,11 +18,10 @@ using System.Utilities;
 /// </remarks>
 report 7 "Trial Balance/Previous Year"
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './Finance/GeneralLedger/Reports/TrialBalancePreviousYear.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Trial Balance/Previous Year';
     UsageCategory = ReportsAndAnalysis;
+    DefaultRenderingLayout = RDLCLayout;
 
     dataset
     {
@@ -212,12 +211,23 @@ report 7 "Trial Balance/Previous Year"
         }
     }
 
+    rendering
+    {
+        layout(RDLCLayout)
+        {
+            Type = RDLC;
+            LayoutFile = './Finance/GeneralLedger/Reports/TrialBalancePreviousYear.rdlc';
+            Summary = 'Report layout made in the legacy RDLC format. Use an RDLC editor to modify the layout.';
+        }
+    }
+
     labels
     {
     }
 
     trigger OnPreReport()
     begin
+        "G/L Account".SecurityFiltering(SecurityFilter::Filtered);
         GLFilter := "G/L Account".GetFilters();
         FiscalYearStartDate := "G/L Account".GetRangeMin("Date Filter");
         FiscalYearEndDate := "G/L Account".GetRangeMax("Date Filter");
