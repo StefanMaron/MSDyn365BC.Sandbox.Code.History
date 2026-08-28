@@ -162,6 +162,10 @@ codeunit 2000042 "Post Coded Bank Statement"
                         CurrExchRate.ExchangeAmtLCYToFCY(GenJnlLine."Posting Date", GenJnlLine."Currency Code", GenJnlLine."Amount (LCY)", GenJnlLine."Currency Factor"));
                 end else
                     GenJnlLine.Validate(Amount, -CodBankStmtLine."Statement Amount");
+                if GenJnlLine."Currency Code" <> '' then begin
+                    GenJnlLine."Source Currency Code" := GenJnlLine."Currency Code";
+                    GenJnlLine."Source Currency Amount" := GenJnlLine.Amount;
+                end;
                 GenJnlLine."System-Created Entry" := true;
                 OnTransferCodBankStmtLinesOnBeforeGenJnlLineInsert(GenJnlLine, CodBankStmtLine);
                 GenJnlLine.Insert();
@@ -503,6 +507,7 @@ codeunit 2000042 "Post Coded Bank Statement"
                             CustBankAcc."Customer No." := CodedTrans."Account No.";
                 end;
             end;
+            OnAfterSearchCustomer(Cust, CustBankAcc, CodBankStmtLine);
             exit(Cust.Get(CustBankAcc."Customer No."));
         end
     end;
@@ -849,6 +854,11 @@ codeunit 2000042 "Post Coded Bank Statement"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterInitCodBankStmtLine(var CodBankStmtLine: Record "CODA Statement Line"; TransactionCoding: Record "Transaction Coding"; AccountType: Integer; UpdateApplicationAmounts: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSearchCustomer(var Customer: Record Customer; var CustomerBankAccount: Record "Customer Bank Account"; var CODAStatementLine: Record "CODA Statement Line")
     begin
     end;
 

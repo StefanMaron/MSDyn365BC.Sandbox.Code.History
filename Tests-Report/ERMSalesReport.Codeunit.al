@@ -47,6 +47,9 @@ codeunit 134976 "ERM Sales Report"
         EmptyReportDatasetTxt: Label 'There is nothing to print for the selected filters.';
         WrongDecimalErr: Label 'Wrong count of decimals', Locked = true;
         DescriptionVATClauseLineLbl: Label 'Description_VATClauseLine';
+        CustWithDiffShipmentDateNotExpectedErr: Label 'Customer with shipment date different from %1 should not be shown in report.', Comment = '%1 = Shipment Date';
+        NoCustLbl: Label 'No_Cust', Locked = true;
+        CustBalanceLCYLbl: Label 'CustBalanceLCY', Locked = true;
 
     [Test]
     [HandlerFunctions('CustomerTrialBalanceRequestPageHandler')]
@@ -499,7 +502,7 @@ codeunit 134976 "ERM Sales Report"
 
         Commit();
         Customer.SetRange("No.", SalesHeader."Sell-to Customer No.");
-        
+
         // [WHEN] Run report "Customer/Item Sales"
         RequestPageXML := Report.RunRequestPage(Report::"Customer/Item Sales", RequestPageXML);
         LibraryReportDataset.RunReportAndLoad(Report::"Customer/Item Sales", Customer, RequestPageXML);
@@ -530,7 +533,7 @@ codeunit 134976 "ERM Sales Report"
     begin
         // [SCENARIO] Check that correct Sub Totals and Grand Totals are showing on the Customer Item Sales Report after posting several Sales Orders.
         Initialize();
-        
+
         // [GIVEN] Create Customer "C1" and post two Sales Headers
         LibrarySales.CreateCustomer(Customer);
         CreateSalesDocumentWithLine(SalesHeader, SalesLine, SalesHeader."Document Type"::Order, Customer."No.");
@@ -543,7 +546,7 @@ codeunit 134976 "ERM Sales Report"
         SalesLine.Validate("Unit Cost", LibraryRandom.RandDecInRange(500, 1000, 2));
         SalesLine.Modify(true);
         LibrarySales.PostSalesDocument(SalesHeader, true, true);
-        
+
         // [GIVEN] Create Customer "C2" and post one Sales Header
         LibrarySales.CreateCustomer(Customer2);
         Clear(SalesHeader);
@@ -555,7 +558,7 @@ codeunit 134976 "ERM Sales Report"
 
         Commit();
         Customer.SetFilter("No.", '%1|%2', Customer."No.", Customer2."No.");
-        
+
         // [WHEN] Run report "Customer/Item Sales"
         RequestPageXML := Report.RunRequestPage(Report::"Customer/Item Sales", RequestPageXML);
         LibraryReportDataset.RunReportAndLoad(Report::"Customer/Item Sales", Customer, RequestPageXML);
@@ -636,8 +639,8 @@ codeunit 134976 "ERM Sales Report"
     procedure OverdueEntriesStatementReport()
     var
         GenJournalLine: Record "Gen. Journal Line";
-        Amount: Decimal;
         PeriodLength: DateFormula;
+        Amount: Decimal;
     begin
         // Verify Overdue Entries in Statement Report when Print Overdue Entries option is True.
 
@@ -661,8 +664,8 @@ codeunit 134976 "ERM Sales Report"
     procedure ReversedEntriesStatementReport()
     var
         GenJournalLine: Record "Gen. Journal Line";
-        Amount: Decimal;
         PeriodLength: DateFormula;
+        Amount: Decimal;
     begin
         // Verify Reversed Entries in Statement Report When Print Reversed Entries option is True.
 
@@ -687,8 +690,8 @@ codeunit 134976 "ERM Sales Report"
     procedure UnappliedEntryStatementReport()
     var
         GenJournalLine: Record "Gen. Journal Line";
-        Amount: Decimal;
         PeriodLength: DateFormula;
+        Amount: Decimal;
     begin
         // Verify Unapplied Entries in Statement Report when Print Unapplied Entries option is True.
 
@@ -713,8 +716,8 @@ codeunit 134976 "ERM Sales Report"
     procedure PrintAgingBandStatementReport()
     var
         GenJournalLine: Record "Gen. Journal Line";
-        Amount: Decimal;
         PeriodLength: DateFormula;
+        Amount: Decimal;
         PostingDate: Date;
     begin
         // Verify Statement Report when Include Aging Band option is True.
@@ -740,8 +743,8 @@ codeunit 134976 "ERM Sales Report"
     procedure CustomerStatementReport()
     var
         GenJournalLine: Record "Gen. Journal Line";
-        Amount: Decimal;
         PeriodLength: DateFormula;
+        Amount: Decimal;
         PostingDate: Date;
     begin
         // Verify Statement Report when Print Overdue Entries, Print Reversed Entries, Print Unapplied Entries and Include Aging Band
@@ -908,6 +911,7 @@ codeunit 134976 "ERM Sales Report"
           GenJournalLinePayment, GenJournalLinePayment."Document Type"::Payment, GenJournalLine."Account No.", '',
           2 * -LibraryRandom.RandDec(100, 2), CalcDate('<' + Format(LibraryRandom.RandInt(5)) + 'D>', WorkDate()));
         RunCustomerDetailedAging(GenJournalLinePayment);
+        LibraryReportDataset.LoadDataSetFile();
         LibraryReportDataset.SetRange(DocumentNoLbl, '');
         LibraryReportDataset.GetNextRow();
 
@@ -2796,7 +2800,7 @@ codeunit 134976 "ERM Sales Report"
     [Test]
     procedure ReportTotalsBufferFormatAmountFormatted()
     var
-        ReportTotalsBuffer: Record "Report Totals Buffer" temporary;
+        TempReportTotalsBuffer: Record "Report Totals Buffer" temporary;
         CurrencyCode: Code[10];
     begin
         // [FEATURE] [UT]
@@ -2807,11 +2811,11 @@ codeunit 134976 "ERM Sales Report"
         CurrencyCode := CreateCurrencyWithDecimalPlaces();
 
         // [WHEN] Invoke "Report Totals Buffer".Add(...) with AutoFormatExp and Amount = 123.123
-        ReportTotalsBuffer.Add('', 123.123, true, true, true, CurrencyCode);
+        TempReportTotalsBuffer.Add('', 123.123, true, true, true, CurrencyCode);
 
         // [THEN] "Amount Formatted" = 123.123
-        ReportTotalsBuffer.FindFirst();
-        Assert.IsTrue(ReportTotalsBuffer."Amount Formatted".EndsWith('.123'), WrongDecimalErr);
+        TempReportTotalsBuffer.FindFirst();
+        Assert.IsTrue(TempReportTotalsBuffer."Amount Formatted".EndsWith('.123'), WrongDecimalErr);
     end;
 
     [Test]
@@ -3283,8 +3287,8 @@ codeunit 134976 "ERM Sales Report"
         SalesHeader: Record "Sales Header";
         SalesShipmentHeader: Record "Sales Shipment Header";
         SalesLine: Record "Sales Line";
-        PostedDocumentNo: Code[20];
         InteractionLogEntry: Record "Interaction Log Entry";
+        PostedDocumentNo: Code[20];
         LogInteraction: Boolean;
         ParametersXml: Text;
     begin
@@ -3540,12 +3544,573 @@ codeunit 134976 "ERM Sales Report"
         VerifyCustomerBalanceToDateTwoEntriesExist(Customer."No.", InvoiceAmount[1], InvoiceAmount[1], InvoiceAmount[1] + InvoiceAmount[2]);
     end;
 
+    [Test]
+    [HandlerFunctions('CustomerOrderDetailRequestPageHandler')]
+    procedure OrderDetailShowsSalesLineWithDiffShortcutDim1Code()
+    var
+        Customer: Record Customer;
+        DimensionValue: Record "Dimension Value";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO 625992] Report shows sales line when Shortcut Dimension 1 Code differs from customer Global Dimension 1 Code.
+        Initialize();
+
+        // [GIVEN] Create customer with Global Dimension 1 Code.
+        GeneralLedgerSetup.Get();
+        LibrarySales.CreateCustomer(Customer);
+        LibraryDimension.CreateDimensionValue(DimensionValue, GeneralLedgerSetup."Global Dimension 1 Code");
+        Customer.Validate("Global Dimension 1 Code", DimensionValue.Code);
+        Customer.Modify(true);
+
+        // [GIVEN] Create Sales Order with Sales Line with different Shortcut Dimension 1 Code.
+        CreateSalesDocumentWithLine(SalesHeader, SalesLine, SalesHeader."Document Type"::Order, Customer."No.");
+        LibraryDimension.CreateDimensionValue(DimensionValue, GeneralLedgerSetup."Global Dimension 1 Code");
+        SalesLine.Validate("Shortcut Dimension 1 Code", DimensionValue.Code);
+        SalesLine.Modify(true);
+
+        // [WHEN] Run Customer - Order Detail report for the customer.
+        RunCustomerOrderDetailReport(Customer."No.", false);
+
+        // [THEN] Verify Sales Line amount is shown in the report.
+        VerifyLineAmtCustomerOrderDetailReport(SalesLine."No.", SalesLine."Line Amount");
+    end;
+
+    [Test]
+    [HandlerFunctions('CustomerOrderDetailWithShipmentDateRequestPageHandler')]
+    procedure OrderDetailFiltersCustomersByShipmentDate()
+    var
+        SalesHeader: array[2] of Record "Sales Header";
+        SalesLine: array[2] of Record "Sales Line";
+        CustomerNo: array[2] of Code[20];
+        ShipmentDate: Date;
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO 631546] Report filtered by Shipment Date only shows customers with matching shipment transactions.
+        Initialize();
+
+        // [GIVEN] Sales Order for  first Customer with Shipment Date = WorkDate.
+        ShipmentDate := WorkDate();
+        CustomerNo[1] := CreateCustomer();
+        CreateSalesOrder(SalesHeader[1], SalesLine[1], '', CustomerNo[1]);
+        SalesLine[1].Validate("Shipment Date", ShipmentDate);
+        SalesLine[1].Modify(true);
+
+        // [GIVEN] Sales Order for second Customer with Shipment Date = WorkDate + 30D.
+        CustomerNo[2] := CreateCustomer();
+        CreateSalesOrder(SalesHeader[2], SalesLine[2], '', CustomerNo[2]);
+        SalesLine[2].Validate("Shipment Date", ShipmentDate + 30);
+        SalesLine[2].Modify(true);
+
+        // [WHEN] Run Customer - Order Detail report filtered to Shipment Date = WorkDate.
+        RunCustomerOrderDetailReportWithShipmentDate('', Format(ShipmentDate));
+
+        // [THEN] First Customer with matching shipment date is shown in the report.
+        VerifyLineAmtCustomerOrderDetailReport(SalesLine[1]."No.", SalesLine[1]."Line Amount");
+
+        // [THEN] Second Customer with non-matching shipment date is not shown in the report.
+        LibraryReportDataset.SetRange('No_Customer', CustomerNo[2]);
+        Assert.AreEqual(0, LibraryReportDataset.RowCount(), StrSubstNo(CustWithDiffShipmentDateNotExpectedErr, ShipmentDate));
+        LibraryVariableStorage.AssertEmpty();
+    end;
+
+    [Test]
+    [HandlerFunctions('CustomerDetailTrialBalanceRequestPageHandler')]
+    procedure CustDetailTrialBalCorrOfRemAmtAfterExchRateAdj()
+    var
+        Customer: Record Customer;
+        GenJournalLine: Record "Gen. Journal Line";
+        CustNo: Code[20];
+        CurrencyCode: Code[10];
+        InvoiceAmount: Decimal;
+        i: Integer;
+    begin
+        // [FEATURE] [Customer - Detail Trial Bal.]
+        // [SCENARIO 630380] Customer Detail Trial Balance report shows correct balance when
+        // Correction of Remaining Amount entries exist from applying payments in FCY with rounding.
+        Initialize();
+
+        // [GIVEN] Create Currency with random exchange rate causing LCY rounding on application.
+        CurrencyCode := CreateCurrencyWithFixedExchRates(LibraryRandom.RandDec(1, 5));
+        CustNo := LibrarySales.CreateCustomerNo();
+        InvoiceAmount := LibraryRandom.RandDec(100, 2);
+
+        // [GIVEN] Create two posted invoices in FCY with random amount each.
+        for i := 1 to 2 do
+            CreatePostGeneralJournalLine(
+                GenJournalLine, GenJournalLine."Document Type"::Invoice, CustNo, CurrencyCode, InvoiceAmount, WorkDate());
+
+        // [GIVEN] Create posted payment in FCY equal to total invoiced amount, applied to both invoices.
+        CreatePostGeneralJournalLine(
+            GenJournalLine, GenJournalLine."Document Type"::Payment, CustNo, CurrencyCode, -2 * InvoiceAmount, WorkDate());
+        ApplyPaymentToAllOpenInvoices(GenJournalLine."Document No.", CustNo);
+
+        // [WHEN] Run Customer Detail Trial Balance Report.
+        LibraryVariableStorage.Enqueue(false); // ShowAmountsInLCY
+        LibraryVariableStorage.Enqueue(false); // NewPageperCustomer
+        LibraryVariableStorage.Enqueue(false); // ExcludeCustHaveaBalanceOnly
+        LibraryVariableStorage.Enqueue(CustNo);
+        Commit();
+        REPORT.Run(REPORT::"Customer - Detail Trial Bal.");
+
+        // [THEN] Verify CustBalanceLCY equals Customer Net Change (LCY) which includes correction entries.
+        Customer.Get(CustNo);
+        Customer.SetFilter("Date Filter", '%1..', WorkDate());
+        Customer.CalcFields("Net Change (LCY)");
+        LibraryReportDataset.LoadDataSetFile();
+        LibraryReportDataset.SetRange(NoCustLbl, CustNo);
+        Assert.IsTrue(LibraryReportDataset.GetNextRow(), StrSubstNo(RowNotFoundErr, NoCustLbl, CustNo));
+        while LibraryReportDataset.GetNextRow() do;
+        LibraryReportDataset.AssertCurrentRowValueEquals(CustBalanceLCYLbl, Customer."Net Change (LCY)");
+    end;
+
+    [Test]
+    [HandlerFunctions('CustomerTrialBalanceRequestPageHandler')]
+    procedure CustomerTrialBalanceIgnoreApplicationEntries()
+    var
+        InvoiceGenJournalLine: Record "Gen. Journal Line";
+        PaymentGenJournalLine: Record "Gen. Journal Line";
+        CustomerNo: Code[20];
+        InvoiceAmount: Decimal;
+        ExpectedDebitAmount: Decimal;
+        ExpectedCreditAmount: Decimal;
+    begin
+        // [FEATURE] [AI test]
+        // [SCENARIO 575179] Report aggregates debit/credit from non-Application entry types and excludes Application entries.
+        Initialize();
+
+        // [GIVEN] One invoice and one payment posted for the same customer and then applied.
+        CustomerNo := LibrarySales.CreateCustomerNo();
+        InvoiceAmount := LibraryRandom.RandDec(1000, 2);
+        CreatePostGeneralJournalLine(
+            InvoiceGenJournalLine, InvoiceGenJournalLine."Document Type"::Invoice, CustomerNo, '', InvoiceAmount, WorkDate());
+        CreatePostGeneralJournalLine(
+            PaymentGenJournalLine, PaymentGenJournalLine."Document Type"::Payment, CustomerNo, '', -InvoiceAmount, WorkDate());
+        ApplyPaymentToAllOpenInvoices(PaymentGenJournalLine."Document No.", CustomerNo);
+
+        GetDetailedCustLedgEntrySums(
+            CustomerNo, CalcDate('<-CY>', WorkDate()), CalcDate('<CY>', WorkDate()),
+            '', '', '', ExpectedDebitAmount, ExpectedCreditAmount);
+
+        // [WHEN] Run Customer - Trial Balance report for current year.
+        RunCustomerTrialBalanceReportForCY(CustomerNo, '', '');
+
+        // [THEN] The report shows sums from non-Application entry types only.
+        VerifyCustomerTrialBalanceDCAmounts(CustomerNo, ExpectedDebitAmount, ExpectedCreditAmount);
+    end;
+
+    [Test]
+    procedure CustomerTrialBalanceNoFilterRestrictsQueryScope()
+    var
+        Customer: Record Customer;
+        FirstCustomerNo: Code[20];
+        SecondCustomerNo: Code[20];
+        ThirdCustomerNo: Code[20];
+        FirstDebitAmount: Decimal;
+        FirstCreditAmount: Decimal;
+        SecondDebitAmount: Decimal;
+        SecondCreditAmount: Decimal;
+        ThirdDebitAmount: Decimal;
+        ThirdCreditAmount: Decimal;
+    begin
+        // [FEATURE] [AI test]
+        // [SCENARIO 575179] Customer No. filter limits dataset to the requested customers.
+        Initialize();
+
+        // [GIVEN] Three customers with posted debit/credit entries in the same period.
+        FirstCustomerNo := CreatePostDebitCreditJournalLines(FirstDebitAmount, FirstCreditAmount, CreateCustomer());
+        SecondCustomerNo := CreatePostDebitCreditJournalLines(SecondDebitAmount, SecondCreditAmount, CreateCustomer());
+        ThirdCustomerNo := CreatePostDebitCreditJournalLines(ThirdDebitAmount, ThirdCreditAmount, CreateCustomer());
+
+        // [WHEN] Run report for the first and third customers only.
+        Customer.SetFilter("No.", FirstCustomerNo + '|' + ThirdCustomerNo);
+        Customer.SetRange("Date Filter", CalcDate('<-CY>', WorkDate()), CalcDate('<CY>', WorkDate()));
+        Commit();
+        LibraryReportDataset.RunReportAndLoad(Report::"Customer - Trial Balance", Customer, '');
+
+        // [THEN] First and third customer values are present.
+        LibraryReportDataset.MoveToRow(LibraryReportDataset.FindRow('No_Customer', FirstCustomerNo) + 1);
+        LibraryReportDataset.AssertCurrentRowValueEquals('PeriodDebitAmt', FirstDebitAmount);
+        LibraryReportDataset.AssertCurrentRowValueEquals('PeriodCreditAmt', Abs(FirstCreditAmount));
+
+        LibraryReportDataset.MoveToRow(LibraryReportDataset.FindRow('No_Customer', ThirdCustomerNo) + 1);
+        LibraryReportDataset.AssertCurrentRowValueEquals('PeriodDebitAmt', ThirdDebitAmount);
+        LibraryReportDataset.AssertCurrentRowValueEquals('PeriodCreditAmt', Abs(ThirdCreditAmount));
+
+        // [THEN] Second customer is excluded from report.
+        LibraryReportDataset.AssertElementWithValueNotExist('No_Customer', SecondCustomerNo);
+    end;
+
+    [Test]
+    procedure CustomerTrialBalancePostingGroupFilter()
+    var
+        FirstCustomerPostingGroup: Record "Customer Posting Group";
+        SecondCustomerPostingGroup: Record "Customer Posting Group";
+        FirstCustomer: Record Customer;
+        SecondCustomer: Record Customer;
+        Customer: Record Customer;
+        FirstDebitAmount: Decimal;
+        FirstCreditAmount: Decimal;
+        SecondDebitAmount: Decimal;
+        SecondCreditAmount: Decimal;
+    begin
+        // [FEATURE] [AI test]
+        // [SCENARIO 575179] Customer Posting Group filter restricts aggregation.
+        Initialize();
+
+        // [GIVEN] Two posting groups and two customers in different groups.
+        LibrarySales.CreateCustomerPostingGroup(FirstCustomerPostingGroup);
+        LibrarySales.CreateCustomerPostingGroup(SecondCustomerPostingGroup);
+
+        LibrarySales.CreateCustomer(FirstCustomer);
+        FirstCustomer.Validate("Customer Posting Group", FirstCustomerPostingGroup.Code);
+        FirstCustomer.Modify(true);
+
+        LibrarySales.CreateCustomer(SecondCustomer);
+        SecondCustomer.Validate("Customer Posting Group", SecondCustomerPostingGroup.Code);
+        SecondCustomer.Modify(true);
+
+        CreatePostDebitCreditJournalLines(FirstDebitAmount, FirstCreditAmount, FirstCustomer."No.");
+        CreatePostDebitCreditJournalLines(SecondDebitAmount, SecondCreditAmount, SecondCustomer."No.");
+
+        // [WHEN] Run report with Customer Posting Group filter.
+        Customer.SetRange("Date Filter", CalcDate('<-CY>', WorkDate()), CalcDate('<CY>', WorkDate()));
+        Customer.SetFilter("Customer Posting Group", FirstCustomerPostingGroup.Code);
+        Commit();
+        LibraryReportDataset.RunReportAndLoad(Report::"Customer - Trial Balance", Customer, '');
+
+        // [THEN] Only customers in selected posting group are shown.
+        LibraryReportDataset.MoveToRow(LibraryReportDataset.FindRow('No_Customer', FirstCustomer."No.") + 1);
+        LibraryReportDataset.AssertCurrentRowValueEquals('PeriodDebitAmt', FirstDebitAmount);
+        LibraryReportDataset.AssertCurrentRowValueEquals('PeriodCreditAmt', Abs(FirstCreditAmount));
+
+        LibraryReportDataset.AssertElementWithValueNotExist('No_Customer', SecondCustomer."No.");
+    end;
+
+    [Test]
+    [HandlerFunctions('CustomerTrialBalanceRequestPageHandler')]
+    procedure CustomerTrialBalanceScenario4GlobalDimensionFilter()
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+        CustomerNo: Code[20];
+        GlobalDim1Value: Code[20];
+        GlobalDim2Value: Code[20];
+        DebitAmount: Decimal;
+        CreditAmount: Decimal;
+        DebitAmountDim: Decimal;
+        CreditAmountDim: Decimal;
+    begin
+        // [FEATURE] [AI test]
+        // [SCENARIO 575179] Global dimension filter restricts debit/credit aggregation.
+        Initialize();
+
+        // [GIVEN] New Dimension Values for Global Dimension: "G1","G2"
+        CreateGlobalDimValues(GlobalDim1Value, GlobalDim2Value);
+
+        // [GIVEN] Post Customer ledger entries with Debit Amount = "D" and Credit Amount = "C" without dimensions
+        CustomerNo := CreatePostDebitCreditJournalLines(DebitAmount, CreditAmount, CreateCustomer());
+
+        // [GIVEN] Post Customer ledger entries with Debit Amount = "D1" and Credit Amount = "C1" and dimensions "G1","G2"
+        DebitAmountDim := LibraryRandom.RandDec(1000, 2);
+        CreditAmountDim := -LibraryRandom.RandDec(1000, 2);
+        CreateDebitCreditJournalLinesWithDimensions(
+            GenJournalLine, CustomerNo, DebitAmountDim, CreditAmountDim, GlobalDim1Value, GlobalDim2Value);
+        LibraryERM.PostGeneralJnlLine(GenJournalLine);
+
+        // [WHEN] Run Customer - Trial Balance report with filters by dimensions "G1","G2"
+        RunCustomerTrialBalanceReportForCY(CustomerNo, GlobalDim1Value, GlobalDim2Value);
+
+        // [THEN] Only dimension-filtered amounts are shown in report.
+        VerifyCustomerTrialBalanceDCAmounts(CustomerNo, DebitAmountDim, Abs(CreditAmountDim));
+
+        // [THEN] Sums of all amounts are not shown in report
+        LibraryReportDataset.AssertElementWithValueNotExist('PeriodDebitAmt', DebitAmount + DebitAmountDim);
+    end;
+
+    [Test]
+    [HandlerFunctions('CustomerTrialBalanceRequestPageHandler')]
+    procedure CustomerTrialBalanceCurrencyFilter()
+    var
+        FirstGenJournalLine: Record "Gen. Journal Line";
+        CustomerNo: Code[20];
+        CurrencyCode: Code[10];
+        ExpectedDebitAmount: Decimal;
+        ExpectedCreditAmount: Decimal;
+    begin
+        // [FEATURE] [AI test]
+        // [SCENARIO 575179] Currency filter restricts debit/credit aggregation.
+        Initialize();
+
+        // [GIVEN] Customer entries in LCY and FCY.
+        CustomerNo := CreateCustomer();
+        CurrencyCode := LibraryERM.CreateCurrencyWithRandomExchRates();
+
+        CreatePostGeneralJournalLine(
+            FirstGenJournalLine, FirstGenJournalLine."Document Type"::Invoice, CustomerNo, '', LibraryRandom.RandDec(1000, 2), WorkDate());
+        CreatePostGeneralJournalLine(
+            FirstGenJournalLine, FirstGenJournalLine."Document Type"::Payment, CustomerNo, '', -LibraryRandom.RandDec(1000, 2), WorkDate());
+        CreatePostGeneralJournalLine(
+            FirstGenJournalLine, FirstGenJournalLine."Document Type"::Invoice, CustomerNo, CurrencyCode, LibraryRandom.RandDec(1000, 2), WorkDate());
+        CreatePostGeneralJournalLine(
+            FirstGenJournalLine, FirstGenJournalLine."Document Type"::Payment, CustomerNo, CurrencyCode, -LibraryRandom.RandDec(1000, 2), WorkDate());
+
+        GetDetailedCustLedgEntrySums(
+            CustomerNo, CalcDate('<-CY>', WorkDate()), CalcDate('<CY>', WorkDate()),
+            CurrencyCode, '', '', ExpectedDebitAmount, ExpectedCreditAmount);
+
+        // [WHEN] Run report with Currency Filter = FCY code.
+        RunCustomerTrialBalanceReportForCYWithFilters(CustomerNo, '', '', '', CurrencyCode);
+
+        // [THEN] Only FCY entries contribute to totals.
+        VerifyCustomerTrialBalanceDCAmounts(CustomerNo, ExpectedDebitAmount, ExpectedCreditAmount);
+    end;
+
+    [Test]
+    [HandlerFunctions('CustomerTrialBalanceRequestPageHandler')]
+    procedure CustomerTrialBalanceNoEntriesInRangeShowsZeroAmounts()
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+        CustomerNo: Code[20];
+    begin
+        // [FEATURE] [AI test]
+        // [SCENARIO 575179] Customer with no entries in current period has zero Period Debit/Credit.
+        Initialize();
+
+        // [GIVEN] Customer has only prior-year entries.
+        CustomerNo := CreateCustomer();
+        CreatePostGeneralJournalLine(GenJournalLine, GenJournalLine."Document Type"::Invoice,
+            CustomerNo, '', LibraryRandom.RandDec(1000, 2), CalcDate('<-1Y>', WorkDate()));
+
+        // [WHEN] Run report for current year.
+        RunCustomerTrialBalanceReportForCY(CustomerNo, '', '');
+
+        // [THEN] Period amounts are zero.
+        VerifyCustomerTrialBalanceDCAmounts(CustomerNo, 0, 0);
+    end;
+
+    [Test]
+    [HandlerFunctions('CustomerOrderDetailWithShipmentDateRequestPageHandler')]
+    procedure OrderDetailSkipsEmptyOrderHeadersWhenShipmentDateFiltered()
+    var
+        SalesHeader: array[2] of Record "Sales Header";
+        SalesLine: array[2] of Record "Sales Line";
+        CustomerNo: Code[20];
+        ShipmentDate: Date;
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO] Report skips order headers with no matching lines when Shipment Date filter is applied.
+        Initialize();
+
+        // [GIVEN] Create a Customer with two Sales Orders.
+        ShipmentDate := WorkDate();
+        CustomerNo := CreateCustomer();
+
+        // [GIVEN] Create a new Sales Order with Shipment Date = WorkDate (matching filter).
+        CreateSalesOrder(SalesHeader[1], SalesLine[1], '', CustomerNo);
+        SalesLine[1].Validate("Shipment Date", ShipmentDate);
+        SalesLine[1].Modify(true);
+
+        // [GIVEN] Create a new Sales Order with Shipment Date = WorkDate + 30D (not matching filter).
+        CreateSalesOrder(SalesHeader[2], SalesLine[2], '', CustomerNo);
+        SalesLine[2].Validate("Shipment Date", ShipmentDate + 30);
+        SalesLine[2].Modify(true);
+
+        // [WHEN] Run Customer - Order Detail report filtered to Shipment Date = WorkDate.
+        RunCustomerOrderDetailReportWithShipmentDate(CustomerNo, Format(ShipmentDate));
+
+        // [THEN] Sales Line from first Order (matching shipment date) is shown.
+        VerifyLineAmtCustomerOrderDetailReport(SalesLine[1]."No.", SalesLine[1]."Line Amount");
+
+        // [THEN] Order header for second Order is not shown (no empty header for non-matching order).
+        LibraryReportDataset.Reset();
+        LibraryReportDataset.SetRange('SalesHeaderNo', SalesHeader[2]."No.");
+        Assert.AreEqual(0, LibraryReportDataset.RowCount(), 'Order with non-matching shipment date should not appear in report.');
+        LibraryVariableStorage.AssertEmpty();
+    end;
+
+    [Test]
+    [HandlerFunctions('CustomerOrderDetailWithItemNoFilterRequestPageHandler')]
+    procedure OrderDetailSkipsOrderHeaderWhenItemNoFilterExcludesAllLines()
+    var
+        SalesHeader: array[2] of Record "Sales Header";
+        SalesLine: array[2] of Record "Sales Line";
+        CustomerNo: Code[20];
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO 638980] Report skips order headers when Item No. filter excludes all lines of an order.
+        Initialize();
+
+        // [GIVEN] Create a Customer with two Sales Orders, each with a different item.
+        CustomerNo := CreateCustomer();
+        CreateSalesOrder(SalesHeader[1], SalesLine[1], '', CustomerNo);
+        CreateSalesOrder(SalesHeader[2], SalesLine[2], '', CustomerNo);
+
+        // [WHEN] Run Customer - Order Detail report with Item No. filter = item from first Order.
+        LibraryVariableStorage.Enqueue(SalesLine[1]."No.");
+        RunCustomerOrderDetailReportWithItemNoFilter(CustomerNo);
+
+        // [THEN] Sales Line from first Order (matching item) is shown.
+        VerifyLineAmtCustomerOrderDetailReport(SalesLine[1]."No.", SalesLine[1]."Line Amount");
+
+        // [THEN] Order header for second Order is not shown (item filter excludes all its lines).
+        LibraryReportDataset.Reset();
+        LibraryReportDataset.SetRange('SalesHeaderNo', SalesHeader[2]."No.");
+        Assert.AreEqual(0, LibraryReportDataset.RowCount(), 'Order with non-matching item should not appear in report.');
+        LibraryVariableStorage.AssertEmpty();
+    end;
+
+    [Test]
+    [HandlerFunctions('CustomerOrderDetailWithItemNoFilterRequestPageHandler')]
+    procedure OrderDetailShowsOrderHeaderWhenItemNoFilterMatchesSomeLines()
+    var
+        SalesHeader: Record "Sales Header";
+        SalesLine: array[2] of Record "Sales Line";
+        CustomerNo: Code[20];
+        MatchingItemNo: Code[20];
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO 638980] Report shows order header when Item No. filter matches at least one line.
+        Initialize();
+
+        // [GIVEN] Create a Customer with one Sales Order containing two lines with different items.
+        CustomerNo := CreateCustomer();
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, CustomerNo);
+        MatchingItemNo := LibraryInventory.CreateItemNo();
+        LibrarySales.CreateSalesLine(
+          SalesLine[1], SalesHeader, SalesLine[1].Type::Item, MatchingItemNo, LibraryRandom.RandInt(10));
+        SalesLine[1].Validate("Unit Price", LibraryRandom.RandDecInRange(1000, 2000, 2));
+        SalesLine[1].Modify(true);
+        LibrarySales.CreateSalesLine(
+          SalesLine[2], SalesHeader, SalesLine[2].Type::Item, LibraryInventory.CreateItemNo(), LibraryRandom.RandInt(10));
+        SalesLine[2].Validate("Unit Price", LibraryRandom.RandDecInRange(1000, 2000, 2));
+        SalesLine[2].Modify(true);
+
+        // [WHEN] Run Customer - Order Detail report with Item No. filter = matching item.
+        LibraryVariableStorage.Enqueue(MatchingItemNo);
+        RunCustomerOrderDetailReportWithItemNoFilter(CustomerNo);
+
+        // [THEN] Sales Line with matching item is shown.
+        VerifyLineAmtCustomerOrderDetailReport(SalesLine[1]."No.", SalesLine[1]."Line Amount");
+
+        // [THEN] Sales Line with non-matching item is not shown.
+        LibraryReportDataset.Reset();
+        LibraryReportDataset.SetRange('No_SalesLine', SalesLine[2]."No.");
+        Assert.AreEqual(0, LibraryReportDataset.RowCount(), 'Sales line with non-matching item should not appear in report.');
+        LibraryVariableStorage.AssertEmpty();
+    end;
+
+    [Test]
+    [HandlerFunctions('CustomerOrderDetailWithItemNoFilterRequestPageHandler')]
+    procedure OrderDetailShowsMultipleOrdersWhenItemNoFilterMatchesBoth()
+    var
+        SalesHeader: array[2] of Record "Sales Header";
+        SalesLine: array[2] of Record "Sales Line";
+        CustomerNo: Code[20];
+        CommonItemNo: Code[20];
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO 638980] Report shows both order headers when Item No. filter matches lines in both orders.
+        Initialize();
+
+        // [GIVEN] Create a Customer with two Sales Orders, both containing the same item.
+        CustomerNo := CreateCustomer();
+        CommonItemNo := LibraryInventory.CreateItemNo();
+        LibrarySales.CreateSalesHeader(SalesHeader[1], SalesHeader[1]."Document Type"::Order, CustomerNo);
+        LibrarySales.CreateSalesLine(
+          SalesLine[1], SalesHeader[1], SalesLine[1].Type::Item, CommonItemNo, LibraryRandom.RandInt(10));
+        SalesLine[1].Validate("Unit Price", LibraryRandom.RandDecInRange(1000, 2000, 2));
+        SalesLine[1].Modify(true);
+        LibrarySales.CreateSalesHeader(SalesHeader[2], SalesHeader[2]."Document Type"::Order, CustomerNo);
+        LibrarySales.CreateSalesLine(
+          SalesLine[2], SalesHeader[2], SalesLine[2].Type::Item, CommonItemNo, LibraryRandom.RandInt(10));
+        SalesLine[2].Validate("Unit Price", LibraryRandom.RandDecInRange(1000, 2000, 2));
+        SalesLine[2].Modify(true);
+
+        // [WHEN] Run Customer - Order Detail report with Item No. filter = common item.
+        LibraryVariableStorage.Enqueue(CommonItemNo);
+        RunCustomerOrderDetailReportWithItemNoFilter(CustomerNo);
+
+        // [THEN] Sales Line from Order 1 is shown.
+        VerifyLineAmtCustomerOrderDetailReport(SalesLine[1]."No.", SalesLine[1]."Line Amount");
+
+        // [THEN] Sales Line from Order 2 is also shown.
+        LibraryReportDataset.Reset();
+        LibraryReportDataset.SetRange('SalesHeaderNo', SalesHeader[2]."No.");
+        Assert.AreNotEqual(0, LibraryReportDataset.RowCount(), 'Order 2 with matching item should appear in report.');
+        LibraryVariableStorage.AssertEmpty();
+    end;
+
+    [Test]
+    [HandlerFunctions('CustomerOrderDetailWithItemAndShipmentDateRequestPageHandler')]
+    procedure OrderDetailFiltersByItemNoAndShipmentDateAcrossTwoCustomers()
+    var
+        SalesHeader: array[2] of Record "Sales Header";
+        SalesLine: array[4] of Record "Sales Line";
+        CustomerNo: array[2] of Code[20];
+        ItemNo: array[2] of Code[20];
+        ShipmentDate: Date;
+    begin
+        // [FEATURE] [AI test 0.4]
+        // [SCENARIO 638980] Report filters by both Item No. and Shipment Date across two customers with multiple items.
+        Initialize();
+
+        // [GIVEN] Create Two items.
+        ShipmentDate := WorkDate();
+        ItemNo[1] := LibraryInventory.CreateItemNo();
+        ItemNo[2] := LibraryInventory.CreateItemNo();
+
+        // [GIVEN] Create a new Customer with Sales Order: line for First Item with Shipment Date = WorkDate, line for Second Item with Shipment Date = WorkDate + 30D.
+        CustomerNo[1] := CreateCustomer();
+        LibrarySales.CreateSalesHeader(SalesHeader[1], SalesHeader[1]."Document Type"::Order, CustomerNo[1]);
+        LibrarySales.CreateSalesLine(
+          SalesLine[1], SalesHeader[1], SalesLine[1].Type::Item, ItemNo[1], LibraryRandom.RandInt(10));
+        SalesLine[1].Validate("Unit Price", LibraryRandom.RandDecInRange(1000, 2000, 2));
+        SalesLine[1].Validate("Shipment Date", ShipmentDate);
+        SalesLine[1].Modify(true);
+        LibrarySales.CreateSalesLine(
+          SalesLine[2], SalesHeader[1], SalesLine[2].Type::Item, ItemNo[2], LibraryRandom.RandInt(10));
+        SalesLine[2].Validate("Unit Price", LibraryRandom.RandDecInRange(1000, 2000, 2));
+        SalesLine[2].Validate("Shipment Date", ShipmentDate + 30);
+        SalesLine[2].Modify(true);
+
+        // [GIVEN] Create a new Customer with Sales Order: line for First Item with Shipment Date = WorkDate + 30D, line for Second Item with Shipment Date = WorkDate.
+        CustomerNo[2] := CreateCustomer();
+        LibrarySales.CreateSalesHeader(SalesHeader[2], SalesHeader[2]."Document Type"::Order, CustomerNo[2]);
+        LibrarySales.CreateSalesLine(
+          SalesLine[3], SalesHeader[2], SalesLine[3].Type::Item, ItemNo[1], LibraryRandom.RandInt(10));
+        SalesLine[3].Validate("Unit Price", LibraryRandom.RandDecInRange(1000, 2000, 2));
+        SalesLine[3].Validate("Shipment Date", ShipmentDate + 30);
+        SalesLine[3].Modify(true);
+        LibrarySales.CreateSalesLine(
+          SalesLine[4], SalesHeader[2], SalesLine[4].Type::Item, ItemNo[2], LibraryRandom.RandInt(10));
+        SalesLine[4].Validate("Unit Price", LibraryRandom.RandDecInRange(1000, 2000, 2));
+        SalesLine[4].Validate("Shipment Date", ShipmentDate);
+        SalesLine[4].Modify(true);
+
+        // [WHEN] Run Customer - Order Detail report with First Item No. and Shipment Date = WorkDate.
+        LibraryVariableStorage.Enqueue(ItemNo[1]);
+        LibraryVariableStorage.Enqueue(Format(ShipmentDate));
+        RunCustomerOrderDetailReportWithItemAndShipmentDate(StrSubstNo('%1|%2', CustomerNo[1], CustomerNo[2]));
+
+        // [THEN] C1 line with First Item No. and matching shipment date is shown.
+        VerifyLineAmtCustomerOrderDetailReport(SalesLine[1]."No.", SalesLine[1]."Line Amount");
+
+        // [THEN] Second Sales order header is not shown (First Item line has non-matching shipment date).
+        LibraryReportDataset.Reset();
+        LibraryReportDataset.SetRange('SalesHeaderNo', SalesHeader[2]."No.");
+        Assert.AreEqual(0, LibraryReportDataset.RowCount(), 'C2 order should not appear when item has non-matching shipment date.');
+        LibraryVariableStorage.AssertEmpty();
+    end;
+
     local procedure Initialize()
     begin
         LibraryApplicationArea.DisableApplicationAreaSetup();
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"ERM Sales Report");
         LibrarySetupStorage.Restore();
         LibraryVariableStorage.Clear();
+        Clear(LibraryReportDataset);
 
         // Lazy Setup.
         if isInitialized then
@@ -3668,7 +4233,7 @@ codeunit 134976 "ERM Sales Report"
     end;
 #endif
 
-    local procedure CreateCustomerItemReferenceNo(var Customer: Record Customer; var Item: Record Item): Code[20]
+    local procedure CreateCustomerItemReferenceNo(var Customer: Record Customer; var Item: Record Item): Code[50]
     var
         ItemReference: Record "Item Reference";
     begin
@@ -3682,7 +4247,6 @@ codeunit 134976 "ERM Sales Report"
     local procedure CreateGeneralJournalLine(var GenJournalLine: Record "Gen. Journal Line"; DocumentType: Enum "Gen. Journal Document Type"; CustomerNo: Code[20]; CurrencyCode: Code[10]; Amount: Decimal; PostingDate: Date)
     var
         GenJournalBatch: Record "Gen. Journal Batch";
-        LibraryERM: Codeunit "Library - ERM";
     begin
         ClearGenJournalLine(GenJournalBatch);
         LibraryERM.CreateGeneralJnlLine(
@@ -3694,8 +4258,6 @@ codeunit 134976 "ERM Sales Report"
     end;
 
     local procedure CreatePostGeneralJournalLine(var GenJournalLine: Record "Gen. Journal Line"; DocumentType: Enum "Gen. Journal Document Type"; CustomerNo: Code[20]; CurrencyCode: Code[10]; Amount: Decimal; PostingDate: Date)
-    var
-        LibraryERM: Codeunit "Library - ERM";
     begin
         CreateGeneralJournalLine(GenJournalLine, DocumentType, CustomerNo, CurrencyCode, Amount, PostingDate);
         LibraryERM.PostGeneralJnlLine(GenJournalLine);
@@ -3938,8 +4500,6 @@ codeunit 134976 "ERM Sales Report"
     end;
 
     local procedure CreatePostGeneralJournalLineWithDueDate(var GenJournalLine: Record "Gen. Journal Line"; DocumentType: Enum "Gen. Journal Document Type"; CustomerNo: Code[20]; CurrencyCode: Code[10]; Amount: Decimal; PostingDate: Date; DueDate: Date)
-    var
-        LibraryERM: Codeunit "Library - ERM";
     begin
         CreateGeneralJournalLine(GenJournalLine, DocumentType, CustomerNo, CurrencyCode, Amount, PostingDate);
         GenJournalLine.Validate("Due Date", DueDate);
@@ -4191,7 +4751,9 @@ codeunit 134976 "ERM Sales Report"
         Customer: Record Customer;
     begin
         LibraryVariableStorage.Enqueue(ShowAmountInLCY);
+#if not CLEAN28
         LibraryVariableStorage.Enqueue(false);
+#endif
         Customer.SetRange("No.", SellToCustomerNo);
         Commit();  // Due to limitation in page testability, commit is needed in this test case.
         REPORT.Run(REPORT::"Customer - Order Detail", true, false, Customer);
@@ -4224,6 +4786,20 @@ codeunit 134976 "ERM Sales Report"
         Customer.SetFilter("Global Dimension 1 Filter", Dim1Filter);
         Customer.SetFilter("Global Dimension 2 Filter", Dim2Filter);
         REPORT.Run(REPORT::"Customer - Trial Balance", true, false, Customer);
+    end;
+
+    local procedure RunCustomerTrialBalanceReportForCYWithFilters(CustomerNoFilter: Text; Dim1Filter: Code[20]; Dim2Filter: Code[20]; CustomerPostingGroupFilter: Code[20]; CurrencyFilter: Code[10])
+    var
+        Customer: Record Customer;
+    begin
+        if CustomerNoFilter <> '' then
+            Customer.SetFilter("No.", CustomerNoFilter);
+        Customer.SetRange("Date Filter", CalcDate('<-CY>', WorkDate()), CalcDate('<CY>', WorkDate()));
+        Customer.SetFilter("Global Dimension 1 Filter", Dim1Filter);
+        Customer.SetFilter("Global Dimension 2 Filter", Dim2Filter);
+        Customer.SetFilter("Customer Posting Group", CustomerPostingGroupFilter);
+        Customer.SetFilter("Currency Filter", CurrencyFilter);
+        Report.Run(Report::"Customer - Trial Balance", true, false, Customer);
     end;
 
 #if not CLEAN28
@@ -4468,6 +5044,25 @@ codeunit 134976 "ERM Sales Report"
         LibraryReportDataset.AssertCurrentRowValueEquals('PeriodCreditAmt', CreditAmount);
     end;
 
+    local procedure GetDetailedCustLedgEntrySums(CustomerNo: Code[20]; DateFrom: Date; DateTo: Date; CurrencyFilter: Code[10]; Dim1Filter: Code[20]; Dim2Filter: Code[20]; var DebitAmountLCY: Decimal; var CreditAmountLCY: Decimal)
+    var
+        DetailedCustLedgEntry: Record "Detailed Cust. Ledg. Entry";
+    begin
+        DetailedCustLedgEntry.SetRange("Customer No.", CustomerNo);
+        DetailedCustLedgEntry.SetRange("Posting Date", DateFrom, DateTo);
+        DetailedCustLedgEntry.SetFilter("Entry Type", '<>%1', DetailedCustLedgEntry."Entry Type"::Application);
+        if Dim1Filter <> '' then
+            DetailedCustLedgEntry.SetFilter("Initial Entry Global Dim. 1", Dim1Filter);
+        if Dim2Filter <> '' then
+            DetailedCustLedgEntry.SetFilter("Initial Entry Global Dim. 2", Dim2Filter);
+        if CurrencyFilter <> '' then
+            DetailedCustLedgEntry.SetFilter("Currency Code", CurrencyFilter);
+        DetailedCustLedgEntry.CalcSums("Debit Amount (LCY)", "Credit Amount (LCY)");
+
+        DebitAmountLCY := DetailedCustLedgEntry."Debit Amount (LCY)";
+        CreditAmountLCY := DetailedCustLedgEntry."Credit Amount (LCY)";
+    end;
+
     local procedure VerifyCustomerOrderSummarySalesAmount(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line")
     var
         CurrencyExchangeRate: Record "Currency Exchange Rate";
@@ -4596,12 +5191,18 @@ codeunit 134976 "ERM Sales Report"
     procedure CustomerOrderDetailRequestPageHandler(var CustomerOrderDetail: TestRequestPage "Customer - Order Detail")
     var
         ShowAmountInLCY: Variant;
+#if not CLEAN28
         PrintOnlyPerPage: Variant;
+#endif
     begin
         LibraryVariableStorage.Dequeue(ShowAmountInLCY);
+#if not CLEAN28
         LibraryVariableStorage.Dequeue(PrintOnlyPerPage);
+#endif
         CustomerOrderDetail.ShowAmountsInLCY.SetValue(ShowAmountInLCY);
+#if not CLEAN28
         CustomerOrderDetail.NewPagePerCustomer.SetValue(PrintOnlyPerPage);
+#endif
         CustomerOrderDetail.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
     end;
 
@@ -4994,6 +5595,34 @@ codeunit 134976 "ERM Sales Report"
         LibraryReportDataset.AssertElementWithValueExists('Totals_Profit', (SubtotalsProfit + SubtotalsProfit2));
     end;
 
+    local procedure RunCustomerOrderDetailReportWithShipmentDate(CustomerNoFilter: Code[100]; ShipmentDateFilter: Text)
+    var
+        Customer: Record Customer;
+    begin
+        LibraryVariableStorage.Enqueue(ShipmentDateFilter);
+        Customer.SetFilter("No.", CustomerNoFilter);
+        Commit();
+        Report.Run(Report::"Customer - Order Detail", true, false, Customer);
+    end;
+
+    local procedure RunCustomerOrderDetailReportWithItemNoFilter(CustomerNoFilter: Text)
+    var
+        Customer: Record Customer;
+    begin
+        Customer.SetFilter("No.", CustomerNoFilter);
+        Commit();
+        Report.Run(Report::"Customer - Order Detail", true, false, Customer);
+    end;
+
+    local procedure RunCustomerOrderDetailReportWithItemAndShipmentDate(CustomerNoFilter: Text)
+    var
+        Customer: Record Customer;
+    begin
+        Customer.SetFilter("No.", CustomerNoFilter);
+        Commit();
+        Report.Run(Report::"Customer - Order Detail", true, false, Customer);
+    end;
+
     [RequestPageHandler]
     [Scope('OnPrem')]
     procedure StandardSalesInvoiceRequestPageHandler(var StandardSalesInvoice: TestRequestPage "Standard Sales - Invoice")
@@ -5189,5 +5818,40 @@ codeunit 134976 "ERM Sales Report"
     begin
         CustomerBalanceToDate.ShowEntriesWithZeroBalance.SetValue(true);
         CustomerBalanceToDate.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
+    end;
+
+    [RequestPageHandler]
+    procedure CustomerOrderDetailWithShipmentDateRequestPageHandler(var CustomerOrderDetail: TestRequestPage "Customer - Order Detail")
+    var
+        ShipmentDateFilter: Text;
+    begin
+        ShipmentDateFilter := LibraryVariableStorage.DequeueText();
+        if ShipmentDateFilter <> '' then
+            CustomerOrderDetail."Sales Line".SetFilter("Shipment Date", ShipmentDateFilter);
+        CustomerOrderDetail.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
+    end;
+
+    [RequestPageHandler]
+    procedure CustomerOrderDetailWithItemNoFilterRequestPageHandler(var CustomerOrderDetail: TestRequestPage "Customer - Order Detail")
+    var
+        ItemNoFilter: Text;
+    begin
+        ItemNoFilter := LibraryVariableStorage.DequeueText();
+        CustomerOrderDetail."Sales Line".SetFilter("No.", ItemNoFilter);
+        CustomerOrderDetail.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
+    end;
+
+    [RequestPageHandler]
+    procedure CustomerOrderDetailWithItemAndShipmentDateRequestPageHandler(var CustomerOrderDetail: TestRequestPage "Customer - Order Detail")
+    var
+        ItemNoFilter: Text;
+        ShipmentDateFilter: Text;
+    begin
+        ItemNoFilter := LibraryVariableStorage.DequeueText();
+        ShipmentDateFilter := LibraryVariableStorage.DequeueText();
+        CustomerOrderDetail."Sales Line".SetFilter("No.", ItemNoFilter);
+        if ShipmentDateFilter <> '' then
+            CustomerOrderDetail."Sales Line".SetFilter("Shipment Date", ShipmentDateFilter);
+        CustomerOrderDetail.SaveAsXml(LibraryReportDataset.GetParametersFileName(), LibraryReportDataset.GetFileName());
     end;
 }

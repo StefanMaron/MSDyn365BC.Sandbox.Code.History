@@ -561,6 +561,16 @@ codeunit 134163 "Company Init Unit Test"
         LibraryReportSelection: Codeunit "Library - Report Selection";
     begin
         ReportId := LibraryReportSelection.GetReportId(RecUsage, Sequence);
+        case ReportId of
+            Report::"Service - Invoice":
+                ReportId := 11321;
+            Report::"Service - Credit Memo":
+                ReportId := 11322;
+            Report::"Service - Shipment":
+                ReportId := 11323;
+            Report::"Service Document - Test":
+                ReportId := 11325;
+        end;
     end;
 
     local procedure CheckJobWIPMethods()
@@ -810,7 +820,7 @@ codeunit 134163 "Company Init Unit Test"
         Assert.RecordCount(TempApplicationAreaBuffer, 5);
 
         TempApplicationAreaBuffer.SetRange(Selected, false);
-        Assert.RecordCount(TempApplicationAreaBuffer, 31);
+        Assert.RecordCount(TempApplicationAreaBuffer, 32);
     end;
 }
 
