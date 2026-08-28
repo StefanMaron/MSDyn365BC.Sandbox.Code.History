@@ -1,0 +1,1628 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument.Test;
+
+using Microsoft.Bank.Reconciliation;
+using Microsoft.eServices.EDocument;
+using Microsoft.eServices.EDocument.Integration;
+using Microsoft.eServices.EDocument.Processing;
+using Microsoft.eServices.EDocument.Processing.Import;
+using Microsoft.eServices.EDocument.Processing.Import.Purchase;
+using Microsoft.eServices.EDocument.Processing.Import.Sales;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Foundation.Company;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Inventory.Location;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Payables;
+using Microsoft.Purchases.Vendor;
+using Microsoft.Sales.Customer;
+using Microsoft.Sales.Document;
+using System.IO;
+using System.TestLibraries.Utilities;
+using System.Utilities;
+
+codeunit 139883 "E-Doc Process Test"
+{
+    Subtype = Test;
+    TestType = IntegrationTest;
+    TestPermissions = Disabled;
+
+    var
+        Customer: Record Customer;
+        Vendor: Record Vendor;
+        EDocumentService: Record "E-Document Service";
+        Assert: Codeunit Assert;
+        LibraryVariableStorage: Codeunit "Library - Variable Storage";
+        LibraryEDoc: Codeunit "Library - E-Document";
+        EDocImplState: Codeunit "E-Doc. Impl. State";
+        LibraryLowerPermission: Codeunit "Library - Lower Permissions";
+        LibraryInventory: Codeunit "Library - Inventory";
+        LibraryPurchase: Codeunit "Library - Purchase";
+        IsInitialized: Boolean;
+
+
+    [Test]
+    procedure ProcessStructureReceivedData()
+    var
+        EDocument: Record "E-Document";
+        TempEDocImportParameters: Record "E-Doc. Import Parameters";
+        EDocDataStorage: Record "E-Doc. Data Storage";
+        EDocLogRecord: Record "E-Document Log";
+        EDocImport: Codeunit "E-Doc. Import";
+        EDocumentProcessing: Codeunit "E-Document Processing";
+        EDocumentLog: Codeunit "E-Document Log";
+        InStream: InStream;
+        Text: Text;
+    begin
+        Initialize(Enum::"Service Integration"::"Mock");
+        LibraryEDoc.CreateInboundEDocument(EDocument, EDocumentService);
+
+        EDocumentLog.SetBlob('Test', Enum::"E-Doc. File Format"::PDF, 'Data');
+        EDocumentLog.SetFields(EDocument, EDocumentService);
+        EDocLogRecord := EDocumentLog.InsertLog(Enum::"E-Document Service Status"::Imported, Enum::"Import E-Doc. Proc. Status"::Unprocessed);
+
+        EDocument."Structure Data Impl." := "Structure Received E-Doc."::"PDF Mock";
+        EDocument."Unstructured Data Entry No." := EDocLogRecord."E-Doc. Data Storage Entry No.";
+        EDocument."File Name" := 'Test.pdf';
+        EDocument.Modify();
+
+        EDocumentProcessing.ModifyEDocumentProcessingStatus(EDocument, "Import E-Doc. Proc. Status"::Unprocessed);
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Structure received data";
+
+        EDocument.CalcFields("Import Processing Status");
+        Assert.AreEqual(Enum::"Import E-Doc. Proc. Status"::Unprocessed, EDocument."Import Processing Status", 'The status should be updated to the one after the step executed.');
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParameters);
+        EDocument.CalcFields("Import Processing Status");
+        Assert.AreEqual(Enum::"Import E-Doc. Proc. Status"::Readable, EDocument."Import Processing Status", 'The status should be updated to the one after the step executed.');
+        EDocument.Get(EDocument."Entry No");
+        EDocDataStorage.Get(EDocument."Structured Data Entry No.");
+        EDocDataStorage.CalcFields("Data Storage");
+        EDocDataStorage."Data Storage".CreateInStream(InStream);
+        InStream.Read(Text);
+        Assert.AreEqual('Mocked content', Text, 'The data should be read from the mock converter.');
+        Assert.AreEqual(Enum::"E-Doc. File Format"::JSON, EDocDataStorage."File Format", 'The data type should be updated to JSON.');
+    end;
+
+    [Test]
+    procedure ProcessingDoesSequenceOfSteps()
+    var
+        EDocument: Record "E-Document";
+        TempEDocImportParameters: Record "E-Doc. Import Parameters";
+        EDocLogRecord: Record "E-Document Log";
+        EDocImport: Codeunit "E-Doc. Import";
+        EDocumentProcessing: Codeunit "E-Document Processing";
+        EDocumentLog: Codeunit "E-Document Log";
+        ImportEDocumentProcess: Codeunit "Import E-Document Process";
+    begin
+        Initialize(Enum::"Service Integration"::"Mock");
+        LibraryEDoc.CreateInboundEDocument(EDocument, EDocumentService);
+
+        EDocumentLog.SetBlob('Test', Enum::"E-Doc. File Format"::PDF, 'Data');
+        EDocumentLog.SetFields(EDocument, EDocumentService);
+        EDocLogRecord := EDocumentLog.InsertLog(Enum::"E-Document Service Status"::Imported, Enum::"Import E-Doc. Proc. Status"::Unprocessed);
+
+        EDocument."Unstructured Data Entry No." := EDocLogRecord."E-Doc. Data Storage Entry No.";
+        EDocument."Structure Data Impl." := "Structure Received E-Doc."::"PDF Mock";
+        EDocument."Read into Draft Impl." := "E-Doc. Read into Draft"::"PDF Mock";
+        EDocument."File Name" := 'Test.pdf';
+        EDocument.Modify();
+
+        EDocumentProcessing.ModifyEDocumentProcessingStatus(EDocument, "Import E-Doc. Proc. Status"::Unprocessed);
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Prepare draft";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParameters);
+
+        EDocument.CalcFields("Import Processing Status");
+        Assert.AreEqual(ImportEDocumentProcess.GetStatusForStep(TempEDocImportParameters."Step to Run", false), EDocument."Import Processing Status", 'The status should be updated to the one after the step executed.');
+    end;
+
+    [Test]
+    procedure ProcessingUndoesSteps()
+    var
+        EDocument: Record "E-Document";
+        TempEDocImportParameters: Record "E-Doc. Import Parameters";
+        EDocLogRecord: Record "E-Document Log";
+        EDocImport: Codeunit "E-Doc. Import";
+        EDocumentProcessing: Codeunit "E-Document Processing";
+        EDocumentLog: Codeunit "E-Document Log";
+        ImportEDocumentProcess: Codeunit "Import E-Document Process";
+    begin
+        Initialize(Enum::"Service Integration"::"Mock");
+        LibraryEDoc.CreateInboundEDocument(EDocument, EDocumentService);
+
+        EDocumentLog.SetBlob('Test', Enum::"E-Doc. File Format"::PDF, 'Data');
+        EDocumentLog.SetFields(EDocument, EDocumentService);
+        EDocLogRecord := EDocumentLog.InsertLog(Enum::"E-Document Service Status"::Imported, Enum::"Import E-Doc. Proc. Status"::Unprocessed);
+
+        EDocument."Unstructured Data Entry No." := EDocLogRecord."E-Doc. Data Storage Entry No.";
+        EDocument."Structure Data Impl." := "Structure Received E-Doc."::"PDF Mock";
+        EDocument."Read into Draft Impl." := "E-Doc. Read into Draft"::"PDF Mock";
+        EDocument."File Name" := 'Test.pdf';
+        EDocument.Modify();
+
+        EDocumentProcessing.ModifyEDocumentProcessingStatus(EDocument, "Import E-Doc. Proc. Status"::Unprocessed);
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Prepare draft";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParameters);
+
+        EDocument.CalcFields("Import Processing Status");
+        Assert.AreEqual(ImportEDocumentProcess.GetStatusForStep(TempEDocImportParameters."Step to Run", false), EDocument."Import Processing Status", 'The status should be updated to the one after the step executed.');
+
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Structure received data";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParameters);
+
+        EDocument.CalcFields("Import Processing Status");
+        Assert.AreEqual(ImportEDocumentProcess.GetStatusForStep(TempEDocImportParameters."Step to Run", false), EDocument."Import Processing Status", 'The status should be updated to the one after the step executed.');
+    end;
+
+    [Test]
+    procedure PreparingPurchaseDraftFindsPurchaseOrderWhenSpecified()
+    var
+        EDocument: Record "E-Document";
+        EDocumentPurchaseHeader: Record "E-Document Purchase Header";
+        TempEDocImportParameters: Record "E-Doc. Import Parameters";
+        EDocLogRecord: Record "E-Document Log";
+        PurchaseHeader: Record "Purchase Header";
+        EDocumentLog: Codeunit "E-Document Log";
+        EDocumentProcessing: Codeunit "E-Document Processing";
+        EDocImport: Codeunit "E-Doc. Import";
+    begin
+        Initialize(Enum::"Service Integration"::"Mock");
+        LibraryEDoc.CreateInboundEDocument(EDocument, EDocumentService);
+
+        PurchaseHeader."Document Type" := PurchaseHeader."Document Type"::Order;
+        PurchaseHeader."No." := 'EDOC-001';
+        PurchaseHeader.Insert();
+        EDocumentPurchaseHeader."E-Document Entry No." := EDocument."Entry No";
+        EDocumentPurchaseHeader."Purchase Order No." := PurchaseHeader."No.";
+        EDocumentPurchaseHeader."Vendor VAT Id" := '13124234';
+        EDocumentPurchaseHeader.Insert();
+
+        EDocumentLog.SetBlob('Test', Enum::"E-Doc. File Format"::PDF, 'Data');
+        EDocumentLog.SetFields(EDocument, EDocumentService);
+        EDocLogRecord := EDocumentLog.InsertLog(Enum::"E-Document Service Status"::Imported, Enum::"Import E-Doc. Proc. Status"::Unprocessed);
+
+        EDocument."Unstructured Data Entry No." := EDocLogRecord."E-Doc. Data Storage Entry No.";
+        EDocument.Modify();
+
+        EDocumentProcessing.ModifyEDocumentProcessingStatus(EDocument, "Import E-Doc. Proc. Status"::"Ready for draft");
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Prepare draft";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParameters);
+
+        EDocumentPurchaseHeader.SetRecFilter();
+        EDocumentPurchaseHeader.FindFirst();
+        Assert.AreEqual(PurchaseHeader."No.", EDocumentPurchaseHeader."[BC] Purchase Order No.", 'The purchase order should be found when explicitly specified in the E-Document.');
+        EDocument.SetRecFilter();
+
+        PurchaseHeader.SetRecFilter();
+        PurchaseHeader.Delete();
+    end;
+
+    [Test]
+    procedure PreparingPurchaseDraftFindsVendorByTaxId()
+    var
+        EDocument: Record "E-Document";
+        EDocumentPurchaseHeader: Record "E-Document Purchase Header";
+        TempEDocImportParameters: Record "E-Doc. Import Parameters";
+        Vendor2: Record Vendor;
+        CompanyInformation: Record "Company Information";
+        EDocumentProcessing: Codeunit "E-Document Processing";
+        EDocImport: Codeunit "E-Doc. Import";
+    begin
+        Initialize(Enum::"Service Integration"::"Mock");
+        LibraryEDoc.CreateInboundEDocument(EDocument, EDocumentService);
+
+        CompanyInformation.GetRecordOnce();
+        Vendor2."Country/Region Code" := CompanyInformation."Country/Region Code";
+        Vendor2."No." := 'EDOC001';
+        Vendor2."VAT Registration No." := 'XXXXXXX001';
+        Vendor2.Insert();
+        EDocumentPurchaseHeader."E-Document Entry No." := EDocument."Entry No";
+        EDocumentPurchaseHeader."Vendor VAT Id" := Vendor2."VAT Registration No.";
+        EDocumentPurchaseHeader.Insert();
+
+        EDocumentProcessing.ModifyEDocumentProcessingStatus(EDocument, "Import E-Doc. Proc. Status"::"Ready for draft");
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Prepare draft";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParameters);
+
+        EDocumentPurchaseHeader.SetRecFilter();
+        EDocumentPurchaseHeader.FindFirst();
+        Assert.AreEqual(Vendor2."No.", EDocumentPurchaseHeader."[BC] Vendor No.", 'The vendor should be found when the tax id is specified and it matches the one in BC.');
+
+        Vendor2.SetRecFilter();
+        Vendor2.Delete();
+    end;
+
+    [Test]
+    procedure PreparingPurchaseDraftFindsItemByExactDescription()
+    var
+        EDocument: Record "E-Document";
+        EDocumentPurchaseHeader: Record "E-Document Purchase Header";
+        EDocumentPurchaseLine: Record "E-Document Purchase Line";
+        TempEDocImportParameters: Record "E-Doc. Import Parameters";
+        Vendor2: Record Vendor;
+        Item: Record Item;
+        EDocumentProcessing: Codeunit "E-Document Processing";
+        EDocImport: Codeunit "E-Doc. Import";
+    begin
+        // [FEATURE] [AI test 1.0]
+        // [SCENARIO] A draft line whose description exactly matches a single item resolves to that item
+        Initialize(Enum::"Service Integration"::"Mock");
+
+        // [GIVEN] An item "I" and a vendor "V" resolvable by VAT id
+        LibraryInventory.CreateItem(Item);
+        Item.Description := 'Exact description item';
+        Item.Modify();
+        CreateVendorWithTaxId(Vendor2, 'XXXXXXX001');
+
+        // [GIVEN] An inbound e-document from "V" with a line described exactly as "I"
+        LibraryEDoc.CreateInboundEDocument(EDocument, EDocumentService);
+        EDocumentPurchaseHeader."E-Document Entry No." := EDocument."Entry No";
+        EDocumentPurchaseHeader."Vendor VAT Id" := Vendor2."VAT Registration No.";
+        EDocumentPurchaseHeader.Insert();
+        EDocumentPurchaseLine."E-Document Entry No." := EDocument."Entry No";
+        EDocumentPurchaseLine.Description := Item.Description;
+        EDocumentPurchaseLine.Insert();
+
+        // [WHEN] The draft is prepared
+        EDocumentProcessing.ModifyEDocumentProcessingStatus(EDocument, "Import E-Doc. Proc. Status"::"Ready for draft");
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Prepare draft";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParameters);
+
+        // [THEN] The line resolves to item "I"
+        EDocumentPurchaseLine.SetRecFilter();
+        EDocumentPurchaseLine.FindFirst();
+        Assert.AreEqual("Purchase Line Type"::Item, EDocumentPurchaseLine."[BC] Purchase Line Type", 'The purchase line type should be set to Item.');
+        Assert.AreEqual(Item."No.", EDocumentPurchaseLine."[BC] Purchase Type No.", 'The item with the exact description should be found.');
+
+        Vendor2.Delete();
+        Item.Delete();
+    end;
+
+    [Test]
+    procedure PreparingPurchaseDraftFindsAccountConfiguredWithTextToAccountMapping()
+    var
+        EDocument: Record "E-Document";
+        EDocumentPurchaseHeader: Record "E-Document Purchase Header";
+        EDocumentPurchaseLine: Record "E-Document Purchase Line";
+        TempEDocImportParameters: Record "E-Doc. Import Parameters";
+        Vendor2: Record Vendor;
+        CompanyInformation: Record "Company Information";
+        GLAccount: Record "G/L Account";
+        Item: Record Item;
+        TextToAccountMapping: Record "Text-to-Account Mapping";
+        EDocumentProcessing: Codeunit "E-Document Processing";
+        EDocImport: Codeunit "E-Doc. Import";
+    begin
+        Initialize(Enum::"Service Integration"::"Mock");
+        LibraryEDoc.CreateInboundEDocument(EDocument, EDocumentService);
+        GLAccount."No." := 'EDOC001';
+        GLAccount.Insert();
+        LibraryInventory.CreateItem(Item);
+        Item.Description := 'Test description';
+        Item.Modify();
+
+        CompanyInformation.GetRecordOnce();
+        Vendor2."Country/Region Code" := CompanyInformation."Country/Region Code";
+        Vendor2."No." := 'EDOC001';
+        Vendor2."VAT Registration No." := 'XXXXXXX001';
+        Vendor2.Insert();
+
+        TextToAccountMapping."Debit Acc. No." := GLAccount."No.";
+        TextToAccountMapping."Vendor No." := Vendor2."No.";
+        TextToAccountMapping."Mapping Text" := 'Test description';
+        TextToAccountMapping.Insert();
+
+        EDocumentPurchaseHeader."E-Document Entry No." := EDocument."Entry No";
+        EDocumentPurchaseHeader."Vendor VAT Id" := Vendor2."VAT Registration No.";
+        EDocumentPurchaseHeader.Insert();
+        EDocumentPurchaseLine."E-Document Entry No." := EDocument."Entry No";
+        EDocumentPurchaseLine.Description := 'Test description';
+        EDocumentPurchaseLine.Insert();
+
+        EDocumentProcessing.ModifyEDocumentProcessingStatus(EDocument, "Import E-Doc. Proc. Status"::"Ready for draft");
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Prepare draft";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParameters);
+
+        EDocumentPurchaseLine.SetRecFilter();
+        EDocumentPurchaseLine.FindFirst();
+
+        EDocumentPurchaseHeader.SetRecFilter();
+        EDocumentPurchaseHeader.FindFirst();
+        Assert.AreEqual(Vendor2."No.", EDocumentPurchaseHeader."[BC] Vendor No.", 'The vendor should be found when the tax id is specified and it matches the one in BC.');
+        Assert.AreEqual("Purchase Line Type"::"G/L Account", EDocumentPurchaseLine."[BC] Purchase Line Type", 'The purchase line type should be set to G/L Account.');
+        Assert.AreEqual(GLAccount."No.", EDocumentPurchaseLine."[BC] Purchase Type No.", 'The configured Text-to-Account Mapping should take precedence over an item description match.');
+
+        Vendor2.SetRecFilter();
+        Vendor2.Delete();
+        GLAccount.SetRecFilter();
+        GLAccount.Delete();
+        Item.Delete();
+        TextToAccountMapping.SetRecFilter();
+        TextToAccountMapping.Delete();
+    end;
+
+    [Test]
+    procedure PurchaseLineProviderDoesNotMatchDuplicateItemDescriptions()
+    var
+        EDocument: Record "E-Document";
+        EDocumentPurchaseHeader: Record "E-Document Purchase Header";
+        EDocumentPurchaseLine: Record "E-Document Purchase Line";
+        Item: Record Item;
+        Item2: Record Item;
+        EDocProviders: Codeunit "E-Doc. Providers";
+    begin
+        // [FEATURE] [AI test 1.0]
+        // [SCENARIO] A draft line whose description matches more than one item is left unresolved
+        Initialize(Enum::"Service Integration"::"Mock");
+
+        // [GIVEN] Two items "I1" and "I2" sharing the same description
+        LibraryInventory.CreateItem(Item);
+        Item.Description := 'Duplicate description';
+        Item.Modify();
+        LibraryInventory.CreateItem(Item2);
+        Item2.Description := Item.Description;
+        Item2.Modify();
+
+        // [GIVEN] An inbound e-document line described the same as "I1" and "I2"
+        LibraryEDoc.CreateInboundEDocument(EDocument, EDocumentService);
+        EDocumentPurchaseHeader.InsertForEDocument(EDocument);
+        EDocumentPurchaseLine."E-Document Entry No." := EDocument."Entry No";
+        EDocumentPurchaseLine.Description := Item.Description;
+        EDocumentPurchaseLine.Insert();
+
+        // [WHEN] The purchase line is resolved
+        EDocProviders.GetPurchaseLine(EDocumentPurchaseLine);
+
+        // [THEN] The line stays unresolved because the match is ambiguous
+        Assert.AreEqual("Purchase Line Type"::" ", EDocumentPurchaseLine."[BC] Purchase Line Type", 'An ambiguous item description should not resolve the purchase line.');
+        Assert.AreEqual('', EDocumentPurchaseLine."[BC] Purchase Type No.", 'An ambiguous item description should not assign an item number.');
+
+        Item.Delete();
+        Item2.Delete();
+    end;
+
+    [Test]
+    procedure PurchaseLineProviderDoesNotMatchPurchasingBlockedItem()
+    var
+        EDocument: Record "E-Document";
+        EDocumentPurchaseHeader: Record "E-Document Purchase Header";
+        EDocumentPurchaseLine: Record "E-Document Purchase Line";
+        Item: Record Item;
+        EDocProviders: Codeunit "E-Doc. Providers";
+    begin
+        // [FEATURE] [AI test 1.0]
+        // [SCENARIO] A draft line matching a purchasing-blocked item is left unresolved
+        Initialize(Enum::"Service Integration"::"Mock");
+
+        // [GIVEN] A purchasing-blocked item "I"
+        LibraryInventory.CreateItem(Item);
+        Item.Description := 'Purchasing blocked item';
+        Item."Purchasing Blocked" := true;
+        Item.Modify();
+
+        // [GIVEN] An inbound e-document line described exactly as "I"
+        LibraryEDoc.CreateInboundEDocument(EDocument, EDocumentService);
+        EDocumentPurchaseHeader.InsertForEDocument(EDocument);
+        EDocumentPurchaseLine."E-Document Entry No." := EDocument."Entry No";
+        EDocumentPurchaseLine.Description := Item.Description;
+        EDocumentPurchaseLine.Insert();
+
+        // [WHEN] The purchase line is resolved
+        EDocProviders.GetPurchaseLine(EDocumentPurchaseLine);
+
+        // [THEN] The line stays unresolved because the item cannot be purchased
+        Assert.AreEqual("Purchase Line Type"::" ", EDocumentPurchaseLine."[BC] Purchase Line Type", 'A purchasing-blocked item should not resolve the purchase line.');
+
+        Item.Delete();
+    end;
+
+    [Test]
+    procedure FinishDraftCanBeUndone()
+    var
+        EDocument: Record "E-Document";
+        TempEDocImportParameters: Record "E-Doc. Import Parameters";
+        PurchaseHeader: Record "Purchase Header";
+        EDocLogRecord: Record "E-Document Log";
+        EDocImport: Codeunit "E-Doc. Import";
+        EDocumentLog: Codeunit "E-Document Log";
+        EDocumentProcessing: Codeunit "E-Document Processing";
+    begin
+        Initialize(Enum::"Service Integration"::"Mock");
+        LibraryEDoc.CreateInboundEDocument(EDocument, EDocumentService);
+        EDocument."Document Type" := "E-Document Type"::"Purchase Invoice";
+        EDocument.Modify();
+        EDocumentService."Import Process" := "E-Document Import Process"::"Version 2.0";
+        EDocumentService.Modify();
+
+        EDocumentLog.SetBlob('Test', Enum::"E-Doc. File Format"::XML, 'Data');
+        EDocumentLog.SetFields(EDocument, EDocumentService);
+        EDocLogRecord := EDocumentLog.InsertLog(Enum::"E-Document Service Status"::Imported, Enum::"Import E-Doc. Proc. Status"::Readable);
+
+        EDocument."Structured Data Entry No." := EDocLogRecord."E-Doc. Data Storage Entry No.";
+        EDocument.Modify();
+
+
+        EDocumentProcessing.ModifyEDocumentProcessingStatus(EDocument, "Import E-Doc. Proc. Status"::"Draft Ready");
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Finish draft";
+        TempEDocImportParameters."Processing Customizations" := "E-Doc. Proc. Customizations"::"Mock Create Purchase Invoice";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParameters);
+
+        PurchaseHeader.SetRange("E-Document Link", EDocument.SystemId);
+        PurchaseHeader.FindFirst();
+
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Structure received data";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParameters);
+
+        Assert.RecordIsEmpty(PurchaseHeader);
+    end;
+
+    [Test]
+    procedure FinishDraftFromReadyForDraftStateSucceeds()
+    var
+        EDocument: Record "E-Document";
+        TempEDocImportParameters: Record "E-Doc. Import Parameters";
+        PurchaseHeader: Record "Purchase Header";
+        EDocLogRecord: Record "E-Document Log";
+        EDocumentPurchaseHeader: Record "E-Document Purchase Header";
+        EDocumentPurchaseLine: Record "E-Document Purchase Line";
+        EDocImport: Codeunit "E-Doc. Import";
+        EDocumentLog: Codeunit "E-Document Log";
+        EDocumentProcessing: Codeunit "E-Document Processing";
+    begin
+        // [SCENARIO] When finalize action is invoked from Ready for draft state, the system should automatically run Prepare draft first and then Finish draft
+        Initialize(Enum::"Service Integration"::"Mock");
+        LibraryEDoc.CreateInboundEDocument(EDocument, EDocumentService);
+        EDocument."Document Type" := "E-Document Type"::"Purchase Invoice";
+        EDocument.Modify();
+        EDocumentService."Import Process" := "E-Document Import Process"::"Version 2.0";
+        EDocumentService.Modify();
+
+        EDocumentPurchaseHeader."E-Document Entry No." := EDocument."Entry No";
+        EDocumentPurchaseHeader."Vendor VAT Id" := Vendor."VAT Registration No.";
+        EDocumentPurchaseHeader.Insert();
+        EDocumentPurchaseLine."E-Document Entry No." := EDocument."Entry No";
+        EDocumentPurchaseLine."Product Code" := '1234';
+        EDocumentPurchaseLine.Description := 'Test description';
+        EDocumentPurchaseLine.Insert();
+
+        EDocumentLog.SetBlob('Test', Enum::"E-Doc. File Format"::XML, 'Data');
+        EDocumentLog.SetFields(EDocument, EDocumentService);
+        EDocLogRecord := EDocumentLog.InsertLog(Enum::"E-Document Service Status"::Imported, Enum::"Import E-Doc. Proc. Status"::Readable);
+
+        EDocument."Structured Data Entry No." := EDocLogRecord."E-Doc. Data Storage Entry No.";
+        EDocument.Modify();
+
+        // [GIVEN] E-Document is in Ready for draft state
+        EDocumentProcessing.ModifyEDocumentProcessingStatus(EDocument, "Import E-Doc. Proc. Status"::"Ready for draft");
+        EDocument.CalcFields("Import Processing Status");
+        Assert.AreEqual(Enum::"Import E-Doc. Proc. Status"::"Ready for draft", EDocument."Import Processing Status", 'The status should be Ready for draft before processing.');
+
+        // [WHEN] Finish draft step is executed (simulating finalize action)
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Finish draft";
+        TempEDocImportParameters."Processing Customizations" := "E-Doc. Proc. Customizations"::"Mock Create Purchase Invoice";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParameters);
+
+        // [THEN] The document is processed (the system ran Prepare draft automatically and then Finish draft)
+        EDocument.CalcFields("Import Processing Status");
+        Assert.AreEqual(Enum::"Import E-Doc. Proc. Status"::Processed, EDocument."Import Processing Status", 'The status should be Processed after finalize action from Ready for draft state.');
+
+        PurchaseHeader.SetRange("E-Document Link", EDocument.SystemId);
+        Assert.IsFalse(PurchaseHeader.IsEmpty(), 'The purchase header should be created.');
+    end;
+
+    #region HistoricalMatchingTest
+
+    [Test]
+    procedure ProcessingInboundDocumentCreatesLinks()
+    var
+        EDocument: Record "E-Document";
+        TempEDocImportParams: Record "E-Doc. Import Parameters";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        EDocRecordLink: Record "E-Doc. Record Link";
+    begin
+        // [SCENARIO] A incoming e-document purchase invoice is received and processed, links should be created between the e-document and the purchase header and lines.
+        Initialize(Enum::"Service Integration"::"Mock");
+        EDocumentService."Read into Draft Impl." := "E-Doc. Read into Draft"::PEPPOL;
+        EDocumentService.Modify();
+
+        EDocRecordLink.DeleteAll();
+
+        // [GIVEN] An inbound e-document is received and fully processed
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Finish draft";
+        Assert.IsTrue(LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-invoice-0.xml', TempEDocImportParams), 'The e-document should be processed');
+
+        EDocument.Get(EDocument."Entry No");
+        PurchaseHeader.Get(EDocument."Document Record ID");
+
+        // [THEN] The e-document is linked to the purchase header and lines
+        EDocRecordLink.SetRange("Target Table No.", Database::"Purchase Header");
+        EDocRecordLink.SetRange("Target SystemId", PurchaseHeader.SystemId);
+        Assert.RecordCount(EDocRecordLink, 1);
+
+        PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
+        PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
+        PurchaseLine.FindSet();
+        repeat
+            EDocRecordLink.SetRange("Target Table No.", Database::"Purchase Line");
+            EDocRecordLink.SetRange("Target SystemId", PurchaseLine.SystemId);
+            Assert.RecordCount(EDocRecordLink, 1);
+        until PurchaseLine.Next() = 0;
+    end;
+
+    [Test]
+    procedure PostingInboundDocumentCreatesHistoricalRecords()
+    var
+        EDocument: Record "E-Document";
+        TempEDocImportParams: Record "E-Doc. Import Parameters";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseInvoiceHeader: Record "Purch. Inv. Header";
+        EDocVendorAssignmentHistory: Record "E-Doc. Vendor Assign. History";
+        EDocPurchaseLineHistory: Record "E-Doc. Purchase Line History";
+        PurchaseInvoiceLine: Record "Purch. Inv. Line";
+        EDocRecordLink: Record "E-Doc. Record Link";
+    begin
+        // [SCENARIO] A incoming e-document purchase invoice is received, processed, and posted. Historical records should be created.
+        Initialize(Enum::"Service Integration"::"Mock");
+        EDocumentService."Read into Draft Impl." := "E-Doc. Read into Draft"::PEPPOL;
+        EDocumentService.Modify();
+
+        // [GIVEN] An inbound e-document is received and fully processed
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Finish draft";
+        Assert.IsTrue(LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-invoice-0.xml', TempEDocImportParams), 'The e-document should be processed');
+
+        EDocument.Get(EDocument."Entry No");
+        PurchaseHeader.Get(EDocument."Document Record ID");
+        // [GIVEN] The received purchase invoice is modified for posting
+        LibraryEDoc.EditPurchaseDocumentFromEDocumentForPosting(PurchaseHeader, EDocument);
+
+        // [WHEN] The received purchase invoice is posted
+        LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
+        PurchaseInvoiceHeader.SetRange("Pre-Assigned No.", PurchaseHeader."No.");
+        PurchaseInvoiceHeader.FindFirst();
+
+        // [THEN] The historical records are created
+        EDocVendorAssignmentHistory.SetRange("Purch. Inv. Header SystemId", PurchaseInvoiceHeader.SystemId);
+        Assert.RecordCount(EDocVendorAssignmentHistory, 1);
+        PurchaseInvoiceLine.SetRange("Document No.", PurchaseInvoiceHeader."No.");
+        PurchaseInvoiceLine.FindSet();
+        repeat
+            EDocPurchaseLineHistory.SetRange("Purch. Inv. Line SystemId", PurchaseInvoiceLine.SystemId);
+            Assert.RecordCount(EDocPurchaseLineHistory, 1);
+        until PurchaseInvoiceLine.Next() = 0;
+        // [THEN] The links should be deleted, these are there momentarily while the purchase invoice is not yet posted
+        EDocRecordLink.SetRange("E-Document Entry No.", EDocument."Entry No");
+        Assert.RecordCount(EDocRecordLink, 0);
+    end;
+    #endregion
+
+    [Test]
+    procedure AdditionalFieldsAreConsideredWhenCreatingPurchaseInvoice()
+    var
+        EDocPurchLineFieldSetup: Record "ED Purchase Line Field Setup";
+        PurchaseLine: Record "Purchase Line";
+        PurchaseInvoiceLine: Record "Purch. Inv. Line";
+        EDocument: Record "E-Document";
+        TempEDocImportParams: Record "E-Doc. Import Parameters";
+        PurchaseHeader: Record "Purchase Header";
+        EDocPurchLineField: Record "E-Document Line - Field";
+        EDocPurchaseLine: Record "E-Document Purchase Line";
+        Location: Record Location;
+        EDocImport: Codeunit "E-Doc. Import";
+    begin
+        // [SCENARIO] Additional fields are configured for the e-document, and an incoming e-document is received. When creating a purchase invoice, the configured fields should be considered.
+        Initialize(Enum::"Service Integration"::"Mock");
+        EDocumentService."Read into Draft Impl." := "E-Doc. Read into Draft"::PEPPOL;
+        EDocumentService.Modify();
+        // [GIVEN] Additional fields are configured
+        EDocPurchLineFieldSetup."Field No." := PurchaseInvoiceLine.FieldNo("Location Code");
+        EDocPurchLineFieldSetup.Insert();
+        EDocPurchLineFieldSetup."Field No." := PurchaseInvoiceLine.FieldNo("IC Partner Code");
+        EDocPurchLineFieldSetup.Insert();
+        // [GIVEN] An inbound e-document is received and a draft created
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Prepare draft";
+        Assert.IsTrue(LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-invoice-0.xml', TempEDocImportParams), 'The draft for the e-document should be created');
+
+        // [WHEN] Storing custom values for the additional fields of the first line
+        EDocPurchLineField."E-Document Entry No." := EDocument."Entry No";
+        EDocPurchaseLine.SetRange("E-Document Entry No.", EDocument."Entry No");
+        EDocPurchaseLine.FindFirst();
+        EDocPurchLineField."Line No." := EDocPurchaseLine."Line No.";
+        EDocPurchLineField."Field No." := PurchaseInvoiceLine.FieldNo("Location Code");
+        Location.Code := 'TESTLOC';
+        if Location.Insert() then;
+        EDocPurchLineField."Code Value" := Location.Code;
+        EDocPurchLineField.Insert();
+
+        // [WHEN] Creating a purchase invoice from the draft
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Finish draft";
+        Assert.IsTrue(EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParams), 'The e-document should be processed');
+
+        // [THEN] The additional fields should be set on the purchase invoice line
+        EDocument.Get(EDocument."Entry No");
+        PurchaseHeader.Get(EDocument."Document Record ID");
+        PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
+        PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
+        PurchaseLine.FindFirst();
+        Assert.AreEqual(Location.Code, PurchaseLine."Location Code", 'The location code should be set on the purchase line.');
+    end;
+
+    [Test]
+    procedure AdditionalFieldsShouldNotBeConsideredIfNotConfigured()
+    var
+        EDocPurchLineFieldSetup: Record "ED Purchase Line Field Setup";
+        PurchaseLine: Record "Purchase Line";
+        PurchaseInvoiceLine: Record "Purch. Inv. Line";
+        EDocument: Record "E-Document";
+        TempEDocImportParams: Record "E-Doc. Import Parameters";
+        PurchaseHeader: Record "Purchase Header";
+        EDocPurchLineField: Record "E-Document Line - Field";
+        EDocPurchaseLine: Record "E-Document Purchase Line";
+        Location: Record Location;
+        EDocImport: Codeunit "E-Doc. Import";
+    begin
+        // [SCENARIO] Additional fields are configured for the e-document, but the general setup is not configured. When creating a purchase invoice, the configured fields should not be considered.
+        Initialize(Enum::"Service Integration"::"Mock");
+        EDocumentService."Read into Draft Impl." := "E-Doc. Read into Draft"::PEPPOL;
+        EDocumentService.Modify();
+        // [GIVEN] Additional fields are configured
+        EDocPurchLineFieldSetup."Field No." := PurchaseInvoiceLine.FieldNo("Location Code");
+        EDocPurchLineFieldSetup.Insert();
+        EDocPurchLineFieldSetup."Field No." := PurchaseInvoiceLine.FieldNo("IC Partner Code");
+        EDocPurchLineFieldSetup.Insert();
+        // [GIVEN] An inbound e-document is received and a draft created
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Prepare draft";
+        Assert.IsTrue(LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-invoice-0.xml', TempEDocImportParams), 'The draft for the e-document should be created');
+
+        // [GIVEN] Custom values for the additional fields of the first line are configured
+        EDocPurchLineField."E-Document Entry No." := EDocument."Entry No";
+        EDocPurchaseLine.SetRange("E-Document Entry No.", EDocument."Entry No");
+        EDocPurchaseLine.FindFirst();
+        EDocPurchLineField."Line No." := EDocPurchaseLine."Line No.";
+        EDocPurchLineField."Field No." := PurchaseInvoiceLine.FieldNo("Location Code");
+        Location.Code := 'TESTLOC';
+        if Location.Insert() then;
+        EDocPurchLineField."Code Value" := Location.Code;
+        EDocPurchLineField.Insert();
+
+        // [WHEN] Removing the general setup for the additional fields
+        EDocPurchLineFieldSetup.DeleteAll();
+        // [WHEN] Creating a purchase invoice from the draft
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Finish draft";
+        Assert.IsTrue(EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParams), 'The e-document should be processed');
+
+        // [THEN] The additional fields should not be set on the purchase invoice line
+        EDocument.Get(EDocument."Entry No");
+        PurchaseHeader.Get(EDocument."Document Record ID");
+        PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
+        PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
+        PurchaseLine.FindFirst();
+        Assert.AreNotEqual(Location.Code, PurchaseLine."Location Code", 'The location code should not be set on the purchase line.');
+    end;
+
+    [Test]
+    procedure AdditionalFieldWithInvalidValueEnrichesErrorMessage()
+    var
+        EDocPurchLineFieldSetup: Record "ED Purchase Line Field Setup";
+        PurchaseInvoiceLine: Record "Purch. Inv. Line";
+        EDocument: Record "E-Document";
+        TempEDocImportParams: Record "E-Doc. Import Parameters";
+        PurchaseHeader: Record "Purchase Header";
+        EDocPurchLineField: Record "E-Document Line - Field";
+        EDocPurchaseLine: Record "E-Document Purchase Line";
+        ErrorMessage: Record "Error Message";
+        EDocImport: Codeunit "E-Doc. Import";
+        EDocumentErrorHelper: Codeunit "E-Document Error Helper";
+    begin
+        // [SCENARIO] An additional field is configured with an invalid value that fails FieldRef.Validate.
+        // The error message should contain the additional field name, ID, and value.
+        Initialize(Enum::"Service Integration"::"Mock");
+
+        // [GIVEN] An additional field is configured for Location Code (Code[10])
+        EDocPurchLineFieldSetup."Field No." := PurchaseInvoiceLine.FieldNo("Location Code");
+        EDocPurchLineFieldSetup.Insert();
+
+        // [GIVEN] An inbound e-document is received and a draft created
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Prepare draft";
+        Assert.IsTrue(LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-invoice-0.xml', TempEDocImportParams), 'The draft for the e-document should be created');
+
+        // [GIVEN] A value that does not exist as a Location Code
+        EDocPurchLineField."E-Document Entry No." := EDocument."Entry No";
+        EDocPurchaseLine.SetRange("E-Document Entry No.", EDocument."Entry No");
+        EDocPurchaseLine.FindFirst();
+        EDocPurchLineField."Line No." := EDocPurchaseLine."Line No.";
+        EDocPurchLineField."Field No." := PurchaseInvoiceLine.FieldNo("Location Code");
+        EDocPurchLineField."Code Value" := 'INVALID';
+        EDocPurchLineField.Insert();
+
+        // [WHEN] Finalizing the draft
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Finish draft";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParams);
+
+        // [THEN] The e-document should have an error
+        EDocument.Get(EDocument."Entry No");
+        Assert.IsTrue(EDocumentErrorHelper.HasErrors(EDocument), 'The e-document should have errors');
+
+        // [THEN] The error message should reference the additional field name, ID, and value
+        ErrorMessage.SetRange("Context Record ID", EDocument.RecordId());
+        ErrorMessage.SetRange("Message Type", ErrorMessage."Message Type"::Error);
+        ErrorMessage.FindFirst();
+        Assert.ExpectedMessage('While applying additional field "Location Code"', ErrorMessage."Message");
+        Assert.ExpectedMessage(Format(PurchaseInvoiceLine.FieldNo("Location Code")), ErrorMessage."Message");
+        Assert.ExpectedMessage('INVALID', ErrorMessage."Message");
+
+        // [THEN] No purchase invoice should have been created
+        PurchaseHeader.SetRange("E-Document Link", EDocument.SystemId);
+        Assert.RecordIsEmpty(PurchaseHeader);
+    end;
+
+    [Test]
+    procedure AdditionalFieldValueExceedingFieldLengthEnrichesErrorMessage()
+    var
+        EDocPurchLineFieldSetup: Record "ED Purchase Line Field Setup";
+        PurchaseInvoiceLine: Record "Purch. Inv. Line";
+        EDocument: Record "E-Document";
+        TempEDocImportParams: Record "E-Doc. Import Parameters";
+        PurchaseHeader: Record "Purchase Header";
+        EDocPurchLineField: Record "E-Document Line - Field";
+        EDocPurchaseLine: Record "E-Document Purchase Line";
+        ErrorMessage: Record "Error Message";
+        EDocImport: Codeunit "E-Doc. Import";
+        EDocumentErrorHelper: Codeunit "E-Document Error Helper";
+        FieldValue: Code[2048];
+    begin
+        // [SCENARIO] An additional field is configured with a value that exceeds the target field's maximum length.
+        // The error message should reference the additional field name, ID, and the overlong value.
+        Initialize(Enum::"Service Integration"::"Mock");
+
+        // [GIVEN] An additional field is configured for Location Code (Code[10])
+        EDocPurchLineFieldSetup."Field No." := PurchaseInvoiceLine.FieldNo("Location Code");
+        EDocPurchLineFieldSetup.Insert();
+
+        // [GIVEN] An inbound e-document is received and a draft created
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Prepare draft";
+        Assert.IsTrue(LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-invoice-0.xml', TempEDocImportParams), 'The draft for the e-document should be created');
+
+        // [GIVEN] A value that exceeds the target field length (Code[10])
+        FieldValue := 'LONGLOCCODE1'; // 12 characters, exceeds Code[10]
+        EDocPurchLineField."E-Document Entry No." := EDocument."Entry No";
+        EDocPurchaseLine.SetRange("E-Document Entry No.", EDocument."Entry No");
+        EDocPurchaseLine.FindFirst();
+        EDocPurchLineField."Line No." := EDocPurchaseLine."Line No.";
+        EDocPurchLineField."Field No." := PurchaseInvoiceLine.FieldNo("Location Code");
+        EDocPurchLineField."Code Value" := FieldValue;
+        EDocPurchLineField.Insert();
+
+        // [WHEN] Finalizing the draft
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Finish draft";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParams);
+
+        // [THEN] The e-document should have an error
+        EDocument.Get(EDocument."Entry No");
+        Assert.IsTrue(EDocumentErrorHelper.HasErrors(EDocument), 'The e-document should have errors');
+
+        // [THEN] The error message should reference the additional field name and value
+        ErrorMessage.SetRange("Context Record ID", EDocument.RecordId());
+        ErrorMessage.SetRange("Message Type", ErrorMessage."Message Type"::Error);
+        ErrorMessage.FindFirst();
+        Assert.ExpectedMessage('While applying additional field "Location Code"', ErrorMessage."Message");
+        Assert.ExpectedMessage(FieldValue, ErrorMessage."Message");
+
+        // [THEN] No purchase invoice should have been created
+        PurchaseHeader.SetRange("E-Document Link", EDocument.SystemId);
+        Assert.RecordIsEmpty(PurchaseHeader);
+    end;
+
+    [Test]
+    procedure StandardFieldValidationFailureEnrichesErrorMessage()
+    var
+        EDocument: Record "E-Document";
+        TempEDocImportParams: Record "E-Doc. Import Parameters";
+        EDocumentPurchaseHeader: Record "E-Document Purchase Header";
+        PurchaseHeader: Record "Purchase Header";
+        ErrorMessage: Record "Error Message";
+        EDocImport: Codeunit "E-Doc. Import";
+        EDocumentErrorHelper: Codeunit "E-Document Error Helper";
+    begin
+        // [SCENARIO] A standard field validation fails during purchase invoice creation.
+        // The error message should contain the field caption.
+        Initialize(Enum::"Service Integration"::"Mock");
+
+        // [GIVEN] An inbound e-document is received and a draft created
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Prepare draft";
+        Assert.IsTrue(LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-invoice-0.xml', TempEDocImportParams), 'The draft for the e-document should be created');
+
+        // [GIVEN] The draft has an invalid currency code
+        EDocumentPurchaseHeader.GetFromEDocument(EDocument);
+        EDocumentPurchaseHeader."Currency Code" := 'INVCURR';
+        EDocumentPurchaseHeader.Modify();
+
+        // [WHEN] Finalizing the draft
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Finish draft";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParams);
+
+        // [THEN] The e-document should have an error
+        EDocument.Get(EDocument."Entry No");
+        Assert.IsTrue(EDocumentErrorHelper.HasErrors(EDocument), 'The e-document should have errors');
+
+        // [THEN] The error message should reference the Currency Code field
+        ErrorMessage.SetRange("Context Record ID", EDocument.RecordId());
+        ErrorMessage.SetRange("Message Type", ErrorMessage."Message Type"::Error);
+        ErrorMessage.FindFirst();
+        Assert.ExpectedMessage('While validating field "Currency Code"', ErrorMessage."Message");
+
+        // [THEN] No purchase invoice should have been created
+        PurchaseHeader.SetRange("E-Document Link", EDocument.SystemId);
+        Assert.RecordIsEmpty(PurchaseHeader);
+    end;
+
+    [Test]
+    procedure SuccessfulImportWithAdditionalFieldsHasNoErrors()
+    var
+        EDocPurchLineFieldSetup: Record "ED Purchase Line Field Setup";
+        PurchaseInvoiceLine: Record "Purch. Inv. Line";
+        EDocument: Record "E-Document";
+        TempEDocImportParams: Record "E-Doc. Import Parameters";
+        PurchaseHeader: Record "Purchase Header";
+        EDocPurchLineField: Record "E-Document Line - Field";
+        EDocPurchaseLine: Record "E-Document Purchase Line";
+        ErrorMessage: Record "Error Message";
+        Location: Record Location;
+        EDocImport: Codeunit "E-Doc. Import";
+        EDocumentErrorHelper: Codeunit "E-Document Error Helper";
+    begin
+        // [SCENARIO] Additional fields are configured with valid values.
+        // The import should succeed with no errors or warnings.
+        Initialize(Enum::"Service Integration"::"Mock");
+
+        // [GIVEN] An additional field is configured for Location Code
+        EDocPurchLineFieldSetup."Field No." := PurchaseInvoiceLine.FieldNo("Location Code");
+        EDocPurchLineFieldSetup.Insert();
+
+        // [GIVEN] A valid location exists
+        Location.Code := 'VALIDLOC';
+        if Location.Insert() then;
+
+        // [GIVEN] An inbound e-document is received and a draft created
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Prepare draft";
+        Assert.IsTrue(LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-invoice-0.xml', TempEDocImportParams), 'The draft for the e-document should be created');
+
+        // [GIVEN] The additional field has a valid value
+        EDocPurchLineField."E-Document Entry No." := EDocument."Entry No";
+        EDocPurchaseLine.SetRange("E-Document Entry No.", EDocument."Entry No");
+        EDocPurchaseLine.FindFirst();
+        EDocPurchLineField."Line No." := EDocPurchaseLine."Line No.";
+        EDocPurchLineField."Field No." := PurchaseInvoiceLine.FieldNo("Location Code");
+        EDocPurchLineField."Code Value" := 'VALIDLOC';
+        EDocPurchLineField.Insert();
+
+        // [WHEN] Finalizing the draft
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Finish draft";
+        Assert.IsTrue(EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParams), 'The finalization should succeed');
+
+        // [THEN] The e-document should have no errors
+        EDocument.Get(EDocument."Entry No");
+        Assert.IsFalse(EDocumentErrorHelper.HasErrors(EDocument), 'The e-document should not have errors');
+
+        // [THEN] No error or warning messages should exist
+        ErrorMessage.SetRange("Context Record ID", EDocument.RecordId());
+        Assert.RecordIsEmpty(ErrorMessage);
+
+        // [THEN] A purchase invoice should have been created
+        PurchaseHeader.SetRange("E-Document Link", EDocument.SystemId);
+        Assert.RecordIsNotEmpty(PurchaseHeader);
+    end;
+
+    [Test]
+    procedure MultipleAdditionalFieldsFailureOnSecondHasCorrectContext()
+    var
+        EDocPurchLineFieldSetup: Record "ED Purchase Line Field Setup";
+        PurchaseInvoiceLine: Record "Purch. Inv. Line";
+        EDocument: Record "E-Document";
+        TempEDocImportParams: Record "E-Doc. Import Parameters";
+        PurchaseHeader: Record "Purchase Header";
+        EDocPurchLineField: Record "E-Document Line - Field";
+        EDocPurchaseLine: Record "E-Document Purchase Line";
+        ErrorMessage: Record "Error Message";
+        Location: Record Location;
+        EDocImport: Codeunit "E-Doc. Import";
+        EDocumentErrorHelper: Codeunit "E-Document Error Helper";
+    begin
+        // [SCENARIO] Two additional fields are configured. The first has a valid value, the second has an invalid value.
+        // The error message should reference the second field, not the first.
+        Initialize(Enum::"Service Integration"::"Mock");
+
+        // [GIVEN] Two additional fields configured: Location Code and Bin Code
+        EDocPurchLineFieldSetup."Field No." := PurchaseInvoiceLine.FieldNo("Location Code");
+        EDocPurchLineFieldSetup.Insert();
+        Clear(EDocPurchLineFieldSetup);
+        EDocPurchLineFieldSetup."Field No." := PurchaseInvoiceLine.FieldNo("Bin Code");
+        EDocPurchLineFieldSetup.Insert();
+
+        // [GIVEN] A valid location exists
+        Location.Code := 'MULTILOC';
+        if Location.Insert() then;
+
+        // [GIVEN] An inbound e-document is received and a draft created
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Prepare draft";
+        Assert.IsTrue(LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-invoice-0.xml', TempEDocImportParams), 'The draft for the e-document should be created');
+
+        // [GIVEN] First field (Location Code) has a valid value, second field (Bin Code) has an invalid value
+        EDocPurchaseLine.SetRange("E-Document Entry No.", EDocument."Entry No");
+        EDocPurchaseLine.FindFirst();
+
+        EDocPurchLineField."E-Document Entry No." := EDocument."Entry No";
+        EDocPurchLineField."Line No." := EDocPurchaseLine."Line No.";
+        EDocPurchLineField."Field No." := PurchaseInvoiceLine.FieldNo("Location Code");
+        EDocPurchLineField."Code Value" := 'MULTILOC';
+        EDocPurchLineField.Insert();
+
+        Clear(EDocPurchLineField);
+        EDocPurchLineField."E-Document Entry No." := EDocument."Entry No";
+        EDocPurchLineField."Line No." := EDocPurchaseLine."Line No.";
+        EDocPurchLineField."Field No." := PurchaseInvoiceLine.FieldNo("Bin Code");
+        EDocPurchLineField."Code Value" := 'INVALIDBIN';
+        EDocPurchLineField.Insert();
+
+        // [WHEN] Finalizing the draft
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Finish draft";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParams);
+
+        // [THEN] The e-document should have an error
+        EDocument.Get(EDocument."Entry No");
+        Assert.IsTrue(EDocumentErrorHelper.HasErrors(EDocument), 'The e-document should have errors');
+
+        // [THEN] The error message should reference the second field (Bin Code), not the first (Location Code)
+        ErrorMessage.SetRange("Context Record ID", EDocument.RecordId());
+        ErrorMessage.SetRange("Message Type", ErrorMessage."Message Type"::Error);
+        ErrorMessage.FindFirst();
+        Assert.ExpectedMessage('Bin Code', ErrorMessage."Message");
+        Assert.ExpectedMessage('INVALIDBIN', ErrorMessage."Message");
+
+        // [THEN] No purchase invoice should have been created
+        PurchaseHeader.SetRange("E-Document Link", EDocument.SystemId);
+        Assert.RecordIsEmpty(PurchaseHeader);
+    end;
+
+    [Test]
+    procedure NoAdditionalFieldsStandardFieldFailureStillEnriched()
+    var
+        EDocument: Record "E-Document";
+        TempEDocImportParams: Record "E-Doc. Import Parameters";
+        EDocumentPurchaseHeader: Record "E-Document Purchase Header";
+        PurchaseHeader: Record "Purchase Header";
+        ErrorMessage: Record "Error Message";
+        EDocImport: Codeunit "E-Doc. Import";
+        EDocumentErrorHelper: Codeunit "E-Document Error Helper";
+    begin
+        // [SCENARIO] No additional fields are configured. A standard field validation fails.
+        // The error message should still be enriched with the field context.
+        Initialize(Enum::"Service Integration"::"Mock");
+
+        // [GIVEN] An inbound e-document is received and a draft created (no additional fields configured)
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Prepare draft";
+        Assert.IsTrue(LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-invoice-0.xml', TempEDocImportParams), 'The draft for the e-document should be created');
+
+        // [GIVEN] The draft has an invalid currency code
+        EDocumentPurchaseHeader.GetFromEDocument(EDocument);
+        EDocumentPurchaseHeader."Currency Code" := 'BADCURR';
+        EDocumentPurchaseHeader.Modify();
+
+        // [WHEN] Finalizing the draft
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Finish draft";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParams);
+
+        // [THEN] The e-document should have an error
+        EDocument.Get(EDocument."Entry No");
+        Assert.IsTrue(EDocumentErrorHelper.HasErrors(EDocument), 'The e-document should have errors');
+
+        // [THEN] The error message should contain the Currency Code field context
+        ErrorMessage.SetRange("Context Record ID", EDocument.RecordId());
+        ErrorMessage.SetRange("Message Type", ErrorMessage."Message Type"::Error);
+        ErrorMessage.FindFirst();
+        Assert.ExpectedMessage('Currency Code', ErrorMessage."Message");
+
+        // [THEN] No purchase invoice should have been created
+        PurchaseHeader.SetRange("E-Document Link", EDocument.SystemId);
+        Assert.RecordIsEmpty(PurchaseHeader);
+    end;
+
+    [Test]
+    procedure PreparingPurchaseDraftFindsItemReference()
+    var
+        EDocument: Record "E-Document";
+        EDocumentPurchaseHeader: Record "E-Document Purchase Header";
+        EDocumentPurchaseLine: Record "E-Document Purchase Line";
+        TempEDocImportParameters: Record "E-Doc. Import Parameters";
+        Vendor2: Record Vendor;
+        CompanyInformation: Record "Company Information";
+        Item: Record Item;
+        ItemReference: Record "Item Reference";
+        EDocumentProcessing: Codeunit "E-Document Processing";
+        EDocImport: Codeunit "E-Doc. Import";
+    begin
+        // [GIVEN] An E-Doc received with Product code as an existing Item Reference
+        Initialize(Enum::"Service Integration"::"Mock");
+        LibraryEDoc.CreateInboundEDocument(EDocument, EDocumentService);
+
+        CompanyInformation.GetRecordOnce();
+        Vendor2."Country/Region Code" := CompanyInformation."Country/Region Code";
+        Vendor2."No." := 'EDOC001';
+        Vendor2."VAT Registration No." := 'XXXXXXX001';
+        Vendor2.Insert();
+        LibraryInventory.CreateItem(Item);
+        ItemReference := CreateItemReference(Vendor2, Item);
+
+        EDocumentPurchaseHeader."E-Document Entry No." := EDocument."Entry No";
+        EDocumentPurchaseHeader."Vendor VAT Id" := Vendor2."VAT Registration No.";
+        EDocumentPurchaseHeader.Insert();
+        EDocumentPurchaseLine."E-Document Entry No." := EDocument."Entry No";
+        EDocumentPurchaseLine."Product Code" := ItemReference."Reference No.";
+        EDocumentPurchaseLine.Description := 'Test description';
+        EDocumentPurchaseLine.Insert();
+
+        EDocumentProcessing.ModifyEDocumentProcessingStatus(EDocument, "Import E-Doc. Proc. Status"::"Ready for draft");
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Prepare draft";
+
+        // [WHEN] Filling in the draft
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParameters);
+
+        EDocumentPurchaseLine.SetRecFilter();
+        EDocumentPurchaseLine.FindFirst();
+
+        EDocumentPurchaseHeader.SetRecFilter();
+        EDocumentPurchaseHeader.FindFirst();
+
+        // [THEN] The draft is populated with the information in the item reference
+        Assert.AreEqual(Vendor2."No.", EDocumentPurchaseHeader."[BC] Vendor No.", 'The vendor should be found when the tax id is specified and it matches the one in BC.');
+        Assert.AreEqual(Enum::"Purchase Line Type"::Item, EDocumentPurchaseLine."[BC] Purchase Line Type", 'The purchase line type should be set to Item.');
+        Assert.AreEqual(Item."No.", EDocumentPurchaseLine."[BC] Purchase Type No.", 'The item configured in the item reference should be found.');
+
+        Vendor2.SetRecFilter();
+        if Vendor2.Delete() then;
+        Item.SetRecFilter();
+        if Item.Delete() then;
+        ItemReference.SetRecFilter();
+        if ItemReference.Delete() then;
+    end;
+
+    [Test]
+    procedure ItemReferenceIsNotConsideredWhenOutsideOfDateValidity()
+    var
+        EDocument: Record "E-Document";
+        EDocumentPurchaseHeader: Record "E-Document Purchase Header";
+        EDocumentPurchaseLine: Record "E-Document Purchase Line";
+        TempEDocImportParameters: Record "E-Doc. Import Parameters";
+        Vendor2: Record Vendor;
+        CompanyInformation: Record "Company Information";
+        Item: Record Item;
+        ItemReference: Record "Item Reference";
+        EDocumentProcessing: Codeunit "E-Document Processing";
+        EDocImport: Codeunit "E-Doc. Import";
+    begin
+        // [GIVEN] An E-Doc received with Product code as an existing Item Reference
+        Initialize(Enum::"Service Integration"::"Mock");
+        LibraryEDoc.CreateInboundEDocument(EDocument, EDocumentService);
+
+        CompanyInformation.GetRecordOnce();
+        Vendor2."Country/Region Code" := CompanyInformation."Country/Region Code";
+        Vendor2."No." := 'EDOC001';
+        Vendor2."VAT Registration No." := 'XXXXXXX001';
+        Vendor2.Insert();
+
+        LibraryInventory.CreateItem(Item);
+
+        ItemReference := CreateItemReference(Vendor2, Item);
+
+        EDocumentPurchaseHeader."E-Document Entry No." := EDocument."Entry No";
+        EDocumentPurchaseHeader."Vendor VAT Id" := Vendor2."VAT Registration No.";
+        EDocumentPurchaseHeader.Insert();
+        EDocumentPurchaseLine."E-Document Entry No." := EDocument."Entry No";
+        EDocumentPurchaseLine."Product Code" := ItemReference."Reference No.";
+        EDocumentPurchaseLine.Description := 'Test description';
+        EDocumentPurchaseLine.Insert();
+
+        // [GIVEN] The item reference is only valid in the future (not on the e-document's default posting date)
+        ItemReference."Starting Date" := CalcDate('<+1D>', WorkDate());
+        ItemReference.Modify();
+
+        EDocumentProcessing.ModifyEDocumentProcessingStatus(EDocument, "Import E-Doc. Proc. Status"::"Ready for draft");
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Prepare draft";
+
+        // [WHEN] Filling in the draft
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParameters);
+
+        EDocumentPurchaseLine.SetRecFilter();
+        EDocumentPurchaseLine.FindFirst();
+
+        EDocumentPurchaseHeader.SetRecFilter();
+        EDocumentPurchaseHeader.FindFirst();
+
+        // [THEN] The line has no item match found
+        Assert.AreEqual(Vendor2."No.", EDocumentPurchaseHeader."[BC] Vendor No.", 'The vendor should be found when the tax id is specified and it matches the one in BC.');
+        Assert.AreNotEqual(Enum::"Purchase Line Type"::Item, EDocumentPurchaseLine."[BC] Purchase Line Type", 'The purchase line type should not be item (item reference doesn''t match).');
+
+        Vendor2.SetRecFilter();
+        if Vendor2.Delete() then;
+        Item.SetRecFilter();
+        if Item.Delete() then;
+        ItemReference.SetRecFilter();
+        if ItemReference.Delete() then;
+    end;
+
+    [Test]
+    procedure FinishDraftCreditMemoCanBeUndone()
+    var
+        EDocument: Record "E-Document";
+        TempEDocImportParameters: Record "E-Doc. Import Parameters";
+        PurchaseHeader: Record "Purchase Header";
+        EDocLogRecord: Record "E-Document Log";
+        EDocImport: Codeunit "E-Doc. Import";
+        EDocumentLog: Codeunit "E-Document Log";
+        EDocumentProcessing: Codeunit "E-Document Processing";
+    begin
+        // [SCENARIO] A credit memo created via FinishDraft can be reverted
+        Initialize(Enum::"Service Integration"::"Mock");
+        LibraryEDoc.CreateInboundEDocument(EDocument, EDocumentService);
+        EDocument."Document Type" := "E-Document Type"::"Purchase Credit Memo";
+        EDocument.Modify();
+        EDocumentService."Import Process" := "E-Document Import Process"::"Version 2.0";
+        EDocumentService.Modify();
+
+        EDocumentLog.SetBlob('Test', Enum::"E-Doc. File Format"::XML, 'Data');
+        EDocumentLog.SetFields(EDocument, EDocumentService);
+        EDocLogRecord := EDocumentLog.InsertLog(Enum::"E-Document Service Status"::Imported, Enum::"Import E-Doc. Proc. Status"::Readable);
+
+        EDocument."Structured Data Entry No." := EDocLogRecord."E-Doc. Data Storage Entry No.";
+        EDocument.Modify();
+
+        // [GIVEN] A credit memo is created via FinishDraft
+        EDocumentProcessing.ModifyEDocumentProcessingStatus(EDocument, "Import E-Doc. Proc. Status"::"Draft Ready");
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Finish draft";
+        TempEDocImportParameters."Processing Customizations" := "E-Doc. Proc. Customizations"::"Mock Create Purchase Invoice";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParameters);
+
+        PurchaseHeader.SetRange("E-Document Link", EDocument.SystemId);
+        PurchaseHeader.FindFirst();
+        Assert.AreEqual("Purchase Document Type"::"Credit Memo", PurchaseHeader."Document Type", 'The document type should be Credit Memo.');
+
+        // [WHEN] Undo is performed
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Structure received data";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParameters);
+
+        // [THEN] The credit memo is removed
+        Assert.RecordIsEmpty(PurchaseHeader);
+    end;
+
+    [Test]
+    [HandlerFunctions('EditDimensionSetEntriesHandler')]
+    procedure ManuallyAddedDimensionsOnDraftAreCarriedToPurchaseInvoice()
+    var
+        EDocument: Record "E-Document";
+        TempEDocImportParams: Record "E-Doc. Import Parameters";
+        EDocPurchaseLine: Record "E-Document Purchase Line";
+        EDocPurchaseLineReread: Record "E-Document Purchase Line";
+        DimensionValue: Record "Dimension Value";
+        DimSetEntry: Record "Dimension Set Entry";
+        LibraryDimension: Codeunit "Library - Dimension";
+    begin
+        // [SCENARIO] When the user edits dimensions on an e-document draft line via LookupDimensions,
+        // the changes should be persisted to the database.
+        Initialize(Enum::"Service Integration"::"Mock");
+        EDocumentService."Read into Draft Impl." := "E-Doc. Read into Draft"::PEPPOL;
+        EDocumentService.Modify();
+
+        // [GIVEN] An inbound e-document is received and a draft is created
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Prepare draft";
+        Assert.IsTrue(LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-invoice-0.xml', TempEDocImportParams), 'The draft should be created');
+
+        // [GIVEN] A dimension value to add via the Dimensions lookup
+        LibraryDimension.CreateDimWithDimValue(DimensionValue);
+        LibraryVariableStorage.Enqueue(DimensionValue."Dimension Code");
+        LibraryVariableStorage.Enqueue(DimensionValue.Code);
+
+        // [WHEN] LookupDimensions is called on the draft line (simulating the Dimensions page action)
+        EDocPurchaseLine.SetRange("E-Document Entry No.", EDocument."Entry No");
+        EDocPurchaseLine.FindFirst();
+        EDocPurchaseLine.LookupDimensions(); // Opens modal handled by EditDimensionSetEntriesHandler
+
+        // [THEN] The dimension should be persisted on the e-document purchase line when re-read from the database
+        EDocPurchaseLineReread.Get(EDocPurchaseLine."E-Document Entry No.", EDocPurchaseLine."Line No.");
+
+        DimSetEntry.SetRange("Dimension Set ID", EDocPurchaseLineReread."[BC] Dimension Set ID");
+        DimSetEntry.SetRange("Dimension Code", DimensionValue."Dimension Code");
+        DimSetEntry.SetRange("Dimension Value Code", DimensionValue.Code);
+        Assert.RecordIsNotEmpty(DimSetEntry);
+    end;
+
+    [ModalPageHandler]
+    procedure EditDimensionSetEntriesHandler(var EditDimensionSetEntries: TestPage "Edit Dimension Set Entries")
+    var
+        DimensionCode: Code[20];
+        DimensionValueCode: Code[20];
+    begin
+        DimensionCode := CopyStr(LibraryVariableStorage.DequeueText(), 1, 20);
+        DimensionValueCode := CopyStr(LibraryVariableStorage.DequeueText(), 1, 20);
+        EditDimensionSetEntries.New();
+        EditDimensionSetEntries."Dimension Code".SetValue(DimensionCode);
+        EditDimensionSetEntries.DimensionValueCode.SetValue(DimensionValueCode);
+        EditDimensionSetEntries.OK().Invoke();
+    end;
+
+    [Test]
+    procedure ProcessingInboundCreditNoteCreatesCorrectDocumentType()
+    var
+        EDocument: Record "E-Document";
+        TempEDocImportParams: Record "E-Doc. Import Parameters";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        EDocRecordLink: Record "E-Doc. Record Link";
+    begin
+        // [SCENARIO] A PEPPOL CreditNote processed through the full pipeline creates a Purchase Credit Memo with correct content
+        Initialize(Enum::"Service Integration"::"Mock");
+        EDocumentService."Read into Draft Impl." := "E-Doc. Read into Draft"::PEPPOL;
+        EDocumentService.Modify();
+
+        EDocRecordLink.DeleteAll();
+
+        // [GIVEN] An inbound credit note e-document is received and fully processed
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Finish draft";
+        Assert.IsTrue(LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-creditnote-0.xml', TempEDocImportParams), 'The credit note e-document should be processed');
+
+        // [THEN] The E-Document type is Purchase Credit Memo
+        EDocument.Get(EDocument."Entry No");
+        Assert.AreEqual("E-Document Type"::"Purchase Credit Memo", EDocument."Document Type", 'The document type should be Purchase Credit Memo.');
+
+        // [THEN] A Purchase Credit Memo header is created with correct fields
+        PurchaseHeader.Get(EDocument."Document Record ID");
+        Assert.AreEqual("Purchase Document Type"::"Credit Memo", PurchaseHeader."Document Type", 'The purchase header document type should be Credit Memo.');
+        Assert.AreEqual(EDocument.SystemId, PurchaseHeader."E-Document Link", 'The E-Document link should be set on the purchase header.');
+        Assert.AreEqual('CN-5001', PurchaseHeader."Vendor Cr. Memo No.", 'The vendor credit memo number should match the CreditNote ID.');
+        Assert.AreEqual(Vendor."No.", PurchaseHeader."Buy-from Vendor No.", 'The vendor should be resolved from the CreditNote.');
+        Assert.AreEqual(2500, PurchaseHeader."Doc. Amount Incl. VAT", 'The document amount incl. VAT should match the CreditNote total.');
+        Assert.AreEqual('5', PurchaseHeader."Vendor Order No.", 'The Vendor Order No. should match the OrderReference from the CreditNote.');
+
+        // [THEN] The purchase credit memo has the correct number of lines
+        PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
+        PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
+        Assert.RecordCount(PurchaseLine, 1);
+
+        // [THEN] Links are created between e-document and purchase records
+        EDocRecordLink.SetRange("Target Table No.", Database::"Purchase Header");
+        EDocRecordLink.SetRange("Target SystemId", PurchaseHeader.SystemId);
+        Assert.RecordCount(EDocRecordLink, 1);
+    end;
+
+    [Test]
+    procedure ProcessingInboundInvoiceStillCreatesCorrectDocumentType()
+    var
+        EDocument: Record "E-Document";
+        TempEDocImportParams: Record "E-Doc. Import Parameters";
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+    begin
+        // [SCENARIO] After the refactoring, a PEPPOL Invoice still creates a Purchase Invoice with correct content (regression check)
+        Initialize(Enum::"Service Integration"::"Mock");
+        EDocumentService."Read into Draft Impl." := "E-Doc. Read into Draft"::PEPPOL;
+        EDocumentService.Modify();
+
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Finish draft";
+        Assert.IsTrue(LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-invoice-0.xml', TempEDocImportParams), 'The invoice e-document should be processed');
+
+        // [THEN] The E-Document type is Purchase Invoice
+        EDocument.Get(EDocument."Entry No");
+        Assert.AreEqual("E-Document Type"::"Purchase Invoice", EDocument."Document Type", 'The document type should be Purchase Invoice.');
+
+        // [THEN] A Purchase Invoice header is created with correct fields
+        PurchaseHeader.Get(EDocument."Document Record ID");
+        Assert.AreEqual("Purchase Document Type"::Invoice, PurchaseHeader."Document Type", 'The purchase header document type should be Invoice.');
+        Assert.AreEqual('103033', PurchaseHeader."Vendor Invoice No.", 'The vendor invoice number should match the Invoice ID.');
+        Assert.AreEqual('2', PurchaseHeader."Vendor Order No.", 'The vendor order number should match the OrderReference from the Invoice.');
+        Assert.AreEqual(Vendor."No.", PurchaseHeader."Buy-from Vendor No.", 'The vendor should be resolved from the Invoice.');
+        Assert.AreEqual(14140, PurchaseHeader."Doc. Amount Incl. VAT", 'The document amount incl. VAT should match the Invoice total.');
+
+        // [THEN] The purchase invoice has the correct number of lines (2 from peppol-invoice-0.xml)
+        PurchaseLine.SetRange("Document Type", PurchaseHeader."Document Type");
+        PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
+        Assert.RecordCount(PurchaseLine, 2);
+    end;
+
+    #region FinishDraft Sales Order Tests
+
+    [Test]
+    procedure FinishDraftSalesOrder_CreatesSalesOrder()
+    var
+        EDocument: Record "E-Document";
+        TempEDocImportParameters: Record "E-Doc. Import Parameters";
+        SalesHeader: Record "Sales Header";
+    begin
+        // [SCENARIO] A PEPPOL Order XML is imported through the full pipeline with a mock customization. FinishDraft creates a Sales Header with Document Type = Order.
+        Initialize(Enum::"Service Integration"::"Mock");
+
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Finish draft";
+        TempEDocImportParameters."Processing Customizations" := "E-Doc. Proc. Customizations"::"Mock Create Sales Order";
+        Assert.IsTrue(LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-order-standard.xml', TempEDocImportParameters), 'The e-document should be fully processed.');
+        EDocument.Get(EDocument."Entry No");
+
+        // [THEN] The e-document reaches Processed state
+        EDocument.CalcFields("Import Processing Status");
+        Assert.AreEqual(Enum::"Import E-Doc. Proc. Status"::Processed, EDocument."Import Processing Status", 'The status should be Processed after FinishDraft.');
+
+        // [THEN] A Sales Header is linked to the e-document with Document Type = Order
+        SalesHeader.SetRange("E-Document Link", EDocument.SystemId);
+        Assert.IsFalse(SalesHeader.IsEmpty(), 'A Sales Header should be linked to the e-document after FinishDraft.');
+        SalesHeader.FindFirst();
+        Assert.AreEqual("Sales Document Type"::Order, SalesHeader."Document Type", 'The Sales Header Document Type should be Order.');
+    end;
+
+    [Test]
+    procedure FinishDraftSalesOrder_CanBeUndone()
+    var
+        EDocument: Record "E-Document";
+        TempEDocImportParameters: Record "E-Doc. Import Parameters";
+        SalesHeader: Record "Sales Header";
+        EDocImport: Codeunit "E-Doc. Import";
+    begin
+        // [SCENARIO] After a PEPPOL Order XML is imported and a Sales Header created, requesting an earlier step undoes the FinishDraft and clears the Sales Header link.
+        Initialize(Enum::"Service Integration"::"Mock");
+
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Finish draft";
+        TempEDocImportParameters."Processing Customizations" := "E-Doc. Proc. Customizations"::"Mock Create Sales Order";
+        LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-order-standard.xml', TempEDocImportParameters);
+        EDocument.Get(EDocument."Entry No");
+
+        // [GIVEN] FinishDraft has created a Sales Header linked to the e-document
+        SalesHeader.SetRange("E-Document Link", EDocument.SystemId);
+        SalesHeader.FindFirst();
+
+        // [WHEN] An earlier step is requested, causing FinishDraft to be undone
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Structure received data";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParameters);
+
+        // [THEN] The Sales Header is no longer linked to the e-document (E-Document Link cleared)
+        Assert.RecordIsEmpty(SalesHeader);
+    end;
+
+    [Test]
+    procedure FinishDraftSalesOrder_AnyOrderTypeCodeCreatesSalesOrder()
+    var
+        EDocument: Record "E-Document";
+        EDocSalesHeader: Record "E-Document Sales Header";
+        EDocSalesLine: Record "E-Document Sales Line";
+        TempEDocImportParameters: Record "E-Doc. Import Parameters";
+        SalesHeader: Record "Sales Header";
+        Item: Record Item;
+        EDocImport: Codeunit "E-Doc. Import";
+        EDocumentProcessing: Codeunit "E-Document Processing";
+    begin
+        // [SCENARIO] A PEPPOL Order XML with OrderTypeCode=221 is imported. FinishDraft always produces a Sales Order regardless of OrderTypeCode.
+        Initialize(Enum::"Service Integration"::"Mock");
+        WorkDate(DMY2Date(1, 1, 2027));
+
+        // [GIVEN] The XML is parsed into staging records (ReadIntoDraft sets OrderTypeCode = '221' from the XML)
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Read into Draft";
+        LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-order-typecode-221.xml', TempEDocImportParameters);
+        EDocument.Get(EDocument."Entry No");
+
+        // [GIVEN] BC-resolved fields are set (customer + item), simulating what PrepareDraft would do
+        LibraryEDoc.GetGenericItem(Item);
+        EDocSalesHeader.GetFromEDocument(EDocument);
+        EDocSalesHeader."[BC] Customer No." := Customer."No.";
+        EDocSalesHeader.Modify();
+        EDocSalesLine.SetRange("E-Document Entry No.", EDocument."Entry No");
+        if EDocSalesLine.FindSet() then
+            repeat
+                EDocSalesLine."[BC] Sales Line Type" := "Sales Line Type"::Item;
+                EDocSalesLine."[BC] Sales Line No." := Item."No.";
+                EDocSalesLine.Modify();
+            until EDocSalesLine.Next() = 0;
+
+        EDocument."Document Type" := "E-Document Type"::"Sales Order";
+        EDocument.Modify();
+        EDocumentProcessing.ModifyEDocumentProcessingStatus(EDocument, "Import E-Doc. Proc. Status"::"Draft Ready");
+
+        // [WHEN] FinishDraft runs with the real EDocCreateSalesOrder implementation
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Finish draft";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParameters);
+        EDocument.Get(EDocument."Entry No");
+
+        // [THEN] The e-document is Processed and the resulting Sales Header is a Sales Order (OrderTypeCode is ignored)
+        EDocument.CalcFields("Import Processing Status");
+        Assert.AreEqual(Enum::"Import E-Doc. Proc. Status"::Processed, EDocument."Import Processing Status", 'The status should be Processed after FinishDraft regardless of OrderTypeCode.');
+        SalesHeader.Get(EDocument."Document Record ID");
+        Assert.AreEqual("Sales Document Type"::Order, SalesHeader."Document Type", 'OrderTypeCode=221 should produce a Sales Order, not a Blanket Order.');
+    end;
+
+    [Test]
+    procedure FinishDraftSalesOrder_DuplicateOrderError()
+    var
+        EDocument: Record "E-Document";
+        EDocSalesHeader: Record "E-Document Sales Header";
+        EDocSalesLine: Record "E-Document Sales Line";
+        TempEDocImportParameters: Record "E-Doc. Import Parameters";
+        ExistingSalesHeader: Record "Sales Header";
+        Item: Record Item;
+        EDocImport: Codeunit "E-Doc. Import";
+        EDocumentProcessing: Codeunit "E-Document Processing";
+    begin
+        // [SCENARIO] A PEPPOL Order XML is imported. A Sales Order with the same customer and External Document No. already exists. FinishDraft detects the duplicate and logs an error.
+        Initialize(Enum::"Service Integration"::"Mock");
+        WorkDate(DMY2Date(1, 1, 2027));
+
+        // [GIVEN] A Sales Order already exists for the same customer using the Order ID from the XML as its External Document No.
+        // peppol-order-standard.xml has cbc:ID = 'ORD-1001', which maps to EDocSalesHeader."Buyer Order No."
+        ExistingSalesHeader.Init();
+        ExistingSalesHeader."Document Type" := ExistingSalesHeader."Document Type"::Order;
+        ExistingSalesHeader."No." := 'EDOC-DUP-SO-001';
+        ExistingSalesHeader."Sell-to Customer No." := Customer."No.";
+        ExistingSalesHeader."External Document No." := 'ORD-1001';
+        ExistingSalesHeader.Insert();
+
+        // [GIVEN] The XML is parsed into staging records; Buyer Order No. = 'ORD-1001' matches the pre-existing order
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Read into Draft";
+        LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-order-standard.xml', TempEDocImportParameters);
+        EDocument.Get(EDocument."Entry No");
+
+        // [GIVEN] BC-resolved fields are set on the staging records
+        LibraryEDoc.GetGenericItem(Item);
+        EDocSalesHeader.GetFromEDocument(EDocument);
+        EDocSalesHeader."[BC] Customer No." := Customer."No.";
+        EDocSalesHeader.Modify();
+        EDocSalesLine.SetRange("E-Document Entry No.", EDocument."Entry No");
+        if EDocSalesLine.FindSet() then
+            repeat
+                EDocSalesLine."[BC] Sales Line Type" := "Sales Line Type"::Item;
+                EDocSalesLine."[BC] Sales Line No." := Item."No.";
+                EDocSalesLine.Modify();
+            until EDocSalesLine.Next() = 0;
+
+        EDocument."Document Type" := "E-Document Type"::"Sales Order";
+        EDocument.Modify();
+        EDocumentProcessing.ModifyEDocumentProcessingStatus(EDocument, "Import E-Doc. Proc. Status"::"Draft Ready");
+
+        // [WHEN] FinishDraft detects a duplicate — error is captured internally by the "if codeunit.run" pattern
+        TempEDocImportParameters."Step to Run" := "Import E-Document Steps"::"Finish draft";
+        EDocImport.ProcessIncomingEDocument(EDocument, TempEDocImportParameters);
+
+        // [THEN] The e-document is NOT in Processed state
+        EDocument.CalcFields("Import Processing Status");
+        Assert.AreNotEqual(Enum::"Import E-Doc. Proc. Status"::Processed, EDocument."Import Processing Status", 'Duplicate detection should prevent the e-document from reaching Processed state.');
+
+        // [Cleanup]
+        ExistingSalesHeader.Get(ExistingSalesHeader."Document Type"::Order, 'EDOC-DUP-SO-001');
+        ExistingSalesHeader.Delete();
+    end;
+
+    #endregion
+
+    local procedure Initialize(Integration: Enum "Service Integration")
+    var
+        TransformationRule: Record "Transformation Rule";
+        EDocument: Record "E-Document";
+        EDocDataStorage: Record "E-Doc. Data Storage";
+        EDocumentServiceStatus: Record "E-Document Service Status";
+        EDocPurchLineFieldSetup: Record "ED Purchase Line Field Setup";
+        PurchInvHeader: Record "Purch. Inv. Header";
+        VendorLedgerEntry: Record "Vendor Ledger Entry";
+        GLSetup: Record "General Ledger Setup";
+        Currency: Record Currency;
+        LibraryERM: Codeunit "Library - ERM";
+    begin
+        LibraryLowerPermission.SetOutsideO365Scope();
+        LibraryVariableStorage.Clear();
+        Clear(EDocImplState);
+        EDocPurchLineFieldSetup.DeleteAll();
+
+        PurchInvHeader.DeleteAll();
+        VendorLedgerEntry.DeleteAll();
+
+        if IsInitialized then
+            exit;
+
+        GLSetup.GetRecordOnce();
+        GLSetup."VAT Reporting Date Usage" := GLSetup."VAT Reporting Date Usage"::Disabled;
+        GLSetup.Modify();
+
+        // Set a currency that can be used across all localizations
+        Currency.Init();
+        Currency.Validate(Code, 'XYZ');
+        if Currency.Insert(true) then begin
+            LibraryERM.CreateExchangeRate(Currency.Code, Today(), 1.0, 1.0);
+            LibraryERM.CreateExchangeRate(Currency.Code, 20260122D, 1.0, 1.0);
+        end;
+
+        EDocument.DeleteAll();
+        EDocumentServiceStatus.DeleteAll();
+        EDocumentService.DeleteAll();
+        EDocDataStorage.DeleteAll();
+
+        LibraryEDoc.SetupStandardVAT();
+        LibraryEDoc.SetupStandardSalesScenario(Customer, EDocumentService, Enum::"E-Document Format"::Mock, Integration);
+        LibraryEDoc.SetupStandardPurchaseScenario(Vendor, EDocumentService, Enum::"E-Document Format"::Mock, Integration);
+        EDocumentService."Import Process" := "E-Document Import Process"::"Version 2.0";
+        EDocumentService."Read into Draft Impl." := "E-Doc. Read into Draft"::PEPPOL;
+        EDocumentService.Modify();
+
+        TransformationRule.DeleteAll();
+        TransformationRule.CreateDefaultTransformations();
+
+        IsInitialized := true;
+    end;
+
+#pragma warning disable AA0244
+    local procedure CreateItemReference(Vendor: Record Vendor; Item: Record Item) ItemReference: Record "Item Reference"
+#pragma warning restore AA0244
+    begin
+        ItemReference."Item No." := Item."No.";
+        ItemReference."Variant Code" := '';
+        ItemReference."Unit of Measure" := '';
+        ItemReference."Reference Type" := "Item Reference Type"::Vendor;
+        ItemReference."Reference Type No." := Vendor."No.";
+        ItemReference."Reference No." := 'TESTITMREFNO';
+        ItemReference.Insert();
+    end;
+
+    local procedure CreateVendorWithTaxId(var NewVendor: Record Vendor; VatRegistrationNo: Code[20])
+    var
+        CompanyInformation: Record "Company Information";
+    begin
+        LibraryPurchase.CreateVendor(NewVendor);
+        CompanyInformation.GetRecordOnce();
+        NewVendor."Country/Region Code" := CompanyInformation."Country/Region Code";
+        NewVendor."VAT Registration No." := VatRegistrationNo;
+        NewVendor.Modify();
+    end;
+
+    [Test]
+    procedure NewServiceDefaultsToImportProcessV2()
+    var
+        EDocumentService: Record "E-Document Service";
+    begin
+        // [WHEN] A new E-Document Service record is initialized
+        EDocumentService.Init();
+        // [THEN] Import Process defaults to Version 2.0
+        Assert.AreEqual(
+            EDocumentService."Import Process"::"Version 2.0", EDocumentService."Import Process",
+            'New services must default to the v2 draft pipeline.');
+    end;
+
+    [Test]
+    procedure DraftFormatSelectableForImportProcessV2()
+    var
+        EDocService: Record "E-Document Service";
+        EDocServicePage: TestPage "E-Document Service";
+    begin
+        // [FEATURE] [E-Document] [Import]
+        // [SCENARIO] The draft format ("Read into Draft Impl.") is selectable on the service card for Version 2.0 services
+        if EDocService.Get('V2DRAFTFMT') then
+            EDocService.Delete();
+
+        // [GIVEN] An E-Document Service using import process Version 2.0
+        EDocService.Init();
+        EDocService.Code := 'V2DRAFTFMT';
+        EDocService."Import Process" := EDocService."Import Process"::"Version 2.0";
+        EDocService.Insert();
+
+        // [WHEN] Opening the service card and selecting a draft format
+        EDocServicePage.OpenEdit();
+        EDocServicePage.GoToRecord(EDocService);
+        // [THEN] The draft format field is available so the user can tell v2 how to read the incoming document
+        Assert.IsTrue(EDocServicePage."Read into Draft Impl.".Editable(), 'Draft Format must be editable for Version 2.0 services.');
+        EDocServicePage."Read into Draft Impl.".SetValue(Enum::"E-Doc. Read into Draft"::PEPPOL);
+        EDocServicePage.Close();
+
+        // [THEN] The selected format is persisted on the service
+        EDocService.Find();
+        Assert.AreEqual(
+            Enum::"E-Doc. Read into Draft"::PEPPOL, EDocService."Read into Draft Impl.",
+            'The selected draft format must be stored on the service.');
+    end;
+
+}

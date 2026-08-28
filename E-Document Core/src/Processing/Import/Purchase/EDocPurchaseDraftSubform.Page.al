@@ -1,0 +1,700 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+namespace Microsoft.eServices.EDocument.Processing.Import.Purchase;
+
+using Microsoft.Bank.Reconciliation;
+using Microsoft.eServices.EDocument;
+using Microsoft.eServices.EDocument.Processing.Import;
+using Microsoft.Finance.Deferral;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Inventory.Item;
+using Microsoft.Inventory.Item.Catalog;
+using Microsoft.Purchases.Document;
+using Microsoft.Purchases.History;
+using Microsoft.Purchases.Setup;
+using System.Config;
+
+page 6183 "E-Doc. Purchase Draft Subform"
+{
+
+    AutoSplitKey = true;
+    Caption = 'Lines';
+    InsertAllowed = true;
+    LinksAllowed = false;
+    DeleteAllowed = true;
+    ModifyAllowed = true;
+    PageType = ListPart;
+    SourceTable = "E-Document Purchase Line";
+
+    layout
+    {
+        area(Content)
+        {
+            repeater(DocumentLines)
+            {
+                field(Description; Rec.Description)
+                {
+                    ApplicationArea = All;
+                    Editable = true;
+                }
+                field(OrderMatched; OrderMatchedCaption)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Order line match';
+                    Editable = false;
+                    Visible = IsEDocumentMatchedToAnyPOLine;
+                    ToolTip = 'Specifies whether this line is matched to a purchase order line.';
+
+                    trigger OnDrillDown()
+                    begin
+                        OpenMatchedPurchaseOrder(Rec);
+                    end;
+                }
+                field(MatchWarnings; MatchWarningsCaption)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Order match warnings';
+                    Editable = false;
+                    Visible = HasEDocumentOrderMatchWarnings;
+                    StyleExpr = MatchWarningsStyleExpr;
+                    ToolTip = 'Specifies any warnings related to matching this line to a purchase order line.';
+
+                    trigger OnDrillDown()
+                    begin
+                        ShowMatchWarningDetails();
+                    end;
+                }
+                field("Line Type"; Rec."[BC] Purchase Line Type")
+                {
+                    ApplicationArea = All;
+                }
+                field("No."; Rec."[BC] Purchase Type No.")
+                {
+                    ApplicationArea = All;
+                    Lookup = true;
+                    ShowMandatory = true;
+                }
+                field("Name"; MatchedEntityName)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Name';
+                    ToolTip = 'Specifies the name of the matched item, G/L account, or other entity for this line. This value is read-only and reflects the matched record, not the extracted invoice description.';
+                    Editable = false;
+                    Visible = false;
+                }
+                field("VAT Prod. Posting Group"; Rec."[BC] VAT Prod. Posting Group")
+                {
+                    ApplicationArea = All;
+                    Lookup = true;
+                    Visible = VATProdPostGroupIsVisible;
+                }
+                field("Item Reference No."; Rec."[BC] Item Reference No.")
+                {
+                    ApplicationArea = All;
+                    Lookup = true;
+                    Visible = false;
+                }
+                field("Unit Of Measure"; Rec."[BC] Unit of Measure")
+                {
+                    ApplicationArea = All;
+                    Lookup = true;
+                }
+                field("Variant Code"; Rec."[BC] Variant Code")
+                {
+                    ApplicationArea = All;
+                    Lookup = true;
+                }
+                field(Quantity; Rec.Quantity)
+                {
+                    ApplicationArea = All;
+                    Editable = true;
+
+                    trigger OnValidate()
+                    begin
+                        UpdateCalculatedAmounts(true);
+                    end;
+                }
+                field("Direct Unit Cost"; Rec."Unit Price")
+                {
+                    ApplicationArea = All;
+                    Editable = true;
+                    trigger OnValidate()
+                    begin
+                        UpdateCalculatedAmounts(true);
+                    end;
+                }
+                field("Total Discount"; Rec."Total Discount")
+                {
+                    Caption = 'Line Discount';
+                    ApplicationArea = All;
+                    Editable = true;
+                    trigger OnValidate()
+                    begin
+                        UpdateCalculatedAmounts(true);
+                    end;
+                }
+                field("Line Amount"; LineAmount)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Line Amount';
+                    ToolTip = 'Specifies the line amount.';
+                    Editable = false;
+                    AutoFormatType = 1;
+                    AutoFormatExpression = Rec."Currency Code";
+                }
+                field("Deferral Code"; Rec."[BC] Deferral Code")
+                {
+                    ApplicationArea = All;
+                }
+                field("Shortcut Dimension 1 Code"; Rec."[BC] Shortcut Dimension 1 Code")
+                {
+                    ApplicationArea = Dimensions;
+                    Visible = DimVisible1;
+                }
+                field("Shortcut Dimension 2 Code"; Rec."[BC] Shortcut Dimension 2 Code")
+                {
+                    ApplicationArea = Dimensions;
+                    Visible = DimVisible2;
+                }
+                field(AdditionalColumns; AdditionalColumns)
+                {
+                    ApplicationArea = All;
+                    Caption = 'Additional columns';
+                    ToolTip = 'Specifies the additional columns considered.';
+                    Editable = false;
+                    Visible = HasAdditionalColumns;
+                    trigger OnDrillDown()
+                    begin
+                        Page.RunModal(Page::"E-Doc Line Values.", Rec);
+                    end;
+                }
+            }
+        }
+    }
+    actions
+    {
+        area(Processing)
+        {
+            action(History)
+            {
+                ApplicationArea = All;
+                Caption = 'Values from history';
+                Image = History;
+                ToolTip = 'The values for this line were retrieved from previously posted invoices. Open the invoice to see the values.';
+                Visible = Rec."E-Doc. Purch. Line History Id" <> 0;
+                trigger OnAction()
+                begin
+                    if not EDocPurchaseHistMapping.OpenPageWithHistoricMatch(Rec) then
+                        Error(HistoryCantBeRetrievedErr);
+                end;
+            }
+            group("&Line")
+            {
+                Caption = '&Line';
+                Image = Line;
+                group("Order Matching")
+                {
+                    Caption = 'Order matching';
+                    action(MatchToOrderLine)
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Match to order line';
+                        Image = LinkWithExisting;
+                        ToolTip = 'Match this incoming invoice line to a purchase order line.';
+                        Scope = Repeater;
+
+                        trigger OnAction()
+                        var
+                            TempSelectedPOLines: Record "Purchase Line" temporary;
+                            EDocPOMatching: Codeunit "E-Doc. PO Matching";
+                            EDocSelectPOLinesPage: Page "E-Doc. Select PO Lines";
+                        begin
+                            EDocSelectPOLinesPage.SetEDocumentPurchaseLine(Rec);
+                            EDocSelectPOLinesPage.LookupMode := true;
+                            if EDocSelectPOLinesPage.RunModal() <> Action::LookupOK then
+                                exit;
+                            EDocSelectPOLinesPage.GetSelectedPOLines(TempSelectedPOLines);
+                            EDocPOMatching.MatchPOLinesToEDocumentLine(TempSelectedPOLines, Rec);
+                            CurrPage.Update();
+                        end;
+                    }
+                    action(SpecifyReceiptLines)
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Specify receipt line';
+                        Image = ReceiptLines;
+                        ToolTip = 'Specify the corresponding receipt line to the matched order line.';
+                        Scope = Repeater;
+                        Enabled = IsLineMatchedToOrderLine;
+
+                        trigger OnAction()
+                        var
+                            TempSelectedReceiptLines: Record "Purch. Rcpt. Line" temporary;
+                            EDocPOMatching: Codeunit "E-Doc. PO Matching";
+                            EDocSelectReceiptLinesPage: Page "E-Doc. Select Receipt Lines";
+                        begin
+                            EDocSelectReceiptLinesPage.SetEDocumentPurchaseLine(Rec);
+                            EDocSelectReceiptLinesPage.LookupMode := true;
+                            if EDocSelectReceiptLinesPage.RunModal() <> Action::LookupOK then
+                                exit;
+                            EDocSelectReceiptLinesPage.GetSelectedReceiptLines(TempSelectedReceiptLines);
+                            EDocPOMatching.MatchReceiptLinesToEDocumentLine(TempSelectedReceiptLines, Rec);
+                            CurrPage.Update();
+                        end;
+                    }
+                    action(OpenMatchedOrder)
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Open matched order';
+                        Image = ViewOrder;
+                        ToolTip = 'Opens the matched purchase order.';
+                        Scope = Repeater;
+                        Enabled = IsLineMatchedToOrderLine;
+
+                        trigger OnAction()
+                        begin
+                            OpenMatchedPurchaseOrder(Rec);
+                        end;
+                    }
+                    action(OpenMatchedReceipt)
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Open matched receipt';
+                        Image = PostedReceipt;
+                        ToolTip = 'Opens the matched purchase receipt.';
+                        Scope = Repeater;
+                        Enabled = IsLineMatchedToReceiptLine;
+
+                        trigger OnAction()
+                        var
+                            TempPostedReceipts: Record "Purch. Rcpt. Header" temporary;
+                            EDocPOMatching: Codeunit "E-Doc. PO Matching";
+                            CountReceipts: Integer;
+                        begin
+                            EDocPOMatching.LoadReceiptsMatchedToEDocumentLine(Rec, TempPostedReceipts);
+                            CountReceipts := TempPostedReceipts.Count();
+                            if CountReceipts = 0 then
+                                exit;
+                            if CountReceipts = 1 then begin
+                                TempPostedReceipts.FindFirst();
+                                Page.Run(Page::"Posted Purchase Receipt", TempPostedReceipts);
+                                exit;
+                            end;
+                            Page.Run(Page::"Posted Purchase Receipts", TempPostedReceipts);
+                        end;
+                    }
+                    action(RemoveMatch)
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Remove match';
+                        Image = CancelAllLines;
+                        ToolTip = 'Removes any matches between this invoice line and purchase order or receipt lines.';
+                        Scope = Repeater;
+                        Enabled = IsLineMatchedToOrderLine or IsLineMatchedToReceiptLine;
+
+                        trigger OnAction()
+                        var
+                            EDocPOMatching: Codeunit "E-Doc. PO Matching";
+                        begin
+                            EDocPOMatching.RemoveAllMatchesForEDocumentLine(Rec);
+                            CurrPage.Update();
+                        end;
+                    }
+                }
+                group("Related Information")
+                {
+                    Caption = 'Related Information';
+                    action(Dimensions)
+                    {
+                        AccessByPermission = TableData Dimension = R;
+                        ApplicationArea = Dimensions;
+                        Caption = 'Dimensions';
+                        Image = Dimensions;
+                        ShortCutKey = 'Alt+D';
+                        ToolTip = 'View or edit dimensions, such as area, project, or department, that you can assign to sales and purchase documents to distribute costs and analyze transaction history.';
+
+                        trigger OnAction()
+                        begin
+                            Rec.LookupDimensions();
+                        end;
+                    }
+                    action(LookupItemReferences)
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Item References';
+                        ToolTip = 'View item references for the vendor associated with this e-document.';
+                        Image = Change;
+                        Scope = Repeater;
+
+                        trigger OnAction()
+                        var
+                            ItemReference: Record "Item Reference";
+                            ItemReferencePage: Page "Item Reference Entries";
+                        begin
+                            EnsureEDocumentPurchaseHeader();
+                            EDocumentPurchaseHeader.TestField("[BC] Vendor No.");
+                            ItemReference.SetRange("Reference Type", ItemReference."Reference Type"::Vendor);
+                            ItemReference.SetRange("Reference Type No.", EDocumentPurchaseHeader."[BC] Vendor No.");
+                            ItemReferencePage.SetTableView(ItemReference);
+                            ItemReferencePage.Run();
+                        end;
+                    }
+                    action(OpenTextToAccountMappings)
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Text-to-Account Mappings';
+                        ToolTip = 'Opens the Text-to-Account Mapping filtered for the current vendor.';
+                        Image = MapAccounts;
+                        Scope = Repeater;
+                        Visible = AgentDrivenLineMatchingEnabled;
+
+                        trigger OnAction()
+                        var
+                            TextToAccountMapping: Record "Text-to-Account Mapping";
+                        begin
+                            EnsureEDocumentPurchaseHeader();
+                            EDocumentPurchaseHeader.TestField("[BC] Vendor No.");
+                            TextToAccountMapping.SetFilter("Vendor No.", '%1|%2', '', EDocumentPurchaseHeader."[BC] Vendor No.");
+                            Page.Run(Page::"Text-to-Account Mapping", TextToAccountMapping);
+                        end;
+                    }
+                    action(OpenHistoricalPurchaseLines)
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Historical Purchase Lines';
+                        ToolTip = 'Opens historical purchase invoice lines to help match this draft line based on past invoices.';
+                        Image = History;
+                        Scope = Repeater;
+                        Visible = AgentDrivenLineMatchingEnabled;
+
+                        trigger OnAction()
+                        var
+                            TempPurchInvLine: Record "Purch. Inv. Line" temporary;
+                            EDocHistLineDataLoader: Codeunit "E-Doc. Hist. Line Data Loader";
+                            EDocHistoricalLinesList: Page "E-Doc. Historical Lines List";
+                        begin
+                            EnsureEDocumentPurchaseHeader();
+                            EDocumentPurchaseHeader.TestField("[BC] Vendor No.");
+                            EDocHistLineDataLoader.LoadHistoricalLines(TempPurchInvLine, EDocumentPurchaseHeader."[BC] Vendor No.", Rec."Product Code", Rec.Description);
+                            EDocHistoricalLinesList.SetRecords(TempPurchInvLine);
+                            EDocHistoricalLinesList.Run();
+                        end;
+                    }
+                    action(OpenChartOfAccounts)
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Chart of Accounts';
+                        ToolTip = 'Opens the Chart of Accounts to look up G/L accounts for this line.';
+                        Image = ChartOfAccounts;
+                        Scope = Repeater;
+                        Visible = AgentDrivenLineMatchingEnabled;
+
+                        trigger OnAction()
+                        begin
+                            Page.Run(Page::"Chart of Accounts");
+                        end;
+                    }
+                    action(OpenItems)
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Items';
+                        ToolTip = 'Opens the item list to look up items for this line.';
+                        Image = Item;
+                        Scope = Repeater;
+                        Visible = AgentDrivenLineMatchingEnabled;
+
+                        trigger OnAction()
+                        var
+                            Item: Record Item;
+                        begin
+                            Item.SetRange(Blocked, false);
+                            Page.Run(Page::"Item List", Item);
+                        end;
+                    }
+                    action(OpenDeferralTemplates)
+                    {
+                        ApplicationArea = All;
+                        Caption = 'Deferral Templates';
+                        ToolTip = 'Opens the list of deferral templates for assigning deferrals to this line.';
+                        Image = CalculateCalendar;
+                        Scope = Repeater;
+                        Visible = AgentDrivenLineMatchingEnabled;
+
+                        trigger OnAction()
+                        begin
+                            Page.Run(Page::"Deferral Template List");
+                        end;
+                    }
+                }
+            }
+        }
+    }
+
+    var
+        EDocumentPurchaseHeader: Record "E-Document Purchase Header";
+        EDocumentPurchaseLine: Record "E-Document Purchase Line";
+        TempEDocumentPOMatchWarnings: Record "E-Doc PO Match Warning";
+        EDocPurchaseHistMapping: Codeunit "E-Doc. Purchase Hist. Mapping";
+        EDocPOMatching: Codeunit "E-Doc. PO Matching";
+        EDocumentNotification: Codeunit "E-Document Notification";
+        AdditionalColumns, OrderMatchedCaption, MatchWarningsCaption, MatchWarningsStyleExpr, MatchedEntityName : Text;
+        LineAmount: Decimal;
+        DimVisible1, DimVisible2, HasAdditionalColumns, IsEDocumentMatchedToAnyPOLine, IsLineMatchedToOrderLine, IsLineMatchedToReceiptLine, HasEDocumentOrderMatchWarnings, VATProdPostGroupIsVisible : Boolean;
+        AgentDrivenLineMatchingEnabled: Boolean;
+        HistoryCantBeRetrievedErr: Label 'The purchase invoice that matched historically with this line can''t be opened.';
+        EDocumentPurchaseHeaderNotFoundErr: Label 'The purchase header for this e-document could not be found.';
+        AgentDrivenLineMatchingTok: Label 'PAAgentDrivenLineMatching', Locked = true;
+        AgentDrivenTreatmentTok: Label 'agent_driven', Locked = true;
+
+    trigger OnOpenPage()
+    begin
+        SetDimensionsVisibility();
+        UpdatePOMatching();
+        SetAgentDrivenLineMatchingVisibility();
+    end;
+
+    trigger OnNewRecord(BelowxRec: Boolean)
+    begin
+        Clear(LineAmount);
+    end;
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        UpdatePOMatching();
+        SetVATProductPostingGroupVisibility();
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        // Reuse the row already loaded into Rec instead of re-reading it from the database on every displayed line.
+        EDocumentPurchaseLine := Rec;
+        AdditionalColumns := Rec.AdditionalColumnsDisplayText();
+        MatchedEntityName := Rec.GetMatchedEntityName();
+        SetHasAdditionalColumns();
+        UpdateCalculatedAmounts(false);
+        IsLineMatchedToOrderLine := EDocPOMatching.IsEDocumentLineMatchedToAnyPOLine(EDocumentPurchaseLine);
+        IsLineMatchedToReceiptLine := EDocPOMatching.IsEDocumentLineMatchedToAnyReceiptLine(EDocumentPurchaseLine);
+        OrderMatchedCaption := IsLineMatchedToOrderLine ? GetSummaryOfMatchedOrders() : '';
+        UpdateMatchWarnings();
+        SetVATProductPostingGroupVisibility();
+    end;
+
+    trigger OnDeleteRecord(): Boolean
+    begin
+        EDocumentNotification.RefreshAndShowSubTotalMismatchAfterLineDeletion(Rec);
+        exit(true);
+    end;
+
+    internal procedure SetEDocumentPurchaseHeader(EDocPurchHeader: Record "E-Document Purchase Header")
+    begin
+        EDocumentPurchaseHeader := EDocPurchHeader;
+    end;
+
+    local procedure EnsureEDocumentPurchaseHeader()
+    begin
+        if not EDocumentPurchaseHeader.Get(Rec."E-Document Entry No.") then
+            Error(EDocumentPurchaseHeaderNotFoundErr);
+    end;
+
+    local procedure SetAgentDrivenLineMatchingVisibility()
+    var
+        FeatureConfiguration: Codeunit "Feature Configuration";
+    begin
+        AgentDrivenLineMatchingEnabled := FeatureConfiguration.GetConfiguration(AgentDrivenLineMatchingTok) = AgentDrivenTreatmentTok;
+    end;
+
+    local procedure SetDimensionsVisibility()
+    var
+        DimMgt: Codeunit DimensionManagement;
+        DimOther: Boolean;
+    begin
+        DimVisible1 := false;
+        DimVisible2 := false;
+
+        DimMgt.UseShortcutDims(
+          DimVisible1, DimVisible2, DimOther, DimOther, DimOther, DimOther, DimOther, DimOther);
+    end;
+
+    local procedure SetVATProductPostingGroupVisibility()
+    var
+        PurchSetup: Record "Purchases & Payables Setup";
+    begin
+        PurchSetup.Get();
+        VATProdPostGroupIsVisible := PurchSetup."Resolve VAT Group Purch EDoc";
+    end;
+
+    local procedure UpdateCalculatedAmounts(UserModifiedAmount: Boolean)
+    var
+        LineSubtotal: Decimal;
+        DiscountExceedsSubtotalErr: Label 'Discount should not exceed the subtotal of the line';
+    begin
+        LineSubtotal := Rec.Quantity * Rec."Unit Price";
+        LineAmount := LineSubtotal - Rec."Total Discount";
+        if LineSubtotal = 0 then begin
+            if Rec."Total Discount" > 0 then
+                Error(DiscountExceedsSubtotalErr)
+        end
+        else
+            if Rec."Total Discount" / LineSubtotal > 1 then
+                Error(DiscountExceedsSubtotalErr);
+        if not UserModifiedAmount then
+            exit;
+        EDocumentNotification.RefreshAndShowSubTotalMismatchAfterLineEdit(Rec);
+    end;
+
+    local procedure SetHasAdditionalColumns()
+    var
+        EDocPurchLineFieldSetup: Record "ED Purchase Line Field Setup";
+    begin
+        if EDocPurchLineFieldSetup.IsEmpty() then begin
+            HasAdditionalColumns := false;
+            exit;
+        end;
+
+        if EDocumentPurchaseHeader."[BC] Vendor No." = '' then begin
+            HasAdditionalColumns := false;
+            exit;
+        end;
+
+        if Rec."E-Doc. Purch. Line History Id" = 0 then begin
+            HasAdditionalColumns := false;
+            exit;
+        end;
+
+        HasAdditionalColumns := true;
+    end;
+
+    local procedure OpenMatchedPurchaseOrder(SelectedEDocumentPurchaseLine: Record "E-Document Purchase Line")
+    var
+        TempPurchaseOrders: Record "Purchase Header" temporary;
+        PurchaseOrder: Record "Purchase Header";
+        CountPOs: Integer;
+    begin
+        EDocPOMatching.LoadPOsMatchedToEDocumentLine(SelectedEDocumentPurchaseLine, TempPurchaseOrders);
+        CountPOs := TempPurchaseOrders.Count();
+        if CountPOs = 0 then
+            exit;
+        if CountPOs = 1 then begin
+            TempPurchaseOrders.FindFirst();
+            PurchaseOrder.Get(TempPurchaseOrders."Document Type", TempPurchaseOrders."No.");
+            Page.Run(Page::"Purchase Order", PurchaseOrder);
+            exit;
+        end;
+        Page.Run(Page::"Purchase Orders", TempPurchaseOrders);
+    end;
+
+    local procedure UpdatePOMatching()
+    begin
+        IsEDocumentMatchedToAnyPOLine := EDocPOMatching.IsEDocumentMatchedToAnyPOLine(EDocumentPurchaseHeader);
+        EDocPOMatching.CalculatePOMatchWarnings(EDocumentPurchaseHeader, TempEDocumentPOMatchWarnings);
+        HasEDocumentOrderMatchWarnings := not TempEDocumentPOMatchWarnings.IsEmpty();
+    end;
+
+    local procedure GetSummaryOfMatchedOrders(): Text
+    var
+        TempLinkedPurchaseLines: Record "Purchase Line" temporary;
+        MatchedPO: Code[20];
+        MatchedToSingleOrderLbl: Label '%1 - %2', Comment = '%1 - Document No., %2 - Description';
+        MatchedToSingleOrderMultipleLinesLbl: Label '%1 (multiple)', Comment = '%1 - Document No.';
+        MatchedToMultipleOrdersLbl: Label '%1, %2, ...', Comment = '%1 - First Document No., %2 - Second Document No.';
+    begin
+        EDocPOMatching.LoadPOLinesMatchedToEDocumentLine(EDocumentPurchaseLine, TempLinkedPurchaseLines);
+        if not TempLinkedPurchaseLines.FindFirst() then
+            exit('');
+
+        if TempLinkedPurchaseLines.Count() = 1 then
+            exit(StrSubstNo(MatchedToSingleOrderLbl, TempLinkedPurchaseLines."Document No.", TempLinkedPurchaseLines.Description));
+
+        MatchedPO := TempLinkedPurchaseLines."Document No.";
+        TempLinkedPurchaseLines.SetFilter("Document No.", '<>%1', MatchedPO);
+
+        if TempLinkedPurchaseLines.FindFirst() then
+            exit(StrSubstNo(MatchedToMultipleOrdersLbl, MatchedPO, TempLinkedPurchaseLines."Document No."));
+
+        exit(StrSubstNo(MatchedToSingleOrderMultipleLinesLbl, MatchedPO));
+    end;
+
+    local procedure UpdateMatchWarnings()
+    var
+        MissingInfoLbl: Label 'Unit of measure information is missing';
+        ExceedsInvoiceableQtyLbl: Label 'Exceeds quantity received';
+        ExceedsRemainingToInvoiceLbl: Label 'Exceeds remaining to invoice';
+        OverReceiptLbl: Label 'Over-receipt';
+        NoWarningsLbl: Label 'No warnings';
+        MultipleWarningsLbl: Label 'Multiple warnings';
+        MostSevereStyle: Text;
+        SeverityLevel: Integer;
+        CurrentSeverity: Integer;
+    begin
+        MatchWarningsCaption := NoWarningsLbl;
+        MatchWarningsStyleExpr := 'None';
+
+        TempEDocumentPOMatchWarnings.SetRange("E-Doc. Purchase Line SystemId", Rec.SystemId);
+
+        // Severity: Unfavorable (critical) > Ambiguous (warning) > Subordinate (info)
+        SeverityLevel := 0;
+        if TempEDocumentPOMatchWarnings.FindSet() then
+            repeat
+                case TempEDocumentPOMatchWarnings."Warning Type" of
+                    Enum::"E-Doc PO Match Warning"::ExceedsInvoiceableQty:
+                        begin
+                            CurrentSeverity := 3;
+                            MatchWarningsCaption := ExceedsInvoiceableQtyLbl;
+                            MostSevereStyle := 'Unfavorable';
+                        end;
+                    Enum::"E-Doc PO Match Warning"::MissingInformationForMatch:
+                        begin
+                            CurrentSeverity := 3;
+                            MatchWarningsCaption := MissingInfoLbl;
+                            MostSevereStyle := 'Unfavorable';
+                        end;
+                    Enum::"E-Doc PO Match Warning"::ExceedsRemainingToInvoice:
+                        begin
+                            CurrentSeverity := 2;
+                            MatchWarningsCaption := ExceedsRemainingToInvoiceLbl;
+                            MostSevereStyle := 'Ambiguous';
+                        end;
+                    Enum::"E-Doc PO Match Warning"::OverReceipt:
+                        begin
+                            CurrentSeverity := 1;
+                            MatchWarningsCaption := OverReceiptLbl;
+                            MostSevereStyle := 'Subordinate';
+                        end;
+                end;
+                if CurrentSeverity > SeverityLevel then begin
+                    SeverityLevel := CurrentSeverity;
+                    MatchWarningsStyleExpr := MostSevereStyle;
+                end;
+            until TempEDocumentPOMatchWarnings.Next() = 0;
+
+        if TempEDocumentPOMatchWarnings.Count() > 1 then
+            MatchWarningsCaption := MultipleWarningsLbl;
+    end;
+
+    local procedure ShowMatchWarningDetails()
+    var
+        WarningDetails: TextBuilder;
+        MissingInfoDetailLbl: Label 'Quantity information for this line is missing to complete the match. Verify that the draft line has a unit of measure assigned for this item.';
+    begin
+        TempEDocumentPOMatchWarnings.SetRange("E-Doc. Purchase Line SystemId", Rec.SystemId);
+        if not TempEDocumentPOMatchWarnings.FindSet() then
+            exit;
+
+        repeat
+            case TempEDocumentPOMatchWarnings."Warning Type" of
+                Enum::"E-Doc PO Match Warning"::MissingInformationForMatch:
+                    WarningDetails.AppendLine('• ' + MissingInfoDetailLbl);
+                Enum::"E-Doc PO Match Warning"::ExceedsInvoiceableQty,
+                Enum::"E-Doc PO Match Warning"::ExceedsRemainingToInvoice,
+                Enum::"E-Doc PO Match Warning"::OverReceipt:
+                    WarningDetails.AppendLine('• ' + TempEDocumentPOMatchWarnings."Warning Message");
+            end;
+        until TempEDocumentPOMatchWarnings.Next() = 0;
+
+        if WarningDetails.Length() > 0 then
+            Message(WarningDetails.ToText());
+    end;
+}

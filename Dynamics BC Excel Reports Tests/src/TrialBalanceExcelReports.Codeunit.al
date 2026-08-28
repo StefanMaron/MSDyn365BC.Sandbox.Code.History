@@ -1,0 +1,1049 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved. 
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Finance.ExcelReports.Test;
+
+using Microsoft.Finance.Consolidation;
+using Microsoft.Finance.Dimension;
+using Microsoft.Finance.ExcelReports;
+using Microsoft.Finance.GeneralLedger.Account;
+using Microsoft.Finance.GeneralLedger.Budget;
+using Microsoft.Finance.GeneralLedger.Ledger;
+
+codeunit 139544 "Trial Balance Excel Reports"
+{
+    Subtype = Test;
+    RequiredTestIsolation = Disabled;
+    TestPermissions = Disabled;
+    EventSubscriberInstance = Manual;
+
+    var
+        LibraryERM: Codeunit "Library - ERM";
+        LibraryReportDataset: Codeunit "Library - Report Dataset";
+        Assert: Codeunit Assert;
+
+    [Test]
+    [HandlerFunctions('EXRTrialBalanceExcelHandler')]
+    procedure TrialBalanceExportsAsManyItemsAsGLAccounts()
+    var
+        Variant: Variant;
+        RequestPageXml: Text;
+    begin
+        // [SCENARIO] An empty report should export all GL Accounts regardless
+        // [GIVEN] An empty trial balance
+        Initialize();
+        // [GIVEN] 5 G/L Accounts
+        CreateSampleGLAccounts(5);
+        Commit();
+        // [WHEN] Running the report
+        RequestPageXml := Report.RunRequestPage(Report::"EXR Trial Balance Excel", RequestPageXml);
+        LibraryReportDataset.RunReportAndLoad(Report::"EXR Trial Balance Excel", Variant, RequestPageXml);
+        // [THEN] 5 rows of type GLAccount should be exported
+        Assert.AreEqual(5, LibraryReportDataset.RowCount(), 'Only the GLAccounts should be exported');
+        LibraryReportDataset.SetXmlNodeList('DataItem[@name="GLAccounts"]');
+        Assert.AreEqual(5, LibraryReportDataset.RowCount(), 'The exported items should be GLAccounts');
+    end;
+
+    [Test]
+    [HandlerFunctions('EXRTrialBalanceHideNoActivityHandler')]
+    procedure TrialBalanceHidesZeroActivityAccounts()
+    var
+        GLAccount: Record "G/L Account";
+        Variant: Variant;
+        RequestPageXml: Text;
+        ActiveAccountNo: Code[20];
+    begin
+        // [SCENARIO] With Hide Accounts with No Activity enabled, only accounts with activity are exported
+        // [GIVEN] 5 G/L Accounts, only 1 with activity
+        Initialize();
+        CreateSampleGLAccounts(5, GLAccount);
+        ActiveAccountNo := GLAccount."No.";
+        CreateGLEntryWithAmount(ActiveAccountNo, '', '', '', WorkDate(), 100);
+        Commit();
+        // [WHEN] Running the report with Hide Accounts with No Activity enabled
+        RequestPageXml := Report.RunRequestPage(Report::"EXR Trial Balance Excel", RequestPageXml);
+        LibraryReportDataset.RunReportAndLoad(Report::"EXR Trial Balance Excel", Variant, RequestPageXml);
+        // [THEN] Only the active account should be exported
+        LibraryReportDataset.SetXmlNodeList('DataItem[@name="GLAccounts"]');
+        Assert.AreEqual(1, LibraryReportDataset.RowCount(), 'Only the account with activity should be exported');
+        LibraryReportDataset.GetNextRow();
+        LibraryReportDataset.FindCurrentRowValue('AccountNumber', Variant);
+        Assert.AreEqual(ActiveAccountNo, Format(Variant), 'The exported account should be the one with activity');
+    end;
+
+    [Test]
+    [HandlerFunctions('EXRTrialBalanceBudgetExcelHandler')]
+    procedure TrialBalanceBudgetExportsAsManyItemsAsGLAccounts()
+    var
+        Variant: Variant;
+        RequestPageXml: Text;
+    begin
+        // [SCENARIO] An empty report should export all GL Accounts regardless
+        // [GIVEN] An empty trial balance
+        Initialize();
+        // [GIVEN] 7 G/L Accounts
+        CreateSampleGLAccounts(7);
+        Commit();
+        // [WHEN] Running the report
+        RequestPageXml := Report.RunRequestPage(Report::"EXR Trial BalanceBudgetExcel", RequestPageXml);
+        LibraryReportDataset.RunReportAndLoad(Report::"EXR Trial BalanceBudgetExcel", Variant, RequestPageXml);
+        // [THEN] 7 rows of type GLAccount should be exported
+        Assert.AreEqual(7, LibraryReportDataset.RowCount(), 'Only the GLAccounts should be exported');
+        LibraryReportDataset.SetXmlNodeList('DataItem[@name="GLAccounts"]');
+        Assert.AreEqual(7, LibraryReportDataset.RowCount(), 'The exported items should be GLAccounts');
+    end;
+
+
+    [Test]
+    [HandlerFunctions('EXRConsolidatedTrialBalanceHandler')]
+    procedure ConsolidatedTrialBalanceExportsAsManyItemsAsGLAccountsAndBusinessUnits()
+    var
+        Variant: Variant;
+        RequestPageXml: Text;
+    begin
+        // [SCENARIO] An empty Consolidation report should export all GL Accounts regardless and all Business Units
+        // [GIVEN] An empty trial balance
+        Initialize();
+        // [GIVEN] 9 G/L Accounts
+        CreateSampleGLAccounts(9);
+        // [GIVEN] 3 Business units
+        CreateSampleBusinessUnits(3);
+        Commit();
+        // [WHEN] Running the report
+        RequestPageXml := Report.RunRequestPage(Report::"EXR Consolidated Trial Balance", RequestPageXml);
+        LibraryReportDataset.RunReportAndLoad(Report::"EXR Consolidated Trial Balance", Variant, RequestPageXml);
+        // [THEN] The 9 GLAccount rows and 3 Business Unit rows should be exported
+        Assert.AreEqual(9 + 3, LibraryReportDataset.RowCount(), 'Only GL Accounts and Business Units should be exported');
+        LibraryReportDataset.SetXmlNodeList('DataItem[@name="GLAccounts"]');
+        Assert.AreEqual(9, LibraryReportDataset.RowCount(), 'Created GL Accounts should be exported');
+        LibraryReportDataset.SetXmlNodeList('DataItem[@name="BusinessUnits"]');
+        Assert.AreEqual(3, LibraryReportDataset.RowCount(), 'Created BusinessUnits should be exported');
+    end;
+
+    [Test]
+    [HandlerFunctions('EXRTrialBalanceExcelHandler')]
+    procedure TrialBalanceDoesntExportDimensionValuesIfUnused()
+    var
+        Variant: Variant;
+        RequestPageXml: Text;
+    begin
+        // [SCENARIO] An empty report should only export GL Accounts, even if there are dimensions
+        // [GIVEN] An empty trial balance
+        Initialize();
+        // [GIVEN] 3 GL Accounts
+        CreateSampleGLAccounts(3);
+        // [GIVEN] 2 Global Dimensions, with Dimension Values
+        CreateSampleGlobalDimensionAndDimensionValues();
+        Commit();
+        // [WHEN] Running the report
+        RequestPageXml := Report.RunRequestPage(Report::"EXR Trial Balance Excel", RequestPageXml);
+        LibraryReportDataset.RunReportAndLoad(Report::"EXR Trial Balance Excel", Variant, RequestPageXml);
+        // [THEN] Only the GL Accounts should be exported
+        Assert.AreEqual(3, LibraryReportDataset.RowCount(), 'Only the GLAccounts should be exported');
+        LibraryReportDataset.SetXmlNodeList('DataItem[@name="GLAccounts"]');
+        Assert.AreEqual(3, LibraryReportDataset.RowCount(), 'The exported items should be GLAccounts');
+    end;
+
+    [Test]
+    [HandlerFunctions('EXRTrialBalanceBudgetExcelHandler')]
+    procedure TrialBalanceBudgetDoesntExportDimensionValuesIfUnused()
+    var
+        Variant: Variant;
+        RequestPageXml: Text;
+    begin
+        // [SCENARIO] An empty report should only export GL Accounts, even if there are dimensions
+        // [GIVEN] An empty trial balance
+        Initialize();
+        // [GIVEN] 6 GL Accounts
+        CreateSampleGLAccounts(6);
+        // [GIVEN] 2 Global Dimensions, with Dimension Values
+        CreateSampleGlobalDimensionAndDimensionValues();
+        Commit();
+        // [WHEN] Running the report
+        RequestPageXml := Report.RunRequestPage(Report::"EXR Trial BalanceBudgetExcel", RequestPageXml);
+        LibraryReportDataset.RunReportAndLoad(Report::"EXR Trial BalanceBudgetExcel", Variant, RequestPageXml);
+        // [THEN] Only the GL Accounts should be exported
+        Assert.AreEqual(6, LibraryReportDataset.RowCount(), 'Only the GLAccounts should be exported');
+        LibraryReportDataset.SetXmlNodeList('DataItem[@name="GLAccounts"]');
+        Assert.AreEqual(6, LibraryReportDataset.RowCount(), 'The exported items should be GLAccounts');
+    end;
+
+    [Test]
+    [HandlerFunctions('EXRConsolidatedTrialBalanceHandler')]
+    procedure ConsolidatedTrialBalanceDoesntExportDimensionValuesIfUnused()
+    var
+        Variant: Variant;
+        RequestPageXml: Text;
+    begin
+        // [SCENARIO] An empty report should only export GL Accounts, even if there are dimensions
+        // [GIVEN] An empty trial balance
+        Initialize();
+        // [GIVEN] 2 Business Units
+        CreateSampleBusinessUnits(2);
+        // [GIVEN] 6 GL Accounts
+        CreateSampleGLAccounts(6);
+        // [GIVEN] 2 Global Dimensions, with Dimension Values
+        CreateSampleGlobalDimensionAndDimensionValues();
+        Commit();
+        // [WHEN] Running the report
+        RequestPageXml := Report.RunRequestPage(Report::"EXR Consolidated Trial Balance", RequestPageXml);
+        LibraryReportDataset.RunReportAndLoad(Report::"EXR Consolidated Trial Balance", Variant, RequestPageXml);
+        // [THEN] Only the GL Accounts should be exported
+        Assert.AreEqual(6 + 2, LibraryReportDataset.RowCount(), 'Only GL Accounts and Business Units should be exported');
+        LibraryReportDataset.SetXmlNodeList('DataItem[@name="GLAccounts"]');
+        Assert.AreEqual(6, LibraryReportDataset.RowCount(), 'Created GL Accounts should be exported');
+    end;
+
+    [Test]
+    [HandlerFunctions('EXRTrialBalanceExcelHandler')]
+    procedure TrialBalanceExportsOnlyTheUsedDimensionValues()
+    var
+        GLAccount: Record "G/L Account";
+        Dimension: Record Dimension;
+        DimensionValue: Record "Dimension Value";
+        Variant: Variant;
+        ReportValue, RequestPageXml : Text;
+    begin
+        // [SCENARIO] The report should only export the Dimension Values for which it has a total
+        // [GIVEN] A trial balance for an entry with Global Dimension 2 value defined
+        Initialize();
+        CreateSampleGLAccounts(10, GLAccount);
+        CreateSampleGlobalDimensionAndDimensionValues(Dimension, DimensionValue);
+        CreateGLEntry(GLAccount."No.", DimensionValue.Code);
+        Commit();
+        // [WHEN] Running the report
+        RequestPageXml := Report.RunRequestPage(Report::"EXR Trial Balance Excel", RequestPageXml);
+        LibraryReportDataset.RunReportAndLoad(Report::"EXR Trial Balance Excel", Variant, RequestPageXml);
+        // [THEN] All the GLAccounts should be exported
+        LibraryReportDataset.SetXmlNodeList('DataItem[@name="GLAccounts"]');
+        Assert.AreEqual(10, LibraryReportDataset.RowCount(), 'Created GL Accounts should be exported');
+        // [THEN] The only Dimension1 exported is the one of the entry (blank)
+        LibraryReportDataset.SetXmlNodeList('DataItem[@name="Dimension1"]');
+        Assert.AreEqual(1, LibraryReportDataset.RowCount(), 'There should be 1 "Global dimension 1" exported, the blank dimension');
+        LibraryReportDataset.GetNextRow();
+        LibraryReportDataset.FindCurrentRowValue('Dim1Code', Variant);
+        ReportValue := Variant;
+        Assert.AreEqual('', ReportValue, 'The exported dimension should be the blank dimension');
+        // [THEN] The only Dimension2 exported is the one defined on the entry
+        LibraryReportDataset.SetXmlNodeList('DataItem[@name="Dimension2"]');
+        Assert.AreEqual(1, LibraryReportDataset.RowCount(), 'There should be 1 "Global dimension 2" exported');
+        LibraryReportDataset.GetNextRow();
+        LibraryReportDataset.FindCurrentRowValue('Dim2Code', Variant);
+        ReportValue := Variant;
+        Assert.AreEqual(DimensionValue.Code, ReportValue, 'The exported dimension should be the dimension in the GLEntry');
+    end;
+
+    [Test]
+    [HandlerFunctions('EXRTrialBalanceByPeriodHideZeroValuesHandler')]
+    procedure TrialBalanceByPeriodDoesntExportZeroValueDimensionCombinations()
+    var
+        Variant: Variant;
+        RequestPageXml: Text;
+    begin
+        // [SCENARIO] Trial Balance by Period only exports dimension combinations with values.
+        Initialize();
+        CreateTrialBalanceByPeriodDataWithUnusedDimensions();
+        Commit();
+
+        RequestPageXml := Report.RunRequestPage(Report::"EXR Trial Bal by Period Excel", RequestPageXml);
+        LibraryReportDataset.RunReportAndLoad(Report::"EXR Trial Bal by Period Excel", Variant, RequestPageXml);
+
+        LibraryReportDataset.SetXmlNodeList('DataItem[@name="EXRTrialBalanceBuffer"]');
+        Assert.AreEqual(8, LibraryReportDataset.RowCount(), 'Only dimension combinations with values should be exported');
+    end;
+
+    [Test]
+    [HandlerFunctions('EXRTrialBalanceByPeriodIncludeZeroValuesHandler')]
+    procedure TrialBalanceByPeriodExportsZeroValueDimensionCombinationsWhenRequested()
+    var
+        Variant: Variant;
+        RequestPageXml: Text;
+    begin
+        // [SCENARIO] Trial Balance by Period exports zero-value dimension combinations when requested.
+        Initialize();
+        CreateTrialBalanceByPeriodDataWithUnusedDimensions();
+        Commit();
+
+        RequestPageXml := Report.RunRequestPage(Report::"EXR Trial Bal by Period Excel", RequestPageXml);
+        LibraryReportDataset.RunReportAndLoad(Report::"EXR Trial Bal by Period Excel", Variant, RequestPageXml);
+
+        LibraryReportDataset.SetXmlNodeList('DataItem[@name="EXRTrialBalanceBuffer"]');
+        Assert.AreEqual(18, LibraryReportDataset.RowCount(), 'All dimension combinations should be exported');
+    end;
+
+    [Test]
+    [HandlerFunctions('EXRTrialBalanceBudgetExcelHandler')]
+    procedure TrialBalanceBudgetExportsOnlyTheUsedDimensionValues()
+    var
+        GLAccount: Record "G/L Account";
+        Dimension: Record Dimension;
+        DimensionValue: Record "Dimension Value";
+        Variant: Variant;
+        ReportValue, RequestPageXml : Text;
+    begin
+        // [SCENARIO] The report should only export the Dimension Values for which it has a total
+        // [GIVEN] A trial balance for an entry with Global Dimension 2 value defined
+        Initialize();
+        CreateSampleGLAccounts(10, GLAccount);
+        CreateSampleGlobalDimensionAndDimensionValues(Dimension, DimensionValue);
+        CreateGLEntry(GLAccount."No.", DimensionValue.Code);
+        Commit();
+        // [WHEN] Running the report
+        RequestPageXml := Report.RunRequestPage(Report::"EXR Trial BalanceBudgetExcel", RequestPageXml);
+        LibraryReportDataset.RunReportAndLoad(Report::"EXR Trial BalanceBudgetExcel", Variant, RequestPageXml);
+        // [THEN] All the GLAccounts should be exported
+        LibraryReportDataset.SetXmlNodeList('DataItem[@name="GLAccounts"]');
+        Assert.AreEqual(10, LibraryReportDataset.RowCount(), 'Created GL Accounts should be exported');
+        // [THEN] The only Dimension1 exported is the one of the entry (blank)
+        LibraryReportDataset.SetXmlNodeList('DataItem[@name="Dimension1"]');
+        Assert.AreEqual(1, LibraryReportDataset.RowCount(), 'There should be 1 "Global dimension 1" exported, the blank dimension');
+        LibraryReportDataset.GetNextRow();
+        LibraryReportDataset.FindCurrentRowValue('Dim1Code', Variant);
+        ReportValue := Variant;
+        Assert.AreEqual('', ReportValue, 'The exported dimension should be the blank dimension');
+        // [THEN] The only Dimension2 exported is the one defined on the entry
+        LibraryReportDataset.SetXmlNodeList('DataItem[@name="Dimension2"]');
+        Assert.AreEqual(1, LibraryReportDataset.RowCount(), 'There should be 1 "Global dimension 2" exported');
+        LibraryReportDataset.GetNextRow();
+        LibraryReportDataset.FindCurrentRowValue('Dim2Code', Variant);
+        ReportValue := Variant;
+        Assert.AreEqual(DimensionValue.Code, ReportValue, 'The exported dimension should be the dimension in the GLEntry');
+    end;
+
+    [Test]
+    [HandlerFunctions('EXRConsolidatedTrialBalanceHandler')]
+    procedure ConsolidatedTrialBalanceExportsOnlyTheUsedDimensionValues()
+    var
+        GLAccount: Record "G/L Account";
+        Dimension: Record Dimension;
+        DimensionValue: Record "Dimension Value";
+        Variant: Variant;
+        ReportValue, RequestPageXml : Text;
+    begin
+        // [SCENARIO] The report should only export the Dimension Values for which it has a total
+        // [GIVEN] A trial balance for an entry with Global Dimension 2 value defined
+        Initialize();
+        CreateSampleGLAccounts(10, GLAccount);
+        CreateSampleBusinessUnits(1);
+        CreateSampleGlobalDimensionAndDimensionValues(Dimension, DimensionValue);
+        CreateGLEntry(GLAccount."No.", DimensionValue.Code);
+        Commit();
+        // [WHEN] Running the report
+        RequestPageXml := Report.RunRequestPage(Report::"EXR Consolidated Trial Balance", RequestPageXml);
+        LibraryReportDataset.RunReportAndLoad(Report::"EXR Consolidated Trial Balance", Variant, RequestPageXml);
+        // [THEN] All the GLAccounts should be exported
+        LibraryReportDataset.SetXmlNodeList('DataItem[@name="GLAccounts"]');
+        Assert.AreEqual(10, LibraryReportDataset.RowCount(), 'Created GL Accounts should be exported');
+        // [THEN] The only Dimension1 exported is the one of the entry (blank)
+        LibraryReportDataset.SetXmlNodeList('DataItem[@name="Dimension1"]');
+        Assert.AreEqual(1, LibraryReportDataset.RowCount(), 'There should be 1 "Global dimension 1" exported, the blank dimension');
+        LibraryReportDataset.GetNextRow();
+        LibraryReportDataset.FindCurrentRowValue('Dim1Code', Variant);
+        ReportValue := Variant;
+        Assert.AreEqual('', ReportValue, 'The exported dimension should be the blank dimension');
+        // [THEN] The only Dimension2 exported is the one defined on the entry
+        LibraryReportDataset.SetXmlNodeList('DataItem[@name="Dimension2"]');
+        Assert.AreEqual(1, LibraryReportDataset.RowCount(), 'There should be 1 "Global dimension 2" exported');
+        LibraryReportDataset.GetNextRow();
+        LibraryReportDataset.FindCurrentRowValue('Dim2Code', Variant);
+        ReportValue := Variant;
+        Assert.AreEqual(DimensionValue.Code, ReportValue, 'The exported dimension should be the dimension in the GLEntry');
+    end;
+
+    [Test]
+    [HandlerFunctions('EXRConsolidatedTrialBalanceHandler')]
+    procedure ConsolidatedTrialBalanceShouldErrorWithNoBusinessUnits()
+    var
+        GLAccount: Record "G/L Account";
+        Variant: Variant;
+        RequestPageXml: Text;
+    begin
+        // [SCENARIO 544098] Running Consolidation Trial Balance should fail when there are no business units configured.
+        // [GIVEN] A company without business units
+        Initialize();
+        CreateSampleGLAccounts(10, GLAccount);
+        Commit();
+        // [WHEN] Running the Consolidation Trial Balance report
+        RequestPageXml := Report.RunRequestPage(Report::"EXR Consolidated Trial Balance", RequestPageXml);
+        // [THEN] It should fail and not produce a corrupt Excel file.
+        asserterror LibraryReportDataset.RunReportAndLoad(Report::"EXR Consolidated Trial Balance", Variant, RequestPageXml);
+    end;
+
+    [Test]
+    procedure QueryPathProducesCorrectAmounts()
+    var
+        GLAccount: Record "G/L Account";
+        TempDimensionValue: Record "Dimension Value" temporary;
+        TempTrialBalanceData: Record "EXR Trial Balance Buffer";
+        TrialBalance: Codeunit "Trial Balance";
+        PostingAccount: Code[20];
+        BeforePeriodAmount: Decimal;
+        InPeriodAmount: Decimal;
+    begin
+        // [SCENARIO] The query path computes correct Starting Balance, Net Change, and Balance for a posting account.
+        // [GIVEN] A posting account with entries before and within the date range
+        Initialize();
+        CreateGLAccount(GLAccount);
+        PostingAccount := GLAccount."No.";
+        BeforePeriodAmount := 1000;
+        InPeriodAmount := 250;
+        CreateGLEntryWithAmount(PostingAccount, '', '', '', DMY2Date(15, 1, Date2DMY(WorkDate(), 3) - 1), BeforePeriodAmount);
+        CreateGLEntryWithAmount(PostingAccount, '', '', '', DMY2Date(15, 6, Date2DMY(WorkDate(), 3)), InPeriodAmount);
+
+        // [WHEN] Running the query-based trial balance for the current year
+        GLAccount.SetRange("No.", PostingAccount);
+        GLAccount.SetRange("Date Filter", DMY2Date(1, 1, Date2DMY(WorkDate(), 3)), DMY2Date(31, 12, Date2DMY(WorkDate(), 3)));
+        TrialBalance.ConfigureTrialBalance(false, false);
+        TrialBalance.InsertTrialBalanceReportData(GLAccount, TempDimensionValue, TempDimensionValue, TempTrialBalanceData);
+
+        // [THEN] The buffer has correct amounts
+        TempTrialBalanceData.SetRange("G/L Account No.", PostingAccount);
+        Assert.IsTrue(TempTrialBalanceData.FindFirst(), 'Buffer record should exist for the posting account');
+        Assert.AreEqual(BeforePeriodAmount, TempTrialBalanceData."Starting Balance", 'Starting Balance should equal the entry before the period');
+        Assert.AreEqual(InPeriodAmount, TempTrialBalanceData."Net Change", 'Net Change should equal the entry within the period');
+        Assert.AreEqual(BeforePeriodAmount + InPeriodAmount, TempTrialBalanceData.Balance, 'Balance should equal Starting Balance + Net Change');
+    end;
+
+    [Test]
+    procedure GrossDebitAndCreditTurnoverReportedForEachAccount()
+    var
+        GLAccount: Record "G/L Account";
+        TempDimensionValue: Record "Dimension Value" temporary;
+        TempTrialBalanceData: Record "EXR Trial Balance Buffer";
+        TrialBalance: Codeunit "Trial Balance";
+        PostingAccount: Code[20];
+        DebitAmount: Decimal;
+        CreditAmount: Decimal;
+    begin
+        // [SCENARIO] The query path produces gross debit and credit turnover, not netted amounts.
+        // [GIVEN] A posting account with both debit and credit entries in the same period
+        Initialize();
+        CreateGLAccount(GLAccount);
+        PostingAccount := GLAccount."No.";
+        DebitAmount := 5000;
+        CreditAmount := -8000;
+        CreateGLEntryWithAmount(PostingAccount, '', '', '', DMY2Date(1, 3, Date2DMY(WorkDate(), 3)), DebitAmount);
+        CreateGLEntryWithAmount(PostingAccount, '', '', '', DMY2Date(15, 3, Date2DMY(WorkDate(), 3)), CreditAmount);
+
+        // [WHEN] Running the query-based trial balance for the current year
+        GLAccount.SetRange("No.", PostingAccount);
+        GLAccount.SetRange("Date Filter", DMY2Date(1, 1, Date2DMY(WorkDate(), 3)), DMY2Date(31, 12, Date2DMY(WorkDate(), 3)));
+        TrialBalance.ConfigureTrialBalance(false, false);
+        TrialBalance.InsertTrialBalanceReportData(GLAccount, TempDimensionValue, TempDimensionValue, TempTrialBalanceData);
+
+        // [THEN] The buffer has gross debit and credit amounts, not netted
+        TempTrialBalanceData.SetRange("G/L Account No.", PostingAccount);
+        Assert.IsTrue(TempTrialBalanceData.FindFirst(), 'Buffer record should exist for the posting account');
+        Assert.AreEqual(DebitAmount + CreditAmount, TempTrialBalanceData."Net Change", 'Net Change should be the algebraic sum');
+        Assert.AreEqual(DebitAmount, TempTrialBalanceData."Net Change (Debit)", 'Net Change (Debit) should be the gross debit amount');
+        Assert.AreEqual(-CreditAmount, TempTrialBalanceData."Net Change (Credit)", 'Net Change (Credit) should be the gross credit amount');
+    end;
+
+    [Test]
+    procedure QueryPathComputesEndTotalAndTotalAccounts()
+    var
+        PostingAccount1, PostingAccount2, EndTotalAccount, TotalAccount, GLAccount : Record "G/L Account";
+        Dimension: Record Dimension;
+        DimensionValue1, DimensionValue2 : Record "Dimension Value";
+        TempDimension1Values, TempDimension2Values : Record "Dimension Value" temporary;
+        TempTrialBalanceData: Record "EXR Trial Balance Buffer";
+        TrialBalance: Codeunit "Trial Balance";
+        Amount1Dim1, Amount2Dim1, Amount1Dim2 : Decimal;
+    begin
+        // [SCENARIO] End-Total and Total accounts aggregate per-dimension combination from their posting children.
+        // [GIVEN] Two posting accounts, an End-Total, and a Total account in the same range, with entries across two dimension values
+        Initialize();
+
+        // Create the CoA: Posting1, Posting2, End-Total (totaling Posting1..Posting2), Total (same totaling)
+        CreateGLAccount(PostingAccount1);
+        CreateGLAccount(PostingAccount2);
+        CreateGLAccount(EndTotalAccount, Enum::"G/L Account Type"::"End-Total", PostingAccount1."No." + '..' + PostingAccount2."No.");
+        CreateGLAccount(TotalAccount, Enum::"G/L Account Type"::Total, PostingAccount1."No." + '..' + PostingAccount2."No.");
+
+        // Create dimension values for Dim2
+        LibraryERM.CreateDimension(Dimension);
+        LibraryERM.CreateDimensionValue(DimensionValue1, Dimension.Code);
+        DimensionValue1."Global Dimension No." := 2;
+        DimensionValue1.Modify();
+        LibraryERM.CreateDimensionValue(DimensionValue2, Dimension.Code);
+        DimensionValue2."Global Dimension No." := 2;
+        DimensionValue2.Modify();
+
+        // Post entries: Account1 with Dim2=Value1, Account2 with Dim2=Value1, Account1 with Dim2=Value2
+        Amount1Dim1 := 500;
+        Amount2Dim1 := 300;
+        Amount1Dim2 := 200;
+        CreateGLEntryWithAmount(PostingAccount1."No.", '', DimensionValue1.Code, '', WorkDate(), Amount1Dim1);
+        CreateGLEntryWithAmount(PostingAccount2."No.", '', DimensionValue1.Code, '', WorkDate(), Amount2Dim1);
+        CreateGLEntryWithAmount(PostingAccount1."No.", '', DimensionValue2.Code, '', WorkDate(), Amount1Dim2);
+
+        // [WHEN] Running the trial balance for the current year
+        GLAccount.SetRange("Date Filter", DMY2Date(1, 1, Date2DMY(WorkDate(), 3)), DMY2Date(31, 12, Date2DMY(WorkDate(), 3)));
+        TrialBalance.ConfigureTrialBalance(false, false);
+        TrialBalance.InsertTrialBalanceReportData(GLAccount, TempDimension1Values, TempDimension2Values, TempTrialBalanceData);
+
+        // [THEN] End-Total has per-dimension rows with correct sums
+        TempTrialBalanceData.Reset();
+        TempTrialBalanceData.SetRange("G/L Account No.", EndTotalAccount."No.");
+        Assert.AreEqual(2, TempTrialBalanceData.Count(), 'End-Total should have 2 rows (one per Dim2 value)');
+
+        TempTrialBalanceData.SetRange("Dimension 2 Code", DimensionValue1.Code);
+        TempTrialBalanceData.FindFirst();
+        Assert.AreEqual(Amount1Dim1 + Amount2Dim1, TempTrialBalanceData.Balance, 'End-Total Dim2=Value1 should sum both posting accounts');
+
+        TempTrialBalanceData.SetRange("Dimension 2 Code", DimensionValue2.Code);
+        TempTrialBalanceData.FindFirst();
+        Assert.AreEqual(Amount1Dim2, TempTrialBalanceData.Balance, 'End-Total Dim2=Value2 should have only Account1 amount');
+
+        // [THEN] Total account has identical per-dimension rows
+        TempTrialBalanceData.Reset();
+        TempTrialBalanceData.SetRange("G/L Account No.", TotalAccount."No.");
+        Assert.AreEqual(2, TempTrialBalanceData.Count(), 'Total should have 2 rows (one per Dim2 value)');
+
+        TempTrialBalanceData.SetRange("Dimension 2 Code", DimensionValue1.Code);
+        TempTrialBalanceData.FindFirst();
+        Assert.AreEqual(Amount1Dim1 + Amount2Dim1, TempTrialBalanceData.Balance, 'Total Dim2=Value1 should sum both posting accounts');
+    end;
+
+    [Test]
+    procedure QueryPathDoesNotDoubleCountNestedTotals()
+    var
+        GLAccount: Record "G/L Account";
+        TempDimension1Values, TempDimension2Values : Record "Dimension Value" temporary;
+        TempTrialBalanceData: Record "EXR Trial Balance Buffer";
+        TrialBalance: Codeunit "Trial Balance";
+        PostingAccountNo, ChildTotalNo, ParentTotalNo : Code[20];
+        EntryAmount: Decimal;
+    begin
+        // [SCENARIO] A parent End-Total whose Totaling range contains a nested child End-Total must not double-count the child's amounts.
+        // [GIVEN] A posting account (10000), a child End-Total (20000) totaling the posting account,
+        //         and a parent End-Total (30000) whose range 10000..29999 spans BOTH the posting account and the child End-Total's number.
+        // The total accounts are processed in No. order, so the child (20000) is inserted into the buffer before the parent (30000) is computed.
+        Initialize();
+        PostingAccountNo := CreateGLAccountWithNo('10000', Enum::"G/L Account Type"::Posting, '');
+        ChildTotalNo := CreateGLAccountWithNo('20000', Enum::"G/L Account Type"::"End-Total", '10000..19999');
+        ParentTotalNo := CreateGLAccountWithNo('30000', Enum::"G/L Account Type"::"End-Total", '10000..29999');
+
+        // [GIVEN] A single entry posted to the posting account
+        EntryAmount := 1000;
+        CreateGLEntryWithAmount(PostingAccountNo, '', '', '', WorkDate(), EntryAmount);
+
+        // [WHEN] Running the query-based trial balance for the current year
+        GLAccount.SetRange("Date Filter", DMY2Date(1, 1, Date2DMY(WorkDate(), 3)), DMY2Date(31, 12, Date2DMY(WorkDate(), 3)));
+        TrialBalance.ConfigureTrialBalance(false, false);
+        TrialBalance.InsertTrialBalanceReportData(GLAccount, TempDimension1Values, TempDimension2Values, TempTrialBalanceData);
+
+        // [THEN] The child End-Total equals the entry amount (the posting account counted once)
+        TempTrialBalanceData.Reset();
+        TempTrialBalanceData.SetRange("G/L Account No.", ChildTotalNo);
+        TempTrialBalanceData.FindFirst();
+        Assert.AreEqual(EntryAmount, TempTrialBalanceData.Balance, 'Child End-Total should sum the posting account once');
+
+        // [THEN] The parent End-Total ALSO equals the entry amount, not twice:
+        // its Totaling range includes the child End-Total's already-inserted buffer row, which must not be re-summed.
+        TempTrialBalanceData.Reset();
+        TempTrialBalanceData.SetRange("G/L Account No.", ParentTotalNo);
+        TempTrialBalanceData.FindFirst();
+        Assert.AreEqual(EntryAmount, TempTrialBalanceData.Balance, 'Parent End-Total must not double-count the nested child End-Total');
+    end;
+
+    [Test]
+    procedure QueryPathPopulatesBudgetFields()
+    var
+        GLAccount: Record "G/L Account";
+        GLBudgetName: Record "G/L Budget Name";
+        GLBudgetEntry: Record "G/L Budget Entry";
+        TempDimension1Values, TempDimension2Values : Record "Dimension Value" temporary;
+        TempTrialBalanceData: Record "EXR Trial Balance Buffer";
+        TrialBalance: Codeunit "Trial Balance";
+        PostingAccount: Code[20];
+        EntryAmount, BudgetInPeriod, BudgetBeforePeriod : Decimal;
+        PeriodStart, PeriodEnd : Date;
+    begin
+        // [SCENARIO] The query path populates Budget (Net) and Budget (Bal. at Date) fields.
+        // [GIVEN] A posting account with GL entries and budget entries
+        Initialize();
+        LibraryERM.CreateGLAccount(GLAccount);
+        PostingAccount := GLAccount."No.";
+        PeriodStart := DMY2Date(1, 1, Date2DMY(WorkDate(), 3));
+        PeriodEnd := DMY2Date(31, 12, Date2DMY(WorkDate(), 3));
+
+        EntryAmount := 1000;
+        CreateGLEntryWithAmount(PostingAccount, '', '', '', DMY2Date(15, 6, Date2DMY(WorkDate(), 3)), EntryAmount);
+
+        LibraryERM.CreateGLBudgetName(GLBudgetName);
+        BudgetBeforePeriod := 400;
+        BudgetInPeriod := 600;
+        LibraryERM.CreateGLBudgetEntry(GLBudgetEntry, PeriodStart - 30, PostingAccount, GLBudgetName.Name);
+        GLBudgetEntry.Validate(Amount, BudgetBeforePeriod);
+        GLBudgetEntry.Modify();
+        LibraryERM.CreateGLBudgetEntry(GLBudgetEntry, DMY2Date(15, 6, Date2DMY(WorkDate(), 3)), PostingAccount, GLBudgetName.Name);
+        GLBudgetEntry.Validate(Amount, BudgetInPeriod);
+        GLBudgetEntry.Modify();
+
+        // [WHEN] Running with budget data included
+        GLAccount.SetRange("No.", PostingAccount);
+        GLAccount.SetRange("Date Filter", PeriodStart, PeriodEnd);
+        TrialBalance.ConfigureTrialBalance(false, true);
+        TrialBalance.InsertTrialBalanceReportData(GLAccount, TempDimension1Values, TempDimension2Values, TempTrialBalanceData);
+
+        // [THEN] Budget fields are populated
+        TempTrialBalanceData.SetRange("G/L Account No.", PostingAccount);
+        Assert.IsTrue(TempTrialBalanceData.FindFirst(), 'Buffer record should exist');
+        Assert.AreEqual(BudgetInPeriod, TempTrialBalanceData."Budget (Net)", 'Budget (Net) should be the budget entry within the period');
+        Assert.AreEqual(BudgetBeforePeriod + BudgetInPeriod, TempTrialBalanceData."Budget (Bal. at Date)", 'Budget (Bal. at Date) should be cumulative up to period end');
+    end;
+
+    [Test]
+    procedure ConsolidatedQueryPathBreaksDownByBusinessUnit()
+    var
+        GLAccount: Record "G/L Account";
+        BusinessUnit1, BusinessUnit2 : Record "Business Unit";
+        TempDimension1Values, TempDimension2Values : Record "Dimension Value" temporary;
+        TempTrialBalanceData: Record "EXR Trial Balance Buffer";
+        TrialBalance: Codeunit "Trial Balance";
+        PostingAccount: Code[20];
+        AmountBU1, AmountBU2 : Decimal;
+    begin
+        // [SCENARIO] The consolidated trial balance query path produces separate rows per Business Unit.
+        // [GIVEN] A posting account with entries for two different Business Units
+        Initialize();
+        LibraryERM.CreateGLAccount(GLAccount);
+        PostingAccount := GLAccount."No.";
+        LibraryERM.CreateBusinessUnit(BusinessUnit1);
+        LibraryERM.CreateBusinessUnit(BusinessUnit2);
+
+        AmountBU1 := 750;
+        AmountBU2 := 320;
+        CreateGLEntryWithAmount(PostingAccount, '', '', BusinessUnit1.Code, WorkDate(), AmountBU1);
+        CreateGLEntryWithAmount(PostingAccount, '', '', BusinessUnit2.Code, WorkDate(), AmountBU2);
+
+        // [WHEN] Running with BU breakdown
+        GLAccount.SetRange("No.", PostingAccount);
+        GLAccount.SetRange("Date Filter", DMY2Date(1, 1, Date2DMY(WorkDate(), 3)), DMY2Date(31, 12, Date2DMY(WorkDate(), 3)));
+        TrialBalance.ConfigureTrialBalance(true, false);
+        TrialBalance.InsertTrialBalanceReportData(GLAccount, TempDimension1Values, TempDimension2Values, TempTrialBalanceData);
+
+        // [THEN] Two buffer records exist, one per BU, with correct amounts
+        TempTrialBalanceData.SetRange("G/L Account No.", PostingAccount);
+        Assert.AreEqual(2, TempTrialBalanceData.Count(), 'Should have one row per Business Unit');
+
+        TempTrialBalanceData.SetRange("Business Unit Code", BusinessUnit1.Code);
+        TempTrialBalanceData.FindFirst();
+        Assert.AreEqual(AmountBU1, TempTrialBalanceData.Balance, 'BU1 balance should match its entries');
+
+        TempTrialBalanceData.SetRange("Business Unit Code", BusinessUnit2.Code);
+        TempTrialBalanceData.FindFirst();
+        Assert.AreEqual(AmountBU2, TempTrialBalanceData.Balance, 'BU2 balance should match its entries');
+    end;
+
+    [Test]
+    procedure QueryPathRespectsAccountNoFilter()
+    var
+        GLAccount1, GLAccount2, GLAccount3, GLAccount : Record "G/L Account";
+        TempDimension1Values, TempDimension2Values : Record "Dimension Value" temporary;
+        TempTrialBalanceData: Record "EXR Trial Balance Buffer";
+        TrialBalance: Codeunit "Trial Balance";
+    begin
+        // [SCENARIO] The query path only returns data for accounts matching the No. filter.
+        // [GIVEN] Three accounts with entries, but the filter selects only one
+        Initialize();
+        LibraryERM.CreateGLAccount(GLAccount1);
+        LibraryERM.CreateGLAccount(GLAccount2);
+        LibraryERM.CreateGLAccount(GLAccount3);
+        CreateGLEntryWithAmount(GLAccount1."No.", '', '', '', WorkDate(), 100);
+        CreateGLEntryWithAmount(GLAccount2."No.", '', '', '', WorkDate(), 200);
+        CreateGLEntryWithAmount(GLAccount3."No.", '', '', '', WorkDate(), 300);
+
+        // [WHEN] Running with a filter on the second account only
+        GLAccount.SetRange("No.", GLAccount2."No.");
+        GLAccount.SetRange("Date Filter", DMY2Date(1, 1, Date2DMY(WorkDate(), 3)), DMY2Date(31, 12, Date2DMY(WorkDate(), 3)));
+        TrialBalance.ConfigureTrialBalance(false, false);
+        TrialBalance.InsertTrialBalanceReportData(GLAccount, TempDimension1Values, TempDimension2Values, TempTrialBalanceData);
+
+        // [THEN] Only the filtered account appears in the buffer
+        Assert.AreEqual(1, TempTrialBalanceData.Count(), 'Only one account should be in the buffer');
+        TempTrialBalanceData.FindFirst();
+        Assert.AreEqual(GLAccount2."No.", TempTrialBalanceData."G/L Account No.", 'The filtered account should be the one returned');
+        Assert.AreEqual(200, TempTrialBalanceData.Balance, 'Amount should match the filtered account entry');
+    end;
+
+    [Test]
+    procedure QueryPathIncludesAccountsThatNetToZero()
+    var
+        GLAccount: Record "G/L Account";
+        TempDimension1Values, TempDimension2Values : Record "Dimension Value" temporary;
+        TempTrialBalanceData: Record "EXR Trial Balance Buffer";
+        TrialBalance: Codeunit "Trial Balance";
+        ZeroAccount, NonZeroAccount : Code[20];
+        GrossAmount: Decimal;
+    begin
+        // [SCENARIO] Accounts that have entries are included even when they net to zero. The query only returns
+        // accounts with activity, so a zero net change still represents real (offsetting) turnover worth showing.
+        // [GIVEN] One account with cancelling entries (net zero, gross turnover) and another with a non-zero balance
+        Initialize();
+        LibraryERM.CreateGLAccount(GLAccount);
+        ZeroAccount := GLAccount."No.";
+        LibraryERM.CreateGLAccount(GLAccount);
+        NonZeroAccount := GLAccount."No.";
+
+        GrossAmount := 500;
+        CreateGLEntryWithAmount(ZeroAccount, '', '', '', WorkDate(), GrossAmount);
+        CreateGLEntryWithAmount(ZeroAccount, '', '', '', WorkDate(), -GrossAmount);
+        CreateGLEntryWithAmount(NonZeroAccount, '', '', '', WorkDate(), 100);
+
+        // [WHEN] Running the trial balance
+        GLAccount.SetFilter("No.", '%1|%2', ZeroAccount, NonZeroAccount);
+        GLAccount.SetRange("Date Filter", DMY2Date(1, 1, Date2DMY(WorkDate(), 3)), DMY2Date(31, 12, Date2DMY(WorkDate(), 3)));
+        TrialBalance.ConfigureTrialBalance(false, false);
+        TrialBalance.InsertTrialBalanceReportData(GLAccount, TempDimension1Values, TempDimension2Values, TempTrialBalanceData);
+
+        // [THEN] Both accounts are in the buffer
+        Assert.AreEqual(2, TempTrialBalanceData.Count(), 'Both accounts with entries should be in the buffer');
+        // [THEN] The net-zero account is present with zero net change and balance, but its gross turnover is reported
+        TempTrialBalanceData.SetRange("G/L Account No.", ZeroAccount);
+        Assert.IsTrue(TempTrialBalanceData.FindFirst(), 'The net-zero account should be included');
+        Assert.AreEqual(0, TempTrialBalanceData."Net Change", 'Net Change should be zero');
+        Assert.AreEqual(0, TempTrialBalanceData.Balance, 'Balance should be zero');
+        Assert.AreEqual(GrossAmount, TempTrialBalanceData."Net Change (Debit)", 'Gross debit turnover should be reported');
+        Assert.AreEqual(GrossAmount, TempTrialBalanceData."Net Change (Credit)", 'Gross credit turnover should be reported');
+    end;
+
+    [Test]
+    procedure QueryPathReportsCorrectDebitCreditSplitsForZeroEndBalance()
+    var
+        GLAccount, KeptAccount : Record "G/L Account";
+        TempDimension1Values, TempDimension2Values : Record "Dimension Value" temporary;
+        TempTrialBalanceData: Record "EXR Trial Balance Buffer";
+        TrialBalance: Codeunit "Trial Balance";
+        OpeningDebit: Decimal;
+        PriorYear: Integer;
+    begin
+        // [SCENARIO] A combination that nets to zero at the end date but has period activity keeps correct debit/credit
+        // splits: the first pass inserts it (carrying the end-date totals) so the second pass can subtract the opening.
+        Initialize();
+        PriorYear := Date2DMY(WorkDate(), 3) - 1;
+        OpeningDebit := 1000;
+
+        // [GIVEN] An account whose opening debit is fully reversed by a credit within the period (net-zero end, period activity)
+        CreateGLAccount(KeptAccount);
+        CreateGLEntryWithAmount(KeptAccount."No.", '', '', '', DMY2Date(15, 6, PriorYear), OpeningDebit);
+        CreateGLEntryWithAmount(KeptAccount."No.", '', '', '', DMY2Date(15, 6, Date2DMY(WorkDate(), 3)), -OpeningDebit);
+
+        // [WHEN] Running the query-based trial balance for the current year
+        GLAccount.SetRange("Date Filter", DMY2Date(1, 1, Date2DMY(WorkDate(), 3)), DMY2Date(31, 12, Date2DMY(WorkDate(), 3)));
+        TrialBalance.ConfigureTrialBalance(false, false);
+        TrialBalance.InsertTrialBalanceReportData(GLAccount, TempDimension1Values, TempDimension2Values, TempTrialBalanceData);
+
+        // [THEN] The combination is present with correct net AND gross debit/credit columns
+        TempTrialBalanceData.SetRange("G/L Account No.", KeptAccount."No.");
+        Assert.IsTrue(TempTrialBalanceData.FindFirst(), 'Buffer record should exist for the net-zero-at-end combination');
+        Assert.AreEqual(OpeningDebit, TempTrialBalanceData."Starting Balance", 'Starting Balance should equal the opening debit');
+        Assert.AreEqual(-OpeningDebit, TempTrialBalanceData."Net Change", 'Net Change should reverse the opening');
+        Assert.AreEqual(0, TempTrialBalanceData.Balance, 'Balance should net to zero at the end date');
+        Assert.AreEqual(OpeningDebit, TempTrialBalanceData."Starting Balance (Debit)", 'Opening debit split');
+        Assert.AreEqual(0, TempTrialBalanceData."Net Change (Debit)", 'No period debit turnover');
+        Assert.AreEqual(OpeningDebit, TempTrialBalanceData."Net Change (Credit)", 'Period credit turnover equals the reversal');
+        Assert.AreEqual(OpeningDebit, TempTrialBalanceData."Balance (Debit)", 'Cumulative debit at the end date');
+        Assert.AreEqual(OpeningDebit, TempTrialBalanceData."Balance (Credit)", 'Cumulative credit at the end date');
+    end;
+
+    [Test]
+    procedure QueryPathStartingBalanceIncludesClosingDateEntries()
+    var
+        GLAccount: Record "G/L Account";
+        TempDimensionValue: Record "Dimension Value" temporary;
+        TempTrialBalanceData: Record "EXR Trial Balance Buffer";
+        TrialBalance: Codeunit "Trial Balance";
+        PostingAccount: Code[20];
+        ActivityAmount: Decimal;
+        PriorYear: Integer;
+    begin
+        // [SCENARIO] Starting Balance includes closing date entries from the prior fiscal year, emulating what "Close Income Statement" produces.
+        // [GIVEN] A posting account with activity during the prior year
+        Initialize();
+        CreateGLAccount(GLAccount);
+        PostingAccount := GLAccount."No.";
+        PriorYear := Date2DMY(WorkDate(), 3) - 1;
+        ActivityAmount := 5000;
+        CreateGLEntryWithAmount(PostingAccount, '', '', '', DMY2Date(15, 6, PriorYear), ActivityAmount);
+        // [GIVEN] A closing entry on ClosingDate(31/12) that zeroes out the account (emulates Close Income Statement)
+        CreateGLEntryWithAmount(PostingAccount, '', '', '', ClosingDate(DMY2Date(31, 12, PriorYear)), -ActivityAmount);
+        // [GIVEN] An entry on the first day of the current year so the old FindFirst logic derives cutoff ..31/12 (normal date), which misses C31/12
+        CreateGLEntryWithAmount(PostingAccount, '', '', '', DMY2Date(1, 1, Date2DMY(WorkDate(), 3)), 100);
+
+        // [WHEN] Running the trial balance for the current year
+        GLAccount.SetRange("No.", PostingAccount);
+        GLAccount.SetRange("Date Filter", DMY2Date(1, 1, Date2DMY(WorkDate(), 3)), DMY2Date(31, 12, Date2DMY(WorkDate(), 3)));
+        TrialBalance.ConfigureTrialBalance(false, false);
+        TrialBalance.InsertTrialBalanceReportData(GLAccount, TempDimensionValue, TempDimensionValue, TempTrialBalanceData);
+
+        // [THEN] Starting Balance is zero because the closing entry zeroed out the account
+        TempTrialBalanceData.SetRange("G/L Account No.", PostingAccount);
+        TempTrialBalanceData.FindFirst();
+        Assert.AreEqual(0, TempTrialBalanceData."Starting Balance", 'Starting Balance should be zero after closing entries')
+    end;
+
+    [Test]
+    procedure QueryPathSupportsClosingDateAsStartingDate()
+    var
+        GLAccount: Record "G/L Account";
+        TempDimensionValue: Record "Dimension Value" temporary;
+        TempTrialBalanceData: Record "EXR Trial Balance Buffer";
+        TrialBalance: Codeunit "Trial Balance";
+        PostingAccount: Code[20];
+        PriorYearActivity, ClosingAmount, CurrentYearActivity : Decimal;
+        PriorYear, CurrentYear : Integer;
+    begin
+        // [SCENARIO 638353] The query path supports a closing date as the starting date instead of crashing,
+        // and includes that day's closing entries in the period rather than the opening balance.
+        // [GIVEN] A posting account with prior-year activity, a year-end closing entry, and current-year activity
+        Initialize();
+        CreateGLAccount(GLAccount);
+        PostingAccount := GLAccount."No.";
+        CurrentYear := Date2DMY(WorkDate(), 3);
+        PriorYear := CurrentYear - 1;
+        PriorYearActivity := 5000;
+        ClosingAmount := -2000;
+        CurrentYearActivity := 300;
+        CreateGLEntryWithAmount(PostingAccount, '', '', '', DMY2Date(15, 6, PriorYear), PriorYearActivity);
+        CreateGLEntryWithAmount(PostingAccount, '', '', '', ClosingDate(DMY2Date(31, 12, PriorYear)), ClosingAmount);
+        CreateGLEntryWithAmount(PostingAccount, '', '', '', DMY2Date(15, 6, CurrentYear), CurrentYearActivity);
+
+        // [WHEN] Running the trial balance with the starting date set to the prior year's closing date
+        GLAccount.SetRange("No.", PostingAccount);
+        GLAccount.SetRange("Date Filter", ClosingDate(DMY2Date(31, 12, PriorYear)), DMY2Date(31, 12, CurrentYear));
+        TrialBalance.ConfigureTrialBalance(false, false);
+        TrialBalance.InsertTrialBalanceReportData(GLAccount, TempDimensionValue, TempDimensionValue, TempTrialBalanceData);
+
+        // [THEN] The opening balance holds only the activity strictly before the closing date
+        TempTrialBalanceData.SetRange("G/L Account No.", PostingAccount);
+        Assert.IsTrue(TempTrialBalanceData.FindFirst(), 'Buffer record should exist for the posting account');
+        Assert.AreEqual(PriorYearActivity, TempTrialBalanceData."Starting Balance", 'Starting Balance should exclude the closing-date entry');
+        // [THEN] The closing-date entry falls inside the reported period together with current-year activity
+        Assert.AreEqual(ClosingAmount + CurrentYearActivity, TempTrialBalanceData."Net Change", 'Net Change should include the closing-date entry');
+        Assert.AreEqual(PriorYearActivity + ClosingAmount + CurrentYearActivity, TempTrialBalanceData.Balance, 'Balance should equal Starting Balance + Net Change');
+    end;
+
+    local procedure CreateSampleBusinessUnits(HowMany: Integer)
+    var
+        BusinessUnit: Record "Business Unit";
+    begin
+        CreateSampleBusinessUnits(HowMany, BusinessUnit);
+    end;
+
+    local procedure CreateSampleBusinessUnits(HowMany: Integer; var BusinessUnit: Record "Business Unit")
+    var
+        i: Integer;
+    begin
+        for i := 1 to HowMany do
+            LibraryERM.CreateBusinessUnit(BusinessUnit);
+    end;
+
+    local procedure CreateSampleGLAccounts(HowMany: Integer)
+    var
+        GLAccount: Record "G/L Account";
+    begin
+        CreateSampleGLAccounts(HowMany, GLAccount);
+    end;
+
+    local procedure CreateSampleGLAccounts(HowMany: Integer; var GLAccount: Record "G/L Account")
+    var
+        i: Integer;
+    begin
+        for i := 1 to HowMany do
+            CreateGLAccount(GLAccount);
+    end;
+
+    local procedure CreateGLAccount(var GLAccount: Record "G/L Account")
+    begin
+        CreateGLAccount(GLAccount, Enum::"G/L Account Type"::Posting, '');
+    end;
+
+    local procedure CreateGLAccount(var GLAccount: Record "G/L Account"; AccountType: Enum "G/L Account Type"; Totaling: Text)
+    begin
+        LibraryERM.CreateGLAccount(GLAccount);
+        GLAccount."Account Type" := AccountType;
+        GLAccount.Totaling := CopyStr(Totaling, 1, 250);
+        GLAccount.Modify();
+    end;
+
+    local procedure CreateGLAccountWithNo(No: Code[20]; AccountType: Enum "G/L Account Type"; Totaling: Text): Code[20]
+    var
+        GLAccount: Record "G/L Account";
+    begin
+        // Insert with an explicit No. so the test controls both the FindSet (No.) ordering of the
+        // total accounts and whether one total's number falls inside another total's Totaling range.
+        GLAccount.Init();
+        GLAccount."No." := No;
+        GLAccount.Name := No;
+        GLAccount."Account Type" := AccountType;
+        GLAccount.Totaling := CopyStr(Totaling, 1, MaxStrLen(GLAccount.Totaling));
+        GLAccount.Insert();
+        exit(No);
+    end;
+
+    local procedure Initialize()
+    var
+        GLAccount: Record "G/L Account";
+        GLEntry: Record "G/L Entry";
+        GLBudgetEntry: Record "G/L Budget Entry";
+        GLBudgetName: Record "G/L Budget Name";
+        Dimension: Record Dimension;
+        DimensionValue: Record "Dimension Value";
+        BusinessUnit: Record "Business Unit";
+    begin
+        DimensionValue.DeleteAll();
+        Dimension.DeleteAll();
+        GLAccount.DeleteAll();
+        BusinessUnit.DeleteAll();
+        GLEntry.DeleteAll();
+        GLBudgetEntry.DeleteAll();
+        GLBudgetName.DeleteAll();
+        if BindSubscription(this) then;
+    end;
+
+    local procedure CreateSampleGlobalDimensionAndDimensionValues()
+    var
+        Dimension: Record Dimension;
+        DimensionValue: Record "Dimension Value";
+    begin
+        CreateSampleGlobalDimensionAndDimensionValues(Dimension, DimensionValue);
+    end;
+
+    local procedure CreateSampleGlobalDimensionAndDimensionValues(var Dimension: Record Dimension; var DimensionValue: Record "Dimension Value")
+    begin
+        LibraryERM.CreateDimension(Dimension);
+        LibraryERM.CreateDimensionValue(DimensionValue, Dimension.Code);
+        DimensionValue."Global Dimension No." := 1;
+        DimensionValue.Modify();
+        LibraryERM.CreateDimensionValue(DimensionValue, Dimension.Code);
+        DimensionValue."Global Dimension No." := 1;
+        DimensionValue.Modify();
+        LibraryERM.CreateDimension(Dimension);
+        LibraryERM.CreateDimensionValue(DimensionValue, Dimension.Code);
+        DimensionValue."Global Dimension No." := 2;
+        DimensionValue.Modify();
+        LibraryERM.CreateDimensionValue(DimensionValue, Dimension.Code);
+        DimensionValue."Global Dimension No." := 2;
+        DimensionValue.Modify();
+        LibraryERM.CreateDimensionValue(DimensionValue, Dimension.Code);
+        DimensionValue."Global Dimension No." := 2;
+        DimensionValue.Modify();
+    end;
+
+    local procedure CreateTrialBalanceByPeriodDataWithUnusedDimensions()
+    var
+        GLAccount: Record "G/L Account";
+        Dimension1: Record Dimension;
+        Dimension2: Record Dimension;
+        DimensionValue1: Record "Dimension Value";
+        DimensionValue2: Record "Dimension Value";
+    begin
+        CreateGLAccount(GLAccount);
+        LibraryERM.CreateDimension(Dimension1);
+        LibraryERM.CreateDimensionValue(DimensionValue1, Dimension1.Code);
+        DimensionValue1."Global Dimension No." := 1;
+        DimensionValue1.Modify();
+        LibraryERM.CreateDimensionValue(DimensionValue1, Dimension1.Code);
+        DimensionValue1."Global Dimension No." := 1;
+        DimensionValue1.Modify();
+        LibraryERM.CreateDimension(Dimension2);
+        LibraryERM.CreateDimensionValue(DimensionValue2, Dimension2.Code);
+        DimensionValue2."Global Dimension No." := 2;
+        DimensionValue2.Modify();
+        LibraryERM.CreateDimensionValue(DimensionValue2, Dimension2.Code);
+        DimensionValue2."Global Dimension No." := 2;
+        DimensionValue2.Modify();
+        CreateGLEntryWithAmount(GLAccount."No.", DimensionValue1.Code, DimensionValue2.Code, '', WorkDate(), 100);
+    end;
+
+    local procedure CreateGLEntry(GLAccountNo: Code[20]; DimensionValue2Code: Code[20])
+    begin
+        CreateGLEntryWithAmount(GLAccountNo, '', DimensionValue2Code, '', WorkDate(), 1337);
+    end;
+
+    local procedure CreateGLEntryWithAmount(GLAccountNo: Code[20]; Dim1Code: Code[20]; Dim2Code: Code[20]; BusinessUnitCode: Code[20]; PostingDate: Date; Amount: Decimal)
+    var
+        GLEntry: Record "G/L Entry";
+        EntryNo: Integer;
+    begin
+        if GLEntry.FindLast() then;
+        EntryNo := GLEntry."Entry No." + 1;
+        Clear(GLEntry);
+        GLEntry."Entry No." := EntryNo;
+        GLEntry."G/L Account No." := GLAccountNo;
+        GLEntry."Global Dimension 1 Code" := Dim1Code;
+        GLEntry."Global Dimension 2 Code" := Dim2Code;
+        GLEntry."Business Unit Code" := BusinessUnitCode;
+        GLEntry.Amount := Amount;
+        GLEntry."Additional-Currency Amount" := Amount;
+        if Amount > 0 then begin
+            GLEntry."Debit Amount" := Amount;
+            GLEntry."Add.-Currency Debit Amount" := Amount;
+        end else begin
+            GLEntry."Credit Amount" := -Amount;
+            GLEntry."Add.-Currency Credit Amount" := -Amount;
+        end;
+        GLEntry."Posting Date" := PostingDate;
+        GLEntry.Insert();
+    end;
+
+    [RequestPageHandler]
+    procedure EXRTrialBalanceExcelHandler(var EXRTrialBalanceExcel: TestRequestPage "EXR Trial Balance Excel")
+    begin
+        EXRTrialBalanceExcel.GLAccounts.SetFilter("Date Filter", Format(DMY2Date(1, 1, Date2DMY(WorkDate(), 3))) + '..' + Format(DMY2Date(31, 12, Date2DMY(WorkDate(), 3))));
+        EXRTrialBalanceExcel.OK().Invoke();
+    end;
+
+    [RequestPageHandler]
+    procedure EXRTrialBalanceByPeriodHideZeroValuesHandler(var EXRTrialBalanceByPeriodExcel: TestRequestPage "EXR Trial Bal by Period Excel")
+    begin
+        EXRTrialBalanceByPeriodExcel.TrialBalanceByPeriod.SetFilter("Date Filter", Format(WorkDate()));
+        EXRTrialBalanceByPeriodExcel.HideLinesWithZeroValuesField.SetValue(true);
+        EXRTrialBalanceByPeriodExcel.OK().Invoke();
+    end;
+
+    [RequestPageHandler]
+    procedure EXRTrialBalanceByPeriodIncludeZeroValuesHandler(var EXRTrialBalanceByPeriodExcel: TestRequestPage "EXR Trial Bal by Period Excel")
+    begin
+        EXRTrialBalanceByPeriodExcel.TrialBalanceByPeriod.SetFilter("Date Filter", Format(WorkDate()));
+        EXRTrialBalanceByPeriodExcel.HideLinesWithZeroValuesField.SetValue(false);
+        EXRTrialBalanceByPeriodExcel.OK().Invoke();
+    end;
+
+    [RequestPageHandler]
+    procedure EXRTrialBalanceHideNoActivityHandler(var EXRTrialBalanceExcel: TestRequestPage "EXR Trial Balance Excel")
+    begin
+        EXRTrialBalanceExcel.GLAccounts.SetFilter("Date Filter", Format(DMY2Date(1, 1, Date2DMY(WorkDate(), 3))) + '..' + Format(DMY2Date(31, 12, Date2DMY(WorkDate(), 3))));
+        EXRTrialBalanceExcel.HideAccountsWithNoActivityField.SetValue(true);
+        EXRTrialBalanceExcel.OK().Invoke();
+    end;
+
+    [RequestPageHandler]
+    procedure EXRTrialBalanceBudgetExcelHandler(var EXRTrialBalanceBudgetExcel: TestRequestPage "EXR Trial BalanceBudgetExcel")
+    begin
+        EXRTrialBalanceBudgetExcel.GLAccounts.SetFilter("Date Filter", Format(DMY2Date(1, 1, Date2DMY(WorkDate(), 3))) + '..' + Format(DMY2Date(31, 12, Date2DMY(WorkDate(), 3))));
+        EXRTrialBalanceBudgetExcel.OK().Invoke();
+    end;
+
+    [RequestPageHandler]
+    procedure EXRConsolidatedTrialBalanceHandler(var EXRConsolidatedTrialBalance: TestRequestPage "EXR Consolidated Trial Balance")
+    begin
+        EXRConsolidatedTrialBalance.EndingDateField.Value := Format(DMY2Date(31, 12, WorkDate().Year));
+        EXRConsolidatedTrialBalance.OK().Invoke();
+    end;
+
+#if not CLEAN27
+#pragma warning disable AL0432
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Trial Balance", OnIsPerformantTrialBalanceFeatureActive, '', false, false)]
+    local procedure OnIsPerformantTrialBalanceFeatureActive(var Active: Boolean)
+    begin
+        Active := true;
+    end;
+#pragma warning restore AL0432
+#endif
+
+}

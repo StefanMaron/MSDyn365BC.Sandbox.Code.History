@@ -1,0 +1,290 @@
+// ------------------------------------------------------------------------------------------------
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License. See License.txt in the project root for license information.
+// ------------------------------------------------------------------------------------------------
+
+namespace Microsoft.Integration.Shopify;
+
+page 30145 "Shpfy Refund"
+{
+    ApplicationArea = All;
+    Caption = 'Shopify Refund';
+    PageType = Document;
+    SourceTable = "Shpfy Refund Header";
+    UsageCategory = None;
+    InsertAllowed = false;
+
+    layout
+    {
+        area(content)
+        {
+            group(General)
+            {
+                field("Shopify Order No."; Rec."Shopify Order No.")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the unique identifier for the order that appears on the order page in the Shopify admin and the order status page. For example, "#1001", "EN1001", or "1001-A".';
+                }
+                field("Refund Id"; Rec."Refund Id")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the Refund Id.';
+                }
+                field("Created At"; Rec."Created At")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the date and time when the refund was created in Shopify.';
+                }
+                field("Updated At"; Rec."Updated At")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the date and time when the refund was updated in Shopify.';
+                    Visible = false;
+                }
+                field("Sell-to Customer No."; Rec."Sell-to Customer No.")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the Sell-to Customer No.';
+                }
+                field("Sell-to Customer Name"; Rec."Sell-to Customer Name")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the Sell-to Customer Name';
+                }
+                field("Bill-to Customer No."; Rec."Bill-to Customer No.")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the Bill-to Customer No.';
+                }
+                field("Bill-to Customer Name"; Rec."Bill-to Customer Name")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the Bill-to Customer Name.';
+                }
+                field("Total Refunded Amount"; Rec."Total Refunded Amount")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the total amount across all transactions for the refund.';
+                }
+                field("Return No."; Rec."Return No.")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies the Shopify return associated with the refund.';
+                }
+                field("Is Processed"; Rec."Is Processed")
+                {
+                    ApplicationArea = All;
+                    ToolTip = 'Specifies if this refunds already is processed into a Business Central document.';
+                }
+                field(CurrencyCode; Rec."Currency Code")
+                {
+                    ToolTip = 'Specifies the currency code for the refund.';
+                }
+                group(PresentmentCurrency)
+                {
+                    ShowCaption = false;
+                    Visible = PresentmentCurrencyVisible;
+
+                    field("Pres. Tot. Refunded Amount"; Rec."Pres. Tot. Refunded Amount") { }
+                    field("Presentment Currency Code"; Rec."Presentment Currency Code") { }
+                }
+            }
+            group(Tax)
+            {
+                Caption = 'Tax';
+
+                field("Tax Area Code"; Rec."Tax Area Code")
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                    ToolTip = 'Specifies the tax area code from the parent order.';
+                }
+                field("Tax Liable"; Rec."Tax Liable")
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                    ToolTip = 'Specifies whether the parent order is liable for sales tax.';
+                }
+                field("Tax Exempt"; Rec."Tax Exempt")
+                {
+                    ApplicationArea = All;
+                    Editable = false;
+                    ToolTip = 'Specifies whether the parent order is exempt from tax.';
+                }
+            }
+            part(Lines; "Shpfy Refund Lines")
+            {
+                ApplicationArea = All;
+                Caption = 'Lines';
+                SubPageLink = "Refund Id" = field("Refund Id");
+            }
+            group(NoteGroup)
+            {
+                Caption = 'Note';
+                Visible = HasNote;
+
+                field(Note; Rec.GetNote())
+                {
+                    ApplicationArea = All;
+                    ShowCaption = false;
+                    ToolTip = 'Specifies the Note.';
+                }
+            }
+            group(LastErrorInfo)
+            {
+                Caption = 'Last Error Info';
+                Visible = Rec."Has Processing Error";
+
+                field("Last Error Description"; Rec.GetLastErrorDescription())
+                {
+                    ApplicationArea = All;
+                    ShowCaption = false;
+                    ToolTip = 'Last error information with the last process of this document.';
+                    MultiLine = true;
+                    Style = Attention;
+                }
+                field(CallStack; Rec.GetLastErrorCallStack())
+                {
+                    Caption = 'Error Call Stack';
+                    ApplicationArea = All;
+                    MultiLine = true;
+                    ToolTip = 'Specifies the processing error callstack.';
+                }
+            }
+        }
+        area(FactBoxes)
+        {
+            part(LinkedBCDocuments; "Shpfy Linked To Documents")
+            {
+                Caption = 'Linked Documents';
+                SubPageLink = "Shopify Document Type" = const("Shpfy Shop Document Type"::"Shopify Shop Refund"), "Shopify Document Id" = field("Refund Id");
+            }
+        }
+    }
+    actions
+    {
+        area(Processing)
+        {
+            action(CreateCreditMemo)
+            {
+                Caption = 'Create Sales Document';
+                Image = CreateDocument;
+                ToolTip = 'Create a sales document for this refund. The document type (Credit Memo or Return Order) is determined by the shop setting.';
+                Enabled = CanCreateDocument;
+
+                trigger OnAction()
+                var
+                    RefundsAPI: Codeunit "Shpfy Refunds API";
+                    IReturnRefundProcess: Interface "Shpfy IReturnRefund Process";
+                    ErrorInfo: ErrorInfo;
+                begin
+                    RefundsAPI.VerifyRefundCanCreateCreditMemo(Rec."Refund Id");
+                    IReturnRefundProcess := "Shpfy ReturnRefund ProcessType"::"Auto Create Credit Memo";
+                    if IReturnRefundProcess.CanCreateSalesDocumentFor("Shpfy Source Document Type"::Refund, Rec."Refund Id", ErrorInfo) then
+                        IReturnRefundProcess.CreateSalesDocument("Shpfy Source Document Type"::Refund, Rec."Refund Id")
+                    else
+                        Error(ErrorInfo);
+                end;
+            }
+            action(RetrievedShopifyData)
+            {
+                ApplicationArea = All;
+                Caption = 'Retrieved Shopify Data';
+                Image = Entry;
+                ToolTip = 'View the data retrieved from Shopify.';
+
+                trigger OnAction();
+                var
+                    DataCapture: Record "Shpfy Data Capture";
+                begin
+                    DataCapture.SetCurrentKey("Linked To Table", "Linked To Id");
+                    DataCapture.SetRange("Linked To Table", Database::"Shpfy Refund Header");
+                    DataCapture.SetRange("Linked To Id", Rec.SystemId);
+                    Page.Run(Page::"Shpfy Data Capture List", DataCapture);
+                end;
+            }
+        }
+        area(Navigation)
+        {
+            action(ShippingLines)
+            {
+                ApplicationArea = All;
+                Caption = 'Shipping Lines';
+                Image = OrderList;
+                ToolTip = 'View the shipping lines for this refund.';
+                RunObject = Page "Shpfy Refund Shipping Lines";
+                RunPageLink = "Refund Id" = field("Refund Id");
+            }
+            action(TaxLines)
+            {
+                ApplicationArea = All;
+                Caption = 'Tax Lines';
+                Image = TaxDetail;
+                ToolTip = 'View the tax lines from the parent order.';
+
+                trigger OnAction()
+                var
+                    OrderLine: Record "Shpfy Order Line";
+                    OrderTaxLine: Record "Shpfy Order Tax Line";
+                    FilterBuilder: TextBuilder;
+                begin
+                    OrderLine.SetRange("Shopify Order Id", Rec."Order Id");
+                    if OrderLine.FindSet() then
+                        repeat
+                            if FilterBuilder.Length() > 0 then
+                                FilterBuilder.Append('|');
+                            FilterBuilder.Append(Format(OrderLine."Line Id"));
+                        until OrderLine.Next() = 0;
+                    OrderTaxLine.SetFilter("Parent Id", FilterBuilder.ToText());
+                    Page.Run(Page::"Shpfy Order Tax Lines", OrderTaxLine);
+                end;
+            }
+            action(Transactions)
+            {
+                ApplicationArea = All;
+                Caption = 'Transactions';
+                Image = Payment;
+                ToolTip = 'View the transactions created for this refund that results in exchange of money.';
+                RunObject = Page "Shpfy Order Transactions";
+                RunPageLink = "Refund Id" = field("Refund Id");
+                RunPageMode = View;
+            }
+        }
+        area(Promoted)
+        {
+            actionref(PromotedShippingLines; ShippingLines) { }
+            actionref(PromotedTaxLines; TaxLines) { }
+            actionref(PromotedTransactions; Transactions) { }
+            actionref(PromotedCreateCreditNoted; CreateCreditMemo) { }
+            actionref(PromotedRetrievedShopifyData; RetrievedShopifyData) { }
+        }
+    }
+
+    var
+        HasNote: Boolean;
+        CanCreateDocument: Boolean;
+
+        PresentmentCurrencyVisible: Boolean;
+
+    trigger OnAfterGetCurrRecord()
+    begin
+        HasNote := Rec.Note.HasValue();
+        CanCreateDocument := Rec.CheckCanCreateDocument();
+    end;
+
+    trigger OnAfterGetRecord()
+    begin
+        SetPresentmentCurrencyVisibility();
+    end;
+
+    local procedure SetPresentmentCurrencyVisibility()
+    var
+        OrderHeader: Record "Shpfy Order Header";
+    begin
+        if not OrderHeader.Get(Rec."Order Id") then
+            exit;
+
+        PresentmentCurrencyVisible := OrderHeader.IsPresentmentCurrencyOrder();
+        CurrPage.Lines.Page.SetShowPresentmentCurrency(PresentmentCurrencyVisible);
+    end;
+}
