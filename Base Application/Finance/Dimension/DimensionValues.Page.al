@@ -40,19 +40,20 @@ page 537 "Dimension Values"
                     ApplicationArea = Dimensions;
                     Style = Strong;
                     StyleExpr = Emphasize;
-                    ToolTip = 'Specifies the code for the dimension value.';
+                    trigger OnValidate()
+                    begin
+                        SendSpecialCharNotification(Rec.Code);
+                    end;
                 }
                 field(Name; Rec.Name)
                 {
                     ApplicationArea = Dimensions;
                     Style = Strong;
                     StyleExpr = Emphasize;
-                    ToolTip = 'Specifies a descriptive name for the dimension value.';
                 }
                 field("Dimension Value Type"; Rec."Dimension Value Type")
                 {
                     ApplicationArea = Dimensions;
-                    ToolTip = 'Specifies the purpose of the dimension value.';
 
                     trigger OnValidate()
                     begin
@@ -62,7 +63,6 @@ page 537 "Dimension Values"
                 field(Totaling; Rec.Totaling)
                 {
                     ApplicationArea = Dimensions;
-                    ToolTip = 'Specifies an account interval or a list of account numbers. The entries of the account will be totaled to give a total balance. How entries are totaled depends on the value in the Account Type field.';
 
                     trigger OnLookup(var Text: Text): Boolean
                     var
@@ -84,18 +84,15 @@ page 537 "Dimension Values"
                 field(Blocked; Rec.Blocked)
                 {
                     ApplicationArea = Dimensions;
-                    ToolTip = 'Specifies that the related record is blocked from being posted in transactions, for example a customer that is declared insolvent or an item that is placed in quarantine.';
                 }
                 field("Map-to IC Dimension Value Code"; Rec."Map-to IC Dimension Value Code")
                 {
                     ApplicationArea = Dimensions;
-                    ToolTip = 'Specifies which intercompany dimension value corresponds to the dimension value on the line.';
                     Visible = false;
                 }
                 field("Consolidation Code"; Rec."Consolidation Code")
                 {
                     ApplicationArea = Dimensions;
-                    ToolTip = 'Specifies the code that is used for consolidation.';
                     Visible = false;
                 }
             }
@@ -181,9 +178,32 @@ page 537 "Dimension Values"
         end;
     end;
 
+    local procedure SendSpecialCharNotification(InputValue: Text[20])
+    var
+        SpecialCharNotification: Notification;
+    begin
+        if HasSpecialFilterChars(InputValue) then begin
+            SpecialCharNotification.Scope := NotificationScope::LocalScope;
+            SpecialCharNotification.Message := NotificationMsg;
+            SpecialCharNotification.Send();
+        end;
+    end;
+
+    local procedure HasSpecialFilterChars(InputValue: Text[20]): Boolean
+    begin
+        exit(
+            InputValue.Contains('&') or
+            InputValue.Contains('|') or
+            InputValue.Contains('<') or
+            InputValue.Contains('>') or
+            InputValue.Contains('=')
+            );
+    end;
+
     var
         Emphasize: Boolean;
         NameIndent: Integer;
+        NotificationMsg: Label 'The dimension value code contains characters such as &, |, <, >, or = that have special meaning in filters. This may cause unexpected results when the dimension value is used in financial reports, analysis views, or other areas that apply dimension filters. Consider using a code without these characters.';
 
     local procedure FormatLine()
     begin

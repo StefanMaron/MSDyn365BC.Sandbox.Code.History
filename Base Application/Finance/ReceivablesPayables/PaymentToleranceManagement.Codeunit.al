@@ -43,6 +43,7 @@ codeunit 426 "Payment Tolerance Management"
         AccTypeOrBalAccTypeIsIncorrectErr: Label 'The value in either the Account Type field or the Bal. Account Type field is wrong.\\ The value must be %1.', Comment = '%1 = Customer or Vendor';
         SuppressCommit: Boolean;
         SuppressWarning: Boolean;
+        UpdatingGenJnlLineAmount: Boolean;
 
     /// <summary>
     /// Validates payment tolerance for customer ledger entries and shows tolerance warning if needed.
@@ -214,6 +215,9 @@ codeunit 426 "Payment Tolerance Management"
     var
         TempGenJnlLine: Record "Gen. Journal Line" temporary;
     begin
+        if UpdatingGenJnlLineAmount then
+            exit(true);
+
         TempGenJnlLine := NewGenJnlLine;
 
         if TempGenJnlLine."Check Printed" then
@@ -271,6 +275,7 @@ codeunit 426 "Payment Tolerance Management"
     local procedure PurchPmtTolGenJnl(var GenJnlLine: Record "Gen. Journal Line"): Boolean
     var
         NewVendLedgEntry: Record "Vendor Ledger Entry";
+        GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
         GenJnlLineApplID: Code[50];
     begin
         if IsVendBlockPmtToleranceInGenJnlLine(GenJnlLine) then
@@ -284,10 +289,12 @@ codeunit 426 "Payment Tolerance Management"
         NewVendLedgEntry."Currency Code" := GenJnlLine."Currency Code";
         if GenJnlLine."Applies-to Doc. No." <> '' then
             NewVendLedgEntry."Applies-to Doc. No." := GenJnlLine."Applies-to Doc. No.";
-        DelVendPmtTolAcc(NewVendLedgEntry, GenJnlLineApplID);
+        if not GenJnlPostPreview.IsActive() then
+            DelVendPmtTolAcc(NewVendLedgEntry, GenJnlLineApplID);
         NewVendLedgEntry.Amount := GenJnlLine.Amount;
         NewVendLedgEntry."Remaining Amount" := GenJnlLine.Amount;
         NewVendLedgEntry."Document Type" := GenJnlLine."Document Type";
+        GenJnlLineGlobal := GenJnlLine;
         exit(
           PmtTolVendLedgEntry(
             NewVendLedgEntry, GenJnlLine."Account No.", GenJnlLine."Posting Date",
@@ -1603,37 +1610,24 @@ codeunit 426 "Payment Tolerance Management"
             AppliedCustLedgEntry.SetCurrentKey("Customer No.", Open, Positive);
             AppliedCustLedgEntry.SetRange("Customer No.", GenJnlLine."Account No.");
             AppliedCustLedgEntry.SetRange(Open, true);
+            AppliedCustLedgEntry.SetRange("Document No.", DocumentNo);
             AppliedCustLedgEntry.ReadIsolation(IsolationLevel::UpdLock);
-            AppliedCustLedgEntry.SetLoadFields("Document No.", "Accepted Payment Tolerance", "Accepted Pmt. Disc. Tolerance");
-            if AppliedCustLedgEntry.FindSet() then begin
-                repeat
-                    if AppliedCustLedgEntry."Document No." = DocumentNo then begin
-                        AppliedCustLedgEntry."Accepted Payment Tolerance" := 0;
-                        AppliedCustLedgEntry."Accepted Pmt. Disc. Tolerance" := false;
-                        AppliedCustLedgEntry.Modify();
-                    end;
-                until AppliedCustLedgEntry.Next() = 0;
-                if not SuppressCommit then
-                    Commit();
-            end;
+            AppliedCustLedgEntry.ModifyAll("Accepted Payment Tolerance", 0);
+            AppliedCustLedgEntry.ModifyAll("Accepted Pmt. Disc. Tolerance", false);
+            if not SuppressCommit then
+                Commit();
         end else
             if GenJnlLine."Account Type" = GenJnlLine."Account Type"::Vendor then begin
                 AppliedVendLedgEntry.SetCurrentKey("Vendor No.", Open, Positive);
                 AppliedVendLedgEntry.SetRange("Vendor No.", GenJnlLine."Account No.");
                 AppliedVendLedgEntry.SetRange(Open, true);
+                AppliedVendLedgEntry.SetRange("Document No.", DocumentNo);
                 AppliedVendLedgEntry.ReadIsolation(IsolationLevel::UpdLock);
-                AppliedVendLedgEntry.SetLoadFields("Document No.", "Accepted Payment Tolerance", "Accepted Pmt. Disc. Tolerance");
-                if AppliedVendLedgEntry.FindSet() then begin
-                    repeat
-                        if AppliedVendLedgEntry."Document No." = DocumentNo then begin
-                            AppliedVendLedgEntry."Accepted Payment Tolerance" := 0;
-                            AppliedVendLedgEntry."Accepted Pmt. Disc. Tolerance" := false;
-                            AppliedVendLedgEntry.Modify();
-                        end;
-                    until AppliedVendLedgEntry.Next() = 0;
-                    if not SuppressCommit then
-                        Commit();
-                end;
+                AppliedVendLedgEntry.ModifyAll("Accepted Payment Tolerance", 0);
+                AppliedVendLedgEntry.ModifyAll("Accepted Pmt. Disc. Tolerance", false);
+
+                if not SuppressCommit then
+                    Commit();
             end;
 
         OnAfterDelPmtTolApllnDocNo(GenJnlLine, DocumentNo, SuppressCommit);
@@ -2339,7 +2333,8 @@ codeunit 426 "Payment Tolerance Management"
                         if (AppliedCustLedgEntry."Remaining Pmt. Disc. Possible" - AppliedCustLedgEntry."Remaining Amount") <> NewCustLedgEntry.Amount then
                             if NewCustLedgEntry.Amount < (AppliedCustLedgEntry."Remaining Pmt. Disc. Possible" - AppliedCustLedgEntry."Remaining Amount") then begin
                                 NewCustLedgEntry.Amount += AppliedCustLedgEntry."Remaining Pmt. Disc. Possible";
-                                UpdateGenJournalLineAmount(NewCustLedgEntry.Amount);
+                                if GenJnlLineApplID = '' then
+                                    UpdateGenJournalLineAmount(NewCustLedgEntry.Amount);
                                 AdjustRemainingAmount(NewCustLedgEntry, AppliedCustLedgEntry."Remaining Amount");
                                 if not SuppressCommit then
                                     Commit();
@@ -2389,7 +2384,15 @@ codeunit 426 "Payment Tolerance Management"
                                 NewVendLedgEntry."Currency Code", NewVendLedgEntry."Posting Date");
                         AppliedAmount := AppliedAmount + AppliedVendLedgEntry."Remaining Pmt. Disc. Possible";
                         AmountToApply := AmountToApply + AppliedVendLedgEntry."Remaining Pmt. Disc. Possible";
-                    end
+                    end else
+                        if (AppliedVendLedgEntry."Remaining Pmt. Disc. Possible" - AppliedVendLedgEntry."Remaining Amount") <> NewVendLedgEntry.Amount then
+                            if NewVendLedgEntry.Amount > (AppliedVendLedgEntry."Remaining Pmt. Disc. Possible" - AppliedVendLedgEntry."Remaining Amount") then begin
+                                NewVendLedgEntry.Amount += AppliedVendLedgEntry."Remaining Pmt. Disc. Possible";
+                                UpdateGenJournalLineAmount(NewVendLedgEntry.Amount);
+                                AdjustRemainingAmount(NewVendLedgEntry, AppliedVendLedgEntry."Remaining Amount");
+                                if not SuppressCommit then
+                                    Commit();
+                            end;
                 end else begin
                     DelVendPmtTolAcc(NewVendLedgEntry, GenJnlLineApplID);
                     exit(false);
@@ -2550,8 +2553,10 @@ codeunit 426 "Payment Tolerance Management"
                     GenJnlLine.Amount,
                     GenJnlLine."Currency Factor"));
 
+        UpdatingGenJnlLineAmount := true;
         GenJnlLine.Validate("Amount");
         GenJnlLine.Modify(true);
+        UpdatingGenJnlLineAmount := false;
     end;
 
     local procedure AdjustRemainingAmount(var CustLedgEntry: Record "Cust. Ledger Entry"; AppliedRemainingAmount: Decimal)
@@ -2564,6 +2569,19 @@ codeunit 426 "Payment Tolerance Management"
 
             if (CustLedgEntry."Remaining Amount" < 0) and (AppliedRemainingAmount > 0) then
                 CustLedgEntry."Remaining Amount" := 0;
+        end;
+    end;
+
+    local procedure AdjustRemainingAmount(var VendLedgEntry: Record "Vendor Ledger Entry"; AppliedRemainingAmount: Decimal)
+    begin
+        if VendLedgEntry."Remaining Amount" <> 0 then begin
+            VendLedgEntry."Remaining Amount" += AppliedRemainingAmount;
+
+            if (VendLedgEntry."Remaining Amount" > 0) and (AppliedRemainingAmount < 0) then
+                VendLedgEntry."Remaining Amount" := 0;
+
+            if (VendLedgEntry."Remaining Amount" < 0) and (AppliedRemainingAmount > 0) then
+                VendLedgEntry."Remaining Amount" := 0;
         end;
     end;
 
