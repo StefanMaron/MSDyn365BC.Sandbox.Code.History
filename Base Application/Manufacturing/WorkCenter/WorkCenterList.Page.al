@@ -38,6 +38,11 @@ page 99000755 "Work Center List"
                 {
                     ApplicationArea = Manufacturing;
                 }
+                field("Name 2"; Rec."Name 2")
+                {
+                    ApplicationArea = Manufacturing;
+                    Visible = false;
+                }
                 field("Alternate Work Center"; Rec."Alternate Work Center")
                 {
                     ApplicationArea = Manufacturing;
@@ -103,6 +108,12 @@ page 99000755 "Work Center List"
                 field("Shop Calendar Code"; Rec."Shop Calendar Code")
                 {
                     ApplicationArea = Planning;
+                }
+                field("Calendar Entries Available Until"; Rec."Calendar Entries Avail. Until")
+                {
+                    ApplicationArea = Manufacturing;
+                    Editable = false;
+                    StyleExpr = CalendarHorizonStyleTxt;
                 }
                 field("Search Name"; Rec."Search Name")
                 {
@@ -278,24 +289,10 @@ page 99000755 "Work Center List"
                 Caption = 'Calculate Work Center Calendar';
                 Image = CalcWorkCenterCalendar;
                 RunObject = Report "Calculate Work Center Calendar";
-                ToolTip = 'Create new calendar entries for the work center to define the available daily capacity.';
             }
         }
         area(reporting)
         {
-#if not CLEAN26
-            action("Work Center List")
-            {
-                ApplicationArea = Manufacturing;
-                Caption = 'Work Center List';
-                Image = "Report";
-                RunObject = Report "Work Center List";
-                ToolTip = 'View or edit the list of work centers.';
-                ObsoleteState = Pending;
-                ObsoleteReason = 'This report has been replaced by the page Work Center List and will be removed in a future release.';
-                ObsoleteTag = '26.0';
-            }
-#endif
 #if not CLEAN27
             action("Work Center Load")
             {
@@ -328,7 +325,6 @@ page 99000755 "Work Center List"
                 Caption = 'Work/Machine Center Load';
                 Image = "Report";
                 RunObject = Report "Work/Machine Center Load";
-                ToolTip = 'Get an overview of availability at the work center and machine center, such as the capacity, the allocated quantity, availability after order, and the load in percent.';
             }
         }
         area(Promoted)
@@ -353,14 +349,6 @@ page 99000755 "Work Center List"
             group(Category_Report)
             {
                 Caption = 'Report', Comment = 'Generated from the PromotedActionCategories property index 2.';
-#if not CLEAN26
-                actionref("Work Center List_Promoted"; "Work Center List")
-                {
-                    ObsoleteState = Pending;
-                    ObsoleteReason = 'This report has been replaced by the page Work Center List and will be removed in a future release.';
-                    ObsoleteTag = '26.0';
-                }
-#endif
 #if not CLEAN27
                 actionref("Work Center Load_Promoted"; "Work Center Load")
                 {
@@ -398,6 +386,17 @@ page 99000755 "Work Center List"
             }
         }
     }
+
+    trigger OnAfterGetRecord()
+    begin
+        Rec.CalcFields("Calendar Entries Avail. Until");
+        CalendarHorizonStyleTxt := '';
+        if (Rec."Calendar Entries Avail. Until" <> 0D) and (Rec."Calendar Entries Avail. Until" < WorkDate()) then
+            CalendarHorizonStyleTxt := 'Unfavorable';
+    end;
+
+    var
+        CalendarHorizonStyleTxt: Text;
 
     procedure GetCurrSelectionFilter(): Text
     var

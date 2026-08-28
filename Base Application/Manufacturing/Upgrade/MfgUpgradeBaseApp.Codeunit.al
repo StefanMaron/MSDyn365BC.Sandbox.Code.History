@@ -4,13 +4,9 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Upgrade;
 
-#if not CLEAN26
+#if not CLEANSCHEMA29
 using Microsoft.Inventory.Item;
-#endif
-#if not CLEAN27
 using Microsoft.Inventory.Location;
-#endif
-#if not CLEAN26
 using Microsoft.Inventory.Planning;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Setup;
@@ -22,14 +18,12 @@ codeunit 104062 "Mfg. Upgrade BaseApp"
 
     var
         HybridDeployment: Codeunit System.Environment."Hybrid Deployment";
-#if not CLEAN27
+#if not CLEANSCHEMA29
         UpgradeTag: Codeunit System.Upgrade."Upgrade Tag";
         UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
 #endif
 
     trigger OnUpgradePerCompany()
-    var
-        CurrentModuleInfo: ModuleInfo;
     begin
         if not HybridDeployment.VerifyCanStartUpgrade(CompanyName()) then
             exit;
@@ -38,20 +32,18 @@ codeunit 104062 "Mfg. Upgrade BaseApp"
         UpgradeInventoryPlanningFields();
 #endif
 
-        // Upgrade starting from version 29
-        NavApp.GetCurrentModuleInfo(CurrentModuleInfo);
-        if CurrentModuleInfo.AppVersion().Major() < 29 then
-            exit;
-
-#if not CLEAN26
+#if not CLEANSCHEMA29
         UpgradeFlushingMethod();
 #endif
+
 #if not CLEAN27
         UpgradeGranularWarehouseHandlingSetup();
 #endif
+
+        UpgradeProdDefinitionDisplaySetup();
     end;
 
-#if not CLEAN26
+#if not CLEANSCHEMA29
     local procedure UpgradeFlushingMethod()
     begin
         if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetManufacturingFlushingMethodActivateManualWithoutPickUpgradeTag()) then
@@ -80,7 +72,32 @@ codeunit 104062 "Mfg. Upgrade BaseApp"
     end;
 #endif
 
-#if not CLEAN26
+    local procedure UpgradeProdDefinitionDisplaySetup()
+    var
+        ManufacturingSetup: Record Microsoft.Manufacturing.Setup."Manufacturing Setup";
+        UpgradeTagLocal: Codeunit System.Upgrade."Upgrade Tag";
+        UpgradeTagDefinitionsLocal: Codeunit "Upgrade Tag Definitions";
+    begin
+        if UpgradeTagLocal.HasUpgradeTag(UpgradeTagDefinitionsLocal.GetProdDefinitionDisplaySetupUpgradeTag()) then
+            exit;
+
+        // The "Show Rtng BOM Select ..." and "Show Prod Comp Select ..." fields on Manufacturing Setup were added with
+        // InitValue = Edit, but InitValue only applies to new records. Back-fill the fields to Edit to match the intended 
+        // default.
+        if ManufacturingSetup.Get() then begin
+            ManufacturingSetup."Show Rtng BOM Select Both" := ManufacturingSetup."Show Rtng BOM Select Both"::Edit;
+            ManufacturingSetup."Show Rtng BOM Select Partial" := ManufacturingSetup."Show Rtng BOM Select Partial"::Edit;
+            ManufacturingSetup."Show Rtng BOM Select Nothing" := ManufacturingSetup."Show Rtng BOM Select Nothing"::Edit;
+            ManufacturingSetup."Show Prod Comp Select Both" := ManufacturingSetup."Show Prod Comp Select Both"::Edit;
+            ManufacturingSetup."Show Prod Comp Select Partial" := ManufacturingSetup."Show Prod Comp Select Partial"::Edit;
+            ManufacturingSetup."Show Prod Comp Select Nothing" := ManufacturingSetup."Show Prod Comp Select Nothing"::Edit;
+            ManufacturingSetup.Modify();
+        end;
+
+        UpgradeTagLocal.SetUpgradeTag(UpgradeTagDefinitionsLocal.GetProdDefinitionDisplaySetupUpgradeTag());
+    end;
+
+#if not CLEANSCHEMA29
     local procedure CheckProductionOrderIsEmpty(): Boolean;
     var
         ProductionOrder: Record "Production Order";
@@ -123,7 +140,7 @@ codeunit 104062 "Mfg. Upgrade BaseApp"
     end;
 #endif
 
-#if not CLEAN27
+#if not CLEANSCHEMA29
     local procedure SetUpgradeTag(DataUpgradeExecuted: Boolean; UpgradeTagCode: Code[250])
     begin
         UpgradeTag.SetUpgradeTag(UpgradeTagCode);
@@ -132,7 +149,7 @@ codeunit 104062 "Mfg. Upgrade BaseApp"
     end;
 #endif
 
-#if not CLEAN26
+#if not CLEANSCHEMA29
     local procedure UpdateFromManualToPickPlusManualFlushingMethod_Item()
     var
         Item: Record Item;
@@ -219,7 +236,6 @@ codeunit 104062 "Mfg. Upgrade BaseApp"
                 ManufacturingSetup.Modify();
             until ManufacturingSetup.Next() = 0;
     end;
-
 #endif
 
 #if not CLEAN27

@@ -457,10 +457,13 @@ codeunit 99000842 "Service Line-Reserve"
                     CreateReservEntry.SetApplyFromEntryNo(OldReservationEntry."Appl.-from Item Entry");
                 end;
 
-                TransferQty := CreateReservEntry.TransferReservEntry(DATABASE::"Item Journal Line",
-                    ItemJournalLine."Entry Type".AsInteger(), ItemJournalLine."Journal Template Name",
-                    ItemJournalLine."Journal Batch Name", 0, ItemJournalLine."Line No.",
-                    ItemJournalLine."Qty. per Unit of Measure", OldReservationEntry, TransferQty);
+                IsHandled := false;
+                OnTransServLineToItemJnlLineOnBeforeTransferReservationEntry(OldReservationEntry, ServiceLine, ItemJournalLine, IsHandled);
+                if not IsHandled then
+                    TransferQty := CreateReservEntry.TransferReservEntry(DATABASE::"Item Journal Line",
+                        ItemJournalLine."Entry Type".AsInteger(), ItemJournalLine."Journal Template Name",
+                        ItemJournalLine."Journal Batch Name", 0, ItemJournalLine."Line No.",
+                        ItemJournalLine."Qty. per Unit of Measure", OldReservationEntry, TransferQty);
 
             until (ReservationEngineMgt.NEXTRecord(OldReservationEntry) = 0) or (TransferQty = 0);
             CheckApplFromItemEntry := false;
@@ -796,6 +799,11 @@ codeunit 99000842 "Service Line-Reserve"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnTransServLineToItemJnlLineOnBeforeTransferReservationEntry(var ReservationEntry: Record "Reservation Entry"; var ServiceLine: Record "Service Line"; var ItemJournalLine: Record "Item Journal Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnVerifyChangeOnBeforeHasError(NewServiceLine: Record "Service Line"; OldServiceLine: Record "Service Line"; var HasError: Boolean; var ShowError: Boolean)
     begin
     end;
@@ -1126,9 +1134,6 @@ codeunit 99000842 "Service Line-Reserve"
         SourceRecRef.SetTable(ServiceLine);
         ServiceLine.SetReservationEntry(CalcReservEntry);
         OnSetServLineOnBeforeUpdateReservation(CalcReservEntry, ServiceLine);
-#if not CLEAN26
-        ReservationManagement.RunOnSetServLineOnBeforeUpdateReservation(CalcReservEntry, ServiceLine);
-#endif
         EntryIsPositive := (CreateReservEntry.SignFactor(CalcReservEntry) * ServiceLine."Outstanding Qty. (Base)") <= 0;
     end;
 

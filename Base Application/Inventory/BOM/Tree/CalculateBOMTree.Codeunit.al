@@ -478,6 +478,7 @@ codeunit 5870 "Calculate BOM Tree"
             if (ParentBOMBuffer.Indentation + 1 = BOMBuffer.Indentation) and
                ((BOMBuffer."Qty. per Top Item" <> 0) or (BOMBuffer.Type in [BOMBuffer.Type::"Machine Center", BOMBuffer.Type::"Work Center"]))
             then begin
+                OnTraverseCostTreeOnBeforeAddCosts(BOMBuffer, ParentBOMBuffer);
                 if not BOMBuffer."Is Leaf" then
                     TraverseCostTree(BOMBuffer)
                 else
@@ -514,6 +515,7 @@ codeunit 5870 "Calculate BOM Tree"
             end;
 
         BOMBuffer := ParentBOMBuffer;
+        OnTraverseCostTreeOnBeforeLastUpdateNodeCosts(BOMBuffer, ParentBOMBuffer);
         UpdateNodeCosts(BOMBuffer, ParentBOMBuffer."Lot Size");
         exit(BOMBuffer."Able to Make Top Item");
     end;
@@ -769,6 +771,8 @@ codeunit 5870 "Calculate BOM Tree"
             DueDate := StartDate
         else
             DueDate := StartDate - (CalcDate(LeadTimeOffset, StartDate) - StartDate);
+
+        OnAfterCalcCompDueDate(DueDate, DemandDate, ParentItem, LeadTimeOffset);
     end;
 
     local procedure AvailByDateExists(BOMBuffer: Record "BOM Buffer"): Boolean
@@ -830,6 +834,11 @@ codeunit 5870 "Calculate BOM Tree"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterFilterBOMBuffer(var ParentItem: Record Item; var BOMBuffer: Record "BOM Buffer"; DemandDate: Date; TreeType: Option)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterCalcCompDueDate(var DueDate: Date; DemandDate: Date; ParentItem: Record Item; LeadTimeOffset: DateFormula)
     begin
     end;
 
@@ -1024,6 +1033,16 @@ codeunit 5870 "Calculate BOM Tree"
 
     [IntegrationEvent(false, false)]
     local procedure OnTraverseCostTreeOnAfterAddCosts(var ParentBOMBuffer: Record "BOM Buffer"; var BOMBuffer: Record "BOM Buffer")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnTraverseCostTreeOnBeforeAddCosts(var BOMBuffer: Record "BOM Buffer"; var ParentBOMBuffer: Record "BOM Buffer")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnTraverseCostTreeOnBeforeLastUpdateNodeCosts(var BOMBuffer: Record "BOM Buffer"; var ParentBOMBuffer: Record "BOM Buffer")
     begin
     end;
 

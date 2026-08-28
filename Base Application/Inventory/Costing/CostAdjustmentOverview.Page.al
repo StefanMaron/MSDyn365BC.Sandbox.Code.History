@@ -10,6 +10,7 @@ using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Setup;
 using System.Environment;
+using System.Environment.Configuration;
 using System.Text;
 
 page 5801 "Cost Adjustment Overview"
@@ -450,7 +451,6 @@ page 5801 "Cost Adjustment Overview"
                     Caption = 'Post inventory cost to G/L';
                     Image = PostInventoryToGL;
                     RunObject = Report "Post Inventory Cost to G/L";
-                    ToolTip = 'Post the quantity and value changes to the inventory in the item ledger entries and the value entries when you post inventory transactions, such as sales shipments or purchase receipts.';
                 }
             }
             group(Diagnostics)
@@ -470,6 +470,7 @@ page 5801 "Cost Adjustment Overview"
                     Caption = 'Export item data';
                     ToolTip = 'Use this function to export item related data to text file (you can attach this file to support requests in case you may have issues with costing calculation).';
                     Image = Export;
+                    Visible = not ManufacturingEnabled;
 
                     trigger OnAction()
                     var
@@ -484,7 +485,7 @@ page 5801 "Cost Adjustment Overview"
                     Caption = 'Import item data';
                     ToolTip = 'Use this function to import item related data from text file.';
                     Image = Import;
-                    Visible = SandboxActionsVisible;
+                    Visible = SandboxActionsVisible and not ManufacturingEnabled;
 
                     trigger OnAction()
                     begin
@@ -496,7 +497,6 @@ page 5801 "Cost Adjustment Overview"
                 action("Reset Cost Is Adjusted")
                 {
                     Caption = 'Reset Cost Is Adjusted';
-                    ToolTip = 'Mark that the cost of the item must be adjusted.';
                     Image = MoveToNextPeriod;
 
                     RunObject = report "Reset Cost Is Adjusted";
@@ -504,7 +504,6 @@ page 5801 "Cost Adjustment Overview"
                 action("Costing Issues Detection")
                 {
                     Caption = 'Costing Issues Detection report';
-                    ToolTip = 'Run the diagnostic report to detect issues in item related data that may cause costing calculation errors.';
                     Image = ShowWarning;
 
                     RunObject = report "Costing Errors Detection";
@@ -595,6 +594,7 @@ page 5801 "Cost Adjustment Overview"
         AverageCostCalcType, AverageCostPeriod : Text;
         StatusRunStyleExpr, StatusItemStyleExpr : Text;
         SandboxActionsVisible: Boolean;
+        ManufacturingEnabled: Boolean;
         StrMenuOptionsTxt: Label 'Selected,All', Comment = 'Comma separated phrases must be translated separately.';
         ScheduleInstructionTxt: Label 'For which items do you want to schedule the cost adjustment?';
         RunInstructionTxt: Label 'For which items do you want to run the cost adjustment?';
@@ -604,8 +604,10 @@ page 5801 "Cost Adjustment Overview"
 
     trigger OnOpenPage()
     var
+        ApplicationAreaMgmtFacade: Codeunit "Application Area Mgmt. Facade";
     begin
         SandboxActionsVisible := IsSandBoxActionsVisible();
+        ManufacturingEnabled := ApplicationAreaMgmtFacade.IsManufacturingEnabled();
 
         CheckActionMessages();
     end;

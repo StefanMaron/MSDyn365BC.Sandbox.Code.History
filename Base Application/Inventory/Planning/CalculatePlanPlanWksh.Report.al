@@ -46,9 +46,12 @@ report 99001017 "Calculate Plan - Plan. Wksh."
                 end else begin
                     CalcItemPlan.ClearInvtProfileOffsetting();
                     CalcItemPlan.SetResiliencyOn();
-                    if CalcItemPlan.Run(Item) then
-                        CounterOK := CounterOK + 1
-                    else
+                    if CalcItemPlan.Run(Item) then begin
+                        if CalcItemPlan.GetPlanningSkippedForMissingSKUPolicy() then
+                            CalcItemPlan.GetResiliencyErrors(PlanningErrorLog)
+                        else
+                            CounterOK := CounterOK + 1;
+                    end else
                         if not CalcItemPlan.GetResiliencyError(PlanningErrorLog) then begin
                             ErrorText := CopyStr(GetLastErrorText, 1, MaxStrLen(ErrorText));
                             if ErrorText = '' then
@@ -89,6 +92,7 @@ report 99001017 "Calculate Plan - Plan. Wksh."
                 CalcItemPlan.Initialize(FromDate, ToDate, MPS, MRP, RespectPlanningParm);
 
                 SetAtStartPosition := true;
+                OnOnPreDataItemOnAfterSetAtStartPosition(Item);
 
                 ReqLine.SetRange("Worksheet Template Name", CurrTemplateName);
                 ReqLine.SetRange("Journal Batch Name", CurrWorksheetName);
@@ -376,6 +380,11 @@ report 99001017 "Calculate Plan - Plan. Wksh."
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterItemOnPreDataItem(var Item: Record Item)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnOnPreDataItemOnAfterSetAtStartPosition(var Item: Record Item)
     begin
     end;
 
