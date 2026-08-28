@@ -187,6 +187,14 @@ table 339 "Item Application Entry"
 #endif
         TrackChain: Boolean;
         MaxValuationDate: Date;
+        CheckCyclicalLoopDepth: Integer;
+        FwdToAppliedOutbndsCache: Dictionary of [Integer, Boolean];
+        FwdToAppliedInbndsCache: Dictionary of [Integer, Boolean];
+        FwdToInbndTransfersCache: Dictionary of [Integer, Boolean];
+        NegativeToPositiveChain: Dictionary of [Integer, Boolean];
+        PositiveToNegativeChain: Dictionary of [Integer, Boolean];
+        CheckCyclicProdCyclicalLoopCache: Dictionary of [Text, Boolean];
+        CheckCyclicAsmCyclicalLoopCache: Dictionary of [Text, Boolean];
         AppliedFromEntryToAdjustErr: Label 'You have to run the %1 batch job, before you can revalue %2 %3.', Comment = '%1 = Report::"Adjust Cost - Item Entries", %2 = Item Ledger Entry table caption, %3 = Inbound Item Ledger Entry No.';
 
     [InherentPermissions(PermissionObjectType::TableData, Database::"Item Application Entry", 'r')]
@@ -438,33 +446,45 @@ table 339 "Item Application Entry"
     begin
         if CheckItemLedgEntry."Entry No." = FromItemLedgEntry."Entry No." then
             exit(true);
-        TempVisitedItemApplicationEntry.DeleteAll();
-        TempItemLedgerEntryInChainNo.DeleteAll();
+
+        // Only reset visited tracking on the outermost (non-reentrant) call.
+        // A reentrant call (e.g. via an event subscriber that triggers ApplyItemLedgEntry)
+        // must NOT clear this state, otherwise the outer traversal loses its cycle-detection
+        // guard and recurses infinitely.
+        if CheckCyclicalLoopDepth = 0 then begin
+            TempVisitedItemApplicationEntry.DeleteAll();
+            TempItemLedgerEntryInChainNo.DeleteAll();
+            ClearChainCaches();
+        end;
+        CheckCyclicalLoopDepth += 1;
 
         if FromItemLedgEntry.Positive then begin
-            if CheckCyclicFwdToAppliedOutbnds(CheckItemLedgEntry, FromItemLedgEntry."Entry No.") then
-                exit(true);
-            exit(CheckCyclicFwdToInbndTransfers(CheckItemLedgEntry, FromItemLedgEntry."Entry No."));
+            IsCyclicalLoop := CheckCyclicFwdToAppliedOutbnds(CheckItemLedgEntry, FromItemLedgEntry."Entry No.");
+            if not IsCyclicalLoop then
+                IsCyclicalLoop := CheckCyclicFwdToInbndTransfers(CheckItemLedgEntry, FromItemLedgEntry."Entry No.");
+        end else begin
+            if FromItemLedgEntry."Entry Type" = FromItemLedgEntry."Entry Type"::Consumption then
+                IsCyclicalLoop := CheckCyclicProdCyclicalLoop(CheckItemLedgEntry, FromItemLedgEntry);
+            if not IsCyclicalLoop then
+                if FromItemLedgEntry."Entry Type" = FromItemLedgEntry."Entry Type"::"Assembly Consumption" then
+                    IsCyclicalLoop := CheckCyclicAsmCyclicalLoop(CheckItemLedgEntry, FromItemLedgEntry);
+            if not IsCyclicalLoop then begin
+                OnCheckIsCyclicalLoopOnBeforeCheckCyclicForwardToAppliedInbounds(CheckItemLedgEntry, FromItemLedgEntry, MaxValuationDate, IsCyclicalLoop);
+                if not IsCyclicalLoop then
+                    IsCyclicalLoop := CheckCyclicFwdToAppliedInbnds(CheckItemLedgEntry, FromItemLedgEntry."Entry No.");
+            end;
         end;
-        if FromItemLedgEntry."Entry Type" = FromItemLedgEntry."Entry Type"::Consumption then
-            if CheckCyclicProdCyclicalLoop(CheckItemLedgEntry, FromItemLedgEntry) then
-                exit(true);
-        if FromItemLedgEntry."Entry Type" = FromItemLedgEntry."Entry Type"::"Assembly Consumption" then
-            if CheckCyclicAsmCyclicalLoop(CheckItemLedgEntry, FromItemLedgEntry) then
-                exit(true);
 
-        IsCyclicalLoop := false;
-        OnCheckIsCyclicalLoopOnBeforeCheckCyclicForwardToAppliedInbounds(CheckItemLedgEntry, FromItemLedgEntry, MaxValuationDate, IsCyclicalLoop);
-        if IsCyclicalLoop then
-            exit(true);
-
-        exit(CheckCyclicFwdToAppliedInbnds(CheckItemLedgEntry, FromItemLedgEntry."Entry No."));
+        CheckCyclicalLoopDepth -= 1;
+        exit(IsCyclicalLoop);
     end;
 
     local procedure CheckCyclicProdCyclicalLoop(CheckItemLedgerEntry: Record "Item Ledger Entry"; ItemLedgerEntry: Record "Item Ledger Entry"): Boolean
     var
         Result: Boolean;
         IsHandled: Boolean;
+        CacheKey: Text;
+        TargetInChain: Boolean;
     begin
         Result := false;
         IsHandled := false;
@@ -472,6 +492,18 @@ table 339 "Item Application Entry"
         if IsHandled then
             exit(Result);
 
+        CacheKey := BuildProdAsmCacheKey(ItemLedgerEntry);
+        if CheckCyclicProdCyclicalLoopCache.Get(CacheKey, TargetInChain) then
+            exit(TargetInChain);
+
+        Result := CheckCyclicProdCyclicalLoopInner(CheckItemLedgerEntry, ItemLedgerEntry);
+        if not CheckCyclicProdCyclicalLoopCache.ContainsKey(CacheKey) then
+            CheckCyclicProdCyclicalLoopCache.Add(CacheKey, Result);
+        exit(Result);
+    end;
+
+    local procedure CheckCyclicProdCyclicalLoopInner(CheckItemLedgerEntry: Record "Item Ledger Entry"; var ItemLedgerEntry: Record "Item Ledger Entry"): Boolean
+    begin
         if not IsItemEntryTypeEverPosted(ItemLedgerEntry."Item No.", "Item Ledger Entry Type"::Output) then
             exit(false);
 
@@ -500,6 +532,8 @@ table 339 "Item Application Entry"
     var
         Result: Boolean;
         IsHandled: Boolean;
+        CacheKey: Text;
+        TargetInChain: Boolean;
     begin
         Result := false;
         IsHandled := false;
@@ -507,6 +541,18 @@ table 339 "Item Application Entry"
         if IsHandled then
             exit(Result);
 
+        CacheKey := BuildProdAsmCacheKey(ItemLedgerEntry);
+        if CheckCyclicAsmCyclicalLoopCache.Get(CacheKey, TargetInChain) then
+            exit(TargetInChain);
+
+        Result := CheckCyclicAsmCyclicalLoopInner(CheckItemLedgerEntry, ItemLedgerEntry);
+        if not CheckCyclicAsmCyclicalLoopCache.ContainsKey(CacheKey) then
+            CheckCyclicAsmCyclicalLoopCache.Add(CacheKey, Result);
+        exit(Result);
+    end;
+
+    local procedure CheckCyclicAsmCyclicalLoopInner(CheckItemLedgerEntry: Record "Item Ledger Entry"; var ItemLedgerEntry: Record "Item Ledger Entry"): Boolean
+    begin
         if not IsItemEntryTypeEverPosted(ItemLedgerEntry."Item No.", "Item Ledger Entry Type"::"Assembly Output") then
             exit(false);
 
@@ -527,6 +573,17 @@ table 339 "Item Application Entry"
         ItemLedgerEntry.SetRange("Order No.", ItemLedgerEntry."Order No.");
         ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::"Assembly Output");
         exit(CheckCyclicOrderCyclicalLoop(CheckItemLedgerEntry, ItemLedgerEntry));
+    end;
+
+    local procedure BuildProdAsmCacheKey(ItemLedgerEntry: Record "Item Ledger Entry"): Text
+    begin
+        exit(StrSubstNo('%1|%2|%3|%4|%5|%6',
+          ItemLedgerEntry."Item No.",
+          ItemLedgerEntry."Order Type",
+          ItemLedgerEntry."Order No.",
+          ItemLedgerEntry."Order Line No.",
+          ItemLedgerEntry."Entry Type",
+          ItemLedgerEntry.Positive));
     end;
 
     local procedure CheckCyclicOrderCyclicalLoop(CheckItemLedgerEntry: Record "Item Ledger Entry"; var ItemLedgerEntry: Record "Item Ledger Entry"): Boolean
@@ -554,31 +611,55 @@ table 339 "Item Application Entry"
     local procedure CheckCyclicFwdToAppliedOutbnds(CheckItemLedgerEntry: Record "Item Ledger Entry"; EntryNo: Integer): Boolean
     var
         ItemApplicationEntriesOutb: Query "Item Application Entries Outb.";
+        Result: Boolean;
     begin
-        if AppliedOutbndEntryExists(ItemApplicationEntriesOutb, EntryNo, false, false) then
-            exit(CheckCyclicFwdToAppliedOutbEntries(CheckItemLedgerEntry, ItemApplicationEntriesOutb, EntryNo, true));
+        if FwdToAppliedOutbndsCache.Get(EntryNo, Result) then
+            exit(Result);
 
-        exit(false);
+        if AppliedOutbndEntryExists(ItemApplicationEntriesOutb, EntryNo, false, false) then
+            Result := CheckCyclicFwdToAppliedOutbEntries(CheckItemLedgerEntry, ItemApplicationEntriesOutb, EntryNo, true)
+        else
+            Result := false;
+
+        if not FwdToAppliedOutbndsCache.ContainsKey(EntryNo) then
+            FwdToAppliedOutbndsCache.Add(EntryNo, Result);
+        exit(Result);
     end;
 
     local procedure CheckCyclicFwdToAppliedInbnds(CheckItemLedgerEntry: Record "Item Ledger Entry"; EntryNo: Integer): Boolean
     var
         ItemApplicationEntriesInb: Query "Item Application Entries Inb.";
+        Result: Boolean;
     begin
-        if AppliedInbndEntryExists(ItemApplicationEntriesInb, EntryNo, false) then
-            exit(CheckCyclicFwdToAppliedInbEntries(CheckItemLedgerEntry, ItemApplicationEntriesInb, EntryNo, false));
+        if FwdToAppliedInbndsCache.Get(EntryNo, Result) then
+            exit(Result);
 
-        exit(false);
+        if AppliedInbndEntryExists(ItemApplicationEntriesInb, EntryNo, false) then
+            Result := CheckCyclicFwdToAppliedInbEntries(CheckItemLedgerEntry, ItemApplicationEntriesInb, EntryNo, false)
+        else
+            Result := false;
+
+        if not FwdToAppliedInbndsCache.ContainsKey(EntryNo) then
+            FwdToAppliedInbndsCache.Add(EntryNo, Result);
+        exit(Result);
     end;
 
     local procedure CheckCyclicFwdToInbndTransfers(CheckItemLedgerEntry: Record "Item Ledger Entry"; EntryNo: Integer): Boolean
     var
         ItemApplicationEntries: Query "Item Application Entries";
+        Result: Boolean;
     begin
-        if AppliedInbndTransEntryExists(ItemApplicationEntries, EntryNo, false) then
-            exit(CheckCyclicFwdToAppliedEntries(CheckItemLedgerEntry, ItemApplicationEntries, EntryNo, false));
+        if FwdToInbndTransfersCache.Get(EntryNo, Result) then
+            exit(Result);
 
-        exit(false);
+        if AppliedInbndTransEntryExists(ItemApplicationEntries, EntryNo, false) then
+            Result := CheckCyclicFwdToAppliedEntries(CheckItemLedgerEntry, ItemApplicationEntries, EntryNo, false)
+        else
+            Result := false;
+
+        if not FwdToInbndTransfersCache.ContainsKey(EntryNo) then
+            FwdToInbndTransfersCache.Add(EntryNo, Result);
+        exit(Result);
     end;
 
     local procedure CheckCyclicFwdToProdOutput(CheckItemLedgerEntry: Record "Item Ledger Entry"; EntryNo: Integer): Boolean
@@ -668,6 +749,7 @@ table 339 "Item Application Entry"
     local procedure CheckCyclicFwdToSingleAppliedEntry(CheckItemLedgerEntry: Record "Item Ledger Entry"; ToEntryNo: Integer; ItemLedgerEntryNo: Integer; IsPositiveToNegativeFlow: Boolean): Boolean
     var
         IsCyclicalLoop: Boolean;
+        TargetInChain: Boolean;
     begin
         if not CheckLatestItemLedgerEntryValuationDate(ItemLedgerEntryNo, MaxValuationDate) then
             exit(false);
@@ -677,23 +759,37 @@ table 339 "Item Application Entry"
             if TempItemLedgerEntryInChainNo.Insert() then;
         end;
 
-        if ToEntryNo = CheckItemLedgerEntry."Entry No." then
+        if LookupChainResult(ToEntryNo, IsPositiveToNegativeFlow, TargetInChain) then
+            exit(TargetInChain);
+
+        if ToEntryNo = CheckItemLedgerEntry."Entry No." then begin
+            CacheChainResult(ToEntryNo, IsPositiveToNegativeFlow, true);
             exit(true);
+        end;
 
         if not IsPositiveToNegativeFlow then begin
-            if CheckCyclicFwdToAppliedOutbnds(CheckItemLedgerEntry, ToEntryNo) then
+            if CheckCyclicFwdToAppliedOutbnds(CheckItemLedgerEntry, ToEntryNo) then begin
+                CacheChainResult(ToEntryNo, IsPositiveToNegativeFlow, true);
                 exit(true);
+            end;
         end else begin
-            if CheckCyclicFwdToAppliedInbnds(CheckItemLedgerEntry, ToEntryNo) then
+            if CheckCyclicFwdToAppliedInbnds(CheckItemLedgerEntry, ToEntryNo) then begin
+                CacheChainResult(ToEntryNo, IsPositiveToNegativeFlow, true);
                 exit(true);
-            if CheckCyclicFwdToProdOutput(CheckItemLedgerEntry, ToEntryNo) then
+            end;
+            if CheckCyclicFwdToProdOutput(CheckItemLedgerEntry, ToEntryNo) then begin
+                CacheChainResult(ToEntryNo, IsPositiveToNegativeFlow, true);
                 exit(true);
-            if CheckCyclicFwdToAsmOutput(CheckItemLedgerEntry, ToEntryNo) then
+            end;
+            if CheckCyclicFwdToAsmOutput(CheckItemLedgerEntry, ToEntryNo) then begin
+                CacheChainResult(ToEntryNo, IsPositiveToNegativeFlow, true);
                 exit(true);
+            end;
         end;
 
         IsCyclicalLoop := false;
         OnCheckCyclicFwdToAppliedEntriesOnAfterCheckItemApplicationEntry(CheckItemLedgerEntry, ToEntryNo, IsPositiveToNegativeFlow, IsCyclicalLoop);
+        CacheChainResult(ToEntryNo, IsPositiveToNegativeFlow, IsCyclicalLoop);
         exit(IsCyclicalLoop);
     end;
 
@@ -712,6 +808,34 @@ table 339 "Item Application Entry"
         TempVisitedItemApplicationEntry.Quantity := TempVisitedItemApplicationEntry.Quantity + 1;
         TempVisitedItemApplicationEntry.Insert();
         exit(false);
+    end;
+
+    local procedure LookupChainResult(EntryNo: Integer; IsPositiveToNegative: Boolean; var TargetInChain: Boolean): Boolean
+    begin
+        if IsPositiveToNegative then
+            exit(PositiveToNegativeChain.Get(EntryNo, TargetInChain));
+        exit(NegativeToPositiveChain.Get(EntryNo, TargetInChain));
+    end;
+
+    local procedure CacheChainResult(EntryNo: Integer; IsPositiveToNegative: Boolean; TargetInChain: Boolean)
+    begin
+        if IsPositiveToNegative then begin
+            if not PositiveToNegativeChain.ContainsKey(EntryNo) then
+                PositiveToNegativeChain.Add(EntryNo, TargetInChain);
+        end else
+            if not NegativeToPositiveChain.ContainsKey(EntryNo) then
+                NegativeToPositiveChain.Add(EntryNo, TargetInChain);
+    end;
+
+    local procedure ClearChainCaches()
+    begin
+        Clear(FwdToAppliedOutbndsCache);
+        Clear(FwdToAppliedInbndsCache);
+        Clear(FwdToInbndTransfersCache);
+        Clear(NegativeToPositiveChain);
+        Clear(PositiveToNegativeChain);
+        Clear(CheckCyclicProdCyclicalLoopCache);
+        Clear(CheckCyclicAsmCyclicalLoopCache);
     end;
 
     procedure GetVisitedEntries(FromItemLedgEntry: Record "Item Ledger Entry"; var ItemLedgEntryInChain: Record "Item Ledger Entry"; WithinValuationDate: Boolean)

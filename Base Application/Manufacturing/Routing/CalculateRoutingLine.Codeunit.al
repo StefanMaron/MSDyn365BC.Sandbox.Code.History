@@ -134,6 +134,7 @@ codeunit 99000774 "Calculate Routing Line"
     var
         ActuallyPostedTime: Decimal;
         DistributedCapNeed: Decimal;
+        ShouldUpdateAllocatedTimeAndExpectedCapacityNeed: Boolean;
     begin
         OnBeforeInitProdOrderCapNeed(ProdOrder, ProdOrderRoutingLine, ProdOrderCapNeed, TimeType, NeedDate, StartingTime, EndingTime, NeedQty, LotSize);
 
@@ -157,7 +158,9 @@ codeunit 99000774 "Calculate Routing Line"
         ProdOrderCapNeed.Efficiency := CalendarEntry.Efficiency;
         ProdOrderCapNeed."Requested Only" := false;
         ProdOrderCapNeed.Active := true;
-        if ProdOrder.Status <> ProdOrder.Status::Simulated then begin
+        ShouldUpdateAllocatedTimeAndExpectedCapacityNeed := ProdOrder.Status <> ProdOrder.Status::Simulated;
+        OnInitProdOrderCapNeedOnBeforeUpdateAllocatedTimeAndExpectedCapacityNeed(ProdOrderCapNeed, ShouldUpdateAllocatedTimeAndExpectedCapacityNeed);
+        if ShouldUpdateAllocatedTimeAndExpectedCapacityNeed then begin
             ActuallyPostedTime := CalcActuallyPostedCapacityTime(ProdOrderRoutingLine, TimeType);
             DistributedCapNeed := CalcDistributedCapacityNeedForOperation(ProdOrderRoutingLine, TimeType);
             ProdOrderCapNeed."Allocated Time" := NeedQty - ActuallyPostedTime + DistributedCapNeed;
@@ -182,7 +185,7 @@ codeunit 99000774 "Calculate Routing Line"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCreateLoadBack(RemainNeedQty, CalendarEntry, TimeType, Write, FirstEntry, WaitTimeOnly, CurrentWorkCenterNo, ProdStartingDate, ProdStartingTime, ProdEndingDate, ProdEndingTime, IsHandled);
+        OnBeforeCreateLoadBack(RemainNeedQty, CalendarEntry, TimeType, Write, FirstEntry, WaitTimeOnly, CurrentWorkCenterNo, ProdStartingDate, ProdStartingTime, ProdEndingDate, ProdEndingTime, IsHandled, RemainNeedQtyBase, CurrentTimeFactor);
         if IsHandled then
             exit;
 
@@ -283,7 +286,7 @@ codeunit 99000774 "Calculate Routing Line"
         IsHandled: Boolean;
     begin
         IsHandled := false;
-        OnBeforeCreateLoadForward(RemainNeedQty, CalendarEntry, TimeType, Write, LoadFactor, FirstEntry, WaitTimeOnly, CurrentWorkCenterNo, ProdStartingDate, ProdStartingTime, ProdEndingDate, ProdEndingTime, IsHandled);
+        OnBeforeCreateLoadForward(RemainNeedQty, CalendarEntry, TimeType, Write, LoadFactor, FirstEntry, WaitTimeOnly, CurrentWorkCenterNo, ProdStartingDate, ProdStartingTime, ProdEndingDate, ProdEndingTime, IsHandled, RemainNeedQtyBase, CurrentTimeFactor);
         if IsHandled then
             exit;
 
@@ -1361,7 +1364,7 @@ codeunit 99000774 "Calculate Routing Line"
         CalcExpectedCost(ProdOrderRoutingLine, TotalQtyPerOperation, TotalCapacityPerOperation);
 
         IsHandled := false;
-        OnBeforeScheduleRoutingLine(ProdOrderRoutingLine, CalcStartEndDate, IsHandled);
+        OnBeforeScheduleRoutingLine(ProdOrderRoutingLine, CalcStartEndDate, IsHandled, Direction);
         if not IsHandled then
             if ProdOrderRoutingLine."Schedule Manually" then
                 CalculateRoutingLineFixed()
@@ -1467,6 +1470,7 @@ codeunit 99000774 "Calculate Routing Line"
                         repeat
                             if LastProdOrderCapNeed."Ending Time" < EndTime then begin
                                 AvailTime := Min(CalendarMgt.CalcTimeDelta(EndTime, LastProdOrderCapNeed."Ending Time"), AvailCap);
+                                OnFinitelyLoadCapBackOnAfterCalcAvailTimeFromLastProdOrderCapNeed(AvailTime, EndTime, AvailCap, LastProdOrderCapNeed);
                                 if AvailTime > 0 then begin
                                     UpdateTimesBack(AvailTime, AvailCap, TimetoProgram, StartTime, EndTime);
                                     CreateCapNeed(CalendarEntry.Date, StartTime, EndTime, TimetoProgram, TimeType, 1);
@@ -1488,6 +1492,7 @@ codeunit 99000774 "Calculate Routing Line"
 
                     if (AvailCap > 0) and (RemainNeedQty > 0) then begin
                         AvailTime := Min(CalendarMgt.CalcTimeDelta(EndTime, CalendarEntry."Starting Time"), AvailCap);
+                        OnFinitelyLoadCapBackOnAfterCalcAvailTimeFromCalendarEntry(AvailTime, EndTime, AvailCap, CalendarEntry);
                         if AvailTime > 0 then begin
                             UpdateTimesBack(AvailTime, AvailCap, TimetoProgram, StartTime, EndTime);
                             AdjustStartingTime(CalendarEntry, StartTime);
@@ -1716,6 +1721,7 @@ codeunit 99000774 "Calculate Routing Line"
     var
         RoundedTimetoProgram: Decimal;
         IsHandled: Boolean;
+        ShouldUpdateAvailCap: Boolean;
     begin
         IsHandled := false;
         OnBeforeUpdateTimesBack(CalendarEntry, ProdOrderRoutingLine, AvailTime, AvailCap, TimetoProgram, StartTime, EndTime, ConCurrCap, Workcenter, RemainNeedQty, IsHandled);
@@ -1732,7 +1738,9 @@ codeunit 99000774 "Calculate Routing Line"
             100 / CalendarEntry.Efficiency / ConCurrCap, 1, '>');
         StartTime := CalendarMgt.CalcTimeSubtract(EndTime, RoundedTimetoProgram);
         RemainNeedQty := RemainNeedQty - TimetoProgram;
-        if ProdOrderRoutingLine.Status <> ProdOrderRoutingLine.Status::Simulated then
+        ShouldUpdateAvailCap := ProdOrderRoutingLine.Status <> ProdOrderRoutingLine.Status::Simulated;
+        OnUpdateTimesBackOnBeforeUpdateAvailCap(ProdOrderRoutingLine, ShouldUpdateAvailCap);
+        if ShouldUpdateAvailCap then
             AvailCap := AvailCap - RoundedTimetoProgram;
     end;
 
@@ -1740,6 +1748,7 @@ codeunit 99000774 "Calculate Routing Line"
     var
         RoundedTimetoProgram: Decimal;
         IsHandled: Boolean;
+        ShouldUpdateAvailCap: Boolean;
     begin
         IsHandled := false;
         OnBeforeUpdateTimesForward(CalendarEntry, ProdOrderRoutingLine, AvailTime, AvailCap, TimetoProgram, StartTime, EndTime, ConCurrCap, Workcenter, RemainNeedQty, IsHandled);
@@ -1756,7 +1765,9 @@ codeunit 99000774 "Calculate Routing Line"
             100 / CalendarEntry.Efficiency / ConCurrCap, 1, '>');
         EndTime := StartTime + RoundedTimetoProgram;
         RemainNeedQty := RemainNeedQty - TimetoProgram;
-        if ProdOrderRoutingLine.Status <> ProdOrderRoutingLine.Status::Simulated then
+        ShouldUpdateAvailCap := ProdOrderRoutingLine.Status <> ProdOrderRoutingLine.Status::Simulated;
+        OnUpdateTimesForwardOnBeforeUpdateAvailCap(ProdOrderRoutingLine, ShouldUpdateAvailCap);
+        if ShouldUpdateAvailCap then
             AvailCap := AvailCap - RoundedTimetoProgram;
     end;
 
@@ -2068,6 +2079,11 @@ codeunit 99000774 "Calculate Routing Line"
     var
         CapacityLedgerEntry: Record "Capacity Ledger Entry";
     begin
+        if not (ProdOrderRoutingLine.Status in
+                [ProdOrderRoutingLine.Status::Released, ProdOrderRoutingLine.Status::Finished])
+        then
+            exit(0);
+
         if TimeType in [TimeType::"Setup Time", TimeType::"Run Time"] then begin
             CapacityLedgerEntry.SetRange("Order Type", CapacityLedgerEntry."Order Type"::Production);
             CapacityLedgerEntry.SetRange("Order No.", ProdOrderRoutingLine."Prod. Order No.");
@@ -2334,7 +2350,7 @@ codeunit 99000774 "Calculate Routing Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeScheduleRoutingLine(var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; var CalcStartEndDate: Boolean; var IsHandled: Boolean)
+    local procedure OnBeforeScheduleRoutingLine(var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; var CalcStartEndDate: Boolean; var IsHandled: Boolean; var Direction: Option Forward,Backward)
     begin
     end;
 
@@ -2384,7 +2400,7 @@ codeunit 99000774 "Calculate Routing Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCreateLoadForwardOnBeforeEndStopLoop(ProdOrderRoutingLine: Record "Prod. Order Routing Line"; TimeType: Enum "Routing Time Type"; var StopLoop: Boolean; FirstEntry: Boolean; WaitTimeOnly: Boolean; ProdStartingDate: Date; ProdStartingTime: Time; ProdEndingDate: Date; ProdEndingTime: Time; var RemainNeedQty: Decimal; var RemainNeedQtyBase: Decimal; Write: Boolean; LoadFactor: Decimal; CurrentWorkCenterNo: Code[20]; CurrentTimeFactor: Decimal; CurrentRounding: Decimal; var CalendarEntry: Record "Calendar Entry")
+    local procedure OnCreateLoadForwardOnBeforeEndStopLoop(ProdOrderRoutingLine: Record "Prod. Order Routing Line"; var TimeType: Enum "Routing Time Type"; var StopLoop: Boolean; FirstEntry: Boolean; WaitTimeOnly: Boolean; ProdStartingDate: Date; ProdStartingTime: Time; ProdEndingDate: Date; ProdEndingTime: Time; var RemainNeedQty: Decimal; var RemainNeedQtyBase: Decimal; var Write: Boolean; var LoadFactor: Decimal; var CurrentWorkCenterNo: Code[20]; var CurrentTimeFactor: Decimal; var CurrentRounding: Decimal; var CalendarEntry: Record "Calendar Entry")
     begin
     end;
 
@@ -2539,6 +2555,16 @@ codeunit 99000774 "Calculate Routing Line"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnFinitelyLoadCapBackOnAfterCalcAvailTimeFromLastProdOrderCapNeed(var AvailTime: Decimal; EndTime: Time; AvailCap: Decimal; LastProdOrderCapacityNeed: Record "Prod. Order Capacity Need")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnFinitelyLoadCapBackOnAfterCalcAvailTimeFromCalendarEntry(var AvailTime: Decimal; EndTime: Time; AvailCap: Decimal; CalendarEntry: Record "Calendar Entry")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnCalcRoutingLineForwardOnAfterCalcRemainNeedQty(ProdOrderRoutingLine: Record "Prod. Order Routing Line"; WorkCenter: Record "Work Center"; var RemainNeedQty: Decimal)
     begin
     end;
@@ -2549,12 +2575,27 @@ codeunit 99000774 "Calculate Routing Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateLoadBack(var RemainNeedQty: Decimal; CalendarEntry: Record "Calendar Entry"; TimeType: Enum "Routing Time Type"; Write: Boolean; FirstEntry: Boolean; WaitTimeOnly: Boolean; CurrentWorkCenterNo: Code[20]; ProdStartingDate: Date; ProdStartingTime: Time; ProdEndingDate: Date; ProdEndingTime: Time; var IsHandled: Boolean)
+    local procedure OnBeforeCreateLoadBack(var RemainNeedQty: Decimal; CalendarEntry: Record "Calendar Entry"; var TimeType: Enum "Routing Time Type"; var Write: Boolean; FirstEntry: Boolean; WaitTimeOnly: Boolean; var CurrentWorkCenterNo: Code[20]; ProdStartingDate: Date; ProdStartingTime: Time; ProdEndingDate: Date; ProdEndingTime: Time; var IsHandled: Boolean; var RemainNeedQtyBase: Decimal; var CurrentTimeFactor: Decimal)
     begin
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCreateLoadForward(var RemainNeedQty: Decimal; CalendarEntry: Record "Calendar Entry"; TimeType: Enum "Routing Time Type"; Write: Boolean; LoadFactor: Decimal; FirstEntry: Boolean; WaitTimeOnly: Boolean; CurrentWorkCenterNo: Code[20]; ProdStartingDate: Date; ProdStartingTime: Time; ProdEndingDate: Date; ProdEndingTime: Time; var IsHandled: Boolean)
+    local procedure OnBeforeCreateLoadForward(var RemainNeedQty: Decimal; CalendarEntry: Record "Calendar Entry"; var TimeType: Enum "Routing Time Type"; var Write: Boolean; var LoadFactor: Decimal; FirstEntry: Boolean; WaitTimeOnly: Boolean; var CurrentWorkCenterNo: Code[20]; ProdStartingDate: Date; ProdStartingTime: Time; ProdEndingDate: Date; ProdEndingTime: Time; var IsHandled: Boolean; var RemainNeedQtyBase: Decimal; var CurrentTimeFactor: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInitProdOrderCapNeedOnBeforeUpdateAllocatedTimeAndExpectedCapacityNeed(var ProdOrderCapacityNeed: Record "Prod. Order Capacity Need"; var ShouldUpdateAllocatedTimeAndExpectedCapacityNeed: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateTimesBackOnBeforeUpdateAvailCap(var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; var ShouldUpdateAvailCap: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateTimesForwardOnBeforeUpdateAvailCap(var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; var ShouldUpdateAvailCap: Boolean)
     begin
     end;
 }

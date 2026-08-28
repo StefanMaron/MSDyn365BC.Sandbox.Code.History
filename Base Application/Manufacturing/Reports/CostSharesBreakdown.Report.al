@@ -13,11 +13,11 @@ using System.Utilities;
 
 report 5848 "Cost Shares Breakdown"
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/Reports/CostSharesBreakdown.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Cost Shares Breakdown';
+    ToolTip = 'View the item''s cost broken down in inventory, WIP, or COGS, according to purchase and material cost, capacity cost, capacity overhead cost, manufacturing overhead cost, subcontracted cost, variance, indirect cost, revaluation, and rounding. The report breaks down cost at a single BOM level and does not roll up the costs from lower BOM levels. The report does not calculate the cost share from items that use the Average costing method.';
     UsageCategory = ReportsAndAnalysis;
+    DefaultRenderingLayout = RDLCLayout;
 
     dataset
     {
@@ -66,7 +66,17 @@ report 5848 "Cost Shares Breakdown"
                 DataItemTableView = sorting("Order Type", "Order No.", "Order Line No.") where("Order Type" = const(Production));
 
                 trigger OnAfterGetRecord()
+                var
+                    TempItem: Record Item temporary;
                 begin
+                    if Item.Get("Capacity Ledger Entry"."Item No.") then begin
+                        TempItem := Item;
+                        TempItem.Insert();
+                        TempItem.CopyFilters(Item);
+                        if TempItem.IsEmpty() then
+                            CurrReport.Skip();
+                    end;
+
                     InsertCapLedgEntryCostShare("Capacity Ledger Entry");
                 end;
 
@@ -467,6 +477,16 @@ report 5848 "Cost Shares Breakdown"
         end;
     }
 
+    rendering
+    {
+        layout(RDLCLayout)
+        {
+            Type = RDLC;
+            LayoutFile = './Manufacturing/Reports/CostSharesBreakdown.rdlc';
+            Summary = 'Report layout made in the legacy RDLC format. Use an RDLC editor to modify the layout.';
+        }
+    }
+
     labels
     {
     }
@@ -520,8 +540,11 @@ report 5848 "Cost Shares Breakdown"
     local procedure CalcRemainingQty(FromItemLedgEntry: Record "Item Ledger Entry")
     var
         ItemApplnEntry: Record "Item Application Entry";
+        OldRemainingQty: Decimal;
     begin
+        OldRemainingQty := RemainingQty;
         RemainingQty := FromItemLedgEntry.Quantity;
+        OnCalcRemainingQtyOnAfterSetRemainingQty(FromItemLedgEntry, RemainingQty, OldRemainingQty);
 
         if FromItemLedgEntry.Positive then begin
             if TempCostShareBuffer.Get(FromItemLedgEntry."Entry No.") then
@@ -577,6 +600,7 @@ report 5848 "Cost Shares Breakdown"
         ToEntryNo: Integer;
         CostShare: Decimal;
         AppliedQty: Decimal;
+        IsHandled: Boolean;
     begin
         repeat
             if not TempCostShareBuffer.Get(EntryNo) then begin
@@ -597,10 +621,13 @@ report 5848 "Cost Shares Breakdown"
 
             ToCostShareBuffer := TempCostShareBuffer;
             if (ToCostShareBuffer."Posting Date" <= EndDate) or (EndDate = 0D) then begin
-                if (EndDate = 0D) or (ToItemLedgEntry."Posting Date" <= EndDate) and
-                   (FromCostShareBuffer.Quantity * ItemApplnEntry.Quantity < 0)
-                then
-                    AppliedQty := AppliedQty + ItemApplnEntry.Quantity;
+                IsHandled := false;
+                OnForwardItemLedgEntryCostShareOnBeforeCheckCostShareQtyCondition(FromCostShareBuffer, ItemApplnEntry, AppliedQty, IsHandled);
+                if not IsHandled then
+                    if (EndDate = 0D) or (ToItemLedgEntry."Posting Date" <= EndDate) and
+                       (FromCostShareBuffer.Quantity * ItemApplnEntry.Quantity < 0)
+                    then
+                        AppliedQty := AppliedQty + ItemApplnEntry.Quantity;
 
                 if ToCostShareBuffer.Quantity < 0 then
                     ToCostShareBuffer."New Quantity" := ToCostShareBuffer."New Quantity" - ItemApplnEntry.Quantity;
@@ -687,6 +714,7 @@ report 5848 "Cost Shares Breakdown"
         TempCostShareBuffer."Item Ledger Entry No." := ItemLedgEntry."Entry No.";
         TempCostShareBuffer."Item No." := ItemLedgEntry."Item No.";
         TempCostShareBuffer.Quantity := ItemLedgEntry.Quantity;
+        OnInsertItemLedgEntryCostShareOnAfterSetQuantity(ItemLedgEntry, TempCostShareBuffer);
         TempCostShareBuffer."Entry Type" := ItemLedgEntry."Entry Type";
         TempCostShareBuffer."Location Code" := ItemLedgEntry."Location Code";
         TempCostShareBuffer."Variant Code" := ItemLedgEntry."Variant Code";
@@ -770,6 +798,18 @@ report 5848 "Cost Shares Breakdown"
         CostShareBuffer."Capacity Overhead" += InvtAdjmtEntryOrder."Single-Level Cap. Ovhd Cost";
         CostShareBuffer."Material Overhead" += InvtAdjmtEntryOrder."Single-Level Mfg. Ovhd Cost";
         CostShareBuffer.Subcontracted += InvtAdjmtEntryOrder."Single-Level Subcontrd. Cost";
+
+        ApplyShareOfCostToCostShareBuffer(ItemLedgEntry, CostShareBuffer, InvtAdjmtEntryOrder, OutputQty, ShareOfCost);
+    end;
+
+    local procedure ApplyShareOfCostToCostShareBuffer(ItemLedgEntry: Record "Item Ledger Entry"; var CostShareBuffer: Record "Cost Share Buffer"; var InvtAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)"; OutputQty: Decimal; var ShareOfCost: Decimal)
+    var
+        IsHandled: Boolean;
+    begin
+        IsHandled := false;
+        OnUpdateCostShareBufFromInvAdjmtEntryOrderOnBeforeApplyShareOfCost(ItemLedgEntry, CostShareBuffer, InvtAdjmtEntryOrder, OutputQty, ShareOfCost, IsHandled);
+        if IsHandled then
+            exit;
 
         if OutputQty <> 0 then begin
             ShareOfCost := ItemLedgEntry.Quantity / OutputQty;
@@ -914,5 +954,24 @@ report 5848 "Cost Shares Breakdown"
         CostSharePrint := NewPrintCostShare;
         ShowDetails := NewShowDetails;
     end;
-}
 
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcRemainingQtyOnAfterSetRemainingQty(FromItemLedgerEntry: Record "Item Ledger Entry"; var RemainingQty: Decimal; OldRemainingQty: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnForwardItemLedgEntryCostShareOnBeforeCheckCostShareQtyCondition(CostShareBuffer: Record "Cost Share Buffer"; ItemApplicationEntry: Record "Item Application Entry"; var AppliedQty: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnInsertItemLedgEntryCostShareOnAfterSetQuantity(ItemLedgerEntry: Record "Item Ledger Entry"; var TempCostShareBuffer: Record "Cost Share Buffer" temporary)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnUpdateCostShareBufFromInvAdjmtEntryOrderOnBeforeApplyShareOfCost(ItemLedgerEntry: Record "Item Ledger Entry"; var CostShareBuffer: Record "Cost Share Buffer"; var InventoryAdjmtEntryOrder: Record "Inventory Adjmt. Entry (Order)"; OutputQuantity: Decimal; var ShareOfCost: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+}

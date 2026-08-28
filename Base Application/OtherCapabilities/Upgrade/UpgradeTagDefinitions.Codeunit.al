@@ -146,6 +146,11 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetPurchasesPayablesAndSalesReceivablesSetupsUpgradeTag());
         PerCompanyUpgradeTags.Add(GetLocationBinPolicySetupsUpgradeTag());
         PerCompanyUpgradeTags.Add(GetAllowInventoryAdjmtUpgradeTag());
+#if not CLEAN29
+        PerCompanyUpgradeTags.Add(GetDirectTransferPostingToEnumUpgradeTag());
+#endif
+        PerCompanyUpgradeTags.Add(GetDirectTransferOnTransferRouteUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetDirectTransferOnTransferOrderUpgradeTag());
         PerCompanyUpgradeTags.Add(GetLocationGranularWarehouseHandlingSetupsUpgradeTag());
         PerCompanyUpgradeTags.Add(GetVATSetupUpgradeTag());
         PerCompanyUpgradeTags.Add(GetVATSetupAllowVATDateTag());
@@ -173,6 +178,11 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetPurchRcptLineFieldsUpgradeTag());
         PerCompanyUpgradeTags.Add(GetSalesShptLineFieldsUpgradeTag());
         PerCompanyUpgradeTags.Add(GetServiceShptLineFieldsUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetZeroClosedBankAccountLedgerEntriesUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetDepreciationBooksGLIntegrationUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetWarehouseActivitySourceTypeForJobPlanningLineUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetRemittanceAdviceReportSelectionUpgradeTag());
+        PerCompanyUpgradeTags.Add(GetProdDefinitionDisplaySetupUpgradeTag());
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Upgrade Tag", 'OnGetPerDatabaseUpgradeTags', '', false, false)]
@@ -1088,6 +1098,22 @@ codeunit 9998 "Upgrade Tag Definitions"
     begin
         exit('MS-474798-AllowInventoryAdjmtUpgradeTag-20230518');
     end;
+#if not CLEAN29
+    internal procedure GetDirectTransferPostingToEnumUpgradeTag(): Code[250]
+    begin
+        exit('MS-617394-DirectTransferPostingToEnum-20260113');
+    end;
+#endif
+
+    internal procedure GetDirectTransferOnTransferRouteUpgradeTag(): Code[250]
+    begin
+        exit('MS-617394-DirectTransferOnTransferRoute-20260113');
+    end;
+
+    internal procedure GetDirectTransferOnTransferOrderUpgradeTag(): Code[250]
+    begin
+        exit('MS-617394-DirectTransferOnTransferOrder-20260113');
+    end;
 
     internal procedure GetLocationGranularWarehouseHandlingSetupsUpgradeTag(): Code[250]
     begin
@@ -1218,7 +1244,7 @@ codeunit 9998 "Upgrade Tag Definitions"
     begin
         exit('MS-619893-ABCAnalysisSetup-20260129');
     end;
-    
+
     internal procedure GetPurchRcptLineFieldsUpgradeTag(): Code[250]
     begin
         exit('MS-579697-PurchRcptLineFieldsUpgradeTag-20250926');
@@ -1232,5 +1258,31 @@ codeunit 9998 "Upgrade Tag Definitions"
     internal procedure GetServiceShptLineFieldsUpgradeTag(): Code[250]
     begin
         exit('MS-579699-ServiceShptLineFieldsUpgradeTag-20250926');
+    end;
+
+    internal procedure GetZeroClosedBankAccountLedgerEntriesUpgradeTag(): Code[250]
+    begin
+        exit('MS-621821-ZeroClosedBankAccountLedgerEntriesUpgradeTag-20260223');
+    end;
+
+    internal procedure GetDepreciationBooksGLIntegrationUpgradeTag(): Code[250]
+    begin
+        exit('MS-626097-DepreciationBooksGLIntegrationUpgradeTag-20260319');
+    end;
+
+    internal procedure GetRemittanceAdviceReportSelectionUpgradeTag(): Code[250]
+    begin
+        exit('MS-RemittanceAdviceReportSelection-20260723');
+    end;
+
+    internal procedure GetWarehouseActivitySourceTypeForJobPlanningLineUpgradeTag(): Code[250]
+    begin
+        // Upgrade legacy Job-related warehouse records from (Database::Job, 0) to (Database::"Job Planning Line", Order)
+        exit('MS-625654-WarehouseActivitySourceTypeForJobPlanningLineUpgradeTag-20260518');
+    end;
+
+    internal procedure GetProdDefinitionDisplaySetupUpgradeTag(): Code[250]
+    begin
+        exit('MS-629001-ProdDefinitionDisplaySetupUpgradeTag-20260723');
     end;
 }

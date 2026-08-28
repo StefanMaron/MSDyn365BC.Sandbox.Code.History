@@ -524,7 +524,8 @@ table 99000758 "Machine Center"
         }
         field(81; "Overhead Rate"; Decimal)
         {
-            AutoFormatType = 0;
+            AutoFormatType = 2;
+            AutoFormatExpression = '';
             Caption = 'Overhead Rate';
             ToolTip = 'Specifies the overhead rate of this machine center.';
 
@@ -557,7 +558,7 @@ table 99000758 "Machine Center"
         field(7300; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            ToolTip = 'Specifies the location where the machine center operates by default.';
+            ToolTip = 'Specifies the location for which the bin codes on this machine center apply. The bin codes are used on production order routing lines and components only when the production order''s location matches this value.';
             Editable = false;
             TableRelation = Location.Code where("Use As In-Transit" = const(false),
                                                  "Bin Mandatory" = const(true));
@@ -592,7 +593,7 @@ table 99000758 "Machine Center"
         field(7301; "Open Shop Floor Bin Code"; Code[20])
         {
             Caption = 'Open Shop Floor Bin Code';
-            ToolTip = 'Specifies the bin that functions as the default open shop floor bin at the work center.';
+            ToolTip = 'Specifies the default bin for production order components with manual, forward, or backward flushing method. Copied to the production order routing line when the location code matches, then used as the component''s bin code based on the flushing method.';
             TableRelation = Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
@@ -603,7 +604,7 @@ table 99000758 "Machine Center"
         field(7302; "To-Production Bin Code"; Code[20])
         {
             Caption = 'To-Production Bin Code';
-            ToolTip = 'Specifies the bin where components picked for production are placed by default before they can be consumed.';
+            ToolTip = 'Specifies the default bin for production order components with pick-based flushing methods (Pick + Forward, Pick + Backward, Pick + Manual). Copied to the production order routing line when the location code matches, then used as the component''s bin code based on the flushing method.';
             TableRelation = Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
@@ -614,13 +615,22 @@ table 99000758 "Machine Center"
         field(7303; "From-Production Bin Code"; Code[20])
         {
             Caption = 'From-Production Bin Code';
-            ToolTip = 'Specifies the bin where finished end items are taken from by default when the process involves warehouse activity.';
+            ToolTip = 'Specifies the default bin for finished output. Copied to the production order routing line when the location code matches. At the last routing operation, this bin code flows to the production order line''s bin code.';
             TableRelation = Bin.Code where("Location Code" = field("Location Code"));
 
             trigger OnValidate()
             begin
                 CheckBinCode("Location Code", "From-Production Bin Code", FieldCaption("From-Production Bin Code"), "No.");
             end;
+        }
+        field(7304; "Calendar Entries Avail. Until"; Date)
+        {
+            CalcFormula = max("Calendar Entry".Date where("Capacity Type" = const("Machine Center"),
+                                                          "No." = field("No.")));
+            Caption = 'Calendar Entries Available Until';
+            Editable = false;
+            FieldClass = FlowField;
+            ToolTip = 'Specifies the last date for which machine center calendar entries have been calculated. If this date is in the past, run the Calculate Machine Center Calendar report to extend the calendar.';
         }
     }
 
@@ -781,38 +791,20 @@ table 99000758 "Machine Center"
     end;
 
     procedure GetBinCodeForFlushingMethod(UseFlushingMethod: Boolean; FlushingMethod: Enum "Flushing Method") Result: Code[20]
-#if not CLEAN26
-    var
-        ManufacturingSetup: Record "Manufacturing Setup";
-#endif
     begin
         if not UseFlushingMethod then
             exit("From-Production Bin Code");
 
-#if not CLEAN26
-        if not ManufacturingSetup.IsFeatureKeyFlushingMethodManualWithoutPickEnabled() then
-            case FlushingMethod of
-                FlushingMethod::Manual,
-                FlushingMethod::"Pick + Manual",
-                FlushingMethod::"Pick + Forward",
-                FlushingMethod::"Pick + Backward":
-                    exit("To-Production Bin Code");
-                FlushingMethod::Forward,
-                FlushingMethod::Backward:
-                    exit("Open Shop Floor Bin Code");
-            end
-        else
-#endif
-            case FlushingMethod of
-                FlushingMethod::"Pick + Manual",
-                FlushingMethod::"Pick + Forward",
-                FlushingMethod::"Pick + Backward":
-                    exit("To-Production Bin Code");
-                FlushingMethod::Manual,
-                FlushingMethod::Forward,
-                FlushingMethod::Backward:
-                    exit("Open Shop Floor Bin Code");
-            end;
+        case FlushingMethod of
+            FlushingMethod::"Pick + Manual",
+            FlushingMethod::"Pick + Forward",
+            FlushingMethod::"Pick + Backward":
+                exit("To-Production Bin Code");
+            FlushingMethod::Manual,
+            FlushingMethod::Forward,
+            FlushingMethod::Backward:
+                exit("Open Shop Floor Bin Code");
+        end;
 
         OnAfterGetBinCodeForFlushingMethod(Rec, FlushingMethod, Result);
     end;
