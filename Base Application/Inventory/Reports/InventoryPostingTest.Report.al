@@ -19,9 +19,8 @@ using System.Utilities;
 
 report 702 "Inventory Posting - Test"
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './Inventory/Reports/InventoryPostingTest.rdlc';
     Caption = 'Inventory Posting - Test';
+    DefaultRenderingLayout = RDLCLayout;
 
     dataset
     {
@@ -637,6 +636,7 @@ report 702 "Inventory Posting - Test"
                             else
                                 Item.SetFilter("Location Filter", '%1', '');
                             Item.CalcFields(Inventory);
+                            OnItemJournalLineOnAfterGetRecordOnAfterCalcItemInventory(Item, "Item Journal Line");
 
                             if Item.Inventory - QtyToPostBase < 0 then
                                 if "Location Code" <> '' then
@@ -775,6 +775,16 @@ report 702 "Inventory Posting - Test"
 
         actions
         {
+        }
+    }
+
+    rendering
+    {
+        layout(RDLCLayout)
+        {
+            Type = RDLC;
+            LayoutFile = './Inventory/Reports/InventoryPostingTest.rdlc';
+            Summary = 'Report layout made in the legacy RDLC format. Use an RDLC editor to modify the layout.';
         }
     }
 
@@ -946,6 +956,11 @@ report 702 "Inventory Posting - Test"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeItemJournalLineOnAfterGetRecord(ItemJournalLine: Record "Item Journal Line"; var ErrorCounter: Integer; var ErrorText: array[30] of Text[250])
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnItemJournalLineOnAfterGetRecordOnAfterCalcItemInventory(var Item: Record Item; ItemJournalLine: Record "Item Journal Line")
     begin
     end;
 

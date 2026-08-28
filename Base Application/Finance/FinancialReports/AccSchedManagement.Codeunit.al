@@ -2780,7 +2780,13 @@ codeunit 8 AccSchedManagement
             PAGE.Run(PAGE::"Chart of Cost Types", CostType);
         end else begin
             AccScheduleLine.CopyFilter("Business Unit Filter", GLAcc."Business Unit Filter");
-            AccScheduleLine.CopyFilter("G/L Budget Filter", GLAcc."Budget Filter");
+            if TempColumnLayout."Ledger Entry Type" = TempColumnLayout."Ledger Entry Type"::"Budget Entries" then begin
+                if TempColumnLayout."Budget Name" <> '' then
+                    GLAcc.SetRange("Budget Filter", TempColumnLayout."Budget Name")
+                else
+                    AccScheduleLine.CopyFilter("G/L Budget Filter", GLAcc."Budget Filter");
+            end else
+                AccScheduleLine.CopyFilter("G/L Budget Filter", GLAcc."Budget Filter");
             SetGLAccRowFilters(GLAcc, AccScheduleLine);
             SetGLAccColumnFilters(GLAcc, AccScheduleLine, TempColumnLayout);
             AccSchedName.Get(AccScheduleLine."Schedule Name");
@@ -2823,8 +2829,10 @@ codeunit 8 AccSchedManagement
                   GetDimTotalingFilter(3, TempColumnLayout."Dimension 3 Totaling"),
                   GetDimTotalingFilter(4, TempColumnLayout."Dimension 4 Totaling"));
                 GLAccAnalysisView.SetFilter("Business Unit Filter", TempColumnLayout."Business Unit Totaling");
-                if TempColumnLayout."G/L Account Totaling" <> '' then
+                if TempColumnLayout."G/L Account Totaling" <> '' then begin
+                    GLAccAnalysisView.SetFilter("No.", TempColumnLayout."G/L Account Totaling");
                     GLAcc.SetFilter("No.", TempColumnLayout."G/L Account Totaling");
+                end;
                 if SubcategoryEntryFilter <> '' then begin
                     GlAcc.SetRange("Account Type", GlAcc."Account Type"::Posting);
                     GLAcc.SetFilter("Account Subcategory Entry No.", SubcategoryEntryFilter);

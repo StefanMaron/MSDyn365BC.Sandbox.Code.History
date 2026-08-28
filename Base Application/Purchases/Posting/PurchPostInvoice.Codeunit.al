@@ -364,6 +364,8 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
         InvoicePostingBuffer."Dimension Set ID" := PurchLine."Dimension Set ID";
         InvoicePostingBuffer."Job No." := PurchLine."Job No.";
         InvoicePostingBuffer."VAT %" := PurchLine.GetVATPct();
+        InvoicePostingBuffer."Spend Request No." := PurchLine."Spend Request No.";
+        InvoicePostingBuffer."Spend Request Close" := PurchLine."Spend Request Close";
         NonDeductibleVAT.Copy(InvoicePostingBuffer, PurchLine);
         InvoicePostingBuffer."VAT Difference" := PurchLine."VAT Difference";
         if InvoicePostingBuffer.Type = InvoicePostingBuffer.Type::"Fixed Asset" then begin
@@ -759,6 +761,8 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
         GenJnlLine.CopyFromPurchHeader(PurchHeader);
         GenJnlLine.SetCurrencyFactor(PurchHeader."Currency Code", PurchHeader."Currency Factor");
         GenJnlLine."System-Created Entry" := true;
+        GenJnlLine."Spend Request No." := PurchHeader."Spend Request No.";
+        GenJnlLine."Spend Request Close" := PurchHeader."Spend Request Close";
 
         GenJnlLine.CopyFromPurchHeaderApplyTo(PurchHeader);
         GenJnlLine."Applies-to Bill No." := PurchHeader."Applies-to Bill No.";
@@ -950,6 +954,7 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
         VATAmountACY: Decimal;
         VATAmountRemainder: Decimal;
         VATAmountACYRemainder: Decimal;
+        IsFCYAmount: Boolean;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -980,6 +985,7 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
 
                             VATAmount := VATBaseAmount * VATPostingSetup."VAT+EC %" / 100;
                             VATAmountACY := VATBaseAmountACY * VATPostingSetup."VAT+EC %" / 100;
+                            IsFCYAmount := PurchHeader."Currency Code" <> '';
 
                             PurchPostInvoiceEvents.RunOnCalculateVATAmountInBufferOnBeforeTempInvoicePostingBufferAssign(VATAmount, VATAmountACY, TempInvoicePostingBuffer);
                             TempInvoicePostingBufferReverseCharge := InvoicePostingBuffer;
@@ -989,14 +995,14 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
                                     VATAmountACYRemainder := VATAmountACY;
                                 end;
 
-                                VATAmountRemainder += VATAmount;
-                                InvoicePostingBuffer."VAT Amount" := Round(VATAmountRemainder, CurrencyDocument."Amount Rounding Precision");
-                                VATAmountRemainder -= InvoicePostingBuffer."VAT Amount";
+                                if IsFCYAmount then
+                                    VATAmount := CurrExchRate.ExchangeAmtFCYToLCY(
+                                        PurchHeader.GetUseDate(), PurchHeader."Currency Code",
+                                        VATAmount, PurchHeader."Currency Factor");
 
-                                if PurchHeader."Currency Code" <> '' then
-                                    InvoicePostingBuffer."VAT Amount" := Round(CurrExchRate.ExchangeAmtFCYToLCY(
-                                            PurchHeader.GetUseDate(), PurchHeader."Currency Code",
-                                            InvoicePostingBuffer."VAT Amount", PurchHeader."Currency Factor"));
+                                VATAmountRemainder += VATAmount;
+                                InvoicePostingBuffer."VAT Amount" := Round(VATAmountRemainder);
+                                VATAmountRemainder -= InvoicePostingBuffer."VAT Amount";
 
                                 VATAmountACYRemainder += VATAmountACY;
                                 InvoicePostingBuffer."VAT Amount (ACY)" := Round(VATAmountACYRemainder, Currency."Amount Rounding Precision");
@@ -1005,9 +1011,11 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
                                 InvoicePostingBuffer."VAT Base Amount" := Round(InvoicePostingBuffer."VAT Base Amount" * (1 - PurchHeader."VAT Base Discount %" / 100));
                                 InvoicePostingBuffer."VAT Base Amount (ACY)" := Round(InvoicePostingBuffer."VAT Base Amount (ACY)" * (1 - PurchHeader."VAT Base Discount %" / 100));
                             end else begin
-                                if PurchHeader."Currency Code" <> '' then
+                                if IsFCYAmount then
                                     VATAmount := Round(
-                                        CurrExchRate.ExchangeAmtFCYToLCY(PurchHeader.GetUseDate(), PurchHeader."Currency Code", VATAmount, PurchHeader."Currency Factor"))
+                                        CurrExchRate.ExchangeAmtFCYToLCY(
+                                            PurchHeader.GetUseDate(), PurchHeader."Currency Code",
+                                            VATAmount, PurchHeader."Currency Factor"))
                                 else
                                     VATAmount := Round(VATAmount);
 
@@ -1299,6 +1307,8 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
             CalcSplitAmount(
                 GenJnlLine."Salvage Value", GenJnlLine2."Salvage Value", TotalGenJnlLine."Salvage Value", I, SplitNo);
 
+            OnSplitFAOnBeforeRunGenJnlPostLine(GenJnlLine, GenJnlLine2, TotalGenJnlLine, I, SplitNo);
+
             RunGenJnlPostLine(GenJnlLine, GenJnlPostLine);
         end;
     end;
@@ -1401,5 +1411,10 @@ codeunit 816 "Purch. Post Invoice" implements "Invoice Posting"
                     FADeprBook2.Insert(true);
                 until FADeprBook.Next() = 0;
         end;
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnSplitFAOnBeforeRunGenJnlPostLine(var GenJournalLine: Record "Gen. Journal Line"; var GenJournalLine2: Record "Gen. Journal Line"; var TotalGenJournalLine: Record "Gen. Journal Line"; IterationCounter: Integer; SplitNo: Integer)
+    begin
     end;
 }

@@ -704,7 +704,7 @@ table 5900 "Service Header"
         field(28; "Location Code"; Code[10])
         {
             Caption = 'Location Code';
-            ToolTip = 'Specifies the code of the location (for example, warehouse or distribution center) of the items specified on the service item lines.';
+            ToolTip = 'Specifies the code of the location (for example, warehouse or distribution center) of the items specified on the service item lines. When you select the customer and the customer has a location assigned, the value is taken from the Customer card. If the customer has no location, but a Responsibility Center is populated, the location code is taken from the Responsibility Center. If neither is specified, the value is taken from Company Information.';
             TableRelation = Location;
 
             trigger OnValidate()
@@ -3257,7 +3257,6 @@ table 5900 "Service Header"
     local procedure ValidatePaymentTerms(var ServiceHeader: Record "Service Header")
     var
         PaymentTerms: Record "Payment Terms";
-        AdjustDueDate: Codeunit "Due Date-Adjust";
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -3265,69 +3264,29 @@ table 5900 "Service Header"
         if IsHandled then
             exit;
 
-        GeneralLedgerSetup.GetRecordOnce();
-        if ("Document Type" <> "Document Type"::"Credit Memo") or
-           (GeneralLedgerSetup."Payment Discount Type" = GeneralLedgerSetup."Payment Discount Type"::"Calc. Pmt. Disc. on Lines")
-        then
-            if (ServiceHeader."Payment Terms Code" <> '') and (ServiceHeader."Document Date" <> 0D) then begin
-                PaymentTerms.Get("Payment Terms Code");
-                ServiceHeader."Due Date" := CalcDate(PaymentTerms."Due Date Calculation", "Document Date");
-                AdjustDueDate.SalesAdjustDueDate(
-                  ServiceHeader."Due Date", ServiceHeader."Document Date", PaymentTerms.CalculateMaxDueDate("Document Date"), "Bill-to Customer No.");
-                ServiceHeader."Pmt. Discount Date" := CalcDate(PaymentTerms."Discount Date Calculation", "Document Date");
-                ServiceHeader.Validate("Payment Discount %", PaymentTerms."Discount %");
+        if (ServiceHeader."Payment Terms Code" <> '') and (ServiceHeader."Document Date" <> 0D) then begin
+            PaymentTerms.Get("Payment Terms Code");
+            if (ServiceHeader."Document Type" in [ServiceHeader."Document Type"::"Credit Memo"]) and
+               not PaymentTerms."Calc. Pmt. Disc. on Cr. Memos"
+            then begin
+                ServiceHeader.Validate("Due Date", ServiceHeader."Document Date");
+                ServiceHeader.Validate("Pmt. Discount Date", 0D);
+                ServiceHeader.Validate("Payment Discount %", 0);
             end else begin
-                ServiceHeader."Due Date" := ServiceHeader."Document Date";
-                AdjustDueDate.SalesAdjustDueDate(ServiceHeader."Due Date", ServiceHeader."Document Date", 99991231D, ServiceHeader."Bill-to Customer No.");
+                ServiceHeader."Due Date" := CalcDate(PaymentTerms."Due Date Calculation", ServiceHeader."Document Date");
                 IsHandled := false;
                 OnValidatePaymentTermsCodeOnBeforeCalcPmtDiscDate(ServiceHeader, IsHandled);
                 if not IsHandled then
-                    ServiceHeader."Pmt. Discount Date" := ServiceHeader."Document Date";
-                ServiceHeader.Validate("Payment Discount %", 0);
-            end
-        else
-            if ServiceHeader."Payment Terms Code" <> '' then begin
-                PaymentTerms.Get("Payment Terms Code");
-                ServiceHeader.Validate("Payment Discount %", PaymentTerms."Discount %");
-            end else
-                ServiceHeader.Validate("Payment Discount %", 0);
-
-        if (ServiceHeader."Document Type" = ServiceHeader."Document Type"::"Credit Memo") and
-           not PaymentTerms."Calc. Pmt. Disc. on Cr. Memos"
-        then begin
+                    ServiceHeader."Pmt. Discount Date" := CalcDate(PaymentTerms."Discount Date Calculation", ServiceHeader."Document Date");
+                ServiceHeader.Validate("Payment Discount %", PaymentTerms."Discount %")
+            end;
+        end else begin
             IsHandled := false;
             OnValidatePaymentTermsCodeOnBeforeValidateDueDate(ServiceHeader, IsHandled);
             if not IsHandled then
                 ServiceHeader.Validate("Due Date", ServiceHeader."Document Date");
             ServiceHeader.Validate("Pmt. Discount Date", 0D);
             ServiceHeader.Validate("Payment Discount %", 0);
-        end;
-    end;
-
-    procedure ValidatePaymentTerms()
-    var
-        PaymentTerms: Record "Payment Terms";
-        AdjustDueDate: Codeunit "Due Date-Adjust";
-    begin
-        GeneralLedgerSetup.GetRecordOnce();
-        if ("Document Type" <> "Document Type"::"Credit Memo") or
-           (GeneralLedgerSetup."Payment Discount Type" = GeneralLedgerSetup."Payment Discount Type"::"Calc. Pmt. Disc. on Lines")
-        then
-            if ("Payment Terms Code" <> '') and ("Document Date" <> 0D) then begin
-                PaymentTerms.Get("Payment Terms Code");
-                "Due Date" := CalcDate(PaymentTerms."Due Date Calculation", "Document Date");
-                AdjustDueDate.SalesAdjustDueDate(
-                  "Due Date", "Document Date", PaymentTerms.CalculateMaxDueDate("Document Date"), "Bill-to Customer No.");
-                "Pmt. Discount Date" := CalcDate(PaymentTerms."Due Date Calculation", "Document Date");
-            end else begin
-                "Due Date" := "Document Date";
-                AdjustDueDate.SalesAdjustDueDate("Due Date", "Document Date", 99991231D, "Bill-to Customer No.");
-                "Pmt. Discount Date" := "Document Date";
-            end;
-        if ("Document Type" = "Document Type"::"Credit Memo") and ("Payment Terms Code" <> '') then begin
-            PaymentTerms.Get("Payment Terms Code");
-            if not PaymentTerms."Calc. Pmt. Disc. on Cr. Memos" then
-                "Pmt. Discount Date" := 0D;
         end;
     end;
 
@@ -4348,52 +4307,53 @@ table 5900 "Service Header"
     begin
         IsHandled := false;
         OnBeforeSetDefaultNoSeries(Rec, xRec, IsHandled);
-        if IsHandled then
-            exit;
-
-        GeneralLedgerSetup.GetRecordOnce();
-        if GeneralLedgerSetup."Journal templ. Name Mandatory" then begin
-            if "Journal Templ. Name" = '' then begin
-                if not IsCreditDocType() then
-                    GenJournalTemplate.Get(ServiceMgtSetup."Serv. Inv. Template Name")
-                else
-                    GenJournalTemplate.Get(ServiceMgtSetup."Serv. Cr. Memo Templ. Name");
-                "Journal Templ. Name" := GenJournalTemplate.Name;
+        if not IsHandled then begin
+            GeneralLedgerSetup.GetRecordOnce();
+            if GeneralLedgerSetup."Journal templ. Name Mandatory" then begin
+                if "Journal Templ. Name" = '' then begin
+                    if not IsCreditDocType() then
+                        GenJournalTemplate.Get(ServiceMgtSetup."Serv. Inv. Template Name")
+                    else
+                        GenJournalTemplate.Get(ServiceMgtSetup."Serv. Cr. Memo Templ. Name");
+                    "Journal Templ. Name" := GenJournalTemplate.Name;
+                end else
+                    GenJournalTemplate.Get("Journal Templ. Name");
+                PostingNoSeries := GenJournalTemplate."Posting No. Series";
             end else
-                GenJournalTemplate.Get("Journal Templ. Name");
-            PostingNoSeries := GenJournalTemplate."Posting No. Series";
-        end else
-            if IsCreditDocType() then
-                PostingNoSeries := ServiceMgtSetup."Posted Serv. Credit Memo Nos."
-            else
-                PostingNoSeries := ServiceMgtSetup."Posted Service Invoice Nos.";
+                if IsCreditDocType() then
+                    PostingNoSeries := ServiceMgtSetup."Posted Serv. Credit Memo Nos."
+                else
+                    PostingNoSeries := ServiceMgtSetup."Posted Service Invoice Nos.";
 
-        case "Document Type" of
-            "Document Type"::Quote, "Document Type"::Order:
-                begin
-                    if NoSeries.IsAutomatic(PostingNoSeries) then
-                        "Posting No. Series" := PostingNoSeries;
-                    if NoSeries.IsAutomatic(ServiceMgtSetup."Posted Service Shipment Nos.") then
-                        "Shipping No. Series" := ServiceMgtSetup."Posted Service Shipment Nos.";
-                end;
-            "Document Type"::Invoice:
-                begin
-                    if ("No. Series" <> '') and (ServiceMgtSetup."Service Invoice Nos." = PostingNoSeries) then
+            case "Document Type" of
+                "Document Type"::Quote, "Document Type"::Order:
+                    begin
+                        if NoSeries.IsAutomatic(PostingNoSeries) then
+                            "Posting No. Series" := PostingNoSeries;
+                        if NoSeries.IsAutomatic(ServiceMgtSetup."Posted Service Shipment Nos.") then
+                            "Shipping No. Series" := ServiceMgtSetup."Posted Service Shipment Nos.";
+                    end;
+                "Document Type"::Invoice:
+                    begin
+                        if ("No. Series" <> '') and (ServiceMgtSetup."Service Invoice Nos." = PostingNoSeries) then
+                            "Posting No. Series" := "No. Series"
+                        else
+                            if NoSeries.IsAutomatic(PostingNoSeries) then
+                                "Posting No. Series" := PostingNoSeries;
+                        if ServiceMgtSetup."Shipment on Invoice" then
+                            if NoSeries.IsAutomatic(ServiceMgtSetup."Posted Service Shipment Nos.") then
+                                "Shipping No. Series" := ServiceMgtSetup."Posted Service Shipment Nos.";
+                    end;
+                "Document Type"::"Credit Memo":
+                    if ("No. Series" <> '') and (ServiceMgtSetup."Service Credit Memo Nos." = PostingNoSeries) then
                         "Posting No. Series" := "No. Series"
                     else
                         if NoSeries.IsAutomatic(PostingNoSeries) then
                             "Posting No. Series" := PostingNoSeries;
-                    if ServiceMgtSetup."Shipment on Invoice" then
-                        if NoSeries.IsAutomatic(ServiceMgtSetup."Posted Service Shipment Nos.") then
-                            "Shipping No. Series" := ServiceMgtSetup."Posted Service Shipment Nos.";
-                end;
-            "Document Type"::"Credit Memo":
-                if ("No. Series" <> '') and (ServiceMgtSetup."Service Credit Memo Nos." = PostingNoSeries) then
-                    "Posting No. Series" := "No. Series"
-                else
-                    if NoSeries.IsAutomatic(PostingNoSeries) then
-                        "Posting No. Series" := PostingNoSeries;
+            end;
         end;
+
+        OnAfterSetDefaultNoSeries(Rec);
     end;
 
     local procedure InitRecordFromContact()
@@ -5559,7 +5519,7 @@ table 5900 "Service Header"
                             if ServiceContractHeader."Last Invoice Date" = 0D then
                                 ServiceContractLine."Invoiced to Date" := 0D
                             else
-                                ServContractMgt.CalcInvoicedToDate(ServiceContractLine, ServiceContractLine."Starting Date", ServiceContractHeader."Next Invoice Period Start" - 1);
+                                CalcContractLineInvoicedToDate(ServiceContractLine, ServiceContractHeader, Rec."No.");
                             ServiceContractLine.Modify(true);
                         until ServiceContractLine.Next() = 0;
                 end;
@@ -5643,6 +5603,22 @@ table 5900 "Service Header"
             ServiceContractHeader."Last Invoice Period End" := 0D;
 
         exit(true);
+    end;
+
+    local procedure CalcContractLineInvoicedToDate(var ServiceContractLine: Record "Service Contract Line"; ServiceContractHeader: Record "Service Contract Header"; ExcludeDocNo: Code[20])
+    var
+        ServiceLedgerEntry: Record "Service Ledger Entry";
+        ServContractMgt: Codeunit ServContractManagement;
+    begin
+        ServiceLedgerEntry.SetCurrentKey("Service Contract No.");
+        ServiceLedgerEntry.SetRange("Service Contract No.", ServiceContractLine."Contract No.");
+        ServiceLedgerEntry.SetRange("Service Item No. (Serviced)", ServiceContractLine."Service Item No.");
+        ServiceLedgerEntry.SetRange("Entry Type", ServiceLedgerEntry."Entry Type"::Sale);
+        ServiceLedgerEntry.SetFilter("Document No.", '<>%1', ExcludeDocNo);
+        if ServiceLedgerEntry.IsEmpty() then
+            ServiceContractLine."Invoiced to Date" := 0D
+        else
+            ServContractMgt.CalcInvoicedToDate(ServiceContractLine, ServiceContractLine."Starting Date", ServiceContractHeader."Next Invoice Period Start" - 1);
     end;
 
     /// <summary>
@@ -6057,9 +6033,19 @@ table 5900 "Service Header"
     begin
     end;
 
+    internal procedure RunOnValidatePaymentTermsCodeOnBeforeValidateDueDate(var ServiceHeader: Record "Service Header"; var IsHandled: Boolean)
+    begin
+        OnValidatePaymentTermsCodeOnBeforeValidateDueDate(ServiceHeader, IsHandled);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnValidatePaymentTermsCodeOnBeforeValidateDueDate(var ServiceHeader: Record "Service Header"; var IsHandled: Boolean)
     begin
+    end;
+
+    internal procedure RunOnValidatePaymentTermsCodeOnBeforeCalcPmtDiscDate(var ServiceHeader: Record "Service Header"; var IsHandled: Boolean)
+    begin
+        OnValidatePaymentTermsCodeOnBeforeCalcPmtDiscDate(ServiceHeader, IsHandled)
     end;
 
     [IntegrationEvent(false, false)]
@@ -6134,6 +6120,11 @@ table 5900 "Service Header"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeSetDefaultNoSeries(var ServiceHeader: Record "Service Header"; xServiceHeader: Record "Service Header"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterSetDefaultNoSeries(var ServiceHeader: Record "Service Header")
     begin
     end;
 

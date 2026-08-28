@@ -637,6 +637,8 @@ table 303 "Finance Charge Memo Line"
                             CumulateDetailedEntries(Amount, UseDueDate, UseCalcDate,
                               UseInterestRate, FinanceChargeInterestRate."Interest Period (Days)", BaseAmount);
                     NrOfDays := UseCalcDate - UseDueDate;
+                    if (CustLedgEntry."Closed at Date" <> 0D) and (CustLedgEntry."Closed at Date" < UseCalcDate) then
+                        NrOfDays := CustLedgEntry."Closed at Date" - UseDueDate;
 
                     OnCalcFinChrgOnBeforeCheckNrOfLinesToInsert(FinChrgMemoLine, NrOfDays);
                     if (NrOfLinesToInsert > 0) and
@@ -822,11 +824,11 @@ table 303 "Finance Charge Memo Line"
         Checking := DoChecking;
     end;
 
-    local procedure BuildDescription(var Descr: Text; InterestRate: Decimal; DueDate: Date; NrOfDays: Integer; BaseAmount: Decimal)
+    local procedure BuildDescription(var Descr: Text[100]; InterestRate: Decimal; DueDate: Date; NrOfDays: Integer; BaseAmount: Decimal)
     var
         AutoFormatType: Enum "Auto Format";
     begin
-        DocTypeText := DelChr(Format("Document Type"), '<');
+        DocTypeText := CopyStr(DelChr(Format("Document Type"), '<'), 1, 30);
         if DocTypeText = '' then
             DocTypeText := Text002;
         if FinChrgTerms."Line Description" = '' then
@@ -849,11 +851,11 @@ table 303 "Finance Charge Memo Line"
                 MaxStrLen(Description));
     end;
 
-    local procedure BuildMultiDescription(var Descr: Text; DueDate: Date; NrOfDays: Integer)
+    local procedure BuildMultiDescription(var Descr: Text[100]; DueDate: Date; NrOfDays: Integer)
     var
         AutoFormatType: Enum "Auto Format";
     begin
-        DocTypeText := DelChr(Format("Document Type"), '<');
+        DocTypeText := CopyStr(DelChr(Format("Document Type"), '<'), 1, 30);
         if DocTypeText = '' then
             DocTypeText := Text002;
         if FinChrgTerms.Description = '' then

@@ -6,10 +6,14 @@ namespace Microsoft.Service.Posting;
 
 using Microsoft.Bank.BankAccount;
 using Microsoft.EServices.EDocument;
+using Microsoft.Finance.Currency;
+using Microsoft.Finance.GeneralLedger.Setup;
 using Microsoft.Finance.ReceivablesPayables;
+using Microsoft.Finance.VAT.Calculation;
 using Microsoft.Foundation.AuditCodes;
 using Microsoft.Foundation.PaymentTerms;
 using Microsoft.Inventory.Intrastat;
+using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
 using Microsoft.Sales.Setup;
 using Microsoft.Service.Document;
@@ -57,7 +61,42 @@ codeunit 10789 "Service Posting Subscr. ES"
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Service-Post", 'OnValidatePostingAndDocumentDateOnAfterValidateDocumentDate', '', true, true)]
     local procedure OnValidatePostingAndDocumentDateOnAfterValidateDocumentDate(var ServiceHeader: Record "Service Header")
     begin
-        ServiceHeader.ValidatePaymentTerms();
+        ValidatePaymentTermsOnPost(ServiceHeader);
+    end;
+
+#if not CLEAN29
+    procedure ValidatePaymentTermsOnPost(var ServiceHeader: Record "Service Header")
+#else
+    local procedure ValidatePaymentTermsOnPost(var ServiceHeader: Record "Service Header")
+#endif
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        PaymentTerms: Record "Payment Terms";
+        DueDateAdjust: Codeunit "Due Date-Adjust";
+    begin
+        GeneralLedgerSetup.GetRecordOnce();
+        if (ServiceHeader."Document Type" <> ServiceHeader."Document Type"::"Credit Memo") or
+           (GeneralLedgerSetup."Payment Discount Type" = GeneralLedgerSetup."Payment Discount Type"::"Calc. Pmt. Disc. on Lines")
+        then
+            if (ServiceHeader."Payment Terms Code" <> '') and (ServiceHeader."Document Date" <> 0D) then begin
+                PaymentTerms.Get(ServiceHeader."Payment Terms Code");
+                ServiceHeader."Due Date" := CalcDate(PaymentTerms."Due Date Calculation", ServiceHeader."Document Date");
+                DueDateAdjust.SalesAdjustDueDate(
+                  ServiceHeader."Due Date", ServiceHeader."Document Date", PaymentTerms.CalculateMaxDueDate(ServiceHeader."Document Date"), ServiceHeader."Bill-to Customer No.");
+                ServiceHeader."Pmt. Discount Date" := CalcDate(PaymentTerms."Discount Date Calculation", ServiceHeader."Document Date");
+            end else begin
+                ServiceHeader."Due Date" := ServiceHeader."Document Date";
+                DueDateAdjust.SalesAdjustDueDate(ServiceHeader."Due Date", ServiceHeader."Document Date", 99991231D, ServiceHeader."Bill-to Customer No.");
+                ServiceHeader."Pmt. Discount Date" := ServiceHeader."Document Date";
+            end;
+        if (ServiceHeader."Document Type" = ServiceHeader."Document Type"::"Credit Memo") and (ServiceHeader."Payment Terms Code" <> '') then begin
+            PaymentTerms.Get(ServiceHeader."Payment Terms Code");
+            if not PaymentTerms."Calc. Pmt. Disc. on Cr. Memos" then begin
+                ServiceHeader."Due Date" := ServiceHeader."Document Date";
+                ServiceHeader."Payment Discount %" := 0;
+                ServiceHeader."Pmt. Discount Date" := 0D;
+            end;
+        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Serv-Documents Mgt.", 'OnPostDocumentLinesOnAfterPostSalesAndVAT', '', true, true)]
@@ -105,42 +144,62 @@ codeunit 10789 "Service Posting Subscr. ES"
     local procedure TestSalesEfects(ServiceHeader: Record "Service Header")
     var
         CustLedgEntry: Record "Cust. Ledger Entry";
+        Customer: Record Customer;
         ShowError: Boolean;
         Text1100000: Label 'At least one document of %1 No. %2 is closed or in a Bill Group.';
         Text1100001: Label 'This will avoid the document to be settled.\';
         Text1100002: Label 'The posting process of %3 No. %4 will not settle any document.\';
-        Text1100003: Label 'Due this customer is using Apply to Oldest Application Method, please remove the lines for the Bill Group before posting.';
+        ApplyToOldestErr: Label 'Due this customer is using Apply to Oldest Application Method, please remove the lines for the Bill Group before posting.';
+        ManualApplicationErr: Label 'Please change the Applies-to Doc. No. or remove the applied document from the Bill Group before posting.';
     begin
+        if ServiceHeader."Document Type" <> ServiceHeader."Document Type"::"Credit Memo" then
+            exit;
+
+        // Without a customer the posting cannot succeed, so there is nothing to settle and the check is skipped.
+        if not Customer.Get(ServiceHeader."Bill-to Customer No.") then
+            exit;
+
+        CustLedgEntry.SetCurrentKey("Document No.", "Document Type", "Customer No.");
+        CustLedgEntry.SetFilter("Document Type", '%1|%2', CustLedgEntry."Document Type"::Invoice,
+          CustLedgEntry."Document Type"::Bill);
+        CustLedgEntry.SetFilter("Document Situation", '<>%1', CustLedgEntry."Document Situation"::" ");
+        CustLedgEntry.SetRange("Customer No.", ServiceHeader."Bill-to Customer No.");
+        CustLedgEntry.SetRange(Open, true);
+
+        if Customer."Application Method" = Customer."Application Method"::Manual then begin
+            if ServiceHeader."Applies-to Doc. No." = '' then
+                exit;
+            CustLedgEntry.SetRange("Document Type", ServiceHeader."Applies-to Doc. Type");
+            CustLedgEntry.SetRange("Document No.", ServiceHeader."Applies-to Doc. No.");
+        end;
+
         ShowError := false;
-        if ServiceHeader."Document Type" = ServiceHeader."Document Type"::"Credit Memo" then begin
-            CustLedgEntry.SetCurrentKey("Document No.", "Document Type", "Customer No.");
-            CustLedgEntry.SetFilter("Document Type", '%1|%2', CustLedgEntry."Document Type"::Invoice,
-              CustLedgEntry."Document Type"::Bill);
-            CustLedgEntry.SetFilter("Document Situation", '<>%1', CustLedgEntry."Document Situation"::" ");
-            CustLedgEntry.SetRange("Customer No.", ServiceHeader."Bill-to Customer No.");
-            CustLedgEntry.SetRange(Open, true);
+        if CustLedgEntry.Find('-') then
+            repeat
+                if CustLedgEntry."Document Situation" <> CustLedgEntry."Document Situation"::Cartera then
+                    if not ((CustLedgEntry."Document Situation" in
+                             [CustLedgEntry."Document Situation"::"Closed Documents",
+                              CustLedgEntry."Document Situation"::"Closed BG/PO"]) and
+                            (CustLedgEntry."Document Status" = CustLedgEntry."Document Status"::Rejected))
+                    then
+                        ShowError := true;
+            until CustLedgEntry.Next() = 0;
 
-            if CustLedgEntry.Find('-') then
-                repeat
-                    if CustLedgEntry."Document Situation" <> CustLedgEntry."Document Situation"::Cartera then
-                        if not ((CustLedgEntry."Document Situation" in
-                                 [CustLedgEntry."Document Situation"::"Closed Documents",
-                                  CustLedgEntry."Document Situation"::"Closed BG/PO"]) and
-                                (CustLedgEntry."Document Status" = CustLedgEntry."Document Status"::Rejected))
-                        then
-                            ShowError := true;
-                until CustLedgEntry.Next() = 0;
-
-            if ShowError then
-                Error(Text1100000 +
-                  Text1100001 +
-                  Text1100002 +
-                  Text1100003,
+        if ShowError then
+            if Customer."Application Method" = Customer."Application Method"::Manual then
+                Error(
+                  Text1100000 + Text1100001 + Text1100002 + ManualApplicationErr,
+                  Format(CustLedgEntry."Document Type"),
+                  Format(CustLedgEntry."Document No."),
+                  Format(ServiceHeader."Document Type"),
+                  Format(ServiceHeader."No."))
+            else
+                Error(
+                  Text1100000 + Text1100001 + Text1100002 + ApplyToOldestErr,
                   Format(CustLedgEntry."Document Type"),
                   Format(CustLedgEntry."Document No."),
                   Format(ServiceHeader."Document Type"),
                   Format(ServiceHeader."No."));
-        end;
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Serv-Documents Mgt.", 'OnFinalizeInvoiceDocumentOnBeforeServiceInvoiceHeaderInsert', '', true, true)]
@@ -173,5 +232,94 @@ codeunit 10789 "Service Posting Subscr. ES"
             if (ServiceHeader."Corrected Invoice No." <> '') and (ServiceHeader."Posting Description" = '') then
                 ServiceHeader."Posting Description" := Format(Text1100002) + ' ' + ServiceHeader."No."
         end;
+    end;
+
+    [EventSubscriber(ObjectType::Table, Database::"Service Header", 'OnBeforeValidatePaymentTerms', '', true, true)]
+    local procedure OnBeforeValidatePaymentTerms(var ServiceHeader: Record "Service Header"; var IsHandled: Boolean)
+    var
+        PaymentTerms: Record "Payment Terms";
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        AdjustDueDate: Codeunit "Due Date-Adjust";
+    begin
+        GeneralLedgerSetup.GetRecordOnce();
+        if (ServiceHeader."Document Type" <> ServiceHeader."Document Type"::"Credit Memo") or
+           (GeneralLedgerSetup."Payment Discount Type" = GeneralLedgerSetup."Payment Discount Type"::"Calc. Pmt. Disc. on Lines")
+        then
+            if (ServiceHeader."Payment Terms Code" <> '') and (ServiceHeader."Document Date" <> 0D) then begin
+                PaymentTerms.Get(ServiceHeader."Payment Terms Code");
+                ServiceHeader."Due Date" := CalcDate(PaymentTerms."Due Date Calculation", ServiceHeader."Document Date");
+                AdjustDueDate.SalesAdjustDueDate(
+                  ServiceHeader."Due Date", ServiceHeader."Document Date", PaymentTerms.CalculateMaxDueDate(ServiceHeader."Document Date"), ServiceHeader."Bill-to Customer No.");
+                ServiceHeader."Pmt. Discount Date" := CalcDate(PaymentTerms."Discount Date Calculation", ServiceHeader."Document Date");
+                ServiceHeader.Validate("Payment Discount %", PaymentTerms."Discount %");
+            end else begin
+                ServiceHeader."Due Date" := ServiceHeader."Document Date";
+                AdjustDueDate.SalesAdjustDueDate(ServiceHeader."Due Date", ServiceHeader."Document Date", 99991231D, ServiceHeader."Bill-to Customer No.");
+                IsHandled := false;
+                ServiceHeader.RunOnValidatePaymentTermsCodeOnBeforeCalcPmtDiscDate(ServiceHeader, IsHandled);
+                if not IsHandled then
+                    ServiceHeader."Pmt. Discount Date" := ServiceHeader."Document Date";
+                ServiceHeader.Validate("Payment Discount %", 0);
+            end
+        else
+            if ServiceHeader."Payment Terms Code" <> '' then begin
+                PaymentTerms.Get(ServiceHeader."Payment Terms Code");
+                ServiceHeader.Validate("Payment Discount %", PaymentTerms."Discount %");
+            end else
+                ServiceHeader.Validate("Payment Discount %", 0);
+
+        if (ServiceHeader."Document Type" = ServiceHeader."Document Type"::"Credit Memo") and
+           not PaymentTerms."Calc. Pmt. Disc. on Cr. Memos"
+        then begin
+            IsHandled := false;
+            ServiceHeader.RunOnValidatePaymentTermsCodeOnBeforeValidateDueDate(ServiceHeader, IsHandled);
+            if not IsHandled then
+                ServiceHeader.Validate("Due Date", ServiceHeader."Document Date");
+            ServiceHeader.Validate("Pmt. Discount Date", 0D);
+            ServiceHeader.Validate("Payment Discount %", 0);
+        end;
+        IsHandled := true;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Serv-Amounts Mgt.", 'OnSumServiceLine2OnAfterSetVATPercentFromServLine', '', true, true)]
+    local procedure OnSumServiceLine2OnAfterSetVATPercentFromServLine(var TotalServiceLine: Record "Service Line"; var ServiceLine: Record "Service Line")
+    begin
+        TotalServiceLine."EC %" := ServiceLine."EC %";
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Serv-Amounts Mgt.", 'OnDivideAmountOnSetVATPercentFromVATAmountLine', '', true, true)]
+    local procedure OnDivideAmountOnSetVATPercentFromVATAmountLine(var ServiceLine: Record "Service Line"; var TempVATAmountLine: Record "VAT Amount Line")
+    begin
+        ServiceLine."EC %" := TempVATAmountLine."EC %";
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Serv-Amounts Mgt.", 'OnDivideAmountOnAfterCalcRemainderVATAmount', '', true, true)]
+    local procedure OnDivideAmountOnAfterCalcRemainderVATAmount(var TempVATAmountLineRemainder: Record "VAT Amount Line" temporary; var ServiceLine: Record "Service Line"; var TempVATAmountLine: Record "VAT Amount Line" temporary)
+    begin
+        TempVATAmountLineRemainder."EC Amount" +=
+            TempVATAmountLine."EC Amount" *
+            (ServiceLine.CalcLineAmount() - ServiceLine."Pmt. Discount Amount") /
+            (TempVATAmountLine.CalcLineAmount() - TempVATAmountLine."Pmt. Discount Amount");
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Serv-Amounts Mgt.", 'OnDivideAmountOnAfterCalcServiceLineAmountIncludingVAT', '', true, true)]
+    local procedure OnDivideAmountOnAfterCalcServiceLineAmountIncludingVAT(var ServiceLine: Record "Service Line"; var TempVATAmountLineRemainder: Record "VAT Amount Line" temporary; var Currency: Record "Currency")
+    begin
+        ServiceLine."Amount Including VAT" += Round(TempVATAmountLineRemainder."EC Amount", Currency."Amount Rounding Precision");
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Serv-Amounts Mgt.", 'OnDivideAmountOnAfterSetVATAmountLineRemainderToZero', '', true, true)]
+    local procedure OnDivideAmountOnAfterSetVATAmountLineRemainderToZero(var TempVATAmountLineRemainder: Record "VAT Amount Line" temporary)
+    begin
+        TempVATAmountLineRemainder."EC Amount" := 0;
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Serv-Amounts Mgt.", 'OnDivideAmountOnAfterCalcVATAmountLineRemainder', '', true, true)]
+    local procedure OnDivideAmountOnAfterCalcVATAmountLineRemainder(var TempVATAmountLineRemainder: Record "VAT Amount Line" temporary; var TempVATAmountLine: Record "VAT Amount Line" temporary; var ServiceLine: Record "Service Line")
+    begin
+        TempVATAmountLineRemainder."EC Amount" +=
+            TempVATAmountLine."EC Amount" *
+            (ServiceLine.CalcLineAmount() - ServiceLine."Pmt. Discount Amount") /
+            (TempVATAmountLine.CalcLineAmount() - TempVATAmountLine."Pmt. Discount Amount");
     end;
 }

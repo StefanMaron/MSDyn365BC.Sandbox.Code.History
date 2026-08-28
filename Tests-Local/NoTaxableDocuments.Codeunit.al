@@ -26,6 +26,7 @@ codeunit 147515 "No Taxable Documents"
         NoTaxableEntryIsNotFoundErr: Label 'No Taxable is not found.';
         NoTaxableEntryShouldNotBeCreatedErr: Label 'No Taxable Entry should not be created.';
         CarteraDocShouldNotBeCreatedErr: Label ' Cartera Doc should not be created.';
+        NoTaxableEntryShouldBeCreatedErr: Label 'No Taxable Entry should be created.';
 
     [Test]
     [Scope('OnPrem')]
@@ -1046,6 +1047,191 @@ codeunit 147515 "No Taxable Documents"
         asserterror Navigate."No. of Records".AssertEquals(LibraryRandom.RandInt(0));
     end;
 
+    [Test]
+    [HandlerFunctions('ConfirmHandler')]
+    procedure ServiceInvoiceWithDifferentBillToCreatesNoTaxableEntry()
+    var
+        BillToCustomer: Record Customer;
+        NoTaxableEntry: Record "No Taxable Entry";
+        SellToCustomer: Record Customer;
+        ServiceHeader: Record "Service Header";
+        ServiceInvoiceHeader: Record "Service Invoice Header";
+        ServiceItem: Record "Service Item";
+        ServiceItemLine: Record "Service Item Line";
+        ServiceLine: Record "Service Line";
+        ItemNo: Code[20];
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 621044] Service invoice with different Bill-to customer creates No Taxable Entry.
+        LibraryLowerPermissions.SetO365Full();
+
+        // [GIVEN] Create Customer VAT Setup for both Sell-to and Bill-to Customers.
+        LibrarySII.CreateCustWithVATSetup(SellToCustomer);
+        LibrarySII.CreateCustWithVATSetup(BillToCustomer);
+
+        // [GIVEN] Create Service Order.
+        LibrarySII.CreateServiceHeader(ServiceHeader, ServiceHeader."Document Type"::Invoice, SellToCustomer."No.", '');
+
+        // [GIVEN] Change Bill-to customer to another customer.
+        ServiceHeader.Validate("Bill-to Customer No.", BillToCustomer."No.");
+        ServiceHeader.Modify(true);
+
+        // [GIVEN] Create Service Item and Service Item Line.
+        LibraryService.CreateServiceItem(ServiceItem, ServiceHeader."Customer No.");
+        LibraryService.CreateServiceItemLine(ServiceItemLine, ServiceHeader, ServiceItem."No.");
+
+        // [GIVEN] Create Item with No Taxable VAT setup. 
+        ItemNo := CreateItemWithNoTaxableVATSetup(ServiceHeader);
+
+        // [GIVEN] Create Servie Line with the Item. 
+        CreateServiceLineWithUnitPrice(ServiceHeader, ServiceLine, ItemNo);
+
+        // [WHEN] Post the Service Order.
+        LibraryService.PostServiceOrder(ServiceHeader, true, false, true);
+
+        // [GIVEN] Find the Service Invoice created.
+        ServiceInvoiceHeader.SetRange("Pre-Assigned No.", ServiceHeader."No.");
+        ServiceInvoiceHeader.FindFirst();
+
+        // [THEN] No Taxable Entry is created for the Bill-to customer
+        NoTaxableEntry.SetRange("Document No.", ServiceInvoiceHeader."No.");
+        NoTaxableEntry.SetRange("Source No.", ServiceInvoiceHeader."Bill-to Customer No.");
+        Assert.IsFalse(NoTaxableEntry.IsEmpty(), NoTaxableEntryShouldBeCreatedErr);
+    end;
+
+    [Test]
+    procedure ServiceInvoiceWithSameBillToCreatesNoTaxableEntry()
+    var
+        BillToCustomer: Record Customer;
+        NoTaxableEntry: Record "No Taxable Entry";
+        ServiceHeader: Record "Service Header";
+        ServiceInvoiceHeader: Record "Service Invoice Header";
+        ServiceItem: Record "Service Item";
+        ServiceItemLine: Record "Service Item Line";
+        ServiceLine: Record "Service Line";
+        ItemNo: Code[20];
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO 621044] Service invoice with Same Bill-to customer creates No Taxable Entry.
+        LibraryLowerPermissions.SetO365Full();
+
+        // [GIVEN] Create Customer VAT Setup for Bill-to Customer.
+        LibrarySII.CreateCustWithVATSetup(BillToCustomer);
+
+        // [GIVEN] Create Service Order.
+        LibrarySII.CreateServiceHeader(ServiceHeader, ServiceHeader."Document Type"::Invoice, BillToCustomer."No.", '');
+
+        // [GIVEN] Create Service Item and Service Item Line.
+        LibraryService.CreateServiceItem(ServiceItem, ServiceHeader."Customer No.");
+        LibraryService.CreateServiceItemLine(ServiceItemLine, ServiceHeader, ServiceItem."No.");
+
+        // [GIVEN] Create Item with No Taxable VAT setup. 
+        ItemNo := CreateItemWithNoTaxableVATSetup(ServiceHeader);
+
+        // [GIVEN] Create Servie Line with the Item. 
+        CreateServiceLineWithUnitPrice(ServiceHeader, ServiceLine, ItemNo);
+
+        // [WHEN] Post the Service Order.
+        LibraryService.PostServiceOrder(ServiceHeader, true, false, true);
+
+        // [GIVEN] Find the Service Invoice created.
+        ServiceInvoiceHeader.SetRange("Pre-Assigned No.", ServiceHeader."No.");
+        ServiceInvoiceHeader.FindFirst();
+
+        // [THEN] No Taxable Entry is created for the Bill-to customer.
+        NoTaxableEntry.SetRange("Document No.", ServiceInvoiceHeader."No.");
+        NoTaxableEntry.SetRange("Source No.", ServiceInvoiceHeader."Bill-to Customer No.");
+        Assert.IsFalse(NoTaxableEntry.IsEmpty(), NoTaxableEntryShouldBeCreatedErr);
+    end;
+
+    [Test]
+    [HandlerFunctions('SuggestFinChargeMemoLinesRequestPageHandler')]
+    procedure NoTaxableEntryForIssuedFinanceChargeMemo()
+    var
+        Customer: Record Customer;
+        FinanceChargeMemoHeader: Record "Finance Charge Memo Header";
+        FinanceChargeTerms: Record "Finance Charge Terms";
+        IssuedFinChargeMemoHeader: Record "Issued Fin. Charge Memo Header";
+        NoTaxableEntry: Record "No Taxable Entry";
+        FinanceChargeDate: Date;
+        InvoiceDate: Date;
+    begin
+        // [SCENARIO 642269] No Taxable Entry is created when issuing a Finance Charge Memo whose interest account uses No Taxable VAT
+
+        // [GIVEN] Create a new Customer with VAT setup and Finance Charge Terms that post interest.
+        LibrarySII.CreateCustWithVATSetup(Customer);
+        CreateFinanceChargeTermsPostingInterest(FinanceChargeTerms);
+        Customer.Validate("Fin. Charge Terms Code", FinanceChargeTerms.Code);
+        Customer.Modify(true);
+
+        // [GIVEN] Interest account of the customer posting group uses a No Taxable VAT posting setup.
+        SetupNoTaxableInterestAccount(Customer);
+
+        // [GIVEN] An overdue posted sales invoice creating a customer balance.
+        InvoiceDate := WorkDate();
+        FinanceChargeDate := CalcDate('<+62D>', InvoiceDate);
+        CreateAndPostSalesInvoice(Customer, InvoiceDate);
+
+        // [GIVEN] A Finance Charge Memo with suggested interest lines.
+        CreateFinanceChargeMemoWithLines(FinanceChargeMemoHeader, Customer, FinanceChargeDate);
+
+        // [WHEN] Issue the Finance Charge Memo.
+        LibraryERM.IssueFinanceChargeMemo(FinanceChargeMemoHeader);
+
+        // [THEN] A No Taxable Entry is created for the issued finance charge memo interest.
+        IssuedFinChargeMemoHeader.SetRange("Customer No.", Customer."No.");
+        IssuedFinChargeMemoHeader.SetRange("Pre-Assigned No.", FinanceChargeMemoHeader."No.");
+        IssuedFinChargeMemoHeader.FindFirst();
+
+        FilterOnNoTaxableEntry(NoTaxableEntry, Customer."No.", IssuedFinChargeMemoHeader."No.");
+        Assert.IsFalse(NoTaxableEntry.IsEmpty(), NoTaxableEntryShouldBeCreatedErr);
+        NoTaxableEntry.FindFirst();
+        Assert.IsTrue(NoTaxableEntry.Base > 0, NoTaxableEntryShouldBeCreatedErr);
+    end;
+
+    [Test]
+    [HandlerFunctions('SuggestFinChargeMemoLinesRequestPageHandler')]
+    procedure NoTaxableEntryNotCreatedForIssuedFinanceChargeMemoWithTaxableInterest()
+    var
+        Customer: Record Customer;
+        FinanceChargeMemoHeader: Record "Finance Charge Memo Header";
+        FinanceChargeTerms: Record "Finance Charge Terms";
+        IssuedFinChargeMemoHeader: Record "Issued Fin. Charge Memo Header";
+        NoTaxableEntry: Record "No Taxable Entry";
+        FinanceChargeDate: Date;
+        InvoiceDate: Date;
+    begin
+        // [SCENARIO 642269] No Taxable Entry is not created when issuing a Finance Charge Memo whose interest account uses normal (taxable) VAT
+
+        // [GIVEN] Create a Customer with VAT setup and Finance Charge Terms that post interest.
+        LibrarySII.CreateCustWithVATSetup(Customer);
+        CreateFinanceChargeTermsPostingInterest(FinanceChargeTerms);
+        Customer.Validate("Fin. Charge Terms Code", FinanceChargeTerms.Code);
+        Customer.Modify(true);
+
+        // [GIVEN] Interest account of the customer posting group uses a normal (taxable) VAT posting setup.
+        SetupTaxableInterestAccount(Customer);
+
+        // [GIVEN] An overdue posted sales invoice creating a customer balance.
+        InvoiceDate := WorkDate();
+        FinanceChargeDate := CalcDate('<+62D>', InvoiceDate);
+        CreateAndPostSalesInvoice(Customer, InvoiceDate);
+
+        // [GIVEN] A Finance Charge Memo with suggested interest lines.
+        CreateFinanceChargeMemoWithLines(FinanceChargeMemoHeader, Customer, FinanceChargeDate);
+
+        // [WHEN] Issue the Finance Charge Memo.
+        LibraryERM.IssueFinanceChargeMemo(FinanceChargeMemoHeader);
+
+        // [THEN] No No Taxable Entry is created for the issued finance charge memo interest.
+        IssuedFinChargeMemoHeader.SetRange("Customer No.", Customer."No.");
+        IssuedFinChargeMemoHeader.SetRange("Pre-Assigned No.", FinanceChargeMemoHeader."No.");
+        IssuedFinChargeMemoHeader.FindFirst();
+
+        FilterOnNoTaxableEntry(NoTaxableEntry, Customer."No.", IssuedFinChargeMemoHeader."No.");
+        Assert.IsTrue(NoTaxableEntry.IsEmpty(), NoTaxableEntryShouldNotBeCreatedErr);
+    end;
+
     local procedure CreateGLAccountNoTaxableSale(): Code[20]
     var
         GLAccount: Record "G/L Account";
@@ -1224,6 +1410,160 @@ codeunit 147515 "No Taxable Documents"
         PurchaseLine.Modify(true);
     end;
 
+    local procedure CreateServiceLineWithUnitPrice(ServiceHeader: Record "Service Header"; var ServiceLine: Record "Service Line"; ItemNo: Code[20])
+    begin
+        LibraryService.CreateServiceLineWithQuantity(
+            ServiceLine, ServiceHeader, ServiceLine.Type::Item, ItemNo, LibraryRandom.RandInt(100));
+        ServiceLine.Validate("Unit Price", LibraryRandom.RandDec(100, 2));
+        ServiceLine.Modify(true);
+    end;
+
+    local procedure CreateItemWithNoTaxableVATSetup(ServiceHeader: Record "Service Header"): Code[20]
+    var
+        VATPostingSetup: Record "VAT Posting Setup";
+        ItemNo: Code[20];
+    begin
+        ItemNo := LibrarySII.CreateItemNoWithSpecificVATSetup(
+            LibrarySII.CreateSpecificNoTaxableVATSetup(
+                ServiceHeader."VAT Bus. Posting Group", false, VATPostingSetup."No Taxable Type"::"Non Taxable Due To Localization Rules"));
+        exit(ItemNo);
+    end;
+
+    local procedure CreateFinanceChargeTermsPostingInterest(var FinanceChargeTerms: Record "Finance Charge Terms")
+    begin
+        LibraryERM.CreateFinanceChargeTerms(FinanceChargeTerms);
+        FinanceChargeTerms.Validate("Interest Calculation", FinanceChargeTerms."Interest Calculation"::"Open Entries");
+        FinanceChargeTerms.Validate("Interest Calculation Method", FinanceChargeTerms."Interest Calculation Method"::"Average Daily Balance");
+        FinanceChargeTerms.Validate("Interest Rate", 1.5);
+        FinanceChargeTerms.Validate("Interest Period (Days)", 30);
+        FinanceChargeTerms.Validate("Minimum Amount (LCY)", 10);
+        FinanceChargeTerms.Validate("Additional Fee (LCY)", 0);
+        Evaluate(FinanceChargeTerms."Grace Period", '<5D>');
+        Evaluate(FinanceChargeTerms."Due Date Calculation", '<1M>');
+        FinanceChargeTerms.Validate("Post Interest", true);
+
+        FinanceChargeTerms.Modify(true);
+    end;
+
+    local procedure SetupNoTaxableInterestAccount(Customer: Record Customer)
+    var
+        CustomerPostingGroup: Record "Customer Posting Group";
+        GeneralPostingSetup: Record "General Posting Setup";
+        GenProductPostingGroup: Record "Gen. Product Posting Group";
+        GLAccount: Record "G/L Account";
+        NoTaxableVATProdPostGroup: Code[20];
+    begin
+        // [GIVEN] No Taxable VAT posting setup for the customer's VAT Bus. Posting Group
+        NoTaxableVATProdPostGroup := LibrarySII.CreateSpecificNoTaxableVATSetup(Customer."VAT Bus. Posting Group", false, 0);
+
+        // [GIVEN] Gen. Prod. Posting Group defaulting to the No Taxable VAT Prod. Posting Group
+        LibraryERM.CreateGenProdPostingGroup(GenProductPostingGroup);
+        GenProductPostingGroup.Validate("Def. VAT Prod. Posting Group", NoTaxableVATProdPostGroup);
+        GenProductPostingGroup.Modify(true);
+        LibraryERM.CreateGeneralPostingSetup(GeneralPostingSetup, Customer."Gen. Bus. Posting Group", GenProductPostingGroup.Code);
+        GeneralPostingSetup.Validate("Sales Account", LibraryERM.CreateGLAccountNo());
+        GeneralPostingSetup.Modify(true);
+
+        // [GIVEN] Interest account using the No Taxable VAT setup
+        LibraryERM.CreateGLAccount(GLAccount);
+        GLAccount.Validate("Gen. Posting Type", GLAccount."Gen. Posting Type"::Sale);
+        GLAccount.Validate("Gen. Bus. Posting Group", Customer."Gen. Bus. Posting Group");
+        GLAccount.Validate("Gen. Prod. Posting Group", GenProductPostingGroup.Code);
+        GLAccount.Validate("VAT Bus. Posting Group", Customer."VAT Bus. Posting Group");
+        GLAccount.Validate("VAT Prod. Posting Group", NoTaxableVATProdPostGroup);
+        GLAccount.Modify(true);
+
+        CustomerPostingGroup.Get(Customer."Customer Posting Group");
+        CustomerPostingGroup.Validate("Interest Account", GLAccount."No.");
+        CustomerPostingGroup.Modify(true);
+    end;
+
+    local procedure SetupTaxableInterestAccount(Customer: Record Customer)
+    var
+        CustomerPostingGroup: Record "Customer Posting Group";
+        GeneralPostingSetup: Record "General Posting Setup";
+        GenProductPostingGroup: Record "Gen. Product Posting Group";
+        GLAccount: Record "G/L Account";
+        VATPostingSetup: Record "VAT Posting Setup";
+        VATProductPostingGroup: Record "VAT Product Posting Group";
+    begin
+        // [GIVEN] Normal (taxable) VAT posting setup for the customer's VAT Bus. Posting Group
+        LibraryERM.CreateVATProductPostingGroup(VATProductPostingGroup);
+        LibraryERM.CreateVATPostingSetup(VATPostingSetup, Customer."VAT Bus. Posting Group", VATProductPostingGroup.Code);
+        VATPostingSetup.Validate("VAT Calculation Type", VATPostingSetup."VAT Calculation Type"::"Normal VAT");
+        VATPostingSetup.Validate("VAT %", LibraryRandom.RandIntInRange(50, 70));
+        VATPostingSetup.Validate("VAT Identifier", VATPostingSetup."VAT Bus. Posting Group");
+        VATPostingSetup.Validate("Sales VAT Account", LibraryERM.CreateGLAccountNo());
+        VATPostingSetup.Validate("Purchase VAT Account", LibraryERM.CreateGLAccountNo());
+        VATPostingSetup.Modify(true);
+
+        // [GIVEN] Gen. Prod. Posting Group defaulting to the normal VAT Prod. Posting Group
+        LibraryERM.CreateGenProdPostingGroup(GenProductPostingGroup);
+        GenProductPostingGroup.Validate("Def. VAT Prod. Posting Group", VATProductPostingGroup.Code);
+        GenProductPostingGroup.Modify(true);
+        LibraryERM.CreateGeneralPostingSetup(GeneralPostingSetup, Customer."Gen. Bus. Posting Group", GenProductPostingGroup.Code);
+        GeneralPostingSetup.Validate("Sales Account", LibraryERM.CreateGLAccountNo());
+        GeneralPostingSetup.Modify(true);
+
+        // [GIVEN] Interest account using the normal VAT setup
+        LibraryERM.CreateGLAccount(GLAccount);
+        GLAccount.Validate("Gen. Posting Type", GLAccount."Gen. Posting Type"::Sale);
+        GLAccount.Validate("Gen. Bus. Posting Group", Customer."Gen. Bus. Posting Group");
+        GLAccount.Validate("Gen. Prod. Posting Group", GenProductPostingGroup.Code);
+        GLAccount.Validate("VAT Bus. Posting Group", Customer."VAT Bus. Posting Group");
+        GLAccount.Validate("VAT Prod. Posting Group", VATProductPostingGroup.Code);
+        GLAccount.Modify(true);
+
+        CustomerPostingGroup.Get(Customer."Customer Posting Group");
+        CustomerPostingGroup.Validate("Interest Account", GLAccount."No.");
+        CustomerPostingGroup.Modify(true);
+    end;
+
+    local procedure CreateAndPostSalesInvoice(Customer: Record Customer; PostingDate: Date)
+    var
+        GLAccount: Record "G/L Account";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        VATPostingSetup: Record "VAT Posting Setup";
+    begin
+        VATPostingSetup.Get(
+          Customer."VAT Bus. Posting Group", LibrarySII.CreateSpecificNoTaxableVATSetup(Customer."VAT Bus. Posting Group", false, 0));
+
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.");
+        SalesHeader.Validate("Posting Date", PostingDate);
+        SalesHeader.Modify(true);
+        LibrarySales.CreateSalesLine(
+          SalesLine, SalesHeader, SalesLine.Type::"G/L Account",
+          LibraryERM.CreateGLAccountWithVATPostingSetup(VATPostingSetup, GLAccount."Gen. Posting Type"::Sale), 1);
+        SalesLine.Validate("Unit Price", LibraryRandom.RandDecInRange(1000, 2000, 2));
+        SalesLine.Modify(true);
+        LibrarySales.PostSalesDocument(SalesHeader, true, true);
+    end;
+
+    local procedure CreateFinanceChargeMemoWithLines(var FinanceChargeMemoHeader: Record "Finance Charge Memo Header"; Customer: Record Customer; PostingDate: Date)
+    var
+        FinanceChargeMemoPage: TestPage "Finance Charge Memo";
+    begin
+        LibraryERM.CreateFinanceChargeMemoHeader(FinanceChargeMemoHeader, Customer."No.");
+        FinanceChargeMemoHeader.Validate("Posting Date", PostingDate);
+        FinanceChargeMemoHeader.Validate("Document Date", PostingDate);
+        FinanceChargeMemoHeader.Modify(true);
+        Commit();
+
+        FinanceChargeMemoPage.OpenEdit();
+        FinanceChargeMemoPage.Filter.SetFilter("No.", FinanceChargeMemoHeader."No.");
+        FinanceChargeMemoPage.SuggestFinChargeMemoLines.Invoke();
+        FinanceChargeMemoPage.Close();
+    end;
+
+    local procedure FilterOnNoTaxableEntry(var NoTaxableEntry: Record "No Taxable Entry"; CustomerNo: Code[20]; DocumentNo: Code[20])
+    begin
+        NoTaxableEntry.SetRange(Type, NoTaxableEntry.Type::Sale);
+        NoTaxableEntry.SetRange("Source No.", CustomerNo);
+        NoTaxableEntry.SetRange("Document Type", NoTaxableEntry."Document Type"::"Finance Charge Memo");
+        NoTaxableEntry.SetRange("Document No.", DocumentNo);
+    end;
+
     [ConfirmHandler]
     [Scope('OnPrem')]
     procedure ConfirmHandler(Question: Text[1024]; var Reply: Boolean)
@@ -1235,5 +1575,11 @@ codeunit 147515 "No Taxable Documents"
     [Scope('OnPrem')]
     procedure MessageHandler(Message: Text[1024])
     begin
+    end;
+
+    [RequestPageHandler]
+    procedure SuggestFinChargeMemoLinesRequestPageHandler(var SuggestFinChargeMemoLines: TestRequestPage "Suggest Fin. Charge Memo Lines")
+    begin
+        SuggestFinChargeMemoLines.OK().Invoke();
     end;
 }

@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -288,6 +288,7 @@ table 18 Customer
         field(14; "Our Account No."; Text[20])
         {
             Caption = 'Our Account No.';
+            MaskType = Concealed;
             OptimizeForTextSearch = true;
         }
         /// <summary>
@@ -2445,6 +2446,7 @@ table 18 Customer
         VATRegistrationLogMgt.DeleteCustomerLog(Rec);
 
         DimMgt.DeleteDefaultDim(DATABASE::Customer, "No.");
+        DeleteDimValuePerAccount();
 
         CalendarManagement.DeleteCustomizedBaseCalendarData(CustomizedCalendarChange."Source Type"::Customer, "No.");
     end;
@@ -2697,6 +2699,7 @@ table 18 Customer
         ConfirmManagement: Codeunit "Confirm Management";
         ContactPageID: Integer;
     begin
+        OnBeforeShowContact(Rec, ContBusRel);
         if OfficeMgt.GetContact(OfficeContact, "No.") and (OfficeContact.Count = 1) then begin
             ContactPageID := PAGE::"Contact Card";
             OnShowContactOnBeforeOpenContactCard(OfficeContact, ContactPageID);
@@ -3434,8 +3437,11 @@ table 18 Customer
         OnGetCustNoOpenCardOnBeforeFilterCustomer(Customer);
         Customer.SetRange(Blocked, Customer.Blocked::" ");
         Customer.SetRange(Name, CustomerText);
-        if Customer.FindFirst() then
-            exit(Customer."No.");
+        IsHandled := false;
+        OnGetCustNoOpenCardOnBeforeCustomerFindFirst(Customer, IsHandled);
+        if not IsHandled then
+            if Customer.FindFirst() then
+                exit(Customer."No.");
 
         Customer.SetCurrentKey(Name);
 
@@ -4046,10 +4052,10 @@ table 18 Customer
         Currency: Record Currency;
     begin
         Currency.SetLoadFields(Code);
-        if not IsNullGuid("Currency Id") then
+        if not IsNullGuid("Currency Id") then begin
             Currency.GetBySystemId("Currency Id");
-
-        Validate("Currency Code", Currency.Code);
+            Validate("Currency Code", Currency.Code);
+        end;
     end;
 
     local procedure UpdatePaymentTermsCode()
@@ -4424,6 +4430,16 @@ table 18 Customer
                 VATRegistrationNo := CountryRegion."ISO Code" + VATRegistrationNo;
 
         exit(VATRegistrationNo);
+    end;
+
+    local procedure DeleteDimValuePerAccount()
+    var
+        DimValuePerAccount: Record "Dim. Value per Account";
+    begin
+        DimValuePerAccount.SetRange("Table ID", Database::Customer);
+        DimValuePerAccount.SetRange("No.", "No.");
+        if not DimValuePerAccount.IsEmpty() then
+            DimValuePerAccount.DeleteAll(true);
     end;
 
     /// <summary>
@@ -4943,6 +4959,16 @@ table 18 Customer
     end;
 
     /// <summary>
+    /// Raised before executing the ShowContact procedure.
+    /// </summary>
+    /// <param name="Customer">The customer record.</param>
+    /// <param name="ContBusRel">The contact business relation record.</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeShowContact(var Customer: Record Customer; var ContactBusinessRelation: Record "Contact Business Relation")
+    begin
+    end;
+
+    /// <summary>
     /// Raised before opening the contact card from ShowContact.
     /// </summary>
     /// <param name="Contact">The contact record to display.</param>
@@ -4968,6 +4994,16 @@ table 18 Customer
     /// <param name="Customer">The customer record with the initial filter applied.</param>
     [IntegrationEvent(false, false)]
     local procedure OnGetCustNoOpenCardOnAfterOnAfterCustomerFilterFromStart(var Customer: Record Customer)
+    begin
+    end;
+
+    /// <summary>
+    /// Raised before the Customer.FindFirst() operation after setting the name filter in GetCustNoOpenCard.
+    /// </summary>
+    /// <param name="Customer">The customer record with applied filters.</param>
+    /// <param name="IsHandled">Set to true to skip the FindFirst check and continue with alternative search logic.</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnGetCustNoOpenCardOnBeforeCustomerFindFirst(var Customer: Record Customer; var IsHandled: Boolean)
     begin
     end;
 
@@ -5069,5 +5105,4 @@ table 18 Customer
     local procedure OnAfterGetVATRegistrationNo(var Customer: Record Customer; var VATRegNo: Text[20]);
     begin
     end;
-
 }

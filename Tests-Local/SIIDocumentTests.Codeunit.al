@@ -2382,6 +2382,43 @@ codeunit 147520 SIIDocumentTests
 
     [Test]
     [Scope('OnPrem')]
+    procedure PurchInvWithInvTypeLCAndReverseChargeVATXML()
+    var
+        CountryRegion: Record "Country/Region";
+        PurchaseHeader: Record "Purchase Header";
+        VendorLedgerEntry: Record "Vendor Ledger Entry";
+        SIIDocUploadState: Record "SII Doc. Upload State";
+        XMLDoc: DotNet XmlDocument;
+        VATRate: Decimal;
+        Amount: Decimal;
+    begin
+        // [FEATURE] [AI test 0.4] [Purchase] [Invoice] [XML] [Reverse Charge] [VAT]
+        // [SCENARIO 637259] Reverse Charge VAT Amount exports under the DesgloseIVA for the purchase invoice with invoice type "LC"
+        Initialize();
+
+        // [GIVEN] Posted Purchase Invoice with "Invoice Type" = "Customs - Complementary Liquidation", one Purchase Line where
+        // [GIVEN] line is calculated as Reverse Charge VAT with VAT Amount = "X"
+        LibraryERM.CreateCountryRegion(CountryRegion);
+        LibrarySII.CreatePurchDocWithReverseChargeVAT(
+          PurchaseHeader, VATRate, Amount, PurchaseHeader."Document Type"::Invoice, CountryRegion.Code);
+        PurchaseHeader.Validate("Invoice Type", PurchaseHeader."Invoice Type"::"Customs - Complementary Liquidation");
+        PurchaseHeader.Modify(true);
+        LibraryERM.FindVendorLedgerEntry(
+          VendorLedgerEntry, PurchaseHeader."Document Type", LibraryPurchase.PostPurchaseDocument(PurchaseHeader, false, true));
+
+        // [GIVEN] SII version is "2.1"
+        SIIXMLCreator.SetSIIVersionNo(SIIDocUploadState."Version No."::"2.1");
+
+        // [WHEN] XML is generated
+        Assert.IsTrue(SIIXMLCreator.GenerateXml(VendorLedgerEntry, XMLDoc, UploadType::Regular, false), IncorrectXMLDocErr);
+
+        // [THEN] 'sii:CuotaSoportada' under 'sii:DesgloseIVA" has value = "X" and no 'sii:InversionSujetoPasivo' block is emitted
+        LibrarySII.VerifyOneNodeWithValueByXPath(
+          XMLDoc, XPathPurchBaseImponibleTok, '/sii:CuotaSoportada', SIIXMLCreator.FormatNumber(Round(VATRate * Amount / 100)));
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
     procedure FechaOperacionNextDateAfterPostingDateSalesCreditMemoWithSchemeCode14AndVersion11bis()
     var
         CustLedgerEntry: Record "Cust. Ledger Entry";
@@ -3292,6 +3329,274 @@ codeunit 147520 SIIDocumentTests
         // [THEN] Verify ImporteTotal is available in XML for 09 Travel Agency Services
         CustLedgerEntry.CalcFields("Original Amt. (LCY)");
         LibrarySII.ValidateElementByName(XMLDoc, 'sii:ImporteTotal', SIIXMLCreator.FormatNumber(CustLedgerEntry."Original Amt. (LCY)"));
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ValidateInvoicesIssuedUrlWithAllowedBaseUrl()
+    var
+        SIISetup: Record "SII Setup";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO] Setting InvoicesIssuedEndpointUrl to a valid URL starting with https://www1.agenciatributaria.gob.es succeeds
+        Initialize();
+
+        // [GIVEN] SII Setup record "S"
+        SIISetup.Get();
+
+        // [WHEN] Validate InvoicesIssuedEndpointUrl with an allowed base URL
+        SIISetup.Validate(InvoicesIssuedEndpointUrl, 'https://www1.agenciatributaria.gob.es/wlpl/SSII-FACT/ws/fe/SiiFactFEV1SOAP');
+
+        // [THEN] No error is thrown and the value is set
+        Assert.AreEqual('https://www1.agenciatributaria.gob.es/wlpl/SSII-FACT/ws/fe/SiiFactFEV1SOAP', SIISetup.InvoicesIssuedEndpointUrl, 'InvoicesIssuedEndpointUrl should be set');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ValidateInvoicesReceivedUrlWithPrewww1BaseUrl()
+    var
+        SIISetup: Record "SII Setup";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO] Setting InvoicesReceivedEndpointUrl to a valid URL starting with https://prewww1.aeat.es succeeds
+        Initialize();
+
+        // [GIVEN] SII Setup record "S"
+        SIISetup.Get();
+
+        // [WHEN] Validate InvoicesReceivedEndpointUrl with prewww1 base URL
+        SIISetup.Validate(InvoicesReceivedEndpointUrl, 'https://prewww1.aeat.es/wlpl/SSII-FACT/ws/fr/SiiFactFRV1SOAP');
+
+        // [THEN] No error is thrown and the value is set
+        Assert.AreEqual('https://prewww1.aeat.es/wlpl/SSII-FACT/ws/fr/SiiFactFRV1SOAP', SIISetup.InvoicesReceivedEndpointUrl, 'InvoicesReceivedEndpointUrl should be set');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ValidatePaymentsIssuedUrlWithWww2BaseUrl()
+    var
+        SIISetup: Record "SII Setup";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO] Setting PaymentsIssuedEndpointUrl to a valid URL starting with https://www2.agenciatributaria.gob.es succeeds
+        Initialize();
+
+        // [GIVEN] SII Setup record "S"
+        SIISetup.Get();
+
+        // [WHEN] Validate PaymentsIssuedEndpointUrl with www2 base URL
+        SIISetup.Validate(PaymentsIssuedEndpointUrl, 'https://www2.agenciatributaria.gob.es/wlpl/SSII-FACT/ws/fr/SiiFactPAGV1SOAP');
+
+        // [THEN] No error is thrown and the value is set
+        Assert.AreEqual('https://www2.agenciatributaria.gob.es/wlpl/SSII-FACT/ws/fr/SiiFactPAGV1SOAP', SIISetup.PaymentsIssuedEndpointUrl, 'PaymentsIssuedEndpointUrl should be set');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ValidatePaymentsReceivedUrlWithPrewww2BaseUrl()
+    var
+        SIISetup: Record "SII Setup";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO] Setting PaymentsReceivedEndpointUrl to a valid URL starting with https://prewww2.aeat.es succeeds
+        Initialize();
+
+        // [GIVEN] SII Setup record "S"
+        SIISetup.Get();
+
+        // [WHEN] Validate PaymentsReceivedEndpointUrl with prewww2 base URL
+        SIISetup.Validate(PaymentsReceivedEndpointUrl, 'https://prewww2.aeat.es/wlpl/SSII-FACT/ws/fe/SiiFactCOBV1SOAP');
+
+        // [THEN] No error is thrown and the value is set
+        Assert.AreEqual('https://prewww2.aeat.es/wlpl/SSII-FACT/ws/fe/SiiFactCOBV1SOAP', SIISetup.PaymentsReceivedEndpointUrl, 'PaymentsReceivedEndpointUrl should be set');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ValidateCollectionInCashUrlWithAllowedBaseUrl()
+    var
+        SIISetup: Record "SII Setup";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO] Setting CollectionInCashEndpointUrl to a valid URL starting with https://www1.agenciatributaria.gob.es succeeds
+        Initialize();
+
+        // [GIVEN] SII Setup record "S"
+        SIISetup.Get();
+
+        // [WHEN] Validate CollectionInCashEndpointUrl with an allowed base URL
+        SIISetup.Validate(CollectionInCashEndpointUrl, 'https://www1.agenciatributaria.gob.es/wlpl/SSII-FACT/ws/pm/SiiFactCMV1SOAP');
+
+        // [THEN] No error is thrown and the value is set
+        Assert.AreEqual('https://www1.agenciatributaria.gob.es/wlpl/SSII-FACT/ws/pm/SiiFactCMV1SOAP', SIISetup.CollectionInCashEndpointUrl, 'CollectionInCashEndpointUrl should be set');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ValidateInvoicesIssuedUrlWithInvalidBaseUrl()
+    var
+        SIISetup: Record "SII Setup";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO] Setting InvoicesIssuedEndpointUrl to a URL with a disallowed base raises an error
+        Initialize();
+
+        // [GIVEN] SII Setup record "S"
+        SIISetup.Get();
+
+        // [WHEN] Validate InvoicesIssuedEndpointUrl with a disallowed URL
+        asserterror SIISetup.Validate(InvoicesIssuedEndpointUrl, 'https://evil.com/wlpl/SSII-FACT/ws/fe/SiiFactFEV1SOAP');
+
+        // [THEN] An error is thrown about invalid endpoint URL
+        Assert.ExpectedError('is not on the allow-list for this feature');
+        Assert.ExpectedErrorCode('Dialog');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ValidateInvoicesReceivedUrlWithHttpUrl()
+    var
+        SIISetup: Record "SII Setup";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO] Setting InvoicesReceivedEndpointUrl to an HTTP URL (not HTTPS) raises an error
+        Initialize();
+
+        // [GIVEN] SII Setup record "S"
+        SIISetup.Get();
+
+        // [WHEN] Validate InvoicesReceivedEndpointUrl with HTTP instead of HTTPS
+        asserterror SIISetup.Validate(InvoicesReceivedEndpointUrl, 'http://www1.agenciatributaria.gob.es/wlpl/SSII-FACT/ws/fr/SiiFactFRV1SOAP');
+
+        // [THEN] An error is thrown about invalid endpoint URL
+        Assert.ExpectedError('is not on the allow-list for this feature');
+        Assert.ExpectedErrorCode('Dialog');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ValidatePaymentsIssuedUrlWithInvalidDomain()
+    var
+        SIISetup: Record "SII Setup";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO] Setting PaymentsIssuedEndpointUrl to a URL that embeds the allowed domain in a different host raises an error
+        Initialize();
+
+        // [GIVEN] SII Setup record "S"
+        SIISetup.Get();
+
+        // [WHEN] Validate PaymentsIssuedEndpointUrl with a subdomain-spoofing URL
+        asserterror SIISetup.Validate(PaymentsIssuedEndpointUrl, 'https://www1.agenciatributaria.gob.es.evil.com/wlpl/SSII-FACT/ws/fr/SiiFactPAGV1SOAP');
+
+        // [THEN] An error is thrown about invalid endpoint URL
+        Assert.ExpectedError('is not on the allow-list for this feature');
+        Assert.ExpectedErrorCode('Dialog');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ValidatePaymentsReceivedUrlWithInvalidUrl()
+    var
+        SIISetup: Record "SII Setup";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO] Setting PaymentsReceivedEndpointUrl to a completely invalid URL raises an error
+        Initialize();
+
+        // [GIVEN] SII Setup record "S"
+        SIISetup.Get();
+
+        // [WHEN] Validate PaymentsReceivedEndpointUrl with a random invalid URL
+        asserterror SIISetup.Validate(PaymentsReceivedEndpointUrl, 'https://totally-wrong-domain.com/something');
+
+        // [THEN] An error is thrown about invalid endpoint URL
+        Assert.ExpectedError('is not on the allow-list for this feature');
+        Assert.ExpectedErrorCode('Dialog');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ValidateCollectionInCashUrlWithInvalidBaseUrl()
+    var
+        SIISetup: Record "SII Setup";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO] Setting CollectionInCashEndpointUrl to a disallowed URL raises an error
+        Initialize();
+
+        // [GIVEN] SII Setup record "S"
+        SIISetup.Get();
+
+        // [WHEN] Validate CollectionInCashEndpointUrl with a disallowed URL
+        asserterror SIISetup.Validate(CollectionInCashEndpointUrl, 'https://malicious-site.org/wlpl/SSII-FACT/ws/pm/SiiFactCMV1SOAP');
+
+        // [THEN] An error is thrown about invalid endpoint URL
+        Assert.ExpectedError('is not on the allow-list for this feature');
+        Assert.ExpectedErrorCode('Dialog');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure IsAllowedEndpointUrlReturnsTrueForAllFourBaseUrls()
+    var
+        SIISetup: Record "SII Setup";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO] IsAllowedEndpointUrl returns true for each of the 4 allowed base URLs
+        Initialize();
+
+        // [GIVEN] SII Setup record "S"
+        SIISetup.Get();
+
+        // [WHEN] IsAllowedEndpointUrl is called with each of the four allowed base URLs
+
+        // [THEN] All four return true
+        Assert.IsTrue(SIISetup.IsAllowedEndpointUrl('https://www1.agenciatributaria.gob.es/path'), 'www1.agenciatributaria.gob.es should be allowed');
+        Assert.IsTrue(SIISetup.IsAllowedEndpointUrl('https://www2.agenciatributaria.gob.es/path'), 'www2.agenciatributaria.gob.es should be allowed');
+        Assert.IsTrue(SIISetup.IsAllowedEndpointUrl('https://prewww1.aeat.es/path'), 'prewww1.aeat.es should be allowed');
+        Assert.IsTrue(SIISetup.IsAllowedEndpointUrl('https://prewww2.aeat.es/path'), 'prewww2.aeat.es should be allowed');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure IsAllowedEndpointUrlReturnsFalseForEmptyUrl()
+    var
+        SIISetup: Record "SII Setup";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO] IsAllowedEndpointUrl returns false for an empty string
+        Initialize();
+
+        // [GIVEN] SII Setup record "S"
+        SIISetup.Get();
+
+        // [WHEN] IsAllowedEndpointUrl is called with an empty string
+
+        // [THEN] It returns false
+        Assert.IsFalse(SIISetup.IsAllowedEndpointUrl(''), 'Empty URL should not be allowed');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure IsAllowedEndpointUrlIsCaseInsensitive()
+    var
+        SIISetup: Record "SII Setup";
+    begin
+        // [FEATURE] [AI test 0.3]
+        // [SCENARIO] IsAllowedEndpointUrl returns true when the URL uses mixed case
+        Initialize();
+
+        // [GIVEN] SII Setup record "S"
+        SIISetup.Get();
+
+        // [WHEN] IsAllowedEndpointUrl is called with mixed case URLs
+
+        // [THEN] All return true regardless of casing
+        Assert.IsTrue(SIISetup.IsAllowedEndpointUrl('HTTPS://WWW1.AGENCIATRIBUTARIA.GOB.ES/path'), 'Upper case www1 URL should be allowed');
+        Assert.IsTrue(SIISetup.IsAllowedEndpointUrl('Https://Www2.AgenciaTributaria.Gob.Es/path'), 'Mixed case www2 URL should be allowed');
+        Assert.IsTrue(SIISetup.IsAllowedEndpointUrl('HTTPS://PREWWW1.AEAT.ES/path'), 'Upper case prewww1 URL should be allowed');
+        Assert.IsTrue(SIISetup.IsAllowedEndpointUrl('Https://PreWww2.Aeat.Es/path'), 'Mixed case prewww2 URL should be allowed');
     end;
 
     local procedure Initialize()

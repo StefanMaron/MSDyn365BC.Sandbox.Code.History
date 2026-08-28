@@ -1504,6 +1504,169 @@ codeunit 147305 "Cartera Posting"
         Assert.RecordCount(GLRegister, LibraryRandom.RandIntInRange(3, 3));
     end;
 
+    [Test]
+    [Scope('OnPrem')]
+    procedure ApplyPaymentToBillWithMultiplePostingGroupsCreatesExactlyTwoGLEntries()
+    var
+        Customer: Record Customer;
+        CustomerPostingGroup: Record "Customer Posting Group";
+        CustomerPostingGroup2: Record "Customer Posting Group";
+        GenJournalLine: Record "Gen. Journal Line";
+        GenJournalBatch: Record "Gen. Journal Batch";
+        GLEntry: Record "G/L Entry";
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        SalesInvoiceNo: Code[20];
+        BillNo: Code[20];
+        PaymentDocNo: Code[20];
+        InvAmount: Decimal;
+        LastGLEntryNo: Integer;
+    begin
+        // [FEATURE] [AI test]
+        // [SCENARIO 634046] When applying a Payment to a Bill using Allow Multiple Posting Groups,
+        // exactly 2 G/L entries are created (Debit Receivables, Credit Bills) with correct accounts.
+        Initialize();
+
+        // [GIVEN] Enable "Allow Multiple Posting Groups" in Sales & Receivables Setup.
+        SetSalesAllowMultiplePostingGroups(true);
+
+        // [GIVEN] Create a customer with "Allow Multiple Posting Groups" enabled.
+        LibrarySales.CreateCustomer(Customer);
+        Customer.Validate("Allow Multiple Posting Groups", true);
+        Customer.Modify();
+        CustomerPostingGroup.Get(Customer."Customer Posting Group");
+
+        // [GIVEN] Create another customer posting group with different Receivables and Bills accounts.
+        LibrarySales.CreateCustomerPostingGroup(CustomerPostingGroup2);
+
+        // [GIVEN] Create bidirectional alt posting group links.
+        LibrarySales.CreateAltCustomerPostingGroup(Customer."Customer Posting Group", CustomerPostingGroup2.Code);
+        LibrarySales.CreateAltCustomerPostingGroup(CustomerPostingGroup2.Code, Customer."Customer Posting Group");
+
+        // [GIVEN] Post a sales invoice with the customer's default posting group (PG1).
+        LibrarySales.CreateSalesDocumentWithItem(
+            SalesHeader, SalesLine, "Sales Document Type"::Invoice,
+            Customer."No.", '', LibraryRandom.RandInt(10), '', 0D);
+        SalesLine.Validate("Unit Price", LibraryRandom.RandDecInRange(100, 200, 2));
+        SalesLine.Modify();
+        SalesHeader.CalcFields("Amount Including VAT");
+        InvAmount := SalesHeader."Amount Including VAT";
+        SalesInvoiceNo := LibrarySales.PostSalesDocument(SalesHeader, true, true);
+
+        // [GIVEN] Create a Bill from the Invoice via Cartera journal (Bill CLE uses PG1).
+        BillNo :=
+            CreateApplyPostBillToInvoice(
+                GenJournalLine."Account Type"::Customer, Customer."No.", InvAmount, SalesInvoiceNo);
+
+        // [GIVEN] Post a Payment with the alt posting group (PG2).
+        LibraryERM.SelectGenJnlBatch(GenJournalBatch);
+        LibraryERM.CreateGeneralJnlLine(
+            GenJournalLine, GenJournalBatch."Journal Template Name", GenJournalBatch.Name,
+            GenJournalLine."Document Type"::Payment, GenJournalLine."Account Type"::Customer,
+            Customer."No.", -InvAmount);
+        GenJournalLine.Validate("Posting Group", CustomerPostingGroup2.Code);
+        GenJournalLine.Validate("Bal. Account No.", LibraryERM.CreateGLAccountNoWithDirectPosting());
+        GenJournalLine.Modify();
+        PaymentDocNo := GenJournalLine."Document No.";
+        LibraryERM.PostGeneralJnlLine(GenJournalLine);
+
+        // [GIVEN] Record the last G/L Entry number before the application.
+        GLEntry.FindLast();
+        LastGLEntryNo := GLEntry."Entry No.";
+
+        // [WHEN] Apply the Payment to the Bill from Customer Ledger Entries.
+        ApplyPaymentToBillFromCustLedgEntry(PaymentDocNo, SalesInvoiceNo, BillNo);
+
+        // [THEN] Exactly 2 G/L entries are created for the application (not 4 duplicated entries).
+        GLEntry.Reset();
+        GLEntry.SetFilter("Entry No.", '>%1', LastGLEntryNo);
+        Assert.RecordCount(GLEntry, 2);
+
+        // [THEN] One G/L entry debits the Payment's posting group Receivables Account.
+        GLEntry.SetRange("G/L Account No.", CustomerPostingGroup2."Receivables Account");
+        Assert.RecordCount(GLEntry, 1);
+        GLEntry.FindFirst();
+        Assert.IsTrue(GLEntry."Debit Amount" > 0,
+            StrSubstNo(FieldErr, GLEntry.FieldCaption("Debit Amount"), GLEntry.TableCaption()));
+
+        // [THEN] One G/L entry credits the Bill's posting group Bills Account.
+        GLEntry.SetRange("G/L Account No.", CustomerPostingGroup."Bills Account");
+        Assert.RecordCount(GLEntry, 1);
+        GLEntry.FindFirst();
+        Assert.IsTrue(GLEntry."Credit Amount" > 0,
+            StrSubstNo(FieldErr, GLEntry.FieldCaption("Credit Amount"), GLEntry.TableCaption()));
+    end;
+
+    [Test]
+    procedure BillCustLedgEntryUsesAlternativePostingGroupFromSalesInvoice()
+    var
+        CustLedgerEntry: Record "Cust. Ledger Entry";
+        Customer: Record Customer;
+        CustomerPostingGroup2: Record "Customer Posting Group";
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceNo: Code[20];
+    begin
+        // [SCENARIO 644753] Bill Customer Ledger Entries use the alternative Customer Posting Group set on the Sales Document
+        // instead of the customer's default Customer Posting Group when creating bills.
+        Initialize();
+
+        // [GIVEN] Enable "Allow Multiple Posting Groups" in Sales & Receivables Setup.
+        SetSalesAllowMultiplePostingGroups(true);
+
+        // [GIVEN] Create a customer with a bill-creating (Cartera) payment method and "Allow Multiple Posting Groups" enabled.
+        CreateCustomerWithAllowMultiplePostingGroups(Customer, true);
+
+        // [GIVEN] Create an alternative Customer Posting Group linked to the customer's default posting group.
+        LibrarySales.CreateCustomerPostingGroup(CustomerPostingGroup2);
+        LibrarySales.CreateAltCustomerPostingGroup(Customer."Customer Posting Group", CustomerPostingGroup2.Code);
+
+        // [GIVEN] Create a sales invoice and set the alternative Customer Posting Group on the Sales Document.
+        CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Invoice, Customer."No.");
+        SalesHeader.Validate("Customer Posting Group", CustomerPostingGroup2.Code);
+        SalesHeader.Modify(true);
+
+        // [WHEN] Post the sales invoice (splitting it into bills).
+        SalesInvoiceNo := LibrarySales.PostSalesDocument(SalesHeader, true, true);
+
+        // [THEN] The created Bill Customer Ledger Entry uses the alternative Customer Posting Group from the Sales Document.
+        LibraryERM.FindCustomerLedgerEntry(CustLedgerEntry, CustLedgerEntry."Document Type"::Bill, SalesInvoiceNo);
+        Assert.AreEqual(
+            CustomerPostingGroup2.Code,
+            CustLedgerEntry."Customer Posting Group",
+            StrSubstNo(
+                FieldErr, CustLedgerEntry.FieldCaption("Customer Posting Group"), CustLedgerEntry.TableCaption()));
+    end;
+
+    [Test]
+    procedure BillCustLedgEntryKeepsDefaultPostingGroupWhenNoAlternativeUsed()
+    var
+        CustLedgerEntry: Record "Cust. Ledger Entry";
+        Customer: Record Customer;
+        SalesHeader: Record "Sales Header";
+        SalesInvoiceNo: Code[20];
+    begin
+        // [SCENARIO 644753] When no alternative Customer Posting Group is used on the Sales Document, the Bill
+        // Customer Ledger Entry keeps the customer's default Customer Posting Group (previous behavior is not affected).
+        Initialize();
+
+        // [GIVEN] A customer with a bill-creating (Cartera) payment method and its default Customer Posting Group.
+        LibraryCarteraReceivables.CreateCarteraCustomer(Customer, '');
+
+        // [GIVEN] A sales invoice created without changing the Customer Posting Group.
+        LibraryCarteraReceivables.CreateSalesInvoice(SalesHeader, Customer."No.");
+
+        // [WHEN] Post the sales invoice (splitting it into a bill).
+        SalesInvoiceNo := LibrarySales.PostSalesDocument(SalesHeader, true, true);
+
+        // [THEN] The Bill Customer Ledger Entry uses the customer's default Customer Posting Group.
+        LibraryERM.FindCustomerLedgerEntry(CustLedgerEntry, CustLedgerEntry."Document Type"::Bill, SalesInvoiceNo);
+        Assert.AreEqual(
+            Customer."Customer Posting Group",
+            CustLedgerEntry."Customer Posting Group",
+            StrSubstNo(
+                FieldErr, CustLedgerEntry.FieldCaption("Customer Posting Group"), CustLedgerEntry.TableCaption()));
+    end;
+
     local procedure Initialize()
     begin
         LibraryVariableStorage.Clear();
@@ -3507,6 +3670,15 @@ codeunit 147305 "Cartera Posting"
 
         LibraryERM.SetAppliestoIdCustomer(CustLedgerEntry2);
         LibraryERM.PostCustLedgerApplication(CustLedgerEntry);
+    end;
+
+    local procedure CreateCustomerWithAllowMultiplePostingGroups(var Customer: Record Customer; AllowMultiplePostingGroups: Boolean)
+    begin
+        CreateCustomer(Customer);
+        if not AllowMultiplePostingGroups then
+            exit;
+        Customer.Validate("Allow Multiple Posting Groups", AllowMultiplePostingGroups);
+        Customer.Modify(true);
     end;
 
     [ModalPageHandler]

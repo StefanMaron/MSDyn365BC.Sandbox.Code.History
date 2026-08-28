@@ -211,7 +211,8 @@ page 54 "Purchase Order Subform"
                     trigger OnValidate()
                     begin
                         Rec.RestoreLookupSelection();
-                        NoOnAfterValidate();
+                        if Rec."No." <> xRec."No." then
+                            NoOnAfterValidate();
 
                         if Rec."No." = xRec."No." then
                             exit;
@@ -935,6 +936,11 @@ page 54 "Purchase Order Subform"
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = AttachingLinesEnabled;
+                }
+                field("Spend Request No."; Rec."Spend Request No.")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Visible = false;
                 }
             }
             group(Control43)
@@ -1712,6 +1718,9 @@ page 54 "Purchase Order Subform"
     var
         IsHandled: Boolean;
     begin
+        if not Unconditionally and (Rec."No." = xRec."No.") then
+            exit;
+
         IsHandled := false;
         OnBeforeInsertExtendedText(Rec, IsHandled);
         if IsHandled then
