@@ -361,6 +361,7 @@ codeunit 5920 ServItemManagement
         OnCreateServItemOnSalesLineShpt(ServItem, SalesHeader, SalesLine);
 
         ServItem.Modify();
+        OnAfterModifyServiceItem(ServItem, SalesHeader, SalesLine, SalesShipmentLine);
     end;
 
     local procedure AddServiceItemComponents(SalesHeader: Record "Sales Header"; SalesLine: Record "Sales Line"; SalesShipmentLine: Record "Sales Shipment Line")
@@ -418,13 +419,22 @@ codeunit 5920 ServItemManagement
         ConfirmManagement: Codeunit "Confirm Management";
         NoSeries: Codeunit "No. Series";
         IsHandled: Boolean;
+        SkipConfirm: Boolean;
     begin
         OnBeforeCreateServItemOnServItemLine(ServItemLine);
         ServItemLine.TestField("Service Item No.", '');
         ServItemLine.TestField("Document No.");
         ServItemLine.TestField(Description);
-        if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text000), true) then
+
+        IsHandled := false;
+        SkipConfirm := false;
+        OnCreateServItemOnServItemLineOnBeforeConfirmCreateServItem(ServItemLine, IsHandled, SkipConfirm);
+        if IsHandled then
             exit;
+
+        if not SkipConfirm then
+            if not ConfirmManagement.GetResponseOrDefault(StrSubstNo(Text000), true) then
+                exit;
 
         Clear(ServItem);
         ServItem.Init();
@@ -770,6 +780,11 @@ codeunit 5920 ServItemManagement
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnCreateServItemOnServItemLineOnBeforeConfirmCreateServItem(var ServiceItemLine: Record "Service Item Line"; var IsHandled: Boolean; var SkipConfirm: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnBeforeDeleteServItemOnSaleCreditMemo(SalesHeader: Record "Sales Header"; var IsHandled: Boolean)
     begin
     end;
@@ -786,6 +801,11 @@ codeunit 5920 ServItemManagement
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeReplaceSIComponent(var ServiceLine: Record "Service Line"; ServiceHeader: Record "Service Header"; ServShptDocNo: Code[20]; ServShptLineNo: Integer; var TempTrackingSpecification: Record "Tracking Specification" temporary; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterModifyServiceItem(var ServiceItem: Record "Service Item"; var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; var SalesShipmentLine: Record "Sales Shipment Line")
     begin
     end;
 

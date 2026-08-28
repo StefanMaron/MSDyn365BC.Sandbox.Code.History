@@ -28,9 +28,6 @@
 			"path": "..\\Tests\\DotNet-Internal"
 		},
 		{
-			"path": "..\\Tests\\DotNet-Internal"
-		},
-		{
 			"path": "..\\Tests\\ERM"
 		},
 		{
@@ -74,9 +71,6 @@
 		},
 		{
 			"path": "..\\Tests\\NATIVEINVOICINGTEST"
-		},
-		{
-			"path": "..\\Tests\\Performance-Internal"
 		},
 		{
 			"path": "..\\Tests\\Permissions"
@@ -138,6 +132,9 @@
 		{
 			"path": "..\\Tests\\BCPT-SampleTests"
 		},
+		{
+			"path": "../../../../../../Users/v-cwurtzen/.claude/plans"
+		}
 	],
 	"settings": {}
 }

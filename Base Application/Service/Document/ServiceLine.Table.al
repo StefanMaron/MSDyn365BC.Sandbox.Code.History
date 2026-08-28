@@ -642,7 +642,8 @@ table 5902 "Service Line"
                 Amount := Round(Amount, Currency."Amount Rounding Precision");
                 case "VAT Calculation Type" of
                     "VAT Calculation Type"::"Normal VAT",
-                    "VAT Calculation Type"::"Reverse Charge VAT":
+                    "VAT Calculation Type"::"Reverse Charge VAT",
+                    "VAT Calculation Type"::"No Taxable VAT":
                         begin
                             "VAT Base Amount" :=
                               Round(Amount * (1 - GetVatBaseDiscountPct(ServHeader) / 100), Currency."Amount Rounding Precision");
@@ -689,7 +690,8 @@ table 5902 "Service Line"
                 "Amount Including VAT" := Round("Amount Including VAT", Currency."Amount Rounding Precision");
                 case "VAT Calculation Type" of
                     "VAT Calculation Type"::"Normal VAT",
-                    "VAT Calculation Type"::"Reverse Charge VAT":
+                    "VAT Calculation Type"::"Reverse Charge VAT",
+                    "VAT Calculation Type"::"No Taxable VAT":
                         begin
                             Amount :=
                               Round(
@@ -840,7 +842,7 @@ table 5902 "Service Line"
         {
             Caption = 'Project No.';
             ToolTip = 'Specifies the number of the related project.';
-            TableRelation = Job."No." where("Bill-to Customer No." = field("Bill-to Customer No."));
+            TableRelation = Job."No.";
 
             trigger OnValidate()
             var
@@ -858,9 +860,28 @@ table 5902 "Service Line"
                 if "Job No." <> '' then begin
                     Job.Get("Job No.");
                     Job.TestBlocked();
+                    if Job."Task Billing Method" = Job."Task Billing Method"::"One customer" then
+                        Rec.TestField("Bill-to Customer No.", Job."Bill-to Customer No.");
                 end;
 
                 CreateDimFromDefaultDim(Rec.FieldNo("Job No."));
+            end;
+
+            trigger OnLookup()
+            var
+                Job: Record Job;
+            begin
+                if Rec."Bill-to Customer No." = '' then
+                    exit;
+                MarkJobsForBillToCustomer(Job);
+
+                if Rec."Job No." <> '' then begin
+                    Job."No." := Rec."Job No.";
+                    if Job.Find('=') then;
+                end;
+                
+                if Page.RunModal(0, Job) = Action::LookupOK then
+                    Rec.Validate("Job No.", Job."No.");
             end;
         }
         field(46; "Job Task No."; Code[20])
@@ -882,8 +903,32 @@ table 5902 "Service Line"
                 if "Job Task No." = '' then
                     "Job Line Type" := "Job Line Type"::" ";
 
+                VerifyCustomerForJobTask();
                 if "Job Task No." <> xRec."Job Task No." then
                     Validate("Job Planning Line No.", 0);
+            end;
+
+            trigger OnLookup()
+            var
+                Job: Record Job;
+                JobTask: Record "Job Task";
+            begin
+                if Rec."Job No." = '' then
+                    exit;
+
+                JobTask.SetRange("Job No.", Rec."Job No.");
+                if Job.Get(Rec."Job No.") then
+                    if Job."Task Billing Method" = Job."Task Billing Method"::"Multiple customers" then
+                        JobTask.SetRange("Bill-to Customer No.", Rec."Bill-to Customer No.");
+
+                if Rec."Job Task No." <> '' then begin
+                    JobTask."Job No." := Rec."Job No.";
+                    JobTask."Job Task No." := Rec."Job Task No.";
+                    if JobTask.Find('=') then;
+                end;
+
+                if Page.RunModal(0, JobTask) = Action::LookupOK then
+                    Rec.Validate("Job Task No.", JobTask."Job Task No.");
             end;
         }
         field(47; "Job Line Type"; Enum "Job Line Type")
@@ -3211,7 +3256,7 @@ table 5902 "Service Line"
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", DimensionSetID, DATABASE::Customer);
         DimMgt.UpdateGlobalDimFromDimSetID("Dimension Set ID", "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code");
 
-        OnAfterCreateDim(Rec, CurrFieldNo);
+        OnAfterCreateDim(Rec, CurrFieldNo, xRec);
     end;
 
     procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
@@ -3642,9 +3687,8 @@ table 5902 "Service Line"
             "Line Amount" := ExpectedLineAmount;
             ClearVATDifference();
         end;
-        if ServHeader."Tax Area Code" = '' then
-            UpdateVATAmounts();
 
+        UpdateVATAmounts();
         InitOutstandingAmount();
         ShouldCheckCrLimit := not IsCustCrLimitChecked and (CurrFieldNo <> 0);
         OnUpdateAmountsOnAfterCalcShouldCheckCrLimit(Rec, IsCustCrLimitChecked, CurrFieldNo, ShouldCheckCrLimit);
@@ -4243,7 +4287,7 @@ table 5902 "Service Line"
             end;
         end else begin
             ServItem.CalcFields("Service Item Components");
-            if ServItem."Service Item Components" and not HideReplacementDialog then begin
+            if ServItem."Service Item Components" and not HideReplacementDialog and GuiAllowed() then begin
                 Select := StrMenu(Text006, GetStrMenuDefaultValue());
                 case Select of
                     1:
@@ -4793,6 +4837,7 @@ table 5902 "Service Line"
             if ("VAT Calculation Type" = "VAT Calculation Type"::"Sales Tax") or
                (("VAT Calculation Type" in
                  ["VAT Calculation Type"::"Normal VAT",
+                  "VAT Calculation Type"::"No Taxable VAT",
                   "VAT Calculation Type"::"Reverse Charge VAT"]) and
                 ("VAT %" <> 0))
             then
@@ -4811,7 +4856,8 @@ table 5902 "Service Line"
             if ServHeader."Prices Including VAT" then
                 case "VAT Calculation Type" of
                     "VAT Calculation Type"::"Normal VAT",
-                    "VAT Calculation Type"::"Reverse Charge VAT":
+                    "VAT Calculation Type"::"Reverse Charge VAT",
+                    "VAT Calculation Type"::"No Taxable VAT":
                         begin
                             Amount :=
                               (TotalLineAmount - TotalInvDiscAmount + CalcLineAmount()) / (1 + GetVATPct() / 100) -
@@ -4853,7 +4899,8 @@ table 5902 "Service Line"
                 if not IsHandled then
                     case "VAT Calculation Type" of
                         "VAT Calculation Type"::"Normal VAT",
-                      "VAT Calculation Type"::"Reverse Charge VAT":
+                        "VAT Calculation Type"::"Reverse Charge VAT",
+                        "VAT Calculation Type"::"No Taxable VAT":
                             begin
                                 Amount := Round(CalcLineAmount(), Currency."Amount Rounding Precision");
                                 "VAT Base Amount" :=
@@ -6584,6 +6631,51 @@ table 5902 "Service Line"
         ServItemReferenceMgt.EnterServiceItemReference(Rec);
     end;
 
+    local procedure VerifyCustomerForJobTask()
+    var
+        Job: Record Job;
+        JobTask: Record "Job Task";
+    begin
+        if (Rec."Job No." = '') or (Rec."Job Task No." = '') then
+            exit;
+
+        Job.Get(Rec."Job No.");
+        if Job."Task Billing Method" = Job."Task Billing Method"::"One customer" then
+            exit;
+
+        JobTask.SetLoadFields("Job No.", "Bill-to Customer No.");
+        JobTask.Get(Rec."Job No.", Rec."Job Task No.");
+        JobTask.TestField("Bill-to Customer No.", Rec."Bill-to Customer No.");
+    end;
+
+    local procedure MarkJobsForBillToCustomer(var Job: Record Job)
+    var
+        JobTaskByBillToCustomer: Query "Job Task by Bill-to Customer";
+        ProcessedJobList: List of [Code[20]];
+    begin
+        Job.SetRange("Bill-to Customer No.", Rec."Bill-to Customer No.");
+        Job.SetRange("Task Billing Method", Job."Task Billing Method"::"One customer");
+        if Job.FindSet() then
+            repeat
+                Job.Mark(true);
+                ProcessedJobList.Add(Job."No.");
+            until Job.Next() = 0;
+        Job.SetRange("Bill-to Customer No.");
+        Job.SetRange("Task Billing Method");
+
+        JobTaskByBillToCustomer.SetFilter(Bill_to_Customer_No_Filter, Rec."Bill-to Customer No.");
+        JobTaskByBillToCustomer.Open();
+        while JobTaskByBillToCustomer.Read() do
+            if not ProcessedJobList.Contains(JobTaskByBillToCustomer.Job_No) then
+                if Job.Get(JobTaskByBillToCustomer.Job_No) then begin
+                    Job.Mark(true);
+                    ProcessedJobList.Add(Job."No.");
+                end;
+        JobTaskByBillToCustomer.Close();
+
+        Job.MarkedOnly(true);
+    end;
+
     internal procedure ClearVATPct()
     begin
         "VAT %" := 0;
@@ -7142,7 +7234,7 @@ table 5902 "Service Line"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDim(var ServiceLine: Record "Service Line"; CurrFieldNo: Integer)
+    local procedure OnAfterCreateDim(var ServiceLine: Record "Service Line"; CurrFieldNo: Integer; xServiceLine: Record "Service Line")
     begin
     end;
 

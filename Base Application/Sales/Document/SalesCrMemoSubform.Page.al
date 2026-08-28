@@ -215,7 +215,8 @@ page 96 "Sales Cr. Memo Subform"
                         UpdateEditableOnRow();
 
                         Rec.RestoreLookupSelection();
-                        NoOnAfterValidate();
+                        if Rec."No." <> xRec."No." then
+                            NoOnAfterValidate();
 
                         if Rec."No." = xRec."No." then
                             exit;
@@ -643,12 +644,17 @@ page 96 "Sales Cr. Memo Subform"
                     ApplicationArea = Basic, Suite;
                     Visible = false;
                 }
+#if not CLEAN29
                 field("Account Code"; Rec."Account Code")
                 {
                     ApplicationArea = Basic, Suite;
                     ToolTip = 'Specifies that the document number is used as the file name. The files are stored at the location that has been specified in the Sales & Receivables Setup window';
                     Visible = false;
+                    ObsoleteReason = 'This field is deprecated and will be removed in a future release.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '29.0';
                 }
+#endif
             }
             group(Control39)
             {
@@ -1267,6 +1273,9 @@ page 96 "Sales Cr. Memo Subform"
     /// <param name="Unconditionally">Whether to insert text without checking conditions.</param>
     procedure InsertExtendedText(Unconditionally: Boolean)
     begin
+        if not Unconditionally and (Rec."No." = xRec."No.") then
+            exit;
+
         OnBeforeInsertExtendedText(Rec, xRec);
         if TransferExtendedText.SalesCheckIfAnyExtText(Rec, Unconditionally) then begin
             CurrPage.SaveRecord();

@@ -409,6 +409,10 @@ codeunit 99000837 "Prod. Order Line-Reserve"
 
         if ProdOrderLine.Status = ProdOrderLine.Status::Simulated then
             exit;
+
+        if ProdOrderLine.IsTemporary() then
+            exit;
+
         if ProdOrderLine."Item No." <> '' then
             PlanningAssignment.ChkAssignOne(ProdOrderLine."Item No.", ProdOrderLine."Variant Code", ProdOrderLine."Location Code", WorkDate());
     end;
@@ -617,7 +621,18 @@ codeunit 99000837 "Prod. Order Line-Reserve"
     var
         ProdOrderLine: Record "Prod. Order Line";
     begin
-        ProdOrderLine.Get(ReservationEntry."Source Subtype", ReservationEntry."Source ID", ReservationEntry."Source Prod. Order Line");
+        if not ProdOrderLine.Get(ReservationEntry."Source Subtype", ReservationEntry."Source ID", ReservationEntry."Source Prod. Order Line") then begin
+            ProdOrderLine.Init();
+            ProdOrderLine.Status := Enum::"Production Order Status".FromInteger(ReservationEntry."Source Subtype");
+            ProdOrderLine."Prod. Order No." := ReservationEntry."Source ID";
+            ProdOrderLine."Line No." := ReservationEntry."Source Prod. Order Line";
+            ProdOrderLine."Item No." := ReservationEntry."Item No.";
+            ProdOrderLine."Variant Code" := ReservationEntry."Variant Code";
+            SourceRecordRef.GetTable(ProdOrderLine);
+            OnAfterGetSourceValue(ReservationEntry, SourceRecordRef, ReturnOption);
+            exit(0);
+        end;
+
         SourceRecordRef.GetTable(ProdOrderLine);
         case ReturnOption of
             ReturnOption::"Net Qty. (Base)":
@@ -1119,9 +1134,6 @@ codeunit 99000837 "Prod. Order Line-Reserve"
         SourceRecRef.SetTable(ProdOrderLine);
         ProdOrderLine.SetReservationEntry(CalcReservEntry);
         OnSetProdOrderLineOnBeforeUpdateReservation(CalcReservEntry, ProdOrderLine);
-#if not CLEAN26
-        ReservationManagement.RunOnSetProdOrderLineOnBeforeUpdateReservation(CalcReservEntry, ProdOrderLine);
-#endif
         EntryIsPositive := (ProdOrderLine."Remaining Qty. (Base)" < 0);
     end;
 

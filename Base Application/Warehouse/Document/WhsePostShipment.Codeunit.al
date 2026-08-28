@@ -12,6 +12,7 @@ using Microsoft.Foundation.NoSeries;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Tracking;
+using Microsoft.Inventory.Transfer;
 using Microsoft.Utilities;
 using Microsoft.Warehouse.Comment;
 using Microsoft.Warehouse.History;
@@ -81,6 +82,7 @@ codeunit 5763 "Whse.-Post Shipment"
 
     local procedure "Code"()
     var
+        TransferHeader: Record "Transfer Header";
         GenJnlPostPreview: Codeunit "Gen. Jnl.-Post Preview";
         NoSeries: Codeunit "No. Series";
         SequenceNoMgt: Codeunit "Sequence No. Mgt.";
@@ -93,6 +95,13 @@ codeunit 5763 "Whse.-Post Shipment"
         OnBeforeCheckWhseShptLines(WhseShptLine, WhseShptHeader, WhsePostParameters."Post Invoice", WhsePostParameters."Suppress Commit", IsHandled, WhsePostParameters."Preview Posting");
         if IsHandled then
             exit;
+
+        if (not WhsePostParameters."Suppress Commit") and (WhseShptLine."Source Document" = WhseShptLine."Source Document"::"Outbound Transfer") then begin
+            TransferHeader.SetLoadFields("Direct Transfer", "Direct Transfer Posting");
+            if TransferHeader.Get(WhseShptLine."Source No.") then
+                WhsePostParameters."Suppress Commit" := TransferHeader.ShouldPostReceiptWithShipment();
+        end;
+
         WhseShptLine.SetFilter("Qty. to Ship", '>0');
         OnRunOnAfterWhseShptLineSetFilters(WhseShptLine);
         if WhseShptLine.Find('-') then
@@ -294,6 +303,7 @@ codeunit 5763 "Whse.-Post Shipment"
         OnPostUpdateWhseDocumentsOnBeforeUpdateWhseShptHeader(WhseShptHeaderParam);
 
         WhseShptLine2.SetRange("No.", WhseShptHeaderParam."No.");
+        OnPostUpdateWhseDocumentsOnAfterWhseShptLineSetFilters(WhseShptLine2, WhseShptHeaderParam);
         if WhseShptLine2.IsEmpty() then begin
             WhseShptHeaderParam.DeleteRelatedLines();
             WhseShptHeaderParam.Delete();
@@ -870,6 +880,11 @@ codeunit 5763 "Whse.-Post Shipment"
 
     [IntegrationEvent(false, false)]
     local procedure OnPostUpdateWhseDocumentsOnBeforeUpdateWhseShptHeader(var WhseShptHeaderParam: Record "Warehouse Shipment Header")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnPostUpdateWhseDocumentsOnAfterWhseShptLineSetFilters(var WhseShptLine2: Record "Warehouse Shipment Line"; var WhseShptHeaderParam: Record "Warehouse Shipment Header")
     begin
     end;
 

@@ -59,10 +59,14 @@ codeunit 113 "Vend. Entry-Edit"
         VendLedgEntry.Description := Rec.Description;
         VendLedgEntry.Validate("Exported to Payment File", Rec."Exported to Payment File");
         VendLedgEntry.Validate("Creditor No.", Rec."Creditor No.");
+        VendLedgEntry.Validate("Dispute Status", Rec."Dispute Status");
         OnBeforeVendLedgEntryModify(VendLedgEntry, Rec);
         VendLedgEntry.TestField("Entry No.", Rec."Entry No.");
         VendLedgEntry.Modify();
+        OnRunOnAfterVendLedgEntryModify(Rec, VendLedgEntry);
+#if not CLEAN29
         OnRunOnAfterVendLedgEntryMofidy(VendLedgEntry);
+#endif
         Rec := VendLedgEntry;
     end;
 
@@ -113,8 +117,21 @@ codeunit 113 "Vend. Entry-Edit"
     begin
     end;
 
+#if not CLEAN29
+    [Obsolete('Replaced by event OnRunOnAfterVendLedgEntryModify()', '29.0')]
     [IntegrationEvent(false, false)]
     local procedure OnRunOnAfterVendLedgEntryMofidy(var VendorLedgerEntry: Record "Vendor Ledger Entry")
+    begin
+    end;
+#endif
+
+    /// <summary>
+    /// Raised after the vendor ledger entry has been modified.
+    /// </summary>
+    /// <param name="VendorLedgerEntryRec">The vendor ledger entry record passed to the codeunit.</param>
+    /// <param name="VendorLedgerEntry">The modified vendor ledger entry.</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnRunOnAfterVendLedgEntryModify(var VendorLedgerEntryRec: Record "Vendor Ledger Entry"; var VendorLedgerEntry: Record "Vendor Ledger Entry")
     begin
     end;
 

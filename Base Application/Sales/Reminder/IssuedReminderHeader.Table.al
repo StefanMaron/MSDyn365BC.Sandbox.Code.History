@@ -563,23 +563,57 @@ table 297 "Issued Reminder Header"
             DataClassification = CustomerContent;
             TableRelation = "Reminder Action Group"."Code";
         }
+#if not CLEANSCHEMA32
         field(10605; GLN; Code[13])
         {
             Caption = 'GLN';
+            ObsoleteReason = 'This field is obsolete and should not be used.';
+#if CLEAN29
+            ObsoleteState = Removed;
+            ObsoleteTag = '32.0';
+#else
+            ObsoleteState = Pending;
+            ObsoleteTag = '29.0';
+#endif
         }
         field(10606; "Account Code"; Text[30])
         {
             Caption = 'Account Code';
+            ObsoleteReason = 'This field is obsolete and should not be used.';
+#if CLEAN29
+            ObsoleteState = Removed;
+            ObsoleteTag = '32.0';
+#else
+            ObsoleteState = Pending;
+            ObsoleteTag = '29.0';
+#endif
         }
         field(10612; "E-Invoice Created"; Boolean)
         {
             Caption = 'E-Invoice Created';
             Editable = false;
+            ObsoleteReason = 'This field is obsolete and should not be used.';
+#if CLEAN29
+            ObsoleteState = Removed;
+            ObsoleteTag = '32.0';
+#else
+            ObsoleteState = Pending;
+            ObsoleteTag = '29.0';
+#endif
         }
         field(10613; "E-Invoice"; Boolean)
         {
             Caption = 'E-Invoice';
+            ObsoleteReason = 'This field is obsolete and should not be used.';
+#if CLEAN29
+            ObsoleteState = Removed;
+            ObsoleteTag = '32.0';
+#else
+            ObsoleteState = Pending;
+            ObsoleteTag = '29.0';
+#endif
         }
+#endif
     }
 
     keys
@@ -777,7 +811,9 @@ table 297 "Issued Reminder Header"
         IssuedReminderLine.Reset();
         IssuedReminderLine.SetRange("Reminder No.", "No.");
         IssuedReminderLine.SetFilter(Type, '>%1', IssuedReminderLine.Type::" ");
+#if not CLEAN29
         IssuedReminderLine.SetFilter("Account Code", '<>%1&<>%2', '', "Account Code");
+#endif
         exit(not IssuedReminderLine.IsEmpty);
     end;
 
@@ -834,5 +870,22 @@ table 297 "Issued Reminder Header"
     [IntegrationEvent(false, false)]
     internal procedure OnGetReportParameters(var LogInteraction: Boolean; var ShowNotDueAmounts: Boolean; var ShowMIRLines: Boolean; ReportID: Integer; var Handled: Boolean)
     begin
+    end;
+
+    /// <summary>
+    /// Returns the description to use when logging an interaction for this issued reminder.
+    /// When the posting description still holds the default text derived from the pre-assigned
+    /// (unissued) reminder number, it is replaced with the same text based on the issued reminder
+    /// number so the Contact History references the registered reminder. Customized posting
+    /// descriptions are preserved.
+    /// </summary>
+    /// <returns>The interaction log description text.</returns>
+    procedure GetLogInteractionDescription(): Text[100]
+    var
+        ReminderHeader: Record "Reminder Header";
+    begin
+        if ("Pre-Assigned No." <> '') and ("Posting Description" = ReminderHeader.GetDefaultPostingDescription("Pre-Assigned No.")) then
+            exit(ReminderHeader.GetDefaultPostingDescription("No."));
+        exit("Posting Description");
     end;
 }
