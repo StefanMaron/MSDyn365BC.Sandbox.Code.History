@@ -11,6 +11,7 @@ using Microsoft.Finance.Currency;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Journal;
+using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.ReceivablesPayables;
 using Microsoft.FixedAssets.FixedAsset;
 using Microsoft.Foundation.Attachment;
@@ -101,7 +102,8 @@ table 25 "Vendor Ledger Entry"
             AutoFormatExpression = Rec."Currency Code";
             AutoFormatType = 1;
             CalcFormula = sum("Detailed Vendor Ledg. Entry".Amount where("Vendor Ledger Entry No." = field("Entry No."),
-                                                                          "Posting Date" = field("Date Filter")));
+                                                                          "Posting Date" = field("Date Filter"),
+                                                                          "Excluded from calculation" = const(false)));
             Caption = 'Remaining Amount';
             ToolTip = 'Specifies the amount that remains to be applied to before the entry is totally applied to.';
             Editable = false;
@@ -123,7 +125,8 @@ table 25 "Vendor Ledger Entry"
             AutoFormatType = 1;
             AutoFormatExpression = '';
             CalcFormula = sum("Detailed Vendor Ledg. Entry"."Amount (LCY)" where("Vendor Ledger Entry No." = field("Entry No."),
-                                                                                  "Posting Date" = field("Date Filter")));
+                                                                                  "Posting Date" = field("Date Filter"),
+                                                                                  "Excluded from calculation" = const(false)));
             Caption = 'Remaining Amt. (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -352,6 +355,8 @@ table 25 "Vendor Ledger Entry"
         field(53; "Transaction No."; Integer)
         {
             Caption = 'Transaction No.';
+            TableRelation = "G/L Transaction";
+            ToolTip = 'Specifies the transaction number that groups related G/L entries from the same posting.';
         }
         field(54; "Closed by Amount (LCY)"; Decimal)
         {
@@ -584,6 +589,13 @@ table 25 "Vendor Ledger Entry"
         {
             Caption = 'Prepayment';
         }
+        field(95; "G/L Register No."; Integer)
+        {
+            Caption = 'G/L Register No.';
+            Editable = false;
+            TableRelation = "G/L Register";
+            ToolTip = 'Specifies the G/L register number that groups related G/L entries from the same posting.';
+        }
         field(170; "Creditor No."; Code[20])
         {
             Caption = 'Creditor No.';
@@ -720,6 +732,13 @@ table 25 "Vendor Ledger Entry"
             Caption = 'Remit-to Code';
             ToolTip = 'Specifies the address for the remit-to code.';
             TableRelation = "Remit Address".Code where("Vendor No." = field("Vendor No."));
+        }
+        field(1340; "Dispute Status"; Code[10])
+        {
+            Caption = 'Dispute Status';
+            TableRelation = "Dispute Status";
+            DataClassification = CustomerContent;
+            ToolTip = 'Specifies if there is an ongoing dispute for this document.';
         }
         field(12170; "Document Occurrence"; Integer)
         {

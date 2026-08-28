@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -11,7 +11,9 @@ using Microsoft.Foundation.Shipping;
 using Microsoft.Foundation.Task;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Transfer;
+#if not CLEAN28
 using Microsoft.Manufacturing.Document;
+#endif
 using Microsoft.Purchases.Vendor;
 using Microsoft.RoleCenters;
 using Microsoft.Sales.Customer;
@@ -96,7 +98,6 @@ page 9009 "Whse. Worker WMS Role Center"
                 Caption = 'Warehouse &Bin List';
                 Image = "Report";
                 RunObject = Report "Warehouse Bin List";
-                ToolTip = 'Get an overview of warehouse bins, their setup, and the quantity of items within the bins.';
             }
             action("Warehouse A&djustment Bin")
             {
@@ -104,7 +105,6 @@ page 9009 "Whse. Worker WMS Role Center"
                 Caption = 'Warehouse A&djustment Bin';
                 Image = "Report";
                 RunObject = Report "Whse. Adjustment Bin";
-                ToolTip = 'Get an overview of warehouse bins, their setup, and the quantity of items within the bins.';
             }
             action("Whse. P&hys. Inventory List")
             {
@@ -112,7 +112,6 @@ page 9009 "Whse. Worker WMS Role Center"
                 Caption = 'Whse. P&hys. Inventory List';
                 Image = "Report";
                 RunObject = Report "Whse. Phys. Inventory List";
-                ToolTip = 'View or print the list of the lines that you have calculated in the Warehouse Physical Inventory Journal window. You can use this report during the physical inventory count to mark down actual quantities on hand in the warehouse and compare them to what is recorded in the program.';
             }
             action("Customer &Labels")
             {
@@ -120,19 +119,28 @@ page 9009 "Whse. Worker WMS Role Center"
                 Caption = 'Customer &Labels';
                 Image = "Report";
                 RunObject = Report "Customer - Labels";
-                ToolTip = 'View, save, or print mailing labels with the customers'' names and addresses. The report can be used to send sales letters, for example.';
             }
+#if not CLEAN28
             separator(Action1130001)
             {
+                ObsoleteReason = 'Preparation for replacement by Subcontracting app';
+                ObsoleteState = Pending;
+                ObsoleteTag = '28.0';
             }
             action("Subcontract. Transfer Shipment")
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = LegacySubcontracting;
                 Caption = 'Subcontract. Transfer Shipment';
                 Image = "Report";
                 RunObject = Report "Subcontract. Transfer Shipment";
                 ToolTip = 'Create a subcontracting transfer shipment.';
+                ObsoleteReason = 'Preparation for replacement by Subcontracting app';
+                ObsoleteState = Pending;
+#pragma warning disable AS0072
+                ObsoleteTag = '27.0';
+#pragma warning restore AS0072
             }
+#endif
         }
         area(embedding)
         {
@@ -223,7 +231,7 @@ page 9009 "Whse. Worker WMS Role Center"
 #if not CLEAN27
             action("Subcontracting Transfers")
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = LegacySubcontracting;
                 Caption = 'Subcontracting Transfers';
                 RunObject = Page "Subcontracting Transfer List";
                 ToolTip = 'View the list of subcontracting transfers.';

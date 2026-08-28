@@ -59,6 +59,10 @@ page 99000768 "Manufacturing Setup"
                 {
                     ApplicationArea = Manufacturing;
                 }
+                field("Copy Loc. to Cap. Val. Entries"; Rec."Copy Loc. to Cap. Val. Entries")
+                {
+                    ApplicationArea = Manufacturing;
+                }
                 field("Inc. Non. Inv. Cost To Prod"; Rec."Inc. Non. Inv. Cost To Prod")
                 {
                     ApplicationArea = Manufacturing;
@@ -218,7 +222,7 @@ page 99000768 "Manufacturing Setup"
                 Caption = 'Subcontracting';
                 field("Subcontr. Ship. Reason Code"; Rec."Subcontr. Ship. Reason Code")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = LegacySubcontracting;
                     ToolTip = 'Specifies the reason code for the subcontracting shipment.';
                     ObsoleteReason = 'Preparation for replacement by Subcontracting app';
                     ObsoleteState = Pending;
@@ -226,14 +230,90 @@ page 99000768 "Manufacturing Setup"
                 }
                 field("Subcontr. Return Reason Code"; Rec."Subcontr. Return Reason Code")
                 {
-                    ApplicationArea = Basic, Suite;
+                    ApplicationArea = LegacySubcontracting;
                     ToolTip = 'Specifies the reason code for the subcontracting return.';
                     ObsoleteReason = 'Preparation for replacement by Subcontracting app';
                     ObsoleteState = Pending;
                     ObsoleteTag = '27.0';
                 }
+                field("Legacy Subcontracting"; Rec."Legacy Subcontracting")
+                {
+                    ApplicationArea = LegacySubcontracting;
+                    ObsoleteReason = 'Preparation for replacement by Subcontracting app';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
+                }
             }
 #endif
+            group(ProductionDefinitionWizard)
+            {
+                Caption = 'Production Definition Wizard';
+
+                group(BOMRoutingDisplayGroup)
+                {
+                    Caption = 'BOM/Routing Step Display';
+
+                    field("Show Rtng BOM Select Both"; Rec."Show Rtng BOM Select Both")
+                    {
+                        ApplicationArea = Manufacturing;
+                    }
+                    field("Show Rtng BOM Select Partial"; Rec."Show Rtng BOM Select Partial")
+                    {
+                        ApplicationArea = Manufacturing;
+                    }
+                    field("Show Rtng BOM Select Nothing"; Rec."Show Rtng BOM Select Nothing")
+                    {
+                        ApplicationArea = Manufacturing;
+                    }
+                }
+                group(ProdCompDisplayGroup)
+                {
+                    Caption = 'Components/Routing Preview Step Display';
+
+                    field("Show Prod Comp Select Both"; Rec."Show Prod Comp Select Both")
+                    {
+                        ApplicationArea = Manufacturing;
+                    }
+                    field("Show Prod Comp Select Partial"; Rec."Show Prod Comp Select Partial")
+                    {
+                        ApplicationArea = Manufacturing;
+                    }
+                    field("Show Prod Comp Select Nothing"; Rec."Show Prod Comp Select Nothing")
+                    {
+                        ApplicationArea = Manufacturing;
+                    }
+                }
+                group(GeneralWizardOptions)
+                {
+                    Caption = 'General Options';
+
+                    field("Always Save Modified Versions"; Rec."Always Save Modified Versions")
+                    {
+                        ApplicationArea = Manufacturing;
+                    }
+                    field("Allow Edit UI Selection"; Rec."Allow Edit UI Selection")
+                    {
+                        ApplicationArea = Manufacturing;
+                    }
+                }
+                group(WizardDefaults)
+                {
+                    Caption = 'Defaults';
+
+                    field("Def. Wiz. Work Center No."; Rec."Def. Wiz. Work Center No.")
+                    {
+                        ApplicationArea = Manufacturing;
+                    }
+                    field("Def. Wiz. Comp Item No."; Rec."Def. Wiz. Comp Item No.")
+                    {
+                        ApplicationArea = Manufacturing;
+                    }
+                    field("Def. Wiz. Flushing Method"; Rec."Def. Wiz. Flushing Method")
+                    {
+                        ApplicationArea = Manufacturing;
+                    }
+                }
+            }
         }
         area(factboxes)
         {
@@ -249,10 +329,82 @@ page 99000768 "Manufacturing Setup"
             }
         }
     }
-
+#if not CLEAN28
     actions
     {
+        area(processing)
+        {
+            group(LegacySubcontracting)
+            {
+                Caption = 'Legacy Subcontracting';
+                ObsoleteReason = 'Preparation for replacement by Subcontracting app';
+                ObsoleteState = Pending;
+                ObsoleteTag = '28.0';
+
+                action("Activate Legacy Subcontracting")
+                {
+                    ApplicationArea = Manufacturing;
+                    Caption = 'Activate Legacy Subcontracting';
+                    ToolTip = 'Activates the Legacy Subcontracting application area so that the legacy subcontracting functionality becomes available. A session restart is required for the change to take effect.';
+                    Image = Change;
+                    Visible = not Rec."Legacy Subcontracting";
+                    ObsoleteReason = 'Legacy Subcontracting will be discontinued, environments should move to the Subcontracting App.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
+
+                    trigger OnAction()
+                    var
+                        LegacySubcFeatureHandler: Codeunit "Legacy Subc. Feature Handler";
+                        ActivateLegacySubcontractingQst: Label 'Legacy subcontracting features are scheduled for removal in a future release. We recommend installing and using the Subcontracting app instead. Do you want to activate legacy subcontracting anyway?';
+                    begin
+                        LegacySubcFeatureHandler.CheckCanEnableLegacySubcontracting();
+                        if not Confirm(ActivateLegacySubcontractingQst, false) then
+                            exit;
+
+                        LegacySubcFeatureHandler.SetLegacySubcontracting(Rec, true);
+                    end;
+                }
+                action("Disable Legacy Subcontracting")
+                {
+                    ApplicationArea = Manufacturing;
+                    Caption = 'Disable Legacy Subcontracting';
+                    ToolTip = 'Disables the Legacy Subcontracting application area and enables the Subcontracting application area. A session restart is required for the change to take effect.';
+                    Image = Change;
+                    Visible = Rec."Legacy Subcontracting";
+                    ObsoleteReason = 'Legacy Subcontracting will be discontinued, environments should move to the Subcontracting App.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
+
+                    trigger OnAction()
+                    var
+                        LegacySubcFeatureHandler: Codeunit "Legacy Subc. Feature Handler";
+                    begin
+                        LegacySubcFeatureHandler.SetLegacySubcontracting(Rec, false);
+                    end;
+                }
+                action("Pre Check Disable Legacy Subcontracting")
+                {
+                    ApplicationArea = LegacySubcontracting;
+                    Caption = 'Pre-Check Disable Legacy Subcontracting';
+                    ToolTip = 'Performs a pre-check to ensure that the legacy subcontracting feature can be safely disabled. This action does not actually disable the feature or trigger migration.';
+                    Image = CheckList;
+                    ObsoleteReason = 'Subcontracting app will be enabled by default, so this pre-check is no longer necessary';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
+
+                    trigger OnAction()
+                    var
+                        LegacySubcFeatureHandler: Codeunit "Legacy Subc. Feature Handler";
+                        PreChecksPassedMsg: Label 'Pre-checks passed. You can now disable Legacy Subcontracting using the action "Disable Legacy Subcontracting".';
+                    begin
+                        LegacySubcFeatureHandler.CheckCanDisableLegacySubcontracting();
+                        Message(PreChecksPassedMsg);
+                    end;
+                }
+            }
+        }
     }
+#endif
 
     trigger OnOpenPage()
     var
@@ -266,6 +418,4 @@ page 99000768 "Manufacturing Setup"
 
         ManufacturingSetupNotif.ShowPlanningFieldsMoveNotification();
     end;
-
 }
-

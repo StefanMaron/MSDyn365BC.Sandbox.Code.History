@@ -235,6 +235,7 @@ table 23 Vendor
         field(14; "Our Account No."; Text[20])
         {
             Caption = 'Our Account No.';
+            MaskType = Concealed;
             ToolTip = 'Specifies your account number with the vendor, if you have one.';
             OptimizeForTextSearch = true;
         }
@@ -485,7 +486,8 @@ table 23 Vendor
             CalcFormula = - sum("Detailed Vendor Ledg. Entry".Amount where("Vendor No." = field("No."),
                                                                            "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
                                                                            "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
-                                                                           "Currency Code" = field("Currency Filter")));
+                                                                           "Currency Code" = field("Currency Filter"),
+                                                                           "Excluded from calculation" = const(false)));
             Caption = 'Balance';
             Editable = false;
             FieldClass = FlowField;
@@ -497,7 +499,8 @@ table 23 Vendor
             CalcFormula = - sum("Detailed Vendor Ledg. Entry"."Amount (LCY)" where("Vendor No." = field("No."),
                                                                                    "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
                                                                                    "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
-                                                                                   "Currency Code" = field("Currency Filter")));
+                                                                                   "Currency Code" = field("Currency Filter"),
+                                                                                   "Excluded from calculation" = const(false)));
             Caption = 'Balance (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -510,7 +513,8 @@ table 23 Vendor
                                                                            "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
                                                                            "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
                                                                            "Posting Date" = field("Date Filter"),
-                                                                           "Currency Code" = field("Currency Filter")));
+                                                                           "Currency Code" = field("Currency Filter"),
+                                                                           "Excluded from calculation" = const(false)));
             Caption = 'Net Change';
             Editable = false;
             FieldClass = FlowField;
@@ -523,7 +527,8 @@ table 23 Vendor
                                                                                    "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
                                                                                    "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
                                                                                    "Posting Date" = field("Date Filter"),
-                                                                                   "Currency Code" = field("Currency Filter")));
+                                                                                   "Currency Code" = field("Currency Filter"),
+                                                                                   "Excluded from calculation" = const(false)));
             Caption = 'Net Change (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -576,7 +581,8 @@ table 23 Vendor
                                                                            "Initial Entry Due Date" = field(upperlimit("Date Filter")),
                                                                            "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
                                                                            "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
-                                                                           "Currency Code" = field("Currency Filter")));
+                                                                           "Currency Code" = field("Currency Filter"),
+                                                                           "Excluded from calculation" = const(false)));
             Caption = 'Balance Due';
             Editable = false;
             FieldClass = FlowField;
@@ -589,7 +595,8 @@ table 23 Vendor
                                                                                    "Initial Entry Due Date" = field(upperlimit("Date Filter")),
                                                                                    "Initial Entry Global Dim. 1" = field("Global Dimension 1 Filter"),
                                                                                    "Initial Entry Global Dim. 2" = field("Global Dimension 2 Filter"),
-                                                                                   "Currency Code" = field("Currency Filter")));
+                                                                                   "Currency Code" = field("Currency Filter"),
+                                                                                   "Excluded from calculation" = const(false)));
             Caption = 'Balance Due (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -1286,6 +1293,18 @@ table 23 Vendor
         {
             Caption = 'Self-Billing Agreement';
             ToolTip = 'Specifies the value of the Self-Billing Agreement field.';
+
+            trigger OnValidate()
+            begin
+                if not Rec."Self-Billing Agreement" then
+                    Rec.TestField("Self-Billing Invoice Nos.", '');
+            end;
+        }
+        field(181; "Self-Billing Invoice Nos."; Code[20])
+        {
+            Caption = 'Self-Billing Invoice Nos.';
+            ToolTip = 'Specifies the number series that is used to assign numbers to self-billed purchase invoices for this vendor. If it is empty, the number series from the Posted Self-Billing Inv. Nos. field in Purchases & Payables Setup is used.';
+            TableRelation = "No. Series";
         }
         field(288; "Preferred Bank Account Code"; Code[20])
         {
@@ -1934,14 +1953,35 @@ table 23 Vendor
             Caption = 'Apply Company Payment days';
             InitValue = true;
         }
+#if not CLEANSCHEMA31
         field(12180; "Subcontracting Location Code"; Code[10])
         {
             Caption = 'Subcontracting Location Code';
             TableRelation = Location;
+            ObsoleteReason = 'Preparation for replacement by Subcontracting app';
+#if not CLEAN28
+            ObsoleteState = Pending;
+#pragma warning disable AS0072
+            ObsoleteTag = '27.0';
+#pragma warning restore AS0072
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '31.0';
+#endif
         }
         field(12181; "Subcontractor Procurement"; Boolean)
         {
             Caption = 'Subcontractor Procurement';
+            ObsoleteReason = 'Preparation for replacement by Subcontracting app';
+#if not CLEAN28
+            ObsoleteState = Pending;
+#pragma warning disable AS0072
+            ObsoleteTag = '27.0';
+#pragma warning restore AS0072
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '31.0';
+#endif
         }
         field(12182; "Linked to Work Center"; Boolean)
         {
@@ -1949,11 +1989,32 @@ table 23 Vendor
             Caption = 'Linked to Work Center';
             Editable = false;
             FieldClass = FlowField;
+            ObsoleteReason = 'Preparation for replacement by Subcontracting app';
+#if not CLEAN28
+            ObsoleteState = Pending;
+#pragma warning disable AS0072
+            ObsoleteTag = '27.0';
+#pragma warning restore AS0072
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '31.0';
+#endif
         }
         field(12183; Subcontractor; Boolean)
         {
             Caption = 'Subcontractor';
+            ObsoleteReason = 'Preparation for replacement by Subcontracting app';
+#if not CLEAN28
+            ObsoleteState = Pending;
+#pragma warning disable AS0072
+            ObsoleteTag = '27.0';
+#pragma warning restore AS0072
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '31.0';
+#endif
         }
+#endif
         field(12184; "First Name"; Text[30])
         {
             Caption = 'First Name';
@@ -2281,6 +2342,7 @@ table 23 Vendor
         ContactPageID: Integer;
         ShouldExit: Boolean;
     begin
+        OnBeforeShowContact(Rec);
         if OfficeMgt.GetContact(OfficeContact, "No.") and (OfficeContact.Count = 1) then begin
             ContactPageID := PAGE::"Contact Card";
             OnShowContactOnBeforeOpenContactCard(OfficeContact, ContactPageID);
@@ -3385,6 +3447,11 @@ table 23 Vendor
 
     [IntegrationEvent(false, false)]
     local procedure OnMarkVendorsWithSimilarNameOnBeforeVendorFindSet(var Vendor: Record Vendor)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeShowContact(var Vendor: Record Vendor)
     begin
     end;
 

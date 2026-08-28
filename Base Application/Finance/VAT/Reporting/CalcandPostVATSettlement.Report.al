@@ -27,13 +27,12 @@ using System.Utilities;
 /// </summary>
 report 20 "Calc. and Post VAT Settlement"
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './Finance/VAT/Reporting/CalcandPostVATSettlement.rdlc';
     AdditionalSearchTerms = 'settle vat value added tax,report vat value added tax';
     ApplicationArea = Basic, Suite;
     Caption = 'Calculate and Post VAT Settlement';
     Permissions = TableData "VAT Entry" = rimd;
     UsageCategory = ReportsAndAnalysis;
+    DefaultRenderingLayout = RDLCLayout;
 
     dataset
     {
@@ -968,6 +967,16 @@ report 20 "Calc. and Post VAT Settlement"
         end;
     }
 
+    rendering
+    {
+        layout(RDLCLayout)
+        {
+            Type = RDLC;
+            LayoutFile = './Finance/VAT/Reporting/CalcandPostVATSettlement.rdlc';
+            Summary = 'Report layout made in the legacy RDLC format. Use an RDLC editor to modify the layout.';
+        }
+    }
+
     labels
     {
     }
@@ -1099,7 +1108,6 @@ report 20 "Calc. and Post VAT Settlement"
         UseAmtsInAddCurr: Boolean;
         HeaderText: Text[30];
         CountryRegionFilter: Text;
-        ActivityCodeFilter: Text;
 #if not CLEAN27
         PriorPeriodVATEntry: Record "Periodic Settlement VAT Entry";
         PriorPeriodVATEntry2: Record "Periodic Settlement VAT Entry";
@@ -1187,6 +1195,7 @@ report 20 "Calc. and Post VAT Settlement"
         EntrdStartDate: Date;
         EndDateReq: Date;
         PostingDate: Date;
+        ActivityCodeFilter: Text;
 
     procedure InitializeRequest(NewStartDate: Date; NewEndDate: Date; NewPostingDate: Date; NewDocNo: Code[20]; NewSettlementAcc: Code[20]; NewPosRoundAcc: Code[20]; NewNegRoundAcc: Code[20]; ShowVATEntries: Boolean; Post: Boolean)
     begin

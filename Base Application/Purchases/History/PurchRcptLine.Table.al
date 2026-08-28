@@ -646,6 +646,7 @@ table 121 "Purch. Rcpt. Line"
         {
             Caption = 'Purchasing Code';
             TableRelation = Purchasing;
+            ToolTip = 'Specifies the purchasing code associated with the receipt line.';
         }
         field(5714; "Special Order Sales No."; Code[20])
         {
@@ -1233,7 +1234,7 @@ table 121 "Purch. Rcpt. Line"
         PurchaseLine: Record "Purchase Line";
     begin
         if Type = Type::" " then
-            exit(PurchaseLine.FormatType());
+            exit(PurchaseLine.FormatTypeAsText());
 
         exit(Format(Type));
     end;

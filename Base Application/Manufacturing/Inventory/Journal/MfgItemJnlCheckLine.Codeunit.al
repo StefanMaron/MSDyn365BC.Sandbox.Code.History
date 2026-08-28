@@ -14,11 +14,8 @@ using Microsoft.Warehouse.Request;
 codeunit 99000760 "Mfg. Item Jnl. Check Line"
 {
     var
-#if not CLEAN27
-        ItemJnlCheckLine: Codeunit "Item Jnl.-Check Line";
-#endif
         CannotPostTheseLinesErr: Label 'You cannot post these lines because you have not entered a quantity on one or more of the lines. ';
-#if not CLEAN27
+#if not CLEAN28
         CannotPostTheseLinesWIPErr: Label 'You cannot post these lines because you have not entered a WIP quantity on one or more of the lines.';
 #endif
         WarehouseHandlingRequiredErr: Label 'Warehouse handling is required for %1 = %2, %3 = %4, %5 = %6.', Comment = '%1 %3 %5 - field captions, %2 %4 %6 - field values';
@@ -38,6 +35,11 @@ codeunit 99000760 "Mfg. Item Jnl. Check Line"
         IsHandled: Boolean;
         ShouldCheckItemNo: Boolean;
     begin
+        IsHandled := false;
+        OnBeforeOnRunOnCheckWarehouse(ItemJournalLine, CalledFromAdjustment, CalledFromInvtPutawayPick, IsHandled);
+        if IsHandled then
+            exit;
+
         if (ItemJournalLine."Entry Type" in [ItemJournalLine."Entry Type"::Consumption, ItemJournalLine."Entry Type"::Output]) and
            not (ItemJournalLine."Value Entry Type" = ItemJournalLine."Value Entry Type"::Revaluation) and
            not ItemJournalLine.OnlyStopTime()
@@ -46,24 +48,15 @@ codeunit 99000760 "Mfg. Item Jnl. Check Line"
             ItemJournalLine.TestField("Order Type", ItemJournalLine."Order Type"::Production, ErrorInfo.Create());
             ShouldCheckItemNo := not CalledFromAdjustment and (ItemJournalLine."Entry Type" = ItemJournalLine."Entry Type"::Output);
             OnRunCheckOnAfterCalcShouldCheckItemNo(ItemJournalLine, ProdOrderLine, CalledFromAdjustment, ShouldCheckItemNo);
-#if not CLEAN26
-            ItemJnlCheckLine.RunOnRunCheckOnAfterCalcShouldCheckItemNo(ItemJournalLine, ProdOrderLine, CalledFromAdjustment, ShouldCheckItemNo);
-#endif
             if ShouldCheckItemNo then
                 if CheckFindProdOrderLine(ProdOrderLine, ItemJournalLine."Order No.", ItemJournalLine."Order Line No.") then begin
                     ItemJournalLine.TestField("Item No.", ProdOrderLine."Item No.", ErrorInfo.Create());
                     OnAfterCheckFindProdOrderLine(ItemJournalLine, ProdOrderLine);
-#if not CLEAN26
-                    ItemJnlCheckLine.RunOnAfterCheckFindProdOrderLine(ItemJournalLine, ProdOrderLine);
-#endif
                 end;
 
             if ItemJournalLine.Subcontracting then begin
                 IsHandled := false;
                 OnBeforeCheckSubcontracting(ItemJournalLine, IsHandled);
-#if not CLEAN26
-                ItemJnlCheckLine.RunOnBeforeCheckSubcontracting(ItemJournalLine, IsHandled);
-#endif
                 if not IsHandled then begin
                     WorkCenter.Get(ItemJournalLine."Work Center No.");
                     WorkCenter.TestField("Subcontractor No.", ErrorInfo.Create());
@@ -92,9 +85,6 @@ codeunit 99000760 "Mfg. Item Jnl. Check Line"
     begin
         IsHandled := false;
         OnBeforeCheckWarehouse(ItemJnlLine, IsHandled);
-#if not CLEAN26
-        ItemJnlCheckLine.RunOnBeforeCheckWarehouse(ItemJnlLine, IsHandled);
-#endif
         if IsHandled then
             exit;
 
@@ -163,9 +153,6 @@ codeunit 99000760 "Mfg. Item Jnl. Check Line"
     begin
         IsHandled := false;
         OnBeforeCheckWarehouseLastOutputOperation(ItemJnlLine, Result, IsHandled);
-#if not CLEAN26
-        ItemJnlCheckLine.RunOnBeforeCheckWarehouseLastOutputOperation(ItemJnlLine, Result, IsHandled);
-#endif
         if IsHandled then
             exit(Result);
 
@@ -237,22 +224,37 @@ codeunit 99000760 "Mfg. Item Jnl. Check Line"
     end;
 
     [EventSubscriber(ObjectType::Codeunit, Codeunit::"Item Jnl.-Check Line", 'OnCheckEmptyQuantity', '', true, true)]
-    local procedure OnCheckEmptyQuantity(ItemJournalLine: Record "Item Journal Line");
+    local procedure OnCheckEmptyQuantity(ItemJournalLine: Record "Item Journal Line")
+#if not CLEAN28
+    var
+        LegacySubcFeatureHandler: Codeunit "Legacy Subc. Feature Handler";
+#endif
     begin
-#if not CLEAN27
-        if (ItemJournalLine."Quantity (Base)" = 0) and (ItemJournalLine."Invoiced Qty. (Base)" = 0) and
-           ((ItemJournalLine."Entry Type" = ItemJournalLine."Entry Type"::Output) and
-           (ItemJournalLine."Output Quantity (Base)" = 0) and (ItemJournalLine."Scrap Quantity (Base)" = 0) and
-           (not ItemJournalLine."WIP Item") and ItemJournalLine.TimeIsEmpty())
-        then
-            Error(ErrorInfo.Create(CannotPostTheseLinesErr, true));
+#if not CLEAN28
+        if LegacySubcFeatureHandler.IsLegacySubcontractingEnabled() then begin
+            if (ItemJournalLine."Quantity (Base)" = 0) and (ItemJournalLine."Invoiced Qty. (Base)" = 0) and
+               ((ItemJournalLine."Entry Type" = ItemJournalLine."Entry Type"::Output) and
+               (ItemJournalLine."Output Quantity (Base)" = 0) and (ItemJournalLine."Scrap Quantity (Base)" = 0) and
+               (not ItemJournalLine."WIP Item") and ItemJournalLine.TimeIsEmpty())
+            then
+                Error(ErrorInfo.Create(CannotPostTheseLinesErr, true));
 
-        if (ItemJournalLine."Entry Type" = ItemJournalLine."Entry Type"::Output) and
-           (ItemJournalLine."WIP Quantity" <> 0) and
-           (not ItemJournalLine."WIP Item") and
-           ItemJournalLine.TimeIsEmpty()
-        then
-            Error(ErrorInfo.Create(CannotPostTheseLinesWIPErr, true));
+            if (ItemJournalLine."Entry Type" = ItemJournalLine."Entry Type"::Output) and
+               (ItemJournalLine."WIP Quantity" <> 0) and
+               (not ItemJournalLine."WIP Item") and
+               ItemJournalLine.TimeIsEmpty()
+            then
+                Error(ErrorInfo.Create(CannotPostTheseLinesWIPErr, true));
+            exit;
+        end else
+            if ItemJournalLine."Entry Type" = ItemJournalLine."Entry Type"::Output then begin
+                if (ItemJournalLine."Output Quantity (Base)" = 0) and (ItemJournalLine."Scrap Quantity (Base)" = 0) and
+                   ItemJournalLine.TimeIsEmpty() and (ItemJournalLine."Invoiced Qty. (Base)" = 0)
+                then
+                    Error(ErrorInfo.Create(CannotPostTheseLinesErr, true))
+            end else
+                if (ItemJournalLine."Quantity (Base)" = 0) and (ItemJournalLine."Invoiced Qty. (Base)" = 0) then
+                    Error(ErrorInfo.Create(CannotPostTheseLinesErr, true));
 #else
         if ItemJournalLine."Entry Type" = ItemJournalLine."Entry Type"::Output then begin
             if (ItemJournalLine."Output Quantity (Base)" = 0) and (ItemJournalLine."Scrap Quantity (Base)" = 0) and
@@ -308,6 +310,11 @@ codeunit 99000760 "Mfg. Item Jnl. Check Line"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeCheckWarehouseLastOutputOperation(var ItemJournalLine: Record "Item Journal Line"; var Result: Boolean; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnRunOnCheckWarehouse(var ItemJournalLine: Record "Item Journal Line"; CalledFromAdjustment: Boolean; CalledFromInvtPutawayPick: Boolean; var IsHandled: Boolean)
     begin
     end;
 }

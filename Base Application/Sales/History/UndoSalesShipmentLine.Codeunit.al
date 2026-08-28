@@ -73,6 +73,7 @@ codeunit 5815 "Undo Sales Shipment Line"
         ItemsToAdjust: List of [Code[20]];
         ATOWindowDialog: Dialog;
         NextLineNo: Integer;
+        IsCalledFromPurchRcptLine: Boolean;
 
 #pragma warning disable AA0074
         UndoShipmentLinesQst: Label 'Do you really want to undo the selected Shipment lines?';
@@ -88,7 +89,7 @@ codeunit 5815 "Undo Sales Shipment Line"
         Text059: Label '%1 %2 %3', Comment = '%1 = SalesShipmentLine."Document No.". %2 = SalesShipmentLine.FIELDCAPTION("Line No."). %3 = SalesShipmentLine."Line No.". This is used in a progress window.';
 #pragma warning restore AA0074
         AlreadyReversedErr: Label 'This shipment has already been reversed.';
-        NoLinesToReverseErr: Label 'There are no lines with quantity to reverse.';
+        NoLinesToReverseErr: Label 'No lines with a quantity available for reversal were found among the selected lines. Select a line with a quantity that has not already been reversed, and try again.';
         InvoiceCancelledQst: Label 'The quantity to undo might differ from the original shipment because the invoice was cancelled. Do you want to proceed with the undo?';
 
     /// <summary>
@@ -127,6 +128,7 @@ codeunit 5815 "Undo Sales Shipment Line"
         OnCodeOnAfterSalesShptLineSetFilters(SalesShipmentLine, UndoSalesShptLineParams."Hide Dialog");
         if SalesShipmentLine.IsEmpty() then
             Error(NoLinesToReverseErr);
+
         SalesShipmentLine.FindFirst();
         repeat
             if not UndoSalesShptLineParams."Hide Dialog" then
@@ -170,7 +172,7 @@ codeunit 5815 "Undo Sales Shipment Line"
             if PostedWhseShptLineFound then
                 WhseUndoQuantity.UndoPostedWhseShptLine(PostedWhseShipmentLine);
 
-            TempWarehouseJournalLine.SetRange("Source Line No.", SalesShipmentLine."Line No.");
+            TempWarehouseJournalLine.SetRange("Source Line No.", SalesShipmentLine."Order Line No.");
             WhseUndoQuantity.PostTempWhseJnlLineCache(TempWarehouseJournalLine, WhseJnlRegisterLine);
 
             UndoPostATO(SalesShipmentLine, WhseJnlRegisterLine);
@@ -224,8 +226,8 @@ codeunit 5815 "Undo Sales Shipment Line"
                     UnApplyDropShipment(ItemLedgerEntry, NewSalesShptLine, SalesShptLine);
                 until ItemLedgerEntry.Next() = 0;
         end;
-
-        UndoPurchaseReceiptLineForDropShipment(PurchItemLedgerEntryToUndo);
+        if not IsCalledFromPurchRcptLine then
+            UndoPurchaseReceiptLineForDropShipment(PurchItemLedgerEntryToUndo);
     end;
 
     local procedure ApplyFilterForItemTracking(var ItemLedgerEntry: Record "Item Ledger Entry"; SalesShptLine: Record "Sales Shipment Line")
@@ -246,12 +248,11 @@ codeunit 5815 "Undo Sales Shipment Line"
 
         ItemApplicationEntry.SetBaseLoadFields();
         ItemApplicationEntry.SetRange("Item Ledger Entry No.", ItemLedgerEntry."Entry No.");
-        ItemApplicationEntry.SetRange("Cost Application", true);
         ItemApplicationEntry.SetRange("Inbound Item Entry No.", ItemLedgerEntry."Applies-to Entry");
         ItemApplicationEntry.SetRange("Outbound Item Entry No.", ItemLedgerEntry."Entry No.");
-        ItemApplicationEntry.FindFirst();
-
-        ItemJnlPostLine.UnApplyDropShipment(ItemApplicationEntry, RelevantUndoShipmentLedgerEntryNo);
+        OnUnApplyDropShipmentOnBeforeFindItemApplicationEntry(ItemApplicationEntry, ItemLedgerEntry);
+        if ItemApplicationEntry.FindFirst() then
+            ItemJnlPostLine.UnApplyDropShipment(ItemApplicationEntry, RelevantUndoShipmentLedgerEntryNo);
     end;
 
     local procedure FindRelevantNewSalesShptLedgerEntryNo(SalesShptLine: Record "Sales Shipment Line"; NewSalesShptLine: Record "Sales Shipment Line"; ItemLedgerEntry: Record "Item Ledger Entry"): Integer
@@ -293,6 +294,7 @@ codeunit 5815 "Undo Sales Shipment Line"
         PurchaseReceiptLine.FindFirst();
 
         UndoPurchaseReceiptLine.SetHideDialog(true);
+        UndoPurchaseReceiptLine.IsUndoSalesShipmentLineForDropShipment(true);
         UndoPurchaseReceiptLine.Run(PurchaseReceiptLine)
     end;
 
@@ -407,6 +409,7 @@ codeunit 5815 "Undo Sales Shipment Line"
         ItemJournalLine."Bin Code" := SalesShipmentLine2."Bin Code";
         ItemJournalLine."Document Date" := SalesShipmentHeader."Document Date";
         ItemJournalLine."Unit of Measure Code" := SalesShipmentLine2."Unit of Measure Code";
+        ItemJournalLine.Description := SalesShipmentLine2.Description;
 
         OnAfterCopyItemJnlLineFromSalesShpt(ItemJournalLine, SalesShipmentHeader, SalesShipmentLine2, TempWarehouseJournalLine, WhseUndoQuantity, ItemLedgEntryNo, NextLineNo, TempGlobalItemLedgerEntry, TempGlobalItemEntryRelation, IsHandled);
         if IsHandled then
@@ -738,6 +741,11 @@ codeunit 5815 "Undo Sales Shipment Line"
 
         if not ItemsToAdjust.Contains(Item2."No.") then
             ItemsToAdjust.Add(Item2."No.");
+    end;
+
+    procedure SetCalledFromUndoPurchaseReceiptLine(NewCalledFromPurchRcptLine: Boolean)
+    begin
+        IsCalledFromPurchRcptLine := NewCalledFromPurchRcptLine;
     end;
 
     /// <summary>
@@ -1110,6 +1118,16 @@ codeunit 5815 "Undo Sales Shipment Line"
     /// <param name="UndoSalesShptLineParams">The undo parameters being used.</param>
     [IntegrationEvent(false, false)]
     local procedure OnBeforeDeleteRelatedItems(var SalesShipmentLine: Record "Sales Shipment Line"; UndoSalesShptLineParams: Record "Undo Sales Shpt. Line Params")
+    begin
+    end;
+
+    /// <summary>
+    /// Raised before finding the item application entry for a drop shipment being unapplied.
+    /// </summary>
+    /// <param name="ItemApplicationEntry">The item application entry with applied filters.</param>
+    /// <param name="ItemLedgerEntry">The item ledger entry for the drop shipment.</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnUnApplyDropShipmentOnBeforeFindItemApplicationEntry(var ItemApplicationEntry: Record "Item Application Entry"; ItemLedgerEntry: Record "Item Ledger Entry")
     begin
     end;
 }

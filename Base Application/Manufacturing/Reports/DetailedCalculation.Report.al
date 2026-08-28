@@ -8,22 +8,24 @@ using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Costing;
 using Microsoft.Inventory.Item;
-#if not CLEAN27
+#if not CLEAN28
 using Microsoft.Manufacturing.Document;
 #endif
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.Setup;
+#if not CLEAN28
 using Microsoft.Manufacturing.WorkCenter;
+#endif
 using System.Utilities;
 
 report 99000756 "Detailed Calculation"
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './Manufacturing/Reports/DetailedCalculation.rdlc';
     ApplicationArea = Manufacturing;
     Caption = 'Detailed Calculation';
+    ToolTip = 'View the list of all costs for the item taking into account any scrap during production.';
     UsageCategory = ReportsAndAnalysis;
+    DefaultRenderingLayout = RDLCLayout;
 
     dataset
     {
@@ -139,44 +141,58 @@ report 99000756 "Detailed Calculation"
 
                 trigger OnAfterGetRecord()
                 var
+#if not CLEAN28
                     WorkCenter: Record "Work Center";
-#if not CLEAN27
                     SubcPrices: Record "Subcontractor Prices";
                     SubcontractingPriceMgt: Codeunit SubcontractingPricesMgt;
+                    LegacySubcFeatureHandler: Codeunit "Legacy Subc. Feature Handler";
 #endif
                     UnitCostCalculation: Enum "Unit Cost Calculation Type";
+                    IsHandled: Boolean;
                 begin
                     ProdUnitCost := "Unit Cost per";
 
-                    if "Routing Line".Type = "Routing Line".Type::"Work Center" then
-                        WorkCenter.Get("Routing Line"."Work Center No.");
-#if not CLEAN27
-                    if ("Routing Line".Type = "Routing Line".Type::"Work Center") and
-                       (WorkCenter."Subcontractor No." <> '')
-                    then begin
-                        SubcPrices."Vendor No." := WorkCenter."Subcontractor No.";
-                        SubcPrices."Item No." := Item."No.";
-                        SubcPrices."Standard Task Code" := "Routing Line"."Standard Task Code";
-                        SubcPrices."Work Center No." := WorkCenter."No.";
-                        SubcPrices."Variant Code" := '';
-                        SubcPrices."Unit of Measure Code" := Item."Base Unit of Measure";
-                        SubcPrices."Start Date" := CalculateDate;
-                        SubcPrices."Currency Code" := '';
-                        SubcontractingPriceMgt.GetRoutingPricelistCost(
-                          SubcPrices,
-                          WorkCenter,
-                          DirectUnitCost,
-                          IndirectCostPct,
-                          OverheadRate,
-                          ProdUnitCost,
-                          UnitCostCalculation,
-                          1,
-                          1,
-                          1);
-                    end else
+                    IsHandled := false;
+                    OnAfterGetRecordRoutingLineOnBeforeCalcRoutingCostPerUnit(
+                      "Routing Line", Item."No.", Item."Base Unit of Measure", "Routing Line"."Standard Task Code",
+                      CalculateDate, DirectUnitCost, IndirectCostPct, OverheadRate, ProdUnitCost, UnitCostCalculation, IsHandled);
+                    if not IsHandled then
+#if not CLEAN28
+#pragma warning disable AA0013
+                    begin
+#pragma warning restore AA0013
+                        if "Routing Line".Type = "Routing Line".Type::"Work Center" then
+                            WorkCenter.Get("Routing Line"."Work Center No.");
+                        if ("Routing Line".Type = "Routing Line".Type::"Work Center") and
+                           (WorkCenter."Subcontractor No." <> '') and
+                           LegacySubcFeatureHandler.IsLegacySubcontractingEnabled()
+                        then begin
+                            SubcPrices."Vendor No." := WorkCenter."Subcontractor No.";
+                            SubcPrices."Item No." := Item."No.";
+                            SubcPrices."Standard Task Code" := "Routing Line"."Standard Task Code";
+                            SubcPrices."Work Center No." := WorkCenter."No.";
+                            SubcPrices."Variant Code" := '';
+                            SubcPrices."Unit of Measure Code" := Item."Base Unit of Measure";
+                            SubcPrices."Start Date" := CalculateDate;
+                            SubcPrices."Currency Code" := '';
+                            SubcontractingPriceMgt.GetRoutingPricelistCost(
+                              SubcPrices,
+                              WorkCenter,
+                              DirectUnitCost,
+                              IndirectCostPct,
+                              OverheadRate,
+                              ProdUnitCost,
+                              UnitCostCalculation,
+                              1,
+                              1,
+                              1);
+                        end else
 #endif
-                        MfgCostCalcMgt.CalcRoutingCostPerUnit(
-                          Type, "No.", DirectUnitCost, IndirectCostPct, OverheadRate, ProdUnitCost, UnitCostCalculation);
+                            MfgCostCalcMgt.CalcRoutingCostPerUnit(
+                              Type, "No.", DirectUnitCost, IndirectCostPct, OverheadRate, ProdUnitCost, UnitCostCalculation);
+#if not CLEAN28
+                    end;
+#endif
                     CostTime :=
                       MfgCostCalcMgt.CalculateCostTime(
                         MfgCostCalcMgt.CalcQtyAdjdForBOMScrap(Item."Lot Size", Item."Scrap %"),
@@ -453,6 +469,16 @@ report 99000756 "Detailed Calculation"
         end;
     }
 
+    rendering
+    {
+        layout(RDLCLayout)
+        {
+            Type = RDLC;
+            LayoutFile = './Manufacturing/Reports/DetailedCalculation.rdlc';
+            Summary = 'Report layout made in the legacy RDLC format. Use an RDLC editor to modify the layout.';
+        }
+    }
+
     labels
     {
     }
@@ -527,6 +553,11 @@ report 99000756 "Detailed Calculation"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeOnPreReport(var Item: Record Item)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnAfterGetRecordRoutingLineOnBeforeCalcRoutingCostPerUnit(var RoutingLine: Record "Routing Line"; ItemNo: Code[20]; BaseUnitOfMeasure: Code[10]; StandardTaskCode: Code[10]; CalculationDate: Date; var DirectUnitCost: Decimal; var IndirectCostPct: Decimal; var OverheadRate: Decimal; var ProdUnitCost: Decimal; var UnitCostCalculation: Enum "Unit Cost Calculation Type"; var IsHandled: Boolean)
     begin
     end;
 }

@@ -56,6 +56,10 @@ codeunit 134982 "ERM Financial Reports"
         G_L_Entry_Posting_DateLbl: Label 'G_L_Entry_Posting_Date';
         G_L_Entry_Document_DateLbl: Label 'G_L_Entry_Document_Date';
         PostingGroupDetailsLedEntryErr: Label 'Posting group should be populated from customer ledger entry';
+        MissingGLEntryErr: Label 'No %1 exists for account %2 and source currency %3.', Comment = '%1 = Table Caption, %2 = G/L Account No., %3 = Source Currency Code';
+        CloseIncomeAmountMismatchErr: Label 'Close Income Statement %1 mismatch for source currency %2. Expected %3, actual %4.', Comment = '%1 = Field Caption, %2 = Source Currency Code, %3 = Expected Amount, %4 = Actual Amount';
+        CloseIncomeLineCountErr: Label 'Close Income Statement must create one consolidated line for account %1 when no dimensions are selected. Expected %2, actual %3.', Comment = '%1 = G/L Account No., %2 = Expected line count, %3 = Actual line count';
+        CloseIncomeLineAmountErr: Label 'The consolidated Close Income Statement line amount must equal the negated sum of the posted G/L entry amounts.';
 
     [Test]
     [HandlerFunctions('RHDetailTrialBalance')]
@@ -1426,6 +1430,245 @@ codeunit 134982 "ERM Financial Reports"
     end;
 
     [Test]
+    [HandlerFunctions('ConfirmHandler,MessageHandler')]
+    procedure CloseIncomeStatementWithARCAndMixedInvoiceCurrencies2()
+    var
+        AccountingPeriod: Record "Accounting Period";
+        Currency: array[3] of Record Currency;
+        Customer: Record Customer;
+        GLAccount: Record "G/L Account";
+        GenJournalLine: Record "Gen. Journal Line";
+        GeneralPostingSetup: Record "General Posting Setup";
+        Item: Record Item;
+        CloseIncomeStatement: Report "Close Income Statement";
+        AdditionalReportingCurrency: Code[10];
+        InvoiceNoLCY: Code[20];
+        InvoiceNoEUR: Code[20];
+        InvoiceNoUSD: Code[20];
+        SalesGLAccountNo: Code[20];
+        InvoiceFilter: Text;
+    begin
+        // [SCENARIO 625803] Close Income Statement with Additional Reporting Currency and mixed invoice currencies keeps separate source-currency totals.
+        Initialize();
+
+        // [GIVEN] Create three Currencies with Exchange Rates.
+        Currency[1].Get(LibraryERM.CreateCurrencyWithExchangeRate(WorkDate(), LibraryRandom.RandDecInDecimalRange(0.85, 0.85, 2), LibraryRandom.RandDecInDecimalRange(0.85, 0.85, 2)));
+        Currency[2].Get(LibraryERM.CreateCurrencyWithExchangeRate(WorkDate(), LibraryRandom.RandDecInDecimalRange(0.75, 0.75, 2), LibraryRandom.RandDecInDecimalRange(0.75, 0.75, 2)));
+        Currency[3].Get(LibraryERM.CreateCurrencyWithExchangeRate(WorkDate(), LibraryRandom.RandDecInDecimalRange(0.95, 0.95, 2), LibraryRandom.RandDecInDecimalRange(0.95, 0.95, 2)));
+
+        // [GIVEN] Create LCY Code.
+        LibraryERM.SetLCYCode(Currency[1].Code);
+
+        // [GIVEN] Additional Reporting Currency is set in General Ledger Setup.
+        AdditionalReportingCurrency := UpdateCurOnGeneralLedgerSetup(Currency[2].Code);
+
+        // [GIVEN] Create a Customer.
+        LibrarySales.CreateCustomer(Customer);
+
+        // [GIVEN] Create an Item with Unit Price.]
+        LibraryInventory.CreateItem(Item);
+        Item.Validate("Unit Price", LibraryRandom.RandDecInRange(1000, 2000, 2));
+        Item.Modify(true);
+
+        // [GIVEN] Create and Post Sales Invoices for Customer in different Currencies.
+        InvoiceNoLCY := CreateAndPostSalesInvoice(Customer."No.", Item."No.", Currency[1].Code);
+        InvoiceNoEUR := CreateAndPostSalesInvoice(Customer."No.", Item."No.", Currency[2].Code);
+        InvoiceNoUSD := CreateAndPostSalesInvoice(Customer."No.", Item."No.", Currency[3].Code);
+
+        // [GIVEN] Find General Posting Setup for Customer and Item.
+        GeneralPostingSetup.Get(Customer."Gen. Bus. Posting Group", Item."Gen. Prod. Posting Group");
+        SalesGLAccountNo := GeneralPostingSetup."Sales Account";
+
+        // [GIVEN] Close Fiscal Year.
+        LibraryFiscalYear.CloseFiscalYear();
+
+        // [GIVEN] Create a G/L Account for Income Statement.
+        LibraryCostAccounting.CreateIncomeStmtGLAccount(GLAccount);
+
+        // [GIVEN] Create General Journal Line for G/L Account.
+        CreateGeneralJournalLine(
+            GenJournalLine,
+            GenJournalLine."Account Type"::"G/L Account",
+            GLAccount."No.",
+            LibraryRandom.RandDec(100, 2));
+        GenJournalLine.Validate("Posting Date", WorkDate());
+        GenJournalLine.Modify(true);
+
+        // [GIVEN] Run "Close Income Statement" for G/L Account.
+        LibraryERM.FindGLAccount(GLAccount);
+        CloseIncomeStatement.InitializeRequestTest(AccountingPeriod.GetFiscalYearEndDate(WorkDate()), GenJournalLine, GLAccount, true);
+        CloseIncomeStatement.UseRequestPage(false);
+        CloseIncomeStatement.Run();
+
+        // [GIVEN] Find the Last GL Register Entry and reverse it.
+        InvoiceFilter := StrSubstNo('%1|%2|%3', InvoiceNoLCY, InvoiceNoEUR, InvoiceNoUSD);
+        AssertCloseIncomeTotalsMatchPostedTotals(SalesGLAccountNo, InvoiceFilter, GenJournalLine."Document No.", Currency[1].Code);
+        AssertCloseIncomeTotalsMatchPostedTotals(SalesGLAccountNo, InvoiceFilter, GenJournalLine."Document No.", Currency[2].Code);
+        AssertCloseIncomeTotalsMatchPostedTotals(SalesGLAccountNo, InvoiceFilter, GenJournalLine."Document No.", Currency[3].Code);
+
+        // Cleanup: restore General Ledger Setup.
+        UpdateCurOnGeneralLedgerSetup(AdditionalReportingCurrency);
+    end;
+
+    [Test]
+    [HandlerFunctions('MessageHandler,ConfirmHandler,CloseIncomeStatementRequestPageHandler')]
+    procedure CloseIncomeStatementConsolidatesEntriesPerGLAccountWithoutARC()
+    var
+        GLAccount: Record "G/L Account";
+        BalGLAccount: Record "G/L Account";
+        GenJournalLine: Record "Gen. Journal Line";
+        GenJournalBatch: Record "Gen. Journal Batch";
+        GenJournalTemplate: Record "Gen. Journal Template";
+        ClosingGenJournalLine: Record "Gen. Journal Line";
+        Date: Record Date;
+        GeneralLedgerSetup: Record "General Ledger Setup";
+        DocNo: Code[20];
+        PostingDate: Date;
+        Amount1: Decimal;
+        Amount2: Decimal;
+        Amount3: Decimal;
+        OldAdditionalReportingCurrency: Code[10];
+    begin
+        // [FEATURE] [AI test]
+        // [SCENARIO 646076] Close Income Statement consolidates multiple G/L entries into one journal line per account when no dimensions are selected and ARC is not enabled.
+        Initialize();
+
+        // [GIVEN] No dimensions are selected for the Close Income Statement report
+        ClearSelectedDimensionsForCloseIncomeStatement();
+
+        // [GIVEN] Additional Reporting Currency is blank
+        GeneralLedgerSetup.Get();
+        OldAdditionalReportingCurrency := GeneralLedgerSetup."Additional Reporting Currency";
+        if OldAdditionalReportingCurrency <> '' then
+            UpdateCurOnGeneralLedgerSetup('');
+
+        // [GIVEN] Previous Fiscal Year Closed, New Fiscal Year Created and Closed
+        LibraryFiscalYear.CloseFiscalYear();
+        ExecuteUIHandler();
+        LibraryFiscalYear.CreateFiscalYear();
+        LibraryFiscalYear.CloseFiscalYear();
+
+        // [GIVEN] Income Statement G/L Account "A" and a Balance Sheet G/L Account for balancing
+        LibraryCostAccounting.CreateIncomeStmtGLAccount(GLAccount);
+        LibraryERM.CreateGLAccount(BalGLAccount);
+
+        // [GIVEN] Three posted G/L entries to account "A" with blank dimensions in the closed fiscal year
+        PostingDate := LibraryFiscalYear.GetLastPostingDate(true);
+        Amount1 := LibraryRandom.RandIntInRange(100, 500);
+        Amount2 := LibraryRandom.RandIntInRange(100, 500);
+        Amount3 := LibraryRandom.RandIntInRange(100, 500);
+        CreateAndPostGenJnlLineOnPostingDate(GLAccount."No.", BalGLAccount."No.", PostingDate, Amount1);
+        CreateAndPostGenJnlLineOnPostingDate(GLAccount."No.", BalGLAccount."No.", PostingDate, Amount2);
+        CreateAndPostGenJnlLineOnPostingDate(GLAccount."No.", BalGLAccount."No.", PostingDate, Amount3);
+
+        // [GIVEN] Gen. Journal Template and Batch for close income statement output
+        LibraryERM.CreateGenJournalTemplate(GenJournalTemplate);
+        LibraryERM.CreateGenJournalBatch(GenJournalBatch, GenJournalTemplate.Name);
+        LibraryERM.ClearGenJournalLines(GenJournalBatch);
+        GenJournalLine.Init();
+        GenJournalLine."Journal Template Name" := GenJournalBatch."Journal Template Name";
+        GenJournalLine."Journal Batch Name" := GenJournalBatch.Name;
+
+        // [WHEN] Run Close Income Statement with no dimensions selected
+        Date.SetRange("Period Type", Date."Period Type"::Month);
+        Date.SetRange("Period Start", PostingDate);
+        Date.FindFirst();
+        DocNo := LibraryUtility.GenerateGUID();
+        RunCloseIncomeStatement(GenJournalLine, NormalDate(Date."Period End"), DocNo);
+
+        // [THEN] Exactly one closing Gen. Journal Line exists for account "A"
+        ClosingGenJournalLine.SetRange("Journal Template Name", GenJournalBatch."Journal Template Name");
+        ClosingGenJournalLine.SetRange("Journal Batch Name", GenJournalBatch.Name);
+        ClosingGenJournalLine.SetRange("Document No.", DocNo);
+        ClosingGenJournalLine.SetRange("Account No.", GLAccount."No.");
+        Assert.AreEqual(
+            1, ClosingGenJournalLine.Count,
+            StrSubstNo(CloseIncomeLineCountErr, GLAccount."No.", 1, ClosingGenJournalLine.Count));
+
+        // [THEN] The closing line amount equals the negated sum of posted amounts
+        ClosingGenJournalLine.FindFirst();
+        Assert.AreEqual(
+            -(Amount1 + Amount2 + Amount3), ClosingGenJournalLine.Amount, CloseIncomeLineAmountErr);
+    end;
+
+    [Test]
+    [HandlerFunctions('MessageHandler,ConfirmHandler,CloseIncomeStatementWithBalAccountRequestPageHandler')]
+    procedure CloseIncomeStatementConsolidatesEntriesPerGLAccountWithARC()
+    var
+        GLAccount: Record "G/L Account";
+        BalGLAccount: Record "G/L Account";
+        ReportBalancingGLAccount: Record "G/L Account";
+        GenJournalLine: Record "Gen. Journal Line";
+        GenJournalBatch: Record "Gen. Journal Batch";
+        ClosingGLEntry: Record "G/L Entry";
+        Date: Record Date;
+        DocNo: Code[20];
+        PostingDate: Date;
+        Amount1: Decimal;
+        Amount2: Decimal;
+        Amount3: Decimal;
+    begin
+        // [FEATURE] [AI test]
+        // [SCENARIO 646077] Close Income Statement consolidates multiple G/L entries into one journal line per account when no dimensions are selected and ARC is enabled.
+        Initialize();
+
+        // [GIVEN] No dimensions are selected for the Close Income Statement report
+        ClearSelectedDimensionsForCloseIncomeStatement();
+
+        // [GIVEN] Additional Reporting Currency is enabled
+        UpdateCurOnGeneralLedgerSetup(LibraryERM.CreateCurrencyWithRandomExchRates());
+
+        // [GIVEN] Previous Fiscal Year Closed, New Fiscal Year Created and Closed
+        LibraryFiscalYear.CloseFiscalYear();
+        ExecuteUIHandler();
+        LibraryFiscalYear.CreateFiscalYear();
+        LibraryFiscalYear.CloseFiscalYear();
+
+        // [GIVEN] Income Statement G/L Account "A", a balancing account for the posted entries and a
+        // separate balancing account for the report. They must differ, because the report excludes its
+        // own balancing account from the accounts that are closed.
+        LibraryCostAccounting.CreateIncomeStmtGLAccount(GLAccount);
+        LibraryERM.CreateGLAccount(BalGLAccount);
+        LibraryERM.CreateGLAccount(ReportBalancingGLAccount);
+
+        // [GIVEN] Three posted G/L entries to account "A" with blank dimensions and blank Business Unit Code
+        PostingDate := LibraryFiscalYear.GetLastPostingDate(true);
+        Amount1 := LibraryRandom.RandIntInRange(100, 500);
+        Amount2 := LibraryRandom.RandIntInRange(100, 500);
+        Amount3 := LibraryRandom.RandIntInRange(100, 500);
+        CreateAndPostGenJnlLineOnPostingDate(GLAccount."No.", BalGLAccount."No.", PostingDate, Amount1);
+        CreateAndPostGenJnlLineOnPostingDate(GLAccount."No.", BalGLAccount."No.", PostingDate, Amount2);
+        CreateAndPostGenJnlLineOnPostingDate(GLAccount."No.", BalGLAccount."No.", PostingDate, Amount3);
+
+        // [GIVEN] Gen. Journal Batch with a No. Series, required because with an Additional Reporting Currency
+        // report 94 posts the closing entries directly instead of inserting journal lines.
+        LibraryERM.SelectGenJnlBatch(GenJournalBatch);
+        LibraryERM.ClearGenJournalLines(GenJournalBatch);
+        GenJournalLine.Init();
+        GenJournalLine."Journal Template Name" := GenJournalBatch."Journal Template Name";
+        GenJournalLine."Journal Batch Name" := GenJournalBatch.Name;
+
+        // [WHEN] Run Close Income Statement with no dimensions selected
+        Date.SetRange("Period Type", Date."Period Type"::Month);
+        Date.SetRange("Period Start", PostingDate);
+        Date.FindFirst();
+        DocNo := LibraryUtility.GenerateGUID();
+        RunCloseIncomeStatementWithBalAccount(GenJournalLine, NormalDate(Date."Period End"), DocNo, ReportBalancingGLAccount."No.");
+
+        // [THEN] Exactly one closing G/L Entry exists for account "A"
+        ClosingGLEntry.SetRange("G/L Account No.", GLAccount."No.");
+        ClosingGLEntry.SetRange("Document No.", DocNo);
+        Assert.AreEqual(
+            1, ClosingGLEntry.Count,
+            StrSubstNo(CloseIncomeLineCountErr, GLAccount."No.", 1, ClosingGLEntry.Count));
+
+        // [THEN] The consolidated closing entry equals the negated sum of posted amounts
+        ClosingGLEntry.CalcSums(Amount);
+        Assert.AreEqual(
+            -(Amount1 + Amount2 + Amount3), ClosingGLEntry.Amount, CloseIncomeLineAmountErr);
+    end;
+
+    [Test]
     [HandlerFunctions('ConfirmHandler,RHReconcileCustandVendAccs')]
     procedure ReconcileCustVendAccounts_AfterExchRateAdjustment()
     var
@@ -1514,6 +1757,63 @@ codeunit 134982 "ERM Financial Reports"
             GLAccount.CalcFields("Net Change");
             LibraryReportDataset.AssertCurrentRowValueEquals('NetChange_GLAccount', GLAccount."Net Change");
         end;
+    end;
+
+    [Test]
+    [HandlerFunctions('RHDetailTrialBalance')]
+    [Scope('OnPrem')]
+    procedure DetailTrialBalanceClosingEntryExcludedFromRunningBalance()
+    var
+        AccountingPeriod: Record "Accounting Period";
+        GLAccountNo: Code[20];
+        BalGLAccountNo: Code[20];
+        FiscalYearEndDate: Date;
+        ClosingEntryDate: Date;
+        LastEntryDate: Date;
+        FirstAmount: Decimal;
+        ClosingAmount: Decimal;
+        LastAmount: Decimal;
+    begin
+        // [FEATURE] [Detail Trial Balance] [AI Test]
+        // [SCENARIO 645090] Closing entry is not added to the running balance when "Include Closing Entries Within the Period" is disabled.
+        Initialize();
+
+        // [GIVEN] A closing entry can only be posted on the ending date of a fiscal year, so anchor the scenario on the first open fiscal year.
+        AccountingPeriod.SetRange("New Fiscal Year", true);
+        AccountingPeriod.SetRange(Closed, false);
+        AccountingPeriod.FindFirst();
+        FiscalYearEndDate := CalcDate('<-1D>', AccountingPeriod."Starting Date");
+        ClosingEntryDate := ClosingDate(FiscalYearEndDate);
+        LastEntryDate := AccountingPeriod."Starting Date";
+
+        GLAccountNo := LibraryERM.CreateGLAccountNo();
+        BalGLAccountNo := LibraryERM.CreateGLAccountNo();
+        FirstAmount := LibraryRandom.RandDecInRange(100, 200, 2);
+        ClosingAmount := LibraryRandom.RandDecInRange(100, 200, 2);
+        LastAmount := LibraryRandom.RandDecInRange(100, 200, 2);
+
+        // [GIVEN] Ordinary entry of Amount = "X" posted to G/L Account "A" on the last day of the fiscal year.
+        CreateAndPostGenJnlLineOnPostingDate(GLAccountNo, BalGLAccountNo, FiscalYearEndDate, FirstAmount);
+
+        // [GIVEN] Closing entry of Amount = "C" posted to "A" on the closing date of the same fiscal year end.
+        CreateAndPostGenJnlLineOnPostingDate(GLAccountNo, BalGLAccountNo, ClosingEntryDate, ClosingAmount);
+
+        // [GIVEN] Ordinary entry of Amount = "Y" posted to "A" on the first day of the new fiscal year.
+        CreateAndPostGenJnlLineOnPostingDate(GLAccountNo, BalGLAccountNo, LastEntryDate, LastAmount);
+
+        // [WHEN] Save Detail Trial Balance Report for "A" with "Include Closing Entries Within the Period" = No.
+        RunDetailTrialBalanceReport(
+          GLAccountNo, false, false, false, false, CopyStr(StrSubstNo('%1..%2', FiscalYearEndDate, LastEntryDate), 1, 30));
+
+        // [THEN] The closing entry is not printed.
+        LibraryReportDataset.LoadDataSetFile();
+        LibraryReportDataset.AssertElementWithValueNotExist('EntryNo_GLEntry', FindGLEntryNo(GLAccountNo, ClosingEntryDate));
+
+        // [THEN] Balance of the last printed entry is "X" + "Y", the excluded closing entry "C" is not accumulated.
+        LibraryReportDataset.SetRange('EntryNo_GLEntry', FindGLEntryNo(GLAccountNo, LastEntryDate));
+        if not LibraryReportDataset.GetNextRow() then
+            Error(RowNotFoundErr, 'EntryNo_GLEntry', FindGLEntryNo(GLAccountNo, LastEntryDate));
+        LibraryReportDataset.AssertCurrentRowValueEquals('GLBalance', FirstAmount + LastAmount);
     end;
 
     local procedure Initialize()
@@ -2291,6 +2591,19 @@ codeunit 134982 "ERM Financial Reports"
         GenJournalLine.FindSet();
     end;
 
+    local procedure ClearSelectedDimensionsForCloseIncomeStatement()
+    var
+        SelectedDimension: Record "Selected Dimension";
+        AllObj: Record AllObj;
+    begin
+        // Other tests in this codeunit leave Selected Dimension records behind for report 94. They would make
+        // the report close per dimension, which hides defects that only occur when no dimensions are selected.
+        SelectedDimension.SetRange("User ID", UserId());
+        SelectedDimension.SetRange("Object Type", AllObj."Object Type"::Report);
+        SelectedDimension.SetRange("Object ID", Report::"Close Income Statement");
+        SelectedDimension.DeleteAll();
+    end;
+
     local procedure RunCloseIncomeStatement(GenJournalLine: Record "Gen. Journal Line"; PostingDate: Date; DocumentNo: Code[20])
     begin
         // Enqueue values for CloseIncomeStatementRequestPageHandler.
@@ -2303,13 +2616,26 @@ codeunit 134982 "ERM Financial Reports"
         Report.Run(Report::"Close Income Statement");
     end;
 
+    local procedure RunCloseIncomeStatementWithBalAccount(GenJournalLine: Record "Gen. Journal Line"; PostingDate: Date; DocumentNo: Code[20]; BalancingAccountNo: Code[20])
+    begin
+        // Enqueue values for CloseIncomeStatementWithBalAccountRequestPageHandler.
+        LibraryVariableStorage.Enqueue(PostingDate);
+        LibraryVariableStorage.Enqueue(GenJournalLine."Journal Template Name");
+        LibraryVariableStorage.Enqueue(GenJournalLine."Journal Batch Name");
+        LibraryVariableStorage.Enqueue(DocumentNo);
+        LibraryVariableStorage.Enqueue(BalancingAccountNo);
+
+        Commit();  // commit requires to run report.
+        Report.Run(Report::"Close Income Statement");
+    end;
+
     local procedure ExecuteUIHandler()
     begin
         // Generate Dummy message. Required for executing the test case successfully in ES.
         Message(JournalLineCreatedMsg);
     end;
 
-    local procedure CreateAndPostSalesInvoice(CustomerNo: Code[20]; ItemNo: Code[20]; CurrencyCode: Code[10])
+    local procedure CreateAndPostSalesInvoice(CustomerNo: Code[20]; ItemNo: Code[20]; CurrencyCode: Code[10]): Code[20]
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
@@ -2321,7 +2647,7 @@ codeunit 134982 "ERM Financial Reports"
 
         LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, ItemNo, LibraryRandom.RandInt(1));
 
-        LibrarySales.PostSalesDocument(SalesHeader, true, true);
+        exit(LibrarySales.PostSalesDocument(SalesHeader, true, true));
     end;
 
     local procedure RunAuditTrailReport(RegisterNo: Integer)
@@ -2359,6 +2685,73 @@ codeunit 134982 "ERM Financial Reports"
             LibraryReportDataset.AssertCurrentRowValueEquals(G_L_Entry_Document_DateLbl, Format(GLEntry."Document Date"));
         end else
             Error(ReportErr, GenJournalLine.FieldCaption("Document No."), GenJournalLine."Document No.");
+    end;
+
+    local procedure UpdateCurOnGeneralLedgerSetup(CurrencyCode: Code[10]) OldAdditionalReportingCurrency: Code[10]
+    var
+        GeneralLedgerSetup: Record "General Ledger Setup";
+    begin
+        // Update Additional Reporting Currency.
+        GeneralLedgerSetup.Get();
+        OldAdditionalReportingCurrency := GeneralLedgerSetup."Additional Reporting Currency";
+        GeneralLedgerSetup."Additional Reporting Currency" := CurrencyCode;
+        GeneralLedgerSetup.Modify(true);
+        Commit();  // Required to run the Test Case on RTC because Modal Form Pops Up after modifying General Ledger Setup.
+    end;
+
+    local procedure AssertCloseIncomeTotalsMatchPostedTotals(GLAccountFilter: Text; InvoiceFilter: Text; CloseIncomeDocumentNo: Code[20]; SourceCurrencyCode: Code[10])
+    var
+        PostedGLEntry: Record "G/L Entry";
+        CloseIncomeGLEntry: Record "G/L Entry";
+    begin
+        PostedGLEntry.SetFilter("G/L Account No.", GLAccountFilter);
+        PostedGLEntry.SetFilter("Document No.", InvoiceFilter);
+        PostedGLEntry.SetRange("Source Currency Code", SourceCurrencyCode);
+        Assert.RecordIsNotEmpty(PostedGLEntry);
+        PostedGLEntry.CalcSums(Amount, "Additional-Currency Amount", "Source Currency Amount");
+
+        CloseIncomeGLEntry.SetRange("Document No.", CloseIncomeDocumentNo);
+        CloseIncomeGLEntry.SetFilter("G/L Account No.", GLAccountFilter);
+        CloseIncomeGLEntry.SetRange("Source Currency Code", SourceCurrencyCode);
+        if CloseIncomeGLEntry.IsEmpty() then
+            Error(MissingGLEntryErr, CloseIncomeGLEntry.TableCaption(), GLAccountFilter, SourceCurrencyCode);
+        CloseIncomeGLEntry.CalcSums(Amount, "Additional-Currency Amount", "Source Currency Amount");
+
+        Assert.AreEqual(
+          -PostedGLEntry.Amount, CloseIncomeGLEntry.Amount,
+          StrSubstNo(CloseIncomeAmountMismatchErr, PostedGLEntry.FieldCaption(Amount), SourceCurrencyCode, -PostedGLEntry.Amount, CloseIncomeGLEntry.Amount));
+        Assert.AreEqual(
+          -PostedGLEntry."Additional-Currency Amount", CloseIncomeGLEntry."Additional-Currency Amount",
+          StrSubstNo(CloseIncomeAmountMismatchErr,
+            PostedGLEntry.FieldCaption("Additional-Currency Amount"), SourceCurrencyCode,
+            -PostedGLEntry."Additional-Currency Amount", CloseIncomeGLEntry."Additional-Currency Amount"));
+        Assert.AreEqual(
+          -PostedGLEntry."Source Currency Amount", CloseIncomeGLEntry."Source Currency Amount",
+          StrSubstNo(CloseIncomeAmountMismatchErr,
+            PostedGLEntry.FieldCaption("Source Currency Amount"), SourceCurrencyCode,
+            -PostedGLEntry."Source Currency Amount", CloseIncomeGLEntry."Source Currency Amount"));
+    end;
+
+    local procedure CreateAndPostGenJnlLineOnPostingDate(GLAccountNo: Code[20]; BalGLAccountNo: Code[20]; PostingDate: Date; Amount: Decimal)
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+    begin
+        CreateGeneralJournalLine(GenJournalLine, GenJournalLine."Account Type"::"G/L Account", GLAccountNo, Amount);
+        GenJournalLine.Validate("Posting Date", PostingDate);
+        GenJournalLine.Validate("Bal. Account Type", GenJournalLine."Bal. Account Type"::"G/L Account");
+        GenJournalLine.Validate("Bal. Account No.", BalGLAccountNo);
+        GenJournalLine.Modify(true);
+        LibraryERM.PostGeneralJnlLine(GenJournalLine);
+    end;
+
+    local procedure FindGLEntryNo(GLAccountNo: Code[20]; PostingDate: Date): Integer
+    var
+        GLEntry: Record "G/L Entry";
+    begin
+        GLEntry.SetRange("G/L Account No.", GLAccountNo);
+        GLEntry.SetRange("Posting Date", PostingDate);
+        GLEntry.FindFirst();
+        exit(GLEntry."Entry No.");
     end;
 
     [ConfirmHandler]
@@ -2575,10 +2968,23 @@ codeunit 134982 "ERM Financial Reports"
         CloseIncomeStatement.DocumentNo.SetValue(LibraryVariableStorage.DequeueText()); // Document No.
         CloseIncomeStatement.OK().Invoke();
     end;
-    
+
     [RequestPageHandler]
     procedure CloseIncomeStatementBalAccountHandler(var CloseIncomeStatement: TestRequestPage "Close Income Statement")
     begin
+        CloseIncomeStatement.BalancingAccountNo.SetValue(LibraryVariableStorage.DequeueText()); // Balancing Account No.
+        CloseIncomeStatement.OK().Invoke();
+    end;
+
+    [RequestPageHandler]
+    procedure CloseIncomeStatementWithBalAccountRequestPageHandler(var CloseIncomeStatement: TestRequestPage "Close Income Statement")
+    begin
+        // Same as CloseIncomeStatementRequestPageHandler, but supplies a Balancing Account No., which this
+        // version of report 94 requires when an Additional Reporting Currency is set. Dimensions are left blank.
+        CloseIncomeStatement.FiscalYearEndingDate.SetValue(LibraryVariableStorage.DequeueDate()); // Fiscal Year Ending Date
+        CloseIncomeStatement.GenJournalTemplate.SetValue(LibraryVariableStorage.DequeueText()); // Gen. Journal Template
+        CloseIncomeStatement.GenJournalBatch.SetValue(LibraryVariableStorage.DequeueText()); // Gen. Journal Batch
+        CloseIncomeStatement.DocumentNo.SetValue(LibraryVariableStorage.DequeueText()); // Document No.
         CloseIncomeStatement.BalancingAccountNo.SetValue(LibraryVariableStorage.DequeueText()); // Balancing Account No.
         CloseIncomeStatement.OK().Invoke();
     end;

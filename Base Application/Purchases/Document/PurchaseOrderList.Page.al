@@ -39,8 +39,7 @@ page 9307 "Purchase Order List"
     QueryCategory = 'Purchase Order List';
     RefreshOnActivate = true;
     SourceTable = "Purchase Header";
-    SourceTableView = where("Document Type" = const(Order),
-                            "Subcontracting Order" = const(false));
+    SourceTableView = where("Document Type" = const(Order));
     UsageCategory = Lists;
     AdditionalSearchTerms = 'Procurement List, Buy Order Overview, Vendor Orders, Order Purchase Log, Acquisition List, Supplier Orders, Buy List, Purchase Log, Supply Order List, Goods Order Overview';
 
@@ -318,24 +317,6 @@ page 9307 "Purchase Order List"
                         Rec.ShowDocDim();
                     end;
                 }
-#if not CLEAN26
-                action(Statistics)
-                {
-                    ApplicationArea = Suite;
-                    Caption = 'Statistics';
-                    Image = Statistics;
-                    ShortCutKey = 'F7';
-                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseOrderStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '26.0';
-
-                    trigger OnAction()
-                    begin
-                        Rec.OpenPurchaseOrderStatistics();
-                    end;
-                }
-#endif
                 action(PurchaseOrderStatistics)
                 {
                     ApplicationArea = Basic, Suite;
@@ -343,11 +324,7 @@ page 9307 "Purchase Order List"
                     Enabled = Rec."No." <> '';
                     Image = Statistics;
                     ShortCutKey = 'F7';
-#if CLEAN26
                     Visible = true;
-#else
-                    Visible = false;
-#endif                    
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Purchase Order Statistics";
                     RunPageOnRec = true;
@@ -617,7 +594,6 @@ page 9307 "Purchase Order List"
                     Caption = 'Delete Invoiced Orders';
                     Image = Delete;
                     RunObject = Report "Delete Invoiced Purch. Orders";
-                    ToolTip = 'Delete orders that were not automatically deleted after completion. For example, when several purchase orders were completed by a single invoice.';
                 }
             }
             group("Request Approval")
@@ -893,18 +869,9 @@ page 9307 "Purchase Order List"
                 actionref(Dimensions_Promoted; Dimensions)
                 {
                 }
-#if not CLEAN26
-                actionref(Statistics_Promoted; Statistics)
-                {
-                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '26.0';
-                }
-#else                
                 actionref(PurchaseOrderStatistics_Promoted; PurchaseOrderStatistics)
                 {
                 }
-#endif
                 actionref("Co&mments_Promoted"; "Co&mments")
                 {
                 }
@@ -975,7 +942,19 @@ page 9307 "Purchase Order List"
     trigger OnOpenPage()
     var
         PurchasesPayablesSetup: Record "Purchases & Payables Setup";
+#if not CLEAN28
+        LegacySubcFeatureHandler: Codeunit Microsoft.Manufacturing.Setup."Legacy Subc. Feature Handler";
+        BackedupFiltergroup: Integer;
+#endif
     begin
+#if not CLEAN28
+        if LegacySubcFeatureHandler.IsLegacySubcontractingEnabled() then begin
+            BackedupFiltergroup := Rec.FilterGroup;
+            Rec.FilterGroup(2); // Set table view
+            Rec.SetRange("Subcontracting Order", false);
+            Rec.FilterGroup(BackedupFiltergroup);
+        end;
+#endif
         if Rec.GetFilter(Receive) <> '' then
             Rec.FilterPartialReceived();
         if Rec.GetFilter(Invoice) <> '' then

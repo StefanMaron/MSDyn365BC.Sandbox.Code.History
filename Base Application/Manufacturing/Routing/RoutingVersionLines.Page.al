@@ -26,12 +26,12 @@ page 99000767 "Routing Version Lines"
                 field("Previous Operation No."; Rec."Previous Operation No.")
                 {
                     ApplicationArea = Manufacturing;
-                    Visible = false;
+                    Visible = ParallelFieldsVisible;
                 }
                 field("Next Operation No."; Rec."Next Operation No.")
                 {
                     ApplicationArea = Manufacturing;
-                    Visible = false;
+                    Visible = ParallelFieldsVisible;
                 }
                 field(Type; Rec.Type)
                 {
@@ -45,12 +45,12 @@ page 99000767 "Routing Version Lines"
                 {
                     ApplicationArea = Manufacturing;
                 }
-#if not CLEAN27
+#if not CLEAN28
                 field("WIP Item"; Rec."WIP Item")
                 {
-                    ApplicationArea = Manufacturing;
+                    ApplicationArea = LegacySubcontracting;
                     ToolTip = 'Specifies if the item is a work in process (WIP) item.';
-                    ObsoleteReason = 'Preparation for replacement by Suncontracting app ';
+                    ObsoleteReason = 'Preparation for replacement by Subcontracting app';
                     ObsoleteState = Pending;
                     ObsoleteTag = '27.0';
                 }
@@ -215,6 +215,16 @@ page 99000767 "Routing Version Lines"
     var
         RtngComment: Record "Routing Comment Line";
         ShowRelatedDataEnabled: Boolean;
+        ParallelFieldsVisible: Boolean;
+
+    /// <summary>
+    /// Sets the visibility of the Next/Previous Operation No. fields, which are only relevant for parallel routings.
+    /// </summary>
+    /// <param name="Visible">Whether the Next/Previous Operation No. fields should be visible.</param>
+    procedure SetParallelFieldsVisible(Visible: Boolean)
+    begin
+        ParallelFieldsVisible := Visible;
+    end;
 
     local procedure ShowComment()
     begin

@@ -78,7 +78,6 @@ page 9012 "Shop Supervisor Role Center"
                 Caption = 'Routing &Sheet';
                 Image = "Report";
                 RunObject = Report "Routing Sheet";
-                ToolTip = 'View basic information for routings, such as send-ahead quantity, setup time, run time and time unit. This report shows you the operations to be performed in this routing, the work or machine centers to be used, the personnel, the tools, and the description of each operation.';
             }
             separator(Action51)
             {
@@ -102,7 +101,6 @@ page 9012 "Shop Supervisor Role Center"
                 Caption = 'Inventory - &Availability Plan (Excel)';
                 Image = ItemAvailability;
                 RunObject = Report "Inv. Availability Plan";
-                ToolTip = 'View a list of the quantity of each item in customer, purchase, and transfer orders and the quantity available in inventory. The list is divided into columns that cover six periods with starting and ending dates as well as the periods before and after those periods. The list is useful when you are planning your inventory purchases.';
             }
             separator(Action53)
             {
@@ -113,14 +111,13 @@ page 9012 "Shop Supervisor Role Center"
                 Caption = 'Capacity Tas&k List';
                 Image = "Report";
                 RunObject = Report "Capacity Task List";
-                ToolTip = 'View the production orders that are waiting to be processed at the work centers and machine centers. Printouts are made for the capacity of the work center or machine center. The report includes information such as starting and ending time, date per production order and input quantity.';
             }
             action("Subcontractor - Dis&patch List")
             {
                 ApplicationArea = Manufacturing;
                 Caption = 'Subcontractor - Dis&patch List';
                 Image = "Report";
-#if not CLEAN27
+#if not CLEAN28
                 RunObject = Report "Subcontr. Dispatching List";
 #else
                 RunObject = Report "Subcontractor - Dispatch List";
@@ -149,7 +146,6 @@ page 9012 "Shop Supervisor Role Center"
                 Caption = 'Production Order Statistics';
                 Image = "Report";
                 RunObject = report "Production Order Statistics";
-                ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
             }
             action("S&tatus")
             {
@@ -268,10 +264,10 @@ page 9012 "Shop Supervisor Role Center"
                 RunObject = Page "Transfer Orders";
                 ToolTip = 'Move inventory items between company locations. With transfer orders, you ship the outbound transfer from one location and receive the inbound transfer at the other location. This allows you to manage the involved warehouse activities and provides more certainty that inventory quantities are updated correctly.';
             }
-#if not CLEAN27
+#if not CLEAN28
             action("Subcontracting Orders")
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = LegacySubcontracting;
                 Caption = 'Subcontracting Orders';
                 RunObject = Page "Subcontracting Order List";
                 ToolTip = 'View the list of subcontracting orders.';
@@ -281,7 +277,7 @@ page 9012 "Shop Supervisor Role Center"
             }
             action("Subcontracting Transfers")
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = LegacySubcontracting;
                 Caption = 'Subcontracting Transfers';
                 RunObject = Page "Subcontracting Transfer List";
                 ToolTip = 'View the list of subcontracting transfers.';
@@ -327,15 +323,22 @@ page 9012 "Shop Supervisor Role Center"
                                     Recurring = const(false));
                 ToolTip = 'Calculate a supply plan to fulfill item demand with purchases or transfers.';
             }
+#if not CLEAN28
             action(SubcontractingWorksheets)
             {
-                ApplicationArea = Manufacturing;
-                Caption = 'Subcontracting Worksheets';
+                ApplicationArea = LegacySubcontracting;
+                Caption = 'Subcontracting Worksheets (Obsolete)';
                 RunObject = Page "Req. Wksh. Names";
+#pragma warning disable AL0432
                 RunPageView = where("Template Type" = const("For. Labor"),
                                     Recurring = const(false));
+#pragma warning restore AL0432
+                ObsoleteReason = 'Will be replaced by the Subcontracting App.';
+                ObsoleteState = Pending;
+                ObsoleteTag = '28.0';
                 ToolTip = 'Calculate the needed production supply, find the production orders that have material ready to send to a subcontractor, and automatically create purchase orders for subcontracted operations from production order routings.';
             }
+#endif
         }
         area(sections)
         {
@@ -486,7 +489,6 @@ page 9012 "Shop Supervisor Role Center"
                 Caption = 'Update &Unit Cost';
                 Image = UpdateUnitCost;
                 RunObject = Report "Update Unit Cost";
-                ToolTip = 'Recalculate the unit cost of production items on production orders. The value in the Unit Cost field on the production order line is updated according to the selected options.';
             }
             separator(Action84)
             {

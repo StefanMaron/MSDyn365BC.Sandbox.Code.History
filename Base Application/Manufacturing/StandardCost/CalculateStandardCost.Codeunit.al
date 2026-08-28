@@ -254,7 +254,7 @@ codeunit 5812 "Calculate Standard Cost"
             CalcAssemblyItem(ItemNo, Item, 0, CalcMfgItems)
         end else
             CalcMfgItem(ItemNo, Item, 0);
-
+        OnCalcItemOnAfterCalculateCosts(Item);
         if TempItem.Find('-') then
             repeat
                 ItemCostMgt.UpdateStdCostShares(TempItem);
@@ -318,6 +318,7 @@ codeunit 5812 "Calculate Standard Cost"
         Item3: Record Item;
         NoOfRecords: Integer;
         LineCount: Integer;
+        IsHandled: Boolean;
     begin
         NewTempItem.DeleteAll();
 
@@ -325,6 +326,12 @@ codeunit 5812 "Calculate Standard Cost"
         OnBeforeCalcItems(Item2);
 
         NoOfRecords := Item.Count();
+
+        IsHandled := false;
+        OnCalcItemsOnBeforeProcessItems(Item2, NewTempItem, IsHandled);
+        if IsHandled then
+            exit;
+
         if ShowDialog then
             Window.Open(Text002);
 
@@ -409,7 +416,7 @@ codeunit 5812 "Calculate Standard Cost"
                                     Item."Rolled-up Material Cost" += ComponentQuantity * CompItem."Unit Cost";
                                     Item."Single-Level Material Cost" += ComponentQuantity * CompItem."Unit Cost"
                                 end;
-                            OnCalcAssemblyItemOnAfterCalcItemCost(Item, CompItem, BOMComp, ComponentQuantity);
+                            OnCalcAssemblyItemOnAfterCalcItemCost(Item, CompItem, BOMComp, ComponentQuantity, Level, CalcMfgItems);
                         end;
                     BOMComp.Type::Resource:
                         begin
@@ -649,6 +656,8 @@ codeunit 5812 "Calculate Standard Cost"
           Item."Single-Level Cap. Ovhd Cost" +
           Item."Single-Level Mfg. Ovhd Cost" +
           Item."Single-Lvl Mat. Non-Invt. Cost";
+
+        OnCalcMfgItemOnAfterCalculateCosts(SLMat, SLCap, SLSub, SLCapOvhd, SLMfgOvhd, Item, LotSize, MfgItemQtyBase, Level, CalculationDate, RUMat);
 
         TempItem := Item;
         TempItem.Insert();
@@ -905,6 +914,7 @@ codeunit 5812 "Calculate Standard Cost"
                         CalcProdBOMCost(
                           MfgItem, ProdBOMLine."No.", RtngNo, CompItemQtyBase, false, Level, SLMat, RUMat, RUCap, RUSub, RUCapOvhd, RUMfgOvhd, SLNonInvMat, RUNonInvMat, SKU);
                 end;
+                OnCalcProdBOMCostOnBeforeNextLineIteration(ProdBOMLine, PBOMVersionCode, Level, CompItemQtyBase, CompItem, SLMat);
             until ProdBOMLine.Next() = 0;
     end;
 
@@ -933,6 +943,7 @@ codeunit 5812 "Calculate Standard Cost"
     var
         RtngLine: Record "Routing Line";
         RtngHeader: Record "Routing Header";
+        IsHandled: Boolean;
     begin
         if RtngLine.CertifiedRoutingVersionExists(RtngHeaderNo, CalculationDate) then begin
             if RtngLine."Version Code" = '' then begin
@@ -941,7 +952,10 @@ codeunit 5812 "Calculate Standard Cost"
             end;
 
             repeat
-                CalcRtngLineCostSKU(RtngLine, MainItem, MfgItemQtyBase, SLCap, SLSub, SLCapOvhd);
+                IsHandled := false;
+                OnCalcRtngCostSKUOnBeforeCalcRtngLineCostSKU(RtngLine, MainItem, MfgItemQtyBase, SLCap, SLSub, SLCapOvhd, IsHandled);
+                if not IsHandled then
+                    CalcRtngLineCostSKU(RtngLine, MainItem, MfgItemQtyBase, SLCap, SLSub, SLCapOvhd);
             until RtngLine.Next() = 0;
         end;
     end;
@@ -957,6 +971,7 @@ codeunit 5812 "Calculate Standard Cost"
 #if not CLEAN27
         SubContPrices: Record "Subcontractor Prices";
         SubContPriceMgt: Codeunit SubcontractingPricesMgt;
+        LegacySubcFeatureHandler: Codeunit "Legacy Subc. Feature Handler";
 #endif
         IsHandled: Boolean;
     begin
@@ -974,7 +989,8 @@ codeunit 5812 "Calculate Standard Cost"
 
 #if not CLEAN27
         if (Type = Type::"Work Center") and
-           (WorkCenter."Subcontractor No." <> '')
+           (WorkCenter."Subcontractor No." <> '') and
+           LegacySubcFeatureHandler.IsLegacySubcontractingEnabled()
         then begin
             SubContPrices."Vendor No." := WorkCenter."Subcontractor No.";
             SubContPrices."Item No." := Item."No.";
@@ -1295,19 +1311,23 @@ codeunit 5812 "Calculate Standard Cost"
         OvhdRate: Decimal;
         CostTime: Decimal;
         UnitCostCalculation: Enum "Unit Cost Calculation Type";
+        IsHandled: Boolean;
     begin
-        OnBeforeCalcRtngLineCost(RoutingLine, MfgItemQtyBase);
+        OnBeforeCalcRtngLineCost(RoutingLine, MfgItemQtyBase, ParentItem);
         if (RoutingLine.Type = RoutingLine.Type::"Work Center") and (RoutingLine."No." <> '') then
             WorkCenter.Get(RoutingLine."No.");
 
         UnitCost := RoutingLine."Unit Cost per";
+        IsHandled := false;
+        OnCalcRtngLineCostOnBeforeCalcRoutingCostPerUnit(RoutingLine, MfgItemQtyBase, WorkCenter, DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation, ParentItem, IsHandled);
+        if not IsHandled then
 #if not CLEAN27
-        CalcRoutingCostPerUnit(
-            RoutingLine.Type, RoutingLine."No.", DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation,
-            ParentItem, RoutingLine."Standard Task Code");
+            CalcRoutingCostPerUnit(
+                RoutingLine.Type, RoutingLine."No.", DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation,
+                ParentItem, RoutingLine."Standard Task Code");
 #else
-        CalcRoutingCostPerUnit(
-            RoutingLine.Type, RoutingLine."No.", DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation);
+            CalcRoutingCostPerUnit(
+                RoutingLine.Type, RoutingLine."No.", DirUnitCost, IndirCostPct, OvhdRate, UnitCost, UnitCostCalculation);
 #endif
         OnCalcRtngLineCostOnAfterCalcRoutingCostPerUnit(RoutingLine, WorkCenter, MfgItemQtyBase, UnitCostCalculation);
         CostTime :=
@@ -1325,7 +1345,7 @@ codeunit 5812 "Calculate Standard Cost"
             IncrCost(SLCap, DirUnitCost, CostTime);
         IncrCost(SLCapOvhd, CostCalcMgt.CalcOvhdCost(DirUnitCost, IndirCostPct, OvhdRate, 1), CostTime);
 
-        OnAfterCalcRtngLineCost(RoutingLine, MfgItemQtyBase, SLCap, SLSub, SLCapOvhd, StdCostWkshName, ParentItem, CostTime);
+        OnAfterCalcRtngLineCost(RoutingLine, MfgItemQtyBase, SLCap, SLSub, SLCapOvhd, StdCostWkshName, ParentItem, CostTime, DirUnitCost);
     end;
 
     internal procedure CalcRtngLineCostSKU(RoutingLine: Record "Routing Line"; MainItem: Record Item; MfgItemQtyBase: Decimal; var SLCap: Decimal; var SLSub: Decimal; var SLCapOvhd: Decimal)
@@ -1337,8 +1357,9 @@ codeunit 5812 "Calculate Standard Cost"
         OvhdRate: Decimal;
         CostTime: Decimal;
         UnitCostCalculation: Enum "Unit Cost Calculation Type";
+        DummyParentItem: Record Item;
     begin
-        OnBeforeCalcRtngLineCost(RoutingLine, MfgItemQtyBase);
+        OnBeforeCalcRtngLineCost(RoutingLine, MfgItemQtyBase, DummyParentItem);
         if (RoutingLine.Type = RoutingLine.Type::"Work Center") and (RoutingLine."No." <> '') then
             WorkCenter.Get(RoutingLine."No.");
 
@@ -1383,7 +1404,12 @@ codeunit 5812 "Calculate Standard Cost"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCalcRtngLineCost(RoutingLine: Record "Routing Line"; MfgItemQtyBase: Decimal; var SLCap: Decimal; var SLSub: Decimal; var SLCapOvhd: Decimal; var StdCostWkshName: Text[50]; var ParentItem: Record Item; CostTime: Decimal)
+    local procedure OnAfterCalcRtngLineCost(RoutingLine: Record "Routing Line"; MfgItemQtyBase: Decimal; var SLCap: Decimal; var SLSub: Decimal; var SLCapOvhd: Decimal; var StdCostWkshName: Text[50]; var ParentItem: Record Item; CostTime: Decimal; var DirUnitCost: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcRtngCostSKUOnBeforeCalcRtngLineCostSKU(var RoutingLine: Record "Routing Line"; MainItem: Record Item; MfgItemQtyBase: Decimal; var SLCap: Decimal; var SLSub: Decimal; var SLCapOvhd: Decimal; var IsHandled: Boolean)
     begin
     end;
 
@@ -1407,6 +1433,11 @@ codeunit 5812 "Calculate Standard Cost"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcItemsOnBeforeProcessItems(var Item2: Record Item; var NewTempItem: Record Item; var IsHandled: Boolean)
+    begin
+    end;
+
     internal procedure RunOnBeforeCalcItem(var Item: Record Item; UseAssemblyList: Boolean; var IsHandled: Boolean)
     begin
         OnBeforeCalcItem(Item, UseAssemblyList, IsHandled);
@@ -1423,7 +1454,7 @@ codeunit 5812 "Calculate Standard Cost"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnBeforeCalcRtngLineCost(var RoutingLine: Record "Routing Line"; MfgItemQtyBase: Decimal)
+    local procedure OnBeforeCalcRtngLineCost(var RoutingLine: Record "Routing Line"; MfgItemQtyBase: Decimal; var ParentItem: Record Item)
     begin
     end;
 
@@ -1468,12 +1499,15 @@ codeunit 5812 "Calculate Standard Cost"
     end;
 
     internal procedure RunOnCalcAssemblyItemOnAfterCalcItemCost(var Item: Record Item; CompItem: Record Item; BOMComponent: Record "BOM Component"; ComponentQuantity: Decimal)
+    var
+        DummyLevel: Integer;
+        DummyCalcMfgItems: Boolean;
     begin
-        OnCalcAssemblyItemOnAfterCalcItemCost(Item, CompItem, BOMComponent, ComponentQuantity);
+        OnCalcAssemblyItemOnAfterCalcItemCost(Item, CompItem, BOMComponent, ComponentQuantity, DummyLevel, DummyCalcMfgItems);
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnCalcAssemblyItemOnAfterCalcItemCost(var Item: Record Item; CompItem: Record Item; BOMComponent: Record "BOM Component"; ComponentQuantity: Decimal)
+    local procedure OnCalcAssemblyItemOnAfterCalcItemCost(var Item: Record Item; CompItem: Record Item; BOMComponent: Record "BOM Component"; var ComponentQuantity: Decimal; var Level: Integer; var CalcMfgItems: Boolean)
     begin
     end;
 
@@ -1494,6 +1528,11 @@ codeunit 5812 "Calculate Standard Cost"
 
     [IntegrationEvent(false, false)]
     local procedure OnCalcMfgItemOnBeforeCalculateCosts(var SLMat: Decimal; var SLCap: Decimal; var SLSub: Decimal; var SLCapOvhd: Decimal; var SLMfgOvhd: Decimal; var Item: Record Item; LotSize: Decimal; MfgItemQtyBase: Decimal; Level: Integer; CalculationDate: Date; var RUMat: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcMfgItemOnAfterCalculateCosts(SingleLevelMaterial: Decimal; SingleLevelCapacity: Decimal; SingleLevelSubcontracted: Decimal; SingleLevelCapacityOverhead: Decimal; SingleLevelMfgOverhead: Decimal; var Item: Record Item; LotSize: Decimal; MfgItemQtyBase: Decimal; Level: Integer; CalculationDate: Date; RolledUpMaterial: Decimal)
     begin
     end;
 
@@ -1588,6 +1627,21 @@ codeunit 5812 "Calculate Standard Cost"
     begin
     end;
 
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcRtngLineCostOnBeforeCalcRoutingCostPerUnit(var RoutingLine: Record "Routing Line"; MfgItemQtyBase: Decimal; var WorkCenter: Record "Work Center"; var DirUnitCost: Decimal; var IndirCostPct: Decimal; var OvhdRate: Decimal; var UnitCost: Decimal; var UnitCostCalculation: Enum "Unit Cost Calculation Type"; var ParentItem: Record Item; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcItemOnAfterCalculateCosts(var Item: Record Item)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCalcProdBOMCostOnBeforeNextLineIteration(var ProductionBOMLine: Record "Production BOM Line"; PBOMVersionCode: Code[20]; Level: Integer; CompItemQtyBase: Decimal; CompItem: Record Item; SLMat: Decimal)
+    begin
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"Standard Cost Worksheet", 'OnAfterValidateEvent', 'No.', true, true)]
     local procedure OnValidateNoByType(var Rec: Record "Standard Cost Worksheet")
     var
@@ -1613,4 +1667,3 @@ codeunit 5812 "Calculate Standard Cost"
         end;
     end;
 }
-

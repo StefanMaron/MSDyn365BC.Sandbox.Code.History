@@ -12,6 +12,7 @@ using Microsoft.Finance.Deferral;
 using Microsoft.Finance.Dimension;
 using Microsoft.Finance.GeneralLedger.Account;
 using Microsoft.Finance.GeneralLedger.Setup;
+using Microsoft.Finance.SpendRequest;
 using Microsoft.Finance.VAT.Reporting;
 using Microsoft.Finance.VAT.Setup;
 using Microsoft.FixedAssets.Journal;
@@ -26,6 +27,7 @@ using Microsoft.Purchases.Payables;
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Customer;
 using Microsoft.Sales.Receivables;
+using System.Environment.Configuration;
 using System.Security.User;
 using System.Utilities;
 
@@ -42,6 +44,8 @@ codeunit 11 "Gen. Jnl.-Check Line"
 {
     Permissions = tabledata "General Posting Setup" = rimd,
                   tabledata "Cost Accounting Setup" = R,
+                  tabledata "G/L Account" = r,
+                  tabledata "Spend Request" = r,
                   tabledata "Payment Terms" = R;
     TableNo = "Gen. Journal Line";
 
@@ -98,6 +102,7 @@ codeunit 11 "Gen. Jnl.-Check Line"
         GLAccSourceCurrencyDoesNotAllowedErr: Label 'The currency code %1 on general journal line does not allowed for posting to G/L account %2.', Comment = '%1 - currency code, %2 - G/L Account No.';
         Text12001: Label 'must not be prior to %1';
         Text12000: Label 'The error is in line no. %1.';
+        SpendRequestIsDepletedMsg: Label 'Spend request %1 was approved for %2 and current allocation is %3.', Comment = '%1 is a document no., %2 and %3 are amounts in local currency.';
 
     /// <summary>
     /// Performs comprehensive validation checks on a general journal line before posting.
@@ -226,6 +231,8 @@ codeunit 11 "Gen. Jnl.-Check Line"
 
         ValidateIncludeInVATReport(GenJnlLine);
 
+        TestSpendRequest(GenJnlLine);
+
         OnAfterCheckGenJnlLine(GenJnlLine, ErrorMessageMgt);
 
         if LogErrorMode then
@@ -285,6 +292,36 @@ codeunit 11 "Gen. Jnl.-Check Line"
 
         if GenJnlLine."Applies-to Doc. No." <> '' then
             GenJnlLine.TestField("Applies-to ID", '', ErrorInfo.Create());
+    end;
+
+    local procedure TestSpendRequest(var GenJnlLine: Record "Gen. Journal Line")
+    var
+        SpendRequest: Record "Spend Request";
+        GLAccount: Record "G/L Account";
+        NotificationLifecycleMgt: Codeunit "Notification Lifecycle Mgt.";
+        OverspendNotification: Notification;
+    begin
+        if GenJnlLine."Spend Request No." = '' then begin
+            if (GenJnlLine."Account Type" = GenJnlLine."Account Type"::"G/L Account") and (GenJnlLine."Account No." <> '') then
+                if GLAccount.Get(GenJnlLine."Account No.") then
+                    if GLAccount."Spend Request Required" = GLAccount."Spend Request Required"::Required then
+                        GenJnlLine.TestField("Spend Request No.");
+            if (GenJnlLine."Bal. Account Type" = GenJnlLine."Bal. Account Type"::"G/L Account") and (GenJnlLine."Bal. Account No." <> '') then
+                if GLAccount.Get(GenJnlLine."Bal. Account No.") then
+                    if GLAccount."Spend Request Required" = GLAccount."Spend Request Required"::Required then
+                        GenJnlLine.TestField("Spend Request No.");
+        end else begin
+            SpendRequest.SetAutoCalcFields("Total Spent Amount (LCY)");
+            SpendRequest.Get(GenJnlLine."Spend Request No.");
+            // This spend request may have been closed in a prior entry in this transaction
+            if not ((SpendRequest.Status = SpendRequest.Status::Closed) and (SpendRequest."Closed By Document No." = GenJnlLine."Document No.")) then
+                SpendRequest.TestField(Status, SpendRequest.Status::Approved);
+            if Abs(GenJnlLine."Amount (LCY)") > SpendRequest."Total Expected Amount (LCY)" - SpendRequest."Total Spent Amount (LCY)" then begin
+                OverspendNotification.Scope := OverspendNotification.Scope::LocalScope;
+                OverspendNotification.Message := StrSubstNo(SpendRequestIsDepletedMsg, SpendRequest."No.", SpendRequest."Total Expected Amount (LCY)", SpendRequest."Total Spent Amount (LCY)");
+                NotificationLifecycleMgt.SendNotification(OverspendNotification, GenJnlLine.RecordId);
+            end;
+        end;
     end;
 
     /// <summary>
@@ -489,6 +526,7 @@ codeunit 11 "Gen. Jnl.-Check Line"
         DateCheckDone: Boolean;
         IsHandled: Boolean;
     begin
+        OnBeforeCheckDates(GenJnlLine);
         GenJnlLine.TestField("Posting Date", ErrorInfo.Create());
         if GenJnlLine."Posting Date" <> NormalDate(GenJnlLine."Posting Date") then begin
             if (GenJnlLine."Account Type" <> GenJnlLine."Account Type"::"G/L Account") or
@@ -1166,13 +1204,13 @@ codeunit 11 "Gen. Jnl.-Check Line"
 
         if (GenJnlLine."Currency Code" <> '') and (GenJnlLine."Currency Code" <> GLSetup."LCY Code") then begin
             CheckAccountCurrencyCode(
-                GenJnlLine."Account No.", GenJnlLine."Account Type", GenJnlLine."Currency Code", ACYOnlyPosting);
+                GenJnlLine, GenJnlLine."Account No.", GenJnlLine."Account Type", GenJnlLine."Currency Code", ACYOnlyPosting);
             CheckAccountCurrencyCode(
-                GenJnlLine."Bal. Account No.", GenJnlLine."Bal. Account Type", GenJnlLine."Currency Code", ACYOnlyPosting);
+                GenJnlLine, GenJnlLine."Bal. Account No.", GenJnlLine."Bal. Account Type", GenJnlLine."Currency Code", ACYOnlyPosting);
         end;
     end;
 
-    local procedure CheckAccountCurrencyCode(AccountNo: Code[20]; AccountType: Enum "Gen. Journal Account Type"; CurrencyCode: Code[10]; ACYOnly: Boolean)
+    local procedure CheckAccountCurrencyCode(GenJnlLine: Record "Gen. Journal Line"; AccountNo: Code[20]; AccountType: Enum "Gen. Journal Account Type"; CurrencyCode: Code[10]; ACYOnly: Boolean)
     var
         GLAccount: Record "G/L Account";
         BankAccount: Record "Bank Account";
@@ -1195,6 +1233,8 @@ codeunit 11 "Gen. Jnl.-Check Line"
                 begin
                     Customer.Get(AccountNo);
                     CustomerPostingGroup.Get(Customer."Customer Posting Group");
+                    if CustomerPostingGroup."Receivables Account" = '' then
+                        CustomerPostingGroup.Get(GenJnlLine."Posting Group");
                     GLAccount.Get(CustomerPostingGroup."Receivables Account");
                     CheckGLAccountSourceCurrency(GLAccount, CurrencyCode);
                 end;
@@ -1202,6 +1242,8 @@ codeunit 11 "Gen. Jnl.-Check Line"
                 begin
                     Vendor.Get(AccountNo);
                     VendorPostingGroup.Get(Vendor."Vendor Posting Group");
+                    if VendorPostingGroup."Payables Account" = '' then
+                        VendorPostingGroup.Get(GenJnlLine."Posting Group");
                     GLAccount.Get(VendorPostingGroup."Payables Account");
                     CheckGLAccountSourceCurrency(GLAccount, CurrencyCode);
                 end;
@@ -1209,6 +1251,8 @@ codeunit 11 "Gen. Jnl.-Check Line"
                 begin
                     BankAccount.Get(AccountNo);
                     BankAccountPostingGroup.Get(BankAccount."Bank Acc. Posting Group");
+                    if BankAccountPostingGroup."G/L Account No." = '' then
+                        BankAccountPostingGroup.Get(GenJnlLine."Posting Group");
                     GLAccount.Get(BankAccountPostingGroup."G/L Account No.");
                     CheckGLAccountSourceCurrency(GLAccount, CurrencyCode);
                 end;
@@ -1603,6 +1647,16 @@ codeunit 11 "Gen. Jnl.-Check Line"
     /// <param name="IsHandled">Set to true to skip standard fiscal year validation logic.</param>
     [IntegrationEvent(true, false)]
     local procedure OnBeforeCheckPostingDateInFiscalYear(GenJournalLine: Record "Gen. Journal Line"; var IsHandled: Boolean)
+    begin
+    end;
+
+    /// <summary>
+    /// Integration event raised at the beginning of the CheckDates procedure before any date validation is performed.
+    /// Enables custom validation logic on journal line fields as part of the initial validation phase.
+    /// </summary>
+    /// <param name="GenJnlLine">Journal line record being validated.</param>
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCheckDates(var GenJnlLine: Record "Gen. Journal Line")
     begin
     end;
 

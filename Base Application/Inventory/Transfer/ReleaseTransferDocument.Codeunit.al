@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -6,7 +6,9 @@ namespace Microsoft.Inventory.Transfer;
 
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Setup;
-
+#if not CLEAN28
+using Microsoft.Manufacturing.Setup;
+#endif
 codeunit 5708 "Release Transfer Document"
 {
     TableNo = "Transfer Header";
@@ -45,10 +47,8 @@ codeunit 5708 "Release Transfer Document"
             if not TransferHeader."Direct Transfer" then
                 TransferHeader.TestField("In-Transit Code")
             else
-                if InvtSetup."Direct Transfer Posting" = InvtSetup."Direct Transfer Posting"::"Receipt and Shipment" then begin
-                    TransferHeader.VerifyNoOutboundWhseHandlingOnLocation(TransferHeader."Transfer-from Code");
+                if TransferHeader."Direct Transfer Posting" = TransferHeader."Direct Transfer Posting"::"Shipment and Receipt" then
                     TransferHeader.VerifyNoInboundWhseHandlingOnLocation(TransferHeader."Transfer-to Code");
-                end;
 
         TransferHeader.TestField(Status, TransferHeader.Status::Open);
 
@@ -64,7 +64,7 @@ codeunit 5708 "Release Transfer Document"
 
         if not (
             TransferHeader."Direct Transfer" and
-            (InvtSetup."Direct Transfer Posting" = InvtSetup."Direct Transfer Posting"::"Direct Transfer"))
+            (InvtSetup."Direct Transfer Posting Type" = InvtSetup."Direct Transfer Posting Type"::"Direct Transfer"))
         then
             WhseTransferRelease.SetCallFromTransferOrder(true);
 
@@ -112,6 +112,9 @@ codeunit 5708 "Release Transfer Document"
     local procedure CheckTransLines(var TransLine: Record "Transfer Line"; TransHeader: Record "Transfer Header")
     var
         Item: Record Item;
+#if not CLEAN28
+        LegacySubcFeatureHandler: Codeunit "Legacy Subc. Feature Handler";
+#endif
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -119,22 +122,32 @@ codeunit 5708 "Release Transfer Document"
         if IsHandled then
             exit;
 
-        TransLine.SetLoadFields("Document No.", Quantity, "WIP Quantity", "Item No.", "Variant Code");
+        TransLine.SetLoadFields("Document No.", Quantity,
+#if not CLEAN28
+            "WIP Quantity",
+#endif
+            "Item No.", "Variant Code");
         TransLine.SetRange("Document No.", TransHeader."No.");
         TransLine.SetFilter(Quantity, '<>0');
-        TransHeader.CalcFields("Subcontracting Order");
-        case TransHeader."Subcontracting Order" of
-            true:
-                if not TransLine.FindFirst() then begin
-                    TransLine.SetRange(Quantity);
-                    TransLine.SetFilter("WIP Quantity", '<>0');
+#if not CLEAN28
+        if LegacySubcFeatureHandler.IsLegacySubcontractingEnabled() then begin
+            TransHeader.CalcFields("Subcontracting Order");
+            case TransHeader."Subcontracting Order" of
+                true:
+                    if not TransLine.FindFirst() then begin
+                        TransLine.SetRange(Quantity);
+                        TransLine.SetFilter("WIP Quantity", '<>0');
+                        if TransLine.IsEmpty() then
+                            Error(NothingToReleaseErr, TransHeader."No.");
+                    end;
+                false:
                     if TransLine.IsEmpty() then
                         Error(NothingToReleaseErr, TransHeader."No.");
-                end;
-            false:
-        if TransLine.IsEmpty() then
-            Error(NothingToReleaseErr, TransHeader."No.");
-        end;
+            end;
+        end else
+#endif
+            if TransLine.IsEmpty() then
+                Error(NothingToReleaseErr, TransHeader."No.");
 
         TransLine.SetFilter("Item No.", '<>%1', '');
         if TransLine.FindSet() then

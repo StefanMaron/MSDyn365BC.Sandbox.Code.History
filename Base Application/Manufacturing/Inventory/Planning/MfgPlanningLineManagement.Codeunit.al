@@ -107,10 +107,11 @@ codeunit 99000819 "Mfg. Planning Line Management"
 
     local procedure TransferRoutingLine(var PlanningRoutingLine: Record "Planning Routing Line"; ReqLine: Record "Requisition Line"; RoutingLine: Record "Routing Line")
     var
-#if not CLEAN27
+#if not CLEAN28
         WorkCenter: Record Microsoft.Manufacturing.WorkCenter."Work Center";
         SubcontractorPrices: Record "Subcontractor Prices";
         SubcontractingPricesMgt: Codeunit SubcontractingPricesMgt;
+        LegacySubcFeatureHandler: Codeunit "Legacy Subc. Feature Handler";
 #endif
         IsHandled: Boolean;
     begin
@@ -130,23 +131,25 @@ codeunit 99000819 "Mfg. Planning Line Management"
         PlanningLineManagement.RunOnTransferRoutingLineOnBeforeCalcRoutingCostPerUnit(PlanningRoutingLine, ReqLine, RoutingLine);
 #endif
 
-#if not CLEAN27
-        if RoutingLine.Type = RoutingLine.Type::"Work Center" then
+#if not CLEAN28
+        if LegacySubcFeatureHandler.IsLegacySubcontractingEnabled() and (RoutingLine.Type = RoutingLine.Type::"Work Center") then begin
             WorkCenter.Get(RoutingLine."Work Center No.");
-
-        if (RoutingLine.Type = RoutingLine.Type::"Work Center") and (WorkCenter."Subcontractor No." <> '') then begin
-            SubcontractorPrices."Vendor No." := WorkCenter."Subcontractor No.";
-            SubcontractorPrices."Item No." := ReqLine."No.";
-            SubcontractorPrices."Standard Task Code" := PlanningRoutingLine."Standard Task Code";
-            SubcontractorPrices."Work Center No." := WorkCenter."No.";
-            SubcontractorPrices."Variant Code" := ReqLine."Variant Code";
-            SubcontractorPrices."Unit of Measure Code" := ReqLine."Unit of Measure Code";
-            SubcontractorPrices."Start Date" := ReqLine."Order Date";
-            SubcontractorPrices."Currency Code" := '';
-            SubcontractingPricesMgt.GetRoutingPricelistCost(
-              SubcontractorPrices, WorkCenter,
-              PlanningRoutingLine."Direct Unit Cost", PlanningRoutingLine."Indirect Cost %", PlanningRoutingLine."Overhead Rate", PlanningRoutingLine."Unit Cost per", PlanningRoutingLine."Unit Cost Calculation",
-              ReqLine.Quantity, ReqLine."Qty. per Unit of Measure", ReqLine."Quantity (Base)");
+            if (WorkCenter."Subcontractor No." <> '') then begin
+                SubcontractorPrices."Vendor No." := WorkCenter."Subcontractor No.";
+                SubcontractorPrices."Item No." := ReqLine."No.";
+                SubcontractorPrices."Standard Task Code" := PlanningRoutingLine."Standard Task Code";
+                SubcontractorPrices."Work Center No." := WorkCenter."No.";
+                SubcontractorPrices."Variant Code" := ReqLine."Variant Code";
+                SubcontractorPrices."Unit of Measure Code" := ReqLine."Unit of Measure Code";
+                SubcontractorPrices."Start Date" := ReqLine."Order Date";
+                SubcontractorPrices."Currency Code" := '';
+                SubcontractingPricesMgt.GetRoutingPricelistCost(
+                  SubcontractorPrices, WorkCenter,
+                  PlanningRoutingLine."Direct Unit Cost", PlanningRoutingLine."Indirect Cost %", PlanningRoutingLine."Overhead Rate", PlanningRoutingLine."Unit Cost per", PlanningRoutingLine."Unit Cost Calculation",
+                  ReqLine.Quantity, ReqLine."Qty. per Unit of Measure", ReqLine."Quantity (Base)");
+            end else
+                MfgCostCalcMgt.CalcRoutingCostPerUnit(
+                PlanningRoutingLine.Type, PlanningRoutingLine."No.", PlanningRoutingLine."Direct Unit Cost", PlanningRoutingLine."Indirect Cost %", PlanningRoutingLine."Overhead Rate", PlanningRoutingLine."Unit Cost per", PlanningRoutingLine."Unit Cost Calculation");
         end else
 #endif
             MfgCostCalcMgt.CalcRoutingCostPerUnit(
@@ -349,6 +352,7 @@ codeunit 99000819 "Mfg. Planning Line Management"
         PlanningComponent."Worksheet Batch Name" := ReqLine."Journal Batch Name";
         PlanningComponent."Worksheet Line No." := ReqLine."Line No.";
         PlanningComponent."Line No." := NextPlanningCompLineNo;
+        OnCreatePlanningComponentFromProdBOMOnBeforeGetPlanningParameters(PlanningComponent, ReqLine, ProdBOMLine, CompSKU, LineQtyPerUOM, ItemQtyPerUOM, NextPlanningCompLineNo, SKU, Blocked);
         PlanningComponent.Validate("Item No.", ProdBOMLine."No.");
         PlanningComponent."Variant Code" := ProdBOMLine."Variant Code";
         PlanningComponent."Location Code" := SKU."Components at Location";
@@ -589,6 +593,11 @@ codeunit 99000819 "Mfg. Planning Line Management"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeInsertPlanningComponent(var ReqLine: Record "Requisition Line"; var ProductionBOMLine: Record "Production BOM Line"; var PlanningComponent: Record "Planning Component"; LineQtyPerUOM: Decimal; ItemQtyPerUOM: Decimal)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCreatePlanningComponentFromProdBOMOnBeforeGetPlanningParameters(var PlanningComponent: Record "Planning Component"; RequisitionLine: Record "Requisition Line"; ProductionBOMLine: Record "Production BOM Line"; CompStockkeepingUnit: Record "Stockkeeping Unit"; LineQtyPerUOM: Decimal; ItemQtyPerUOM: Decimal; var NextPlanningCompLineNo: Integer; StockkeepingUnit: Record "Stockkeeping Unit"; Blocked: Boolean)
     begin
     end;
 }

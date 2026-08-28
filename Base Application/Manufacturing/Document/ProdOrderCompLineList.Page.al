@@ -5,6 +5,7 @@
 namespace Microsoft.Manufacturing.Document;
 
 using Microsoft.Finance.Dimension;
+using Microsoft.Inventory.Ledger;
 
 page 5407 "Prod. Order Comp. Line List"
 {
@@ -143,10 +144,33 @@ page 5407 "Prod. Order Comp. Line List"
                     AutoFormatType = 0;
                     ApplicationArea = Manufacturing;
                 }
-#if not CLEAN27
-                field("Qty. on Transfer Order (Base)"; Rec."Qty. on Transfer Order (Base)")
+                field("Act. Consumption (Qty)"; ActConsumptionQtyValue)
                 {
                     ApplicationArea = Manufacturing;
+                    AutoFormatType = 0;
+                    Caption = 'Consumed Quantity (Base)';
+                    ToolTip = 'Specifies the quantity of the component that has been posted as consumed by the production order.';
+                    DecimalPlaces = 0 : 5;
+
+                    trigger OnDrillDown()
+                    var
+                        ItemLedgerEntry: Record "Item Ledger Entry";
+                    begin
+                        if not (Rec.Status in [Rec.Status::Released, Rec.Status::Finished]) then
+                            exit;
+                        ItemLedgerEntry.SetCurrentKey("Order Type", "Order No.", "Order Line No.", "Entry Type", "Prod. Order Comp. Line No.");
+                        ItemLedgerEntry.SetRange("Order Type", ItemLedgerEntry."Order Type"::Production);
+                        ItemLedgerEntry.SetRange("Order No.", Rec."Prod. Order No.");
+                        ItemLedgerEntry.SetRange("Order Line No.", Rec."Prod. Order Line No.");
+                        ItemLedgerEntry.SetRange("Entry Type", ItemLedgerEntry."Entry Type"::Consumption);
+                        ItemLedgerEntry.SetRange("Prod. Order Comp. Line No.", Rec."Line No.");
+                        Page.Run(0, ItemLedgerEntry);
+                    end;
+                }
+#if not CLEAN28
+                field("Qty. on Transfer Order (Base)"; Rec."Qty. on Transfer Order (Base)")
+                {
+                    ApplicationArea = LegacySubcontracting;
                     ToolTip = 'Specifies the item amount that is on the transfer order.';
                     ObsoleteReason = 'Preparation for replacement by Subcontracting app';
                     ObsoleteState = Pending;
@@ -154,7 +178,7 @@ page 5407 "Prod. Order Comp. Line List"
                 }
                 field("Qty. in Transit (Base)"; Rec."Qty. in Transit (Base)")
                 {
-                    ApplicationArea = Manufacturing;
+                    ApplicationArea = LegacySubcontracting;
                     ToolTip = 'Specifies the items that are in transit.';
                     ObsoleteReason = 'Preparation for replacement by Subcontracting app';
                     ObsoleteState = Pending;
@@ -162,7 +186,7 @@ page 5407 "Prod. Order Comp. Line List"
                 }
                 field("Qty. transf. to Subcontractor"; Rec."Qty. transf. to Subcontractor")
                 {
-                    ApplicationArea = Manufacturing;
+                    ApplicationArea = LegacySubcontracting;
                     ToolTip = 'Specifies the item amount that will be transferred to the subcontractor.';
                     ObsoleteReason = 'Preparation for replacement by Subcontracting app';
                     ObsoleteState = Pending;
@@ -207,7 +231,8 @@ page 5407 "Prod. Order Comp. Line List"
                     ApplicationArea = Manufacturing;
                     Visible = false;
                 }
-            }
+
+             }
         }
         area(factboxes)
         {
@@ -252,6 +277,11 @@ page 5407 "Prod. Order Comp. Line List"
     trigger OnAfterGetRecord()
     begin
         Rec.ShowShortcutDimCode(ShortcutDimCode);
+        if Rec.Status in [Rec.Status::Released, Rec.Status::Finished] then begin
+            Rec.CalcFields("Act. Consumption (Qty)");
+            ActConsumptionQtyValue := Rec."Act. Consumption (Qty)";
+        end else
+            ActConsumptionQtyValue := 0;
     end;
 
     trigger OnNewRecord(BelowxRec: Boolean)
@@ -261,5 +291,6 @@ page 5407 "Prod. Order Comp. Line List"
 
     protected var
         ShortcutDimCode: array[8] of Code[20];
+        ActConsumptionQtyValue: Decimal;
 }
 

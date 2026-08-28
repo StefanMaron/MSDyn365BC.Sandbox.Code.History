@@ -18,7 +18,8 @@ codeunit 1325 "Cancel PstdPurchInv (Yes/No)"
     end;
 
     var
-        CancelPostedInvoiceQst: Label 'This invoice was posted from a purchase order. To cancel it, a purchase credit memo will be created and posted. The quantities from the original purchase order will be restored, provided the purchase order still exists.\ \Do you want to continue?';
+        CancelPostedInvoiceFromOrderQst: Label 'This invoice was posted from a purchase order. To cancel it, a purchase credit memo will be created and posted. The quantities from the original purchase order will be restored, provided the purchase order still exists.\ \Do you want to continue?';
+        CancelPostedInvoiceQst: Label 'The posted purchase invoice will be canceled, and a purchase credit memo will be created and posted.\ \Do you want to continue?';
         OpenPostedCreditMemoQst: Label 'A credit memo was successfully created. Do you want to open the posted credit memo?';
 
     procedure CancelInvoice(var PurchInvHeader: Record "Purch. Inv. Header"): Boolean
@@ -28,8 +29,11 @@ codeunit 1325 "Cancel PstdPurchInv (Yes/No)"
         CorrectPostedPurchInvoice: Codeunit "Correct Posted Purch. Invoice";
         IsHandled: Boolean;
     begin
-        CorrectPostedPurchInvoice.TestCorrectInvoiceIsAllowed(PurchInvHeader, true);
-        if Confirm(CancelPostedInvoiceQst) then
+        IsHandled := false;
+        OnCancelInvoiceOnBeforeTestCorrectInvoiceIsAllowed(PurchInvHeader, IsHandled);
+        if not IsHandled then
+            CorrectPostedPurchInvoice.TestCorrectInvoiceIsAllowed(PurchInvHeader, true);
+        if Confirm(GetCancelPostedInvoiceQst(PurchInvHeader)) then
             if CorrectPostedPurchInvoice.CancelPostedInvoice(PurchInvHeader) then
                 if Confirm(OpenPostedCreditMemoQst) then begin
                     CancelledDocument.FindPurchCancelledInvoice(PurchInvHeader."No.");
@@ -44,8 +48,20 @@ codeunit 1325 "Cancel PstdPurchInv (Yes/No)"
         exit(false);
     end;
 
+    local procedure GetCancelPostedInvoiceQst(PurchInvHeader: Record "Purch. Inv. Header"): Text
+    begin
+        if PurchInvHeader."Order No." <> '' then
+            exit(CancelPostedInvoiceFromOrderQst);
+        exit(CancelPostedInvoiceQst);
+    end;
+
     [IntegrationEvent(false, false)]
     local procedure OnBeforeShowPostedPurchaseCreditMemo(var PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr."; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnCancelInvoiceOnBeforeTestCorrectInvoiceIsAllowed(var PurchInvHeader: Record "Purch. Inv. Header"; var IsHandled: Boolean)
     begin
     end;
 }

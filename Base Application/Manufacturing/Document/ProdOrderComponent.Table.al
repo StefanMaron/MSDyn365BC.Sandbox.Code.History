@@ -17,7 +17,7 @@ using Microsoft.Inventory.Ledger;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Planning;
 using Microsoft.Inventory.Tracking;
-#if not CLEAN27
+#if not CLEAN28
 using Microsoft.Inventory.Transfer;
 #endif
 using Microsoft.Manufacturing.Capacity;
@@ -25,7 +25,7 @@ using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.Setup;
 using Microsoft.Purchases.Document;
-#if not CLEAN27
+#if not CLEAN28
 using Microsoft.Purchases.Vendor;
 #endif
 using Microsoft.Warehouse.Activity;
@@ -178,16 +178,20 @@ table 5407 "Prod. Order Component"
             var
                 ProdOrderLine: Record "Prod. Order Line";
                 ProdOrderRoutingLine: Record "Prod. Order Routing Line";
-#if not CLEAN27
+#if not CLEAN28
                 Vendor: Record Vendor;
                 SKU: Record "Stockkeeping Unit";
                 GetPlanningParameters: Codeunit "Planning-Get Parameters";
                 SubcontractingManagement: Codeunit SubcontractingManagement;
+                LegacySubcFeatureHandler: Codeunit "Legacy Subc. Feature Handler";
                 ShouldUpdateLocation: Boolean;
 #endif
                 IsHandled: Boolean;
             begin
                 UpdateExpectedQuantity();
+
+                if IsTemporary() then
+                    exit;
 
                 ProdOrderLine.Get(Status, "Prod. Order No.", "Prod. Order Line No.");
 
@@ -205,30 +209,32 @@ table 5407 "Prod. Order Component"
                         if ProdOrderRoutingLine.FindFirst() then begin
                             "Due Date" := ProdOrderRoutingLine."Starting Date";
                             "Due Time" := ProdOrderRoutingLine."Starting Time";
-#if not CLEAN27
-                            if SubcontractorPrices.ReadPermission then
-                                if (ProdOrderRoutingLine.Type = ProdOrderRoutingLine.Type::"Work Center") then
-                                    if SubcontractingManagement.GetSubcontractor(ProdOrderRoutingLine."No.", Vendor) then begin
-                                        IsHandled := false;
-                                        OnValidateRoutingLinkCodeOnBeforeSubcontractorProcurementCheck(Rec, Vendor, IsHandled);
-                                        if not IsHandled then
-                                            if Vendor."Subcontractor Procurement" then
-                                                Validate("Location Code", Vendor."Subcontracting Location Code");
-                                    end;
+#if not CLEAN28
+                            if LegacySubcFeatureHandler.IsLegacySubcontractingEnabled() then
+                                if SubcontractorPrices.ReadPermission then
+                                    if (ProdOrderRoutingLine.Type = ProdOrderRoutingLine.Type::"Work Center") then
+                                        if SubcontractingManagement.GetSubcontractor(ProdOrderRoutingLine."No.", Vendor) then begin
+                                            IsHandled := false;
+                                            OnValidateRoutingLinkCodeOnBeforeSubcontractorProcurementCheck(Rec, Vendor, IsHandled);
+                                            if not IsHandled then
+                                                if Vendor."Subcontractor Procurement" then
+                                                    Validate("Location Code", Vendor."Subcontracting Location Code");
+                                        end;
                         end;
-                    end else begin
-                        ShouldUpdateLocation := xRec."Routing Link Code" <> '';
-                        OnValidateRoutingLinkCodeOnAfterShouldUpdateLocation(Rec, GetPlanningParameters, SKU, ProdOrderLine, ShouldUpdateLocation);
-                        if ShouldUpdateLocation then begin
-                            GetPlanningParameters.AtSKU(
-                            SKU,
-                            ProdOrderLine."Item No.",
-                            ProdOrderLine."Variant Code",
-                            ProdOrderLine."Location Code");
-                            Validate("Location Code", SKU."Components at Location");
+                    end else
+                        if LegacySubcFeatureHandler.IsLegacySubcontractingEnabled() then begin
+                            ShouldUpdateLocation := xRec."Routing Link Code" <> '';
+                            OnValidateRoutingLinkCodeOnAfterShouldUpdateLocation(Rec, GetPlanningParameters, SKU, ProdOrderLine, ShouldUpdateLocation);
+                            if ShouldUpdateLocation then begin
+                                GetPlanningParameters.AtSKU(
+                                SKU,
+                                ProdOrderLine."Item No.",
+                                ProdOrderLine."Variant Code",
+                                ProdOrderLine."Location Code");
+                                Validate("Location Code", SKU."Components at Location");
 #endif
+                            end;
                         end;
-                    end;
                 end;
                 if Format("Lead-Time Offset") <> '' then begin
                     "Due Date" :=
@@ -385,6 +391,7 @@ table 5407 "Prod. Order Component"
                                                                    "Order Line No." = field("Prod. Order Line No."),
                                                                    "Prod. Order Comp. Line No." = field("Line No.")));
             Caption = 'Act. Consumption (Qty)';
+            ToolTip = 'Specifies the quantity of the component that has been posted as consumed by the production order.';
             DecimalPlaces = 0 : 5;
             Editable = false;
             FieldClass = FlowField;
@@ -398,9 +405,6 @@ table 5407 "Prod. Order Component"
             var
                 ItemLedgEntry: Record "Item Ledger Entry";
                 PickWhseWorksheetLine: Record "Whse. Worksheet Line";
-#if not CLEAN26
-                ManufacturingSetup: Record "Manufacturing Setup";
-#endif
                 PickQtyCheckNeeded, WhseWorksheetLineExistCheckNeeded : Boolean;
             begin
                 if ("Flushing Method" = "Flushing Method"::Backward) and (Status = Status::Released) then begin
@@ -415,31 +419,16 @@ table 5407 "Prod. Order Component"
                         Error(Text99000002, "Flushing Method", ItemLedgEntry.TableCaption());
                 end;
 
-#if not CLEAN26
-                if not ManufacturingSetup.IsFeatureKeyFlushingMethodManualWithoutPickEnabled() then begin
-                    PickQtyCheckNeeded :=
-                        ("Flushing Method" <> xRec."Flushing Method") and
-                        (xRec."Flushing Method" in
-                            [xRec."Flushing Method"::Manual, xRec."Flushing Method"::"Pick + Manual", xRec."Flushing Method"::"Pick + Forward", xRec."Flushing Method"::"Pick + Backward"]);
-                    WhseWorksheetLineExistCheckNeeded :=
-                        (xRec."Flushing Method" in
-                            [xRec."Flushing Method"::Manual, xRec."Flushing Method"::"Pick + Manual", xRec."Flushing Method"::"Pick + Forward", xRec."Flushing Method"::"Pick + Backward"]) and
-                        ("Flushing Method" in
-                            ["Flushing Method"::Forward, "Flushing Method"::Backward]);
-                end else begin
-#endif
-                    PickQtyCheckNeeded :=
-                        ("Flushing Method" <> xRec."Flushing Method") and
-                        (xRec."Flushing Method" in
-                            [xRec."Flushing Method"::"Pick + Manual", xRec."Flushing Method"::"Pick + Forward", xRec."Flushing Method"::"Pick + Backward"]);
-                    WhseWorksheetLineExistCheckNeeded :=
-                        (xRec."Flushing Method" in
-                            [xRec."Flushing Method"::"Pick + Manual", xRec."Flushing Method"::"Pick + Forward", xRec."Flushing Method"::"Pick + Backward"]) and
-                        ("Flushing Method" in
-                            ["Flushing Method"::Manual, "Flushing Method"::Forward, "Flushing Method"::Backward]);
-#if not CLEAN26
-                end;
-#endif
+                PickQtyCheckNeeded :=
+                    ("Flushing Method" <> xRec."Flushing Method") and
+                    (xRec."Flushing Method" in
+                        [xRec."Flushing Method"::"Pick + Manual", xRec."Flushing Method"::"Pick + Forward", xRec."Flushing Method"::"Pick + Backward"]);
+                WhseWorksheetLineExistCheckNeeded :=
+                    (xRec."Flushing Method" in
+                        [xRec."Flushing Method"::"Pick + Manual", xRec."Flushing Method"::"Pick + Forward", xRec."Flushing Method"::"Pick + Backward"]) and
+                    ("Flushing Method" in
+                        ["Flushing Method"::Manual, "Flushing Method"::Forward, "Flushing Method"::Backward]);
+
                 if PickQtyCheckNeeded then begin
                     CalcFields("Pick Qty.");
                     if "Pick Qty." <> 0 then
@@ -647,7 +636,7 @@ table 5407 "Prod. Order Component"
 
                 CalculateQuantity(Quantity);
                 if "Qty. Rounding Precision" < 1 then
-                    Quantity := UOMMgt.RoundAndValidateQty(Quantity, "Qty. Rounding Precision", FieldCaption(Quantity))
+                    Quantity := UOMMgt.RoundQty(Quantity, "Qty. Rounding Precision")
                 else
                     Quantity := UOMMgt.RoundToItemRndPrecision(Quantity, "Qty. Rounding Precision");
 
@@ -686,18 +675,23 @@ table 5407 "Prod. Order Component"
             DecimalPlaces = 2 : 5;
 
             trigger OnValidate()
+            var
+                IsHandled: Boolean;
             begin
                 TestField("Item No.");
 
                 Item.Get("Item No.");
                 GetGLSetup();
-                if Item."Costing Method" = Item."Costing Method"::Standard then begin
-                    if CurrFieldNo = FieldNo("Unit Cost") then
-                        Error(
-                          Text99000003,
-                          FieldCaption("Unit Cost"), Item.FieldCaption("Costing Method"), Item."Costing Method");
-                    UpdateUnitCost();
-                end;
+                IsHandled := false;
+                OnValidateUnitCostOnBeforeCheckCostingMethod(Rec, IsHandled);
+                if not IsHandled then
+                    if Item."Costing Method" = Item."Costing Method"::Standard then begin
+                        if CurrFieldNo = FieldNo("Unit Cost") then
+                            Error(
+                              Text99000003,
+                              FieldCaption("Unit Cost"), Item.FieldCaption("Costing Method"), Item."Costing Method");
+                        UpdateUnitCost();
+                    end;
                 Validate("Calculation Formula");
             end;
         }
@@ -948,8 +942,8 @@ table 5407 "Prod. Order Component"
             Editable = false;
             FieldClass = FlowField;
         }
-#if not CLEANSCHEMA30
-#if not CLEAN27
+#if not CLEANSCHEMA31
+#if not CLEAN28
         field(12180; "Qty. transf. to Subcontractor"; Decimal)
         {
             AutoFormatType = 0;
@@ -1009,12 +1003,12 @@ table 5407 "Prod. Order Component"
             TableRelation = "Purchase Header"."No." where("Document Type" = const(Order),
                                                            "Subcontracting Order" = const(true));
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
             ObsoleteTag = '27.0';
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
         field(12185; "Original Location"; Code[10])
@@ -1022,12 +1016,12 @@ table 5407 "Prod. Order Component"
             Caption = 'Original Location';
             TableRelation = Location;
             ObsoleteReason = 'Preparation for replacement by Subcontracting app';
-#if not CLEAN27
+#if not CLEAN28
             ObsoleteState = Pending;
             ObsoleteTag = '27.0';
 #else
             ObsoleteState = Removed;
-            ObsoleteTag = '30.0';
+            ObsoleteTag = '31.0';
 #endif
         }
 #endif
@@ -1136,6 +1130,9 @@ table 5407 "Prod. Order Component"
         ItemLedgEntry: Record "Item Ledger Entry";
         ItemTrackingMgt: Codeunit "Item Tracking Management";
         NewQuantity: Decimal;
+#if not CLEAN28
+        LegacySubcFeatureHandler: Codeunit "Legacy Subc. Feature Handler";
+#endif
         IsHandled: Boolean;
     begin
         if Status = Status::Finished then
@@ -1150,11 +1147,13 @@ table 5407 "Prod. Order Component"
             if not ItemLedgEntry.IsEmpty() then
                 Error(Text99000000, "Item No.", "Line No.");
 
-#if not CLEAN27
-            CalcFields("Qty. transf. to Subcontractor", "Qty. on Transfer Order (Base)", "Qty. in Transit (Base)");
-            TestField("Qty. transf. to Subcontractor", 0);
-            TestField("Qty. in Transit (Base)", 0);
-            TestField("Qty. on Transfer Order (Base)", 0);
+#if not CLEAN28
+            if LegacySubcFeatureHandler.IsLegacySubcontractingEnabled() then begin
+                CalcFields("Qty. transf. to Subcontractor", "Qty. on Transfer Order (Base)", "Qty. in Transit (Base)");
+                TestField("Qty. transf. to Subcontractor", 0);
+                TestField("Qty. in Transit (Base)", 0);
+                TestField("Qty. on Transfer Order (Base)", 0);
+            end;
 #endif
             ConfirmDeletion();
         end;
@@ -1263,7 +1262,7 @@ table 5407 "Prod. Order Component"
         CountFromTotalLineLbl: Label '%1 of %2', Comment = '%1= Current line number, %2= Total line number';
         IgnoreErrors: Boolean;
         ErrorOccured: Boolean;
-#if not CLEAN27
+#if not CLEAN28
         SubcontractorPrices: Record "Subcontractor Prices";
 #endif
         WarningRaised: Boolean;
@@ -1295,8 +1294,14 @@ table 5407 "Prod. Order Component"
         ProdOrderLine: Record "Prod. Order Line";
         ProdOrderRtngLine: Record "Prod. Order Routing Line";
         NeededQty: Decimal;
+        IsHandled: Boolean;
     begin
-        ProdOrderLine.Get(Status, "Prod. Order No.", "Prod. Order Line No.");
+        OnBeforeGetProdOrderNeeds(Rec, ProdOrderLine, IsHandled);
+        if IsHandled then
+            exit;
+
+        if ProdOrderLine."Prod. Order No." = '' then
+            ProdOrderLine.Get(Status, "Prod. Order No.", "Prod. Order Line No.");
 
         if "Due Date" = 0D then begin
             "Due Date" := ProdOrderLine."Starting Date";
@@ -1372,6 +1377,11 @@ table 5407 "Prod. Order Component"
                     until CapLedgEntry.Next() = 0;
             end;
 
+            IsHandled := false;
+            OnGetNeededQtyOnBeforeCalcActNeededQtyBase(Rec, OutputQtyBase, NeededQty, IsHandled);
+            if IsHandled then
+                exit(NeededQty);
+
             CompQtyBase := MfgCostCalcMgt.CalcActNeededQtyBase(ProdOrderLine, Rec, OutputQtyBase);
             OnGetNeededQtyAfterCalcCompQtyBase(Rec, CompQtyBase, OutputQtyBase);
 
@@ -1380,8 +1390,14 @@ table 5407 "Prod. Order Component"
                 if Status in [Status::Released, Status::Finished] then
                     CalcFields("Act. Consumption (Qty)");
                 OnGetNeededQtyAfterCalcActConsumptionQty(Rec);
-                exit(NeededQty -
-                  UOMMgt.RoundToItemRndPrecision("Act. Consumption (Qty)" / "Qty. per Unit of Measure", RoundingPrecision));
+                NeededQty :=
+                  NeededQty -
+                  UOMMgt.RoundToItemRndPrecision("Act. Consumption (Qty)" / "Qty. per Unit of Measure", RoundingPrecision);
+                IsHandled := false;
+                OnGetNeededQtyOnBeforeExitWithPreviousPosting(Rec, CompQtyBase, NeededQty, IsHandled);
+                if IsHandled then
+                    exit(NeededQty);
+                exit(NeededQty);
             end;
             exit(NeededQty);
         end;
@@ -1531,9 +1547,11 @@ table 5407 "Prod. Order Component"
         ProdOrderLine: Record "Prod. Order Line";
         IsHandled: Boolean;
     begin
-        IsHandled := false;
         OnBeforeCreateDim(Rec, DefaultDimSource, CurrFieldNo, IsHandled);
         if IsHandled then
+            exit;
+
+        if IsTemporary() then
             exit;
 
         SourceCodeSetup.Get();
@@ -1546,7 +1564,7 @@ table 5407 "Prod. Order Component"
             "Shortcut Dimension 1 Code", "Shortcut Dimension 2 Code", ProdOrderLine."Dimension Set ID",
             Database::"Prod. Order Line");
 
-        OnAfterCreateDim(Rec, DefaultDimSource);
+        OnAfterCreateDim(Rec, DefaultDimSource, xRec);
     end;
 
     procedure IsInbound(): Boolean
@@ -1759,10 +1777,12 @@ table 5407 "Prod. Order Component"
     begin
         OnBeforeGetDefaultConsumptionBin(Rec, ProdOrderRtngLine, BinCode);
 
-        ProdOrderLine.Get(Status, "Prod. Order No.", "Prod. Order Line No.");
-        if "Location Code" = ProdOrderLine."Location Code" then
-            if FindFirstRtngLine(ProdOrderRtngLine, ProdOrderLine) then
-                BinCode := GetBinCodeFromRtngLine(ProdOrderRtngLine);
+        if not IsTemporary() then begin
+            ProdOrderLine.Get(Status, "Prod. Order No.", "Prod. Order Line No.");
+            if "Location Code" = ProdOrderLine."Location Code" then
+                if FindFirstRtngLine(ProdOrderRtngLine, ProdOrderLine) then
+                    BinCode := GetBinCodeFromRtngLine(ProdOrderRtngLine);
+        end;
 
         OnGetDefaultConsumptionBinOnAfterGetBinCodeFromRtngLine(Rec, ProdOrderRtngLine, BinCode);
         if BinCode <> '' then
@@ -1805,68 +1825,33 @@ table 5407 "Prod. Order Component"
     end;
 
     local procedure GetBinCodeFromRtngLine(ProdOrderRtngLine: Record "Prod. Order Routing Line") BinCode: Code[20]
-#if not CLEAN26
-    var
-        ManufacturingSetup: Record "Manufacturing Setup";
-#endif
     begin
-#if not CLEAN26
-        if not ManufacturingSetup.IsFeatureKeyFlushingMethodManualWithoutPickEnabled() then
-            case "Flushing Method" of
-                "Flushing Method"::Manual,
-                "Flushing Method"::"Pick + Manual",
-                "Flushing Method"::"Pick + Forward",
-                "Flushing Method"::"Pick + Backward":
-                    BinCode := ProdOrderRtngLine."To-Production Bin Code";
-                "Flushing Method"::Forward,
-                "Flushing Method"::Backward:
-                    BinCode := ProdOrderRtngLine."Open Shop Floor Bin Code";
-            end
-        else
-#endif
-            case "Flushing Method" of
-                "Flushing Method"::"Pick + Manual",
-                "Flushing Method"::"Pick + Forward",
-                "Flushing Method"::"Pick + Backward":
-                    BinCode := ProdOrderRtngLine."To-Production Bin Code";
-                "Flushing Method"::Manual,
-                "Flushing Method"::Forward,
-                "Flushing Method"::Backward:
-                    BinCode := ProdOrderRtngLine."Open Shop Floor Bin Code";
-            end;
+        case "Flushing Method" of
+            "Flushing Method"::"Pick + Manual",
+            "Flushing Method"::"Pick + Forward",
+            "Flushing Method"::"Pick + Backward":
+                BinCode := ProdOrderRtngLine."To-Production Bin Code";
+            "Flushing Method"::Manual,
+            "Flushing Method"::Forward,
+            "Flushing Method"::Backward:
+                BinCode := ProdOrderRtngLine."Open Shop Floor Bin Code";
+        end;
     end;
 
     local procedure GetBinCodeFromLocation(LocationCode: Code[10]) BinCode: Code[20]
-#if not CLEAN26
-    var
-        ManufacturingSetup: Record "Manufacturing Setup";
-#endif
     begin
         GetLocation(LocationCode);
-#if not CLEAN26
-        if not ManufacturingSetup.IsFeatureKeyFlushingMethodManualWithoutPickEnabled() then
-            case "Flushing Method" of
-                "Flushing Method"::Manual,
-                "Flushing Method"::"Pick + Manual",
-                "Flushing Method"::"Pick + Forward",
-                "Flushing Method"::"Pick + Backward":
-                    BinCode := Location."To-Production Bin Code";
-                "Flushing Method"::Forward,
-                "Flushing Method"::Backward:
-                    BinCode := Location."Open Shop Floor Bin Code";
-            end
-        else
-#endif
-            case "Flushing Method" of
-                "Flushing Method"::"Pick + Manual",
-                "Flushing Method"::"Pick + Forward",
-                "Flushing Method"::"Pick + Backward":
-                    BinCode := Location."To-Production Bin Code";
-                "Flushing Method"::Manual,
-                "Flushing Method"::Forward,
-                "Flushing Method"::Backward:
-                    BinCode := Location."Open Shop Floor Bin Code";
-            end;
+
+        case "Flushing Method" of
+            "Flushing Method"::"Pick + Manual",
+            "Flushing Method"::"Pick + Forward",
+            "Flushing Method"::"Pick + Backward":
+                BinCode := Location."To-Production Bin Code";
+            "Flushing Method"::Manual,
+            "Flushing Method"::Forward,
+            "Flushing Method"::Backward:
+                BinCode := Location."Open Shop Floor Bin Code";
+        end;
 
         OnAfterGetBinCodeFromLocation(Rec, Location, BinCode);
     end;
@@ -1926,9 +1911,11 @@ table 5407 "Prod. Order Component"
         ProdOrderComp2: Record "Prod. Order Component";
         OverwriteBinCode, IsHandled : Boolean;
     begin
-        IsHandled := false;
         OnBeforeUpdateBin(ProdOrderComp, FieldNo, FieldCaption, IsHandled);
         if IsHandled then
+            exit;
+
+        if IsTemporary() then
             exit;
 
         ProdOrderComp2 := ProdOrderComp;
@@ -2238,6 +2225,8 @@ table 5407 "Prod. Order Component"
     var
         DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
     begin
+        if IsTemporary() then
+            exit;
         InitDefaultDimensionSources(DefaultDimSource);
         CreateDim(DefaultDimSource);
     end;
@@ -2399,7 +2388,7 @@ table 5407 "Prod. Order Component"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCreateDim(var ProdOrderComponent: Record "Prod. Order Component"; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]])
+    local procedure OnAfterCreateDim(var ProdOrderComponent: Record "Prod. Order Component"; DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; xProdOrderComponent: Record "Prod. Order Component")
     begin
     end;
 
@@ -2544,6 +2533,16 @@ table 5407 "Prod. Order Component"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnGetNeededQtyOnBeforeCalcActNeededQtyBase(var ProdOrderComponent: Record "Prod. Order Component"; var OutputQtyBase: Decimal; var Result: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnGetNeededQtyOnBeforeExitWithPreviousPosting(var ProdOrderComponent: Record "Prod. Order Component"; var CompQtyBase: Decimal; var Result: Decimal; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnGetNeededQtyOnAfterCalcBasedOn(var ProdOrderComponent: Record "Prod. Order Component")
     begin
     end;
@@ -2593,7 +2592,7 @@ table 5407 "Prod. Order Component"
     begin
     end;
 
-#if not CLEAN27
+#if not CLEAN28
     [Obsolete('Preparation for replacement by Subcontracting app', '27.0')]
     [IntegrationEvent(false, false)]
     local procedure OnValidateRoutingLinkCodeOnAfterShouldUpdateLocation(var ProdOrderComponent: Record "Prod. Order Component"; var PlanningGetParameters: Codeunit "Planning-Get Parameters"; var StockkeepingUnit: Record "Stockkeeping Unit"; var ProdOrderLine: Record "Prod. Order Line"; var ShouldUpdateLocation: Boolean)
@@ -2666,7 +2665,7 @@ table 5407 "Prod. Order Component"
     begin
     end;
 
-#if not CLEAN27
+#if not CLEAN28
     [Obsolete('Replacec by Subcontracting app', '27.0')]
     [IntegrationEvent(false, false)]
     local procedure OnValidateRoutingLinkCodeOnBeforeSubcontractorProcurementCheck(var ProdOrderComponent: Record "Prod. Order Component"; Vendor: Record Vendor; var IsHandled: Boolean)
@@ -2680,8 +2679,17 @@ table 5407 "Prod. Order Component"
     end;
 
     [IntegrationEvent(false, false)]
+    local procedure OnValidateUnitCostOnBeforeCheckCostingMethod(var ProdOrderComponent: Record "Prod. Order Component"; var IsHandled: Boolean)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
     local procedure OnBeforeCreateDim(var ProdOrderComponent: Record "Prod. Order Component"; var DefaultDimSource: List of [Dictionary of [Integer, Code[20]]]; CurrentFieldNo: Integer; var IsHandled: Boolean)
     begin
     end;
-}
 
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeGetProdOrderNeeds(var ProdOrderComponent: Record "Prod. Order Component"; var ProdOrderLine: Record "Prod. Order Line"; var IsHandled: Boolean)
+    begin
+    end;
+}

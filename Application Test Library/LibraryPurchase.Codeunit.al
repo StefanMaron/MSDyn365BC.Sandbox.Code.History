@@ -1,4 +1,4 @@
-/// <summary>
+﻿/// <summary>
 /// Provides utility functions for creating and managing purchase documents in test scenarios, including purchase orders, invoices, and credit memos.
 /// </summary>
 codeunit 130512 "Library - Purchase"
@@ -646,8 +646,10 @@ codeunit 130512 "Library - Purchase"
     procedure CreateSubcontractor(var Vendor: Record Vendor)
     begin
         CreateVendor(Vendor);
+#if not CLEAN28
         Vendor.Validate(Subcontractor, true);
         Vendor.Modify(true);
+#endif
     end;
 
     procedure CreateVendor(var Vendor: Record Vendor): Code[20]
@@ -817,7 +819,7 @@ codeunit 130512 "Library - Purchase"
         Vendor.Validate(City, LibraryUtility.GenerateGUID());
         Vendor.Validate("Phone No.", Format(LibraryRandom.RandIntInRange(100000000, 999999999)));
         Vendor.Validate("Fax No.", LibraryUtility.GenerateGUID());
-        Vendor.Validate("E-Mail", LibraryUtility.GenerateGUID() + '@' + LibraryUtility.GenerateGUID());
+        Vendor.Validate("E-Mail", LibraryUtility.GenerateGUID() + '@' + LibraryUtility.GenerateGUID() + '.com');
         Vendor.Modify(true);
         exit(Vendor."No.");
     end;

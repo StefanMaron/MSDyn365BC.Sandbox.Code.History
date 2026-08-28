@@ -42,6 +42,11 @@ codeunit 137140 "SCM Inventory Documents"
         TransferOrderErr: Label 'Transfer Order has not been posted successfully.';
         ReserveMustNotBeNeverErr: Label 'Reserve must not be Never';
         InventoryReceiptErr: Label 'Inventory Receipt has not been posted successfully.';
+        UnitAmountShouldEqualUnitCostErr: Label 'Unit Amount should equal Unit Cost when Indirect Cost %% is 0.';
+        UnitCostShouldEqualUnitAmountErr: Label 'Unit Cost should equal Unit Amount when Indirect Cost %% is 0.';
+        AmountShouldEqualQtyTimesUnitAmountErr: Label 'Amount should equal Quantity * Unit Amount.';
+        UnitAmountShouldBeDerivedErr: Label 'Unit Amount should be derived from Unit Cost and Indirect Cost %%.';
+        UnitCostShouldBeDerivedErr: Label 'Unit Cost should be derived from Unit Amount and Indirect Cost %%.';
 
     [Test]
     [Scope('OnPrem')]
@@ -324,9 +329,9 @@ codeunit 137140 "SCM Inventory Documents"
         TransferLine.Modify(true);
 
         // [WHEN] Post the transfer using "Direct Transfer Posting" = "Direct Transfer"
-        SetDirectTransferPosting(1);
+        SetDirectTransferPosting(Enum::"Direct Transfer Posting Type"::"Direct Transfer");
         asserterror LibraryInventory.PostDirectTransferOrder(TransferHeader);
-        SetDirectTransferPosting(0);
+        SetDirectTransferPosting(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
     end;
 
     [Test]
@@ -364,9 +369,9 @@ codeunit 137140 "SCM Inventory Documents"
         TransferLine.Modify(true);
 
         // [WHEN] Post the transfer using "Direct Transfer Posting" = "Direct Transfer"
-        SetDirectTransferPosting(1);
+        SetDirectTransferPosting(Enum::"Direct Transfer Posting Type"::"Direct Transfer");
         LibraryInventory.PostDirectTransferOrder(TransferHeader);
-        SetDirectTransferPosting(0);
+        SetDirectTransferPosting(Enum::"Direct Transfer Posting Type"::"Shipment and Receipt");
 
         // [THEN] Item ledger shows 100 pcs of item "I" moved to location "B"
         VerifyItemInventory(Item, ToLocation.Code, Qty);
@@ -1835,7 +1840,7 @@ codeunit 137140 "SCM Inventory Documents"
         //[GIVEN] UpdateInventory setup with Direct Transfer Posting as Direct Transfer
         InventorySetup.Get();
 
-        InventorySetup."Direct Transfer Posting" := InventorySetup."Direct Transfer Posting"::"Direct Transfer";
+        InventorySetup."Direct Transfer Posting Type" := InventorySetup."Direct Transfer Posting Type"::"Direct Transfer";
         InventorySetup.Modify();
         LibraryWarehouse.NoSeriesSetup(WhseSetup);
 
@@ -1975,7 +1980,7 @@ codeunit 137140 "SCM Inventory Documents"
         // [GIVEN] Update Inventory setup with Direct Transfer Posting as Direct Transfer and Prevent Negative Inventory as TRUE
         InventorySetup.Get();
         InventorySetup."Prevent Negative Inventory" := true;
-        InventorySetup."Direct Transfer Posting" := InventorySetup."Direct Transfer Posting"::"Direct Transfer";
+        InventorySetup."Direct Transfer Posting Type" := InventorySetup."Direct Transfer Posting Type"::"Direct Transfer";
         InventorySetup.Modify();
 
         // [GIVEN] Create Two locations: "A" and "B" without Warehouse Setup
@@ -2025,7 +2030,7 @@ codeunit 137140 "SCM Inventory Documents"
         // [GIVEN] Update Inventory Setup with Direct Transfer Posting as Direct Transfer and Prevent Negative Inventory as TRUE
         InventorySetup.Get();
         InventorySetup."Prevent Negative Inventory" := true;
-        InventorySetup."Direct Transfer Posting" := InventorySetup."Direct Transfer Posting"::"Direct Transfer";
+        InventorySetup."Direct Transfer Posting Type" := InventorySetup."Direct Transfer Posting Type"::"Direct Transfer";
         InventorySetup.Modify();
 
         // [GIVEN] Create Two locations: "A" and "B" without Warehouse Setup
@@ -2156,6 +2161,352 @@ codeunit 137140 "SCM Inventory Documents"
         // [THEN] Inventory Receipt should be posted successfully.
         InvtReceiptHeader.SetRange("Receipt No.", DocumentNo);
         Assert.IsTrue(InvtReceiptHeader.FindFirst(), InventoryReceiptErr);
+    end;
+
+    [Test]
+    procedure ValidateManualNoOnInvtReceiptHeaderBeforeInsert()
+    var
+        InvtDocumentHeader: Record "Invt. Document Header";
+        InventorySetup: Record "Inventory Setup";
+        NoSeries: Record "No. Series";
+        ManualNo: Code[20];
+    begin
+        // [SCENARIO 1857] Validating "No." on Invt. Document Header (Receipt) before Insert should not fail even if Inventory Setup has not been retrieved into the table's InvtSetup variable yet.
+        Initialize();
+
+        // [GIVEN] A No. Series allowing manual numbers is configured as Invt. Receipt Nos.
+        NoSeries.Get(LibraryERM.CreateNoSeriesCode());
+        NoSeries.Validate("Manual Nos.", true);
+        NoSeries.Modify(true);
+        InventorySetup.Get();
+        InventorySetup."Invt. Receipt Nos." := NoSeries.Code;
+        InventorySetup.Modify(true);
+        ManualNo := LibraryUtility.GenerateRandomCode20(InvtDocumentHeader.FieldNo("No."), DATABASE::"Invt. Document Header");
+
+        // [WHEN] Creating a new Invt. Document Header with a manual "No." before Insert
+        InvtDocumentHeader.Init();
+        InvtDocumentHeader.Validate("Document Type", InvtDocumentHeader."Document Type"::Receipt);
+        InvtDocumentHeader.Validate("No.", ManualNo);
+        InvtDocumentHeader.Insert(true);
+
+        // [THEN] The record is inserted with the manually assigned number
+        Assert.AreEqual(ManualNo, InvtDocumentHeader."No.", 'Invt. Receipt Header "No." must equal the manually assigned number.');
+    end;
+
+    [Test]
+    procedure ValidateManualNoOnInvtShipmentHeaderBeforeInsert()
+    var
+        InvtDocumentHeader: Record "Invt. Document Header";
+        InventorySetup: Record "Inventory Setup";
+        NoSeries: Record "No. Series";
+        ManualNo: Code[20];
+    begin
+        // [SCENARIO 1857] Validating "No." on Invt. Document Header (Shipment) before Insert should not fail even if Inventory Setup has not been retrieved into the table's InvtSetup variable yet.
+        Initialize();
+
+        // [GIVEN] A No. Series allowing manual numbers is configured as Invt. Shipment Nos.
+        NoSeries.Get(LibraryERM.CreateNoSeriesCode());
+        NoSeries.Validate("Manual Nos.", true);
+        NoSeries.Modify(true);
+        InventorySetup.Get();
+        InventorySetup."Invt. Shipment Nos." := NoSeries.Code;
+        InventorySetup.Modify(true);
+        ManualNo := LibraryUtility.GenerateRandomCode20(InvtDocumentHeader.FieldNo("No."), DATABASE::"Invt. Document Header");
+
+        // [WHEN] Creating a new Invt. Document Header with a manual "No." before Insert
+        InvtDocumentHeader.Init();
+        InvtDocumentHeader.Validate("Document Type", InvtDocumentHeader."Document Type"::Shipment);
+        InvtDocumentHeader.Validate("No.", ManualNo);
+        InvtDocumentHeader.Insert(true);
+
+        // [THEN] The record is inserted with the manually assigned number
+        Assert.AreEqual(ManualNo, InvtDocumentHeader."No.", 'Invt. Shipment Header "No." must equal the manually assigned number.');
+    end;
+
+    [Test]
+    procedure InvtReceiptLineValidateUnitCostUpdatesUnitAmountAndAmount()
+    var
+        InvtDocumentHeader: Record "Invt. Document Header";
+        InvtDocumentLine: Record "Invt. Document Line";
+        Item: Record Item;
+        Location: Record Location;
+        InvtReceiptSubform: TestPage "Invt. Receipt Subform";
+        UnitCost: Decimal;
+        Qty: Decimal;
+    begin
+        // [FEATURE] [Invt. Receipt] [Unit Cost]
+        // [SCENARIO 636739] Entering Unit Cost on Invt. Receipt line updates Unit Amount and Amount
+        Initialize();
+
+        // [GIVEN] An item with FIFO costing and no indirect cost
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
+        LibraryInventory.CreateItemSimple(Item, Item."Costing Method"::FIFO, 0);
+
+        // [GIVEN] An Invt. Receipt document with a line for the item with Quantity = 2
+        LibraryInventory.CreateInvtDocument(InvtDocumentHeader, InvtDocumentHeader."Document Type"::Receipt, Location.Code);
+        LibraryInventory.CreateInvtDocumentLine(InvtDocumentHeader, InvtDocumentLine, Item."No.", 0, 2);
+        Qty := InvtDocumentLine.Quantity;
+
+        // [WHEN] Entering Unit Cost on the Invt. Receipt line via page
+        UnitCost := LibraryRandom.RandDec(100, 2);
+        InvtReceiptSubform.OpenEdit();
+        InvtReceiptSubform.GoToRecord(InvtDocumentLine);
+        InvtReceiptSubform."Unit Cost".SetValue(UnitCost);
+        InvtReceiptSubform.Close();
+
+        // [THEN] Unit Amount equals Unit Cost and Amount equals Quantity * Unit Amount
+        InvtDocumentLine.Find();
+        Assert.AreEqual(UnitCost, InvtDocumentLine."Unit Amount", UnitAmountShouldEqualUnitCostErr);
+        Assert.AreEqual(Round(Qty * UnitCost), InvtDocumentLine.Amount, AmountShouldEqualQtyTimesUnitAmountErr);
+    end;
+
+    [Test]
+    procedure InvtReceiptLineValidateUnitAmountUpdatesUnitCostAndAmount()
+    var
+        InvtDocumentHeader: Record "Invt. Document Header";
+        InvtDocumentLine: Record "Invt. Document Line";
+        Item: Record Item;
+        Location: Record Location;
+        InvtReceiptSubform: TestPage "Invt. Receipt Subform";
+        UnitAmount: Decimal;
+        Qty: Decimal;
+    begin
+        // [FEATURE] [Invt. Receipt] [Unit Amount]
+        // [SCENARIO 636739] Entering Unit Amount on Invt. Receipt line updates Unit Cost and Amount
+        Initialize();
+
+        // [GIVEN] An item with FIFO costing and no indirect cost
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
+        LibraryInventory.CreateItemSimple(Item, Item."Costing Method"::FIFO, 0);
+
+        // [GIVEN] An Invt. Receipt document with a line for the item with Quantity = 2
+        LibraryInventory.CreateInvtDocument(InvtDocumentHeader, InvtDocumentHeader."Document Type"::Receipt, Location.Code);
+        LibraryInventory.CreateInvtDocumentLine(InvtDocumentHeader, InvtDocumentLine, Item."No.", 0, 2);
+        Qty := InvtDocumentLine.Quantity;
+
+        // [WHEN] Validating Unit Amount on the Invt. Receipt line
+        UnitAmount := LibraryRandom.RandDec(100, 2);
+        InvtReceiptSubform.OpenEdit();
+        InvtReceiptSubform.GoToRecord(InvtDocumentLine);
+        InvtReceiptSubform."Unit Amount".SetValue(UnitAmount);
+        InvtReceiptSubform.Close();
+
+        // [THEN] Unit Cost equals Unit Amount and Amount equals Quantity * Unit Amount
+        InvtDocumentLine.Find();
+        Assert.AreEqual(UnitAmount, InvtDocumentLine."Unit Cost", UnitCostShouldEqualUnitAmountErr);
+        Assert.AreEqual(Round(Qty * UnitAmount), InvtDocumentLine.Amount, AmountShouldEqualQtyTimesUnitAmountErr);
+    end;
+
+    [Test]
+    procedure InvtReceiptLineValidateUnitCostWithIndirectCostPct()
+    var
+        InvtDocumentHeader: Record "Invt. Document Header";
+        InvtDocumentLine: Record "Invt. Document Line";
+        Item: Record Item;
+        Location: Record Location;
+        GLSetup: Record "General Ledger Setup";
+        InvtReceiptSubform: TestPage "Invt. Receipt Subform";
+        UnitCost: Decimal;
+        ExpectedUnitAmount: Decimal;
+    begin
+        // [FEATURE] [Invt. Receipt] [Unit Cost] [Indirect Cost]
+        // [SCENARIO 636739] Entering Unit Cost on Invt. Receipt line with Indirect Cost % derives correct Unit Amount
+        Initialize();
+
+        // [GIVEN] An item with FIFO costing and Indirect Cost % = 10
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
+        LibraryInventory.CreateItem(Item, Item."Costing Method"::FIFO, 0, 0, 10, '');
+
+        // [GIVEN] An Invt. Receipt document with a line for the item with Quantity = 2
+        LibraryInventory.CreateInvtDocument(InvtDocumentHeader, InvtDocumentHeader."Document Type"::Receipt, Location.Code);
+        LibraryInventory.CreateInvtDocumentLine(InvtDocumentHeader, InvtDocumentLine, Item."No.", 0, 2);
+
+        // [WHEN] Entering Unit Cost on the Invt. Receipt line via page
+        UnitCost := LibraryRandom.RandDec(100, 2);
+        InvtReceiptSubform.OpenEdit();
+        InvtReceiptSubform.GoToRecord(InvtDocumentLine);
+        InvtReceiptSubform."Unit Cost".SetValue(UnitCost);
+        InvtReceiptSubform.Close();
+
+        // [THEN] Unit Amount is derived from Unit Cost and Indirect Cost %
+        InvtDocumentLine.Find();
+        GLSetup.Get();
+        ExpectedUnitAmount := Round(UnitCost / (1 + 10 / 100), GLSetup."Unit-Amount Rounding Precision");
+        Assert.AreEqual(ExpectedUnitAmount, InvtDocumentLine."Unit Amount", UnitAmountShouldBeDerivedErr);
+        Assert.AreEqual(Round(InvtDocumentLine.Quantity * ExpectedUnitAmount), InvtDocumentLine.Amount, AmountShouldEqualQtyTimesUnitAmountErr);
+    end;
+
+    [Test]
+    procedure InvtReceiptLineValidateUnitAmountWithIndirectCostPct()
+    var
+        InvtDocumentHeader: Record "Invt. Document Header";
+        InvtDocumentLine: Record "Invt. Document Line";
+        Item: Record Item;
+        Location: Record Location;
+        GLSetup: Record "General Ledger Setup";
+        UnitAmount: Decimal;
+        ExpectedUnitCost: Decimal;
+    begin
+        // [FEATURE] [Invt. Receipt] [Unit Amount] [Indirect Cost]
+        // [SCENARIO 636739] Entering Unit Amount on Invt. Receipt line with Indirect Cost % derives correct Unit Cost
+        Initialize();
+
+        // [GIVEN] An item with FIFO costing and Indirect Cost % = 10
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
+        LibraryInventory.CreateItem(Item, Item."Costing Method"::FIFO, 0, 0, 10, '');
+
+        // [GIVEN] An Invt. Receipt document with a line for the item with Quantity = 2
+        LibraryInventory.CreateInvtDocument(InvtDocumentHeader, InvtDocumentHeader."Document Type"::Receipt, Location.Code);
+        LibraryInventory.CreateInvtDocumentLine(InvtDocumentHeader, InvtDocumentLine, Item."No.", 0, 2);
+
+        // [WHEN] Validating Unit Amount on the Invt. Receipt line
+        UnitAmount := LibraryRandom.RandDec(100, 2);
+        InvtDocumentLine.Validate("Unit Amount", UnitAmount);
+
+        // [THEN] Unit Cost is derived from Unit Amount and Indirect Cost %
+        GLSetup.Get();
+        ExpectedUnitCost := Round(UnitAmount * (1 + 10 / 100), GLSetup."Unit-Amount Rounding Precision");
+        Assert.AreEqual(ExpectedUnitCost, InvtDocumentLine."Unit Cost", UnitCostShouldBeDerivedErr);
+        Assert.AreEqual(Round(InvtDocumentLine.Quantity * UnitAmount), InvtDocumentLine.Amount, AmountShouldEqualQtyTimesUnitAmountErr);
+    end;
+
+    [Test]
+    procedure InvtShipmentLineValidateUnitCostUpdatesUnitAmountAndAmount()
+    var
+        InvtDocumentHeader: Record "Invt. Document Header";
+        InvtDocumentLine: Record "Invt. Document Line";
+        Item: Record Item;
+        Location: Record Location;
+        InvtShipmentSubform: TestPage "Invt. Shipment Subform";
+        UnitCost: Decimal;
+        Qty: Decimal;
+    begin
+        // [FEATURE] [Invt. Shipment] [Unit Cost]
+        // [SCENARIO] Entering Unit Cost on Invt. Shipment line updates Unit Amount (1:1 sync) and Amount
+        Initialize();
+
+        // [GIVEN] An item with FIFO costing
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
+        LibraryInventory.CreateItemSimple(Item, Item."Costing Method"::FIFO, 0);
+
+        // [GIVEN] An Invt. Shipment document with a line for the item with Quantity = 2
+        LibraryInventory.CreateInvtDocument(InvtDocumentHeader, InvtDocumentHeader."Document Type"::Shipment, Location.Code);
+        LibraryInventory.CreateInvtDocumentLine(InvtDocumentHeader, InvtDocumentLine, Item."No.", 0, 2);
+        Qty := InvtDocumentLine.Quantity;
+
+        // [WHEN] Entering Unit Cost on the Invt. Shipment line via page
+        UnitCost := LibraryRandom.RandDec(100, 2);
+        InvtShipmentSubform.OpenEdit();
+        InvtShipmentSubform.GoToRecord(InvtDocumentLine);
+        InvtShipmentSubform."Unit Cost".SetValue(UnitCost);
+        InvtShipmentSubform.Close();
+
+        // [THEN] Unit Amount equals Unit Cost (1:1 sync for Shipment) and Amount equals Quantity * Unit Amount
+        InvtDocumentLine.Find();
+        Assert.AreEqual(UnitCost, InvtDocumentLine."Unit Amount", UnitAmountShouldEqualUnitCostErr);
+        Assert.AreEqual(Round(Qty * UnitCost), InvtDocumentLine.Amount, AmountShouldEqualQtyTimesUnitAmountErr);
+    end;
+
+    [Test]
+    procedure InvtShipmentLineValidateUnitAmountUpdatesUnitCostAndAmount()
+    var
+        InvtDocumentHeader: Record "Invt. Document Header";
+        InvtDocumentLine: Record "Invt. Document Line";
+        Item: Record Item;
+        Location: Record Location;
+        InvtShipmentSubform: TestPage "Invt. Shipment Subform";
+        UnitAmount: Decimal;
+        Qty: Decimal;
+    begin
+        // [FEATURE] [Invt. Shipment] [Unit Amount]
+        // [SCENARIO] Entering Unit Amount on Invt. Shipment line updates Unit Cost (1:1 sync) and Amount
+        Initialize();
+
+        // [GIVEN] An item with FIFO costing
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
+        LibraryInventory.CreateItemSimple(Item, Item."Costing Method"::FIFO, 0);
+
+        // [GIVEN] An Invt. Shipment document with a line for the item with Quantity = 2
+        LibraryInventory.CreateInvtDocument(InvtDocumentHeader, InvtDocumentHeader."Document Type"::Shipment, Location.Code);
+        LibraryInventory.CreateInvtDocumentLine(InvtDocumentHeader, InvtDocumentLine, Item."No.", 0, 2);
+        Qty := InvtDocumentLine.Quantity;
+
+        // [WHEN] Entering Unit Amount on the Invt. Shipment line via page
+        UnitAmount := LibraryRandom.RandDec(100, 2);
+        InvtShipmentSubform.OpenEdit();
+        InvtShipmentSubform.GoToRecord(InvtDocumentLine);
+        InvtShipmentSubform."Unit Amount".SetValue(UnitAmount);
+        InvtShipmentSubform.Close();
+
+        // [THEN] Unit Cost equals Unit Amount (1:1 sync for Shipment) and Amount equals Quantity * Unit Amount
+        InvtDocumentLine.Find();
+        Assert.AreEqual(UnitAmount, InvtDocumentLine."Unit Cost", UnitCostShouldEqualUnitAmountErr);
+        Assert.AreEqual(Round(Qty * UnitAmount), InvtDocumentLine.Amount, AmountShouldEqualQtyTimesUnitAmountErr);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ItemReceiptWithSerialSpecificTrackingAndAlternateUOM()
+    var
+        Location: Record Location;
+        Item: Record Item;
+        ItemUOM: Record "Item Unit of Measure";
+        NonBaseUOM: Record "Unit of Measure";
+        InvtDocumentHeader: Record "Invt. Document Header";
+        InvtDocumentLine: Record "Invt. Document Line";
+        InvtReceiptHeader: Record "Invt. Receipt Header";
+        ReservationEntry: Record "Reservation Entry";
+        SerialNo: Code[50];
+        i: Integer;
+        DocumentNo: Code[20];
+    begin
+        // [FEATURE] [Item Receipt] [Item Tracking] [Serial Specific Tracking] [Alternate UOM]
+        // [SCENARIO 637511] Item Receipt with serial-specific tracking and alternate UOM (BOX=3) should post successfully
+        // when quantity is 1 BOX with 3 serial numbers each assigned base qty 1
+        Initialize();
+
+        // [GIVEN] Location with Inventory Posting Setup
+        LibraryWarehouse.CreateLocationWithInventoryPostingSetup(Location);
+
+        // [GIVEN] Serial no.-tracked item with serial specific tracking enabled
+        CreateSerialSpecificTrackedItem(Item);
+
+        // [GIVEN] Alternate UOM where BOX = 3 pieces
+        LibraryInventory.CreateUnitOfMeasureCode(NonBaseUOM);
+        LibraryInventory.CreateItemUnitOfMeasure(ItemUOM, Item."No.", NonBaseUOM.Code, 3);  // 1 BOX = 3 PCS
+
+        // [GIVEN] Create item receipt with 1 BOX
+        LibraryInventory.CreateInvtDocument(InvtDocumentHeader, InvtDocumentHeader."Document Type"::Receipt, Location.Code);
+        DocumentNo := InvtDocumentHeader."No.";
+        LibraryInventory.CreateInvtDocumentLine(InvtDocumentHeader, InvtDocumentLine, Item."No.", 0, 1);  // 1 BOX
+        InvtDocumentLine.Validate("Unit of Measure Code", NonBaseUOM.Code);
+        InvtDocumentLine.Modify(true);
+
+        // [GIVEN] Assign 3 serial numbers with base quantity 1 each (total 3 pieces = 1 BOX)
+        for i := 1 to 3 do begin
+            SerialNo := LibraryUtility.GenerateGUID();
+            LibraryItemTracking.CreateItemReceiptItemTracking(ReservationEntry, InvtDocumentLine, SerialNo, '', '', 1);
+        end;
+
+        // [WHEN] Post the item receipt
+        LibraryInventory.PostInvtDocument(InvtDocumentHeader);
+
+        // [THEN] Inventory Receipt Header should be created successfully - verifying post was successful
+        InvtReceiptHeader.SetRange("Receipt No.", DocumentNo);
+        Assert.IsTrue(InvtReceiptHeader.FindFirst(), 'Inventory Receipt should exist after posting');
+    end;
+
+    local procedure CreateSerialSpecificTrackedItem(var Item: Record Item)
+    var
+        ItemTrackingCode: Record "Item Tracking Code";
+    begin
+        LibraryInventory.CreateItemTrackingCode(ItemTrackingCode);
+        ItemTrackingCode.Validate("SN Specific Tracking", true);
+        ItemTrackingCode.Modify();
+
+        LibraryInventory.CreateItem(Item);
+        Item.Validate("Item Tracking Code", ItemTrackingCode.Code);
+        Item.Modify(true);
     end;
 
     local procedure PostWhseShipmentFromTO(DocumentNo: Code[20])
@@ -2489,7 +2840,7 @@ codeunit 137140 "SCM Inventory Documents"
     begin
         InventorySetup.Get();
         InventorySetup.Validate("Posted Direct Trans. Nos.", LibraryUtility.GetGlobalNoSeriesCode());
-        InventorySetup.Validate("Direct Transfer Posting", InventorySetup."Direct Transfer Posting"::"Direct Transfer");
+        InventorySetup.Validate("Direct Transfer Posting Type", InventorySetup."Direct Transfer Posting Type"::"Direct Transfer");
         InventorySetup.Modify(true);
     end;
 
@@ -2509,12 +2860,12 @@ codeunit 137140 "SCM Inventory Documents"
         InventorySetup.Modify(true);
     end;
 
-    local procedure SetDirectTransferPosting(DirectTransferPosting: Option)
+    local procedure SetDirectTransferPosting(DirectTransferPosting: Enum "Direct Transfer Posting Type")
     var
         InventorySetup: Record "Inventory Setup";
     begin
         InventorySetup.Get();
-        InventorySetup."Direct Transfer Posting" := DirectTransferPosting;
+        InventorySetup."Direct Transfer Posting Type" := DirectTransferPosting;
         InventorySetup.Modify();
     end;
 

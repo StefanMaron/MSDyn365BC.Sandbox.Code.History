@@ -5,7 +5,7 @@
 namespace Microsoft.Manufacturing.Routing;
 
 using Microsoft.Manufacturing.Capacity;
-#if not CLEAN27
+#if not CLEAN28
 using Microsoft.Manufacturing.Document;
 #endif
 
@@ -31,12 +31,12 @@ page 99000765 "Routing Lines"
                 field("Previous Operation No."; Rec."Previous Operation No.")
                 {
                     ApplicationArea = Manufacturing;
-                    Visible = false;
+                    Visible = ParallelFieldsVisible;
                 }
                 field("Next Operation No."; Rec."Next Operation No.")
                 {
                     ApplicationArea = Manufacturing;
-                    Visible = false;
+                    Visible = ParallelFieldsVisible;
                 }
                 field(Type; Rec.Type)
                 {
@@ -140,10 +140,10 @@ page 99000765 "Routing Lines"
                     ApplicationArea = Manufacturing;
                     Visible = false;
                 }
-#if not CLEAN27
+#if not CLEAN28
                 field("WIP Item"; Rec."WIP Item")
                 {
-                    ApplicationArea = Manufacturing;
+                    ApplicationArea = LegacySubcontracting;
                     ToolTip = 'Specifies if the item is a work in process (WIP) item.';
                     ObsoleteReason = 'Preparation for replacement by Subcontracting app';
                     ObsoleteState = Pending;
@@ -213,10 +213,10 @@ page 99000765 "Routing Lines"
                         ShowQualityMeasures();
                     end;
                 }
-#if not CLEAN27
+#if not CLEAN28
                 action("Subcontracting Prices")
                 {
-                    ApplicationArea = Manufacturing;
+                    ApplicationArea = LegacySubcontracting;
                     Caption = 'Subcontracting Prices';
                     Image = Price;
                     ToolTip = 'View the related subcontracting prices.';
@@ -249,6 +249,16 @@ page 99000765 "Routing Lines"
         RtngComment: Record "Routing Comment Line";
         ShowRelatedDataEnabled: Boolean;
         UnitCostPerEditable: Boolean;
+        ParallelFieldsVisible: Boolean;
+
+    /// <summary>
+    /// Sets the visibility of the Next/Previous Operation No. fields, which are only relevant for parallel routings.
+    /// </summary>
+    /// <param name="Visible">Whether the Next/Previous Operation No. fields should be visible.</param>
+    procedure SetParallelFieldsVisible(Visible: Boolean)
+    begin
+        ParallelFieldsVisible := Visible;
+    end;
 
     local procedure ShowComment()
     begin
@@ -292,7 +302,7 @@ page 99000765 "Routing Lines"
         PAGE.Run(PAGE::"Routing Quality Measures", RtngQltyMeasure);
     end;
 
-#if not CLEAN27
+#if not CLEAN28
     [Obsolete('Preparation for replacement by Subcontracting app', '27.0')]
     [Scope('OnPrem')]
     procedure ShowSubcPrices()

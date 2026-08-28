@@ -19,7 +19,6 @@ using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Family;
 using Microsoft.Manufacturing.Forecast;
-using Microsoft.Manufacturing.Journal;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.ProductionBOM;
 using Microsoft.Manufacturing.Reports;
@@ -117,7 +116,6 @@ page 9010 "Production Planner Role Center"
                     Caption = 'Routing Sheet';
                     Image = "Report";
                     RunObject = Report "Routing Sheet";
-                    ToolTip = 'View basic information for routings, such as send-ahead quantity, setup time, run time and time unit. This report shows you the operations to be performed in this routing, the work or machine centers to be used, the personnel, the tools, and the description of each operation.';
                 }
 #if not CLEAN28
                 action("Inventory - &Availability Plan")
@@ -138,7 +136,6 @@ page 9010 "Production Planner Role Center"
                     Caption = 'Inventory - &Availability Plan (Excel)';
                     Image = ItemAvailability;
                     RunObject = Report "Inv. Availability Plan";
-                    ToolTip = 'View a list of the quantity of each item in customer, purchase, and transfer orders and the quantity available in inventory. The list is divided into columns that cover six periods with starting and ending dates as well as the periods before and after those periods. The list is useful when you are planning your inventory purchases.';
                 }
 #if not CLEAN27
                 action("Planning Availability")
@@ -159,7 +156,6 @@ page 9010 "Production Planner Role Center"
                     Caption = 'Capacity Task List';
                     Image = "Report";
                     RunObject = Report "Capacity Task List";
-                    ToolTip = 'View the production orders that are waiting to be processed at the work centers and machine centers. Printouts are made for the capacity of the work center or machine center). The report includes information such as starting and ending time, date per production order and input quantity.';
                 }
                 action("Subcontractor - Dispatch List")
                 {
@@ -167,7 +163,6 @@ page 9010 "Production Planner Role Center"
                     Caption = 'Subcontractor - Dispatch List';
                     Image = "Report";
                     RunObject = Report "Subcontractor - Dispatch List";
-                    ToolTip = 'View the list of material to be sent to manufacturing subcontractors.';
                 }
             }
             group(Production)
@@ -179,7 +174,6 @@ page 9010 "Production Planner Role Center"
                     Caption = 'Production Order - &Shortage List';
                     Image = "Report";
                     RunObject = Report "Prod. Order - Shortage List";
-                    ToolTip = 'View a list of the missing quantity per production order. The report shows how the inventory development is planned from today until the set day - for example whether orders are still open.';
                 }
                 action("D&etailed Calculation")
                 {
@@ -187,7 +181,6 @@ page 9010 "Production Planner Role Center"
                     Caption = 'D&etailed Calculation';
                     Image = "Report";
                     RunObject = Report "Detailed Calculation";
-                    ToolTip = 'View a cost list per item taking into account the scrap.';
                 }
 #if not CLEAN27
                 action("P&roduction Order - Calculation")
@@ -208,7 +201,6 @@ page 9010 "Production Planner Role Center"
                     Caption = 'Production Order Statistics';
                     Image = "Report";
                     RunObject = report "Production Order Statistics";
-                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                 }
                 action("Sta&tus")
                 {
@@ -224,7 +216,6 @@ page 9010 "Production Planner Role Center"
                     Caption = 'Inventory &Valuation WIP';
                     Image = "Report";
                     RunObject = Report "Inventory Valuation - WIP";
-                    ToolTip = 'View inventory valuation for selected production orders in your WIP inventory. The report also shows information about the value of consumption, capacity usage and output in WIP.';
                 }
                 action("Prod. Order - &Job Card")
                 {
@@ -232,7 +223,6 @@ page 9010 "Production Planner Role Center"
                     Caption = 'Prod. Order - &Job Card';
                     Image = "Report";
                     RunObject = Report "Prod. Order - Job Card";
-                    ToolTip = 'View a list of the work in progress of a production order. Output, Scrapped Quantity and Production Lead Time are shown or printed depending on the operation.';
                 }
             }
         }
@@ -253,10 +243,10 @@ page 9010 "Production Planner Role Center"
                 RunObject = Page "Transfer Orders";
                 ToolTip = 'Move inventory items between company locations. With transfer orders, you ship the outbound transfer from one location and receive the inbound transfer at the other location. This allows you to manage the involved warehouse activities and provides more certainty that inventory quantities are updated correctly.';
             }
-#if not CLEAN27
+#if not CLEAN28
             action("Subcontracting Orders")
             {
-                ApplicationArea = Manufacturing;
+                ApplicationArea = LegacySubcontracting;
                 Caption = 'Subcontracting Orders';
                 RunObject = Page "Subcontracting Order List";
                 ToolTip = 'View the list of subcontracting orders.';
@@ -266,7 +256,7 @@ page 9010 "Production Planner Role Center"
             }
             action("Subcontracting Transfers")
             {
-                ApplicationArea = Manufacturing;
+                ApplicationArea = LegacySubcontracting;
                 Caption = 'Subcontracting Transfers';
                 RunObject = Page "Subcontracting Transfer List";
                 ToolTip = 'View the list of subcontracting transfers.';
@@ -460,15 +450,22 @@ page 9010 "Production Planner Role Center"
                                         Recurring = const(false));
                     ToolTip = 'Calculate a supply plan to fulfill item demand with purchases or transfers.';
                 }
+#if not CLEAN28
                 action(SubcontractingWorksheets)
                 {
-                    ApplicationArea = Manufacturing;
-                    Caption = 'Subcontracting Worksheets';
+                    ApplicationArea = LegacySubcontracting;
+                    Caption = 'Subcontracting Worksheets (Obsolete)';
                     RunObject = Page "Req. Wksh. Names";
+#pragma warning disable AL0432
                     RunPageView = where("Template Type" = const("For. Labor"),
                                         Recurring = const(false));
+#pragma warning restore AL0432
                     ToolTip = 'Calculate the needed production supply, find the production orders that have material ready to send to a subcontractor, and automatically create purchase orders for subcontracted operations from production order routings.';
+                    ObsoleteReason = 'Will be replaced by the Subcontracting App.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
                 }
+#endif
                 action("Standard Cost Worksheet")
                 {
                     ApplicationArea = Manufacturing;
@@ -754,14 +751,21 @@ page 9010 "Production Planner Role Center"
                     RunObject = Page "Planning Worksheet";
                     ToolTip = 'Plan supply orders automatically to fulfill new demand.';
                 }
+#if not CLEAN28
                 action("Subcontracting &Worksheet")
                 {
-                    ApplicationArea = Manufacturing;
-                    Caption = 'Subcontracting &Worksheet';
+                    ApplicationArea = LegacySubcontracting;
+                    Caption = 'Subcontracting &Worksheet (Obsolete)';
                     Image = SubcontractingWorksheet;
-                    RunObject = Page "Subcontracting Worksheet";
+#pragma warning disable AL0432
+                    RunObject = Page Microsoft.Manufacturing.Journal."Subcontracting Worksheet";
+#pragma warning restore AL0432
+                    ObsoleteReason = 'Will be replaced by the Subcontracting App.';
+                    ObsoleteState = Pending;
+                    ObsoleteTag = '28.0';
                     ToolTip = 'Calculate the needed production supply, find the production orders that have material ready to send to a subcontractor, and automatically create purchase orders for subcontracted operations from production order routings.';
                 }
+#endif
                 action("Change Pro&duction Order Status")
                 {
                     ApplicationArea = Manufacturing;

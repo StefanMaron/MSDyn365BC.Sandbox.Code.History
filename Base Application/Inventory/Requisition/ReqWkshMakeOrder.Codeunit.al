@@ -16,6 +16,9 @@ using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Setup;
 using Microsoft.Inventory.Tracking;
 using Microsoft.Inventory.Transfer;
+#if not CLEAN28
+using Microsoft.Manufacturing.Setup;
+#endif
 using Microsoft.Projects.Project.Planning;
 using Microsoft.Purchases.Document;
 using Microsoft.Purchases.Setup;
@@ -202,6 +205,10 @@ codeunit 333 "Req. Wksh.-Make Order"
 
         if PrevChangedDocOrderNo <> '' then
             PrintChangedDocument(PrevChangedDocOrderType, PrevChangedDocOrderNo);
+
+        if OrderCounter <> 0 then
+            MoveRequisitionWkshBatch(ReqLine);
+
         // Copy number of created orders and current journal batch name to requisition worksheet
         ReqLine.Init();
         ReqLine."Line No." := OrderCounter;
@@ -242,7 +249,7 @@ codeunit 333 "Req. Wksh.-Make Order"
                         end;
             end;
 
-        OnAfterCode(ReqLine, OrderLineCounter, OrderCounter, PrintPurchOrders, SuppressCommit, PurchOrderHeader);
+        OnAfterCode(ReqLine, OrderLineCounter, OrderCounter, PrintPurchOrders, SuppressCommit, PurchOrderHeader, this);
     end;
 
     local procedure CheckRunPrintPurchOrders()
@@ -522,6 +529,8 @@ codeunit 333 "Req. Wksh.-Make Order"
           TempFailedReqLine,
           TempDocumentEntry);
         ReqWkshMakeOrders.SetSuppressCommit(SuppressCommit);
+        
+        OnTryCarryOutReqLineActionOnBeforeRun(ReqLine);
         if ReqWkshMakeOrders.Run(ReqLine) then begin
             ReqWkshMakeOrders.GetTryParam(
               PurchOrderHeader,
@@ -532,6 +541,7 @@ codeunit 333 "Req. Wksh.-Make Order"
               PrevLocationCode,
               OrderCounter,
               OrderLineCounter);
+            OnTryCarryOutReqLineActionOnAfterGetTryParam(ReqLine, PurchOrderHeader, LineCount, NextLineNo, PrevPurchCode, PrevShipToCode, PrevLocationCode, OrderCounter, OrderLineCounter);
 
             if PrintPurchOrders and PlanningResiliency then
                 if PurchOrderHeader."No." <> '' then
@@ -638,6 +648,9 @@ codeunit 333 "Req. Wksh.-Make Order"
     var
         PurchOrderLine2: Record "Purchase Line";
         DimensionSetIDArr: array[10] of Integer;
+#if not CLEAN28
+        LegacySubcFeatureHandler: Codeunit "Legacy Subc. Feature Handler";
+#endif
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -695,8 +708,8 @@ codeunit 333 "Req. Wksh.-Make Order"
                 PurchOrderLine.UpdateUnitCost();
             end;
 
-#if not CLEAN27
-        if ReqLine2."Prod. Order No." <> '' then begin
+#if not CLEAN28
+        if LegacySubcFeatureHandler.IsLegacySubcontractingEnabled() and (ReqLine2."Prod. Order No." <> '') then begin
             PurchOrderLine."Base UM Qty/Pricelist UM Qty" := ReqLine2."Base UM Qty/Pricelist UM Qty";
             PurchOrderLine."UoM for Pricelist" := ReqLine2."UoM for Pricelist";
             PurchOrderLine."Pricelist UM Qty/Base UM Qty" := ReqLine2."Pricelist UM Qty/Base UM Qty";
@@ -1402,7 +1415,7 @@ codeunit 333 "Req. Wksh.-Make Order"
         exit(true);
     end;
 
-    local procedure GetTransferHeader(var TransferHeader: Record "Transfer Header"; RequisitionLine: Record "Requisition Line")
+    procedure GetTransferHeader(var TransferHeader: Record "Transfer Header"; RequisitionLine: Record "Requisition Line")
     begin
         TempTransHeader.SetRange("Transfer-from Code", RequisitionLine."Transfer-from Code");
         TempTransHeader.SetRange("Transfer-to Code", RequisitionLine."Location Code");
@@ -1410,7 +1423,7 @@ codeunit 333 "Req. Wksh.-Make Order"
             TransferHeader.Get(TempTransHeader."No.");
     end;
 
-    local procedure SetTransferHeader(TransferHeader: Record "Transfer Header")
+    procedure SetTransferHeader(TransferHeader: Record "Transfer Header")
     begin
         TempTransHeader := TransferHeader;
         if TempTransHeader.Insert() then;
@@ -1456,6 +1469,12 @@ codeunit 333 "Req. Wksh.-Make Order"
             PurchaseLine.Validate("Job Task No.", JobPlanningLine."Job Task No.");
             PurchaseLine.Validate("Job Planning Line No.", JobPlanningLine."Line No.");
         end;
+    end;
+
+    local procedure MoveRequisitionWkshBatch(var RequisitionLine: Record "Requisition Line")
+    begin
+        if ReqWkshName.Get(RequisitionLine."Worksheet Template Name", RequisitionLine."Journal Batch Name") then
+            ReqWkshName.OnMoveRequisitionWkshBatch(ReqWkshName.RecordId());
     end;
 
     [IntegrationEvent(false, false)]
@@ -1544,7 +1563,7 @@ codeunit 333 "Req. Wksh.-Make Order"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnAfterCode(var RequisitionLine: Record "Requisition Line"; OrderLineCounter: Integer; OrderCounter: Integer; PrintPurchOrders: Boolean; SuppressCommit: Boolean; var PurchOrderHeader: Record "Purchase Header")
+    local procedure OnAfterCode(var RequisitionLine: Record "Requisition Line"; OrderLineCounter: Integer; OrderCounter: Integer; PrintPurchOrders: Boolean; SuppressCommit: Boolean; var PurchOrderHeader: Record "Purchase Header"; Sender: Codeunit "Req. Wksh.-Make Order")
     begin
     end;
 
@@ -1789,7 +1808,7 @@ codeunit 333 "Req. Wksh.-Make Order"
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnInsertPurchOrderLineOnBeforeTransferReqLine(var PurchOrderHeader: Record "Purchase Header"; PurchOrderLine: Record "Purchase Line"; var RequisitionLine: Record "Requisition Line")
+    local procedure OnInsertPurchOrderLineOnBeforeTransferReqLine(var PurchOrderHeader: Record "Purchase Header"; var PurchOrderLine: Record "Purchase Line"; var RequisitionLine: Record "Requisition Line")
     begin
     end;
 
@@ -1825,6 +1844,16 @@ codeunit 333 "Req. Wksh.-Make Order"
 
     [IntegrationEvent(false, false)]
     local procedure OnBeforeTryCarryOutReqLineAction(var RequisitionLine: Record "Requisition Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnTryCarryOutReqLineActionOnBeforeRun(var RequisitionLine: Record "Requisition Line")
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnTryCarryOutReqLineActionOnAfterGetTryParam(var RequisitionLine: Record "Requisition Line"; var PurchaseHeader: Record "Purchase Header"; var LineCount: Integer; var NextLineNo: Integer; var PrevPurchCode: Code[10]; var PrevShipToCode: Code[10]; var PrevLocationCode: Code[10]; var OrderCounter: Integer; var OrderLineCounter: Integer)
     begin
     end;
 

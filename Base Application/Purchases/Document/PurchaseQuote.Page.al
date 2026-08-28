@@ -1,4 +1,4 @@
-// ------------------------------------------------------------------------------------------------
+﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -263,6 +263,11 @@ page 49 "Purchase Quote"
                 field("Requested Receipt Date"; Rec."Requested Receipt Date")
                 {
                     ApplicationArea = Suite;
+                }
+                field("Spend Request No."; Rec."Spend Request No.")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Importance = Additional;
                 }
                 field("Vendor Order No."; Rec."Vendor Order No.")
                 {
@@ -869,25 +874,6 @@ page 49 "Purchase Quote"
             {
                 Caption = '&Quote';
                 Image = Quote;
-#if not CLEAN26
-                action(Statistics)
-                {
-                    ApplicationArea = Suite;
-                    Caption = 'Statistics';
-                    Image = Statistics;
-                    ShortCutKey = 'F7';
-                    ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
-                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '26.0';
-
-                    trigger OnAction()
-                    begin
-                        Rec.OpenDocumentStatistics();
-                        CurrPage.PurchLines.Page.ForceTotalsCalculation();
-                    end;
-                }
-#endif
                 action(PurchaseStatistics)
                 {
                     ApplicationArea = Basic, Suite;
@@ -895,11 +881,7 @@ page 49 "Purchase Quote"
                     Enabled = Rec."No." <> '';
                     Image = Statistics;
                     ShortCutKey = 'F7';
-#if CLEAN26
                     Visible = true;
-#else
-                    Visible = false;
-#endif
                     ToolTip = 'View statistical information, such as the value of posted entries, for the record.';
                     RunObject = Page "Purchase Statistics";
                     RunPageOnRec = true;
@@ -1495,18 +1477,9 @@ page 49 "Purchase Quote"
                 actionref(Dimensions_Promoted; Dimensions)
                 {
                 }
-#if not CLEAN26
-                actionref(Statistics_Promoted; Statistics)
-                {
-                    ObsoleteReason = 'The statistics action will be replaced with the PurchaseStatistics action. The new action uses RunObject and does not run the action trigger. Use a page extension to modify the behaviour.';
-                    ObsoleteState = Pending;
-                    ObsoleteTag = '26.0';
-                }
-#else
                 actionref(PurchaseStatistics_Promoted; PurchaseStatistics)
                 {
                 }
-#endif
                 actionref(DocAttach_Promoted; DocAttach)
                 {
                 }
@@ -1543,13 +1516,13 @@ page 49 "Purchase Quote"
         CurrPage.ApprovalFactBox.PAGE.UpdateApprovalEntriesFromSourceRecord(Rec.RecordId);
         ShowWorkflowStatus := CurrPage.WorkflowStatus.PAGE.SetFilterOnWorkflowRecord(Rec.RecordId);
         StatusStyleTxt := Rec.GetStatusStyleText();
+        Rec.GetContactDetails(BuyFromContact, PayToContact);
     end;
 
     trigger OnAfterGetRecord()
     begin
         CalculateCurrentShippingAndPayToOption();
-        BuyFromContact.GetOrClear(Rec."Buy-from Contact No.");
-        PayToContact.GetOrClear(Rec."Pay-to Contact No.");
+        Rec.GetContactDetails(BuyFromContact, PayToContact);
         CurrPage.IncomingDocAttachFactBox.Page.SetCurrentRecordID(Rec.RecordId);
     end;
 

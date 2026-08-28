@@ -8,7 +8,8 @@ using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Requisition;
 using Microsoft.Manufacturing.Document;
 using Microsoft.Manufacturing.Routing;
-#if not CLEAN27
+#if not CLEAN28
+using Microsoft.Manufacturing.Setup;
 using Microsoft.Purchases.Vendor;
 using System.Security.AccessControl;
 #endif
@@ -26,12 +27,13 @@ tableextension 99000829 "Mfg. Planning Component" extends "Planning Component"
             trigger OnValidate()
             var
                 PlanningRtngLine: Record "Planning Routing Line";
-#if not CLEAN27
+#if not CLEAN28
                 SKU: Record "Stockkeeping Unit";
                 Vendor: Record Vendor;
                 SubcontractingManagement: Codeunit SubcontractingManagement;
                 GetPlanningParameters: Codeunit "Planning-Get Parameters";
                 LicensePermission: Record "License Permission";
+                LegacySubcFeatureHandler: Codeunit "Legacy Subc. Feature Handler";
                 IsHandled: Boolean;
 #endif
             begin
@@ -42,7 +44,7 @@ tableextension 99000829 "Mfg. Planning Component" extends "Planning Component"
 
                 "Due Date" := ReqLine."Starting Date";
                 "Due Time" := ReqLine."Starting Time";
-#if CLEAN27
+#if CLEAN28
                 if "Routing Link Code" <> '' then begin
                     PlanningRtngLine.SetRange("Worksheet Template Name", "Worksheet Template Name");
                     PlanningRtngLine.SetRange("Worksheet Batch Name", "Worksheet Batch Name");
@@ -62,7 +64,7 @@ tableextension 99000829 "Mfg. Planning Component" extends "Planning Component"
                     if PlanningRtngLine.FindFirst() then begin
                         "Due Date" := PlanningRtngLine."Starting Date";
                         "Due Time" := PlanningRtngLine."Starting Time";
-                        if (PlanningRtngLine.Type = PlanningRtngLine.Type::"Work Center") then
+                        if (PlanningRtngLine.Type = PlanningRtngLine.Type::"Work Center") and LegacySubcFeatureHandler.IsLegacySubcontractingEnabled() then
                             if LicensePermission.Get(LicensePermission."Object Type"::Codeunit, CODEUNIT::SubcontractingManagement) then
                                 if LicensePermission."Execute Permission" <> LicensePermission."Execute Permission"::" " then
                                     if SubcontractingManagement.GetSubcontractor(PlanningRtngLine."No.", Vendor) then begin
@@ -249,25 +251,7 @@ tableextension 99000829 "Mfg. Planning Component" extends "Planning Component"
     end;
 
     local procedure GetFlushingMethodBin(): Code[20]
-#if not CLEAN26
-    var
-        ManufacturingSetup: Record Microsoft.Manufacturing.Setup."Manufacturing Setup";
-#endif
     begin
-#if not CLEAN26
-        if not ManufacturingSetup.IsFeatureKeyFlushingMethodManualWithoutPickEnabled() then
-            case "Flushing Method" of
-                "Flushing Method"::Manual,
-                "Flushing Method"::"Pick + Manual",
-                "Flushing Method"::"Pick + Forward",
-                "Flushing Method"::"Pick + Backward":
-                    exit(Location."To-Production Bin Code");
-                "Flushing Method"::Forward,
-                "Flushing Method"::Backward:
-                    exit(Location."Open Shop Floor Bin Code");
-            end
-        else
-#endif
         case "Flushing Method" of
             "Flushing Method"::"Pick + Manual",
             "Flushing Method"::"Pick + Forward",
@@ -327,7 +311,7 @@ tableextension 99000829 "Mfg. Planning Component" extends "Planning Component"
     begin
     end;
 
-#if not CLEAN27
+#if not CLEAN28
     [Obsolete('Preparation for replacement by Subcontracting app', '27.0')]
     [IntegrationEvent(false, false)]
     local procedure OnValidateRoutingLinkCodeOnBeforeSubcontractorProcurementCheck(var PlanningComponent: Record "Planning Component"; Vendor: Record Vendor; var IsHandled: Boolean)

@@ -231,7 +231,8 @@ page 55 "Purch. Invoice Subform"
                         UpdateEditableOnRow();
 
                         Rec.RestoreLookupSelection();
-                        NoOnAfterValidate();
+                        if Rec."No." <> xRec."No." then
+                            NoOnAfterValidate();
 
                         if Rec."No." = xRec."No." then
                             exit;
@@ -795,6 +796,11 @@ page 55 "Purch. Invoice Subform"
                     Visible = false;
                 }
                 field("Units per Parcel"; Rec."Units per Parcel")
+                {
+                    ApplicationArea = Basic, Suite;
+                    Visible = false;
+                }
+                field("Spend Request No."; Rec."Spend Request No.")
                 {
                     ApplicationArea = Basic, Suite;
                     Visible = false;
@@ -1439,6 +1445,9 @@ page 55 "Purch. Invoice Subform"
     var
         IsHandled: Boolean;
     begin
+        if not Unconditionally and (Rec."No." = xRec."No.") then
+            exit;
+
         IsHandled := false;
         OnBeforeInsertExtendedText(Rec, IsHandled);
         if IsHandled then
