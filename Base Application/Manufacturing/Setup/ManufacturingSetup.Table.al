@@ -10,12 +10,15 @@ using Microsoft.Foundation.Calendar;
 #endif
 using Microsoft.Foundation.NoSeries;
 using Microsoft.Inventory.BOM.Tree;
+using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Location;
 using Microsoft.Inventory.Planning;
 using Microsoft.Manufacturing.Capacity;
 using Microsoft.Manufacturing.Forecast;
 using Microsoft.Manufacturing.MachineCenter;
 using Microsoft.Manufacturing.ProductionBOM;
+using Microsoft.Manufacturing.Wizard;
+using Microsoft.Manufacturing.WorkCenter;
 using System.Telemetry;
 using System.Utilities;
 
@@ -321,11 +324,91 @@ table 99000765 "Manufacturing Setup"
             ToolTip = 'Specifies the default general business posting group for production orders.';
             TableRelation = "Gen. Business Posting Group";
         }
+        field(290; "Copy Loc. to Cap. Val. Entries"; Boolean)
+        {
+            Caption = 'Copy location code into value entries linked to capacity ledger entries';
+            InitValue = true;
+            ToolTip = 'Specifies whether the Location Code from the production order is copied to value entries linked to capacity ledger entries. When enabled, Inventory Posting Setup for that specific location is used. When disabled, Location Code remains blank on capacity value entries and Inventory Posting Setup for blank location is used.';
+        }
         field(300; "Default Flushing Method"; Enum "Flushing Method")
         {
             Caption = 'Default Flushing Method';
             InitValue = "Pick + Manual";
             ToolTip = 'Specifies default flushing method assigned to new items. A different flushing method on item cards will override this default.';
+        }
+        field(301; "Show Rtng BOM Select Both"; Enum "Prod. Definition Display")
+        {
+            Caption = 'Show BOM/Routing (Both Available)';
+            DataClassification = CustomerContent;
+            InitValue = Edit;
+            ToolTip = 'Specifies whether the BOM/Routing selection step is shown when both a BOM and a Routing exist for the item. This setting only applies in Create Production Order mode. In Define Item Structure mode, the BOM and Routing steps are always shown in Edit mode.';
+        }
+        field(302; "Show Rtng BOM Select Partial"; Enum "Prod. Definition Display")
+        {
+            Caption = 'Show BOM/Routing (Partially Available)';
+            DataClassification = CustomerContent;
+            InitValue = Edit;
+            ToolTip = 'Specifies whether the BOM/Routing selection step is shown when only one of BOM or Routing exists. This setting only applies in Create Production Order mode. In Define Item Structure mode, the BOM and Routing steps are always shown in Edit mode.';
+        }
+        field(303; "Show Rtng BOM Select Nothing"; Enum "Prod. Definition Display")
+        {
+            Caption = 'Show BOM/Routing (None Available)';
+            DataClassification = CustomerContent;
+            InitValue = Edit;
+            ToolTip = 'Specifies whether the BOM/Routing selection step is shown when neither a BOM nor a Routing exists. This setting only applies in Create Production Order mode. In Define Item Structure mode, the BOM and Routing steps are always shown in Edit mode.';
+        }
+        field(304; "Show Prod Comp Select Both"; Enum "Prod. Definition Display")
+        {
+            Caption = 'Show Prod. Components (Both Available)';
+            DataClassification = CustomerContent;
+            InitValue = Edit;
+            ToolTip = 'Specifies whether the components/routing preview steps are shown when both a BOM and a Routing exist. This setting only applies in Create Production Order mode. In Define Item Structure mode, the components and production routing steps are never shown.';
+        }
+        field(305; "Show Prod Comp Select Partial"; Enum "Prod. Definition Display")
+        {
+            Caption = 'Show Prod. Components (Partially Available)';
+            DataClassification = CustomerContent;
+            InitValue = Edit;
+            ToolTip = 'Specifies whether the components/routing preview steps are shown when only one of BOM or Routing exists. This setting only applies in Create Production Order mode. In Define Item Structure mode, the components and production routing steps are never shown.';
+        }
+        field(306; "Show Prod Comp Select Nothing"; Enum "Prod. Definition Display")
+        {
+            Caption = 'Show Prod. Components (None Available)';
+            DataClassification = CustomerContent;
+            InitValue = Edit;
+            ToolTip = 'Specifies whether the components/routing preview steps are shown when neither BOM nor Routing exists. This setting only applies in Create Production Order mode. In Define Item Structure mode, the components and production routing steps are never shown.';
+        }
+        field(307; "Always Save Modified Versions"; Boolean)
+        {
+            Caption = 'Always Save Modified Versions';
+            DataClassification = CustomerContent;
+            ToolTip = 'Specifies that newly created BOM/Routing versions are always kept even when the Save option is set to Empty when using the production order creation wizard.';
+        }
+        field(308; "Allow Edit UI Selection"; Boolean)
+        {
+            Caption = 'Allow Edit UI Selection';
+            DataClassification = CustomerContent;
+            ToolTip = 'Specifies that users can override the step visibility settings (Show/Edit/Hide) on the wizard introduction step.';
+        }
+        field(309; "Def. Wiz. Work Center No."; Code[20])
+        {
+            Caption = 'Default Prod. Wiz. Work Center No.';
+            DataClassification = CustomerContent;
+            TableRelation = "Work Center";
+            ToolTip = 'Specifies the fallback work center to use when creating new routing lines without an explicit work center.';
+        }
+        field(310; "Def. Wiz. Comp Item No."; Code[20])
+        {
+            Caption = 'Default Prod. Wiz. Component Item No.';
+            DataClassification = CustomerContent;
+            TableRelation = Item where(Type = filter(Inventory | "Non-Inventory"));
+            ToolTip = 'Specifies the default item to use when initializing a new BOM from scratch through the production order creation wizard.';
+        }
+        field(311; "Def. Wiz. Flushing Method"; Enum "Flushing Method")
+        {
+            Caption = 'Default Prod. Wiz. Flushing Method';
+            DataClassification = CustomerContent;
+            ToolTip = 'Specifies the default flushing method applied to Production Order Components when creating a new production BOM from scratch through the production order creation wizard. This is only used for temporary BOM creation; existing BOMs retain their original flushing method.';
         }
         field(5500; "Preset Output Quantity"; Option)
         {
@@ -334,6 +417,23 @@ table 99000765 "Manufacturing Setup"
             OptionCaption = 'Expected Quantity,Zero on All Operations,Zero on Last Operation';
             OptionMembers = "Expected Quantity","Zero on All Operations","Zero on Last Operation";
         }
+#if not CLEANSCHEMA32
+        field(5600; "Legacy Subcontracting"; Boolean)
+        {
+            Caption = 'Legacy Subcontracting';
+            ToolTip = 'Specifies whether to use legacy subcontracting functionality. When enabled, the system will create a purchase order for each subcontracted item on a production order. When disabled, the system will create a single purchase order for all subcontracted items on a production order with multiple lines for each subcontracted item.';
+            AllowInCustomizations = Never;
+            Editable = false;
+            ObsoleteReason = 'Legacy Subcontracting will be discontinued, environments should move to the Subcontracting App.';
+#if not CLEAN28
+            ObsoleteState = Pending;
+            ObsoleteTag = '28.0';
+#else
+            ObsoleteState = Removed;
+            ObsoleteTag = '32.0';
+#endif
+        }
+#endif
     }
 
     keys
@@ -381,16 +481,4 @@ table 99000765 "Manufacturing Setup"
     begin
         exit(ManufacturingSetupFeatureTelemetryNameLbl);
     end;
-
-#if not CLEAN26
-#pragma warning disable AS0072
-    [Obsolete('Feature ''Manual Flushing Method without requiring pick'' will be enabled by default in version 29.0.', '26.0')]
-    procedure IsFeatureKeyFlushingMethodManualWithoutPickEnabled(): Boolean
-    var
-        FeatureKeyManagement: Codeunit System.Environment.Configuration."Feature Key Management";
-    begin
-        exit(FeatureKeyManagement.IsManufacturingFlushingMethodActivateManualWithoutPickEnabled());
-    end;
-#pragma warning restore AS0072
-#endif
 }

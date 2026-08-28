@@ -31,6 +31,12 @@ page 5405 "Item Variant Card"
                 field("Code"; Rec.Code)
                 {
                     ApplicationArea = Planning;
+
+                    trigger OnValidate()
+                    begin
+                        if (xRec.Code = '') and (Rec.Code <> '') then
+                            CurrPage.Update(true);
+                    end;
                 }
                 field(Description; Rec.Description)
                 {

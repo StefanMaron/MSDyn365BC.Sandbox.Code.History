@@ -1,4 +1,4 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
@@ -7,7 +7,9 @@ namespace Microsoft.Manufacturing.Test;
 using Microsoft.Finance.Currency;
 using Microsoft.Finance.GeneralLedger.Ledger;
 using Microsoft.Finance.GeneralLedger.Setup;
+#if not CLEAN29
 using Microsoft.Finance.VAT.Setup;
+#endif
 using Microsoft.Foundation.Enums;
 using Microsoft.Foundation.Navigate;
 using Microsoft.Foundation.UOM;
@@ -31,11 +33,15 @@ using Microsoft.Manufacturing.Routing;
 using Microsoft.Manufacturing.Setup;
 using Microsoft.Manufacturing.StandardCost;
 using Microsoft.Manufacturing.WorkCenter;
+#if not CLEAN29
 using Microsoft.Pricing.Asset;
 using Microsoft.Pricing.PriceList;
 using Microsoft.Pricing.Source;
+#endif
 using Microsoft.Purchases.Document;
+#if not CLEAN29
 using Microsoft.Purchases.History;
+#endif
 using Microsoft.Purchases.Vendor;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.Setup;
@@ -93,11 +99,15 @@ codeunit 137079 "SCM Production Order III"
         LibraryPostInventoryToGL: Codeunit "Library - Post Inventory To GL";
         LibrarySetupStorage: Codeunit "Library - Setup Storage";
         ShopCalendarMgt: Codeunit "Shop Calendar Management";
+#if not CLEAN29
         LibraryPriceCalculation: Codeunit "Library - Price Calculation";
+#endif
         IsInitialized: Boolean;
         ItemJournalLineExistErr: Label 'There is no Item Journal Line within the filter.';
         TrackingMsg: Label 'The change will not affect existing entries';
+#if not CLEAN29
         ItemTrackingErr: Label 'You cannot define item tracking on this line because it is linked to production order';
+#endif
         StartingDateMsg: Label 'Starting Date must be less or equal.';
         EndingDateMsg: Label 'Ending Date must be greater or equal.';
         PickActivitiesCreatedMsg: Label 'Number of Invt. Pick activities created';
@@ -108,7 +118,9 @@ codeunit 137079 "SCM Production Order III"
         ExpectedCostPostingChangedMsg: Label 'Expected Cost Posting to G/L has been changed to Yes. You should now run Post Inventory Cost to G/L.';
         PostJournalLinesConfirmationMsg: Label 'Do you want to post the journal lines';
         JournalLinesPostedMsg: Label 'The journal lines were successfully posted.';
+#if not CLEAN29
         RecreatePurchaseLineConfirmHandlerQst: Label 'If you change %1, the existing purchase lines will be deleted and new purchase lines based on the new information in the header will be created.\\Do you want to continue?';
+#endif
         WHHandlingIsRequiredErr: Label 'Warehouse handling is required for Entry Type = Output';
         QtyPickedBaseErr: Label 'Qty. Picked (Base) must not be 0 in Prod. Order Component';
         ItemTrackingMode: Option AssignLotNo,AssignSerialNo,SelectEntries,SetValue,UpdateQuantityBase,SetNewValue;
@@ -120,9 +132,13 @@ codeunit 137079 "SCM Production Order III"
         ItemSubstItemNoErr: Label 'Wron Item Substitution No.';
         ValueEntrySourceTypeErr: Label 'Value Entry Source Type must be equal to %1';
         ValueEntrySourceNoErr: Label 'Value Entry Source No must be equal to %1';
+#if not CLEAN29
         ProdJournalOutQtyErr: Label 'Output Quantity should be 0 in Production Journal Line linked to Subcontracted Workcenter';
+#endif
         ComponentsAlreadyPickedQst: Label 'Components for production order %1 have already been picked. Do you want to continue?', Comment = 'Production order no.: Components for production order 101001 have already been picked. Do you want to continue?';
+#if not CLEAN29
         SubcItemJnlErr: Label '%1 must be zero', Comment = '%1 - "Subcontractor No."';
+#endif
         RtngLineBinCodeErr: Label 'Wrong %1 in %2.', Comment = '%1: Field(To-Production Bin Code), %2: TableCaption(Prod. Order Routing Line)';
         QuantityImbalanceErr: Label 'out of balance';
         InvalidPrecisionErr: Label 'field to be incorrect';
@@ -484,7 +500,7 @@ codeunit 137079 "SCM Production Order III"
         // Verify: Verify the Quantity and Location Code and Action Message on Requisition Line.
         VerifyRequisitionLineWithLocation(Item."No.", Quantity, LocationBlue.Code, RequisitionLine."Action Message"::New);
     end;
-
+#if not CLEAN29
     [Test]
     [HandlerFunctions('ItemTrackingPageHandler')]
     [Scope('OnPrem')]
@@ -647,7 +663,7 @@ codeunit 137079 "SCM Production Order III"
         VerifyReservationEntry(Item."No.", ProductionOrder.Quantity, ReservationEntry."Reservation Status"::Surplus, LocationBlue.Code);
         VerifyRequisitionLineForSubcontract(ProductionOrder, WorkCenter, Item."No.");
     end;
-
+#endif
     [Test]
     [Scope('OnPrem')]
     procedure StartingDateOnProdOrderRoutingLineForReleasedProdOrderSchedulingBack()
@@ -1460,7 +1476,7 @@ codeunit 137079 "SCM Production Order III"
         VerifyValueEntryForEntryType(
             ValueEntry."Entry Type"::"Indirect Cost", ProductionOrder."No.", 0, CostAmount, 0, ProdOrderLine."Overhead Rate", CostAmount);
     end;
-
+#if not CLEAN29
     [Test]
     [HandlerFunctions('ConfirmHandlerTRUE')]
     [Scope('OnPrem')]
@@ -1495,7 +1511,7 @@ codeunit 137079 "SCM Production Order III"
         // Verify: Verify that the Purchase line should not be updated with Item card. And the field values remains the same.
         VerifyRecreatedPurchaseLine(PurchaseLine, PurchaseHeader."VAT Bus. Posting Group");
     end;
-
+#endif
     [Test]
     [Scope('OnPrem')]
     procedure PostOutputCorrectionWithRequirePickLocationForItemWithRouting()
@@ -2406,6 +2422,7 @@ codeunit 137079 "SCM Production Order III"
             Assert.IsTrue(TempItem.Get(ItemNo[i]), ItemSubstItemNoErr);
     end;
 
+#if not CLEAN29
     [Test]
     [HandlerFunctions('ConfirmHandler')]
     [Scope('OnPrem')]
@@ -2441,6 +2458,7 @@ codeunit 137079 "SCM Production Order III"
         // [THEN] Value Entry is created with "Source Type" and "Source No." taken from from Original VE
         VerifyValueEntrySource(ProductionOrder."No.", WorkCenter."Subcontractor No.", ValueEntry."Source Type"::Vendor);
     end;
+#endif
 
     [Test]
     [HandlerFunctions('ConfirmHandlerTRUE,PostProductionJournalHandler,MessageHandler')]
@@ -2476,6 +2494,7 @@ codeunit 137079 "SCM Production Order III"
         VerifyValueEntrySource(ProdOrderNo, Item."No.", ValueEntry."Source Type"::Item);
     end;
 
+#if not CLEAN29
     [Test]
     [HandlerFunctions('ProductionJournalSubcontractedPageHandler')]
     [Scope('OnPrem')]
@@ -2563,6 +2582,7 @@ codeunit 137079 "SCM Production Order III"
         // [THEN] Error is thrown: "Subcontracor No." must not be
         Assert.ExpectedError(StrSubstNo(SubcItemJnlErr, ItemJournalLine.FieldCaption("Setup Time")));
     end;
+#endif
 
     [Test]
     [Scope('OnPrem')]
@@ -2609,7 +2629,7 @@ codeunit 137079 "SCM Production Order III"
 
     [Test]
     [Scope('OnPrem')]
-    procedure PlannedProdOrderRoutingGetsToProdBinFromWorkCenter()
+    procedure PlannedProdOrderRoutingGetsOpenShopFloorBinFromWorkCenterForManualFlushingMethod()
     var
         RequisitionLine: Record "Requisition Line";
         WorkCenter: Record "Work Center";
@@ -2617,21 +2637,21 @@ codeunit 137079 "SCM Production Order III"
         ItemNo: Code[20];
     begin
         // [FEATURE] [Planning Worksheet] [Work Center] [Bin]
-        // [SCENARIO 379347] Prod. Order Routing Line gets "To-Production Bin Code" from Work Center with Manual Flushing Method through Planning.
+        // [SCENARIO 379347] Prod. Order Routing Line gets "Open Shop Floor Bin Code" from Work Center with Manual Flushing Method through Planning.
         Initialize();
 
-        // [GIVEN] Create Work Center with "Flushing Method" = Manual and "To-Production Bin Code" = "B".
+        // [GIVEN] Create Work Center with "Flushing Method" = Manual and "Open Shop Floor Bin Code" = "B".
         // [GIVEN] Create Requisition Line by calculating Regenerative Plan. Update Work Center on Planning Routing.
         CreateRequisitionLineWithPlanningRouting(RequisitionLine, WorkCenter, ItemNo);
 
         // [WHEN] Carry out Action Message.
         LibraryPlanning.CarryOutActionMsgPlanWksh(RequisitionLine);
 
-        // [THEN] "To-Production Bin Code" in Prod. Order Routing Line is equal to "B".
+        // [THEN] "Open Shop Floor Bin Code" in Prod. Order Routing Line is equal to "B".
         FindProdOrderRoutingLine(ProdOrderRoutingLine, ItemNo);
         Assert.AreEqual(
-          WorkCenter."To-Production Bin Code", ProdOrderRoutingLine."To-Production Bin Code",
-          StrSubstNo(RtngLineBinCodeErr, ProdOrderRoutingLine.FieldCaption("To-Production Bin Code"), ProdOrderRoutingLine.TableCaption()));
+          WorkCenter."Open Shop Floor Bin Code", ProdOrderRoutingLine."Open Shop Floor Bin Code",
+          StrSubstNo(RtngLineBinCodeErr, ProdOrderRoutingLine.FieldCaption("Open Shop Floor Bin Code"), ProdOrderRoutingLine.TableCaption()));
     end;
 
     [Test]
@@ -4816,6 +4836,7 @@ codeunit 137079 "SCM Production Order III"
         ProdOrderCapacityNeed.TestField("Allocated Time", ProdOrderRoutingLine."Run Time");
     end;
 
+#if not CLEAN29
     [Test]
     procedure ConsiderQtyPerUnitOfMeasureForUnitCostInSubcontracting()
     var
@@ -4856,6 +4877,7 @@ codeunit 137079 "SCM Production Order III"
         ItemLedgerEntry.CalcFields("Cost Amount (Expected)");
         ItemLedgerEntry.TestField("Cost Amount (Expected)", ProdOrderLine."Cost Amount");
     end;
+#endif
 
     [Test]
     procedure LastModifiedDateUpdatedOnChangeDueDate()
@@ -4951,6 +4973,7 @@ codeunit 137079 "SCM Production Order III"
         ProdOrderComponent.TestField("Expected Qty. (Base)", 0.05904);
     end;
 
+#if not CLEAN29
     [Test]
     [Scope('OnPrem')]
     procedure QtyRndingPrecisionRespectedOnPurchLineFromSubcontracting()
@@ -5001,6 +5024,7 @@ codeunit 137079 "SCM Production Order III"
         FindItemLedgerEntry(ItemLedgerEntry, ItemLedgerEntry."Entry Type"::Output, Item."No.");
         ItemLedgerEntry.TestField(Quantity, 6);
     end;
+#endif
 
     [Test]
     procedure ConsiderLeadTimeBeforeCalculateComponents()
@@ -5124,6 +5148,7 @@ codeunit 137079 "SCM Production Order III"
         LibraryVariableStorage.AssertEmpty();
     end;
 
+#if not CLEAN29
     [Test]
     procedure RoundingInCostAmountAfterPostingSubcontractingPOWithUoM()
     var
@@ -5193,6 +5218,7 @@ codeunit 137079 "SCM Production Order III"
         ValueEntry.CalcSums("Cost Amount (Actual)");
         ValueEntry.TestField("Cost Amount (Actual)", 24000);
     end;
+#endif
 
     [Test]
     procedure VerifyFinishedProdOrderLineDataForFamilySourceTypeAndRoutingWithBackwardFlushingOnWorkCenter()
@@ -5246,6 +5272,7 @@ codeunit 137079 "SCM Production Order III"
         ProdOrderLine.TestField("Finished Qty. (Base)", ProductionOrder.Quantity);
     end;
 
+#if not CLEAN29
     [Test]
     [Scope('OnPrem')]
     procedure ValidatePurchaseLinePriceUpdateWithPurchasePriceListFunctionality()
@@ -5301,6 +5328,7 @@ codeunit 137079 "SCM Production Order III"
         PurchaseOrder.Control3.PurchasePrices.Lookup();
         LibraryPriceCalculation.DisableExtendedPriceCalculation();
     end;
+#endif
 
     [Test]
     procedure VerifyReleasedProdOrderAllocatedCapacityForFamilySourceType()
@@ -5461,6 +5489,7 @@ codeunit 137079 "SCM Production Order III"
         CapacityLedgerEntries: TestPage "Capacity Ledger Entries";
         RunTime: Decimal;
         UnitCost: Decimal;
+        OutputQty: Decimal;
     begin
         // [SCENARIO 327365] Verify a Reverse Entry should not be created for the last operation of the capacity ledger entry when the reverse action is executed.
         Initialize();
@@ -5475,13 +5504,15 @@ codeunit 137079 "SCM Production Order III"
         // [GIVEN] Generate Random Run Time and Unit Cost.
         RunTime := LibraryRandom.RandDec(10, 2);
         UnitCost := LibraryRandom.RandDec(10, 2);
+        OutputQty := LibraryRandom.RandDec(10, 2);
 
         // [GIVEN] Create and Post Output Journal.
-        CreateAndPostOutputJournalWithRunTimeAndUnitCost(ProductionOrder."No.", 0, RunTime, UnitCost);
+        CreateAndPostOutputJournalWithRunTimeAndUnitCost(ProductionOrder."No.", OutputQty, RunTime, UnitCost);
 
         // [GIVEN] OpenEdit Capacity Ledger Entries.
         CapacityLedgerEntries.OpenEdit();
         CapacityLedgerEntries.Filter.SetFilter("Order No.", ProductionOrder."No.");
+        CapacityLedgerEntries.Filter.SetFilter("Output Quantity", '<>0');
 
         // [WHEN] Invoke "Reverse" action.
         asserterror CapacityLedgerEntries.Reverse.Invoke();
@@ -7731,6 +7762,7 @@ codeunit 137079 "SCM Production Order III"
         Assert.RecordIsNotEmpty(ItemLedgerEntry);
     end;
 
+#if not CLEAN29
     [Test]
     [HandlerFunctions('ConfirmHandler')]
     procedure UndoFirstReceiptInSubcontractingPurchaseOrder()
@@ -8017,6 +8049,7 @@ codeunit 137079 "SCM Production Order III"
         ProdOrderLine.FindFirst();
         ProdOrderLine.OpenItemTrackingLines();
     end;
+#endif
 
     [Test]
     procedure VerifyACYCalculatedCorrectlyForNonInventoryOutputInProduction()
@@ -8240,6 +8273,81 @@ codeunit 137079 "SCM Production Order III"
         asserterror LibraryInventory.PostItemJournalLine(OutputItemJournalBatch."Journal Template Name", OutputItemJournalBatch.Name);
     end;
 
+    [Test]
+    [HandlerFunctions('ConfirmHandler')]
+    procedure ReverseCapacityLedgerEntryLastOperationWithoutOutput()
+    var
+        Item: Record Item;
+        WorkCenter: Record "Work Center";
+        ProductionOrder: Record "Production Order";
+        CapacityLedgerEntries: TestPage "Capacity Ledger Entries";
+        RunTime: Decimal;
+        UnitCost: Decimal;
+    begin
+        // [SCENARIO 623277] When capacity-only entry (no output) and capacity+output entry both exist on the last operation, the capacity-only entry can be reversed directly from Capacity Ledger Entries.
+        Initialize();
+
+        // [GIVEN] Create Production item with routing.
+        CreateProductionItem(Item, '');
+        CreateRoutingAndUpdateItem(Item, WorkCenter);
+
+        // [GIVEN] Create and Refresh Released Production Order.
+        CreateAndRefreshReleasedProductionOrder(ProductionOrder, Item."No.", LibraryRandom.RandInt(10), '', '');
+
+        // [GIVEN] Generate Random Run Time and Unit Cost.
+        RunTime := LibraryRandom.RandDec(10, 2);
+        UnitCost := LibraryRandom.RandDec(10, 2);
+
+        // [GIVEN] Create and Post Output Journal with output quantity on the last operation.
+        CreateAndPostOutputJournalWithRunTimeAndUnitCost(ProductionOrder."No.", LibraryRandom.RandInt(10), RunTime, UnitCost);
+
+        // [GIVEN] OpenEdit Capacity Ledger Entries.
+        CapacityLedgerEntries.OpenEdit();
+        CapacityLedgerEntries.Filter.SetFilter("Order No.", ProductionOrder."No.");
+        CapacityLedgerEntries.Filter.SetFilter("Output Quantity", '0');
+
+        // [WHEN] Invoke "Reverse" action.Reverse Entry should be created for last operation of Capacity Ledger Entry without output.
+        CapacityLedgerEntries.Reverse.Invoke();
+    end;
+
+    [Test]
+    [HandlerFunctions('ConfirmHandler,FinishedProdOrderPageHandler')]
+    procedure VerifyShowDocumentOpensFinishedProductionOrderFromProdOrderLineList()
+    var
+        Item: Record Item;
+        ProductionOrder: Record "Production Order";
+        ProdOrderLineList: TestPage "Prod. Order Line List";
+    begin
+        // [FEATURE] [AI test]
+        // [SCENARIO 639865] "Show Document" action on "Prod. Order Line List" must open "Finished Production Order" page for Finished status.
+        Initialize();
+
+        // [GIVEN] Create a simple manufacturing item.
+        LibraryInventory.CreateItem(Item);
+
+        // [GIVEN] Create and Refresh a Released Production Order.
+        LibraryManufacturing.CreateProductionOrder(
+            ProductionOrder, ProductionOrder.Status::Released, ProductionOrder."Source Type"::Item, Item."No.", LibraryRandom.RandInt(5));
+        LibraryManufacturing.RefreshProdOrder(ProductionOrder, false, true, true, true, false);
+
+        // [GIVEN] Change status from Released to Finished.
+        LibraryManufacturing.ChangeStatusReleasedToFinished(ProductionOrder."No.");
+        ProductionOrder.Get(ProductionOrder.Status::Finished, ProductionOrder."No.");
+
+        // [GIVEN] Open the "Prod. Order Line List" page filtered to the Finished Production Order.
+        ProdOrderLineList.OpenView();
+        ProdOrderLineList.Filter.SetFilter(Status, Format(ProductionOrder.Status::Finished));
+        ProdOrderLineList.Filter.SetFilter("Prod. Order No.", ProductionOrder."No.");
+        ProdOrderLineList.First();
+
+        // [WHEN] Invoke "Show Document" action.
+        LibraryVariableStorage.Enqueue(ProductionOrder."No.");
+        ProdOrderLineList.ShowDocument.Invoke();
+
+        // [THEN] "Finished Production Order" page opens (handler verifies the correct order).
+        LibraryVariableStorage.AssertEmpty();
+    end;
+
     local procedure Initialize()
     begin
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"SCM Production Order III");
@@ -8367,6 +8475,7 @@ codeunit 137079 "SCM Production Order III"
         ItemJournalLine.Modify(true);
     end;
 
+#if not CLEAN29
     local procedure MockSubcontractedJournalLine(var ItemJournalLine: Record "Item Journal Line")
     var
         WorkCenter: Record "Work Center";
@@ -8383,6 +8492,7 @@ codeunit 137079 "SCM Production Order III"
         ItemJournalLine."Work Center No." := WorkCenter."No.";
         ItemJournalLine.Insert();
     end;
+#endif
 
     local procedure CreateItemsSetup(var Item: Record Item; var Item2: Record Item; QuantityPer: Decimal)
     var
@@ -8529,7 +8639,7 @@ codeunit 137079 "SCM Production Order III"
         AcceptActionMessage(RequisitionLine, ItemNo);
         LibraryPlanning.CarryOutReqWksh(RequisitionLine, WorkDate(), WorkDate(), WorkDate(), WorkDate(), '');
     end;
-
+#if not CLEAN29
     local procedure AssignTrackingOnProdOrderLine(ProdOrderNo: Code[20])
     var
         ProdOrderLine: Record "Prod. Order Line";
@@ -8538,7 +8648,7 @@ codeunit 137079 "SCM Production Order III"
         ProdOrderLine.FindFirst();
         ProdOrderLine.OpenItemTrackingLines();  // Invokes ItemTrackingPageHandler.
     end;
-
+#endif
     local procedure CalculateAndPostConsumptionJournal(ProductionOrderNo: Code[20])
     var
         ItemJournalLine: Record "Item Journal Line";
@@ -8613,7 +8723,7 @@ codeunit 137079 "SCM Production Order III"
         LibraryManufacturing.OutputJnlExplodeRoute(ItemJournalLine);
         SelectItemJournalLine(ItemJournalLine, OutputItemJournalBatch."Journal Template Name", OutputItemJournalBatch.Name);
     end;
-
+#if not CLEAN29
     local procedure UndoPurchReceiptWithProductionSubcontracting(ItemWithTracking: Boolean; DoInvoiceSubcontracting: Boolean; DoConsumeOutputBeforeUndo: Boolean)
     var
         WorkCenter: Record "Work Center";
@@ -8658,7 +8768,7 @@ codeunit 137079 "SCM Production Order III"
         // [THEN] Verify that CapacityLE are reversed after Undo Purchase Receipt.
         VerifyCapacityLedgerEntryAfterUndo(DocumentNo, Item."No.");
     end;
-
+#endif
     local procedure CreateOutputCorrectionWithLocationAndItemTracking(var Item: Record Item; var ProductionOrder: Record "Production Order"; LocationCode: Code[10]; ApplyToItemEntry: Boolean)
     var
         RoutingLine: Record "Routing Line";
@@ -8847,11 +8957,15 @@ codeunit 137079 "SCM Production Order III"
         exit(ItemTrackingCode.Code);
     end;
 
+#if not CLEAN29
     local procedure CalculateSubcontractOrder(var WorkCenter: Record "Work Center")
     begin
         WorkCenter.SetRange("No.", WorkCenter."No.");
+#pragma warning disable AL0432
         LibraryManufacturing.CalculateSubcontractOrder(WorkCenter);
+#pragma warning restore AL0432
     end;
+#endif
 
     local procedure CreateWorkCenter(var WorkCenter: Record "Work Center"; IsSubcontracted: Boolean)
     var
@@ -9219,7 +9333,9 @@ codeunit 137079 "SCM Production Order III"
         RoutingLine: Record "Routing Line";
     begin
         CreateRoutingAndUpdateItem(Item, WorkCenter);
+#if not CLEAN29
         WorkCenter.Validate("Subcontractor No.", '');
+#endif
         WorkCenter.Modify();
         UpdateFlushingMethodOnWorkCenter(WorkCenter, FlushingMethod); // The flushing method on work center will be copied to Prod. Order Routing Line
         RoutingHeader.Get(Item."Routing No.");
@@ -9276,6 +9392,7 @@ codeunit 137079 "SCM Production Order III"
         ProdOrderLine.Modify();
     end;
 
+#if not CLEAN29
     local procedure CreateAndPostSubcontractingPurchaseOrder(WorkCenter: Record "Work Center"; ItemNo: Code[20])
     var
         RequisitionLine: Record "Requisition Line";
@@ -9293,6 +9410,7 @@ codeunit 137079 "SCM Production Order III"
         PurchaseLine.Modify();
         LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
     end;
+#endif
 
     local procedure CreateProdOrderAddNewComponentAndCreateConsumptionLine(var ProdOrderComponent: Record "Prod. Order Component"; CompLineQtyPer: Decimal)
     var
@@ -9428,7 +9546,7 @@ codeunit 137079 "SCM Production Order III"
         if RoutingLine.FindLast() then
             exit(RoutingLine."Operation No.");
     end;
-
+#if not CLEAN29
     local procedure FindPurchaseOrderLine(var PurchaseLine: Record "Purchase Line"; No: Code[20])
     begin
         PurchaseLine.SetRange("Document Type", PurchaseLine."Document Type"::Order);
@@ -9436,14 +9554,14 @@ codeunit 137079 "SCM Production Order III"
         PurchaseLine.SetRange("No.", No);
         PurchaseLine.FindFirst();
     end;
-
+#endif
     local procedure FindWarehouseReceiptNo(var WarehouseReceiptLine: Record "Warehouse Receipt Line"; SourceDocument: Enum "Warehouse Activity Source Document"; SourceNo: Code[20])
     begin
         WarehouseReceiptLine.SetRange("Source Document", SourceDocument);
         WarehouseReceiptLine.SetRange("Source No.", SourceNo);
         WarehouseReceiptLine.FindFirst();
     end;
-
+#if not CLEAN29
     local procedure PostPurchaseOrderAsShip(ItemNo: Code[20])
     var
         PurchaseHeader: Record "Purchase Header";
@@ -9477,7 +9595,7 @@ codeunit 137079 "SCM Production Order III"
         LibraryPurchase.UndoPurchaseReceiptLine(PurchRcptLine);
         exit(PurchRcptLine."Document No.");
     end;
-
+#endif
     local procedure FindProductionOrderRoutingLine(var ProdOrderRoutingLine: Record "Prod. Order Routing Line"; ProductionOrderNo: Code[20])
     begin
         ProdOrderRoutingLine.SetRange("Prod. Order No.", ProductionOrderNo);
@@ -10093,7 +10211,7 @@ codeunit 137079 "SCM Production Order III"
         ProdOrderLine.Validate("Unit of Measure Code", UnitOfMeasureCode);
         ProdOrderLine.Modify(true);
     end;
-
+#if not CLEAN29
     local procedure UpdatePurchaseHeaderVATBusPostingGroup(var PurchaseHeader: Record "Purchase Header")
     begin
         PurchaseHeader.Validate("VAT Bus. Posting Group", GetDifferentVATBusPostingGroup(PurchaseHeader."VAT Bus. Posting Group"));
@@ -10108,6 +10226,7 @@ codeunit 137079 "SCM Production Order III"
         VATPostingSetup.FindLast();
         exit(VATPostingSetup."VAT Bus. Posting Group");
     end;
+#endif
 
     local procedure InitProdOrderComponent(var NewProdOrderComponent: Record "Prod. Order Component"; OldProdOrderComponent: Record "Prod. Order Component")
     begin
@@ -10226,7 +10345,7 @@ codeunit 137079 "SCM Production Order III"
         PurchaseLine.FindFirst();
         PurchaseLine.TestField(Quantity, Quantity);
     end;
-
+#if not CLEAN29
     local procedure VerifyRecreatedPurchaseLine(PurchaseLine: Record "Purchase Line"; VATBusPostingGroupCode: Code[20])
     var
         RecreatedPurchaseLine: Record "Purchase Line";
@@ -10244,7 +10363,7 @@ codeunit 137079 "SCM Production Order III"
         RecreatedPurchaseLine.TestField("Requested Receipt Date", PurchaseLine."Requested Receipt Date");
         RecreatedPurchaseLine.TestField("VAT Bus. Posting Group", VATBusPostingGroupCode);
     end;
-
+#endif
     local procedure VerifyRequisitionLine(No: Code[20]; ActionMessage: Enum "Action Message Type"; Quantity: Decimal;
                                                                            DueDate: Date)
     var
@@ -10314,6 +10433,7 @@ codeunit 137079 "SCM Production Order III"
         ReservationEntry.TestField("Location Code", LocationCode);
     end;
 
+#if not CLEAN29
     local procedure VerifyRequisitionLineForSubcontract(ProductionOrder: Record "Production Order"; WorkCenter: Record "Work Center"; ItemNo: Code[20])
     var
         RequisitionLine: Record "Requisition Line";
@@ -10358,6 +10478,7 @@ codeunit 137079 "SCM Production Order III"
         CapacityLedgerEntry.TestField("Output Quantity", 0);
         CapacityLedgerEntry.TestField("Invoiced Quantity", 0);
     end;
+#endif
 
     local procedure VerifyRegisteredWhseActivityLine(RegisteredWhseActivityLine: Record "Registered Whse. Activity Line"; UnitOfMeasureCode: Code[10]; QtyPerUnitOfMeasure: Integer; Quantity: Decimal)
     begin
@@ -11345,6 +11466,7 @@ codeunit 137079 "SCM Production Order III"
         ItemSubstitutionEntries.Cancel().Invoke();
     end;
 
+#if not CLEAN29
     [ModalPageHandler]
     [Scope('OnPrem')]
     procedure ProductionJournalSubcontractedPageHandler(var ProductionJournal: TestPage "Production Journal")
@@ -11352,6 +11474,7 @@ codeunit 137079 "SCM Production Order III"
         ProductionJournal.First();
         Assert.AreEqual(0, ProductionJournal."Output Quantity".AsDecimal(), ProdJournalOutQtyErr);
     end;
+#endif
 
     [ModalPageHandler]
     [Scope('OnPrem')]
@@ -11399,6 +11522,15 @@ codeunit 137079 "SCM Production Order III"
     [PageHandler]
     procedure ReleasedProdOrderPageHandler(var ReleasedProductionOrder: TestPage "Released Production Order")
     begin
+    end;
+
+    [PageHandler]
+    procedure FinishedProdOrderPageHandler(var FinishedProductionOrder: TestPage "Finished Production Order")
+    var
+        ExpectedProdOrderNo: Code[20];
+    begin
+        ExpectedProdOrderNo := CopyStr(LibraryVariableStorage.DequeueText(), 1, MaxStrLen(ExpectedProdOrderNo));
+        FinishedProductionOrder."No.".AssertEquals(ExpectedProdOrderNo);
     end;
 
     [StrMenuHandler]

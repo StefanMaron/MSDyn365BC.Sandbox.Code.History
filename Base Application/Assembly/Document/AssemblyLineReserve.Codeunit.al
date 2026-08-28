@@ -339,6 +339,7 @@ codeunit 926 "Assembly Line-Reserve"
         ReservationEntry.SetRange("Source Type", Database::"Assembly Line");
         ReservationEntry.SetRange("Source Subtype", AssemblyLine."Document Type");
         ReservationEntry.SetRange("Source ID", AssemblyLine."Document No.");
+        ReservationEntry.SetRange("Source Ref. No.", AssemblyLine."Line No.");
         ReservationEntry.SetRange("Source Batch Name", '');
         ReservationEntry.SetRange("Source Prod. Order Line", 0);
         CreateReservEntry.UpdateItemTrackingAfterPosting(ReservationEntry);
@@ -938,9 +939,6 @@ codeunit 926 "Assembly Line-Reserve"
         SourceRecRef.SetTable(AssemblyLine);
         AssemblyLine.SetReservationEntry(CalcReservEntry);
         OnSetAssemblyLineOnBeforeUpdateReservation(CalcReservEntry, AssemblyLine);
-#if not CLEAN26
-        ReservationManagement.RunOnSetAssemblyLineOnBeforeUpdateReservation(CalcReservEntry, AssemblyLine);
-#endif
         EntryIsPositive := ((CreateReservEntry.SignFactor(CalcReservEntry) * AssemblyLine."Remaining Quantity (Base)") <= 0);
     end;
 

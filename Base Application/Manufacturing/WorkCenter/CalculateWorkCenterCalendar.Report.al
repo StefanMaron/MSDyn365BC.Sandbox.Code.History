@@ -9,6 +9,7 @@ using Microsoft.Manufacturing.Capacity;
 report 99001046 "Calculate Work Center Calendar"
 {
     Caption = 'Calculate Work Center Calendar';
+    ToolTip = 'Create new calendar entries for the work center to define the available daily capacity.';
     ProcessingOnly = true;
 
     dataset
@@ -16,7 +17,7 @@ report 99001046 "Calculate Work Center Calendar"
         dataitem("Work Center"; "Work Center")
         {
             DataItemTableView = sorting("No.");
-            RequestFilterFields = "No.";
+            RequestFilterFields = "No.", "Work Center Group Code";
 
             trigger OnAfterGetRecord()
             begin

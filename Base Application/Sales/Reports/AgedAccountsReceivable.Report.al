@@ -18,8 +18,6 @@ using System.Utilities;
 
 report 120 "Aged Accounts Receivable"
 {
-    DefaultLayout = RDLC;
-    RDLCLayout = './Sales/Reports/AgedAccountsReceivable.rdlc';
     ApplicationArea = Basic, Suite;
     Caption = 'Aged Accounts Receivable (Obsolete)';
     PreviewMode = PrintLayout;
@@ -28,6 +26,7 @@ report 120 "Aged Accounts Receivable"
     ObsoleteState = Pending;
     ObsoleteReason = 'This report has been replaced by the report Aged Accounts Receivable (Excel). This report will be removed in a future release.';
     ObsoleteTag = '28.0';
+    DefaultRenderingLayout = RDLCLayout;
 
     dataset
     {
@@ -439,6 +438,7 @@ report 120 "Aged Accounts Receivable"
                                     CurrReport.Break();
 
                             CustLedgEntryEndingDate := TempCustLedgEntry;
+                            DetailedCustomerLedgerEntry.SetLoadFields("Entry Type", "Posting Date", Amount, "Amount (LCY)");
                             DetailedCustomerLedgerEntry.SetRange("Cust. Ledger Entry No.", CustLedgEntryEndingDate."Entry No.");
                             OnTempCustLedgEntryGetRecordOnAfterSetDetailedEntryFilters(DetailedCustomerLedgerEntry);
                             if DetailedCustomerLedgerEntry.FindSet(false) then
@@ -737,6 +737,16 @@ report 120 "Aged Accounts Receivable"
             if Format(PeriodLength) = '' then
                 Evaluate(PeriodLength, '<1M>');
         end;
+    }
+
+    rendering
+    {
+        layout(RDLCLayout)
+        {
+            Type = RDLC;
+            LayoutFile = './Sales/Reports/AgedAccountsReceivable.rdlc';
+            Summary = 'Report layout made in the legacy RDLC format. Use an RDLC editor to modify the layout.';
+        }
     }
 
     labels

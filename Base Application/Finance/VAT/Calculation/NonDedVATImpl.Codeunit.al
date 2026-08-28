@@ -237,7 +237,10 @@ codeunit 6201 "Non-Ded. VAT Impl."
         if IsHandled then
             exit;
         if VATAmountLine."Non-Deductible VAT %" = 100 then
-            VATAmountLine.Validate("Non-Deductible VAT Amount", VATAmountLine."VAT Amount");
+            VATAmountLine.Validate("Non-Deductible VAT Amount", VATAmountLine."VAT Amount")
+        else
+            if VATAmountLine."Non-Deductible VAT %" <> 0 then
+                VATAmountLine.Validate("Non-Deductible VAT Amount", Round(VATAmountLine."VAT Amount" * VATAmountLine."Non-Deductible VAT %" / 100, 0.01));
         VATAmountLine."Deductible VAT Amount" := VATAmountLine."VAT Amount" - VATAmountLine."Non-Deductible VAT Amount";
         if VATAmountLine."Deductible VAT Amount" < 0 then
             VATAmountLine.FieldError("Deductible VAT Amount", CannotBeNegativeErr);
@@ -387,7 +390,7 @@ codeunit 6201 "Non-Ded. VAT Impl."
         VATAmountLine."Calc. Non-Ded. VAT Amount" := Round(VATAmountLine."Calc. Non-Ded. VAT Amount", Currency."Amount Rounding Precision");
         VATAmountLine."Non-Deductible VAT Diff." += PurchaseLine."Non-Deductible VAT Diff.";
         // Ensure deductible amounts are not negative due to rounding
-        if VATAmountLine."Deductible VAT Base" < 0 then begin
+        if (VATAmountLine."Deductible VAT Base" < 0) and (VATAmountLine.Quantity > 0) and (VATAmountLine."Non-Deductible VAT %" > 0) then begin
             VATAmountLine."Non-Deductible VAT Base" += VATAmountLine."Deductible VAT Base";
             VATAmountLine."Deductible VAT Base" := 0;
             VATAmountLine."Non-Deductible VAT Amount" += VATAmountLine."Deductible VAT Amount";
@@ -606,6 +609,7 @@ codeunit 6201 "Non-Ded. VAT Impl."
 
         PurchaseLine."Non-Deductible VAT Base" := -PurchaseLine."Non-Deductible VAT Base";
         PurchaseLine."Non-Deductible VAT Amount" := -PurchaseLine."Non-Deductible VAT Amount";
+        PurchaseLine."Non-Deductible VAT Diff." := -PurchaseLine."Non-Deductible VAT Diff.";
     end;
 
     procedure Reverse(var InvoicePostingBuffer: Record "Invoice Posting Buffer")
@@ -785,6 +789,15 @@ codeunit 6201 "Non-Ded. VAT Impl."
             GenJournalLine.Validate("Non-Deductible VAT Amount LCY", GenJournalLine."Non-Deductible VAT Amount");
             exit;
         end;
+        if (GetNonDedVATPctFromGenJournalLine(GenJournalLine) = 100) and (GenJournalLine."VAT Difference" = 0) then begin
+            GenJournalLine.Validate(
+                "Non-Deductible VAT Base LCY",
+                Round(GenJournalLine."VAT Base Amount (LCY)" * GetNonDedVATPctFromGenJournalLine(GenJournalLine) / 100, Currency."Amount Rounding Precision"));
+            GenJournalLine.Validate(
+                "Non-Deductible VAT Amount LCY",
+                Round((GenJournalLine."Amount (LCY)" - GenJournalLine."VAT Base Amount (LCY)") * GetNonDedVATPctFromGenJournalLine(GenJournalLine) / 100, Currency."Amount Rounding Precision"));
+            exit;
+        end;
         GenJournalLine.Validate(
             "Non-Deductible VAT Base LCY",
             Round(
@@ -823,6 +836,15 @@ codeunit 6201 "Non-Ded. VAT Impl."
         if GenJournalLine."Currency Code" = '' then begin
             GenJournalLine.Validate("Bal. Non-Ded. VAT Base LCY", GenJournalLine."Bal. Non-Ded. VAT Base");
             GenJournalLine.Validate("Bal. Non-Ded. VAT Amount LCY", GenJournalLine."Bal. Non-Ded. VAT Amount");
+            exit;
+        end;
+        if (GetBalNonDedVATPctFromGenJournalLine(GenJournalLine) = 100) and (GenJournalLine."Bal. VAT Difference" = 0) then begin
+            GenJournalLine.Validate(
+                "Bal. Non-Ded. VAT Base LCY",
+                Round(GenJournalLine."Bal. VAT Base Amount (LCY)" * GetBalNonDedVATPctFromGenJournalLine(GenJournalLine) / 100, Currency."Amount Rounding Precision"));
+            GenJournalLine.Validate(
+                "Bal. Non-Ded. VAT Amount LCY",
+                Round((-GenJournalLine."Bal. VAT Base Amount (LCY)" - GenJournalLine."Amount (LCY)") * GetBalNonDedVATPctFromGenJournalLine(GenJournalLine) / 100, Currency."Amount Rounding Precision"));
             exit;
         end;
         GenJournalLine.Validate(
@@ -895,6 +917,7 @@ codeunit 6201 "Non-Ded. VAT Impl."
             Round(
                 PurchaseLine.Amount * VATPostingSetup."VAT %" / 100,
                 Currency."Amount Rounding Precision", Currency.VATRoundingDirection());
+        NonDeductibleVAT.OnAfterCalcRevChargeVATAmountInPurchLine(PurchaseLine, VATAmount);
     end;
 
     procedure Copy(var InvoicePostingBuffer: Record "Invoice Posting Buffer"; PurchaseLine: Record "Purchase Line")
@@ -1176,7 +1199,7 @@ codeunit 6201 "Non-Ded. VAT Impl."
     begin
         if (GenJournalLine."Document Type" = GenJournalLine."Document Type"::Invoice) and
             (GenJournalLine."VAT Calculation Type" = GenJournalLine."VAT Calculation Type"::"Normal VAT") and
-            (Vendor.Get(GenJournalLine."Bill-to/Pay-to No.") and (Vendor."Prices Including VAT")) then
+            ((Vendor.Get(GenJournalLine."Bill-to/Pay-to No.") and (Vendor."Prices Including VAT")) or (GenJournalLine."Non-Deductible VAT Diff." = 0)) then
             exit(true);
         exit(false);
     end;

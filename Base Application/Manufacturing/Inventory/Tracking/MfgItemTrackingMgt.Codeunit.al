@@ -4,6 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Tracking;
 
+using Microsoft.Foundation.NoSeries;
 using Microsoft.Foundation.UOM;
 using Microsoft.Inventory.Item;
 using Microsoft.Inventory.Journal;
@@ -102,9 +103,6 @@ codeunit 99000891 "Mfg. Item Tracking Mgt."
         ReservEntry.SetFilter("Qty. to Handle (Base)", '<>0');
         ReservEntry.SetTrackingFilterFromItemJnlLine(ItemJnlLine);
         OnRetrieveConsumpItemTrackingOnAfterSetFilters(ReservEntry, ItemJnlLine);
-#if not CLEAN26
-        ItemTrackingManagement.RunOnRetrieveConsumpItemTrackingOnAfterSetFilters(ReservEntry, ItemJnlLine);
-#endif
 
         // Sum up in a temporary table per component line:
         exit(ItemTrackingManagement.SumUpItemTracking(ReservEntry, TempHandlingSpecification, true, true));
@@ -119,9 +117,6 @@ codeunit 99000891 "Mfg. Item Tracking Mgt."
     begin
         IsHandled := false;
         OnBeforeRetrieveSubcontrItemTracking(ItemJnlLine, TempHandlingSpecification, Result, IsHandled);
-#if not CLEAN26
-        ItemTrackingManagement.RunOnBeforeRetrieveSubcontrItemTracking(ItemJnlLine, TempHandlingSpecification, Result, IsHandled);
-#endif
         if IsHandled then
             exit(Result);
 
@@ -141,9 +136,6 @@ codeunit 99000891 "Mfg. Item Tracking Mgt."
 
         IsLastOperation := ProdOrderRoutingLine."Next Operation No." = '';
         OnRetrieveSubcontrItemTrackingOnBeforeCheckLastOperation(ProdOrderRoutingLine, IsLastOperation);
-#if not CLEAN26
-        ItemTrackingManagement.RunOnRetrieveSubcontrItemTrackingOnBeforeCheckLastOperation(ProdOrderRoutingLine, IsLastOperation);
-#endif
         if not IsLastOperation then
             exit(false);
 
@@ -155,9 +147,6 @@ codeunit 99000891 "Mfg. Item Tracking Mgt."
             if not ReservEntry.IsEmpty() then
                 ReservEntry.DeleteAll();
             OnRetrieveSubcontrItemTrackingOnAfterDeleteReservEntries(TempHandlingSpecification, ReservEntry);
-#if not CLEAN26
-            ItemTrackingManagement.RunOnRetrieveSubcontrItemTrackingOnAfterDeleteReservEntries(TempHandlingSpecification, ReservEntry);
-#endif
             exit(true);
         end;
         exit(false);
@@ -185,15 +174,15 @@ codeunit 99000891 "Mfg. Item Tracking Mgt."
     var
         WhseItemTrackingLine: Record "Whse. Item Tracking Line";
         ItemLedgerEntry: Record "Item Ledger Entry";
-        EntryNo: Integer;
+        SequenceNoMgt: Codeunit "Sequence No. Mgt.";
         QtyHandledBase: Decimal;
         RemQtyHandledBase: Decimal;
     begin
-        EntryNo := WhseItemTrackingLine.GetLastEntryNo() + 1;
         QtyHandledBase := 0;
 
         ItemLedgerEntry.SetSourceFilterForProdOutputPutAway(ProdOrderLine);
         if ItemLedgerEntry.FindSet() then begin
+            SequenceNoMgt.AllocateSeqNoBuffer(Database::"Whse. Item Tracking Line", ItemLedgerEntry.Count());
             WhseItemTrackingLine.SetSourceFilter(SourceType, ProdOrderLine.Status.AsInteger(), ProdOrderLine."Prod. Order No.", ProdOrderLine."Line No.", false);
             WhseItemTrackingLine.DeleteAll();
             WhseItemTrackingLine.Init();
@@ -210,8 +199,7 @@ codeunit 99000891 "Mfg. Item Tracking Mgt."
 
                 if not WhseItemTrackingLine.FindFirst() then begin
                     WhseItemTrackingLine.Init();
-                    WhseItemTrackingLine."Entry No." := EntryNo;
-                    EntryNo := EntryNo + 1;
+                    WhseItemTrackingLine."Entry No." := WhseItemTrackingLine.GetNextEntryNo();
 
                     WhseItemTrackingLine."Item No." := ItemLedgerEntry."Item No.";
                     WhseItemTrackingLine."Location Code" := ItemLedgerEntry."Location Code";
@@ -272,18 +260,17 @@ codeunit 99000891 "Mfg. Item Tracking Mgt."
     var
         ItemLedgerEntry: Record "Item Ledger Entry";
         WhseItemTrackingLine: Record "Whse. Item Tracking Line";
-        EntryNo: Integer;
+        SequenceNoMgt: Codeunit "Sequence No. Mgt.";
         QtyToApply: Decimal;
     begin
         WhseItemTrackingLine.Reset();
-        EntryNo := WhseItemTrackingLine.GetLastEntryNo();
 
         ItemLedgerEntry.SetSourceFilterForProdOutputPutAway(WhseWkshLine);
-        if ItemLedgerEntry.FindSet() then
+        if ItemLedgerEntry.FindSet() then begin
+            SequenceNoMgt.AllocateSeqNoBuffer(Database::"Whse. Item Tracking Line", ItemLedgerEntry.Count());
             repeat
                 WhseItemTrackingLine.Init();
-                EntryNo += 1;
-                WhseItemTrackingLine."Entry No." := EntryNo;
+                WhseItemTrackingLine."Entry No." := WhseItemTrackingLine.GetNextEntryNo();
                 WhseItemTrackingLine."Item No." := WhseWkshLine."Item No.";
                 WhseItemTrackingLine."Variant Code" := WhseWkshLine."Variant Code";
                 WhseItemTrackingLine."Location Code" := WhseWkshLine."Location Code";
@@ -304,6 +291,7 @@ codeunit 99000891 "Mfg. Item Tracking Mgt."
                     WhseItemTrackingLine.Insert();
                 end;
             until ItemLedgerEntry.Next() = 0;
+        end;
     end;
 
     internal procedure SplitProdOrderLineForOutputPutAway(ProdOrderLine: Record "Prod. Order Line"; var TempProdOrdLineTrackingBuff: Record "Prod. Ord. Line Tracking Buff." temporary; SplitUpToQtyBase: Decimal)
@@ -393,7 +381,10 @@ codeunit 99000891 "Mfg. Item Tracking Mgt."
 
     local procedure UpdateQtySplitForPutAwayOnProdOrdLineTrackingBuffer(var TempProdOrdLineTrackingBuff: Record "Prod. Ord. Line Tracking Buff." temporary; ProdOrderLine: Record "Prod. Order Line"; ItemLedgerEntry: Record "Item Ledger Entry"; var QtyBaseAvailableToPutAway: Decimal; var RemainingHandledQtyBase: Decimal)
     begin
-        QtyBaseAvailableToPutAway := ItemLedgerEntry.Quantity - ProdOrderLine.GetUsedPutAwayQtyPerItemTracking(ItemLedgerEntry."Lot No.", ItemLedgerEntry."Serial No.", ItemLedgerEntry."Package No.");
+        QtyBaseAvailableToPutAway := CalcTotalOutputQtyBaseForTracking(ProdOrderLine, ItemLedgerEntry)
+       - ProdOrderLine.GetUsedPutAwayQtyPerItemTracking(ItemLedgerEntry."Lot No.", ItemLedgerEntry."Serial No.", ItemLedgerEntry."Package No.")
+       - TempProdOrdLineTrackingBuff."Qty. split for Put Away (Base)";
+
         if QtyBaseAvailableToPutAway < 0 then
             exit;
 
@@ -404,6 +395,20 @@ codeunit 99000891 "Mfg. Item Tracking Mgt."
             UOMMgt.QtyRndPrecision());
 
         OnAfterUpdateQtySplitForPutAwayOnProdOrdLineTrackingBuffer(TempProdOrdLineTrackingBuff, ProdOrderLine, ItemLedgerEntry, QtyBaseAvailableToPutAway, RemainingHandledQtyBase);
+    end;
+
+    local procedure CalcTotalOutputQtyBaseForTracking(ProdOrderLine: Record "Prod. Order Line"; ItemLedgerEntry: Record "Item Ledger Entry"): Decimal
+    var
+        TotalItemLedgerEntry: Record "Item Ledger Entry";
+    begin
+        TotalItemLedgerEntry.SetSourceFilterForProdOutputPutAway(ProdOrderLine);
+        TotalItemLedgerEntry.SetCurrentKey("Item No.", Open, "Variant Code", Positive, "Lot No.", "Serial No.", "Package No.");
+        TotalItemLedgerEntry.SetRange("Lot No.", ItemLedgerEntry."Lot No.");
+        TotalItemLedgerEntry.SetRange("Serial No.", ItemLedgerEntry."Serial No.");
+        TotalItemLedgerEntry.SetRange("Package No.", ItemLedgerEntry."Package No.");
+        TotalItemLedgerEntry.SetLoadFields(Quantity);
+        TotalItemLedgerEntry.CalcSums(Quantity);
+        exit(TotalItemLedgerEntry.Quantity);
     end;
 
     local procedure CalcQtyBaseToPutAway(var RemainingHandledQtyBase: Decimal; QtyBaseAvailableToPutAway: Decimal) Qty: Decimal
@@ -638,9 +643,6 @@ codeunit 99000891 "Mfg. Item Tracking Mgt."
         end;
 
         OnAfterCollectPostedOutputEntries(ItemLedgerEntry, TempTrackingSpecification);
-#if not CLEAN26
-        ItemTrackingLines.RunOnAfterCollectPostedOutputEntries(ItemLedgerEntry, TempTrackingSpecification);
-#endif
     end;
 
     [EventSubscriber(ObjectType::Page, Page::"Item Tracking Lines", 'OnCheckItemTrackingLineIsBoundForBarcodeScanning', '', true, false)]
