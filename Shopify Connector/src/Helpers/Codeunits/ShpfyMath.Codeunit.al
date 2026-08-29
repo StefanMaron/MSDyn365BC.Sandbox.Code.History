@@ -19,6 +19,7 @@ codeunit 30158 "Shpfy Math"
     begin
         if X < Y then
             exit(Y);
+
         exit(X);
     end;
 

@@ -39,6 +39,7 @@ codeunit 2627 "Stat. Acc. Telemetry"
 
         FeatureTelemetry.LogUptake('0000KDW', GetFeatureTelemetryName(), Enum::"Feature Uptake Status"::Used);
         FeatureTelemetry.LogUsage('0000KE1', GetFeatureTelemetryName(), 'Posting used for Statistical Account Entries');
+
         LoggedPosting := true;
     end;
 
