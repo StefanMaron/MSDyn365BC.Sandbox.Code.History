@@ -141,6 +141,33 @@ page 7100 "Contact Sync"
                         ShowCaption = false;
                         Style = Subordinate;
                     }
+                    group(AdvancedGroup)
+                    {
+                        Caption = 'Advanced';
+
+                        group(ClearSyncDetailsGroup)
+                        {
+                            Caption = '';
+                            field(ClearSyncDetailsField; ClearSyncDetailsLbl)
+                            {
+                                ApplicationArea = All;
+                                Caption = '';
+                                Editable = false;
+                                ShowCaption = false;
+                                Style = StandardAccent;
+                                StyleExpr = true;
+
+                                trigger OnDrillDown()
+                                begin
+                                    if Confirm(ClearLastSyncConfirmMsg) then begin
+                                        ClearSyncRecordsForCurrentUser();
+                                        Message(LastSyncClearedMsg);
+                                        GoToStep(Step::Welcome);
+                                    end;
+                                end;
+                            }
+                        }
+                    }
                     field(LastsyncDateFolderTime; GetLastSyncDateTime())
                     {
                         ApplicationArea = All;
@@ -521,10 +548,18 @@ page 7100 "Contact Sync"
         end
         else
             if not (NewDeltaLink = '') then begin
-                ContactSyncUserRec.SetDeltaUrl(CopyStr(NewDeltaLink, 1, 2048));
                 ContactSyncUserRec."Last Sync Date Time" := CurrentDateTime();
-                ContactSyncUserRec.Modify(false);
+                ContactSyncUserRec.SetDeltaUrl(CopyStr(NewDeltaLink, 1, 2048));
             end;
+    end;
+
+    local procedure ClearSyncRecordsForCurrentUser()
+    var
+        ContactSyncUserRec: Record "Contact Sync User";
+    begin
+        ContactSyncUserRec.SetRange("User ID", CopyStr(UserId(), 1, 50));
+        if not ContactSyncUserRec.IsEmpty() then
+            ContactSyncUserRec.DeleteAll();
     end;
 
     local procedure GoToStep(NewStep: Option)
@@ -686,4 +721,7 @@ page 7100 "Contact Sync"
         ReadyTextTxt: Text;
         DisclaimerLbl: Label 'Updating Business Central will copy all contacts from the selected Outlook or Teams folder and make them visible to other Business Central users. This may include any personal contacts stored in that folder. Do you want to continue?';
         SyncAcknowledgementTelTxt: Label 'User acknowledged disclaimer for sync direction: Full Sync', Locked = true;
+        ClearLastSyncConfirmMsg: Label 'This will delete the internal log of your last synchronization, but will not modify any contacts you have synchronized to date. Do you want to proceed?';
+        ClearSyncDetailsLbl: Label 'Clear last sync details';
+        LastSyncClearedMsg: Label 'Your last synchronization details were cleared. Choose ok to start over.';
 }
