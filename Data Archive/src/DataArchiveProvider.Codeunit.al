@@ -40,6 +40,7 @@ codeunit 605 "Data Archive Provider" implements "Data Archive Provider"
         DataArchive.Init();
         DataArchive.Description := CopyStr(Description, 1, MaxStrLen(DataArchive.Description));
         DataArchive.Insert(true);
+
         CurrentDataArchiveEntryNo := DataArchive."Entry No.";
         exit(CurrentDataArchiveEntryNo);
     end;
