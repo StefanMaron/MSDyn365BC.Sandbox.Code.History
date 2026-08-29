@@ -548,18 +548,10 @@ page 7100 "Contact Sync"
         end
         else
             if not (NewDeltaLink = '') then begin
-                ContactSyncUserRec."Last Sync Date Time" := CurrentDateTime();
                 ContactSyncUserRec.SetDeltaUrl(CopyStr(NewDeltaLink, 1, 2048));
+                ContactSyncUserRec."Last Sync Date Time" := CurrentDateTime();
+                ContactSyncUserRec.Modify(false);
             end;
-    end;
-
-    local procedure ClearSyncRecordsForCurrentUser()
-    var
-        ContactSyncUserRec: Record "Contact Sync User";
-    begin
-        ContactSyncUserRec.SetRange("User ID", CopyStr(UserId(), 1, 50));
-        if not ContactSyncUserRec.IsEmpty() then
-            ContactSyncUserRec.DeleteAll();
     end;
 
     local procedure GoToStep(NewStep: Option)
