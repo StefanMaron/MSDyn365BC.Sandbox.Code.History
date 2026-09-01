@@ -126,13 +126,16 @@ page 7100 "Contact Sync"
                             end;
                         end;
                     }
-                    field(fullSyncField; FullSyncOption)
+                    field(PreviewText; PreviewTextLbl)
                     {
                         ApplicationArea = All;
-                        Caption = 'Force full sync';
-                        ToolTip = 'When this is enabled, Business Central will synchronize contacts no matter when they were last modified. This may take longer, but can overcome some synchronization issues.';
+                        Caption = '';
+                        Editable = false;
+                        MultiLine = false;
+                        ShowCaption = false;
+                        Style = Subordinate;
                     }
-                    field(PreviewText; PreviewTextLbl)
+                    field(LastsyncDateFolderTime; GetLastSyncDateTime())
                     {
                         ApplicationArea = All;
                         Caption = '';
@@ -148,6 +151,12 @@ page 7100 "Contact Sync"
                         group(ClearSyncDetailsGroup)
                         {
                             Caption = '';
+                            field(fullSyncField; FullSyncOption)
+                            {
+                                ApplicationArea = All;
+                                Caption = 'Force full sync';
+                                ToolTip = 'When this is enabled, Business Central will synchronize contacts no matter when they were last modified. This may take longer, but can overcome some synchronization issues.';
+                            }
                             field(ClearSyncDetailsField; ClearSyncDetailsLbl)
                             {
                                 ApplicationArea = All;
@@ -167,15 +176,6 @@ page 7100 "Contact Sync"
                                 end;
                             }
                         }
-                    }
-                    field(LastsyncDateFolderTime; GetLastSyncDateTime())
-                    {
-                        ApplicationArea = All;
-                        Caption = '';
-                        Editable = false;
-                        MultiLine = false;
-                        ShowCaption = false;
-                        Style = Subordinate;
                     }
                 }
             }
@@ -686,6 +686,9 @@ page 7100 "Contact Sync"
         NewLineChar: Char;
         Deltalink: Text;
         SyncDirection: Enum "ContactSyncDirection";
+        ClearLastSyncConfirmMsg: Label 'This will delete the internal log of your last synchronization, but will not modify any contacts you have synchronized to date. Do you want to proceed?';
+        ClearSyncDetailsLbl: Label 'Clear last sync details';
+        LastSyncClearedMsg: Label 'Your last synchronization details were cleared. Choose ok to start over.';
         ContactsSentToM365Count: Integer;
         ContactsSentToBCCount: Integer;
         ContactsFailedCount: Integer;
@@ -721,7 +724,4 @@ page 7100 "Contact Sync"
         ReadyTextTxt: Text;
         DisclaimerLbl: Label 'Updating Business Central will copy all contacts from the selected Outlook or Teams folder and make them visible to other Business Central users. This may include any personal contacts stored in that folder. Do you want to continue?';
         SyncAcknowledgementTelTxt: Label 'User acknowledged disclaimer for sync direction: Full Sync', Locked = true;
-        ClearLastSyncConfirmMsg: Label 'This will delete the internal log of your last synchronization, but will not modify any contacts you have synchronized to date. Do you want to proceed?';
-        ClearSyncDetailsLbl: Label 'Clear last sync details';
-        LastSyncClearedMsg: Label 'Your last synchronization details were cleared. Choose ok to start over.';
 }
