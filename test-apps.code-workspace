@@ -9,6 +9,36 @@
   },
   "folders": [
     {
+      "path": "./_Exclude_APIV1_ Tests"
+    },
+    {
+      "path": "./_Exclude_APIV2_ Tests"
+    },
+    {
+      "path": "./_Exclude_Bank Deposits Tests"
+    },
+    {
+      "path": "./_Exclude_Business_Events_Test"
+    },
+    {
+      "path": "./_Exclude_Email Logging Using Graph API Tests"
+    },
+    {
+      "path": "./_Exclude_Master_Data_Management_Test_Library"
+    },
+    {
+      "path": "./_Exclude_Master_Data_Management_Tests"
+    },
+    {
+      "path": "./_Exclude_PlanConfiguration_ Tests"
+    },
+    {
+      "path": "./_Exclude_Review_General_Ledger_Entries_Tests"
+    },
+    {
+      "path": "./AI Test Toolkit"
+    },
+    {
       "path": "./Application Test Library"
     },
     {
@@ -18,7 +48,7 @@
       "path": "./Bank Account Reconciliation With AI Tests"
     },
     {
-      "path": "./APIV1/Test/_Exclude_APIV1_ Tests"
+      "path": "./Business Foundation Test Libraries"
     },
     {
       "path": "./Contoso Coffee Demo Dataset Tests"
@@ -33,10 +63,10 @@
       "path": "./Dynamics BC Excel Reports Tests"
     },
     {
-      "path": "./EnforcedDigitalVouchers/Test/Enforced Digital Vouchers Tests"
+      "path": "./E-Document Connector - Avalara Tests"
     },
     {
-      "path": "./EnforcedDigitalVouchers/Test Library/Enforced Digital Vouchers Test Library"
+      "path": "./E-Document Connector - B2Brouter Tests"
     },
     {
       "path": "./E-Document Connector - Continia Tests"
@@ -84,22 +114,22 @@
       "path": "./Excise Taxes Tests"
     },
     {
-      "path": "./TestFramework/AITestToolkit/AI Test Toolkit/src/TestSuite"
+      "path": "./Field Service Integration Test"
     },
     {
-      "path": "./ServiceDeclaration/Test/Service Declaration Tests"
+      "path": "./Field Service Integration Test Library"
     },
     {
-      "path": "./PaymentPractices/Test/Payment Practices Tests"
+      "path": "./Intrastat Core Tests"
     },
     {
-      "path": "./PaymentPractices/Test Library/Payment Practices Test Library"
+      "path": "./Late Payment Prediction Tests"
     },
     {
-      "path": "./SubscriptionBilling/Test/Subscription Billing Tests/DisabledTests"
+      "path": "./Manufacturing Tests"
     },
     {
-      "path": "./System Application/Source/System Application/Email/src/Test Email"
+      "path": "./OnPrem Permissions Tests"
     },
     {
       "path": "./Payment Practices Test Library"
@@ -108,28 +138,82 @@
       "path": "./Payment Practices Tests"
     },
     {
-      "path": "./System Application/Test/System Application Test Library/Extension Management/testArtifacts"
+      "path": "./PayPal Payments Standard Tests"
     },
     {
-      "path": "./System Application/Test/System Application Test/DisabledTests"
+      "path": "./PEPPOL Tests"
     },
     {
-      "path": "./PlanConfiguration/Test/_Exclude_PlanConfiguration_ Tests"
+      "path": "./Performance Toolkit Tests"
     },
     {
-      "path": "./ExcelReports/Test/Dynamics BC Excel Reports Tests"
+      "path": "./PowerBI Reports Test Library"
     },
     {
-      "path": "./EssentialBusinessHeadlines/Test/Essential Business Headlines Test"
+      "path": "./Quality Management Test Library"
     },
     {
-      "path": "./EmailLogging/Test/_Exclude_Email Logging Using Graph API Tests"
+      "path": "./Recommended Apps Tests"
     },
     {
-      "path": "./Intrastat/Test/Intrastat Core Tests"
+      "path": "./Report Layouts Tests"
     },
     {
-      "path": "./Email - Outlook REST API/Test"
+      "path": "./SAF-T Tests"
+    },
+    {
+      "path": "./Sales and Inventory Forecast Tests"
+    },
+    {
+      "path": "./Service Declaration Tests"
+    },
+    {
+      "path": "./Service Management Tests"
+    },
+    {
+      "path": "./Simplified Bank Statement Import Test"
+    },
+    {
+      "path": "./Statistical Accounts Tests"
+    },
+    {
+      "path": "./Sustainability Copilot Tests"
+    },
+    {
+      "path": "./Sustainability Tests"
+    },
+    {
+      "path": "./System Application Partner Test"
+    },
+    {
+      "path": "./System Application Test Library"
+    },
+    {
+      "path": "./Test Runner"
+    },
+    {
+      "path": "./Tests-Bank"
+    },
+    {
+      "path": "./Tests-Cash Flow"
+    },
+    {
+      "path": "./Tests-Cost Accounting"
+    },
+    {
+      "path": "./Tests-CRM integration"
+    },
+    {
+      "path": "./Tests-Data Exchange"
+    },
+    {
+      "path": "./Tests-Dimension"
+    },
+    {
+      "path": "./Tests-ERM"
+    },
+    {
+      "path": "./Tests-Fixed Asset"
     },
     {
       "path": "./Tests-General Journal"
@@ -159,64 +243,10 @@
       "path": "./Tests-Permissions"
     },
     {
-      "path": "./BaseApp/Test/Tests-Bank"
+      "path": "./Tests-Physical Inventory"
     },
     {
-      "path": "./BaseApp/Test/Tests-Cash Flow"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Cost Accounting"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-CRM integration"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Data Exchange"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Dimension"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-ERM"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Fixed Asset"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-General Journal"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Graph"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Integration"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Job"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Local"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Marketing"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Misc"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Monitor Sensitive Fields"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-Permissions"
-    },
-    {
-      "path": "./BaseApp/Source/Base Application/System/DevTools/CALTest"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-SCM-Service"
-    },
-    {
-      "path": "./BaseApp/Test/Tests-SINGLESERVER"
+      "path": "./Tests-Prepayment"
     },
     {
       "path": "./Tests-Rapid Start"
@@ -231,16 +261,16 @@
       "path": "./Tests-Reverse"
     },
     {
-      "path": "./BaseApp/Test/Tests-VAT"
+      "path": "./Tests-SCM"
     },
     {
       "path": "./Tests-SCM-Assembly"
     },
     {
-      "path": "./SalesLinesSuggestions/Test/Sales Lines Suggestions Tests/AI Tests"
+      "path": "./Tests-SCM-Manufacturing"
     },
     {
-      "path": "./SalesLinesSuggestions/Test/Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
+      "path": "./Tests-SCM-Service"
     },
     {
       "path": "./Tests-SINGLESERVER"
