@@ -1,304 +1,274 @@
 {
   "folders": [
     {
-      "path": "./_Exclude_APIV1_ Tests"
-    },
-    {
-      "path": "./_Exclude_APIV2_ Tests"
-    },
-    {
-      "path": "./_Exclude_Bank Deposits Tests"
-    },
-    {
-      "path": "./_Exclude_Business_Events_Test"
-    },
-    {
-      "path": "./_Exclude_Email Logging Using Graph API Tests"
-    },
-    {
-      "path": "./_Exclude_Master_Data_Management_Test_Library"
-    },
-    {
-      "path": "./_Exclude_Master_Data_Management_Tests"
-    },
-    {
-      "path": "./_Exclude_PlanConfiguration_ Tests"
-    },
-    {
-      "path": "./_Exclude_Review_General_Ledger_Entries_Tests"
-    },
-    {
-      "path": "./AI Test Toolkit"
-    },
-    {
       "path": "./Application Test Library"
     },
     {
-      "path": "./Audit File Export Tests"
+      "path": "./StatisticalAccounts/Test/Statistical Accounts Tests"
     },
     {
-      "path": "./Bank Account Reconciliation With AI Tests"
+      "path": "./EU3PartyTradePurchase/test/EU 3-Party Trade Purchase Tests"
     },
     {
-      "path": "./Business Foundation Test Libraries"
+      "path": "./APIV1/Test/_Exclude_APIV1_ Tests"
     },
     {
-      "path": "./Contoso Coffee Demo Dataset Tests"
+      "path": "./SustainabilityCopilotSuggestion/Test/Sustainability Copilot Tests"
     },
     {
-      "path": "./Data Archive Tests"
+      "path": "./DataSearch/Test/Data Search Tests"
     },
     {
-      "path": "./Data Search Tests"
+      "path": "./Manufacturing/Test/Manufacturing Tests"
     },
     {
-      "path": "./Dynamics BC Excel Reports Tests"
+      "path": "./Subcontracting/Test/Subcontracting-Tests/Tests"
     },
     {
-      "path": "./E-Document Connector - Avalara Tests"
+      "path": "./EnforcedDigitalVouchers/Test/Enforced Digital Vouchers Tests"
     },
     {
-      "path": "./E-Document Connector - B2Brouter Tests"
+      "path": "./EnforcedDigitalVouchers/Test Library/Enforced Digital Vouchers Test Library"
     },
     {
-      "path": "./E-Document Connector - Continia Tests"
+      "path": "./SalesAndInventoryForecast/Test/Sales and Inventory Forecast Tests"
     },
     {
-      "path": "./E-Document Connector - ForNAV Tests"
+      "path": "./DataArchive/Test/Data Archive Tests"
     },
     {
-      "path": "./E-Document Connector - Logiq Tests"
+      "path": "./RecommendedApps/Test/Recommended Apps Tests"
     },
     {
-      "path": "./E-Document Connector - Pagero Tests"
+      "path": "./BusinessFoundation/Test/Business Foundation Test Libraries"
     },
     {
-      "path": "./E-Document Connector - SignUp Tests"
+      "path": "./BusinessFoundation/Test/Business Foundation Tests/DisabledTests"
     },
     {
-      "path": "./Email - Current User Connector Tests"
+      "path": "./AuditFileExport/Test/Audit File Export Tests"
     },
     {
-      "path": "./Email - Microsoft 365 Connector Tests"
+      "path": "./Email - Current User Connector/Test/Email - Current User Connector Tests"
     },
     {
-      "path": "./Email - SMTP API Test Library"
+      "path": "./Sustainability/Test/Sustainability Tests"
     },
     {
-      "path": "./Email - SMTP API Tests"
+      "path": "./TestFramework/TestLibraries"
     },
     {
-      "path": "./Email - SMTP Connector Tests"
+      "path": "./TestFramework/teststabilitytools"
     },
     {
-      "path": "./Enforced Digital Vouchers Test Library"
+      "path": "./TestFramework/TestRunner/Test Runner"
     },
     {
-      "path": "./Enforced Digital Vouchers Tests"
+      "path": "./TestFramework/TestRunner/Test Runner/src/DataDrivenTest"
     },
     {
-      "path": "./Essential Business Headlines Test"
+      "path": "./TestFramework/performancetoolkit/Performance Toolkit Tests"
     },
     {
-      "path": "./EU 3-Party Trade Purchase Tests"
+      "path": "./TestFramework/performancetoolkit/Performance Toolkit Tests/src/Mock Tests"
     },
     {
-      "path": "./Excise Taxes Tests"
+      "path": "./TestFramework/AITestToolkit/AI Test Toolkit"
     },
     {
-      "path": "./Field Service Integration Test"
+      "path": "./TestFramework/AITestToolkit/AI Test Toolkit/src/TestSuite"
     },
     {
-      "path": "./Field Service Integration Test Library"
+      "path": "./ServiceDeclaration/Test/Service Declaration Tests"
     },
     {
-      "path": "./Intrastat Core Tests"
+      "path": "./PaymentPractices/Test/Payment Practices Tests"
     },
     {
-      "path": "./Late Payment Prediction Tests"
+      "path": "./PaymentPractices/Test Library/Payment Practices Test Library"
     },
     {
-      "path": "./Manufacturing Tests"
+      "path": "./SubscriptionBilling/Test/Subscription Billing Tests/DisabledTests"
     },
     {
-      "path": "./OnPrem Permissions Tests"
+      "path": "./System Application/Source/System Application/Email/src/Test Email"
     },
     {
-      "path": "./Payment Practices Test Library"
+      "path": "./System Application/Test/System Application Partner Test"
     },
     {
-      "path": "./Payment Practices Tests"
+      "path": "./System Application/Test/System Application Test Library"
     },
     {
-      "path": "./PayPal Payments Standard Tests"
+      "path": "./System Application/Test/System Application Test Library/Extension Management/testArtifacts"
     },
     {
-      "path": "./PEPPOL Tests"
+      "path": "./System Application/Test/System Application Test/DisabledTests"
     },
     {
-      "path": "./Performance Toolkit Tests"
+      "path": "./PlanConfiguration/Test/_Exclude_PlanConfiguration_ Tests"
     },
     {
-      "path": "./PowerBI Reports Test Library"
+      "path": "./ExcelReports/Test/Dynamics BC Excel Reports Tests"
     },
     {
-      "path": "./Quality Management Test Library"
+      "path": "./EssentialBusinessHeadlines/Test/Essential Business Headlines Test"
     },
     {
-      "path": "./Recommended Apps Tests"
+      "path": "./EmailLogging/Test/_Exclude_Email Logging Using Graph API Tests"
     },
     {
-      "path": "./Report Layouts Tests"
+      "path": "./Intrastat/Test/Intrastat Core Tests"
     },
     {
-      "path": "./SAF-T Tests"
+      "path": "./Email - Outlook REST API/Test"
     },
     {
-      "path": "./Sales and Inventory Forecast Tests"
+      "path": "./BaseApp/Source/Base Application/System/DevTools/CALTest"
     },
     {
-      "path": "./Service Declaration Tests"
+      "path": "./BaseApp/Test/Tests-Bank"
     },
     {
-      "path": "./Service Management Tests"
+      "path": "./BaseApp/Test/Tests-Cash Flow"
     },
     {
-      "path": "./Simplified Bank Statement Import Test"
+      "path": "./BaseApp/Test/Tests-Cost Accounting"
     },
     {
-      "path": "./Statistical Accounts Tests"
+      "path": "./BaseApp/Test/Tests-CRM integration"
     },
     {
-      "path": "./Sustainability Copilot Tests"
+      "path": "./BaseApp/Test/Tests-Data Exchange"
     },
     {
-      "path": "./Sustainability Tests"
+      "path": "./BaseApp/Test/Tests-Dimension"
     },
     {
-      "path": "./System Application Partner Test"
+      "path": "./BaseApp/Test/Tests-ERM"
     },
     {
-      "path": "./System Application Test Library"
+      "path": "./BaseApp/Test/Tests-Fixed Asset"
     },
     {
-      "path": "./Test Runner"
+      "path": "./BaseApp/Test/Tests-General Journal"
     },
     {
-      "path": "./Tests-Bank"
+      "path": "./BaseApp/Test/Tests-Graph"
     },
     {
-      "path": "./Tests-Cash Flow"
+      "path": "./BaseApp/Test/Tests-Integration"
     },
     {
-      "path": "./Tests-Cost Accounting"
+      "path": "./BaseApp/Test/Tests-Job"
     },
     {
-      "path": "./Tests-CRM integration"
+      "path": "./BaseApp/Test/Tests-Local"
     },
     {
-      "path": "./Tests-Data Exchange"
+      "path": "./BaseApp/Test/Tests-Marketing"
     },
     {
-      "path": "./Tests-Dimension"
+      "path": "./BaseApp/Test/Tests-Misc"
     },
     {
-      "path": "./Tests-ERM"
+      "path": "./BaseApp/Test/Tests-Monitor Sensitive Fields"
     },
     {
-      "path": "./Tests-Fixed Asset"
+      "path": "./BaseApp/Test/Tests-Permissions"
     },
     {
-      "path": "./Tests-General Journal"
+      "path": "./BaseApp/Test/Tests-Physical Inventory"
     },
     {
-      "path": "./Tests-Graph"
+      "path": "./BaseApp/Test/Tests-Prepayment"
     },
     {
-      "path": "./Tests-Integration"
+      "path": "./BaseApp/Test/Tests-Rapid Start"
     },
     {
-      "path": "./Tests-Job"
+      "path": "./BaseApp/Test/Tests-Report"
     },
     {
-      "path": "./Tests-Local"
+      "path": "./BaseApp/Test/Tests-Resource"
     },
     {
-      "path": "./Tests-Marketing"
+      "path": "./BaseApp/Test/Tests-Reverse"
     },
     {
-      "path": "./Tests-Misc"
+      "path": "./BaseApp/Test/Tests-SCM"
     },
     {
-      "path": "./Tests-Monitor Sensitive Fields"
+      "path": "./BaseApp/Test/Tests-SCM-Assembly"
     },
     {
-      "path": "./Tests-Permissions"
+      "path": "./BaseApp/Test/Tests-SCM-Manufacturing"
     },
     {
-      "path": "./Tests-Physical Inventory"
+      "path": "./BaseApp/Test/Tests-SCM-Service"
     },
     {
-      "path": "./Tests-Prepayment"
+      "path": "./BaseApp/Test/Tests-SINGLESERVER"
     },
     {
-      "path": "./Tests-Rapid Start"
+      "path": "./BaseApp/Test/Tests-SMB"
     },
     {
-      "path": "./Tests-Report"
+      "path": "./BaseApp/Test/Tests-TestLibraries"
     },
     {
-      "path": "./Tests-Resource"
+      "path": "./BaseApp/Test/Tests-Upgrade"
     },
     {
-      "path": "./Tests-Reverse"
+      "path": "./BaseApp/Test/Tests-User"
     },
     {
-      "path": "./Tests-SCM"
+      "path": "./BaseApp/Test/Tests-VAT"
     },
     {
-      "path": "./Tests-SCM-Assembly"
+      "path": "./BaseApp/Test/Tests-Workflow"
     },
     {
-      "path": "./Tests-SCM-Manufacturing"
+      "path": "./SalesLinesSuggestions/Test/Sales Lines Suggestions Tests/AI Tests"
     },
     {
-      "path": "./Tests-SCM-Service"
+      "path": "./SalesLinesSuggestions/Test/Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
     },
     {
-      "path": "./Tests-SINGLESERVER"
+      "path": "./ExciseTaxes/Test/Excise Taxes Tests"
     },
     {
-      "path": "./Tests-SMB"
+      "path": "./Withholding Tax/Test/Withholding Tax Tests"
     },
     {
-      "path": "./Tests-TestLibraries"
+      "path": "./PEPPOL/Test/PEPPOL Tests"
     },
     {
-      "path": "./Tests-Upgrade"
+      "path": "./ErrorMessagesWithRecommendations/Test/Error Messages with Recommendations Tests/DisabledTests"
     },
     {
-      "path": "./Tests-User"
+      "path": "./SAF-T/Test/SAF-T Tests"
     },
     {
-      "path": "./Tests-VAT"
+      "path": "./PayPalPaymentsStandard/Test/PayPal Payments Standard Tests"
     },
     {
-      "path": "./Tests-Workflow"
+      "path": "./Application Test Library/Source/Application Test Library"
     },
     {
-      "path": "./VAT Group Management Tests"
+      "path": "./ServiceManagement/Test/Service Management Tests"
     },
     {
-      "path": "./Withholding Tax Tests"
+      "path": "./ReviewGLEntries/Test/_Exclude_Review_General_Ledger_Entries_Tests"
     },
     {
       "path": "./System Application Test/DisabledTests"
     },
     {
-      "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
+      "path": "./VATGroupManagement/Test/VAT Group Management Tests"
     },
     {
-      "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
+      "path": "./ExternalEvents/test/_Exclude_Business_Events_Test"
     },
     {
       "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
@@ -319,7 +289,7 @@
       "path": "./AI Test Toolkit/src/TestSuite"
     },
     {
-      "path": "./Quality Management/src/Configuration/Template/Test"
+      "path": "./PowerBIReports/Test/PowerBI Reports Tests/DisabledTests"
     },
     {
       "path": "./System Application/Email/src/Test Email"
@@ -337,7 +307,7 @@
       "path": "./Test Runner/src/DataDrivenTest"
     },
     {
-      "path": "./PowerBI Reports Tests/DisabledTests"
+      "path": "./Shopify/test/Shopify Connector Test/DisabledTests"
     },
     {
       "path": "./Error Messages with Recommendations Tests/DisabledTests"
