@@ -2741,6 +2741,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit SCM Planning And Manufacturing - NamedType BinCodesNotEqualErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1981732821 - NamedType 4109186722" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Cannot find impacted documents. Please make sure the document line you are simulating on has reservations and try again.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit SCM Planning And Manufacturing - NamedType CannotFindImpactedDocumentsErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1981732821 - NamedType 1058966137" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The change will not affect existing entries]]></Val>
@@ -2784,6 +2793,42 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit SCM Planning And Manufacturing - NamedType IllegalActionMessageRelationErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1981732821 - NamedType 3075201016" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Impact list does not contain Prod. Order %1 line %2.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Prod. Order No., %2 = Line No.]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit SCM Planning And Manufacturing - NamedType ImpactMissingProdOrderErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1981732821 - NamedType 1102621538" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Impact list does not contain Transfer Order %1 line %2.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Transfer Order No., %2 = Line No.]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit SCM Planning And Manufacturing - NamedType ImpactMissingTransferLineErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1981732821 - NamedType 991417911" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Impact list unexpectedly contains Prod. Order %1 line %2.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Prod. Order No., %2 = Line No.]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit SCM Planning And Manufacturing - NamedType ImpactUnexpectedProdOrderErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1981732821 - NamedType 3057637376" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Impact list unexpectedly contains Sales Order %1 line %2.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Sales Order No., %2 = Line No.]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit SCM Planning And Manufacturing - NamedType ImpactUnexpectedSalesLineErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1981732821 - NamedType 2165627303" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -4692,6 +4737,42 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit SCM WIP Costing Production-II - NamedType NotFoundZeroAmtErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Page 3289044544 - Property 2879900210" ItemType=";Page - Page" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Prod. BOM Comment Line Test]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Page Prod. BOM Comment Line Test - Property Caption)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Page 3289044544 - Control 1622670459 - Property 1295455071" ItemType=";Page - Control" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Specifies the production BOM line that the comment applies to.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Page Prod. BOM Comment Line Test - Control BOM Line No. - Property ToolTip)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Page 3289044544 - Control 2287818464 - Property 1295455071" ItemType=";Page - Control" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Specifies the production BOM that the comment applies to.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Page Prod. BOM Comment Line Test - Control Production BOM No. - Property ToolTip)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Page 3289044544 - Control 3414580985 - Property 1295455071" ItemType=";Page - Control" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Specifies the production BOM version that the comment applies to.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Page Prod. BOM Comment Line Test - Control Version Code - Property ToolTip)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";PageExtension 1864608116 - Action 1493101241 - Property 1295455071" ItemType=";PageExtension - Action" PsrId="63" InstFlg="true" Leaf="true">
