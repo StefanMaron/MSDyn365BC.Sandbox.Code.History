@@ -1627,7 +1627,6 @@ codeunit 137105 "SCM Kitting ATS in Whse/IT IM"
     begin
         ItemLedgerEntry.Reset();
         ItemLedgerEntry.SetRange("Item No.", ItemNo);
-#pragma warning disable AA0181, AA0233 // Positional Find() paired with Next(); suppression tracked for follow-up
         ItemLedgerEntry.Find(FindDirection);
 
         WhseActivityLineTake.Reset();
@@ -1673,7 +1672,6 @@ codeunit 137105 "SCM Kitting ATS in Whse/IT IM"
             WhseActivityLinePlace.Modify(true);
 
         until ItemLedgerEntry.Next() = 0;
-#pragma warning restore AA0181, AA0233
     end;
 
     [Normal]
