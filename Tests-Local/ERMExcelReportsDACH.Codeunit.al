@@ -21,45 +21,44 @@ codeunit 142082 "ERM Excel Reports DACH"
     [Scope('OnPrem')]
     procedure ReminderTestReportTestEndingAndBeginningTexts()
     var
-        ReminderAttachmentText: Record "Reminder Attachment Text";
-        ReminderAttachmentTextLineBeginning: array[2] of Record "Reminder Attachment Text Line";
-        ReminderAttachmentTextLineEnding: array[2] of Record "Reminder Attachment Text Line";
+        ReminderTextBeginning: array[2] of Record "Reminder Text";
+        ReminderTextEnding: array[2] of Record "Reminder Text";
         ReminderLine: Record "Reminder Line";
         ReminderHeader: Record "Reminder Header";
-        ReminderLevel: Record "Reminder Level";
         ReminderTestReport: Report "Reminder - Test";
-        Language: Codeunit Language;
     begin
         // [FEATURE] [Reminder]
         // [SCENARIO 364318] All the lines of Reminder's beginning and Ending text should be printed in "Reminder - Test" Report
         Initialize();
         // [GIVEN] Reminder with 2 lines of beginning and 2 lines of ending texts
         CreateReminderHeader(ReminderHeader);
-        ReminderLevel.Get(ReminderHeader."Reminder Terms Code", ReminderHeader."Reminder Level");
-        LibraryERM.CreateReminderAttachmentText(ReminderAttachmentText, ReminderLevel, Language.GetUserLanguageCode());
 
-        LibraryERM.CreateReminderAttachmentTextLine(
-          ReminderAttachmentTextLineBeginning[1],
-          ReminderAttachmentText,
-          ReminderAttachmentTextLineBeginning[1].Position::"Beginning Line",
+        LibraryERM.CreateReminderText(
+          ReminderTextBeginning[1],
+          ReminderHeader."Reminder Terms Code",
+          ReminderHeader."Reminder Level",
+          ReminderTextBeginning[1].Position::Beginning,
           LibraryUtility.GenerateGUID());
-        LibraryERM.CreateReminderAttachmentTextLine(
-          ReminderAttachmentTextLineBeginning[2],
-          ReminderAttachmentText,
-          ReminderAttachmentTextLineBeginning[2].Position::"Beginning Line",
+        LibraryERM.CreateReminderText(
+          ReminderTextBeginning[2],
+          ReminderHeader."Reminder Terms Code",
+          ReminderHeader."Reminder Level",
+          ReminderTextBeginning[2].Position::Beginning,
           LibraryUtility.GenerateGUID());
 
         LibraryERM.CreateReminderLine(ReminderLine, ReminderHeader."No.", ReminderLine.Type::"G/L Account");
 
-        LibraryERM.CreateReminderAttachmentTextLine(
-          ReminderAttachmentTextLineEnding[1],
-          ReminderAttachmentText,
-          ReminderAttachmentTextLineEnding[1].Position::"Ending Line",
+        LibraryERM.CreateReminderText(
+          ReminderTextEnding[1],
+          ReminderHeader."Reminder Terms Code",
+          ReminderHeader."Reminder Level",
+          ReminderTextEnding[1].Position::Ending,
           LibraryUtility.GenerateGUID());
-        LibraryERM.CreateReminderAttachmentTextLine(
-          ReminderAttachmentTextLineEnding[2],
-          ReminderAttachmentText,
-          ReminderAttachmentTextLineEnding[2].Position::"Ending Line",
+        LibraryERM.CreateReminderText(
+          ReminderTextEnding[2],
+          ReminderHeader."Reminder Terms Code",
+          ReminderHeader."Reminder Level",
+          ReminderTextEnding[2].Position::Ending,
           LibraryUtility.GenerateGUID());
 
         ReminderHeader.InsertLines();
@@ -72,11 +71,22 @@ codeunit 142082 "ERM Excel Reports DACH"
 
         // [THEN] Both beginning text lines are printed in column 2 of lines 23 and 24
         // [THEN] Both ending text lines are printed in column 2 of lines 28 and 29
-        ValidateReminderTexts(ReminderAttachmentTextLineBeginning, ReminderAttachmentTextLineEnding);
+        ValidateReminderTexts(ReminderTextBeginning, ReminderTextEnding);
     end;
 
     local procedure Initialize()
+    var
+        FeatureKey: Record "Feature Key";
+        FeatureKeyUpdateStatus: Record "Feature Data Update Status";
     begin
+        if FeatureKey.Get('ReminderTermsCommunicationTexts') then begin
+            FeatureKey.Enabled := FeatureKey.Enabled::None;
+            FeatureKey.Modify();
+        end;
+        if FeatureKeyUpdateStatus.Get('ReminderTermsCommunicationTexts', CompanyName()) then begin
+            FeatureKeyUpdateStatus."Feature Status" := FeatureKeyUpdateStatus."Feature Status"::Disabled;
+            FeatureKeyUpdateStatus.Modify();
+        end;
         Commit();
         Clear(LibraryReportValidation);
     end;
@@ -103,7 +113,7 @@ codeunit 142082 "ERM Excel Reports DACH"
         ReminderHeader.Modify();
     end;
 
-    local procedure ValidateReminderTexts(ReminderTextBeginning: array[2] of Record "Reminder Attachment Text Line"; ReminderTextEnding: array[2] of Record "Reminder Attachment Text Line")
+    local procedure ValidateReminderTexts(ReminderTextBeginning: array[2] of Record "Reminder Text"; ReminderTextEnding: array[2] of Record "Reminder Text")
     var
         ExcelSheetNo: Integer;
     begin
@@ -128,3 +138,4 @@ codeunit 142082 "ERM Excel Reports DACH"
           WrongCellValueTxt + ' ' + Format(29) + ';' + Format(2));
     end;
 }
+
