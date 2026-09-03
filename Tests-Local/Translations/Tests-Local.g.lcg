@@ -1679,6 +1679,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit UT REP Stock Card - NamedType AmountCap)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2759695614 - NamedType 3661798924" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[BalanceQty]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit UT REP Stock Card - NamedType BalanceQtyLbl)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2759695614 - NamedType 1442670338" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[CostingMethod]]></Val>
@@ -1713,6 +1722,33 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit UT REP Stock Card - NamedType OpeningStockCap)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2759695614 - NamedType 3866437058" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[ReceivedCost]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit UT REP Stock Card - NamedType ReceivedCostLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2759695614 - NamedType 102197523" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[ReceivedQty]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit UT REP Stock Card - NamedType ReceivedQtyLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2759695614 - NamedType 2983342030" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[TotalBalanceAmount]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit UT REP Stock Card - NamedType TotalBalanceAmountLbl)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 4259920039 - NamedType 1510247560" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
