@@ -75,8 +75,8 @@ codeunit 6531 "E-Doc. Remit. Advice Export"
     var
         DocumentSendingProfile: Record "Document Sending Profile";
         EDocumentProcessing: Codeunit "E-Document Processing";
-        RecRef: RecordRef;
         AlreadyExists: Boolean;
+        RecRef: RecordRef;
     begin
         RecRef.GetTable(PaymentVendLedgEntry);
         DocumentSendingProfile := EDocumentProcessing.GetDocSendingProfileForDocRef(RecRef);

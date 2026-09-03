@@ -56,8 +56,6 @@ permissionset 6100 "E-Doc. Core - Objects"
         table "ED Purchase Line Field Setup" = X,
         table "E-Doc Sample Purch. Inv File" = X,
         table "E-Document Message" = X,
-        table "E-Doc. Payment Occurrence" = X,
-        table "E-Doc. External Reference" = X,
 #if not CLEAN28
 #pragma warning disable AL0432
         table "EDoc Historical Matching Setup" = X,
@@ -106,11 +104,7 @@ permissionset 6100 "E-Doc. Core - Objects"
 #endif
         codeunit "E-Doc. Attachment Processor" = X,
         codeunit "E-Doc. Hist. Line Data Loader" = X,
-        codeunit "E-Doc. Message Context" = X,
         codeunit "E-Doc. Message Mgt." = X,
-        codeunit "E-Doc. Msg. Transport Default" = X,
-        codeunit "E-Doc. Payment Occ. Dispatcher" = X,
-        codeunit "E-Doc. Payment Occ. Runner" = X,
         codeunit "Service Participant" = X,
         page "E-Doc. Changes Part" = X,
         page "E-Doc. Changes Preview" = X,
