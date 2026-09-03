@@ -45,12 +45,6 @@ page 1253 "Payment Application Settings"
                         Caption = 'Related Party Name Matching';
                         ApplicationArea = All;
                     }
-
-                    field(CandidateLookbackDays; Rec."Candidate Lookback (Days)")
-                    {
-                        Caption = 'Candidate Lookback (Days)';
-                        ApplicationArea = All;
-                    }
                 }
 
                 group(LedgerEntriesSpecific)
