@@ -1940,15 +1940,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Suggest Reminder - NamedType CaptionErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 3626870028 - NamedType 2313767692" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Reminder Text - %1 %2 Beginning]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1=Reminder Terms Code;%2=Reminder Level]D;]A;(LookupHint=Codeunit ERM Suggest Reminder - NamedType ReminderCaptionTxt)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 3626870028 - NamedType 2248352953" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Reminder Header must not exist.]]></Val>
@@ -1956,6 +1947,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Suggest Reminder - NamedType ReminderHeaderExistErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3626870028 - NamedType 4222469290" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Reminder Level Communication - %1 ∙ %2]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Reminder Terms Code, %2 = Reminder Level No.]D;]A;(LookupHint=Codeunit ERM Suggest Reminder - NamedType ReminderLevelCommunicationCaptionTxt)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3626870028 - NamedType 895055522" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -2129,15 +2129,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Update Currency - Sales - NamedType UnitPriceError)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 3166023919 - NamedType 2296203490" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Additional Fee Setup - Additional Fee per Line Setup -]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Reminder - Add. Fee Setup - NamedType AddFeePerLineTxt)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 3166023919 - NamedType 968502965" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Page Captions must match.]]></Val>
@@ -2147,22 +2138,13 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Reminder - Add. Fee Setup - NamedType CaptionErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 3166023919 - NamedType 827727860" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+  <Item ItemId=";Codeunit 3166023919 - NamedType 3658307233" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Level:]]></Val>
+      <Val><![CDATA[Reminder Level Fee Setup - %1 ∙ %2]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Reminder - Add. Fee Setup - NamedType ReminderLevelTxt)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 3166023919 - NamedType 1887929229" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Reminder Terms:]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Reminder - Add. Fee Setup - NamedType ReminderTermsTxt)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1 = Reminder Terms Code, %2 = Reminder Level No.]D;]A;(LookupHint=Codeunit Reminder - Add. Fee Setup - NamedType ReminderLevelFeeSetupCaptionTxt)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3166023919 - NamedType 225456637" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
