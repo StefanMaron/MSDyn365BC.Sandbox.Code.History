@@ -86,7 +86,6 @@ table 38 "Purchase Header"
 
             trigger OnValidate()
             var
-                MatchedOrderLineMgmt: Codeunit "Matched Order Line Mgmt.";
                 IsHandled: Boolean;
             begin
                 IsHandled := false;
@@ -204,8 +203,6 @@ table 38 "Purchase Header"
                         Rec.Validate("Remit-to Code", '');
                 end else
                     SelectDefaultRemitAddress(Rec);
-
-                MatchedOrderLineMgmt.ApplyVendorsReceiptOnInvoicePolicy(Rec);
             end;
         }
         field(3; "No."; Code[20])
@@ -2774,7 +2771,10 @@ table 38 "Purchase Header"
             var
                 MatchedOrderLineMgmt: Codeunit "Matched Order Line Mgmt.";
             begin
-                MatchedOrderLineMgmt.ApplyReceiptOnInvoiceToLines(Rec);
+                if "Receipt on Invoice" then
+                    MatchedOrderLineMgmt.CheckReceiptOnInvoiceAllowed(Rec);
+
+                MatchedOrderLineMgmt.RefreshMatchedOrderLineReceipt(Rec);
             end;
         }
         field(7000; "Price Calculation Method"; Enum "Price Calculation Method")

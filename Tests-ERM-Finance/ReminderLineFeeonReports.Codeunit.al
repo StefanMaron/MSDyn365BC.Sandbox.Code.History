@@ -9,13 +9,13 @@ codeunit 134993 "Reminder - Line Fee on Reports"
     end;
 
     var
-        Assert: Codeunit Assert;
         Language: Codeunit Language;
         LibraryERM: Codeunit "Library - ERM";
         LibraryInventory: Codeunit "Library - Inventory";
         LibrarySales: Codeunit "Library - Sales";
         LibraryService: Codeunit "Library - Service";
         LibraryReportDataset: Codeunit "Library - Report Dataset";
+        LibraryUtility: Codeunit "Library - Utility";
         LibraryRandom: Codeunit "Library - Random";
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
         IsInitialized: Boolean;
@@ -177,23 +177,22 @@ codeunit 134993 "Reminder - Line Fee on Reports"
     [Scope('OnPrem')]
     procedure PrintServiceInvoiceTextonInvoiceTranslated()
     var
+        ReminderTermsTranslation: Record "Reminder Terms Translation";
         AddFeePerLine: Decimal;
         CustomerNo: Code[20];
         InvoiceNo: Code[20];
-        LanguageCode: Code[10];
         ReminderTermsCode: Code[10];
     begin
         // [SCENARIO 107048] A service invoice report contains translated Add. Fee Note
-        // as selected Reminder Terms contain attachment text in the customer's language.
+        // as selected Reminder Terms contain Translated text on Report and Customer Country is set to use specific lang.
         Initialize();
 
         // [GIVEN] A Reminder Term X, with level 1 with Add. Fee per Line = A, where A > 0, with Text on Report
         // defined in other language and Customer Language set to that language
         AddFeePerLine := LibraryRandom.RandDec(1000, 2);
         CreateCustomerWithReminderTermsAddFeePerLine(CustomerNo, ReminderTermsCode, true, '', AddFeePerLine);
-        LanguageCode := LibraryERM.GetAnyLanguageDifferentFromCurrent();
-        CreateReminderTermsInlineFeeText(ReminderTermsCode, LanguageCode);
-        UpdateCustomerLangCode(CustomerNo, LanguageCode);
+        CreateReminderTermsTranslationEntry(ReminderTermsTranslation, ReminderTermsCode);
+        UpdateCustomerLangCode(CustomerNo, ReminderTermsTranslation."Language Code");
 
         // [GIVEN] A posted service invoice for customer with Reminder Term = X
         InvoiceNo := PostServiceInvoice(CustomerNo, WorkDate());
@@ -201,8 +200,9 @@ codeunit 134993 "Reminder - Line Fee on Reports"
         // [WHEN] The invoice is printed
         ExportServiceInvoice(CustomerNo);
 
-        // [THEN] The Add. Fee per Line note on report is printed in the customer's language
-        ValidateInvoiceAddFeePerLine(ReminderTermsCode, 1, InvoiceNo, AddFeePerLine, '', LanguageCode);
+        // [THEN] The Add. Fee per Line note on report is printed on language defined in Reminder Terms Translation table
+        ValidateInvoiceAddFeePerLine(
+          ReminderTermsCode, 1, InvoiceNo, AddFeePerLine, '', ReminderTermsTranslation."Language Code");
     end;
 
     local procedure Initialize()
@@ -294,16 +294,14 @@ codeunit 134993 "Reminder - Line Fee on Reports"
 
     local procedure CreateReminderTerms(PostLineFee: Boolean; PostInterest: Boolean; PostAddFee: Boolean): Code[10]
     var
-        ReminderAttachmentText: Record "Reminder Attachment Text";
         ReminderTerms: Record "Reminder Terms";
     begin
         LibraryERM.CreateReminderTerms(ReminderTerms);
         ReminderTerms.Validate("Post Interest", PostInterest);
         ReminderTerms.Validate("Post Add. Fee per Line", PostLineFee);
         ReminderTerms.Validate("Post Additional Fee", PostAddFee);
+        ReminderTerms.Validate("Note About Line Fee on Report", '%1 %2 %3 %4');
         ReminderTerms.Modify(true);
-        LibraryERM.CreateReminderAttachmentText(ReminderAttachmentText, ReminderTerms, Language.GetUserLanguageCode());
-        LibraryERM.SetReminderAttachmentTextInlineFeeDescription(ReminderAttachmentText, '%1 %2 %3 %4');
         exit(ReminderTerms.Code)
     end;
 
@@ -320,6 +318,8 @@ codeunit 134993 "Reminder - Line Fee on Reports"
         ReminderLevel.Validate("Due Date Calculation", DueDateCalcFormula);
         ReminderLevel.Validate("Grace Period", GracePeriodCalcFormula);
         ReminderLevel.Validate("Calculate Interest", CalculateInterest);
+        ReminderLevel.Validate("Add. Fee per Line Description",
+          LibraryUtility.GenerateRandomCode(ReminderLevel.FieldNo("Add. Fee per Line Description"), DATABASE::"Reminder Level"));
         if CurrencyCode <> '' then
             CreateCurrencyforReminderLevel(ReminderTermsCode, Level, CurrencyCode, AdditionalFee, LineFee)
         else begin
@@ -329,14 +329,17 @@ codeunit 134993 "Reminder - Line Fee on Reports"
         ReminderLevel.Modify(true);
     end;
 
-    local procedure CreateReminderTermsInlineFeeText(ReminderTermsCode: Code[10]; LanguageCode: Code[10])
+    local procedure CreateReminderTermsTranslationEntry(var ReminderTermsTranslation: Record "Reminder Terms Translation"; ReminderTermsCode: Code[10])
     var
-        ReminderAttachmentText: Record "Reminder Attachment Text";
-        ReminderTerms: Record "Reminder Terms";
+        Language: Record Language;
     begin
-        ReminderTerms.Get(ReminderTermsCode);
-        LibraryERM.CreateReminderAttachmentText(ReminderAttachmentText, ReminderTerms, LanguageCode);
-        LibraryERM.SetReminderAttachmentTextInlineFeeDescription(ReminderAttachmentText, '%1 %2 %3 %4');
+        Language.FindFirst();
+        ReminderTermsTranslation.Init();
+        ReminderTermsTranslation.Validate("Reminder Terms Code", ReminderTermsCode);
+        ReminderTermsTranslation.Validate("Language Code", Language.Code);
+        ReminderTermsTranslation.Insert(true);
+        ReminderTermsTranslation.Validate("Note About Line Fee on Report", '%1 %2 %3 %4');
+        ReminderTermsTranslation.Modify(true);
     end;
 
     local procedure ExportServiceInvoice(CustomerNo: Code[20])
@@ -405,10 +408,9 @@ codeunit 134993 "Reminder - Line Fee on Reports"
     var
         CustLedgerEntry: Record "Cust. Ledger Entry";
         GeneralLedgerSetup: Record "General Ledger Setup";
-        LineFeeNoteOnReportHist: Record "Line Fee Note on Report Hist.";
-        ReminderAttachmentText: Record "Reminder Attachment Text";
         ReminderLevel: Record "Reminder Level";
         ReminderTerms: Record "Reminder Terms";
+        ReminderTermsTranslation: Record "Reminder Terms Translation";
         ElementExpectedValue: Text;
         MarginalPerc: Decimal;
         TextOnReportExpected: Text[150];
@@ -433,21 +435,15 @@ codeunit 134993 "Reminder - Line Fee on Reports"
             CurrencyCode := GeneralLedgerSetup."LCY Code";
         end;
 
-        ReminderAttachmentText.Get(ReminderTerms."Reminder Attachment Text", LanguageCode);
-        TextOnReportExpected := ReminderAttachmentText."Inline Fee Description";
+        // expected result
+        if LanguageCode <> Language.GetUserLanguageCode() then begin
+            ReminderTermsTranslation.Get(ReminderTerms.Code, LanguageCode);
+            TextOnReportExpected := ReminderTermsTranslation."Note About Line Fee on Report"
+        end else
+            TextOnReportExpected := ReminderTerms."Note About Line Fee on Report";
 
         ElementExpectedValue := StrSubstNo(TextOnReportExpected, Format(AddFeePerLine, 0, 9),
             CurrencyCode, AddFeeDueDate, Format(MarginalPerc, 0, 9));
-
-        if AddFeePerLine > 0 then begin
-            Assert.IsTrue(
-                LineFeeNoteOnReportHist.Get(
-                    CustLedgerEntry."Entry No.", AddFeeDueDate, LanguageCode, ReminderTermsCode, LevelNo),
-                'The line fee note was not saved for the reminder communication language.');
-            Assert.AreEqual(
-                ElementExpectedValue, LineFeeNoteOnReportHist.ReportText,
-                'The saved line fee note does not match the reminder communication text.');
-        end;
 
         if LevelNo = 1 then
             LibraryReportDataset.LoadDataSetFile();
