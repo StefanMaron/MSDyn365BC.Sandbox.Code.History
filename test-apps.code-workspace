@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeAnalysis": false,
+    "allint.enabled": false,
+    "al.enableCodeActions": false
+  },
   "folders": [
     {
       "path": "./_Exclude_APIV1_ Tests"
@@ -292,34 +300,7 @@
       "path": "./Withholding Tax Tests"
     },
     {
-      "path": "./AI Test Toolkit/src/TestSuite"
-    },
-    {
-      "path": "./Quality Management-Tests/DisabledTests"
-    },
-    {
-      "path": "./System Application Test Library/Extension Management/testArtifacts"
-    },
-    {
-      "path": "./Base Application/System/DevTools/CALTest"
-    },
-    {
-      "path": "./System Application/Email/src/Test Email"
-    },
-    {
-      "path": "./Subcontracting-Tests/Tests"
-    },
-    {
-      "path": "./Sales Lines Suggestions Tests/AI Tests"
-    },
-    {
-      "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
-    },
-    {
-      "path": "./Performance Toolkit Tests/src/Mock Tests"
-    },
-    {
-      "path": "./Shopify Connector Test/DisabledTests"
+      "path": "./System Application Test/DisabledTests"
     },
     {
       "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
@@ -328,39 +309,58 @@
       "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
     },
     {
-      "path": "./Business Foundation Tests/DisabledTests"
-    },
-    {
       "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
     },
     {
-      "path": "./E-Document Core Tests/DisabledTests"
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
+    },
+    {
+      "path": "./Subcontracting-Tests/Tests"
+    },
+    {
+      "path": "./System Application Test Library/Extension Management/testArtifacts"
+    },
+    {
+      "path": "./Sales Lines Suggestions Tests/AI Tests"
+    },
+    {
+      "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
+    },
+    {
+      "path": "./AI Test Toolkit/src/TestSuite"
     },
     {
       "path": "./Quality Management/src/Configuration/Template/Test"
     },
     {
-      "path": "./System Application Test/DisabledTests"
+      "path": "./System Application/Email/src/Test Email"
     },
     {
-      "path": "./Subscription Billing Tests/DisabledTests"
+      "path": "./Shopify Connector Test/DisabledTests"
     },
     {
-      "path": "./Error Messages with Recommendations Tests/DisabledTests"
+      "path": "./E-Document Core Tests/DisabledTests"
+    },
+    {
+      "path": "./Quality Management-Tests/DisabledTests"
+    },
+    {
+      "path": "./Test Runner/src/DataDrivenTest"
     },
     {
       "path": "./PowerBI Reports Tests/DisabledTests"
     },
     {
-      "path": "./Test Runner/src/DataDrivenTest"
+      "path": "./Error Messages with Recommendations Tests/DisabledTests"
+    },
+    {
+      "path": "./Subscription Billing Tests/DisabledTests"
+    },
+    {
+      "path": "./Business Foundation Tests/DisabledTests"
+    },
+    {
+      "path": "./Base Application/System/DevTools/CALTest"
     }
-  ],
-  "settings": {
-    "al.enableCodeActions": false,
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
-    "search.exclude": {
-      "**.xlf": true
-    }
-  }
+  ]
 }
