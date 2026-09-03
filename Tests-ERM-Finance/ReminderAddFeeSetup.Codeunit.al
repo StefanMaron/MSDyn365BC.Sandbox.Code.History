@@ -2,6 +2,7 @@ codeunit 134998 "Reminder - Add. Fee Setup"
 {
     Subtype = Test;
     TestPermissions = NonRestrictive;
+    Permissions = TableData "Feature Data Update Status" = rimd;
 
     trigger OnRun()
     begin
@@ -9,7 +10,18 @@ codeunit 134998 "Reminder - Add. Fee Setup"
     end;
 
     local procedure Initialize()
+    var
+        FeatureKey: Record "Feature Key";
+        FeatureKeyUpdateStatus: Record "Feature Data Update Status";
     begin
+        if FeatureKey.Get('ReminderTermsCommunicationTexts') then begin
+            FeatureKey.Enabled := FeatureKey.Enabled::None;
+            FeatureKey.Modify();
+        end;
+        if FeatureKeyUpdateStatus.Get('ReminderTermsCommunicationTexts', CompanyName()) then begin
+            FeatureKeyUpdateStatus."Feature Status" := FeatureKeyUpdateStatus."Feature Status"::Disabled;
+            FeatureKeyUpdateStatus.Modify();
+        end;
         Commit();
     end;
 
@@ -21,7 +33,9 @@ codeunit 134998 "Reminder - Add. Fee Setup"
         UnexpectedAddFeeAmountErr: Label 'Unexpected Additional Fee Amount. Expected %1, Actual %2.';
         AddFeeCalculationType: Option "Fixed","Single Dynamic","Accumulated Dynamic";
         CaptionErr: Label 'Page Captions must match.';
-        ReminderLevelFeeSetupCaptionTxt: Label 'Reminder Level Fee Setup - %1 ∙ %2', Comment = '%1 = Reminder Terms Code, %2 = Reminder Level No.';
+        ReminderTermsTxt: Label 'Reminder Terms:';
+        ReminderLevelTxt: Label 'Level:';
+        AddFeePerLineTxt: Label 'Additional Fee Setup - Additional Fee per Line Setup -';
 
     [Test]
     [Scope('OnPrem')]
@@ -959,24 +973,27 @@ codeunit 134998 "Reminder - Add. Fee Setup"
     procedure AddFeeSetupOnOpenPageUT()
     var
         ReminderLevel: Record "Reminder Level";
-        ReminderLevelFeeSetup: TestPage "Reminder Level Fee Setup";
+        AdditionalFeeSetupPage: TestPage "Additional Fee Setup";
+        ReminderLevels: TestPage "Reminder Levels";
+        PageCaption: Text;
     begin
         // [SCENARIO 107048] Verify Add. Fee Setup Caption
         Initialize();
 
         // [GIVEN] When Reminder Terms and Reminder Level exist
         CreateReminderTermsAndLevel(ReminderLevel, true, true, AddFeeCalculationType);
-        ReminderLevel.Validate("Add. Fee Calculation Type", ReminderLevel."Add. Fee Calculation Type"::"Single Dynamic");
-        ReminderLevel.Modify(true);
 
-        // [WHEN] Reminder Level Fee Setup Page is run from Reminder Terms Setup Page.
-        OpenReminderLevelFeeSetupPage(ReminderLevelFeeSetup, ReminderLevel."Reminder Terms Code", ReminderLevel."No.");
+        // [WHEN] Add. Fee Setup Page is run from Reminder Levels Page.
+        OpenReminderLevelsPage(ReminderLevels, ReminderLevel."Reminder Terms Code", ReminderLevel."No.");
+        ReminderLevels."Add. Fee Calculation Type".SetValue(ReminderLevel."Add. Fee Calculation Type"::"Single Dynamic");
 
-        // [THEN] Reminder Level Fee Setup Page has the expected caption
-        Assert.AreEqual(
-            StrSubstNo(ReminderLevelFeeSetupCaptionTxt, ReminderLevel."Reminder Terms Code", ReminderLevel."No."),
-            ReminderLevelFeeSetup.Caption,
-            CaptionErr);
+        AdditionalFeeSetupPage.Trap();
+        ReminderLevels."Additional Fee per Line".Invoke();
+        PageCaption := AddFeePerLineTxt + ' ' + ReminderTermsTxt + ' ' + ReminderLevel."Reminder Terms Code" + ' ' +
+          ReminderLevelTxt + ' ' + Format(ReminderLevel."No.");
+
+        // [THEN] then caption contains Reminder Terms and Reminder Level specified
+        Assert.AreEqual(AdditionalFeeSetupPage.Caption, PageCaption, CaptionErr);
     end;
 
     [Test]
@@ -985,25 +1002,20 @@ codeunit 134998 "Reminder - Add. Fee Setup"
     procedure AddFeeChartOnOpenPageUT()
     var
         ReminderLevel: Record "Reminder Level";
-        TestClientTypeSubscriber: Codeunit "Test Client Type Subscriber";
         AdditionalFeeChart: TestPage "Additional Fee Chart";
-        ReminderLevelFeeSetup: TestPage "Reminder Level Fee Setup";
+        ReminderLevels: TestPage "Reminder Levels";
     begin
         // [SCENARIO 107048] Verify Add. Fee Chart
         Initialize();
 
         // [GIVEN] When Reminder Terms and Reminder Level exist
         CreateReminderTermsAndLevel(ReminderLevel, true, true, AddFeeCalculationType);
-        ReminderLevel.Validate("Add. Fee Calculation Type", ReminderLevel."Add. Fee Calculation Type"::"Single Dynamic");
-        ReminderLevel.Modify(true);
 
-        // [WHEN] Reminder Level Fee Setup Page is run from Reminder Terms Setup Page and Add. Fee Chart is opened
-        BindSubscription(TestClientTypeSubscriber);
-        TestClientTypeSubscriber.SetClientType(ClientType::Windows);
-        OpenReminderLevelFeeSetupPage(ReminderLevelFeeSetup, ReminderLevel."Reminder Terms Code", ReminderLevel."No.");
+        // [WHEN] Add. Fee Chart Page is run from Reminder Levels Page.
+        OpenReminderLevelsPage(ReminderLevels, ReminderLevel."Reminder Terms Code", ReminderLevel."No.");
+        ReminderLevels."Add. Fee Calculation Type".SetValue(ReminderLevel."Add. Fee Calculation Type"::"Single Dynamic");
         AdditionalFeeChart.Trap();
-        ReminderLevelFeeSetup."View Additional Fee Chart".Invoke();
-        ReminderLevelFeeSetup.Close();
+        ReminderLevels."View Additional Fee Chart".Invoke();
 
         // [THEN] then Additional Fee  per Line, M
     end;
@@ -1264,18 +1276,15 @@ codeunit 134998 "Reminder - Add. Fee Setup"
         AdditionalFeeSetup.Modify(true);
     end;
 
-    local procedure OpenReminderLevelFeeSetupPage(var ReminderLevelFeeSetup: TestPage "Reminder Level Fee Setup"; "Code": Code[10]; No: Integer)
+    local procedure OpenReminderLevelsPage(var ReminderLevels: TestPage "Reminder Levels"; "Code": Code[10]; No: Integer)
     var
-        ReminderTermsList: TestPage "Reminder Terms List";
-        ReminderTermsSetup: TestPage "Reminder Terms Setup";
+        ReminderTerms: TestPage "Reminder Terms";
     begin
-        ReminderTermsList.OpenView();
-        ReminderTermsList.FILTER.SetFilter(Code, Code);
-        ReminderTermsSetup.Trap();
-        ReminderTermsList.Edit().Invoke();
-        ReminderTermsSetup.ReminderLevelSetup.FILTER.SetFilter("No.", Format(No));
-        ReminderLevelFeeSetup.Trap();
-        ReminderTermsSetup.ReminderLevelSetup.ReminderLevelFeeSetup.Invoke();
+        ReminderTerms.OpenEdit();
+        ReminderTerms.FILTER.SetFilter(Code, Code);
+        ReminderLevels.Trap();
+        ReminderTerms."&Levels".Invoke();
+        ReminderLevels.FILTER.SetFilter("No.", Format(No));
     end;
 
     local procedure VerifyBufferData(var BusinessChartBuffer: Record "Business Chart Buffer"; AdditionalFeeSetup: Record "Additional Fee Setup"; ReminderLevel: Record "Reminder Level")
@@ -1332,3 +1341,4 @@ codeunit 134998 "Reminder - Add. Fee Setup"
         AdditionalFeeChart.OK().Invoke();
     end;
 }
+
