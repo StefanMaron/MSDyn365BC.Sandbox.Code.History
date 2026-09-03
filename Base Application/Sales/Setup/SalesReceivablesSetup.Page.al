@@ -539,7 +539,7 @@ page 459 "Sales & Receivables Setup"
                     ApplicationArea = Suite;
                     Caption = 'Reminder Terms';
                     Image = ReminderTerms;
-                    RunObject = Page "Reminder Terms List";
+                    RunObject = Page "Reminder Terms";
                     ToolTip = 'Set up reminder terms that you select from on customer cards to define when and how to remind the customer of late payments.';
                 }
                 action("Rounding Methods")
@@ -622,3 +622,4 @@ page 459 "Sales & Receivables Setup"
         CRMIntegrationEnabled: Boolean;
         JnlTemplateNameVisible: Boolean;
 }
+
