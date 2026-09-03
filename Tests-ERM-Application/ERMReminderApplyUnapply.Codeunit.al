@@ -177,11 +177,16 @@ codeunit 134012 "ERM Reminder Apply Unapply"
 
     local procedure Initialize()
     var
+        FeatureKey: Record "Feature Key";
         LibraryERMCountryData: Codeunit "Library - ERM Country Data";
     begin
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"ERM Reminder Apply Unapply");
         LibrarySetupStorage.Restore();
 
+        if FeatureKey.Get('ReminderTermsCommunicationTexts') then begin
+            FeatureKey.Enabled := FeatureKey.Enabled::None;
+            FeatureKey.Modify();
+        end;
         // Lazy Setup.
         if isInitialized then
             exit;
@@ -455,3 +460,4 @@ codeunit 134012 "ERM Reminder Apply Unapply"
         VATEntry.TestField("Country/Region Code", ExpectedCountryRegionCode);
     end;
 }
+
