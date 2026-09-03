@@ -1,4 +1,3 @@
-#if not CLEAN29
 ﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -16,9 +15,6 @@ page 432 "Reminder Levels"
     DataCaptionFields = "Reminder Terms Code";
     PageType = List;
     SourceTable = "Reminder Level";
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Use page 1896 "Reminder Level Setup" instead.';
-    ObsoleteTag = '29.0';
 
     layout
     {
@@ -245,4 +241,4 @@ page 432 "Reminder Levels"
         end;
     end;
 }
-#endif
+
