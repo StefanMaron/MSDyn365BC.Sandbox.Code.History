@@ -194,10 +194,8 @@ codeunit 9200 "Matrix Management"
             "Matrix Page Step Type"::PreviousColumn:
                 if RecordPosition <> '' then begin
                     DimVal.SetPosition(RecordPosition);
-#pragma warning disable AA0181, AA0233 // Positional Find() paired with Next(); suppression tracked for follow-up
                     DimVal.Find('=');
                     if DimVal.Next(-1) <> 0 then begin
-#pragma warning restore AA0181, AA0233
                         RecordPosition := DimVal.GetPosition();
                         TmpFirstColumn := DimVal.Code;
                         TmpSteps := DimVal.Next(NoOfColumns - 1);

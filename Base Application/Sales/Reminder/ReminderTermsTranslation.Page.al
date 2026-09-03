@@ -1,4 +1,3 @@
-#if not CLEAN29
 ﻿// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
@@ -13,9 +12,6 @@ page 1052 "Reminder Terms Translation"
     Caption = 'Reminder Terms Translation';
     DataCaptionExpression = PageCaptionText;
     SourceTable = "Reminder Terms Translation";
-    ObsoleteState = Pending;
-    ObsoleteReason = 'Use page 1897 "Reminder Term Communication" instead.';
-    ObsoleteTag = '29.0';
 
     layout
     {
@@ -53,4 +49,4 @@ page 1052 "Reminder Terms Translation"
     var
         PageCaptionText: Text;
 }
-#endif
+
