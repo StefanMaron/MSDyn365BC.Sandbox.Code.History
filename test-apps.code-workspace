@@ -307,6 +307,9 @@
       "path": "./Performance Toolkit Tests/src/Mock Tests"
     },
     {
+      "path": "./Subcontracting-Tests/Tests"
+    },
+    {
       "path": "./System Application Test Library/Extension Management/testArtifacts"
     },
     {
