@@ -8,7 +8,7 @@ controlAddIn.insertAdjacentHTML('beforeend', '<img style="display:block; max-hei
         Microsoft.Dynamics.NAV.GetImageResource('resources/EarlyAccessPreview/EAPBanner.png') +
         '"/>');
 // SIG // Begin signature block
-// SIG // MIInRwYJKoZIhvcNAQcCoIInODCCJzQCAQExDzANBglg
+// SIG // MIInRAYJKoZIhvcNAQcCoIInNTCCJzECAQExDzANBglg
 // SIG // hkgBZQMEAgEFADB3BgorBgEEAYI3AgEEoGkwZzAyBgor
 // SIG // BgEEAYI3AgEeMCQCAQEEEBDgyQbOONQRoqMAEEvTUJAC
 // SIG // AQACAQACAQACAQACAQAwMTANBglghkgBZQMEAgEFAAQg
@@ -111,8 +111,8 @@ controlAddIn.insertAdjacentHTML('beforeend', '<img style="display:block; max-hei
 // SIG // As38YHlPnarl1vW3dGrmJTgefAz3DmCnXN0nveIPsS+K
 // SIG // XBIWweeCToAJMGE7v/XS3h9qQ6niWQAAVQ1kUAml3zuS
 // SIG // 4MisCgi2F6YoK2WAo1EgXK/lXvDxVjIVU0JdL+KvCfwF
-// SIG // JkDeVuJ9dNXGNi+AOxk0BtYd9hxwL30BElj9MYIZ5TCC
-// SIG // GeECAQEwbjBXMQswCQYDVQQGEwJVUzEeMBwGA1UEChMV
+// SIG // JkDeVuJ9dNXGNi+AOxk0BtYd9hxwL30BElj9MYIZ4jCC
+// SIG // Gd4CAQEwbjBXMQswCQYDVQQGEwJVUzEeMBwGA1UEChMV
 // SIG // TWljcm9zb2Z0IENvcnBvcmF0aW9uMSgwJgYDVQQDEx9N
 // SIG // aWNyb3NvZnQgQ29kZSBTaWduaW5nIFBDQSAyMDI0AhMz
 // SIG // AAACHU0ZyE7XD1dIAAAAAAIdMA0GCWCGSAFlAwQCAQUA
@@ -129,9 +129,9 @@ controlAddIn.insertAdjacentHTML('beforeend', '<img style="display:block; max-hei
 // SIG // YMPQ/PuyqrAL6vobK/SBpwrTHtGcj0bWJ0MxhkmnOO5l
 // SIG // qKWTv5teX5NrKqTRAGRs2Oj1RTpdeXUzY45ly2zVezYJ
 // SIG // HGMhQsj8He81p9ygTh3Kl6b5mL5dz1upUkSLHd6zIQwZ
-// SIG // piNJsjFr67DRv26y89raetetyuIUG3ehgheXMIIXkwYK
-// SIG // KwYBBAGCNwMDATGCF4Mwghd/BgkqhkiG9w0BBwKgghdw
-// SIG // MIIXbAIBAzEPMA0GCWCGSAFlAwQCAQUAMIIBUgYLKoZI
+// SIG // piNJsjFr67DRv26y89raetetyuIUG3ehgheUMIIXkAYK
+// SIG // KwYBBAGCNwMDATGCF4Awghd8BgkqhkiG9w0BBwKgghdt
+// SIG // MIIXaQIBAzEPMA0GCWCGSAFlAwQCAQUAMIIBUgYLKoZI
 // SIG // hvcNAQkQAQSgggFBBIIBPTCCATkCAQEGCisGAQQBhFkK
 // SIG // AwEwMTANBglghkgBZQMEAgEFAAQgxpy+SQNc4eYgdyMW
 // SIG // 46FHpD58bNJvc4IAcsQoH2zt8aoCBmqqiu6JlBgTMjAy
@@ -255,7 +255,7 @@ controlAddIn.insertAdjacentHTML('beforeend', '<img style="display:block; max-hei
 // SIG // hLy/AsGConsXHRWJjXD+57XQKBqJC4822rpM+Zv/Cuk0
 // SIG // +CQ1ZyvgDbjmjJnW4SLq8CdCPSWU5nR0W2rRnj7tfqAx
 // SIG // M328y+l7vzhwRNGQ8cirOoo6CGJ/2XBjU02N7oJtpQUQ
-// SIG // wXEGahC0HVUzWLOhcGbyoYIDUDCCAjgCAQEwgfmhgdGk
+// SIG // wXEGahC0HVUzWLOhcGbyoYIDTTCCAjUCAQEwgfmhgdGk
 // SIG // gc4wgcsxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpXYXNo
 // SIG // aW5ndG9uMRAwDgYDVQQHEwdSZWRtb25kMR4wHAYDVQQK
 // SIG // ExVNaWNyb3NvZnQgQ29ycG9yYXRpb24xJTAjBgNVBAsT
