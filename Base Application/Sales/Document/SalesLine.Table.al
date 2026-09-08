@@ -5701,7 +5701,9 @@ table 37 "Sales Line"
         if IsHandled then
             exit;
 
-        if (Rec.Quantity <> 0) and (Rec."Outstanding Quantity" = 0) and (Rec."Qty. Shipped Not Invoiced" = 0) then
+          if (Rec.Quantity <> 0) and (Rec."Outstanding Quantity" = 0) and (Rec."Qty. Shipped Not Invoiced" = 0) and
+              (Rec.Quantity = xRec.Quantity)
+          then
             if SalesHeader."Document Type" <> SalesHeader."Document Type"::Invoice then
                 exit;
 
@@ -8412,9 +8414,11 @@ table 37 "Sales Line"
 
         if ("Qty. to Invoice" <> 0) and ("Prepmt. Amt. Inv." <> 0) then begin
             GetSalesHeader();
-            if ("Prepayment %" = 100) and not IsFinalInvoice() then
+            if ("Prepayment %" = 100) and not IsFinalInvoice() then begin
+                // Reset to non-zero so GetLineAmountToHandle uses the proration branch, matching the already-posted amount
+                "Prepmt Amt to Deduct" := "Prepmt. Amt. Inv.";
                 "Prepmt Amt to Deduct" := GetLineAmountToHandle("Qty. to Invoice") - "Inv. Disc. Amount to Invoice"
-            else
+            end else
                 "Prepmt Amt to Deduct" :=
                   Round(
                     ("Prepmt. Amt. Inv." - "Prepmt Amt Deducted") *
@@ -10785,10 +10789,15 @@ table 37 "Sales Line"
                 until SelectedSalesLine.Next() = 0;
     end;
 
+    procedure RestoreLookupSelection()
+    begin
+        RestoreLookupSelectionWithResult();
+    end;
+
     /// <summary>
     /// Restores the selected record from the lookup state manager to the sales line.
     /// </summary>
-    procedure RestoreLookupSelection()
+    procedure RestoreLookupSelectionWithResult() SelectionRestored: Boolean
     var
         GLAccount: Record "G/L Account";
         Item: Record Item;
@@ -10799,6 +10808,8 @@ table 37 "Sales Line"
         RecVariant: Variant;
     begin
         if LookupStateManager.IsRecordSaved() then begin
+            SelectionRestored := true;
+            CurrFieldNo := FieldNo("No.");
             case Rec.Type of
                 Rec.Type::Item:
                     begin
