@@ -1,7 +1,7 @@
 WebPageViewerHelper.Initialize();
 Microsoft.Dynamics.NAV.InvokeExtensibilityMethod('ControlAddInReady', [WebPageViewerHelper.GetCallbackURL()]);
 // SIG // Begin signature block
-// SIG // MIInRwYJKoZIhvcNAQcCoIInODCCJzQCAQExDzANBglg
+// SIG // MIInRAYJKoZIhvcNAQcCoIInNTCCJzECAQExDzANBglg
 // SIG // hkgBZQMEAgEFADB3BgorBgEEAYI3AgEEoGkwZzAyBgor
 // SIG // BgEEAYI3AgEeMCQCAQEEEBDgyQbOONQRoqMAEEvTUJAC
 // SIG // AQACAQACAQACAQACAQAwMTANBglghkgBZQMEAgEFAAQg
@@ -104,8 +104,8 @@ Microsoft.Dynamics.NAV.InvokeExtensibilityMethod('ControlAddInReady', [WebPageVi
 // SIG // As38YHlPnarl1vW3dGrmJTgefAz3DmCnXN0nveIPsS+K
 // SIG // XBIWweeCToAJMGE7v/XS3h9qQ6niWQAAVQ1kUAml3zuS
 // SIG // 4MisCgi2F6YoK2WAo1EgXK/lXvDxVjIVU0JdL+KvCfwF
-// SIG // JkDeVuJ9dNXGNi+AOxk0BtYd9hxwL30BElj9MYIZ5TCC
-// SIG // GeECAQEwbjBXMQswCQYDVQQGEwJVUzEeMBwGA1UEChMV
+// SIG // JkDeVuJ9dNXGNi+AOxk0BtYd9hxwL30BElj9MYIZ4jCC
+// SIG // Gd4CAQEwbjBXMQswCQYDVQQGEwJVUzEeMBwGA1UEChMV
 // SIG // TWljcm9zb2Z0IENvcnBvcmF0aW9uMSgwJgYDVQQDEx9N
 // SIG // aWNyb3NvZnQgQ29kZSBTaWduaW5nIFBDQSAyMDI0AhMz
 // SIG // AAACHU0ZyE7XD1dIAAAAAAIdMA0GCWCGSAFlAwQCAQUA
@@ -122,9 +122,9 @@ Microsoft.Dynamics.NAV.InvokeExtensibilityMethod('ControlAddInReady', [WebPageVi
 // SIG // NBLDHA7o0E7PlLOdAyKsBjpI4eHuS2sbyvcaCQmA2979
 // SIG // kxziv2PaAI8/utjPK084tyfur4VOZESoP2ozf83/0/B1
 // SIG // D/nGYF312LGWEejOUSIy0lBz1wLH3khmxkpk0ZuzrKH4
-// SIG // HDmPJIpmBzBJBVfhJf3k5ypjn+qE4o2hgheXMIIXkwYK
-// SIG // KwYBBAGCNwMDATGCF4Mwghd/BgkqhkiG9w0BBwKgghdw
-// SIG // MIIXbAIBAzEPMA0GCWCGSAFlAwQCAQUAMIIBUgYLKoZI
+// SIG // HDmPJIpmBzBJBVfhJf3k5ypjn+qE4o2hgheUMIIXkAYK
+// SIG // KwYBBAGCNwMDATGCF4Awghd8BgkqhkiG9w0BBwKgghdt
+// SIG // MIIXaQIBAzEPMA0GCWCGSAFlAwQCAQUAMIIBUgYLKoZI
 // SIG // hvcNAQkQAQSgggFBBIIBPTCCATkCAQEGCisGAQQBhFkK
 // SIG // AwEwMTANBglghkgBZQMEAgEFAAQgXVJpRsNu0wKcP6TE
 // SIG // q0f52MNlXSYJD+g6JiVFy0WT6o4CBmqqiu6JkxgTMjAy
@@ -248,7 +248,7 @@ Microsoft.Dynamics.NAV.InvokeExtensibilityMethod('ControlAddInReady', [WebPageVi
 // SIG // hLy/AsGConsXHRWJjXD+57XQKBqJC4822rpM+Zv/Cuk0
 // SIG // +CQ1ZyvgDbjmjJnW4SLq8CdCPSWU5nR0W2rRnj7tfqAx
 // SIG // M328y+l7vzhwRNGQ8cirOoo6CGJ/2XBjU02N7oJtpQUQ
-// SIG // wXEGahC0HVUzWLOhcGbyoYIDUDCCAjgCAQEwgfmhgdGk
+// SIG // wXEGahC0HVUzWLOhcGbyoYIDTTCCAjUCAQEwgfmhgdGk
 // SIG // gc4wgcsxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpXYXNo
 // SIG // aW5ndG9uMRAwDgYDVQQHEwdSZWRtb25kMR4wHAYDVQQK
 // SIG // ExVNaWNyb3NvZnQgQ29ycG9yYXRpb24xJTAjBgNVBAsT
