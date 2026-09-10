@@ -70,11 +70,11 @@ report 11301 "Purchase Ledger"
                     {
                         AutoFormatType = 1;
                     }
-                    column(VATDetailBase; VATDetailBaseAmount)
+                    column(VATDetailBase; VATDetail.Base)
                     {
                         AutoFormatType = 1;
                     }
-                    column(VATDetailAmount; VATDetailVATAmount)
+                    column(VATDetailAmount; VATDetail.Amount)
                     {
                         AutoFormatType = 1;
                     }
@@ -231,10 +231,26 @@ report 11301 "Purchase Ledger"
                                 GLPostingDescription := GLPostingDescription + ' ' + Vendor.Name;
                         end;
 
-                        Clear(VATDetailBaseAmount);
-                        Clear(VATDetailVATAmount);
-                        if not UseAmtsInAddCurr then
-                            CalculateVATDetailAmounts("Entry No.");
+                        if not UseAmtsInAddCurr then begin
+                            Clear(VATDetail.Base);
+                            Clear(VATDetail.Amount);
+
+                            if OldTransactionNo <> "Transaction No." then begin
+                                MultipleVATEntries := 0;
+                                OldTransactionNo := "Transaction No.";
+                            end;
+
+                            if ("VAT Bus. Posting Group" <> '') or ("VAT Prod. Posting Group" <> '') then begin
+                                VATDetail.SetCurrentKey("Transaction No.");
+                                VATDetail.SetRange("Transaction No.", "Transaction No.");
+                                if MultipleVATEntries > 0 then begin
+                                    if VATDetail.Next() <> 0 then
+                                        MultipleVATEntries := MultipleVATEntries + 1;
+                                end else
+                                    if VATDetail.Find('-') then
+                                        MultipleVATEntries := MultipleVATEntries + 1;
+                            end;
+                        end;
                     end;
 
                     trigger OnPreDataItem()
@@ -734,6 +750,7 @@ report 11301 "Purchase Ledger"
         VendorLedgerEntry: Record "Vendor Ledger Entry";
         GLSetup: Record "General Ledger Setup";
         VATSumBuffer: Record "VAT Summary Buffer" temporary;
+        VATDetail: Record "VAT Entry";
         SourceCodeSetup: Record "Source Code Setup";
         VATStmt: Report "VAT Statement";
         VATStmtAddCurr: Report "VAT Statement";
@@ -757,8 +774,8 @@ report 11301 "Purchase Ledger"
         NoOfPeriods: Integer;
         PeriodLength: DateFormula;
         Startpage: Integer;
-        VATDetailBaseAmount: Decimal;
-        VATDetailVATAmount: Decimal;
+        MultipleVATEntries: Integer;
+        OldTransactionNo: Integer;
         GLPostingDescription: Text;
         DateCaption: Text;
         ExcludeDeferrals: Boolean;
@@ -793,19 +810,5 @@ report 11301 "Purchase Ledger"
     protected var
         PeriodStartDate: Date;
         PeriodEndDate: Date;
-
-    local procedure CalculateVATDetailAmounts(GLEntryNo: Integer)
-    var
-        GLEntryVATEntryLink: Record "G/L Entry - VAT Entry Link";
-        VATEntry: Record "VAT Entry";
-    begin
-        GLEntryVATEntryLink.SetRange("G/L Entry No.", GLEntryNo);
-        if GLEntryVATEntryLink.FindSet() then
-            repeat
-                VATEntry.Get(GLEntryVATEntryLink."VAT Entry No.");
-                VATDetailBaseAmount += VATEntry.Base;
-                VATDetailVATAmount += VATEntry.Amount;
-            until GLEntryVATEntryLink.Next() = 0;
-    end;
 
 }
