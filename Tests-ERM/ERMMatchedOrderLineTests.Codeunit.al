@@ -13,7 +13,6 @@ codeunit 134468 "ERM Matched Order Line Tests"
         Assert: Codeunit Assert;
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
         LibraryERM: Codeunit "Library - ERM";
-        LibraryDimension: Codeunit "Library - Dimension";
         LibraryInventory: Codeunit "Library - Inventory";
         LibraryItemTracking: Codeunit "Library - Item Tracking";
         LibraryPurchase: Codeunit "Library - Purchase";
