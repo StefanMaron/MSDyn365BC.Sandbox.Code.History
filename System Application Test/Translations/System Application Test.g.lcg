@@ -104,6 +104,15 @@
       <Cmt Name="Dev"><![CDATA[(ObjectTarget=Enum 3596146799)(Namespace=System.Test.Agents)(LookupHint=EnumExtension Mock Agent Meta. Prov. - EnumValue SDK Mock Agent - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";EnumExtension 1399480639 - EnumValue 1028847035 - Property 2879900210" ItemType=";EnumExtension - EnumValue" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[SDK Mock Agent No Archiving]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(ObjectTarget=Enum 3596146799)(Namespace=System.Test.Agents)(LookupHint=EnumExtension Mock Agent Meta. Prov. - EnumValue SDK Mock Agent No Archiving - Property Caption)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";PermissionSet 1236802005 - Property 2879900210" ItemType=";PermissionSet - PermissionSet" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Agent SDK Test]]></Val>
@@ -255,6 +264,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=System.Test.Apps)(LookupHint=Codeunit Extension Management Test - NamedType PackageIdExtensionVersionErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 285145532 - NamedType 2801750451" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Sorry, we couldn't install the app. Do you want to open Extension Installation Status?]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.Test.Apps)(LookupHint=Codeunit Extension Marketplace Test - NamedType InstallationFailedOpenStatusQst)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2242240809 - NamedType 21847271" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">

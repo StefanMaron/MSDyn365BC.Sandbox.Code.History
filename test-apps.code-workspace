@@ -358,6 +358,9 @@
       "path": "./Subcontracting-Tests/Tests"
     },
     {
+      "path": "./Subcontracting-Tests/src/Codeunits/Tests"
+    },
+    {
       "path": "./System Application Test Library/Extension Management/testArtifacts"
     },
     {
