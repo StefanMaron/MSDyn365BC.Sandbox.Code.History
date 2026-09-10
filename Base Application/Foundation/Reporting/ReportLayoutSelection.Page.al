@@ -19,7 +19,6 @@ page 9652 "Report Layout Selection"
     PageType = List;
     SourceTable = "Report Layout Selection";
     SourceTableTemporary = true;
-    UsageCategory = Administration;
 
     layout
     {
