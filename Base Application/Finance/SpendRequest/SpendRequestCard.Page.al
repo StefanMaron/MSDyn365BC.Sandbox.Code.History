@@ -21,7 +21,6 @@ page 6841 "Spend Request Card"
 
                 field("No."; Rec."No.")
                 {
-                    Editable = Rec."No." = '';
                     trigger OnAssistEdit()
                     begin
                         Rec.AssistEditNo();
@@ -29,12 +28,10 @@ page 6841 "Spend Request Card"
                 }
                 field("Requested By"; Rec."Requested By")
                 {
-                    Editable = Rec.Status = Rec.Status::Open;
                 }
                 field(Purpose; Rec.Purpose)
                 {
                     MultiLine = true;
-                    Editable = Rec.Status = Rec.Status::Open;
                 }
                 field(Status; Rec.Status)
                 {
@@ -77,12 +74,10 @@ page 6841 "Spend Request Card"
                 field("Shortcut Dimension 1 Code"; Rec."Shortcut Dimension 1 Code")
                 {
                     Importance = Additional;
-                    Editable = Rec.Status = Rec.Status::Open;
                 }
                 field("Shortcut Dimension 2 Code"; Rec."Shortcut Dimension 2 Code")
                 {
                     Importance = Additional;
-                    Editable = Rec.Status = Rec.Status::Open;
                 }
             }
             part(Lines; "Spend Request Subform")
@@ -99,12 +94,10 @@ page 6841 "Spend Request Card"
                 field("Expected Start Date"; Rec."Expected Start Date")
                 {
                     Importance = Promoted;
-                    Editable = Rec.Status = Rec.Status::Open;
                 }
                 field("Expected End Date"; Rec."Expected End Date")
                 {
                     Importance = Promoted;
-                    Editable = Rec.Status = Rec.Status::Open;
                 }
             }
             group(Approval)
@@ -128,13 +121,13 @@ page 6841 "Spend Request Card"
         {
             group(Action21)
             {
-                Caption = 'Submit';
+                Caption = 'Release';
                 Image = ReleaseDoc;
 
                 action(Release)
                 {
-                    Caption = 'Submit';
-                    ToolTip = 'Set the status field to Submitted so that it can be processed for approval.';
+                    Caption = 'Release';
+                    ToolTip = 'Set the status field to Released so that it can be processed for approval.';
                     ApplicationArea = Basic, Suite;
                     Enabled = Rec.Status <> Rec.Status::Released;
                     Image = ReleaseDoc;
@@ -190,7 +183,12 @@ page 6841 "Spend Request Card"
 
                     trigger OnAction()
                     begin
-                        Rec.Approve();
+                        if Rec.Status = Rec.Status::Approved then
+                            exit;
+                        Rec.Status := Rec.Status::Approved;
+                        Rec."Approved/Rejected At" := CurrentDateTime();
+                        Rec."Approved/Rejected by User ID" := UserSecurityId();
+                        Rec.Modify();
                     end;
                 }
                 action(Reject)
@@ -198,12 +196,18 @@ page 6841 "Spend Request Card"
                     Caption = 'Reject';
                     ToolTip = 'Manually set the status field to Rejected';
                     ApplicationArea = Basic, Suite;
-                    Enabled = Rec.Status <> Rec.Status::Closed;
+                    Enabled = Rec.Status <> Rec.Status::Rejected;
                     Image = Reject;
 
                     trigger OnAction()
                     begin
-                        Rec.Reject();
+                        if Rec.Status = Rec.Status::Rejected then
+                            exit;
+                        Rec.TestStatus(Rec.Status::Released);
+                        Rec.Status := Rec.Status::Rejected;
+                        Rec."Approved/Rejected At" := CurrentDateTime();
+                        Rec."Approved/Rejected by User ID" := UserSecurityId();
+                        Rec.Modify();
                     end;
                 }
             }
@@ -252,19 +256,12 @@ page 6841 "Spend Request Card"
 
                 action(Print)
                 {
-                    Caption = 'Spend Request Document';
+                    Caption = 'Print';
                     ToolTip = 'Prints the spend request so it can be sent to the requester.';
                     ApplicationArea = Basic, Suite;
                     Image = Print;
-
-                    trigger OnAction()
-                    var
-                        SpendRequestDocument: Report "Spend Request Document";
-                    begin
-                        Rec.SetRecFilter();
-                        SpendRequestDocument.SetTableView(Rec);
-                        SpendRequestDocument.Run();
-                    end;
+                    RunObject = Report "Spend Request Document";
+                    RunPageOnRec = true;
                 }
             }
         }
@@ -276,7 +273,7 @@ page 6841 "Spend Request Card"
 
                 group(Category_Release)
                 {
-                    Caption = 'Submit';
+                    Caption = 'Release';
                     ShowAs = SplitButton;
 
                     actionref(Release_Promoted; Release)
@@ -309,14 +306,6 @@ page 6841 "Spend Request Card"
                 Caption = 'Spend Request';
 
                 actionref(Dimensions_Promoted; Dimensions)
-                {
-                }
-            }
-            group(Category_Report)
-            {
-                Caption = 'Reports';
-
-                actionref(Print_Promoted; Print)
                 {
                 }
             }
