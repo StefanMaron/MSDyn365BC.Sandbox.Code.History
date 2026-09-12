@@ -84,12 +84,9 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
         AdjustTillDate: Date;
         StartDateTime: DateTime;
         MaxDuration: Duration;
-        ItemsSinceLastCommit: Integer;
         AutomaticCostAdjustmentTok: Label 'Automatic cost adjustment', Locked = true;
         AutomaticCostAdjustmentEnabledTok: Label 'Automatic cost adjustment was used.', Locked = true;
         CostAdjustmentReachedMaxDurationErr: Label 'The cost adjustment process has reached the maximum duration of %1.', Comment = '%1=Max Duration';
-        CostAdjmtCommitFeatureNameTok: Label 'Cost Adjustment Item-by-Item Commit', Locked = true;
-        CostAdjmtCommitEventNameTok: Label 'CheckAndCommit invoked', Locked = true;
 #pragma warning disable AA0074
         Text009: Label 'WIP';
         Text010: Label 'Assembly';
@@ -191,8 +188,6 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
 
         Clear(ItemJnlPostLine);
         ItemJnlPostLine.SetCalledFromAdjustment(true, PostToGL);
-
-        ItemsSinceLastCommit := 0;
 
         InvtSetup.SetLoadFields("Automatic Cost Adjustment");
         InvtSetup.Get();
@@ -2976,30 +2971,13 @@ codeunit 5895 "Inventory Adjustment" implements "Inventory Adjustment", "Cost Ad
 
     local procedure CheckAndCommit()
     begin
-        ItemsSinceLastCommit += 1;
-        if ItemsBeingAdjusted.Count() > 0 then
-            exit;
+        if ItemsBeingAdjusted.Count() = 0 then begin
+            if CommitAdjustedItems then
+                Commit();
 
-        if CommitAdjustedItems then begin
-            Commit();
-            ItemJnlPostLine.ResetGLPostingState();
-            EmitCheckAndCommitTelemetry();
-            ItemsSinceLastCommit := 0;
+            ItemApplicationTrace.Reset();
+            ItemApplicationTrace.DeleteAll();
         end;
-
-        ItemApplicationTrace.Reset();
-        ItemApplicationTrace.DeleteAll();
-    end;
-
-    local procedure EmitCheckAndCommitTelemetry()
-    var
-        TelemetryDimensions: Dictionary of [Text, Text];
-    begin
-        TelemetryDimensions.Add('ItemsSinceLastCommit', Format(ItemsSinceLastCommit));
-        TelemetryDimensions.Add('IsOnlineAdjmt', Format(IsOnlineAdjmt, 0, 9));
-        TelemetryDimensions.Add('PostToGL', Format(PostToGL, 0, 9));
-        TelemetryDimensions.Add('ItemByItemCommit', Format(CommitAdjustedItems, 0, 9));
-        FeatureTelemetry.LogUsage('0000MEQ', CostAdjmtCommitFeatureNameTok, CostAdjmtCommitEventNameTok, TelemetryDimensions);
     end;
 
     local procedure FindLastDate(DateFilter: Text): Date
