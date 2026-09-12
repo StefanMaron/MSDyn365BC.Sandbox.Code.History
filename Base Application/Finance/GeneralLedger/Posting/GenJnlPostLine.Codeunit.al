@@ -175,6 +175,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
         PreviewMode: Boolean;
         GLEntryInconsistent: Boolean;
         MultiplePostingGroups: Boolean;
+        MultiPostingGrpAggregateOnApplyingPG: Boolean;
         SourceCodeSetupRead: Boolean;
         IsGLRegInserted: Boolean;
 #if not CLEAN28
@@ -5091,6 +5092,11 @@ codeunit 12 "Gen. Jnl.-Post Line"
 
         MultiplePostingGroups := CheckVendMultiplePostingGroups(DetailedCVLedgEntryBuffer);
 
+        MultiPostingGrpAggregateOnApplyingPG := false;
+        if MultiplePostingGroups then
+            MultiPostingGrpAggregateOnApplyingPG :=
+                GetVendorPayablesAccount2(DetailedCVLedgEntryBuffer, GenJournalLine, VendPostingGr) = GetVendorPayablesAccount(GenJournalLine, VendPostingGr);
+
         DetailedCVLedgEntryBuffer.Reset();
         OnAfterSetDtldVendLedgEntryNoOffset(DetailedCVLedgEntryBuffer, DtldVendLedgEntryNoOffset);
         if DetailedCVLedgEntryBuffer.FindSet() then begin
@@ -5458,7 +5464,7 @@ codeunit 12 "Gen. Jnl.-Post Line"
                                     AccNo3 := GetCustomerReceivablesAccount(GenJournalLine, CustomerPostingGroup);
                                 end;
                             GenJournalLine."Account Type"::Vendor:
-                                begin
+                                if MultiPostingGrpAggregateOnApplyingPG then begin
                                     GetVendorPostingGroup(GenJournalLine, VendorPostingGroup);
                                     AccNo2 := GetVendDtldCVLedgEntryBufferAccNo(GenJournalLine, DetailedCVLedgEntryBuffer);
                                     AccNo3 := GetVendorPayablesAccount(GenJournalLine, VendorPostingGroup);
@@ -5470,8 +5476,10 @@ codeunit 12 "Gen. Jnl.-Post Line"
                                     AccNo3 := GetEmployeePayablesAccount(GenJournalLine, EmployeePostingGroup);
                                 end;
                         end;
-                        CreateGLEntryGainLoss(GenJournalLine, AccNo2, DetailedCVLedgEntryBuffer."Amount (LCY)", DetailedCVLedgEntryBuffer."Currency Code" = AddCurrencyCode);
-                        CreateGLEntryGainLoss(GenJournalLine, AccNo3, -DetailedCVLedgEntryBuffer."Amount (LCY)", DetailedCVLedgEntryBuffer."Currency Code" = AddCurrencyCode);
+                        if AccNo2 <> AccNo3 then begin
+                            CreateGLEntryGainLoss(GenJournalLine, AccNo2, DetailedCVLedgEntryBuffer."Amount (LCY)", DetailedCVLedgEntryBuffer."Currency Code" = AddCurrencyCode);
+                            CreateGLEntryGainLoss(GenJournalLine, AccNo3, -DetailedCVLedgEntryBuffer."Amount (LCY)", DetailedCVLedgEntryBuffer."Currency Code" = AddCurrencyCode);
+                        end;
                     end;
 
                     if not Unapply then
