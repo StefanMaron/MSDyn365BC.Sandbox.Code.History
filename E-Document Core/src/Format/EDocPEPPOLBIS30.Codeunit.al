@@ -8,7 +8,6 @@ using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
-using Microsoft.Sales.Peppol;
 using Microsoft.Sales.Reminder;
 using Microsoft.Service.Document;
 using Microsoft.Service.History;
@@ -26,39 +25,35 @@ codeunit 6165 "EDoc PEPPOL BIS 3.0" implements "E-Document"
         ServiceCrMemoHeader: Record "Service Cr.Memo Header";
         ReminderHeader: Record "Reminder Header";
         FinChargeMemoHeader: Record "Finance Charge Memo Header";
+        PEPPOLValidation: Codeunit "PEPPOL30 Sales Validation";
+        PEPPOLServiceValidation: Codeunit "PEPPOL30 Service Validation";
         EDocPEPPOLValidation: Codeunit "E-Doc. PEPPOL Validation";
-        SalesValidation: Interface "PEPPOL30 Validation";
-        ServiceValidation: Interface "PEPPOL30 Validation";
     begin
-        SalesValidation := GetSalesFormat();
-        ServiceValidation := GetServiceFormat();
-
         case SourceDocumentHeader.Number of
             Database::"Sales Header":
                 begin
                     SourceDocumentHeader.SetTable(SalesHeader);
-                    SalesValidation.ValidateDocument(SalesHeader);
-                    SalesValidation.ValidateDocumentLines(SalesHeader);
+                    PEPPOLValidation.Run(SalesHeader);
                 end;
             Database::"Sales Invoice Header":
                 begin
                     SourceDocumentHeader.SetTable(SalesInvoiceHeader);
-                    SalesValidation.ValidatePostedDocument(SalesInvoiceHeader);
+                    PEPPOLValidation.ValidatePostedDocument(SalesInvoiceHeader);
                 end;
             Database::"Sales Cr.Memo Header":
                 begin
                     SourceDocumentHeader.SetTable(SalesCrMemoHeader);
-                    SalesValidation.ValidatePostedDocument(SalesCrMemoHeader);
+                    PEPPOLValidation.ValidatePostedDocument(SalesCrMemoHeader);
                 end;
             Database::"Service Invoice Header":
                 begin
                     SourceDocumentHeader.SetTable(ServiceInvoiceHeader);
-                    ServiceValidation.ValidatePostedDocument(ServiceInvoiceHeader);
+                    PEPPOLServiceValidation.ValidatePostedDocument(ServiceInvoiceHeader);
                 end;
             Database::"Service Cr.Memo Header":
                 begin
                     SourceDocumentHeader.SetTable(ServiceCrMemoHeader);
-                    ServiceValidation.ValidatePostedDocument(ServiceCrMemoHeader);
+                    PEPPOLServiceValidation.ValidatePostedDocument(ServiceCrMemoHeader);
                 end;
             Database::"Reminder Header":
                 begin
@@ -73,8 +68,7 @@ codeunit 6165 "EDoc PEPPOL BIS 3.0" implements "E-Document"
             Database::"Service Header":
                 begin
                     SourceDocumentHeader.SetTable(ServiceHeader);
-                    ServiceValidation.ValidateDocument(ServiceHeader);
-                    ServiceValidation.ValidateDocumentLines(ServiceHeader);
+                    PEPPOLServiceValidation.Run(ServiceHeader);
                 end;
         end;
     end;
@@ -127,38 +121,24 @@ codeunit 6165 "EDoc PEPPOL BIS 3.0" implements "E-Document"
 
     local procedure GenerateInvoiceXMLFile(VariantRec: Variant; var OutStr: OutStream; GeneratePDF: Boolean)
     var
-        SalesInvoicePEPPOLBIS30: XMLport "Sales Invoice - PEPPOL BIS 3.0";
+        SalesInvoicePEPPOL30: XMLport "Sales Invoice - PEPPOL30";
+        PEPPOLFormat: Enum "PEPPOL 3.0 Format";
     begin
-        SalesInvoicePEPPOLBIS30.Initialize(VariantRec);
-        SalesInvoicePEPPOLBIS30.SetGeneratePDF(GeneratePDF);
-        SalesInvoicePEPPOLBIS30.SetDestination(OutStr);
-        SalesInvoicePEPPOLBIS30.Export();
+        SalesInvoicePEPPOL30.Initialize(VariantRec, PEPPOLFormat::"PEPPOL 3.0 - Sales");
+        SalesInvoicePEPPOL30.SetGeneratePDF(GeneratePDF);
+        SalesInvoicePEPPOL30.SetDestination(OutStr);
+        SalesInvoicePEPPOL30.Export();
     end;
 
     local procedure GenerateCrMemoXMLFile(VariantRec: Variant; var OutStr: OutStream; GeneratePDF: Boolean)
     var
-        SalesCrMemoPEPPOLBIS30: XMLport "Sales Cr.Memo - PEPPOL BIS 3.0";
+        SalesCrMemoPEPPOL30: XMLport "Sales Cr.Memo - PEPPOL30";
+        PEPPOLFormat: Enum "PEPPOL 3.0 Format";
     begin
-        SalesCrMemoPEPPOLBIS30.Initialize(VariantRec);
-        SalesCrMemoPEPPOLBIS30.SetGeneratePDF(GeneratePDF);
-        SalesCrMemoPEPPOLBIS30.SetDestination(OutStr);
-        SalesCrMemoPEPPOLBIS30.Export();
-    end;
-
-    local procedure GetSalesFormat(): Enum "PEPPOL 3.0 Format"
-    var
-        PeppolSetup: Record "PEPPOL 3.0 Setup";
-    begin
-        PeppolSetup.GetSetup();
-        exit(PeppolSetup."PEPPOL 3.0 Sales Format");
-    end;
-
-    local procedure GetServiceFormat(): Enum "PEPPOL 3.0 Format"
-    var
-        PeppolSetup: Record "PEPPOL 3.0 Setup";
-    begin
-        PeppolSetup.GetSetup();
-        exit(PeppolSetup."PEPPOL 3.0 Service Format");
+        SalesCrMemoPEPPOL30.Initialize(VariantRec, PEPPOLFormat::"PEPPOL 3.0 - Sales");
+        SalesCrMemoPEPPOL30.SetGeneratePDF(GeneratePDF);
+        SalesCrMemoPEPPOL30.SetDestination(OutStr);
+        SalesCrMemoPEPPOL30.Export();
     end;
 
     local procedure GenerateFinancialResultsXMLFile(VariantRec: Variant; var OutStr: OutStream)
