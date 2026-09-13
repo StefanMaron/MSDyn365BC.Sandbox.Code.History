@@ -149,6 +149,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Sustainability.Tests)(LookupHint=Codeunit Sustainability Report Tests - NamedType TotalCO2eLbl)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2110966602 - NamedType 3565093329" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The report footer must print a total CO2e of %1.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Expected total CO2e]D;]A;(Namespace=Microsoft.Sustainability.Tests)(LookupHint=Codeunit Sustainability Report Tests - NamedType TotalCO2eNotFoundErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2110966602 - NamedType 4256489035" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[TotalCO2e_Lbl]]></Val>
