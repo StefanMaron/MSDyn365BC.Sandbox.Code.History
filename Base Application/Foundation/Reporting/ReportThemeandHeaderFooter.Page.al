@@ -179,7 +179,7 @@ page 9666 "Report Theme and Header/Footer"
                 action(SetApproved)
                 {
                     ApplicationArea = Basic, Suite;
-                    Caption = 'Set as Approved';
+                    Caption = 'Set Approved';
                     Image = Approve;
                     Scope = Repeater;
                     ToolTip = 'Approve the selected parts so they can be assigned as report defaults.';
@@ -192,7 +192,7 @@ page 9666 "Report Theme and Header/Footer"
                 action(SetDraft)
                 {
                     ApplicationArea = Basic, Suite;
-                    Caption = 'Set as Draft';
+                    Caption = 'Set Draft';
                     Image = OpenWorksheet;
                     Scope = Repeater;
                     ToolTip = 'Move the selected parts back to Draft. Draft parts cannot be assigned as report defaults.';
@@ -205,7 +205,7 @@ page 9666 "Report Theme and Header/Footer"
                 action(SetPendingApproval)
                 {
                     ApplicationArea = Basic, Suite;
-                    Caption = 'Set as Pending Approval';
+                    Caption = 'Set Pending Approval';
                     Image = AddWatch;
                     Scope = Repeater;
                     ToolTip = 'Mark the selected parts as pending approval.';
@@ -218,7 +218,7 @@ page 9666 "Report Theme and Header/Footer"
                 action(SetRetired)
                 {
                     ApplicationArea = Basic, Suite;
-                    Caption = 'Set as Retired';
+                    Caption = 'Set Retired';
                     Image = Archive;
                     Scope = Repeater;
                     ToolTip = 'Retire the selected parts so they are no longer offered for assignment.';
@@ -291,7 +291,7 @@ page 9666 "Report Theme and Header/Footer"
             NewPartDialog.GetPartDescription(),
             Rec."Layout Format"::Word,
             true,
-            NewPartDialog.GetCreateEmptyLayout(),
+            false,
             ExcelSheetConfiguration,
             Subtype,
             ReturnReportID,
