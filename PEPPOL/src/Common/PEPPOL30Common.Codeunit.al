@@ -197,8 +197,6 @@ codeunit 37218 "PEPPOL30 Common"
             else
                 Error(UnsupportedDocumentErr);
         end;
-
-        PEPPOLTaxInfoProvider.FinalizeTaxTotals(TempVATAmtLine);
     end;
 
     /// <summary>
