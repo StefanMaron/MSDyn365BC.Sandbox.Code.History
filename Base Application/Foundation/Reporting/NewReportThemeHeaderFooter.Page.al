@@ -35,13 +35,6 @@ page 9668 "New Report Theme Header/Footer"
                 Caption = 'Description';
                 ToolTip = 'Specifies a description for the new theme or header/footer.';
             }
-            field(CreateEmptyLayoutField; CreateEmptyLayout)
-            {
-                ApplicationArea = Basic, Suite;
-                Caption = 'Create a Blank Layout';
-                Visible = IsHeaderFooter and not EditMode;
-                ToolTip = 'Specifies whether to create a blank header/footer that you can export and edit, instead of uploading a file.';
-            }
         }
     }
 
@@ -57,8 +50,6 @@ page 9668 "New Report Theme Header/Footer"
             DialogCaption := NewThemeCaptionLbl
         else
             DialogCaption := NewHeaderFooterCaptionLbl;
-
-        IsHeaderFooter := NewSubtype = Enum::"Report Layout Subtype"::HeaderFooter;
     end;
 
     internal procedure GetPartName(): Text[250]
@@ -69,11 +60,6 @@ page 9668 "New Report Theme Header/Footer"
     internal procedure GetPartDescription(): Text[250]
     begin
         exit(PartDescription);
-    end;
-
-    internal procedure GetCreateEmptyLayout(): Boolean
-    begin
-        exit(CreateEmptyLayout);
     end;
 
     /// <summary>
@@ -90,10 +76,8 @@ page 9668 "New Report Theme Header/Footer"
     var
         PartName: Text[250];
         PartDescription: Text[250];
-        CreateEmptyLayout: Boolean;
         DialogCaption: Text;
         EditMode: Boolean;
-        IsHeaderFooter: Boolean;
         NewThemeCaptionLbl: Label 'New Theme';
         NewHeaderFooterCaptionLbl: Label 'New Header/Footer';
         EditDescriptionCaptionLbl: Label 'Edit Description';
