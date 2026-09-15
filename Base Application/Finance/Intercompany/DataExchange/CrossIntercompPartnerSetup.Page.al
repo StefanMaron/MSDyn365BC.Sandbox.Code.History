@@ -7,6 +7,7 @@ namespace Microsoft.Intercompany.DataExchange;
 using Microsoft.Intercompany.Partner;
 using Microsoft.Intercompany.Setup;
 using System.Environment;
+using System.Utilities;
 
 /// <summary>
 /// Wizard page for setting up cross-environment intercompany partner connections.
@@ -120,8 +121,6 @@ page 561 "CrossIntercomp. Partner Setup"
 
                         trigger OnValidate()
                         begin
-                            if (PartnerSaaSConnectionUrl <> '') and not ValidateDynamicsUrl(PartnerSaaSConnectionUrl) then
-                                Error(UntrustedConnectionUrlErr);
                             NextEnabled := CheckIfSaaSConnectionDetailsAreFilled();
                         end;
                     }
@@ -206,8 +205,6 @@ page 561 "CrossIntercomp. Partner Setup"
                         ExtendedDatatype = URL;
                         Caption = 'Redirect URL';
                         ToolTip = 'Specifies the OAuth 2.0 redirect URL of the Microsoft Entra authentication application. In most scenarios this will be: https://businesscentral.dynamics.com/OAuthLanding.htm .';
-                        // The connector always uses the environment's default redirect URL, so this field is hidden to avoid promising configurable behavior.
-                        Visible = false;
                         trigger OnValidate()
                         begin
                             NextEnabled := CheckIfSaaSConnectionDetailsAreFilled();
@@ -351,7 +348,7 @@ page 561 "CrossIntercomp. Partner Setup"
         NotSetUpQst: Label 'The setup for the connection to the intercompany partner''s environment isn''t complete. If you leave this guide, your settings will be deleted.\\Are you sure you want to exit?';
         LearnMoreTok: Label 'Privacy and Cookies';
         PrivacyLinkTxt: Label 'https://go.microsoft.com/fwlink/?linkid=521839';
-        UntrustedConnectionUrlErr: Label 'The connection URL must be a trusted Business Central API URL.';
+        UrlNotDynamicsErr: Label 'The URL provided is not in the dynamics.com domain.';
 
 
     local procedure LoadSaaSDataForCurrentCompany()
@@ -488,12 +485,24 @@ page 561 "CrossIntercomp. Partner Setup"
 
     internal procedure ValidateDynamicsUrl(Url: Text): Boolean
     var
-        CrossIntercompanyConnector: Codeunit "CrossIntercompany Connector";
+        UrlHelper: Codeunit "URL Helper";
+        UnexpectedDomain: Boolean;
     begin
         if Url = '' then
             exit(true);
 
-        exit(CrossIntercompanyConnector.IsDestinationUrlTrusted(Url));
+        if not Url.StartsWith('https://') then
+            exit(false);
+
+        if UrlHelper.IsPPE() then
+            UnexpectedDomain := StrPos(LowerCase(Url), '.dynamics-tie.com') = 0;
+
+        if UrlHelper.IsPROD() then
+            UnexpectedDomain := StrPos(LowerCase(Url), '.dynamics.com') = 0;
+
+        if not UnexpectedDomain then
+            exit(true);
+        Error(UrlNotDynamicsErr);
     end;
     #endregion
 }
