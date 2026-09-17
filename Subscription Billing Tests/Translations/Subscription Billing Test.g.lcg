@@ -50,6 +50,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.SubscriptionBilling)(LookupHint=Codeunit Customer Deferrals Test - NamedType ConfirmQuestionLbl)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1775220250 - NamedType 3067839315" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Every deferral entry must carry the G/L account from the contract line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.SubscriptionBilling)(LookupHint=Codeunit Customer Deferrals Test - NamedType DeferralsMissingLineGLAccountErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1775220250 - NamedType 1745239345" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[First partial month Number of Days mismatch.]]></Val>
@@ -147,6 +156,24 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.SubscriptionBilling)(LookupHint=Codeunit Customer Deferrals Test - NamedType NumberOfDaysScheduleMismatchErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1775220250 - NamedType 1924687537" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Releasing the contract deferrals must post to the G/L account selected on the contract line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.SubscriptionBilling)(LookupHint=Codeunit Customer Deferrals Test - NamedType ReleasedAmountNotPostedToLineGLAccountErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1775220250 - NamedType 266884808" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The revenue must be posted directly to the G/L account selected on the contract line when no contract deferrals are created.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.SubscriptionBilling)(LookupHint=Codeunit Customer Deferrals Test - NamedType RevenueNotPostedToLineGLAccountErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1775220250 - NamedType 683123631" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -255,6 +282,33 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.SubscriptionBilling)(LookupHint=Codeunit Vendor Deferrals Test - NamedType AmountNotMovedFromDeferralsAccountErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 567495954 - NamedType 1291771271" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The cost must be posted directly to the G/L account selected on the contract line when no contract deferrals are created.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.SubscriptionBilling)(LookupHint=Codeunit Vendor Deferrals Test - NamedType CostNotPostedToLineGLAccountErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 567495954 - NamedType 3067839315" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Every deferral entry must carry the G/L account from the contract line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.SubscriptionBilling)(LookupHint=Codeunit Vendor Deferrals Test - NamedType DeferralsMissingLineGLAccountErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 567495954 - NamedType 1924687537" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Releasing the contract deferrals must post to the G/L account selected on the contract line.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.SubscriptionBilling)(LookupHint=Codeunit Vendor Deferrals Test - NamedType ReleasedAmountNotPostedToLineGLAccountErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 567495954 - NamedType 3676554599" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
