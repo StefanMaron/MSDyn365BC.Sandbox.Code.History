@@ -2592,6 +2592,11 @@ table 39 "Purchase Line"
                 DeferralPostDate: Date;
             begin
                 GetPurchHeader();
+                if "Deferral Code" = xRec."Deferral Code" then begin
+                    if PurchHeader.Status = PurchHeader.Status::Released then
+                        exit;
+                end else
+                    PurchHeader.TestField(Status, PurchHeader.Status::Open);
                 DeferralPostDate := GetDeferralPostDate(PurchHeader);
 
                 DeferralUtilities.DeferralCodeOnValidate(
@@ -9405,9 +9410,9 @@ table 39 "Purchase Line"
     var
         OutstandingAmountExclTax: Decimal;
     begin
-          if (Rec.Quantity <> 0) and (Rec."Outstanding Quantity" = 0) and (Rec."Qty. Rcd. Not Invoiced" = 0) and
-              (Rec.Quantity = xRec.Quantity)
-          then
+        if (Rec.Quantity <> 0) and (Rec."Outstanding Quantity" = 0) and (Rec."Qty. Rcd. Not Invoiced" = 0) and
+            (Rec.Quantity = xRec.Quantity)
+        then
             if PurchHeader."Document Type" <> PurchHeader."Document Type"::Invoice then
                 exit;
 
