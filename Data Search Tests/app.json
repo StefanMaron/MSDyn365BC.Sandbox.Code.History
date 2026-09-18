@@ -4,7 +4,7 @@
   "publisher": "Microsoft",
   "brief": "Data Search Tests.",
   "description": "Data Search Tests.",
-  "version": "30.0.54751.0",
+  "version": "30.0.54756.0",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
   "EULA": "https://go.microsoft.com/fwlink/?linkid=2182906",
   "help": "https://go.microsoft.com/fwlink/?linkid=2206906",
@@ -32,7 +32,7 @@
     }
   ],
   "screenshots": [],
-  "platform": "29.0.0.0",
+  "platform": "30.0.0.0",
   "application": "30.0.0.0",
   "idRanges": [
     {

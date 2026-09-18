@@ -2,7 +2,7 @@
   "id": "6cba115c-63f1-4b08-9e0d-8872a86458db",
   "name": "_Exclude_Review_General_Ledger_Entries_Tests",
   "publisher": "Microsoft",
-  "version": "30.0.54751.0",
+  "version": "30.0.54756.0",
   "brief": "Tests for the _Exclude_Review_General_Ledger_Entries extension",
   "description": "Tests for the _Exclude_Review_General_Ledger_Entries extension",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
@@ -32,7 +32,7 @@
     }
   ],
   "screenshots": [],
-  "platform": "29.0.0.0",
+  "platform": "30.0.0.0",
   "application": "30.0.0.0",
   "resourceExposurePolicy": {
     "allowDebugging": true,

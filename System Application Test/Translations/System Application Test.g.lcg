@@ -68,6 +68,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=System.Test.Agents)(LookupHint=Table Mock Agent Setup - Field User Security ID - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1901787823 - Method 78847173 - NamedType 423991833" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Memory entry %1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 - Entry ID]D;]A;(Namespace=System.Test.Agents)(LookupHint=Codeunit Agent Task Log Page Test - Method CreateTempMemoryEntries - NamedType MemoryEntryLbl)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1399480639 - NamedType 2552095113" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[MA]]></Val>

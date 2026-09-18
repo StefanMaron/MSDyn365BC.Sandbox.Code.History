@@ -2,7 +2,7 @@
   "id": "5f2328eb-b988-422b-8163-0bd3f3ae5d07",
   "name": "Error Messages with Recommendations Tests",
   "publisher": "Microsoft",
-  "version": "30.0.54751.0",
+  "version": "30.0.54756.0",
   "brief": "Error Messages with Recommendations Tests",
   "description": "Error Messages with Recommendations Tests",
   "privacyStatement": "https://go.microsoft.com/fwlink/?linkid=724009",
@@ -44,7 +44,7 @@
     }
   ],
   "screenshots": [],
-  "platform": "29.0.0.0",
+  "platform": "30.0.0.0",
   "application": "30.0.0.0",
   "resourceExposurePolicy": {
     "allowDebugging": true,

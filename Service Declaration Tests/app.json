@@ -2,7 +2,7 @@
   "id": "05f0c243-e68c-44b1-b627-e6e2581a57b2",
   "name": "Service Declaration Tests",
   "publisher": "Microsoft",
-  "version": "30.0.54751.0",
+  "version": "30.0.54756.0",
   "brief": "Tests for the Microsoft Service Declaration extension.",
   "description": "Tests for the Microsoft Service Declaration extension.",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
@@ -10,7 +10,7 @@
   "help": "https://learn.microsoft.com/en-us/dynamics365/business-central/finance-how-setup-use-service-declaration",
   "url": "https://go.microsoft.com/fwlink/?LinkId=724011",
   "logo": "ExtensionLogo.png",
-  "platform": "29.0.0.0",
+  "platform": "30.0.0.0",
   "application": "30.0.0.0",
   "dependencies": [
     {

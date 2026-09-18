@@ -2,7 +2,7 @@
   "id": "e6328152-bb29-4664-9dae-3bc7eaae1fd8",
   "name": "Email - Outlook REST API",
   "publisher": "Microsoft",
-  "version": "30.0.54751.0",
+  "version": "30.0.54756.0",
   "brief": "Provides a library that enables email connectors to communicate with the Outlook and Graph APIs.",
   "description": "This extension provides a library that enables email connectors to communicate with the Outlook and Graph APIs to retrieve user information and send email messages.",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
@@ -26,7 +26,7 @@
     }
   ],
   "screenshots": [],
-  "platform": "29.0.0.0",
+  "platform": "30.0.0.0",
   "application": "30.0.0.0",
   "idRanges": [
     {

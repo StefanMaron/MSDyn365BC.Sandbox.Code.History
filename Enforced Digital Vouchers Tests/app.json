@@ -2,7 +2,7 @@
   "id": "f0eb8756-ea72-4ef8-b0de-686d2a44b259",
   "name": "Enforced Digital Vouchers Tests",
   "publisher": "Microsoft",
-  "version": "30.0.54751.0",
+  "version": "30.0.54756.0",
   "brief": "Tests for the Enforced Digital Vouchers extension.",
   "description": "Tests for the Enforced Digital Vouchers extension.",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
@@ -10,7 +10,7 @@
   "help": "https://go.microsoft.com/fwlink/?LinkId=724011",
   "url": "https://go.microsoft.com/fwlink/?LinkId=724011",
   "logo": "ExtensionLogo.png",
-  "platform": "29.0.0.0",
+  "platform": "30.0.0.0",
   "application": "30.0.0.0",
   "dependencies": [
     {

@@ -2,7 +2,7 @@
   "id": "2fd9cbd8-c94a-46d6-8274-ea6ccb244f12",
   "name": "Service Management",
   "publisher": "Microsoft",
-  "version": "30.0.54751.0",
+  "version": "30.0.54756.0",
   "brief": "Service Management app",
   "description": "The app enables the management of service contracts and orders.",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
@@ -14,7 +14,7 @@
   "screenshots": [],
   "logo": "ExtensionLogo.png",
   "internalsVisibleTo": [],
-  "platform": "29.0.0.0",
+  "platform": "30.0.0.0",
   "application": "30.0.0.0",
   "idRanges": [
     {
