@@ -3596,24 +3596,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SEPA CT Gen. Jnl Line Errors - NamedType MustBePositiveErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 3520383289 - NamedType 3972225717" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Only vendor and employee payments and customer refunds are allowed.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SEPA CT Gen. Jnl Line Errors - NamedType MustBeVendEmplPmtOrCustRefundErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 3520383289 - NamedType 3087388094" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[The account must be a vendor, customer or employee account.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SEPA CT Gen. Jnl Line Errors - NamedType MustBeVendorEmployeeOrCustomerErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 3520383289 - NamedType 2420179014" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The earliest possible transfer date is today.]]></Val>
