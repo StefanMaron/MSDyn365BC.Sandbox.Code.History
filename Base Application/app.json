@@ -4,7 +4,7 @@
   "publisher": "Microsoft",
   "description": "Provides business processes that are typical for small and mid-sized companies, such as sales and purchasing, and customer and vendor management, plus complex processes, such as assembly, manufacturing, service, and directed warehouse management. https://go.microsoft.com/fwlink/?LinkId=2205496",
   "brief": "Base Application (FR)",
-  "version": "30.0.54751.0",
+  "version": "30.0.54756.0",
   "logo": "ExtensionLogo.png",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
   "EULA": "https://go.microsoft.com/fwlink/?linkid=2009120",
@@ -242,7 +242,7 @@
       "publisher": "Microsoft"
     }
   ],
-  "platform": "29.0.0.0",
+  "platform": "30.0.0.0",
   "idRanges": [
     {
       "from": 1,
