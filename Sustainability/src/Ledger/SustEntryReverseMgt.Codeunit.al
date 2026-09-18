@@ -7,9 +7,7 @@ using System.Utilities;
 
 codeunit 6243 "Sust. Entry Reverse Mgt."
 {
-    Permissions =
-        tabledata "Sustainability Ledger Entry" = rim,
-        tabledata "Sust. G/L - Sust. Ledger Rel." = rd;
+    Permissions = tabledata "Sustainability Ledger Entry" = rim;
 
     var
         AlreadyReversedErr: Label 'Entry No. %1 has already been reversed.', Comment = '%1 = Entry No.';
@@ -22,15 +20,12 @@ codeunit 6243 "Sust. Entry Reverse Mgt."
     procedure ReverseEntry(var SustLedgEntry: Record "Sustainability Ledger Entry")
     var
         NewSustLedgEntry: Record "Sustainability Ledger Entry";
-        SustGLSustLedgerRel: Record "Sust. G/L - Sust. Ledger Rel.";
         FeatureTelemetry: Codeunit "Feature Telemetry";
     begin
         ValidateEntryForReversal(SustLedgEntry);
 
         CreateReversalEntry(SustLedgEntry, NewSustLedgEntry);
         UpdateOriginalEntry(SustLedgEntry, NewSustLedgEntry."Entry No.");
-
-        SustGLSustLedgerRel.RemoveRelations(SustLedgEntry."Entry No.");
 
         FeatureTelemetry.LogUsage('0000V2Q', SustainabilityTelemetryFeatureLbl, LedgerEntryReversedTelemetryLbl);
 
@@ -149,9 +144,6 @@ codeunit 6243 "Sust. Entry Reverse Mgt."
         NewEntry.Reversed := true;
         NewEntry."Reversed Entry No." := OriginalEntry."Entry No.";
         NewEntry."Reversed by Entry No." := 0;
-        NewEntry."Collected from G/L Entries" := false;
-        NewEntry."Collect From Date" := 0D;
-        NewEntry."Collect To Date" := 0D;
 
         OnBeforeInsertReversalSustainabilityLedgerEntry(NewEntry, OriginalEntry);
         NewEntry.Insert(true);
