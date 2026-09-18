@@ -6,8 +6,7 @@ namespace Microsoft.Finance.RoleCenters;
 
 using Microsoft.EServices.EDocument;
 
-#pragma warning disable AS0088
-pageextension 7000033 "SII Acc. Payables Activities" extends "Acc. Payables Activities"
+pageextension 7000133 "SII Acc. Payables Activities" extends "Acc. Payables Activities"
 {
     layout
     {

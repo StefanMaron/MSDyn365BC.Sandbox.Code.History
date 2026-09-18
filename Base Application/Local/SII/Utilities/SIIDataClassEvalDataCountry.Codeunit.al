@@ -7,11 +7,8 @@ namespace Microsoft.Utilities;
 using Microsoft.EServices.EDocument;
 using System.Privacy;
 
-#pragma warning disable AS0088
-codeunit 7000030 "SII DataClass EvalData Country"
+codeunit 7000100 "SII DataClass EvalData Country"
 {
-    Access = Internal;
-
     var
         DataClassificationMgt: Codeunit "Data Classification Mgt.";
         DataClassificationEvalData: Codeunit "Data Classification Eval. Data";
