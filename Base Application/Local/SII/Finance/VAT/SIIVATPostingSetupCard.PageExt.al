@@ -4,8 +4,7 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Finance.VAT.Setup;
 
-#pragma warning disable AS0088
-pageextension 7000045 "SII VAT Posting Setup Card" extends "VAT Posting Setup Card"
+pageextension 7000145 "SII VAT Posting Setup Card" extends "VAT Posting Setup Card"
 {
     layout
     {

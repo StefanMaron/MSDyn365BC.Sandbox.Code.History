@@ -11,10 +11,8 @@ using Microsoft.Finance.VAT.Setup;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
 
-#pragma warning disable AS0088
-codeunit 7000029 "SII VAT Subscribers"
+codeunit 7000129 "SII VAT Subscribers"
 {
-    Access = Internal;
 
     [EventSubscriber(ObjectType::Table, Database::"VAT Entry", 'OnAfterCopyFromGenJnlLine', '', true, false)]
     local procedure OnAfterCopyFromGenJnlLine(var VATEntry: Record "VAT Entry"; GenJournalLine: Record "Gen. Journal Line")
