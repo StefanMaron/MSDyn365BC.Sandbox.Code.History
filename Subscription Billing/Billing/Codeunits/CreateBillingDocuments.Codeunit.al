@@ -1,6 +1,5 @@
 namespace Microsoft.SubscriptionBilling;
 
-using Microsoft.Finance.Currency;
 using Microsoft.Foundation.ExtendedText;
 using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Document;
@@ -248,7 +247,6 @@ codeunit 8060 "Create Billing Documents"
         SubContractsItemManagement: Codeunit "Sub. Contracts Item Management";
         TransferExtendedText: Codeunit "Transfer Extended Text";
         UsageBasedDocTypeConv: Codeunit "Usage Based Doc. Type Conv.";
-        UnitPrice: Decimal;
         BillingLineNo: Integer;
     begin
         ServiceObject.Get(TempBillingLine."Subscription Header No.");
@@ -276,11 +274,8 @@ codeunit 8060 "Create Billing Documents"
         if SalesLine."Unit of Measure Code" <> ServiceObject."Unit of Measure" then
             SalesLine.Validate("Unit of Measure Code", ServiceObject."Unit of Measure");
         SalesLine.Validate(Quantity, TempBillingLine.GetSign() * ServiceObject.Quantity);
-        UnitPrice := SalesLine.GetSalesDocumentSign() * TempBillingLine."Unit Price";
-        if SalesHeader."Prices Including VAT" then
-            UnitPrice := ToVATInclusiveUnitPrice(UnitPrice, SalesLine."VAT %", SalesLine."VAT Calculation Type" = SalesLine."VAT Calculation Type"::"Full VAT", SalesLine."Currency Code");
         // Unit Price is assigned directly; the following Validate("Line Discount %") recalculates the line amount.
-        SalesLine."Unit Price" := UnitPrice;
+        SalesLine."Unit Price" := SalesLine.GetSalesDocumentSign() * TempBillingLine."Unit Price";
         SalesLine.Validate("Line Discount %", TempBillingLine."Discount %");
         SalesLine.Validate("Unit Cost (LCY)", TempBillingLine."Unit Cost (LCY)");
         SalesLine."Recurring Billing from" := TempBillingLine."Billing from";
@@ -339,28 +334,10 @@ codeunit 8060 "Create Billing Documents"
         OnAfterInsertSalesLineFromBillingLine(CustomerContractLine, SalesLine);
     end;
 
-    local procedure ToVATInclusiveUnitPrice(NetUnitPrice: Decimal; VATPercent: Decimal; IsFullVAT: Boolean; CurrencyCode: Code[10]): Decimal
-    var
-        Currency: Record Currency;
-        VATFactor: Decimal;
-    begin
-        if IsFullVAT then
-            exit(NetUnitPrice);
-        VATFactor := 1 + VATPercent / 100;
-        if VATFactor = 0 then
-            exit(NetUnitPrice);
-        if CurrencyCode = '' then
-            Currency.InitRoundingPrecision()
-        else
-            Currency.Get(CurrencyCode);
-        exit(Round(NetUnitPrice * VATFactor, Currency."Unit-Amount Rounding Precision"));
-    end;
-
     local procedure SetInvoicePriceFromUsageDataBilling(var SalesLine: Record "Sales Line"; var BillingLine: Record "Billing Line")
     var
         UsageDataBilling: Record "Usage Data Billing";
         ServiceCommitment: Record "Subscription Line";
-        UnitPrice: Decimal;
     begin
         if not ServiceCommitment.Get(BillingLine."Subscription Line Entry No.") then
             exit;
@@ -382,12 +359,9 @@ codeunit 8060 "Create Billing Documents"
         UsageDataBilling.SetRange(Quantity);
         UsageDataBilling.CalcSums(Amount);
         if SalesLine.Quantity <> 0 then
-            UnitPrice := SalesLine.GetSalesDocumentSign() * UsageDataBilling.Amount / SalesLine.Quantity
+            SalesLine.Validate("Unit Price", SalesLine.GetSalesDocumentSign() * UsageDataBilling.Amount / SalesLine.Quantity)
         else
-            UnitPrice := UsageDataBilling."Unit Price";
-        if SalesHeader."Prices Including VAT" then
-            UnitPrice := ToVATInclusiveUnitPrice(UnitPrice, SalesLine."VAT %", SalesLine."VAT Calculation Type" = SalesLine."VAT Calculation Type"::"Full VAT", SalesLine."Currency Code");
-        SalesLine.Validate("Unit Price", UnitPrice);
+            SalesLine.Validate("Unit Price", UsageDataBilling."Unit Price");
         SalesLine.Validate("Line Discount %", ServiceCommitment."Discount %");
     end;
 
@@ -401,7 +375,6 @@ codeunit 8060 "Create Billing Documents"
         UsageBasedDocTypeConv: Codeunit "Usage Based Doc. Type Conv.";
         SubContractsItemManagement: Codeunit "Sub. Contracts Item Management";
         TransferExtendedText: Codeunit "Transfer Extended Text";
-        DirectUnitCost: Decimal;
         BillingLineNo: Integer;
     begin
         ServiceObject.Get(TempBillingLine."Subscription Header No.");
@@ -424,11 +397,8 @@ codeunit 8060 "Create Billing Documents"
         if PurchaseLine."Unit of Measure Code" <> ServiceObject."Unit of Measure" then
             PurchaseLine.Validate("Unit of Measure Code", ServiceObject."Unit of Measure");
         PurchaseLine.Validate(Quantity, TempBillingLine.GetSign() * ServiceObject.Quantity);
-        DirectUnitCost := PurchaseLine.GetPurchaseDocumentSign() * TempBillingLine."Unit Price";
-        if PurchaseHeader."Prices Including VAT" then
-            DirectUnitCost := ToVATInclusiveUnitPrice(DirectUnitCost, PurchaseLine."VAT %", PurchaseLine."VAT Calculation Type" = PurchaseLine."VAT Calculation Type"::"Full VAT", PurchaseLine."Currency Code");
         // Direct Unit Cost is assigned directly; the following Validate("Line Discount %") recalculates the line amount.
-        PurchaseLine."Direct Unit Cost" := DirectUnitCost;
+        PurchaseLine."Direct Unit Cost" := PurchaseLine.GetPurchaseDocumentSign() * TempBillingLine."Unit Price";
         PurchaseLine.Validate("Line Discount %", TempBillingLine."Discount %");
         PurchaseLine."Recurring Billing from" := TempBillingLine."Billing from";
         PurchaseLine."Recurring Billing to" := TempBillingLine."Billing to";
@@ -479,7 +449,6 @@ codeunit 8060 "Create Billing Documents"
     var
         UsageDataBilling: Record "Usage Data Billing";
         ServiceCommitment: Record "Subscription Line";
-        DirectUnitCost: Decimal;
     begin
         if not ServiceCommitment.Get(BillingLine."Subscription Line Entry No.") then
             exit;
@@ -501,12 +470,9 @@ codeunit 8060 "Create Billing Documents"
         UsageDataBilling.SetRange(Quantity);
         UsageDataBilling.CalcSums("Cost Amount");
         if PurchLine.Quantity <> 0 then
-            DirectUnitCost := PurchLine.GetPurchaseDocumentSign() * UsageDataBilling."Cost Amount" / PurchLine.Quantity
+            PurchLine.Validate("Direct Unit Cost", PurchLine.GetPurchaseDocumentSign() * UsageDataBilling."Cost Amount" / PurchLine.Quantity)
         else
-            DirectUnitCost := 0;
-        if PurchaseHeader."Prices Including VAT" then
-            DirectUnitCost := ToVATInclusiveUnitPrice(DirectUnitCost, PurchLine."VAT %", PurchLine."VAT Calculation Type" = PurchLine."VAT Calculation Type"::"Full VAT", PurchLine."Currency Code");
-        PurchLine.Validate("Direct Unit Cost", DirectUnitCost);
+            PurchLine.Validate("Direct Unit Cost", 0);
         PurchLine.Validate("Line Discount %", ServiceCommitment."Discount %");
     end;
 
