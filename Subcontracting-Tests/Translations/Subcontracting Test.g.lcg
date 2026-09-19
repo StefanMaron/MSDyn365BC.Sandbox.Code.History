@@ -176,6 +176,15 @@
       <Cmt Name="Dev"><![CDATA[|%1 = Transfer Order No.]D;]A;(Namespace=Microsoft.Manufacturing.Subcontracting.Test)(LookupHint=Codeunit Subc. Subcontracting Test - NamedType AlreadySpecifiedErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1353084171 - NamedType 3590955825" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Nothing to create. No components or WIP to transfer for the specified subcontracting order.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Subcontracting.Test)(LookupHint=Codeunit Subc. Subcontracting Test - NamedType NothingToCreateErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1353084171 - NamedType 1787661989" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Purchase Order %1 should contain a line tied to Routing Reference No. %2]]></Val>
