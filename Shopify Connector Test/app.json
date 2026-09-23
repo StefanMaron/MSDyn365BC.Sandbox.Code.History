@@ -4,7 +4,7 @@
   "publisher": "Microsoft",
   "brief": "Test for the Shopify Connector extension",
   "description": "Test for the Shopify Connector extension",
-  "version": "30.0.54979.0",
+  "version": "30.0.54991.0",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
   "EULA": "https://go.microsoft.com/fwlink/?linkid=2009120",
   "help": "https://go.microsoft.com/fwlink/?linkid=2179727",
@@ -52,6 +52,10 @@
   "screenshots": [],
   "platform": "30.0.0.0",
   "idRanges": [
+    {
+      "from": 139415,
+      "to": 139420
+    },
     {
       "from": 134241,
       "to": 134247
