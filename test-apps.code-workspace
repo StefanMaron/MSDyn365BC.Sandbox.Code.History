@@ -156,7 +156,7 @@
       "path": "./AI Test Toolkit/src/TestSuite"
     },
     {
-      "path": "./System Application/Email/src/Test Email"
+      "path": "./Test Runner/src/DataDrivenTest"
     },
     {
       "path": "./System Application/Email/src/Test Email"
