@@ -312,6 +312,9 @@
       "path": "./Performance Toolkit Tests/src/Mock Tests"
     },
     {
+      "path": "./Subcontracting-Tests/Tests"
+    },
+    {
       "path": "./PowerBI Reports Tests/DisabledTests"
     },
     {
