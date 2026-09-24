@@ -1,12 +1,4 @@
 {
-  "settings": {
-    "allint.enabled": false,
-    "al.enableCodeActions": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeAnalysis": false
-  },
   "folders": [
     {
       "path": "./_Exclude_APIV1_ Tests"
@@ -351,7 +343,13 @@
       "path": "./Withholding Tax Tests"
     },
     {
-      "path": "./Quality Management/src/Configuration/Template/Test"
+      "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
+    },
+    {
+      "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
+    },
+    {
+      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
     },
     {
       "path": "./Performance Toolkit Tests/src/Mock Tests"
@@ -360,16 +358,7 @@
       "path": "./Subcontracting-Tests/Tests"
     },
     {
-      "path": "./Base Application/System/DevTools/CALTest"
-    },
-    {
       "path": "./System Application Test Library/Extension Management/testArtifacts"
-    },
-    {
-      "path": "./AI Test Toolkit/src/TestSuite"
-    },
-    {
-      "path": "./Test Runner/src/DataDrivenTest"
     },
     {
       "path": "./Sales Lines Suggestions Tests/AI Tests"
@@ -378,16 +367,27 @@
       "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
     },
     {
-      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
+      "path": "./AI Test Toolkit/src/TestSuite"
     },
     {
-      "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
-    },
-    {
-      "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
+      "path": "./Quality Management/src/Configuration/Template/Test"
     },
     {
       "path": "./System Application/Email/src/Test Email"
+    },
+    {
+      "path": "./Test Runner/src/DataDrivenTest"
+    },
+    {
+      "path": "./Base Application/System/DevTools/CALTest"
     }
-  ]
+  ],
+  "settings": {
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "allint.enabled": false,
+    "al.enableCodeActions": false,
+    "al.enableCodeAnalysis": false
+  }
 }
