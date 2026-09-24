@@ -167,6 +167,33 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Integration.Shopify.Test)(LookupHint=Codeunit Shpfy Create Item API Test - NamedType UnexpectedAPICallsErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1620054495 - NamedType 1317088275" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The item %1 will be added to the %2 store as a new product, and it will be immediately active.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 - Item description, %2 - Shopify store name]D;]A;(Namespace=Microsoft.Integration.Shopify.Test)(LookupHint=Codeunit Shpfy Create Product Test - NamedType AddToStoreActiveConfirmLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1620054495 - NamedType 3560027148" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The item %1 will be added to the %2 store as a new product, and it will remain in draft until you activate it.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 - Item description, %2 - Shopify store name]D;]A;(Namespace=Microsoft.Integration.Shopify.Test)(LookupHint=Codeunit Shpfy Create Product Test - NamedType AddToStoreDraftConfirmLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1620054495 - NamedType 962715871" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The item %1 will be added to the %2 store as a new product, and it will be unlisted.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 - Item description, %2 - Shopify store name]D;]A;(Namespace=Microsoft.Integration.Shopify.Test)(LookupHint=Codeunit Shpfy Create Product Test - NamedType AddToStoreUnlistedConfirmLbl)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1620054495 - Method 2112563513 - NamedType 562056659" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[More than expected API calls to Shopify detected.]]></Val>
