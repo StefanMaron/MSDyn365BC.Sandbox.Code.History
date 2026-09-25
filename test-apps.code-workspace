@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "al.enableCodeAnalysis": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeActions": false,
+    "allint.enabled": false
+  },
   "folders": [
     {
       "path": "./_Exclude_APIV1_ Tests"
@@ -343,13 +351,7 @@
       "path": "./Withholding Tax Tests"
     },
     {
-      "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
-    },
-    {
-      "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
-    },
-    {
-      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
+      "path": "./Quality Management/src/Configuration/Template/Test"
     },
     {
       "path": "./Performance Toolkit Tests/src/Mock Tests"
@@ -361,7 +363,16 @@
       "path": "./Subcontracting-Tests/src/Codeunits/Tests"
     },
     {
+      "path": "./Base Application/System/DevTools/CALTest"
+    },
+    {
       "path": "./System Application Test Library/Extension Management/testArtifacts"
+    },
+    {
+      "path": "./AI Test Toolkit/src/TestSuite"
+    },
+    {
+      "path": "./Test Runner/src/DataDrivenTest"
     },
     {
       "path": "./Sales Lines Suggestions Tests/AI Tests"
@@ -370,27 +381,16 @@
       "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
     },
     {
-      "path": "./AI Test Toolkit/src/TestSuite"
+      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
     },
     {
-      "path": "./Quality Management/src/Configuration/Template/Test"
+      "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
+    },
+    {
+      "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
     },
     {
       "path": "./System Application/Email/src/Test Email"
-    },
-    {
-      "path": "./Test Runner/src/DataDrivenTest"
-    },
-    {
-      "path": "./Base Application/System/DevTools/CALTest"
     }
-  ],
-  "settings": {
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "allint.enabled": false,
-    "al.enableCodeActions": false,
-    "al.enableCodeAnalysis": false
-  }
+  ]
 }
