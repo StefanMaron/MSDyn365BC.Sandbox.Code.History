@@ -428,7 +428,6 @@ codeunit 4509 "Email - Outlook API Helper"
     local procedure CreateEmailInboxFromJsonObject(var EmailInbox: Record "Email Inbox"; OutlookAccount: Record "Email - Outlook Account"; var Filters: Record "Email Retrieval Filters"; EmailJsonObject: JsonObject)
     var
         EmailMessage: Codeunit "Email Message";
-        Email: Codeunit Email;
         BodyObject: JsonObject;
         SenderObject: JsonObject;
         ReceivedDateTime: DateTime;
@@ -453,12 +452,6 @@ codeunit 4509 "Email - Outlook API Helper"
         IsRead := GetBooleanFromJsonObject(EmailJsonObject, 'isRead');
         IsDraft := GetBooleanFromJsonObject(EmailJsonObject, 'isDraft');
 
-        if Email.FindRetrievedEmail(OutlookAccount.Id, ExternalMessageId, EmailInbox) then begin
-            if HasAttachments and Filters."Load Attachments" then
-                LoadMissingAttachments(EmailInbox."Message Id", EmailJsonObject);
-            exit;
-        end;
-
         BodyObject := GetJsonObjectFromJsonObject(EmailJsonObject, 'body');
         Body := GetTextFromJsonObject(BodyObject, 'content');
 
@@ -473,7 +466,7 @@ codeunit 4509 "Email - Outlook API Helper"
         EmailMessage.Create('', Subject, Body, HTMLBody, true);
 
         if HasAttachments then
-            AddAttachmentsToMessage(EmailJsonObject, EmailMessage, false);
+            AddAttachmentsToMessage(EmailJsonObject, EmailMessage);
 
         EmailInbox.Id := 0;
         EmailInbox."External Message Id" := CopyStr(ExternalMessageId, 1, MaxStrLen(EmailInbox."External Message Id"));
@@ -608,20 +601,7 @@ codeunit 4509 "Email - Outlook API Helper"
         exit(Value);
     end;
 
-    local procedure LoadMissingAttachments(MessageId: Guid; EmailJsonObject: JsonObject)
-    var
-        EmailMessage: Codeunit "Email Message";
-    begin
-        if not EmailMessage.Get(MessageId) then
-            exit;
-
-        if EmailMessage.Attachments_First() then
-            exit;
-
-        AddAttachmentsToMessage(EmailJsonObject, EmailMessage, true);
-    end;
-
-    local procedure AddAttachmentsToMessage(EmailJsonObject: JsonObject; var EmailMessage: Codeunit "Email Message"; MessageAlreadyRetrieved: Boolean)
+    local procedure AddAttachmentsToMessage(EmailJsonObject: JsonObject; var EmailMessage: Codeunit "Email Message")
     var
         Base64Convert: Codeunit "Base64 Convert";
         TempBlob: Codeunit "Temp Blob";
@@ -658,7 +638,7 @@ codeunit 4509 "Email - Outlook API Helper"
             TempBlob.CreateOutStream(AttachmentOutStream);
             Base64Convert.FromBase64(ContentBytesBase64, AttachmentOutStream);
             TempBlob.CreateInStream(AttachmentInStream);
-            EmailMessage.AddAttachment(AttachmentName, ContentType, IsInline, ContentId, AttachmentInStream, MessageAlreadyRetrieved);
+            EmailMessage.AddAttachment(AttachmentName, ContentType, IsInline, ContentId, AttachmentInStream);
         end;
     end;
 
