@@ -5713,9 +5713,9 @@ table 37 "Sales Line"
         if IsHandled then
             exit;
 
-          if (Rec.Quantity <> 0) and (Rec."Outstanding Quantity" = 0) and (Rec."Qty. Shipped Not Invoiced" = 0) and
-              (Rec.Quantity = xRec.Quantity)
-          then
+        if (Rec.Quantity <> 0) and (Rec."Outstanding Quantity" = 0) and (Rec."Qty. Shipped Not Invoiced" = 0) and
+            (Rec.Quantity = xRec.Quantity)
+        then
             if SalesHeader."Document Type" <> SalesHeader."Document Type"::Invoice then
                 exit;
 
@@ -9636,13 +9636,17 @@ table 37 "Sales Line"
     local procedure ValidateUnitOfMeasureCodeFromNo()
     var
         IsHandled: Boolean;
+        OldStatusCheckSuspended: Boolean;
     begin
         IsHandled := false;
         OnBeforeValidateUnitOfMeasureCodeFromNo(Rec, xRec, IsHandled, CurrFieldNo);
         if IsHandled then
             exit;
 
+        OldStatusCheckSuspended := StatusCheckSuspended;
+        StatusCheckSuspended := true;
         Validate("Unit of Measure Code");
+        StatusCheckSuspended := OldStatusCheckSuspended;
     end;
 
     local procedure NotifyOnMissingSetup(FieldNumber: Integer)
