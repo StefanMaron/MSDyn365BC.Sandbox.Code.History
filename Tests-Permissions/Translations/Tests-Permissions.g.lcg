@@ -248,6 +248,24 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Permissions Test - NamedType UserDebraTxt)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 4167983346 - Method 2274777128 - NamedType 1927214756" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[%1 obsolete permissions were removed.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = number of deleted records.]D;]A;(LookupHint=Codeunit Permissions Test - Method RemoveObsoletePermissionsMessageHandler - NamedType ObsoletePermissionsMsg)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 4167983346 - Method 2274777128 - NamedType 1474243467" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[There is nothing to remove.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Permissions Test - Method RemoveObsoletePermissionsMessageHandler - NamedType NothingToRemoveMsg)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 738097134 - NamedType 104992627" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Sorry, the current permissions prevented the action. (TableData]]></Val>
