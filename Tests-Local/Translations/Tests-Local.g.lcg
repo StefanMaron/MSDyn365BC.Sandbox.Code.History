@@ -3056,6 +3056,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit IT - VAT Rep - Export Unittest - NamedType WrongMaxRecCountErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3895663792 - NamedType 1294679831" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Attribute %1 is missing]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = attribute name]D;]A;(LookupHint=Codeunit IT - VAT Reporting - Export - NamedType AttributeMissingErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3895663792 - NamedType 121782829" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[DatiFattura Report has wrong number of elements for document with multiple lines.]]></Val>
@@ -3063,6 +3072,24 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit IT - VAT Reporting - Export - NamedType DatiFatturaForOneDocumentWithMultipleLinesErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3895663792 - NamedType 4021321781" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Incorrect %1 attribute value]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = attribute name]D;]A;(LookupHint=Codeunit IT - VAT Reporting - Export - NamedType IncorrectAttributeValueErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3895663792 - NamedType 2590742585" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Incorrect %1 count]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = node name]D;]A;(LookupHint=Codeunit IT - VAT Reporting - Export - NamedType IncorrectNodeCountErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3895663792 - NamedType 2395625506" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
