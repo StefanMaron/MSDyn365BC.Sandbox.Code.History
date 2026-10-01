@@ -1388,7 +1388,7 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Supply Planning - NamedType ExceptionMsg)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1 = Safety Stock Quantity, %2 = Date]D;]A;(LookupHint=Codeunit SCM Supply Planning - NamedType ExceptionMsg)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3323549861 - NamedType 991048581" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -1415,25 +1415,25 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Supply Planning - NamedType MaximumOrderQuantityErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1 = Quantity, %2 = Maximum Order Quantity]D;]A;(LookupHint=Codeunit SCM Supply Planning - NamedType MaximumOrderQuantityErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 3323549861 - NamedType 108008388" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+  <Item ItemId=";Codeunit 3323549861 - NamedType 1270550103" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Number of Lines must be same.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Supply Planning - NamedType NumberOfLineEqualError)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Supply Planning - NamedType NumberOfLineEqualErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 3323549861 - NamedType 1131030263" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+  <Item ItemId=";Codeunit 3323549861 - NamedType 557969620" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Number of Lines must not be same.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Supply Planning - NamedType NumberOfLineNotEqualError)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Supply Planning - NamedType NumberOfLineNotEqualErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3323549861 - NamedType 1517548793" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -1442,7 +1442,7 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Supply Planning - NamedType OrderDateErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1 = Requisition Line Order Date, %2 = Purchase Line Order Date]D;]A;(LookupHint=Codeunit SCM Supply Planning - NamedType OrderDateErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3323549861 - NamedType 2559397976" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -1463,13 +1463,13 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Supply Planning - NamedType QuantityErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 3323549861 - NamedType 511527777" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+  <Item ItemId=";Codeunit 3323549861 - NamedType 1271514923" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Order Date (%1) on Requisition Line is not equal to Starting Date on Planning Worksheet.]]></Val>
+      <Val><![CDATA[Starting Date (%1) on Requisition Line is not equal to Expected Receipt Date (%2).]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Supply Planning - NamedType ReqLineOrderDateErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1 = Requisition Line Starting Date, %2 = Expected Receipt Date]D;]A;(LookupHint=Codeunit SCM Supply Planning - NamedType ReqLineStartingDateErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3323549861 - NamedType 4148716209" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -1505,7 +1505,7 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Supply Planning - NamedType SafetyStockQuantityErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1 = Inventory, %2 = Safety Stock Quantity]D;]A;(LookupHint=Codeunit SCM Supply Planning - NamedType SafetyStockQuantityErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3323549861 - NamedType 2156381100" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
