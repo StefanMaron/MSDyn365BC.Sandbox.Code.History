@@ -5,4 +5,31 @@
     <Cmt Name="LcxAdmin" />
     <Cmt Name="Rccx" />
   </OwnedComments>
+  <Item ItemId=";Codeunit 1296091949 - NamedType 976562130" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[An http downgrade should fall back to the hardcoded https URL.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.EServices.EDocumentConnector.SignUp)(LookupHint=Codeunit IntegrationTests - NamedType DowngradeMsg)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1296091949 - NamedType 4109408831" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[A different-host URL should fall back to the hardcoded value.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.EServices.EDocumentConnector.SignUp)(LookupHint=Codeunit IntegrationTests - NamedType FallbackMsg)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1296091949 - NamedType 1548233141" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[A same-host URL should be returned unchanged.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.EServices.EDocumentConnector.SignUp)(LookupHint=Codeunit IntegrationTests - NamedType SameHostMsg)]]></Cmt>
+    </Cmts>
+  </Item>
 </LCX>

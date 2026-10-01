@@ -14,4 +14,22 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.EServices.EDocumentConnector.Pagero)(LookupHint=Codeunit Integration Tests - NamedType IncorrectValueErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1608455343 - NamedType 3023355378" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[A different-host URL should fall back to the hardcoded value.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.EServices.EDocumentConnector.Pagero)(LookupHint=Codeunit Url Validation Tests - NamedType FallbackUrlMsg)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1608455343 - NamedType 993909691" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[A same-host URL should be returned unchanged.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.EServices.EDocumentConnector.Pagero)(LookupHint=Codeunit Url Validation Tests - NamedType StoredUrlMsg)]]></Cmt>
+    </Cmts>
+  </Item>
 </LCX>
