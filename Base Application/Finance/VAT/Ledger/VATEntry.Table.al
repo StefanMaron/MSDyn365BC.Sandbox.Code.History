@@ -285,6 +285,8 @@ table 254 "VAT Entry"
         {
             Caption = 'Transaction No.';
             Editable = false;
+            TableRelation = "G/L Transaction";
+            ToolTip = 'Specifies the transaction number that groups related G/L entries from the same posting.';
         }
         /// <summary>
         /// Unrealized VAT amount when using unrealized VAT functionality for payment-based VAT recognition.
@@ -765,6 +767,13 @@ table 254 "VAT Entry"
                 VATDateReportingMgt.UpdateLinkedEntries(Rec);
             end;
         }
+        field(95; "G/L Register No."; Integer)
+        {
+            Caption = 'G/L Register No.';
+            Editable = false;
+            TableRelation = "G/L Register";
+            ToolTip = 'Specifies the G/L register number that groups related G/L entries from the same posting.';
+        }
         /// <summary>
         /// Percentage of VAT that is non-deductible based on business use or regulatory restrictions.
         /// </summary>
@@ -1142,12 +1151,7 @@ table 254 "VAT Entry"
            (Base = 0)
         then begin
             UnrealizedVATType := GetUnrealizedVATType();
-            // Only fully realize when there is remaining unrealized VAT left on this entry.
-            // Otherwise a fully-settled entry with nothing left to realize returns 1, producing a
-            // zero-amount reversal entry that re-qualifies and drives an unbounded loop.
-            if (Abs(Paid) = Abs(Full)) and
-               (("Remaining Unrealized Amount" <> 0) or ("Remaining Unrealized Base" <> 0))
-            then
+            if Abs(Paid) = Abs(Full) then
                 exit(1);
 
             if GenJnlLine."Document Type" = GenJnlLine."Document Type"::Refund then
