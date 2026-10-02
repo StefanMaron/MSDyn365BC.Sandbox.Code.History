@@ -262,6 +262,7 @@ codeunit 144527 "ECSL XML Gen. Test"
         StartDate: Date;
         EndDate: Date;
     begin
+        // [FEATURE] [AI TEST]
         // [SCENARIO 621502] EC Sales List XML creation should work without GovTalk extension
 
         // [GIVEN] Company information with VAT registration
