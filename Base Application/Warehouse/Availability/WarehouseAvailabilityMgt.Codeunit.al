@@ -41,7 +41,6 @@ codeunit 7314 "Warehouse Availability Mgt."
     var
         ReservEntry: Record "Reservation Entry";
         ReservEntry2: Record "Reservation Entry";
-        TempTrackingSpecification: Record "Tracking Specification" temporary;
         ReservQtyonInvt: Decimal;
         PickQty: Decimal;
         IsHandled: Boolean;
@@ -50,9 +49,6 @@ codeunit 7314 "Warehouse Availability Mgt."
         case SourceType of
             Database::Job, Database::"Job Planning Line":
                 begin
-                    // Both old (Database::Job) and new (Database::"Job Planning Line") formats 
-                    // should look up reservations with Job Planning Line source type
-                    // Reservation entries always have Source Subtype = Order (2), regardless of caller's SourceSubType
                     ReservEntry.SetSourceFilter(
                       Database::"Job Planning Line", "Job Planning Line Status"::Order.AsInteger(), SourceNo, SourceLineNo, true);
                     ReservEntry.SetSourceFilter('', 0);
@@ -78,13 +74,7 @@ codeunit 7314 "Warehouse Availability Mgt."
             until ReservEntry.Next() = 0;
 
         if HandleResPickAndShipQty then begin
-            PickQty := CalcQtyRegisteredPick(ReservEntry);
-            // Keep the shipment check item-wide, as lot validation also adds item-wide reserved pick/shipment quantities.
-            ValidateQtyPickedInShipmentBin(
-                PickQty, ReservEntry."Location Code", ReservEntry."Item No.", ReservEntry."Variant Code", TempTrackingSpecification, ReservEntry."Source Type");
-            PickQty +=
-                CalcQtyOutstandingPick(
-                    ReservEntry."Source Type", ReservEntry."Source Subtype", ReservEntry."Source ID", ReservEntry."Source Ref. No.", ReservEntry."Source Prod. Order Line", WarehouseActivityLine);
+            PickQty := CalcRegisteredAndOutstandingPickQty(ReservEntry, WarehouseActivityLine);
             if ReservQtyonInvt > PickQty then
                 ReservQtyonInvt -= PickQty
             else
@@ -952,6 +942,7 @@ codeunit 7314 "Warehouse Availability Mgt."
         ShipBinTypeFilter := CreatePick.GetBinTypeFilter(1);
 
         if ShipBinTypeFilter <> '' then begin
+            WarehouseEntry.ReadIsolation(IsolationLevel::ReadUnCommitted);
             WarehouseEntry.SetLoadFields("Qty. (Base)");
             WarehouseEntry.SetRange("Item No.", ItemNo);
             WarehouseEntry.SetRange("Location Code", LocationCode);
@@ -973,7 +964,6 @@ codeunit 7314 "Warehouse Availability Mgt."
 
         exit(QtyOnShipmentBins);
     end;
-
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterCalcQtyPicked(var Item: Record Item; var QtyPicked: Decimal; Location: Record Location)
