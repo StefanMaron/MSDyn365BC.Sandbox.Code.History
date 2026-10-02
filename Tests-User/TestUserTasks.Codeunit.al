@@ -236,6 +236,8 @@ codeunit 134769 "Test User Tasks"
 
     local procedure SkipTable(TableNo: Integer): Boolean
     begin
+        if TableNo = DATABASE::"Fin. Report Package Recipient" then
+            exit(true);
         if TableNo = DATABASE::"Contact Sync User" then
             exit(true);
         exit(false);
@@ -354,3 +356,4 @@ codeunit 134769 "Test User Tasks"
             Assert.IsTrue(User.Modify(), 'Modifying the Windows user''s Windows Security ID should be possible in OnPrem environment');
     end;
 }
+

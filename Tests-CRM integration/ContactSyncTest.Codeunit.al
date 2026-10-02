@@ -610,16 +610,6 @@ codeunit 130481 "Contact Sync Test"
         ContactSyncUser.Delete();
     end;
 
-    local procedure CreateContactSyncUserForCurrentUser(var ContactSyncUser: Record "Contact Sync User"; FolderId: Text; DeltaUrl: Text)
-    begin
-        ContactSyncUser.Init();
-        ContactSyncUser."User ID" := CopyStr(UserId(), 1, MaxStrLen(ContactSyncUser."User ID"));
-        ContactSyncUser."Folder ID" := CopyStr(FolderId, 1, MaxStrLen(ContactSyncUser."Folder ID"));
-        ContactSyncUser."Folder Name" := CopyStr('Test Folder', 1, MaxStrLen(ContactSyncUser."Folder Name"));
-        ContactSyncUser."Delta Url" := CopyStr(DeltaUrl, 1, MaxStrLen(ContactSyncUser."Delta Url"));
-        ContactSyncUser.Insert(true);
-    end;
-
     local procedure Initialize()
     begin
         if IsInitialized then
@@ -728,6 +718,16 @@ codeunit 130481 "Contact Sync Test"
         Contact."Middle Name" := 'C';
         Contact.Initials := 'BC';
         Contact.Insert(true);
+    end;
+
+    local procedure CreateContactSyncUserForCurrentUser(var ContactSyncUser: Record "Contact Sync User"; FolderId: Text; DeltaUrl: Text)
+    begin
+        ContactSyncUser.Init();
+        ContactSyncUser."User ID" := CopyStr(UserId(), 1, MaxStrLen(ContactSyncUser."User ID"));
+        ContactSyncUser."Folder ID" := CopyStr(FolderId, 1, MaxStrLen(ContactSyncUser."Folder ID"));
+        ContactSyncUser."Folder Name" := CopyStr('Test Folder', 1, MaxStrLen(ContactSyncUser."Folder Name"));
+        ContactSyncUser."Delta Url" := CopyStr(DeltaUrl, 1, MaxStrLen(ContactSyncUser."Delta Url"));
+        ContactSyncUser.Insert(true);
     end;
 
     // Assert helper procedures - replace external Assert codeunit
