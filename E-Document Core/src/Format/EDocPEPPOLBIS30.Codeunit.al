@@ -2,13 +2,15 @@ namespace Microsoft.eServices.EDocument.IO.Peppol;
 
 using Microsoft.eServices.EDocument;
 using Microsoft.EServices.EDocument.Format;
+using Microsoft.eServices.EDocument.RemittanceAdvice;
+using Microsoft.Finance.GeneralLedger.Journal;
 using Microsoft.Inventory.Transfer;
 using Microsoft.Peppol;
 using Microsoft.Purchases.Document;
+using Microsoft.Purchases.Payables;
 using Microsoft.Sales.Document;
 using Microsoft.Sales.FinanceCharge;
 using Microsoft.Sales.History;
-using Microsoft.Sales.Peppol;
 using Microsoft.Sales.Reminder;
 using Microsoft.Service.Document;
 using Microsoft.Service.History;
@@ -26,7 +28,10 @@ codeunit 6165 "EDoc PEPPOL BIS 3.0" implements "E-Document"
         ServiceCrMemoHeader: Record "Service Cr.Memo Header";
         ReminderHeader: Record "Reminder Header";
         FinChargeMemoHeader: Record "Finance Charge Memo Header";
+        GenJournalLine: Record "Gen. Journal Line";
+        VendorLedgerEntry: Record "Vendor Ledger Entry";
         EDocPEPPOLValidation: Codeunit "E-Doc. PEPPOL Validation";
+        EDocRemittanceAdviceMgt: Codeunit "E-Doc. Remittance Advice Mgt.";
         SalesValidation: Interface "PEPPOL30 Validation";
         ServiceValidation: Interface "PEPPOL30 Validation";
     begin
@@ -76,6 +81,18 @@ codeunit 6165 "EDoc PEPPOL BIS 3.0" implements "E-Document"
                     ServiceValidation.ValidateDocument(ServiceHeader);
                     ServiceValidation.ValidateDocumentLines(ServiceHeader);
                 end;
+            Database::"Gen. Journal Line":
+                begin
+                    SourceDocumentHeader.SetTable(GenJournalLine);
+                    EDocRemittanceAdviceMgt.CheckJournalPayment(GenJournalLine);
+                    EDocPEPPOLValidation.CheckRemittanceAdvice(GenJournalLine);
+                end;
+            Database::"Vendor Ledger Entry":
+                begin
+                    SourceDocumentHeader.SetTable(VendorLedgerEntry);
+                    EDocRemittanceAdviceMgt.CheckPostedPayment(VendorLedgerEntry);
+                    EDocPEPPOLValidation.CheckRemittanceAdvice(VendorLedgerEntry);
+                end;
         end;
     end;
 
@@ -86,16 +103,24 @@ codeunit 6165 "EDoc PEPPOL BIS 3.0" implements "E-Document"
     begin
         TempBlob.CreateOutStream(DocOutStream);
         case EDocument."Document Type" of
-            EDocument."Document Type"::"Sales Invoice", EDocument."Document Type"::"Service Invoice":
-                GenerateInvoiceXMLFile(SourceDocumentHeader, DocOutStream, EDocumentService."Embed PDF in export");
-            EDocument."Document Type"::"Sales Credit Memo", EDocument."Document Type"::"Service Credit Memo":
-                GenerateCrMemoXMLFile(SourceDocumentHeader, DocOutStream, EDocumentService."Embed PDF in export");
+            EDocument."Document Type"::"Sales Invoice":
+                GenerateInvoiceXMLFile(SourceDocumentHeader, DocOutStream, EDocumentService."Embed PDF in export", GetSalesFormat());
+            EDocument."Document Type"::"Service Invoice":
+                GenerateInvoiceXMLFile(SourceDocumentHeader, DocOutStream, EDocumentService."Embed PDF in export", GetServiceFormat());
+            EDocument."Document Type"::"Sales Credit Memo":
+                GenerateCrMemoXMLFile(SourceDocumentHeader, DocOutStream, EDocumentService."Embed PDF in export", GetSalesFormat());
+            EDocument."Document Type"::"Service Credit Memo":
+                GenerateCrMemoXMLFile(SourceDocumentHeader, DocOutStream, EDocumentService."Embed PDF in export", GetServiceFormat());
             EDocument."Document Type"::"Issued Reminder", EDocument."Document Type"::"Issued Finance Charge Memo":
                 GenerateFinancialResultsXMLFile(SourceDocumentHeader, DocOutStream);
             EDocument."Document Type"::"Sales Shipment":
                 GenerateShipmentXMLFile(SourceDocumentHeader, DocOutStream, EDocumentService."Embed PDF in export");
             EDocument."Document Type"::"Transfer Shipment":
                 GenerateTransferShipmentXMLFile(SourceDocumentHeader, DocOutStream, EDocumentService."Embed PDF in export");
+            EDocument."Document Type"::"Purchase Order":
+                GeneratePurchaseOrderXMLFile(SourceDocumentHeader, DocOutStream, EDocumentService."Embed PDF in export");
+            EDocument."Document Type"::"Remittance Advice":
+                GenerateRemittanceAdviceXMLFile(SourceDocumentHeader, DocOutStream);
             else
                 EDocErrorHelper.LogSimpleErrorMessage(EDocument, StrSubstNo(DocumentTypeNotSupportedErr, EDocument.FieldCaption("Document Type"), EDocument."Document Type"));
         end;
@@ -125,24 +150,24 @@ codeunit 6165 "EDoc PEPPOL BIS 3.0" implements "E-Document"
         CreatedDocumentLines.GetTable(TempPurchaseLine);
     end;
 
-    local procedure GenerateInvoiceXMLFile(VariantRec: Variant; var OutStr: OutStream; GeneratePDF: Boolean)
+    local procedure GenerateInvoiceXMLFile(VariantRec: Variant; var OutStr: OutStream; GeneratePDF: Boolean; PEPPOLFormat: Enum "PEPPOL 3.0 Format")
     var
-        SalesInvoicePEPPOLBIS30: XMLport "Sales Invoice - PEPPOL BIS 3.0";
+        SalesInvoicePEPPOL30: XMLport "Sales Invoice - PEPPOL30";
     begin
-        SalesInvoicePEPPOLBIS30.Initialize(VariantRec);
-        SalesInvoicePEPPOLBIS30.SetGeneratePDF(GeneratePDF);
-        SalesInvoicePEPPOLBIS30.SetDestination(OutStr);
-        SalesInvoicePEPPOLBIS30.Export();
+        SalesInvoicePEPPOL30.Initialize(VariantRec, PEPPOLFormat);
+        SalesInvoicePEPPOL30.SetGeneratePDF(GeneratePDF);
+        SalesInvoicePEPPOL30.SetDestination(OutStr);
+        SalesInvoicePEPPOL30.Export();
     end;
 
-    local procedure GenerateCrMemoXMLFile(VariantRec: Variant; var OutStr: OutStream; GeneratePDF: Boolean)
+    local procedure GenerateCrMemoXMLFile(VariantRec: Variant; var OutStr: OutStream; GeneratePDF: Boolean; PEPPOLFormat: Enum "PEPPOL 3.0 Format")
     var
-        SalesCrMemoPEPPOLBIS30: XMLport "Sales Cr.Memo - PEPPOL BIS 3.0";
+        SalesCrMemoPEPPOL30: XMLport "Sales Cr.Memo - PEPPOL30";
     begin
-        SalesCrMemoPEPPOLBIS30.Initialize(VariantRec);
-        SalesCrMemoPEPPOLBIS30.SetGeneratePDF(GeneratePDF);
-        SalesCrMemoPEPPOLBIS30.SetDestination(OutStr);
-        SalesCrMemoPEPPOLBIS30.Export();
+        SalesCrMemoPEPPOL30.Initialize(VariantRec, PEPPOLFormat);
+        SalesCrMemoPEPPOL30.SetGeneratePDF(GeneratePDF);
+        SalesCrMemoPEPPOL30.SetDestination(OutStr);
+        SalesCrMemoPEPPOL30.Export();
     end;
 
     local procedure GetSalesFormat(): Enum "PEPPOL 3.0 Format"
@@ -193,6 +218,53 @@ codeunit 6165 "EDoc PEPPOL BIS 3.0" implements "E-Document"
         TransferShipmentExport.SetGeneratePDF(GeneratePDF);
         TransferShipmentExport.Run(TransferShipmentHeader);
         TransferShipmentExport.GetTransferShipmentXML(TempBlob);
+        CopyStream(DocOutStream, TempBlob.CreateInStream());
+    end;
+
+    local procedure GeneratePurchaseOrderXMLFile(var SourceDocumentHeader: RecordRef; DocOutStream: OutStream; GeneratePDF: Boolean)
+    var
+        PurchaseHeader: Record "Purchase Header";
+        PeppolSetup: Record "PEPPOL 3.0 Setup";
+        PurchaseOrderExport: Codeunit "Export Purchase Order PEPPOL30";
+        TempBlob: Codeunit "Temp Blob";
+    begin
+        PeppolSetup.GetSetup();
+        SourceDocumentHeader.SetTable(PurchaseHeader);
+        PurchaseOrderExport.SetFormat(PeppolSetup."PEPPOL 3.0 Purchase Format");
+        PurchaseOrderExport.SetGeneratePDF(GeneratePDF);
+        PurchaseOrderExport.Run(PurchaseHeader);
+        PurchaseOrderExport.GetPurchaseOrderXML(TempBlob);
+        CopyStream(DocOutStream, TempBlob.CreateInStream());
+    end;
+
+    local procedure GenerateRemittanceAdviceXMLFile(SourceDocumentHeader: RecordRef; DocOutStream: OutStream)
+    var
+        GenJournalLine: Record "Gen. Journal Line";
+        VendorLedgerEntry: Record "Vendor Ledger Entry";
+        TempRemitAdviceBuffer: Record "Remit. Advice Buffer" temporary;
+        RemitAdviceBufferMgt: Codeunit "Remit. Advice Buffer Mgt.";
+        ExportRemitAdvicePEPPOL30: Codeunit "Export Remit. Advice PEPPOL30";
+        EDocPEPPOLValidation: Codeunit "E-Doc. PEPPOL Validation";
+        TempBlob: Codeunit "Temp Blob";
+    begin
+        case SourceDocumentHeader.Number of
+            Database::"Gen. Journal Line":
+                begin
+                    SourceDocumentHeader.SetTable(GenJournalLine);
+                    EDocPEPPOLValidation.CheckRemittanceAdvice(GenJournalLine);
+                    RemitAdviceBufferMgt.BuildFromJournalPayment(GenJournalLine, TempRemitAdviceBuffer);
+                end;
+            Database::"Vendor Ledger Entry":
+                begin
+                    SourceDocumentHeader.SetTable(VendorLedgerEntry);
+                    EDocPEPPOLValidation.CheckRemittanceAdvice(VendorLedgerEntry);
+                    RemitAdviceBufferMgt.BuildFromPostedPayment(VendorLedgerEntry, TempRemitAdviceBuffer);
+                end;
+            else
+                exit;
+        end;
+
+        ExportRemitAdvicePEPPOL30.GenerateXml(TempRemitAdviceBuffer, TempBlob);
         CopyStream(DocOutStream, TempBlob.CreateInStream());
     end;
 

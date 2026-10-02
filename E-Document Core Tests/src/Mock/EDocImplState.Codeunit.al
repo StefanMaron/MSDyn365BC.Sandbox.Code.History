@@ -23,7 +23,11 @@ codeunit 139630 "E-Doc. Impl. State"
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         EnableOnCheck, DisableOnCreateOutput, DisableOnCreateBatch, IsAsync2, EnableHttpData, ThrowIntegrationRuntimeError, ThrowIntegrationLoggedError : Boolean;
         ThrowPaymentOccurrenceProcessingError: Boolean;
-        ThrowRuntimeError, ThrowLoggedError, ThrowBasicInfoError, ThrowCompleteInfoError, OnGetResponseSuccess, OnGetApprovalSuccess, ActionHasUpdate : Boolean;
+        EnableSourceDocumentHeaderCapture: Boolean;
+        ThrowRuntimeError, ThrowLoggedError, ThrowBasicInfoError, ThrowCompleteInfoError, OnGetResponseSuccess, ActionHasUpdate : Boolean;
+#if not CLEAN26
+        OnGetApprovalSuccess: Boolean;
+#endif
         LocalHttpResponse: HttpResponseMessage;
         ActionStatus: Enum "E-Document Service Status";
 
@@ -73,6 +77,9 @@ codeunit 139630 "E-Doc. Impl. State"
             Error('TEST');
         if ThrowLoggedError then
             EDocErrorHelper.LogErrorMessage(EDocument, EDocService, EDocService.FieldNo("Auto Import"), 'TEST');
+
+        if EnableSourceDocumentHeaderCapture then
+            LibraryVariableStorage.Enqueue(SourceDocumentHeader);
 
         if not DisableOnCreateOutput then begin
             TempBlob.CreateOutStream(OutStream);
@@ -455,6 +462,11 @@ codeunit 139630 "E-Doc. Impl. State"
     internal procedure EnableOnCheckEvent()
     begin
         EnableOnCheck := true;
+    end;
+
+    internal procedure EnableSourceDocumentHeaderCaptureEvent()
+    begin
+        EnableSourceDocumentHeaderCapture := true;
     end;
 
     internal procedure SetThrowRuntimeError()
