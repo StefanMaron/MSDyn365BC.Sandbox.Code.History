@@ -22,7 +22,6 @@ codeunit 7100 "Contact Sync User Subscriber"
         // Allow upgrade/data-fix updates on legacy rows unless Delta Url is being changed.
         if Session.GetExecutionContext() in [ExecutionContext::Install, ExecutionContext::Upgrade] then
             exit;
-
         Rec.EnforceRecordOwnershipOnModify(xRec."User ID");
         if not Rec.ValidateApprovedGraphDeltaUrl(Rec."Delta Url") then
             Error(InvalidDeltaUrlErr);
@@ -31,3 +30,4 @@ codeunit 7100 "Contact Sync User Subscriber"
     var
         InvalidDeltaUrlErr: Label 'The Delta URL must be an HTTPS Microsoft Graph URL.';
 }
+
