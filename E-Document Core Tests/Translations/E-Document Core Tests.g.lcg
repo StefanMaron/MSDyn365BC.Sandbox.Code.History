@@ -230,6 +230,42 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.eServices.EDocument.Test)(LookupHint=Codeunit E-Doc. Mapping Test - NamedType TranformationMappingRuleErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2916327188 - NamedType 4259679277" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[cac:BuyerCustomerParty/cac:Party/cbc:EndpointID was not found in the exported PEPPOL order.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.eServices.EDocument.Test)(LookupHint=Codeunit E-Doc. Party Endpoint ID Test - NamedType BuyerEndpointMissingErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2916327188 - NamedType 3601641460" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Failed to get exported blob from E-Document %1.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 - E-Document Entry No.]D;]A;(Namespace=Microsoft.eServices.EDocument.Test)(LookupHint=Codeunit E-Doc. Party Endpoint ID Test - NamedType FailedToGetBlobErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2916327188 - NamedType 3112617815" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[You must specify %1 in %2, or specify %3 and enable %4.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 - VAT Registration No. field caption, %2 - Company Information table caption, %3 - GLN field caption, %4 - Use GLN in Electronic Documents field caption]D;]A;(Namespace=Microsoft.eServices.EDocument.Test)(LookupHint=Codeunit E-Doc. Party Endpoint ID Test - NamedType MissingCompanyPartyIdErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2916327188 - NamedType 1728195938" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[You must specify %1 for Customer %2, or specify %3 and enable %4.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 - VAT Registration No. field caption, %2 - Customer No., %3 - GLN field caption, %4 - Use GLN in Electronic Documents field caption]D;]A;(Namespace=Microsoft.eServices.EDocument.Test)(LookupHint=Codeunit E-Doc. Party Endpoint ID Test - NamedType MissingCustomerPartyIdErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1879823713 - NamedType 2996603465" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Incorrect value found]]></Val>
