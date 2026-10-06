@@ -680,6 +680,33 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Sales.Test)(LookupHint=Table Watch Customer Ledger Entry - Field Sum Comparison Method - Property OptionCaption)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 894522733 - NamedType 2701788001" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The API test password could not be read from %1.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 - Password file path]D;]A;(Namespace=Microsoft.TestLibraries.ERP)(LookupHint=Codeunit Microsoft Test Auth Provider - NamedType ContainerPasswordReadErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 894522733 - NamedType 1695479519" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The API test password could not be retrieved from the %1 secret.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 - Azure Key Vault secret name]D;]A;(Namespace=Microsoft.TestLibraries.ERP)(LookupHint=Codeunit Microsoft Test Auth Provider - NamedType KeyVaultPasswordReadErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 894522733 - NamedType 2889910993" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The API test password could not be retrieved.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.TestLibraries.ERP)(LookupHint=Codeunit Microsoft Test Auth Provider - NamedType PasswordRetrievalFailedErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Table 1872549908 - Property 2879900210" ItemType=";Table - Table" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[All-Keys Type]]></Val>
@@ -5988,6 +6015,24 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(ObjectTarget=Page 2183420390)(LookupHint=PageExtension Users PBT Test - Action TriggerPageBackgroundTask - Property Caption)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Enum 3472052282 - EnumValue 714882521 - Property 2879900210" ItemType=";Enum - EnumValue" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Microsoft Test Environment]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Enum API Test Authentication - EnumValue Microsoft Test Environment - Property Caption)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Enum 3472052282 - EnumValue 3371220206 - Property 2879900210" ItemType=";Enum - EnumValue" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[None]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Enum API Test Authentication - EnumValue None - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
 </LCX>
