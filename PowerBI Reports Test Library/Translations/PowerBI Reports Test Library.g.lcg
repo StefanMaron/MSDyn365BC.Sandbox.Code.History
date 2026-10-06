@@ -59,13 +59,4 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.PowerBIReports.Test)(LookupHint=Enum PowerBI Filter Scenarios - EnumValue Sales Date - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Enum 2605921211 - EnumValue 412974547 - Property 2879900210" ItemType=";Enum - EnumValue" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Sustainability Date]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.PowerBIReports.Test)(LookupHint=Enum PowerBI Filter Scenarios - EnumValue Sustainability Date - Property Caption)]]></Cmt>
-    </Cmts>
-  </Item>
 </LCX>

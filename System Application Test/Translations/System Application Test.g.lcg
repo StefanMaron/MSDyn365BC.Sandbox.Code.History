@@ -1526,6 +1526,15 @@
       <Cmt Name="Dev"><![CDATA[%1 = Translation Value]D;]A;(Namespace=System.Test.Globalization)(LookupHint=Codeunit Translation Tests - Method TestRetrivalAndStorageThroughUIWithFieldLengthCheck - NamedType ExpectedErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1522669910 - NamedType 3600641499" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Edit in Excel is not supported for pages that are based on the User table. To change users, use the Users or User Card page in Business Central.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=System.Test.Integration.Excel)(LookupHint=Codeunit Edit in Excel Test - NamedType UserTableNotSupportedErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2336214198 - NamedType 2961131606" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[No columns were added to the workbook.]]></Val>

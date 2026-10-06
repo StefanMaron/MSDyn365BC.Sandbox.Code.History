@@ -230,6 +230,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.SubscriptionBilling)(LookupHint=Codeunit Item Service Comm. Type Test - NamedType ServiceCommitmentItemErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1010650385 - Method 371424201 - NamedType 3825222601" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[IsLineAttachedToBillingLine returned the wrong value for line %1 when the Sales Line variable was reused across lines.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Sales Line "Line No."]D;]A;(Namespace=Microsoft.SubscriptionBilling)(LookupHint=Codeunit Recurring Billing Docs Test - Method IsLineAttachedToBillingLineReturnsPerLineResultWhenSalesLineVariableIsReused - NamedType IsLineAttachedMismatchErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 837722888 - Method 3277720177 - NamedType 759636845" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The number of filtered billing lines for Subscription Line %1 %2 (%3) does not match the total number of billing lines for this Subscription Line (%4). Adjust the page filters so that there are no gaps in the billing period.]]></Val>

@@ -149,6 +149,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit CDS Connection String - NamedType UserNameMustInclDomainErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3289059696 - NamedType 1708475717" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The Dataverse environment URL must be a dynamics.com address.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit CDS Connection Wizard Tests - NamedType InvalidHostSuffixErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3289059696 - NamedType 3220810991" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[You must register an Microsoft Entra application that will be used to connect to the Dataverse environment and specify the application id, secret and redirect URL in the Dataverse Connection Setup page.]]></Val>
