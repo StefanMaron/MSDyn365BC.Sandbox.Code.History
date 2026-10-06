@@ -1510,7 +1510,7 @@
   </Item>
   <Item ItemId=";Codeunit 1923777852 - Method 3758963687 - NamedType 3641525960" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Version Nos. must have a value]]></Val>
+      <Val><![CDATA[specify a value in the Version Nos. field on the production BOM.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -1519,7 +1519,7 @@
   </Item>
   <Item ItemId=";Codeunit 1923777852 - Method 2732581635 - NamedType 3641525960" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Version Nos. must have a value]]></Val>
+      <Val><![CDATA[specify a value in the Version Nos. field on the routing.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -1560,6 +1560,24 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE12_BackForwardNavigation_RoutingVersionLineCountStable - NamedType WizardShouldHaveFinishedLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 2067474596 - NamedType 460077747" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[To create a version for production BOM %1, specify a value in the Version Nos. field on the production BOM.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Production BOM No.]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE13_BOMWithoutVersionNos_ValidateRaisesActionableError - NamedType ActionableBOMVersionNosErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1923777852 - Method 2738539517 - NamedType 3506387735" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[To create a version for routing %1, specify a value in the Version Nos. field on the routing.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Routing No.]D;]A;(Namespace=Microsoft.Manufacturing.Test)(LookupHint=Codeunit Prod. Def. Wiz. Version Test - Method TestE14_RoutingWithoutVersionNos_ValidateRaisesActionableError - NamedType ActionableRoutingVersionNosErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1923777852 - Method 3841371599 - NamedType 315122868" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
