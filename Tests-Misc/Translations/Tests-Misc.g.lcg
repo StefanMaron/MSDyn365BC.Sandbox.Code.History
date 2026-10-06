@@ -257,6 +257,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Analysis View Table-UT - NamedType SameDimensionCodeError)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2146274198 - NamedType 4024918478" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Unexpected authentication call.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit API Test Auth Provider Tests - NamedType UnexpectedCallErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2157270960 - NamedType 74121247" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Assert.AreNearlyEqual failed. Expected a difference no greater than <%1> between expected value <%2> and actual value <%3>. %4]]></Val>
