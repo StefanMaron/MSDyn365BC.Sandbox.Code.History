@@ -2,18 +2,18 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Purchases.Comment;
+namespace Microsoft.Assembly.Comment;
 
-page 66 "Purch. Comment Sheet"
+page 907 "Assembly Comment Sheet"
 {
     AutoSplitKey = true;
-    Caption = 'Comment Sheet';
-    DataCaptionFields = "Document Type", "No.";
+    Caption = 'Assembly Comment Sheet';
+    DataCaptionFields = "Document No.";
     DelayedInsert = true;
     LinksAllowed = false;
     MultipleNewLines = true;
     PageType = List;
-    SourceTable = "Purch. Comment Line";
+    SourceTable = "Assembly Comment Line";
 
     layout
     {
@@ -24,17 +24,17 @@ page 66 "Purch. Comment Sheet"
                 ShowCaption = false;
                 field(Date; Rec.Date)
                 {
-                    ApplicationArea = Comments;
-                    ToolTip = 'Specifies the date the comment was created.';
+                    ApplicationArea = Assembly;
+                    ToolTip = 'Specifies the date of when the comment was created.';
                 }
                 field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
-                    ToolTip = 'Specifies the comment itself.';
+                    ToolTip = 'Specifies the comment.';
                 }
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = Comments;
+                    ApplicationArea = Assembly;
                     ToolTip = 'Specifies a code for the comment.';
                     Visible = false;
                 }

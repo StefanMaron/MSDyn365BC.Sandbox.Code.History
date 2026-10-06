@@ -505,15 +505,13 @@ report 5802 "Inventory Valuation - WIP"
         end;
     end;
 
-    local procedure IsNotWIP() Result: Boolean
+    local procedure IsNotWIP(): Boolean
     begin
         if "Value Entry"."Item Ledger Entry Type" = "Value Entry"."Item Ledger Entry Type"::Output then
-            Result := not ("Value Entry"."Entry Type" in ["Value Entry"."Entry Type"::"Direct Cost", "Value Entry"."Entry Type"::Revaluation])
-        else
-            Result := "Value Entry"."Expected Cost";
+            exit(not ("Value Entry"."Entry Type" in ["Value Entry"."Entry Type"::"Direct Cost",
+                                       "Value Entry"."Entry Type"::Revaluation]));
 
-        OnAfterIsNotWIP("Value Entry", Result);
-        exit(Result);
+        exit("Value Entry"."Expected Cost");
     end;
 
     local procedure IsProductionCost(ValueEntry: Record "Value Entry"): Boolean
@@ -563,11 +561,6 @@ report 5802 "Inventory Valuation - WIP"
 
     [IntegrationEvent(false, false)]
     local procedure OnValueEntryOnAfterGetRecordOnBeforeIncrementTotals(ValueOfCostPstdToGL: Decimal; AtLastDate: Decimal; var IsHandled: Boolean)
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterIsNotWIP(var ValueEntry: Record "Value Entry"; var Result: Boolean)
     begin
     end;
 }
