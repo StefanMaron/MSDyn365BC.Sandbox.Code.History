@@ -2,7 +2,6 @@ codeunit 137055 "SCM Warehouse Pick"
 {
     Subtype = Test;
     TestPermissions = Disabled;
-    EventSubscriberInstance = Manual;
 
     trigger OnRun()
     begin
@@ -49,12 +48,6 @@ codeunit 137055 "SCM Warehouse Pick"
         ShipQtyErr: Label 'Sales line should be fully shipped with no residual quantity';
         PickNotFoundErr: Label 'Pick should be created for reserved Sales Order %1', Comment = '%1 = Document No.';
         ShippedQtyMismatchErr: Label 'Expected %1 units to be shipped for the sales order.', Comment = '%1 - Quantity';
-        VerifyWhseShptTrackingSpecification: Boolean;
-        WhseShptTrackingSpecificationVerified: Boolean;
-        VerifyWhseShptPurchTrackingSpecification: Boolean;
-        WhseShptPurchTrackingSpecificationVerified: Boolean;
-        WhseShptTrackingSpecificationNotVerifiedErr: Label 'The warehouse shipment tracking specification was not verified.';
-        WhseShptPurchTrackingSpecificationNotVerifiedErr: Label 'The purchase warehouse shipment tracking specification was not verified.';
 
     [Test]
     [HandlerFunctions('ReservationPageHandler')]
@@ -2622,85 +2615,215 @@ codeunit 137055 "SCM Warehouse Pick"
 
         LibraryVariableStorage.AssertEmpty();
     end;
-
     [Test]
+    [HandlerFunctions('ItemTrackingLinesSelectEntriesPageHandler,ItemTrackingSummaryPageHandler')]
     [Scope('OnPrem')]
-    procedure WarehouseShipmentItemTrackingDoesNotInheritSalesLineBin()
+    procedure LotTrackingFlowsToSecondPickAfterPartialWarehouseShipment()
     var
+        Location: Record Location;
+        WarehouseEmployee: Record "Warehouse Employee";
         Item: Record Item;
+        ItemTrackingCode: Record "Item Tracking Code";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        SalesLineReserve: Codeunit "Sales Line-Reserve";
-        SecondSourceQuantityArray: array[3] of Decimal;
+        WarehouseShipmentHeader: Record "Warehouse Shipment Header";
+        WarehouseShipmentLine: Record "Warehouse Shipment Line";
+        WarehouseActivityHeader: Record "Warehouse Activity Header";
+        WarehouseActivityLine: Record "Warehouse Activity Line";
+        LotNo: array[2] of Code[50];
+        LotQty: Decimal;
+        OriginalWorkDate: Date;
     begin
-        // [FEATURE] [Item Tracking] [Bin] [AI Test]
-        // [SCENARIO 648520] Item tracking on a subsequent warehouse shipment is not limited to the bin copied to the sales line by the first partial shipment.
+        // [FEATURE] [Item Tracking] [Bin]
+        // [SCENARIO 648520] The remaining lot can be selected and flows to the second pick after a partial warehouse shipment.
         Initialize();
+        OriginalWorkDate := WorkDate();
+        WorkDate(20250101D);
 
-        // [GIVEN] A sales line has a non-blank bin code copied from a previously posted warehouse shipment.
-        LocationWhite.TestField("Shipment Bin Code");  // Guard: a blank bin would make the test pass trivially.
-        LibraryInventory.CreateItem(Item);
-        CreateSalesOrder(SalesHeader, LocationWhite.Code, Item."No.", LibraryRandom.RandInt(10));
+        // [GIVEN] A FEFO warehouse location contains two lots of a lot-tracked item.
+        LibraryWarehouse.CreateFullWMSLocation(Location, 2);
+        Location.Validate("Pick According to FEFO", true);
+        Location.Modify(true);
+        LibraryWarehouse.CreateWarehouseEmployee(WarehouseEmployee, Location.Code, false);
+        CreateItemWithLotTrackingAndExpirationDate(Item, ItemTrackingCode);
+        ItemTrackingCode.Validate("Lot Warehouse Tracking", false);
+        ItemTrackingCode.Modify(true);
+        LotQty := LibraryRandom.RandIntInRange(10, 20);
+        LotNo[1] := LibraryUtility.GenerateGUID();
+        LotNo[2] := LibraryUtility.GenerateGUID();
+        UpdateInventoryInPickBinWithLotAndExpirationWithoutWarehouseTracking(Item, Location.Code, LotQty, LotNo[1], CalcDate('<+5D>', WorkDate()));
+        UpdateInventoryInPickBinWithLotAndExpirationWithoutWarehouseTracking(Item, Location.Code, LotQty, LotNo[2], CalcDate('<+15D>', WorkDate()));
+
+        // [GIVEN] The first lot is picked and posted as a partial warehouse shipment.
+        CreateSalesOrder(SalesHeader, Location.Code, Item."No.", 2 * LotQty);
         SalesLine.SetRange("Document Type", SalesHeader."Document Type");
         SalesLine.SetRange("Document No.", SalesHeader."No.");
         SalesLine.FindFirst();
-        SalesLine."Bin Code" := LocationWhite."Shipment Bin Code";
-        SalesLine.Modify(false);
+        SalesLine.Validate("Qty. to Ship", LotQty);
+        SalesLine.Modify(true);
+        LibrarySales.ReleaseSalesDocument(SalesHeader);
+        LibraryWarehouse.CreateWhseShipmentFromSO(SalesHeader);
+        FindWarehouseShipmentHeader(WarehouseShipmentHeader, SalesHeader."No.");
+        FilterWarehouseShipmentLine(WarehouseShipmentLine, SalesHeader."No.");
+        WarehouseShipmentLine.FindFirst();
+        LibraryVariableStorage.Enqueue(LotNo[1]);
+        LibraryVariableStorage.Enqueue(LotQty);
+        WarehouseShipmentLine.OpenItemTrackingLines();
+        LibraryWarehouse.CreatePick(WarehouseShipmentHeader);
+        FindWarehouseActivityLine(
+            WarehouseActivityLine, WarehouseActivityLine."Activity Type"::Pick, Location.Code, SalesHeader."No.",
+            WarehouseActivityLine."Action Type"::Take);
+        FindWarehouseActivityHeader(WarehouseActivityHeader, WarehouseActivityHeader.Type::Pick, Location.Code, SalesHeader."No.");
+        WarehouseActivityLine.Reset();
+        WarehouseActivityLine.SetRange("Activity Type", WarehouseActivityHeader.Type);
+        WarehouseActivityLine.SetRange("No.", WarehouseActivityHeader."No.");
+        WarehouseActivityLine.FindSet();
+        repeat
+            WarehouseActivityLine.Validate("Qty. to Handle", LotQty);
+            WarehouseActivityLine.Modify(true);
+        until WarehouseActivityLine.Next() = 0;
+        LibraryWarehouse.RegisterWhseActivity(WarehouseActivityHeader);
+        LibraryWarehouse.PostWhseShipment(WarehouseShipmentHeader, false);
+        WarehouseShipmentHeader.Get(WarehouseShipmentHeader."No.");
+        if WarehouseActivityHeader.Get(WarehouseActivityHeader.Type, WarehouseActivityHeader."No.") then
+            WarehouseActivityHeader.Delete(true);
+      
+        LibraryWarehouse.ReopenWhseShipment(WarehouseShipmentHeader);
+        WarehouseShipmentHeader.Get(WarehouseShipmentHeader."No.");
+        WarehouseShipmentHeader.Delete(true);
 
-        // [WHEN] Item tracking is opened from a warehouse shipment for the remaining quantity.
-        SecondSourceQuantityArray[1] := Database::"Warehouse Shipment Line";
-        SecondSourceQuantityArray[2] := SalesLine."Quantity (Base)";
-        VerifyWhseShptTrackingSpecification := true;
-        BindSubscription(this);
-        SalesLineReserve.CallItemTrackingSecondSource(SalesLine, SecondSourceQuantityArray, false);
-        UnbindSubscription(this);
+        // [GIVEN] The first shipment bin is copied to the sales line and a second shipment is created for the remaining quantity.
+        SalesLine.Find();
+        SalesLine.TestField("Quantity Shipped", LotQty);
+        SalesLine.TestField("Bin Code", Location."Shipment Bin Code");
+        LibraryWarehouse.CreateWhseShipmentFromSO(SalesHeader);
+        FindWarehouseShipmentHeader(WarehouseShipmentHeader, SalesHeader."No.");
+        FilterWarehouseShipmentLine(WarehouseShipmentLine, SalesHeader."No.");
+        WarehouseShipmentLine.FindFirst();
 
-        // [THEN] The tracking specification passed to item tracking has a blank bin code instead of inheriting the sales line bin.
-        Assert.IsTrue(WhseShptTrackingSpecificationVerified, WhseShptTrackingSpecificationNotVerifiedErr);
+        // [WHEN] Select Entries assigns the remaining lot and a second pick is created.
+        LibraryVariableStorage.Enqueue(LotNo[2]);
+        LibraryVariableStorage.Enqueue(LotQty);
+        WarehouseShipmentLine.OpenItemTrackingLines();
+        LibraryWarehouse.CreatePick(WarehouseShipmentHeader);
+
+        // [THEN] The remaining lot stays assigned to the source and the quantity flows to both lines of the second pick.
+        VerifySalesLineLotTracking(SalesLine, LotNo[2], LotQty);
+        WarehouseActivityLine.Reset();
+        FindWarehouseActivityLine(
+            WarehouseActivityLine, WarehouseActivityLine."Activity Type"::Pick, Location.Code, SalesHeader."No.",
+            WarehouseActivityLine."Action Type"::Take);
+        WarehouseActivityLine.TestField(Quantity, LotQty);
+        FindWarehouseActivityLine(
+            WarehouseActivityLine, WarehouseActivityLine."Activity Type"::Pick, Location.Code, SalesHeader."No.",
+            WarehouseActivityLine."Action Type"::Place);
+        WarehouseActivityLine.TestField(Quantity, LotQty);
+
+        WorkDate(OriginalWorkDate);
+        LibraryVariableStorage.AssertEmpty();
     end;
-
+    
     [Test]
-    [Scope('OnPrem')]
-    procedure WarehouseShipmentItemTrackingDoesNotInheritPurchaseLineBin()
+    [HandlerFunctions('WhseItemTrackingLinesAssignLotAndExpirationPageHandler')]
+    procedure LotFlowsToSecondPickAfterPartialWhseShipmentWithWhseLotTracking()
     var
+        Location: Record Location;
+        WarehouseEmployee: Record "Warehouse Employee";
         Item: Record Item;
         ItemTrackingCode: Record "Item Tracking Code";
-        PurchaseHeader: Record "Purchase Header";
-        PurchaseLine: Record "Purchase Line";
-        PurchLineReserve: Codeunit "Purch. Line-Reserve";
-        SecondSourceQuantityArray: array[3] of Decimal;
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        WarehouseShipmentHeader: Record "Warehouse Shipment Header";
+        WarehouseShipmentLine: Record "Warehouse Shipment Line";
+        WarehouseActivityHeader: Record "Warehouse Activity Header";
+        WarehouseActivityLine: Record "Warehouse Activity Line";
+        LotNo: array[2] of Code[50];
+        LotQty: Decimal;
+        OriginalWorkDate: Date;
     begin
-        // [FEATURE] [Item Tracking] [Bin] [Purchase Return] [AI Test]
-        // [SCENARIO 648520] Item tracking on a purchase return warehouse shipment is not limited to the bin copied to the purchase line.
+        // [FEATURE] [Item Tracking] [Bin] [Warehouse]
+        // [SCENARIO 646677] With warehouse lot tracking enabled, the remaining lot can be selected and flows to the single Take and Place lines of the second pick after a partial warehouse shipment.
         Initialize();
+        OriginalWorkDate := WorkDate();
+        WorkDate(20250101D);
 
-        // [GIVEN] A purchase return line has a non-blank bin code from a previous warehouse shipment.
-        LocationWhite.TestField("Shipment Bin Code");
-        LibraryInventory.CreateItemTrackingCode(ItemTrackingCode);
-        ItemTrackingCode.Validate("Lot Specific Tracking", true);
-        ItemTrackingCode.Validate("Lot Warehouse Tracking", true);
-        ItemTrackingCode.Modify(true);
-        LibraryInventory.CreateItem(Item);
-        Item.Validate("Item Tracking Code", ItemTrackingCode.Code);
-        Item.Validate("Lot Nos.", LibraryUtility.GetGlobalNoSeriesCode());
-        Item.Modify(true);
-        LibraryPurchase.CreatePurchHeader(PurchaseHeader, PurchaseHeader."Document Type"::"Return Order", LibraryPurchase.CreateVendorNo());
-        LibraryPurchase.CreatePurchaseLine(PurchaseLine, PurchaseHeader, PurchaseLine.Type::Item, Item."No.", LibraryRandom.RandInt(10));
-        PurchaseLine.Validate("Location Code", LocationWhite.Code);
-        PurchaseLine."Bin Code" := LocationWhite."Shipment Bin Code";
-        PurchaseLine.Modify(false);
+        // [GIVEN] A FEFO warehouse location contains two lots of a lot-tracked item with warehouse lot tracking enabled.
+        LibraryWarehouse.CreateFullWMSLocation(Location, 2);
+        Location.Validate("Pick According to FEFO", true);
+        Location.Modify(true);
+        LibraryWarehouse.CreateWarehouseEmployee(WarehouseEmployee, Location.Code, false);
+        CreateItemWithLotTrackingAndExpirationDate(Item, ItemTrackingCode);
+        ItemTrackingCode.TestField("Lot Warehouse Tracking", true);
+        LotQty := LibraryRandom.RandIntInRange(10, 20);
+        LotNo[1] := LibraryUtility.GenerateGUID();
+        LotNo[2] := LibraryUtility.GenerateGUID();
+        UpdateInventoryInPickBinWithLotAndExpiration(Item, Location.Code, LotQty, LotNo[1], CalcDate('<+5D>', WorkDate()));
+        UpdateInventoryInPickBinWithLotAndExpiration(Item, Location.Code, LotQty, LotNo[2], CalcDate('<+15D>', WorkDate()));
 
-        // [WHEN] Item tracking is opened from a warehouse shipment for the return quantity.
-        SecondSourceQuantityArray[1] := Database::"Warehouse Shipment Line";
-        SecondSourceQuantityArray[2] := PurchaseLine."Quantity (Base)";
-        VerifyWhseShptPurchTrackingSpecification := true;
-        BindSubscription(this);
-        PurchLineReserve.CallItemTracking(PurchaseLine, SecondSourceQuantityArray);
-        UnbindSubscription(this);
+        // [GIVEN] The first lot is picked and posted as a partial warehouse shipment.
+        CreateSalesOrder(SalesHeader, Location.Code, Item."No.", 2 * LotQty);
+        SalesLine.SetRange("Document Type", SalesHeader."Document Type");
+        SalesLine.SetRange("Document No.", SalesHeader."No.");
+        SalesLine.FindFirst();
+        LibrarySales.ReleaseSalesDocument(SalesHeader);
+        LibraryWarehouse.CreateWhseShipmentFromSO(SalesHeader);
+        FindWarehouseShipmentHeader(WarehouseShipmentHeader, SalesHeader."No.");
+        FilterWarehouseShipmentLine(WarehouseShipmentLine, SalesHeader."No.");
+        WarehouseShipmentLine.FindFirst();
+        LibraryWarehouse.CreatePick(WarehouseShipmentHeader);
+        FindWarehouseActivityHeader(WarehouseActivityHeader, WarehouseActivityHeader.Type::Pick, Location.Code, SalesHeader."No.");
+        WarehouseActivityLine.Reset();
+        WarehouseActivityLine.SetRange("Activity Type", WarehouseActivityHeader.Type);
+        WarehouseActivityLine.SetRange("No.", WarehouseActivityHeader."No.");
+        WarehouseActivityLine.FindSet();
+        repeat
+            if WarehouseActivityLine."Lot No." = LotNo[1] then
+                WarehouseActivityLine.Validate("Qty. to Handle", LotQty)
+            else
+                WarehouseActivityLine.Validate("Qty. to Handle", 0);
+            WarehouseActivityLine.Modify(true);
+        until WarehouseActivityLine.Next() = 0;
+        LibraryWarehouse.RegisterWhseActivity(WarehouseActivityHeader);
+        LibraryWarehouse.PostWhseShipment(WarehouseShipmentHeader, false);
+        if WarehouseActivityHeader.Get(WarehouseActivityHeader.Type, WarehouseActivityHeader."No.") then
+            WarehouseActivityHeader.Delete(true);
+        if WarehouseShipmentHeader.Get(WarehouseShipmentHeader."No.") then begin
+            LibraryWarehouse.ReopenWhseShipment(WarehouseShipmentHeader);
+            WarehouseShipmentHeader.Delete(true);
+        end;
 
-        // [THEN] The tracking specification has a blank bin code instead of inheriting the purchase line bin.
-        Assert.IsTrue(WhseShptPurchTrackingSpecificationVerified, WhseShptPurchTrackingSpecificationNotVerifiedErr);
-    end;
+        // [GIVEN] The first shipment bin is copied to the sales line and a second shipment is created for the remaining quantity.
+        SalesLine.Find();
+        SalesLine.TestField("Quantity Shipped", LotQty);
+        SalesLine.TestField("Bin Code", Location."Shipment Bin Code");
+        LibraryWarehouse.CreateWhseShipmentFromSO(SalesHeader);
+        FindWarehouseShipmentHeader(WarehouseShipmentHeader, SalesHeader."No.");
+        FilterWarehouseShipmentLine(WarehouseShipmentLine, SalesHeader."No.");
+        WarehouseShipmentLine.FindFirst();
+
+        // [WHEN] A second pick is created for the remaining quantity.
+        LibraryWarehouse.CreatePick(WarehouseShipmentHeader);
+        FindWarehouseActivityHeader(WarehouseActivityHeader, WarehouseActivityHeader.Type::Pick, Location.Code, SalesHeader."No.");
+
+        // [THEN] The second pick has exactly one Take and one Place line, both carrying the remaining lot and quantity.
+        WarehouseActivityLine.Reset();
+        WarehouseActivityLine.SetRange("Activity Type", WarehouseActivityHeader.Type);
+        WarehouseActivityLine.SetRange("No.", WarehouseActivityHeader."No.");
+        Assert.RecordCount(WarehouseActivityLine, 2);
+        WarehouseActivityLine.SetRange("Action Type", WarehouseActivityLine."Action Type"::Take);
+        Assert.RecordCount(WarehouseActivityLine, 1);
+        WarehouseActivityLine.FindFirst();
+        WarehouseActivityLine.TestField("Lot No.", LotNo[2]);
+        WarehouseActivityLine.TestField(Quantity, LotQty);
+        WarehouseActivityLine.SetRange("Action Type", WarehouseActivityLine."Action Type"::Place);
+        Assert.RecordCount(WarehouseActivityLine, 1);
+        WarehouseActivityLine.FindFirst();
+        WarehouseActivityLine.TestField("Lot No.", LotNo[2]);
+        WarehouseActivityLine.TestField(Quantity, LotQty);
+
+        WorkDate(OriginalWorkDate);
+        LibraryVariableStorage.AssertEmpty();
+    end;   
 
     [Test]
     [HandlerFunctions('ConfirmHandlerTrue')]
@@ -3132,10 +3255,6 @@ codeunit 137055 "SCM Warehouse Pick"
         LibraryTestInitialize.OnTestInitialize(CODEUNIT::"SCM Warehouse Pick");
         WarehouseActivityLine.DeleteAll();
         Clear(GlobalItemNo);
-        Clear(VerifyWhseShptTrackingSpecification);
-        Clear(WhseShptTrackingSpecificationVerified);
-        Clear(VerifyWhseShptPurchTrackingSpecification);
-        Clear(WhseShptPurchTrackingSpecificationVerified);
         LibraryVariableStorage.Clear();
 
         // Lazy Setup.
@@ -3451,34 +3570,46 @@ codeunit 137055 "SCM Warehouse Pick"
         Assert.RecordIsEmpty(WarehouseActivityLine);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Sales Line-Reserve", 'OnCallItemTrackingSecondSourceOnBeforeOpenItemTrackingLines', '', false, false)]
-    local procedure VerifyWarehouseShipmentTrackingSpecification(var SalesLine: Record "Sales Line"; TrackingSpecification: Record "Tracking Specification"; SecondSourceQuantityArray: array[3] of Decimal; var IsHandled: Boolean)
-    begin
-        if not VerifyWhseShptTrackingSpecification then
-            exit;
 
-        Assert.AreEqual(Database::"Warehouse Shipment Line", SecondSourceQuantityArray[1], 'Unexpected item tracking second source.');
-        TrackingSpecification.TestField("Bin Code", '');
-        WhseShptTrackingSpecificationVerified := true;
-        IsHandled := true;
+    local procedure UpdateInventoryInPickBinWithLotAndExpirationWithoutWarehouseTracking(Item: Record Item; LocationCode: Code[10]; Quantity: Decimal; LotNo: Code[50]; ExpirationDate: Date)
+    var
+        Zone: Record Zone;
+        Bin: Record Bin;
+        WarehouseJournalLine: Record "Warehouse Journal Line";
+        ItemJournalLine: Record "Item Journal Line";
+        ReservationEntry: Record "Reservation Entry";
+    begin
+        EnsureGeneralPostingSetupForItem(Item);
+        LibraryWarehouse.FindZone(Zone, LocationCode, LibraryWarehouse.SelectBinType(false, false, true, true), false);
+        LibraryWarehouse.FindBin(Bin, LocationCode, Zone.Code, 1);
+        LibraryWarehouse.WarehouseJournalSetup(LocationCode, WarehouseJournalTemplate, WarehouseJournalBatch);
+        LibraryInventory.ClearItemJournal(ItemJournalTemplate, ItemJournalBatch);
+        LibraryWarehouse.CreateWhseJournalLine(
+          WarehouseJournalLine, WarehouseJournalBatch."Journal Template Name", WarehouseJournalBatch.Name,
+          LocationCode, Zone.Code, Bin.Code,
+          WarehouseJournalLine."Entry Type"::"Positive Adjmt.", Item."No.", Quantity);
+        LibraryWarehouse.RegisterWhseJournalLine(
+          WarehouseJournalBatch."Journal Template Name", WarehouseJournalBatch.Name, LocationCode, true);
+        LibraryWarehouse.CalculateWhseAdjustment(Item, ItemJournalBatch);
+
+        ItemJournalLine.SetRange("Journal Template Name", ItemJournalBatch."Journal Template Name");
+        ItemJournalLine.SetRange("Journal Batch Name", ItemJournalBatch.Name);
+        ItemJournalLine.FindFirst();
+        LibraryItemTracking.CreateItemJournalLineItemTracking(ReservationEntry, ItemJournalLine, '', LotNo, Quantity);
+        ReservationEntry.Validate("Expiration Date", ExpirationDate);
+        ReservationEntry.Modify(true);
+        LibraryInventory.PostItemJournalLine(ItemJournalBatch."Journal Template Name", ItemJournalBatch.Name);
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::"Item Tracking Lines", 'OnBeforeSetSourceSpec', '', false, false)]
-    local procedure VerifyWarehouseShipmentPurchTrackingSpecification(var TrackingSpecification: Record "Tracking Specification"; var ReservationEntry: Record "Reservation Entry"; var ExcludePostedEntries: Boolean)
+    local procedure VerifySalesLineLotTracking(SalesLine: Record "Sales Line"; LotNo: Code[50]; Quantity: Decimal)
+    var
+        ReservationEntry: Record "Reservation Entry";
     begin
-        if not VerifyWhseShptPurchTrackingSpecification then
-            exit;
-
-        TrackingSpecification.TestField("Source Type", Database::"Purchase Line");
-        TrackingSpecification.TestField("Bin Code", '');
-        WhseShptPurchTrackingSpecificationVerified := true;
-    end;
-
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Purch. Line-Reserve", 'OnBeforeRunItemTrackingLinesPage', '', false, false)]
-    local procedure SkipPurchaseItemTrackingLinesPage(var ItemTrackingLines: Page "Item Tracking Lines"; var IsHandled: Boolean)
-    begin
-        if VerifyWhseShptPurchTrackingSpecification then
-            IsHandled := true;
+        ReservationEntry.SetSourceFilter(
+            Database::"Sales Line", SalesLine."Document Type".AsInteger(), SalesLine."Document No.", SalesLine."Line No.", true);
+        ReservationEntry.SetRange("Lot No.", LotNo);
+        ReservationEntry.FindFirst();
+        ReservationEntry.TestField("Quantity (Base)", -Quantity);
     end;
 
     local procedure UpdateInventoryInPickBin(Item: Record Item; LocationCode: Code[10]; Quantity: Decimal)
@@ -3540,6 +3671,37 @@ codeunit 137055 "SCM Warehouse Pick"
         end;
         LibraryERM.SetGeneralPostingSetupInvtAccounts(GeneralPostingSetup);
         GeneralPostingSetup.Modify(true);
+    end;
+
+    [ModalPageHandler]
+    [Scope('OnPrem')]
+    procedure ItemTrackingLinesSelectEntriesPageHandler(var ItemTrackingLines: TestPage "Item Tracking Lines")
+    begin
+        ItemTrackingLines."Select Entries".Invoke();
+        ItemTrackingLines.OK().Invoke();
+    end;
+
+    [ModalPageHandler]
+    [Scope('OnPrem')]
+    procedure ItemTrackingSummaryPageHandler(var ItemTrackingSummary: TestPage "Item Tracking Summary")
+    var
+        LotNo: Code[50];
+        Quantity: Decimal;
+    begin
+        LotNo := CopyStr(LibraryVariableStorage.DequeueText(), 1, MaxStrLen(LotNo));
+        Quantity := LibraryVariableStorage.DequeueDecimal();
+
+        if ItemTrackingSummary.First() then
+            repeat
+                ItemTrackingSummary."Selected Quantity".SetValue(0);
+            until not ItemTrackingSummary.Next();
+
+        ItemTrackingSummary.Filter.SetFilter("Lot No.", LotNo);
+        ItemTrackingSummary.First();
+        ItemTrackingSummary."Selected Quantity".SetValue(Quantity);
+        ItemTrackingSummary."Lot No.".AssertEquals(LotNo);
+        ItemTrackingSummary."Selected Quantity".AssertEquals(Quantity);
+        ItemTrackingSummary.OK().Invoke();
     end;
 
     local procedure UpdateShipmentBinOnWhseShipment(WarehouseShipmentHeader: Record "Warehouse Shipment Header"; BinCode: Code[20])
@@ -4781,4 +4943,3 @@ codeunit 137055 "SCM Warehouse Pick"
         Reply := true;
     end;
 }
-
