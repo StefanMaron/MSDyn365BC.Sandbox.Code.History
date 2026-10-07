@@ -39,6 +39,7 @@ codeunit 134776 "Document Attachment Tests"
         ConfirmOpeningNewOrderAfterQuoteToOrderQst: Label 'Do you want to open the new order?';
         AttachedDateInvalidErr: Label 'Attached date is invalid';
         AttachmentNotDeletedErr: Label 'Attachment is not deleted';
+        DisplayedAttachmentMustBelongToPostedServiceCreditMemoErr: Label 'Displayed attachment must belong to the posted service credit memo.';
         OpenInDetailNotEnabledErr: Label 'OpenInDetail button must be enabled in FactBox %1 of page %2', Comment = '%1=FactBox PageName, %2= PageName';
         ExpectedFieldNotVisibleErr: Label 'Expected field %1 is not visible in %2', Comment = '%1=FieldName, %2=PageName';
         ExpectedFieldNotEditableErr: Label 'Expected field %1 is not editable in %2', Comment = '%1=FieldName, %2=PageName';
@@ -56,6 +57,13 @@ codeunit 134776 "Document Attachment Tests"
         SecondAttachmentFileNameMismatchErr: Label 'Second file name not equal to saved attachment.';
         TwoAttachmentsExpectedErr: Label 'Two attachments were expected for this record.';
         ValueMustBeEqualErr: Label '%1 must be equal to %2 in the %3.', Comment = '%1 = Field Caption , %2 = Expected Value, %3 = Table Caption';
+        PurchaseCreditMemoFileNamePrefixLbl: Label 'purchasecreditmemo', Locked = true;
+        PurchaseInvoiceFileNamePrefixLbl: Label 'purchaseinvoice', Locked = true;
+        SalesCreditMemoFileNamePrefixLbl: Label 'salescreditmemo', Locked = true;
+        SalesInvoiceHeaderFileNameLbl: Label 'salesinvoiceheader', Locked = true;
+        SalesInvoiceLineFileNameLbl: Label 'salesinvoiceline', Locked = true;
+        ServiceCreditMemoFileNamePrefixLbl: Label 'servicecreditmemo', Locked = true;
+        ServiceInvoiceFileNamePrefixLbl: Label 'serviceinvoice', Locked = true;        
 
     [Test]
     [Scope('OnPrem')]
@@ -3066,6 +3074,7 @@ codeunit 134776 "Document Attachment Tests"
         DocumentAttachment: Record "Document Attachment";
         CustLedgerEntry: Record "Cust. Ledger Entry";
         RecordRef: RecordRef;
+        DisplayedFileName: Text[250];
         CustomerLedgerEntries: TestPage "Customer Ledger Entries";
         PostedServiceInvoice: TestPage "Posted Service Invoice";
     begin
@@ -3143,6 +3152,7 @@ codeunit 134776 "Document Attachment Tests"
         DocumentAttachment.Reset();
         DocumentAttachment.SetRange("Table ID", Database::"Service Invoice Header");
         DocumentAttachment.SetRange("No.", ServiceInvoiceHeader."No.");
+        DocumentAttachment.SetRange("File Type", DocumentAttachment."File Type"::PDF);
         DocumentAttachment.FindLast();
         Assert.IsSubstring(DocumentAttachment."File Name", ServiceInvoiceHeader."No.");
 
@@ -3163,9 +3173,13 @@ codeunit 134776 "Document Attachment Tests"
         // [WHEN] Action "Show Posted Document Attachment" is being choosen
         CustomerLedgerEntries.ShowDocumentAttachment.Invoke();
 
-        // [THEN] Page Document Attachment Details opened with the first attachment
-        DocumentAttachment.FindFirst();
-        Assert.AreEqual(DocumentAttachment."File Name", LibraryVariableStorage.DequeueText(), 'Invalid file name');
+        // [THEN] Page Document Attachment Details opened with an attachment belonging to the posted service invoice
+        DisplayedFileName := LibraryVariableStorage.DequeueText();
+        DocumentAttachment.Reset();
+        DocumentAttachment.SetRange("Table ID", Database::"Service Invoice Header");
+        DocumentAttachment.SetRange("No.", ServiceInvoiceHeader."No.");
+        DocumentAttachment.SetRange("File Name", DisplayedFileName);
+        Assert.IsTrue(DocumentAttachment.FindFirst(), 'Displayed attachment must belong to the posted service invoice.');
     end;
 
     [Test]
@@ -3180,6 +3194,7 @@ codeunit 134776 "Document Attachment Tests"
         DocumentAttachment: Record "Document Attachment";
         CustLedgerEntry: Record "Cust. Ledger Entry";
         RecordRef: RecordRef;
+        DisplayedFileName: Text[250];
         CustomerLedgerEntries: TestPage "Customer Ledger Entries";
         PostedServiceCreditMemo: TestPage "Posted Service Credit Memo";
     begin
@@ -3246,6 +3261,7 @@ codeunit 134776 "Document Attachment Tests"
         DocumentAttachment.Reset();
         DocumentAttachment.SetRange("Table ID", Database::"Service Cr.Memo Header");
         DocumentAttachment.SetRange("No.", ServiceCrMemoHeader."No.");
+        DocumentAttachment.SetRange("File Type", DocumentAttachment."File Type"::PDF);
         DocumentAttachment.FindLast();
         Assert.IsSubstring(DocumentAttachment."File Name", ServiceCrMemoHeader."No.");
 
@@ -3266,9 +3282,13 @@ codeunit 134776 "Document Attachment Tests"
         // [WHEN] Action "Show Posted Document Attachment" is being choosen
         CustomerLedgerEntries.ShowDocumentAttachment.Invoke();
 
-        // [THEN] Page Document Attachment Details opened with the first attachment
-        DocumentAttachment.FindFirst();
-        Assert.AreEqual(DocumentAttachment."File Name", LibraryVariableStorage.DequeueText(), 'Invalid file name');
+        // [THEN] Page Document Attachment Details opened with an attachment belonging to the posted service credit memo
+        DisplayedFileName := LibraryVariableStorage.DequeueText();
+        DocumentAttachment.Reset();
+        DocumentAttachment.SetRange("Table ID", Database::"Service Cr.Memo Header");
+        DocumentAttachment.SetRange("No.", ServiceCrMemoHeader."No.");
+        DocumentAttachment.SetRange("File Name", DisplayedFileName);
+        Assert.IsTrue(DocumentAttachment.FindFirst(), DisplayedAttachmentMustBelongToPostedServiceCreditMemoErr);
     end;
 
     [Test]
@@ -4524,6 +4544,181 @@ codeunit 134776 "Document Attachment Tests"
 
         // [THEN] Verify Sales Credit Memo lines have two document attachments (one per each line inserted from Sales Return Order).
         CheckDocAttachments(Database::"Sales Line", 2, CreditMemoNo, SalesHeaderReturnOrder."Document Type"::"Credit Memo".AsInteger(), 'SalesReturnLine');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure DocumentTypeIsInvoiceAfterPostingSalesInvoice()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        RecRef: RecordRef;
+        PostedInvoiceNo: Code[20];
+    begin
+        // [FEATURE] [Document Attachment] [AI Test]
+        // [SCENARIO] Document type is Invoice for attachments transferred to a posted sales invoice.
+        Initialize();
+
+        // [GIVEN] A sales invoice with attachments on the header and line.
+        LibrarySales.CreateCustomer(Customer);
+        LibraryInventory.CreateItem(Item);
+        CreateSalesDoc(SalesHeader, SalesLine, Customer, Item, SalesHeader."Document Type"::Invoice);
+        RecRef.GetTable(SalesHeader);
+        CreateDocAttach(RecRef, StrSubstNo(JpegFileNameTok, SalesInvoiceHeaderFileNameLbl), false, false);
+        RecRef.GetTable(SalesLine);
+        CreateDocAttach(RecRef, StrSubstNo(JpegFileNameTok, SalesInvoiceLineFileNameLbl), false, false);
+
+        // [WHEN] The sales invoice is posted.
+        PostedInvoiceNo := LibrarySales.PostSalesDocument(SalesHeader, true, true);
+
+        // [THEN] The posted invoice header and line attachments have document type Invoice.
+        CheckDocAttachments(
+            Database::"Sales Invoice Header", 1, PostedInvoiceNo, Enum::"Attachment Document Type"::Invoice.AsInteger(), SalesInvoiceHeaderFileNameLbl);
+        CheckDocAttachments(
+            Database::"Sales Invoice Line", 1, PostedInvoiceNo, Enum::"Attachment Document Type"::Invoice.AsInteger(), SalesInvoiceLineFileNameLbl);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure DocumentTypeIsCreditMemoAfterPostingSalesCreditMemo()
+    begin
+        // [FEATURE] [Document Attachment] [AI Test]
+        // [SCENARIO] Document type is Credit Memo for attachments transferred to a posted sales credit memo.
+        Initialize();
+
+        VerifyDocumentTypeAfterPostingSalesDocument(
+            Enum::"Sales Document Type"::"Credit Memo", Database::"Sales Cr.Memo Header", Database::"Sales Cr.Memo Line",
+            Enum::"Attachment Document Type"::"Credit Memo", SalesCreditMemoFileNamePrefixLbl);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure DocumentTypeIsInvoiceAfterPostingPurchaseInvoice()
+    begin
+        // [FEATURE] [Document Attachment] [AI Test]
+        // [SCENARIO] Document type is Invoice for attachments transferred to a posted purchase invoice.
+        Initialize();
+
+        VerifyDocumentTypeAfterPostingPurchaseDocument(
+            Enum::"Purchase Document Type"::Invoice, Database::"Purch. Inv. Header", Database::"Purch. Inv. Line",
+            Enum::"Attachment Document Type"::Invoice, PurchaseInvoiceFileNamePrefixLbl);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure DocumentTypeIsCreditMemoAfterPostingPurchaseCreditMemo()
+    begin
+        // [FEATURE] [Document Attachment] [AI Test]
+        // [SCENARIO] Document type is Credit Memo for attachments transferred to a posted purchase credit memo.
+        Initialize();
+
+        VerifyDocumentTypeAfterPostingPurchaseDocument(
+            Enum::"Purchase Document Type"::"Credit Memo", Database::"Purch. Cr. Memo Hdr.", Database::"Purch. Cr. Memo Line",
+            Enum::"Attachment Document Type"::"Credit Memo", PurchaseCreditMemoFileNamePrefixLbl);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure DocumentTypeIsInvoiceAfterPostingServiceInvoice()
+    begin
+        // [FEATURE] [Document Attachment] [AI Test]
+        // [SCENARIO] Document type is Invoice for attachments transferred to a posted service invoice.
+        Initialize();
+
+        VerifyDocumentTypeAfterPostingServiceDocument(
+            Enum::"Service Document Type"::Invoice, Database::"Service Invoice Header", Database::"Service Invoice Line",
+            Enum::"Attachment Document Type"::Invoice, ServiceInvoiceFileNamePrefixLbl);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure DocumentTypeIsCreditMemoAfterPostingServiceCreditMemo()
+    begin
+        // [FEATURE] [Document Attachment] [AI Test]
+        // [SCENARIO] Document type is Credit Memo for attachments transferred to a posted service credit memo.
+        Initialize();
+
+        VerifyDocumentTypeAfterPostingServiceDocument(
+            Enum::"Service Document Type"::"Credit Memo", Database::"Service Cr.Memo Header", Database::"Service Cr.Memo Line",
+            Enum::"Attachment Document Type"::"Credit Memo", ServiceCreditMemoFileNamePrefixLbl);
+    end;
+
+    local procedure VerifyDocumentTypeAfterPostingSalesDocument(DocumentType: Enum "Sales Document Type"; PostedHeaderTableId: Integer; PostedLineTableId: Integer; ExpectedDocumentType: Enum "Attachment Document Type"; FileNamePrefix: Text)
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        SalesHeader: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        RecordRef: RecordRef;
+        PostedDocumentNo: Code[20];
+    begin
+        LibrarySales.CreateCustomer(Customer);
+        LibraryInventory.CreateItem(Item);
+        CreateSalesDoc(SalesHeader, SalesLine, Customer, Item, DocumentType);
+        RecordRef.GetTable(SalesHeader);
+        CreateDocAttach(RecordRef, FileNamePrefix + 'header.jpeg', false, false);
+        RecordRef.GetTable(SalesLine);
+        CreateDocAttach(RecordRef, FileNamePrefix + 'line.jpeg', false, false);
+
+        PostedDocumentNo := LibrarySales.PostSalesDocument(SalesHeader, true, true);
+
+        CheckDocAttachments(PostedHeaderTableId, 1, PostedDocumentNo, ExpectedDocumentType.AsInteger(), FileNamePrefix + 'header');
+        CheckDocAttachments(PostedLineTableId, 1, PostedDocumentNo, ExpectedDocumentType.AsInteger(), FileNamePrefix + 'line');
+    end;
+
+    local procedure VerifyDocumentTypeAfterPostingPurchaseDocument(DocumentType: Enum "Purchase Document Type"; PostedHeaderTableId: Integer; PostedLineTableId: Integer; ExpectedDocumentType: Enum "Attachment Document Type"; FileNamePrefix: Text)
+    var
+        Item: Record Item;
+        PurchaseHeader: Record "Purchase Header";
+        PurchaseLine: Record "Purchase Line";
+        Vendor: Record Vendor;
+        RecordRef: RecordRef;
+        PostedDocumentNo: Code[20];
+    begin
+        LibraryPurchase.CreateVendor(Vendor);
+        LibraryInventory.CreateItem(Item);
+        CreatePurchDoc(PurchaseHeader, PurchaseLine, Vendor, Item, DocumentType);
+        RecordRef.GetTable(PurchaseHeader);
+        CreateDocAttach(RecordRef, FileNamePrefix + 'header.jpeg', false, false);
+        RecordRef.GetTable(PurchaseLine);
+        CreateDocAttach(RecordRef, FileNamePrefix + 'line.jpeg', false, false);
+
+        PostedDocumentNo := LibraryPurchase.PostPurchaseDocument(PurchaseHeader, true, true);
+
+        CheckDocAttachments(PostedHeaderTableId, 1, PostedDocumentNo, ExpectedDocumentType.AsInteger(), FileNamePrefix + 'header');
+        CheckDocAttachments(PostedLineTableId, 1, PostedDocumentNo, ExpectedDocumentType.AsInteger(), FileNamePrefix + 'line');
+    end;
+
+    local procedure VerifyDocumentTypeAfterPostingServiceDocument(DocumentType: Enum "Service Document Type"; PostedHeaderTableId: Integer; PostedLineTableId: Integer; ExpectedDocumentType: Enum "Attachment Document Type"; FileNamePrefix: Text)
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        ServiceHeader: Record "Service Header";
+        ServiceLine: Record "Service Line";
+        RecordRef: RecordRef;
+        PostedDocumentNo: Code[20];
+    begin
+        LibrarySales.CreateCustomer(Customer);
+        LibraryInventory.CreateItem(Item);
+        LibraryService.CreateServiceHeader(ServiceHeader, DocumentType, Customer."No.");
+        LibraryService.CreateServiceLineWithQuantity(ServiceLine, ServiceHeader, ServiceLine.Type::Item, Item."No.", 1);
+        ServiceLine.Validate("Unit Price", LibraryRandom.RandIntInRange(3, 5));
+        ServiceLine.Modify(true);
+        RecordRef.GetTable(ServiceHeader);
+        CreateDocAttach(RecordRef, FileNamePrefix + 'header.jpeg', false, false);
+        RecordRef.GetTable(ServiceLine);
+        CreateDocAttach(RecordRef, FileNamePrefix + 'line.jpeg', false, false);
+        PostedDocumentNo := ServiceHeader."No.";
+
+        LibraryService.PostServiceOrder(
+            ServiceHeader, DocumentType = DocumentType::Invoice, false, DocumentType = DocumentType::Invoice);
+        if ServiceHeader."Last Posting No." <> '' then
+            PostedDocumentNo := ServiceHeader."Last Posting No.";
+
+        CheckDocAttachments(PostedHeaderTableId, 1, PostedDocumentNo, ExpectedDocumentType.AsInteger(), FileNamePrefix + 'header');
+        CheckDocAttachments(PostedLineTableId, 1, PostedDocumentNo, ExpectedDocumentType.AsInteger(), FileNamePrefix + 'line');
     end;
 
     local procedure Initialize()
