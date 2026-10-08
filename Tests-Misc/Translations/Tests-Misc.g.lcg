@@ -6080,6 +6080,15 @@
       <Cmt Name="Dev"><![CDATA[%1 is the reason why the timeout was exceeded, or any additional data needed to debug a timeout issue.]D;]A;(LookupHint=Codeunit Test Job Queue - NamedType TimeoutErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 908742608 - NamedType 2102384052" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Something went wrong and the job has stopped. Likely causes are system updates or routine maintenance processes. The job will automatically run again. (Attempt %1)]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = the attempt number of the interrupted run]D;]A;(LookupHint=Codeunit Test Job Queue SNAP - NamedType JobSomethingWentWrongMsgErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 908742608 - NamedType 1805881043" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Earliest Start Date/Time should be delayed by about 1 sec. Current delay: %1 ms.]]></Val>
