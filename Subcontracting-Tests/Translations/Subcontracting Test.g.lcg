@@ -419,6 +419,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Subcontracting.Test)(LookupHint=Codeunit Subc. WIP Trans. Create Test - NamedType ProdOrderRoutingTransferWIPEnabledErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1806187075 - NamedType 1872788752" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The return page must include document %1.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Transfer Order No.]D;]A;(Namespace=Microsoft.Manufacturing.Subcontracting.Test)(LookupHint=Codeunit Subc. WIP Trans. Create Test - NamedType ReturnDocumentMissingErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";PageExtension 1579564117 - Action 3507500799 - Property 1295455071" ItemType=";PageExtension - Action" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Deletes the current attachment for automated testing.]]></Val>

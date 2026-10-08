@@ -2,7 +2,7 @@
   "id": "aa5fc5d3-ef4e-4b03-8512-9c584cdc1ceb",
   "name": "Quality Management-Tests",
   "publisher": "Microsoft",
-  "version": "30.0.55851.0",
+  "version": "30.0.55861.0",
   "brief": "Quality Management Tests",
   "description": "Quality Management Tests",
   "contextSensitiveHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2338953",
@@ -12,6 +12,12 @@
   "url": "https://go.microsoft.com/fwlink/?LinkId=724011",
   "logo": "ExtensionLogo.png",
   "dependencies": [
+    {
+      "id": "23de40a6-dfe8-4f80-80db-d70f83ce8caf",
+      "name": "Test Runner",
+      "publisher": "Microsoft",
+      "version": "30.0.0.0"
+    },
     {
       "id": "bc7b3891-f61b-4883-bbb3-384cdef88bec",
       "name": "Quality Management",
