@@ -221,6 +221,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit WFW Item Journal Batch - NamedType RejectActionMustNotBeVisibleLbl)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1981883818 - NamedType 3151151873" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The journal batch must be checked exactly once.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit WFW Item Journal Batch - NamedType RestrictionCheckCountMustBeOneLbl)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1981883818 - NamedType 211392733" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Send Approval Request Journal Batch action must be disabled]]></Val>
