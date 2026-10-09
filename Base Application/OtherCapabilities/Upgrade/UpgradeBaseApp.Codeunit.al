@@ -159,6 +159,7 @@ codeunit 104000 "Upgrade - BaseApp"
 
         ClearTemporaryTables();
         ClearVATAmountLineTable();
+        RerunClearVATAmountLineTable();
 
         UpdateGenJournalBatchReferencedIds();
         UpdateJobs();
@@ -288,6 +289,21 @@ codeunit 104000 "Upgrade - BaseApp"
         VATAmountLine.DeleteAll();
 
         UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetClearVATAmountLineTableUpgradeTag());
+    end;
+
+    local procedure RerunClearVATAmountLineTable()
+    var
+        VATAmountLine: Record "VAT Amount Line";
+        UpgradeTag: Codeunit "Upgrade Tag";
+        UpgradeTagDefinitions: Codeunit "Upgrade Tag Definitions";
+    begin
+        if UpgradeTag.HasUpgradeTag(UpgradeTagDefinitions.GetRerunClearVATAmountLineTableUpgradeTag()) then
+            exit;
+
+        VATAmountLine.Reset();
+        VATAmountLine.DeleteAll();
+
+        UpgradeTag.SetUpgradeTag(UpgradeTagDefinitions.GetRerunClearVATAmountLineTableUpgradeTag());
     end;
 
 #if not CLEANSCHEMA27
