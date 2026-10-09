@@ -90,7 +90,6 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetPowerBIDisplayedElementUpgradeTag());
         PerCompanyUpgradeTags.Add(GetClearTemporaryTablesUpgradeTag());
         PerCompanyUpgradeTags.Add(GetClearVATAmountLineTableUpgradeTag());
-        PerCompanyUpgradeTags.Add(GetRerunClearVATAmountLineTableUpgradeTag());
         PerCompanyUpgradeTags.Add(GetDimSetEntryGlobalDimNoUpgradeTag());
         PerCompanyUpgradeTags.Add(GetPriceSourceGroupUpgradeTag());
         PerCompanyUpgradeTags.Add(GetPriceSourceGroupFixedUpgradeTag());
@@ -723,11 +722,6 @@ codeunit 9998 "Upgrade Tag Definitions"
     internal procedure GetClearVATAmountLineTableUpgradeTag(): Code[250]
     begin
         exit('MS-396184-CleanVATAmountLineTable-20240819');
-    end;
-
-    internal procedure GetRerunClearVATAmountLineTableUpgradeTag(): Code[250]
-    begin
-        exit('MS-653283-CleanVATAmountLineTable-20261007');
     end;
 
     internal procedure GetBankExportImportSetupSEPACT09UpgradeTag(): Code[250]
