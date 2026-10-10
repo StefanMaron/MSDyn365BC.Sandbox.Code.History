@@ -293,6 +293,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.eServices.EDocument.Test)(LookupHint=Codeunit E-Doc. Purch. Order Exp. Test - NamedType IncorrectValueErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1879823713 - NamedType 1155780373" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[This purchase order was already sent electronically. The receiver may reject the resend as a duplicate. Do you want to continue?]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.eServices.EDocument.Test)(LookupHint=Codeunit E-Doc. Purch. Order Exp. Test - NamedType ResendOrderQst)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1879823713 - Method 149638651 - NamedType 383896469" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The actual message is: [%1]5D;, while the expected message is: [%2]5D;.]]></Val>
@@ -381,6 +390,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.eServices.EDocument.Test)(LookupHint=Codeunit E-Doc. Remit. Advice Test - NamedType VoidConfirmQst)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3293707430 - NamedType 2996603465" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Incorrect value found]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.eServices.EDocument.Test)(LookupHint=Codeunit E-Doc. Self-Billing Test - NamedType IncorrectValueErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2231557288 - NamedType 1196747514" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
