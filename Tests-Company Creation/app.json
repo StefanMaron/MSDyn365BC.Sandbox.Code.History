@@ -2,7 +2,7 @@
   "id": "1605dc67-decb-44ba-89b4-5a35fa400282",
   "name": "Tests-Company Creation",
   "publisher": "Microsoft",
-  "version": "30.0.56029.0",
+  "version": "30.0.56094.0",
   "platform": "30.0.0.0",
   "brief": "Tests-Company Creation (AU)",
   "description": "This extension provides tests for company creation and company initialization in Business Central.",
