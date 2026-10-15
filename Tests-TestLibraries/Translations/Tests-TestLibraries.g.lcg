@@ -4451,6 +4451,15 @@
       <Cmt Name="Dev"><![CDATA[%1 - Name of property]D;]A;(LookupHint=Codeunit Library - Graph Mgt - NamedType IncorrectValueErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3290703180 - NamedType 254582296" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The remote server returned an error: (%1) %2.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 - response code number, %2 - reason phrase]D;]A;(LookupHint=Codeunit Library - Graph Mgt - NamedType RemoteServerErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3290703180 - NamedType 2554079898" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Response code %1 (%2) differs from the expected %3.]]></Val>
