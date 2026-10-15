@@ -32,6 +32,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Image Analysis Management Test - NamedType KeyvaultValueTxt)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2368847012 - NamedType 468615819" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The media file is not supported. Only images of the following types are supported: JPEG, PNG, GIF, BMP.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Image Analysis Management Test - NamedType MediaWrongFormatErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2368847012 - NamedType 3012086078" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[There is a missing configuration value on our end. Try again later.]]></Val>
