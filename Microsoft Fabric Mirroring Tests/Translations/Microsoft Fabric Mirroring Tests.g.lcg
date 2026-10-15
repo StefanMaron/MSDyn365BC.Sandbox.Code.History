@@ -59,6 +59,24 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.FabricExport)(LookupHint=Codeunit Test FAB Platform - NamedType SyncAlreadyRunningMsg)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2862924864 - NamedType 2750597136" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Table %1 has no completed synchronization to reset. The next run will send a full snapshot.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = table id]D;]A;(Namespace=Microsoft.FabricExport)(LookupHint=Codeunit Test FAB Platform - NamedType TableNothingToResetMsg)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2862924864 - NamedType 56287350" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Table %1 was reset. The next synchronization run will send a full snapshot.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = table id]D;]A;(Namespace=Microsoft.FabricExport)(LookupHint=Codeunit Test FAB Platform - NamedType TableResetMsg)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2862924864 - NamedType 3074275590" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Connection to Microsoft Fabric succeeded.]]></Val>
@@ -66,6 +84,51 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.FabricExport)(LookupHint=Codeunit Test FAB Platform - NamedType TestConnectionSuccessMsg)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2862924864 - NamedType 2250551929" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Unexpected End Watermark for company %1, table %2.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = company name, %2 = table id]D;]A;(Namespace=Microsoft.FabricExport)(LookupHint=Codeunit Test FAB Platform - NamedType UnexpectedEndWatermarkErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2862924864 - Method 3536027106 - NamedType 1206646099" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[No table matching the requested characteristics was found in Table Metadata.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.FabricExport)(LookupHint=Codeunit Test FAB Platform - Method FindTableId - NamedType NoMatchingTableErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2862924864 - Method 2257871008 - NamedType 2557417877" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Expected field %1 of table %2 not to be selected for export.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Field ID, %2 = Table ID]D;]A;(Namespace=Microsoft.FabricExport)(LookupHint=Codeunit Test FAB Platform - Method VerifyFieldInsertRejected - NamedType FieldNotSelectedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2862924864 - Method 4280344815 - NamedType 2088872178" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Expected field %1 of table %2 to be selected for export.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Field ID, %2 = Table ID]D;]A;(Namespace=Microsoft.FabricExport)(LookupHint=Codeunit Test FAB Platform - Method VerifyFieldsExist - NamedType FieldSelectedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2862924864 - Method 1745287153 - NamedType 3730003017" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Expected table %1 not to be selected for export.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Table ID]D;]A;(Namespace=Microsoft.FabricExport)(LookupHint=Codeunit Test FAB Platform - Method VerifyTableRejected - NamedType TableNotSelectedErr)]]></Cmt>
     </Cmts>
   </Item>
 </LCX>
