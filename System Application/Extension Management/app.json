@@ -75,13 +75,13 @@
       "id": "66d56517-9469-4cdf-83a8-7122c54af08f",
       "name": "VS Code Integration",
       "publisher": "Microsoft",
-      "version": "28.4.0.0"
+      "version": "28.5.0.0"
     },
     {
       "id": "c56e3ef4-7ab0-4636-ae87-013a62f12213",
       "name": "User Permissions",
       "publisher": "Microsoft",
-      "version": "28.4.0.0"
+      "version": "28.5.0.0"
     }
   ],
   "internalsVisibleTo": [
