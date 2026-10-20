@@ -437,6 +437,33 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Costing Performance - NamedType NotLinearCCErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 219962826 - NamedType 2297207205" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Old receipt %1 must be revisited.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = item ledger entry number]D;]A;(LookupHint=Codeunit SCM Costing Performance - NamedType ReceiptNotRevisitedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 219962826 - NamedType 683588421" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Receipt processing must increase from 25 to 50 pending entries. Visits: %1, %2.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = receipt processing count for 25 entries, %2 = receipt processing count for 50 entries]D;]A;(LookupHint=Codeunit SCM Costing Performance - NamedType ReceiptProcessing25To50Err)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 219962826 - NamedType 3774497951" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Receipt processing must increase from 50 to 100 pending entries. Visits: %1, %2.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = receipt processing count for 50 entries, %2 = receipt processing count for 100 entries]D;]A;(LookupHint=Codeunit SCM Costing Performance - NamedType ReceiptProcessing50To100Err)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1407136536 - NamedType 3049020378" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[&Top level,&All levels]]></Val>
