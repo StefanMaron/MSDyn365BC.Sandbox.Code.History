@@ -2,22 +2,17 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Finance.FinancialReports;
+namespace Microsoft.Inventory.BOM.Tree;
 
-enum 25 "Show Empty Amount Type"
+enum 3687 "Low-Level Code Run Mode"
 {
     Extensible = true;
 
-    value(0; Blank)
+    value(0; Calculate)
     {
-        Caption = 'Blank';
     }
-    value(1; Zero)
+
+    value(1; "Write To Database")
     {
-        Caption = 'Zero';
-    }
-    value(2; Dash)
-    {
-        Caption = 'Dash';
     }
 }
