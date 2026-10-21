@@ -2,25 +2,24 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.HumanResources.Employee;
+namespace Microsoft.Inventory.Item.Catalog;
 
-table 5226 "Nationality"
+table 5720 Manufacturer
 {
+    Caption = 'Manufacturer';
+    LookupPageID = Manufacturers;
     DataClassification = CustomerContent;
-    Caption = 'Nationality';
-    LookupPageId = "Nationalities";
-    DrillDownPageId = "Nationalities";
 
     fields
     {
-        field(1; "Code"; Code[20])
+        field(10; "Code"; Code[10])
         {
             Caption = 'Code';
             NotBlank = true;
         }
-        field(2; Description; Text[100])
+        field(20; Name; Text[50])
         {
-            Caption = 'Description';
+            Caption = 'Name';
         }
     }
 
@@ -31,4 +30,12 @@ table 5226 "Nationality"
             Clustered = true;
         }
     }
+
+    fieldgroups
+    {
+        fieldgroup(DropDown; "Code", Name)
+        {
+        }
+    }
 }
+

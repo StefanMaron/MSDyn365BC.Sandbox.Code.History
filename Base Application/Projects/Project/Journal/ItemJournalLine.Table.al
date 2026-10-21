@@ -5287,4 +5287,9 @@ table 83 "Item Journal Line"
     local procedure OnCreateNewDimOnBeforeUpdateGlobalDimFromDimSetID(var ItemJournalLine: Record "Item Journal Line")
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnValidateQtyPhysInventoryOnBeforeCheckQuantity(var ItemJournalLine: Record "Item Journal Line"; xItemJournalLine: Record "Item Journal Line"; var SkipQuantityCheck: Boolean)
+    begin
+    end;
 }
