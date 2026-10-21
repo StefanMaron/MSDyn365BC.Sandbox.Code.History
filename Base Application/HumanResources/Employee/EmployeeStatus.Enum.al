@@ -4,21 +4,21 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.HumanResources.Employee;
 
-enum 5511 "Employee Working Type"
+enum 5200 "Employee Status"
 {
-    Caption = 'Employee Working Type';
     Extensible = true;
+    AssignmentCompatibility = true;
 
-    value(0; Week)
+    value(0; Active)
     {
-        Caption = 'Week';
+        Caption = 'Active';
     }
-    value(1; Month)
+    value(1; Inactive)
     {
-        Caption = 'Month';
+        Caption = 'Inactive';
     }
-    value(2; Year)
+    value(2; Terminated)
     {
-        Caption = 'Year';
+        Caption = 'Terminated';
     }
 }
