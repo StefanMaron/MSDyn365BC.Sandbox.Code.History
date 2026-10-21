@@ -3970,4 +3970,9 @@ table 5050 Contact
     local procedure OnBeforeCreateEmployeeLink(var Contact: Record Contact)
     begin
     end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeCreateCustomer(var Contact: Record Contact; var CustomerNo: Code[20]; var IsHandled: Boolean)
+    begin
+    end;
 }
