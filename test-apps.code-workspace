@@ -343,25 +343,16 @@
       "path": "./Withholding Tax Tests"
     },
     {
-      "path": "./Quality Management/src/Configuration/Template/Test"
-    },
-    {
       "path": "./Performance Toolkit Tests/src/Mock Tests"
     },
     {
-      "path": "./Subcontracting-Tests/Tests"
+      "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
     },
     {
-      "path": "./Base Application/System/DevTools/CALTest"
+      "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
     },
     {
       "path": "./System Application Test Library/Extension Management/testArtifacts"
-    },
-    {
-      "path": "./AI Test Toolkit/src/TestSuite"
-    },
-    {
-      "path": "./Test Runner/src/DataDrivenTest"
     },
     {
       "path": "./Sales Lines Suggestions Tests/AI Tests"
@@ -373,21 +364,30 @@
       "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
     },
     {
-      "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
+      "path": "./Subcontracting-Tests/Tests"
     },
     {
-      "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
+      "path": "./Base Application/System/DevTools/CALTest"
     },
     {
       "path": "./System Application/Email/src/Test Email"
+    },
+    {
+      "path": "./AI Test Toolkit/src/TestSuite"
+    },
+    {
+      "path": "./Quality Management/src/Configuration/Template/Test"
+    },
+    {
+      "path": "./Test Runner/src/DataDrivenTest"
     }
   ],
   "settings": {
-    "al.enableCodeAnalysis": false,
     "allint.enabled": false,
     "search.exclude": {
       "**.xlf": true
     },
+    "al.enableCodeAnalysis": false,
     "al.enableCodeActions": false
   }
 }
