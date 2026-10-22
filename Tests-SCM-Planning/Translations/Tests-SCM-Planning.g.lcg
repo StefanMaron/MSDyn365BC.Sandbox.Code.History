@@ -419,6 +419,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Planning - I - NamedType ValidationError)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3356532981 - NamedType 711415345" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[OnBeforeCheckBlockedItem must be raised for the handled blocked item as many times as for an item that is not blocked.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Planning - II - NamedType HandledCheckBlockedItemEventCountErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3356532981 - NamedType 2687287108" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Location Code must be equal to '%1'  in Requisition Line]]></Val>
@@ -426,6 +435,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Planning - II - NamedType LocationErrorText)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3356532981 - NamedType 1233514759" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[OnBeforeCheckBlockedItem must be raised exactly once for the blocked item.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Planning - II - NamedType OnBeforeCheckBlockedItemCountErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3356532981 - NamedType 1503709891" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -453,6 +471,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Planning - II - NamedType RequisitionLineMustNotExist)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3356532981 - NamedType 3966654832" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[OnBeforeCheckBlockedItem is raised an unexpected number of times for the handled blocked item.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Planning - II - NamedType UnexpectedCheckBlockedItemEventCountErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3356532981 - NamedType 4174999501" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -615,6 +642,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Order Planning - III - NamedType ValidationError)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2531980374 - NamedType 2169165704" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The field Prod. Planning Wksh. Template of table Manufacturing User Template contains a value (%1) that cannot be found in the related table (Req. Wksh. Template).]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = worksheet template name]D;]A;(LookupHint=Codeunit SCM Order Planning - III - NamedType WrongProdCopyDestErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 589420395 - NamedType 816136885" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
