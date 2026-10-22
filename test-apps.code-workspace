@@ -292,49 +292,10 @@
       "path": "./Withholding Tax Tests"
     },
     {
-      "path": "./Quality Management/src/Configuration/Template/Test"
-    },
-    {
-      "path": "./Shopify Connector Test/DisabledTests"
-    },
-    {
-      "path": "./Error Messages with Recommendations Tests/DisabledTests"
-    },
-    {
       "path": "./Performance Toolkit Tests/src/Mock Tests"
     },
     {
-      "path": "./Subcontracting-Tests/Tests"
-    },
-    {
-      "path": "./PowerBI Reports Tests/DisabledTests"
-    },
-    {
-      "path": "./Base Application/System/DevTools/CALTest"
-    },
-    {
-      "path": "./System Application Test Library/Extension Management/testArtifacts"
-    },
-    {
-      "path": "./AI Test Toolkit/src/TestSuite"
-    },
-    {
-      "path": "./Quality Management-Tests/DisabledTests"
-    },
-    {
-      "path": "./Test Runner/src/DataDrivenTest"
-    },
-    {
-      "path": "./Sales Lines Suggestions Tests/AI Tests"
-    },
-    {
-      "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
-    },
-    {
-      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
-    },
-    {
-      "path": "./Subscription Billing Tests/DisabledTests"
+      "path": "./Business Foundation Tests/DisabledTests"
     },
     {
       "path": "./E-Document Core Tests/DisabledTests"
@@ -346,21 +307,60 @@
       "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
     },
     {
-      "path": "./Business Foundation Tests/DisabledTests"
+      "path": "./PowerBI Reports Tests/DisabledTests"
+    },
+    {
+      "path": "./System Application Test Library/Extension Management/testArtifacts"
+    },
+    {
+      "path": "./Subscription Billing Tests/DisabledTests"
+    },
+    {
+      "path": "./Sales Lines Suggestions Tests/AI Tests"
+    },
+    {
+      "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
+    },
+    {
+      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
+    },
+    {
+      "path": "./Quality Management-Tests/DisabledTests"
+    },
+    {
+      "path": "./Subcontracting-Tests/Tests"
     },
     {
       "path": "./System Application Test/DisabledTests"
     },
     {
+      "path": "./Base Application/System/DevTools/CALTest"
+    },
+    {
+      "path": "./Shopify Connector Test/DisabledTests"
+    },
+    {
+      "path": "./Error Messages with Recommendations Tests/DisabledTests"
+    },
+    {
       "path": "./System Application/Email/src/Test Email"
+    },
+    {
+      "path": "./AI Test Toolkit/src/TestSuite"
+    },
+    {
+      "path": "./Quality Management/src/Configuration/Template/Test"
+    },
+    {
+      "path": "./Test Runner/src/DataDrivenTest"
     }
   ],
   "settings": {
-    "al.enableCodeAnalysis": false,
     "allint.enabled": false,
     "search.exclude": {
       "**.xlf": true
     },
+    "al.enableCodeAnalysis": false,
     "al.enableCodeActions": false
   }
 }
