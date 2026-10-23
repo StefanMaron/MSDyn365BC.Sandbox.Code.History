@@ -59,6 +59,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Subcontracting.Test)(LookupHint=Codeunit Subc. Comments Attachment Test - Method StandardTaskCommentsTransferToRoutingLineOnValidation - NamedType CurrentSetupDetail2Lbl)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1926568170 - NamedType 383896469" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Unexpected Message: %1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Message text]D;]A;(Namespace=Microsoft.Manufacturing.Subcontracting.Test)(LookupHint=Codeunit Subc. Get Receipt Lines - NamedType UnexpectedMessageErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3431657116 - NamedType 2009612427" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Serial number %1 from the first receipt must have its own value entry.]]></Val>
