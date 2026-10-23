@@ -80,11 +80,11 @@ table 4580 "Ext. SharePoint Account"
             AllowInCustomizations = Never;
             DataClassification = SystemMetadata;
         }
-        field(14; "REST Base Folder Path Format"; Enum "Ext. SharePoint Path Format")
+        field(13; "Use legacy REST API"; Boolean)
         {
-            Caption = 'REST Base Folder Path Format';
-            ToolTip = 'Specifies whether the base folder is copied from a URL or is already a decoded path. Use Decoded Path when a folder name contains a literal percent sequence such as %20.';
-            InitValue = URL;
+            Caption = 'Use legacy REST API';
+            DataClassification = SystemMetadata;
+            ToolTip = 'Specifies whether to use Microsoft Graph API or SharePoint REST API. Microsoft Graph API supports downloading files larger than 150 MB through chunked transfers. Note: Requires Microsoft Graph permissions (Sites.ReadWrite.All) configured in your app registration instead of SharePoint permissions.';
         }
     }
 
