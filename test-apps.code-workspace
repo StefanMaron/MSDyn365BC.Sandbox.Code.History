@@ -166,11 +166,11 @@
     }
   ],
   "settings": {
-    "al.enableCodeAnalysis": false,
     "search.exclude": {
       "**.xlf": true
     },
     "allint.enabled": false,
+    "al.enableCodeAnalysis": false,
     "al.enableCodeActions": false
   }
 }
