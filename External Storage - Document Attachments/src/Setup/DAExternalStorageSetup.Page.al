@@ -57,16 +57,7 @@ page 8750 "DA External Storage Setup"
             group(UploadAndDeletePolicy)
             {
                 Caption = 'Upload and Delete Policy';
-                field("Delete from External Storage"; Rec."Delete from External Storage")
-                {
-                    Enabled = false;
-                }
-                field(ExternalCleanupStatus; ExternalCleanupStatus)
-                {
-                    Caption = 'External Cleanup Status';
-                    Editable = false;
-                    ToolTip = 'Specifies why external cleanup is blocked regardless of the saved deletion policy.';
-                }
+                field("Delete from External Storage"; Rec."Delete from External Storage") { }
             }
         }
     }
@@ -130,12 +121,10 @@ page 8750 "DA External Storage Setup"
             Rec.Insert();
         end;
         CurrentEnvironmentHash := DAExternalStorageImpl.GetCurrentEnvironmentHash();
-        ExternalCleanupStatus := DAExternalStorageImpl.GetExternalDeletionBlockedMessage();
     end;
 
     var
         CurrentEnvironmentHash: Text[32];
-        ExternalCleanupStatus: Text;
 
     local procedure SelectRootFolder()
     var
