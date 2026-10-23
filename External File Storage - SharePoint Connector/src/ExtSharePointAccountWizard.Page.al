@@ -143,10 +143,6 @@ page 4581 "Ext. SharePoint Account Wizard"
                     IsNextEnabled := SharePointConnectorImpl.IsAccountValid(Rec);
                 end;
             }
-            field("REST Base Folder Path Format"; Rec."REST Base Folder Path Format")
-            {
-                Visible = Rec."Use legacy REST API";
-            }
         }
     }
 
