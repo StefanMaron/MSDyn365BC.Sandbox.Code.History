@@ -2,20 +2,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Projects.Resources.Analysis;
+namespace Microsoft.Manufacturing.MachineCenter;
 
 using Microsoft.Foundation.Enums;
-using Microsoft.Projects.Resources.Resource;
 
-page 225 "Resource Availability"
+page 99000889 "Machine Center Load"
 {
-    Caption = 'Resource Availability';
+    Caption = 'Machine Center Load';
     DeleteAllowed = false;
     InsertAllowed = false;
     LinksAllowed = false;
     PageType = ListPlus;
     SaveValues = true;
-    SourceTable = Resource;
+    SourceTable = "Machine Center";
 
     layout
     {
@@ -26,7 +25,7 @@ page 225 "Resource Availability"
                 Caption = 'Options';
                 field(PeriodType; PeriodType)
                 {
-                    ApplicationArea = Jobs;
+                    ApplicationArea = Manufacturing;
                     Caption = 'View by';
                     ToolTip = 'Specifies by which period amounts are displayed.';
 
@@ -48,7 +47,7 @@ page 225 "Resource Availability"
                 }
                 field(AmountType; AmountType)
                 {
-                    ApplicationArea = Jobs;
+                    ApplicationArea = Manufacturing;
                     Caption = 'View as';
                     ToolTip = 'Specifies how amounts are displayed. Net Change: The net change in the balance for the selected period. Balance at Date: The balance as of the last day in the selected period.';
 
@@ -61,9 +60,9 @@ page 225 "Resource Availability"
                     end;
                 }
             }
-            part(ResAvailLines; "Res. Availability Lines")
+            part(MachineCLoadLines; "Machine Center Load Lines")
             {
-                ApplicationArea = Jobs;
+                ApplicationArea = Manufacturing;
             }
         }
     }
@@ -77,13 +76,22 @@ page 225 "Resource Availability"
         UpdateSubForm();
     end;
 
+    trigger OnOpenPage()
     var
+        PeriodTypeOption: Option;
+    begin
+        PeriodTypeOption := PeriodType.AsInteger();
+        OnBeforeOpenPage(PeriodTypeOption, AmountType);
+        PeriodType := Enum::"Analysis Period Type".FromInteger(PeriodTypeOption);
+    end;
+
+    protected var
         PeriodType: Enum "Analysis Period Type";
         AmountType: Enum "Analysis Amount Type";
 
     local procedure UpdateSubForm()
     begin
-        CurrPage.ResAvailLines.PAGE.SetLines(Rec, PeriodType, AmountType);
+        CurrPage.MachineCLoadLines.PAGE.SetLines(Rec, PeriodType, AmountType);
     end;
 
     local procedure DayPeriodTypeOnPush()
@@ -164,6 +172,11 @@ page 225 "Resource Availability"
     local procedure BalanceatDateAmountTypeOnValid()
     begin
         BalanceatDateAmountTypeOnPush();
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOpenPage(var PeriodType: Option Day,Week,Month,Quarter,Year,Period; var AmountType: Enum "Analysis Amount Type")
+    begin
     end;
 }
 

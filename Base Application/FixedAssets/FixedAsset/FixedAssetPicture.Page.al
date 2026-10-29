@@ -2,20 +2,19 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.HumanResources.Employee;
+namespace Microsoft.FixedAssets.FixedAsset;
 
-using Microsoft.Integration.Entity;
 using System.Device;
 using System.IO;
 
-page 5202 "Employee Picture"
+page 5620 "Fixed Asset Picture"
 {
-    Caption = 'Employee Picture';
+    Caption = 'Fixed Asset Picture';
     DeleteAllowed = false;
     InsertAllowed = false;
     LinksAllowed = false;
     PageType = CardPart;
-    SourceTable = Employee;
+    SourceTable = "Fixed Asset";
 
     layout
     {
@@ -23,9 +22,9 @@ page 5202 "Employee Picture"
         {
             field(Image; Rec.Image)
             {
-                ApplicationArea = Basic, Suite;
+                ApplicationArea = FixedAssets;
                 ShowCaption = false;
-                ToolTip = 'Specifies the picture of the employee.';
+                ToolTip = 'Specifies the picture that has been inserted for the fixed asset.';
             }
         }
     }
@@ -61,8 +60,7 @@ page 5202 "Employee Picture"
                     ClientFileName: Text;
                 begin
                     Rec.TestField("No.");
-                    Rec.TestField("First Name");
-                    Rec.TestField("Last Name");
+                    Rec.TestField(Description);
 
                     if Rec.Image.HasValue() then
                         if not Confirm(OverrideImageQst) then
@@ -75,7 +73,6 @@ page 5202 "Employee Picture"
                     Clear(Rec.Image);
                     Rec.Image.ImportFile(FileName, ClientFileName);
                     Rec.Modify(true);
-                    OnActionImportPictureOnAfterModify(Rec);
 
                     if FileManagement.DeleteServerFile(FileName) then;
                 end;
@@ -90,17 +87,16 @@ page 5202 "Employee Picture"
 
                 trigger OnAction()
                 var
-                    DummyPictureEntity: Record "Picture Entity";
                     FileManagement: Codeunit "File Management";
                     ToFile: Text;
                     ExportPath: Text;
                 begin
                     Rec.TestField("No.");
-                    Rec.TestField("First Name");
-                    Rec.TestField("Last Name");
+                    Rec.TestField(Description);
 
-                    ToFile := DummyPictureEntity.GetDefaultMediaDescription(Rec);
+                    ToFile := StrSubstNo('%1 %2.jpg', Rec."No.", Rec.Description);
                     ExportPath := TemporaryPath + Rec."No." + Format(Rec.Image.MediaId);
+                    OnExportFileActionOnAfterExportPath(Rec, ToFile, ExportPath);
                     Rec.Image.ExportFile(ExportPath);
 
                     FileManagement.ExportImage(ExportPath, ToFile);
@@ -135,7 +131,7 @@ page 5202 "Employee Picture"
 
     trigger OnOpenPage()
     begin
-        CameraAvailable := Camera.IsAvailable();
+        CameraAvailable := Camera.IsAvailable()
     end;
 
     var
@@ -144,17 +140,16 @@ page 5202 "Employee Picture"
         OverrideImageQst: Label 'The existing picture will be replaced. Do you want to continue?';
         DeleteImageQst: Label 'Are you sure you want to delete the picture?';
         SelectPictureTxt: Label 'Select a picture to upload';
-        MimeTypeTok: Label 'image/jpeg', Locked = true;
         DeleteExportEnabled: Boolean;
+        MimeTypeTok: Label 'image/jpeg', Locked = true;
 
-    local procedure TakeNewPicture()
+    procedure TakeNewPicture()
     var
         PictureInstream: InStream;
         PictureDescription: Text;
     begin
         Rec.TestField("No.");
-        Rec.TestField("First Name");
-        Rec.TestField("Last Name");
+        Rec.TestField(Description);
 
         if Rec.Image.HasValue() then
             if not Confirm(OverrideImageQst) then
@@ -169,11 +164,11 @@ page 5202 "Employee Picture"
 
     local procedure SetEditableOnPictureActions()
     begin
-        DeleteExportEnabled := Rec.Image.HasValue();
+        DeleteExportEnabled := Rec.Image.HasValue;
     end;
 
     [IntegrationEvent(false, false)]
-    local procedure OnActionImportPictureOnAfterModify(var Employee: Record Employee)
+    local procedure OnExportFileActionOnAfterExportPath(FixedAsset: Record "Fixed Asset"; var ToFile: Text; var ExportPath: Text)
     begin
     end;
 }

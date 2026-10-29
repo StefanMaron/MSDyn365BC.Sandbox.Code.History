@@ -2,16 +2,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Intercompany.Setup;
+namespace Microsoft.Inventory.Intrastat;
 
-enum 436 "IC Purchase Document Type"
+enum 266 "Intrastat VAT No. On File"
 {
     Extensible = true;
     AssignmentCompatibility = true;
 
-    value(0; " ") { }
-    value(1; "Order") { Caption = 'Order'; }
-    value(2; "Invoice") { Caption = 'Invoice'; }
-    value(3; "Credit Memo") { Caption = 'Credit Memo'; }
-    value(5; "Return Order") { Caption = 'Return Order'; }
+    value(0; "VAT Reg. No.") { Caption = 'VAT Reg. No.'; }
+    value(1; "EU Country Code + VAT Reg. No") { Caption = 'EU Country Code + VAT Reg. No'; }
+    value(2; "VAT Reg. No. Without EU Country Code") { Caption = 'VAT Reg. No. Without EU Country Code'; }
 }
