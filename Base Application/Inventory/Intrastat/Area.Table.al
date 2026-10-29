@@ -2,27 +2,30 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Finance.VAT.Reporting;
+namespace Microsoft.Inventory.Intrastat;
 
-table 344 "VAT Reporting Code"
+table 284 "Area"
 {
-    Caption = 'VAT Reporting Code';
-    LookupPageID = "VAT Reporting Codes";
+    Caption = 'Area';
+    LookupPageID = Areas;
     DataClassification = CustomerContent;
 
     fields
     {
-        field(1; Code; Code[20])
+        field(1; "Code"; Code[10])
         {
+            Caption = 'Code';
+            NotBlank = true;
         }
-        field(2; Description; Text[250])
+        field(2; Text; Text[50])
         {
+            Caption = 'Text';
         }
     }
 
     keys
     {
-        key(Key1; Code)
+        key(Key1; "Code")
         {
             Clustered = true;
         }
@@ -30,7 +33,7 @@ table 344 "VAT Reporting Code"
 
     fieldgroups
     {
-        fieldgroup(DropDown; Code, Description)
+        fieldgroup(DropDown; "Code", Text)
         {
         }
     }

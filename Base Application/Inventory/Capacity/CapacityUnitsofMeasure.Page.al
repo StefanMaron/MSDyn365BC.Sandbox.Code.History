@@ -2,17 +2,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Finance.SalesTax;
+namespace Microsoft.Manufacturing.Capacity;
 
-page 469 "Tax Area List"
+page 99000802 "Capacity Units of Measure"
 {
-    ApplicationArea = SalesTax;
-    Caption = 'Tax Areas';
-    CardPageID = "Tax Area";
-    InsertAllowed = false;
+    ApplicationArea = Manufacturing;
+    Caption = 'Capacity Units of Measure';
     PageType = List;
-    SourceTable = "Tax Area";
-    UsageCategory = Lists;
+    SourceTable = "Capacity Unit of Measure";
+    UsageCategory = Administration;
 
     layout
     {
@@ -23,13 +21,18 @@ page 469 "Tax Area List"
                 ShowCaption = false;
                 field("Code"; Rec.Code)
                 {
-                    ApplicationArea = All;
-                    ToolTip = 'Specifies the code you want to assign to this tax area. You can enter up to 20 characters, both numbers and letters. It is a good idea to enter a code that is easy to remember.';
+                    ApplicationArea = Manufacturing;
+                    ToolTip = 'Specifies the unit code.';
+                }
+                field(Type; Rec.Type)
+                {
+                    ApplicationArea = Manufacturing;
+                    ToolTip = 'Specifies the type of unit of measure.';
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = SalesTax;
-                    ToolTip = 'Specifies a description of the tax area. If you use a number as the tax code, you might want to describe the tax area in this field.';
+                    ApplicationArea = Manufacturing;
+                    ToolTip = 'Specifies the description of the unit of measure.';
                 }
             }
         }

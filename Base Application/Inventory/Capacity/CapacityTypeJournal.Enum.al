@@ -2,14 +2,15 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Receivables;
+namespace Microsoft.Manufacturing.Capacity;
 
-enum 234 "Customer Apply-to Type"
+enum 5873 "Capacity Type Journal"
 {
     Extensible = true;
     AssignmentCompatibility = true;
 
-    value(0; " ") { }
-    value(1; "Applies-to Doc. No.") { }
-    value(2; "Applies-to ID") { }
+    value(0; "Work Center") { Caption = 'Work Center'; }
+    value(1; "Machine Center") { Caption = 'Machine Center'; }
+    value(2; " ") { Caption = ' '; }
+    value(3; "Resource") { Caption = 'Resource'; }
 }

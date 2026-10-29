@@ -4,13 +4,16 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.FixedAssets.Ledger;
 
-codeunit 5620 "FA Reg.-FALedger"
+using Microsoft.Finance.GeneralLedger.Ledger;
+
+codeunit 5619 "G/L Reg.-FALedger"
 {
-    TableNo = "FA Register";
+    TableNo = "G/L Register";
 
     trigger OnRun()
     begin
-        FALedgEntry.SetRange("Entry No.", Rec."From Entry No.", Rec."To Entry No.");
+        FALedgEntry.SetCurrentKey("G/L Entry No.");
+        FALedgEntry.SetRange("G/L Entry No.", Rec."From Entry No.", Rec."To Entry No.");
         PAGE.Run(PAGE::"FA Ledger Entries", FALedgEntry);
     end;
 
