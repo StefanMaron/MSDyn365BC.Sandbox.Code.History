@@ -304,6 +304,9 @@
       "path": "./Subscription Billing Tests/DisabledTests"
     },
     {
+      "path": "./Subcontracting-Tests/Tests"
+    },
+    {
       "path": "./System Application Test/DisabledTests"
     },
     {
