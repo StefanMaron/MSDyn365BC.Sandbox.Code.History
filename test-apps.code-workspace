@@ -354,6 +354,9 @@
       "path": "./Base Application/System/DevTools/CALTest"
     },
     {
+      "path": "./Subcontracting-Tests/Tests"
+    },
+    {
       "path": "./System Application Test/DisabledTests"
     },
     {
