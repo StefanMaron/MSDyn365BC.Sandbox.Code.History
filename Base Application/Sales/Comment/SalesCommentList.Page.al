@@ -1,17 +1,17 @@
-﻿// ------------------------------------------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Purchases.Comment;
+namespace Microsoft.Sales.Comment;
 
-page 68 "Purch. Comment List"
+page 69 "Sales Comment List"
 {
     Caption = 'Comment List';
     DataCaptionFields = "Document Type", "No.";
     Editable = false;
     LinksAllowed = false;
     PageType = List;
-    SourceTable = "Purch. Comment Line";
+    SourceTable = "Sales Comment Line";
 
     layout
     {
@@ -27,12 +27,10 @@ page 68 "Purch. Comment List"
                 field(Date; Rec.Date)
                 {
                     ApplicationArea = Comments;
-                    ToolTip = 'Specifies the date the comment was created.';
                 }
                 field(Comment; Rec.Comment)
                 {
                     ApplicationArea = Comments;
-                    ToolTip = 'Specifies the comment itself.';
                 }
             }
         }
