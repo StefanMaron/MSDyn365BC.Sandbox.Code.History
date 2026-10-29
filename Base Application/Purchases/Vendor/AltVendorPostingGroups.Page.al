@@ -2,14 +2,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.FixedAssets.Posting;
+namespace Microsoft.Purchases.Vendor;
 
-page 5635 "FA Posting Types"
+page 936 "Alt. Vendor Posting Groups"
 {
-    Caption = 'FA Posting Types';
-    Editable = false;
+    Caption = 'Alternative Vendor Posting Groups';
+    DataCaptionFields = "Alt. Vendor Posting Group";
     PageType = List;
-    SourceTable = "FA Posting Type";
+    SourceTable = "Alt. Vendor Posting Group";
 
     layout
     {
@@ -18,21 +18,21 @@ page 5635 "FA Posting Types"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("FA Posting Type Name"; Rec."FA Posting Type Name")
+                field("Alt. Vendor Posting Group"; Rec."Alt. Vendor Posting Group")
                 {
-                    ApplicationArea = FixedAssets;
-                    ToolTip = 'Specifies the name of the fixed asset posting type.';
+                    ApplicationArea = Basic, Suite;
+                    ToolTip = 'Specifies the vendor group for posting business transactions to general general ledger accounts.';
                 }
             }
         }
         area(factboxes)
         {
-            systempart(Control1900383207; Links)
+            systempart(Control2; Links)
             {
                 ApplicationArea = RecordLinks;
                 Visible = false;
             }
-            systempart(Control1905767507; Notes)
+            systempart(Control3; Notes)
             {
                 ApplicationArea = Notes;
                 Visible = false;
@@ -44,4 +44,3 @@ page 5635 "FA Posting Types"
     {
     }
 }
-

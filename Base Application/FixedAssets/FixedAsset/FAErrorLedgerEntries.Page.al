@@ -2,24 +2,21 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Manufacturing.Capacity;
+namespace Microsoft.FixedAssets.Ledger;
 
 using Microsoft.Finance.Dimension;
 using Microsoft.Foundation.Navigate;
-using Microsoft.Inventory.Ledger;
+using System.Security.User;
 
-page 5832 "Capacity Ledger Entries"
+page 5605 "FA Error Ledger Entries"
 {
-    ApplicationArea = Suite;
-    Caption = 'Capacity Ledger Entries';
+    Caption = 'FA Error Ledger Entries';
+    DataCaptionFields = "Canceled from FA No.", "Depreciation Book Code";
     Editable = false;
     PageType = List;
-    AboutTitle = 'About Capacity Ledger Entries';
-    AboutText = 'Track and analyze posted capacity usage for work centers and machine centers, including labor and machine time, quantities, output, scrap, run time, setup time, and costs, to monitor activities such as maintenance and non-production tasks.';
-    SourceTable = "Capacity Ledger Entry";
-    SourceTableView = sorting("Entry No.")
-                      order(descending);
-    UsageCategory = History;
+    SourceTable = "FA Ledger Entry";
+    AboutTitle = 'About FA Error Ledger Entry';
+    AboutText = 'Shows the entries that have been posted as a result of you using the cancel function to cancel an entry.';
 
     layout
     {
@@ -28,106 +25,45 @@ page 5832 "Capacity Ledger Entries"
             repeater(Control1)
             {
                 ShowCaption = false;
-                field("Posting Date"; Rec."Posting Date")
+                field("FA Posting Date"; Rec."FA Posting Date")
                 {
-                    ApplicationArea = Suite;
-                    ToolTip = 'Specifies the posting date of the entry.';
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the posting date of the related fixed asset transaction, such as a depreciation.';
                 }
-                field("Order Type"; Rec."Order Type")
+                field("Document Type"; Rec."Document Type")
                 {
-                    ApplicationArea = Assembly, Manufacturing;
-                    ToolTip = 'Specifies which type of order the entry was created in.';
-                }
-                field("Order No."; Rec."Order No.")
-                {
-                    ApplicationArea = Assembly, Manufacturing;
-                    ToolTip = 'Specifies the number of the order that created the entry.';
-                }
-                field("Order Line No."; Rec."Order Line No.")
-                {
-                    ApplicationArea = Manufacturing;
-                    ToolTip = 'Specifies the line number of the order that created the entry.';
-                    Visible = false;
-                }
-                field(Type; Rec.Type)
-                {
-                    ApplicationArea = Suite;
-                    ToolTip = 'Specifies the type of capacity entry.';
-                }
-                field("No."; Rec."No.")
-                {
-                    ApplicationArea = Suite;
-                    ToolTip = 'Specifies the number of the involved entry or record, according to the specified number series.';
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the entry document type.';
                 }
                 field("Document No."; Rec."Document No.")
                 {
-                    ApplicationArea = Suite;
-                    ToolTip = 'Specifies the document number of the entry.';
-                    Visible = false;
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the document number on the entry.';
                 }
-                field("Item No."; Rec."Item No.")
+                field("Canceled from FA No."; Rec."Canceled from FA No.")
                 {
-                    ApplicationArea = Suite;
-                    ToolTip = 'Specifies the item number.';
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the number of the fixed asset linked to the original entry, from which this fixed asset error ledger entry was created.';
                 }
-                field("Variant Code"; Rec."Variant Code")
+                field("Depreciation Book Code"; Rec."Depreciation Book Code")
                 {
-                    ApplicationArea = Planning;
-                    ToolTip = 'Specifies the variant of the item on the line.';
-                    Visible = false;
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the code for the depreciation book to which the line will be posted if you have selected Fixed Asset in the Type field for this line.';
+                }
+                field("FA Posting Category"; Rec."FA Posting Category")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the posting category assigned to the entry when it was posted.';
+                }
+                field("FA Posting Type"; Rec."FA Posting Type")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the posting type, if Account Type field contains Fixed Asset.';
                 }
                 field(Description; Rec.Description)
                 {
-                    ApplicationArea = Suite;
+                    ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies a description of the entry.';
-                }
-                field(Quantity; Rec.Quantity)
-                {
-                    ApplicationArea = Suite;
-                    ToolTip = 'Specifies the quantity of this entry, in base units of measure.';
-                }
-                field("Direct Cost"; Rec."Direct Cost")
-                {
-                    ApplicationArea = Suite;
-                    ToolTip = 'Specifies the direct cost in LCY of the quantity posting.';
-                }
-                field("Overhead Cost"; Rec."Overhead Cost")
-                {
-                    ApplicationArea = Suite;
-                    ToolTip = 'Specifies the overhead cost in LCY of the quantity posting.';
-                }
-                field("Direct Cost (ACY)"; Rec."Direct Cost (ACY)")
-                {
-                    ApplicationArea = Suite;
-                    ToolTip = 'Specifies the direct cost in the additional reporting currency.';
-                    Visible = false;
-                }
-                field("Overhead Cost (ACY)"; Rec."Overhead Cost (ACY)")
-                {
-                    ApplicationArea = Suite;
-                    ToolTip = 'Specifies the overhead cost in the additional reporting currency.';
-                    Visible = false;
-                }
-                field(Reversed; Rec.Reversed)
-                {
-                    ApplicationArea = Basic, Suite;
-                    Editable = false;
-                    ToolTip = 'Specifies if the entry has been part of a reverse transaction.';
-                    Visible = false;
-                }
-                field("Reversed by Entry No."; Rec."Reversed by Entry No.")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Editable = false;
-                    ToolTip = 'Specifies the number of the correcting entry that replaced the original entry in the reverse transaction.';
-                    Visible = false;
-                }
-                field("Reversed Entry No."; Rec."Reversed Entry No.")
-                {
-                    ApplicationArea = Basic, Suite;
-                    Editable = false;
-                    ToolTip = 'Specifies the number of the original entry that was undone by the reverse transaction.';
-                    Visible = false;
                 }
                 field("Global Dimension 1 Code"; Rec."Global Dimension 1 Code")
                 {
@@ -141,15 +77,89 @@ page 5832 "Capacity Ledger Entries"
                     ToolTip = 'Specifies the code for the global dimension that is linked to the record or entry for analysis purposes. Two global dimensions, typically for the company''s most important activities, are available on all cards, documents, reports, and lists.';
                     Visible = Dim2Visible;
                 }
-                field("Completely Invoiced"; Rec."Completely Invoiced")
+                field(Amount; Rec.Amount)
                 {
-                    ApplicationArea = Assembly, Manufacturing;
-                    ToolTip = 'Specifies if the entry has been fully invoiced or if more posted invoices are expected.';
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the entry amount in currency.';
+                }
+                field("Debit Amount"; Rec."Debit Amount")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the total of the ledger entries that represent debits.';
                     Visible = false;
+                }
+                field("Credit Amount"; Rec."Credit Amount")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the total of the ledger entries that represent credits.';
+                    Visible = false;
+                }
+                field("Reclassification Entry"; Rec."Reclassification Entry")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies whether the entry was made to reclassify a fixed asset, for example, to change the dimension the fixed asset is linked to.';
+                }
+                field("Index Entry"; Rec."Index Entry")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies this entry is an index entry.';
+                    Visible = false;
+                }
+                field("No. of Depreciation Days"; Rec."No. of Depreciation Days")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the number of depreciation days that were used for calculating depreciation for the fixed asset entry.';
+                }
+                field("Bal. Account Type"; Rec."Bal. Account Type")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the type of account that a balancing entry is posted to, such as BANK for a cash account.';
+                    Visible = false;
+                }
+                field("Bal. Account No."; Rec."Bal. Account No.")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the number of the general ledger, customer, vendor, or bank account that the balancing entry is posted to, such as a cash account for cash purchases.';
+                    Visible = false;
+                }
+                field("User ID"; Rec."User ID")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the ID of the user who posted the entry, to be used, for example, in the change log.';
+                    Visible = false;
+
+                    trigger OnDrillDown()
+                    var
+                        UserMgt: Codeunit "User Management";
+                    begin
+                        UserMgt.DisplayUserInformation(Rec."User ID");
+                    end;
+                }
+                field("Source Code"; Rec."Source Code")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the source code that specifies where the entry was created.';
+                    Visible = false;
+                }
+                field("Reason Code"; Rec."Reason Code")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the reason code, a supplementary source code that enables you to trace the entry.';
+                    Visible = false;
+                }
+                field("Posting Date"; Rec."Posting Date")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the entry''s posting date.';
+                }
+                field("G/L Entry No."; Rec."G/L Entry No.")
+                {
+                    ApplicationArea = FixedAssets;
+                    ToolTip = 'Specifies the G/L number for the entry that was created in the general ledger for this fixed asset transaction.';
                 }
                 field("Entry No."; Rec."Entry No.")
                 {
-                    ApplicationArea = Assembly, Manufacturing;
+                    ApplicationArea = FixedAssets;
                     ToolTip = 'Specifies the number of the entry, as assigned from the specified number series when the entry was created.';
                 }
                 field("Dimension Set ID"; Rec."Dimension Set ID")
@@ -199,12 +209,6 @@ page 5832 "Capacity Ledger Entries"
                     Editable = false;
                     ToolTip = 'Specifies the code for Shortcut Dimension 8, which is one of dimension codes that you set up in the General Ledger Setup window.';
                     Visible = Dim8Visible;
-                }
-                field("Cap. Unit of Measure Code"; Rec."Cap. Unit of Measure Code")
-                {
-                    ApplicationArea = Suite;
-                    ToolTip = 'Specifies the unit of measure code for the capacity usage.';
-                    Visible = false;
                 }
             }
         }
@@ -258,37 +262,21 @@ page 5832 "Capacity Ledger Entries"
                         Rec.SetFilter("Dimension Set ID", DimensionSetIDFilter.LookupFilter());
                     end;
                 }
-                action("&Value Entries")
-                {
-                    ApplicationArea = Manufacturing;
-                    Caption = '&Value Entries';
-                    Image = ValueLedger;
-                    RunObject = Page "Value Entries";
-                    RunPageLink = "Capacity Ledger Entry No." = field("Entry No.");
-                    RunPageView = sorting("Capacity Ledger Entry No.", "Entry Type");
-                    ShortCutKey = 'Ctrl+F7';
-                    ToolTip = 'View the history of posted amounts that affect the value of the item. Value entries are created for every transaction with the item.';
-                }
             }
         }
         area(processing)
         {
             action("&Navigate")
             {
-                ApplicationArea = Manufacturing;
+                ApplicationArea = FixedAssets;
                 Caption = 'Find entries...';
                 Image = Navigate;
                 ShortCutKey = 'Ctrl+Alt+Q';
                 ToolTip = 'Find entries and documents that exist for the document number and posting date on the selected document. (Formerly this action was named Navigate.)';
 
                 trigger OnAction()
-                var
-                    Navigate: Page Navigate;
                 begin
-                    if Rec."Order Type" = Rec."Order Type"::Production then
-                        Navigate.SetDoc(Rec."Posting Date", Rec."Order No.")
-                    else
-                        Navigate.SetDoc(Rec."Posting Date", '');
+                    Navigate.SetDoc(Rec."Posting Date", Rec."Document No.");
                     Navigate.Run();
                 end;
             }
@@ -312,9 +300,6 @@ page 5832 "Capacity Ledger Entries"
                     actionref(SetDimensionFilter_Promoted; SetDimensionFilter)
                     {
                     }
-                    actionref("&Value Entries_Promoted"; "&Value Entries")
-                    {
-                    }
                 }
             }
         }
@@ -326,6 +311,7 @@ page 5832 "Capacity Ledger Entries"
     end;
 
     var
+        Navigate: Page Navigate;
         DimensionSetIDFilter: Page "Dimension Set ID Filter";
 
     protected var
@@ -345,3 +331,4 @@ page 5832 "Capacity Ledger Entries"
         DimensionManagement.UseShortcutDims(Dim1Visible, Dim2Visible, Dim3Visible, Dim4Visible, Dim5Visible, Dim6Visible, Dim7Visible, Dim8Visible);
     end;
 }
+
