@@ -2,35 +2,34 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Sales.Customer;
+namespace Microsoft.Inventory.Intrastat;
 
-table 266 "Customer Amount"
+table 260 "Tariff Number"
 {
-    Caption = 'Customer Amount';
+    Caption = 'Tariff Number';
+    LookupPageID = "Tariff Numbers";
     DataClassification = CustomerContent;
 
     fields
     {
-        field(1; "Customer No."; Code[20])
+        field(1; "No."; Code[20])
         {
-            Caption = 'Customer No.';
-            TableRelation = Customer;
+            Caption = 'No.';
+            NotBlank = true;
         }
-        field(2; "Amount (LCY)"; Decimal)
+        field(2; Description; Text[100])
         {
-            AutoFormatType = 1;
-            Caption = 'Amount (LCY)';
+            Caption = 'Description';
         }
-        field(3; "Amount 2 (LCY)"; Decimal)
+        field(3; "Supplementary Units"; Boolean)
         {
-            AutoFormatType = 1;
-            Caption = 'Amount 2 (LCY)';
+            Caption = 'Supplementary Units';
         }
     }
 
     keys
     {
-        key(Key1; "Amount (LCY)", "Amount 2 (LCY)", "Customer No.")
+        key(Key1; "No.")
         {
             Clustered = true;
         }
@@ -38,6 +37,9 @@ table 266 "Customer Amount"
 
     fieldgroups
     {
+        fieldgroup(DropDown; "No.", Description)
+        {
+        }
     }
 }
 

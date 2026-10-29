@@ -2,13 +2,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Finance.GeneralLedger.Account;
+namespace Microsoft.FixedAssets.Ledger;
 
-enum 20 "G/L Account Report Type"
+enum 5631 "FA Ledger Posting Category"
 {
-    AssignmentCompatibility = true;
     Extensible = true;
+    AssignmentCompatibility = true;
 
-    value(0; "Income Statement") { Caption = 'Income Statement'; }
-    value(1; "Balance Sheet") { Caption = 'Balance Sheet'; }
+    value(0; " ") { Caption = ' '; }
+    value(1; "Disposal") { Caption = 'Disposal'; }
+    value(2; "Bal. Disposal") { Caption = 'Bal. Disposal'; }
 }

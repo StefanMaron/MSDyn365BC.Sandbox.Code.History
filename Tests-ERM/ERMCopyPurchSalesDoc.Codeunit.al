@@ -6950,6 +6950,53 @@ codeunit 134332 "ERM Copy Purch/Sales Doc"
         Assert.RecordIsNotEmpty(SalesInvoiceHeader);
     end;
 
+    [Test]
+    [HandlerFunctions('ReceiveAndInvoiceSalesReturnOrderStrMenuHandler')]
+    procedure VerifyQtyToShipNotClearedAfterPostingSalesReturnOrder()
+    var
+        Customer: Record Customer;
+        Item: Record Item;
+        Item2: Record Item;
+        SalesHeader: Record "Sales Header";
+        SalesHeader2: Record "Sales Header";
+        SalesLine: Record "Sales Line";
+        PostedDocumentNo: Code[20];
+        SalesReturnOrder: TestPage "Sales Return Order";
+    begin
+        // [SCENARIO 616052] After posting a sales return order if the sales order remains live the system does not remove the posted quantity reference.
+        Initialize();
+
+        // [GIVEN] Create Customer and two Items.
+        LibrarySales.CreateCustomer(Customer);
+        LibraryInventory.CreateItem(Item);
+        LibraryInventory.CreateItem(Item2);
+
+        // [GIVEN] Create and Post Sales Order with two lines , Post only first line.
+        LibrarySales.CreateSalesHeader(SalesHeader, SalesHeader."Document Type"::Order, Customer."No.");
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item."No.", LibraryRandom.RandIntInRange(1, 10));
+        LibrarySales.CreateSalesLine(SalesLine, SalesHeader, SalesLine.Type::Item, Item2."No.", LibraryRandom.RandIntInRange(1, 10));
+        SalesLine.Validate("Qty. to Ship", 0);
+        SalesLine.Validate("Qty. to Invoice", 0);
+        SalesLine.Modify(true);
+        PostedDocumentNo := LibrarySales.PostSalesDocument(SalesHeader, true, true);
+
+        // [GIVEN] Create Return Order by copying Posted Sales Invoice.
+        LibrarySales.CreateSalesHeader(SalesHeader2, SalesHeader2."Document Type"::"Return Order", Customer."No.");
+        SalesCopyDocument(SalesHeader2, PostedDocumentNo, "Sales Document Type From"::"Posted Invoice");
+        SalesHeader2.Modify(true);
+
+        // [GIVEN] Modify Sales Return Order line to link to Item Ledger Entry of first Item only and post.
+        ModifySalesReturnOrderLine(Item."No.", SalesHeader2);
+
+        // [WHEN] Receive and Invoice Sales Return Order.
+        SalesReturnOrder.OpenView();
+        SalesReturnOrder.GotoRecord(SalesHeader2);
+        SalesReturnOrder.Post.Invoke();
+
+        // [THEN] Verify Sales Line "Qty. to Ship" is not zero after posting Sales Return Order.
+        VerifySalesLineQtyToShip(SalesHeader);
+    end;
+
     local procedure Initialize()
     var
         PriceListLine: Record "Price List Line";

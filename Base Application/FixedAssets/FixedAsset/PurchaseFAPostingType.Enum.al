@@ -2,25 +2,26 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
-namespace Microsoft.Purchases.Pricing;
+namespace Microsoft.FixedAssets.Posting;
 
-enum 7007 "Purchase Price Source Type"
+enum 5607 "Purchase FA Posting Type"
 {
     Extensible = true;
-    value(20; "All Vendors")
+    AssignmentCompatibility = true;
+
+    value(0; " ")
     {
-        Caption = 'All Vendors';
     }
-    value(21; Vendor)
+    value(1; "Acquisition Cost")
     {
-        Caption = 'Vendor';
+        Caption = 'Acquisition Cost';
     }
-    value(50; Campaign)
+    value(2; Maintenance)
     {
-        Caption = 'Campaign';
+        Caption = 'Maintenance';
     }
-    value(51; Contact)
+    value(4; Appreciation)
     {
-        Caption = 'Contact';
+        Caption = 'Appreciation';
     }
 }
