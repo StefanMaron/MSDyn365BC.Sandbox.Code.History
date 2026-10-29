@@ -1,29 +1,10 @@
 {
-  "id": "dfe6916f-cba8-4973-afdc-1544705c661f",
-  "name": "SAF-T Tests",
+  "id": "790cf8ce-f921-42a8-8c34-a0af2ddf6265",
+  "name": "Tests-General Journal",
   "publisher": "Microsoft",
   "version": "$(app_currentVersion)",
-  "brief": "Tests for the SAF-T extension.",
-  "description": "Tests for the SAF-T extension.",
-  "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
-  "EULA": "https://go.microsoft.com/fwlink/?linkid=2009120",
-  "help": "https://learn.microsoft.com/en-us/dynamics365/business-central/localfunctionality/denmark/how-to-use-saft-audit-files-export",
-  "contextSensitiveHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2204541",
-  "url": "https://go.microsoft.com/fwlink/?LinkId=724011",
-  "logo": "ExtensionLogo.png",
+  "platform": "$(app_platformVersion)",
   "dependencies": [
-    {
-      "id": "a41b0c3e-bf1c-4c97-ad1b-b430a3933ada",
-      "name": "Audit File Export",
-      "publisher": "Microsoft",
-      "version": "$(app_minimumVersion)"
-    },
-    {
-      "id": "4ce93371-6bd6-4027-a78f-021064ad250e",
-      "name": "SAF-T",
-      "publisher": "Microsoft",
-      "version": "$(app_minimumVersion)"
-    },
     {
       "id": "5d86850b-0d76-4eca-bd7b-951ad998e997",
       "name": "Tests-TestLibraries",
@@ -41,25 +22,32 @@
       "publisher": "Microsoft",
       "name": "Library Variable Storage",
       "version": "$(app_minimumVersion)"
-    }
-  ],
-  "screenshots": [],
-  "platform": "$(app_platformVersion)",
-  "application": "$(app_minimumVersion)",
-  "idRanges": [
-    {
-      "from": 139511,
-      "to": 139520
     },
     {
-      "from": 139537,
-      "to": 139537
+      "id": "e7320ebb-08b3-4406-b1ec-b4927d3e280b",
+      "publisher": "Microsoft",
+      "name": "Any",
+      "version": "$(app_minimumVersion)"
+    },
+    {
+      "id": "dd0be2ea-f733-4d65-bb34-a28f4624fb14",
+      "name": "Library Assert",
+      "publisher": "Microsoft",
+      "version": "$(app_minimumVersion)"
+    },
+    {
+      "id": "bee8cf2f-494a-42f4-aabd-650e87934d39",
+      "name": "Business Foundation Test Libraries",
+      "publisher": "Microsoft",
+      "version": "$(app_minimumVersion)"
     }
   ],
+  "target": "OnPrem",
   "resourceExposurePolicy": {
     "allowDebugging": true,
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "target": "Cloud"
+  "application": "$(app_minimumVersion)",
+  "brief": "Tests-General Journal (W1)"
 }
