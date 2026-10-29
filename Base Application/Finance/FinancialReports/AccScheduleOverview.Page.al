@@ -2406,12 +2406,18 @@ page 490 "Acc. Schedule Overview"
     /// <returns>Formatted string value for the specified column</returns>
     procedure FormatStr(ColumnNo: Integer): Text
     var
-        AddCurrency: Boolean;
-        Result: Text;
         IsHandled: Boolean;
+    begin
+        exit(GetColumnFormatString(ColumnNo, IsHandled));
+    end;
+
+    local procedure GetColumnFormatString(ColumnNo: Integer; var IsHandled: Boolean) Result: Text
+    var
+        AddCurrency: Boolean;
     begin
         GLSetup.Get();
         AddCurrency := TempFinancialReport.UseAmountsInAddCurrency and (GLSetup."Additional Reporting Currency" <> '');
+        IsHandled := false;
         OnAfterFormatStr(ColumnLayoutArr, UseAmtsInAddCurr, ColumnNo, TempFinancialReport.GetEffectiveNegativeAmountFormat(), Result, IsHandled);
         if IsHandled then
             exit(Result);
