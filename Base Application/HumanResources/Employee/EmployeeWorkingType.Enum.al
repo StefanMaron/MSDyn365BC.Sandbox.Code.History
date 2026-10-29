@@ -4,21 +4,21 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.HumanResources.Employee;
 
-enum 5512 "Employee Engagement Type"
+enum 5511 "Employee Working Type"
 {
-    Caption = 'Employee Engagement Type';
+    Caption = 'Employee Working Type';
     Extensible = true;
 
-    value(0; "Full time")
+    value(0; Week)
     {
-        Caption = 'Full time';
+        Caption = 'Week';
     }
-    value(1; "Part Time")
+    value(1; Month)
     {
-        Caption = 'Part Time';
+        Caption = 'Month';
     }
-    value(2; "Temporary")
+    value(2; Year)
     {
-        Caption = 'Temporary';
+        Caption = 'Year';
     }
 }
