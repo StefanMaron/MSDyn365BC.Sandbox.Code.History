@@ -23,11 +23,6 @@ codeunit 132933 "Azure OpenAI Test Library"
         exit(AOAIChatMessages.AssembleTools());
     end;
 
-    procedure CheckAOAIChatMessagesCompatibilityWithModel(var AOAIChatMessages: Codeunit "AOAI Chat Messages"; Deployment: SecretText)
-    begin
-        AOAIChatMessages.CheckCompatibilityWithModel(Deployment);
-    end;
-
     procedure GetAOAIChatCompletionParametersPayload(AOAIChatCompletionParams: Codeunit "AOAI Chat Completion Params"; var Payload: JsonObject)
     begin
         AOAIChatCompletionParams.AddChatCompletionsParametersToPayload(Payload);
