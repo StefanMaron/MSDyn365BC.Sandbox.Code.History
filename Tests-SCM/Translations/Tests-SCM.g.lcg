@@ -1415,7 +1415,7 @@
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[Field name (Cost Amount (Expected) or Cost Amount (Actual)): Cost Amount (Expected) after adjustment is incorrect]D;]A;(LookupHint=Codeunit SCM Costing Bugs II - NamedType WrongCostAmountErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1: Field name (Cost Amount (Expected) or Cost Amount (Actual)): Cost Amount (Expected) after adjustment is incorrect]D;]A;(LookupHint=Codeunit SCM Costing Bugs II - NamedType WrongCostAmountErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1960309591 - NamedType 1112293165" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
