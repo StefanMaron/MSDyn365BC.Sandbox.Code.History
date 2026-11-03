@@ -1,12 +1,4 @@
 {
-  "settings": {
-    "al.enableCodeAnalysis": false,
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "allint.enabled": false,
-    "al.enableCodeActions": false
-  },
   "folders": [
     {
       "path": "./_Exclude_APIV1_ Tests"
@@ -398,5 +390,13 @@
     {
       "path": "./Subcontracting-Tests/src/Codeunits/Tests"
     }
-  ]
+  ],
+  "settings": {
+    "al.enableCodeActions": false,
+    "al.enableCodeAnalysis": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "allint.enabled": false
+  }
 }
