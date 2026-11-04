@@ -788,6 +788,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Fixed Assets Insurance - NamedType RoundingFactorOption)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1562764938 - NamedType 235639233" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[You cannot change the %1 for fixed asset %2 because acquisition cost has already been posted in depreciation book %3. To move the fixed asset to another posting group, use the FA reclassification journal, or turn on the %4 toggle for the depreciation book.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = FA Posting Group field caption, %2 = fixed asset number, %3 = depreciation book code, %4 = Allow Changes in Depr. Fields field caption]D;]A;(LookupHint=Codeunit ERM Fixed Assets Journal - NamedType CannotChangeFAPostingGroupAfterAcquisitionErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1562764938 - NamedType 2420549545" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The depreciation has been calculated.\\1 fixed asset G/L journal lines were created.\\Do you want to open the Fixed Asset G/L Journal window?]]></Val>

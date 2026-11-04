@@ -1004,6 +1004,24 @@
       <Cmt Name="Dev"><![CDATA[%1 = posting group, %2 = alt. posting group]D;]A;(LookupHint=Codeunit ERM Multiple Posting Groups - NamedType AltPostingGroupNotFilledInErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2480070618 - NamedType 4052440499" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[G/L entry additional currency amount %1 for posting group %2 is not correct]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = G/L entry additional currency amount, %2 = posting-group account number]D;]A;(LookupHint=Codeunit ERM Multiple Posting Groups - NamedType GLEntryAddCurrAmountErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2480070618 - NamedType 1997925594" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[G/L entry amount %1 for posting group %2 is not correct]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = G/L entry amount, %2 = posting-group account number]D;]A;(LookupHint=Codeunit ERM Multiple Posting Groups - NamedType GLEntryAmountErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2480070618 - NamedType 462034013" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Posting Group is not editable in General Journal page]]></Val>
