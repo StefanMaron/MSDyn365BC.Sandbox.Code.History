@@ -65,11 +65,10 @@ page 1600 "Outlook Mail Engine"
         [RunOnClient]
         OfficeHost: DotNet OfficeHost;
     begin
-        if not OfficeMgt.IsAvailable() then
-            if OfficeHost.IsAvailable() then begin
-                OfficeHost := OfficeHost.Create();
-                OfficeMgt.InitializeHost(OfficeHost, OfficeHost.HostType);
-            end;
+        if OfficeHost.IsAvailable() then begin
+            OfficeHost := OfficeHost.Create();
+            OfficeMgt.InitializeHost(OfficeHost, OfficeHost.HostType);
+        end;
 
         GetDetailsFromFilters();
         SendTelemetryOnAddinStarted();
