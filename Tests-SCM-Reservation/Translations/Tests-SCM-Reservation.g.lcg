@@ -2129,6 +2129,15 @@
       <Cmt Name="Dev"><![CDATA[%1= Field Value, %2 =Table Caption.]D;]A;(LookupHint=Codeunit SCM Transfer Reservation - NamedType ReservationFromStockErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 550613498 - NamedType 2435384902" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Reserved item %1 is not on inventory.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Item No.]D;]A;(LookupHint=Codeunit SCM Transfer Reservation - NamedType ReservedItemNotOnInventoryErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 550613498 - NamedType 711799781" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Reserved Qty. Outbnd. (Base) is expected to be non-zero before deletion.]]></Val>
