@@ -5,6 +5,7 @@
 namespace Microsoft.eServices.EDocument.Processing.AI;
 
 using System.AI;
+using System.Azure.KeyVault;
 using System.Environment;
 using System.Telemetry;
 using System.Environment.Configuration;
@@ -27,6 +28,10 @@ codeunit 6195 "E-Doc. AI Tool Processor"
         FeatureTelemetry: Codeunit "Feature Telemetry";
         AISystem: Interface IEDocAISystem;
         TelemetryDimensions: Dictionary of [Text, Text];
+        ModelSwitchSecretNameTok: Label 'EDocAIModelSwitch', Locked = true;
+        GPT56CeresTok: Label 'GPT56Ceres', Locked = true;
+        GPT56CeresLatestLbl: Label 'gpt-56-ceres-latest', Locked = true;
+        GPT56CeresPreviewLbl: Label 'gpt-56-ceres-preview', Locked = true;
 
 
     /// <summary>
@@ -38,6 +43,8 @@ codeunit 6195 "E-Doc. AI Tool Processor"
     procedure Setup(EDocAISystem: Interface IEDocAISystem): Boolean
     var
         CopilotCapability: Codeunit "Copilot Capability";
+        DeploymentName: Text;
+        UseCase: Option "Matching Assistance","PDF Extraction";
     begin
         Clear(TelemetryDimensions);
 
@@ -48,8 +55,9 @@ codeunit 6195 "E-Doc. AI Tool Processor"
         if not CopilotCapability.IsCapabilityActive(Enum::"Copilot Capability"::"E-Document Matching Assistance") then
             exit(false);
 
-        // Setup Azure OpenAI
-        AzureOpenAI.SetAuthorization(Enum::"AOAI Model Type"::"Chat Completions", GetDefaultModel());
+        // Use the same resolved deployment for authorization and telemetry.
+        DeploymentName := GetChatCompletionsDeployment(UseCase::"Matching Assistance");
+        AzureOpenAI.SetAuthorization(Enum::"AOAI Model Type"::"Chat Completions", DeploymentName);
         AzureOpenAI.SetCopilotCapability(Enum::"Copilot Capability"::"E-Document Matching Assistance");
 
         // Setup parameters
@@ -61,7 +69,7 @@ codeunit 6195 "E-Doc. AI Tool Processor"
         SetupChatMessages();
 
         // Setup telemetry
-        TelemetryDimensions.Add('Model', GetDefaultModel());
+        TelemetryDimensions.Add('Model', DeploymentName);
         TelemetryDimensions.Add('MaxTokens', Format(GetDefaultMaxOutputTokens()));
         TelemetryDimensions.Add('Temperature', Format(GetDefaultTemperature()));
 
@@ -241,11 +249,32 @@ codeunit 6195 "E-Doc. AI Tool Processor"
         exit(0);
     end;
 
-    local procedure GetDefaultModel(): Text
+    internal procedure GetChatCompletionsDeployment(UseCase: Option "Matching Assistance","PDF Extraction"): Text
     var
         AOAIDeployments: Codeunit "AOAI Deployments";
+        AzureKeyVault: Codeunit "Azure Key Vault";
+        ModelSwitchValue: Text;
+        UseGPT56: Boolean;
     begin
-        exit(AOAIDeployments.GetGPT41Latest());
+        // Missing, blank or unrecognized switch values keep the previous deployment for each use case.
+        if not AzureKeyVault.GetAzureKeyVaultSecret(ModelSwitchSecretNameTok, ModelSwitchValue) then
+            ModelSwitchValue := '';
+        UseGPT56 := UpperCase(ModelSwitchValue.Trim()) = UpperCase(GPT56CeresTok);
+
+        case UseCase of
+            UseCase::"Matching Assistance":
+                if UseGPT56 then
+                    exit(GPT56CeresLatestLbl)
+                else
+                    exit(AOAIDeployments.GetGPT41Latest());
+            UseCase::"PDF Extraction":
+                if UseGPT56 then
+                    exit(GPT56CeresPreviewLbl)
+                else
+                    exit(AOAIDeployments.GetGPT41MiniPreview());
+            else
+                exit(AOAIDeployments.GetGPT41Latest());
+        end;
     end;
 
     procedure GetEDocumentMatchingAssistanceName(): Text
