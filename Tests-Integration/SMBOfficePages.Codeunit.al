@@ -26,6 +26,7 @@ codeunit 139048 "SMB Office Pages"
         BusRelCodeForCustomers: Code[10];
         IsInitialized: Boolean;
         AttachAvailableErr: Label 'Unexpected result of AttachAvailable for %1 Office Host Type.', Comment = '%1 = Office host type';
+        AttachAvailableDetailsTxt: Label 'Requested host type: %1. Host type reported by the Office host: %2. Office Host Codeunit ID: %3.', Locked = true;
         MustSelectAndEmailBodyOrAttahmentErr: Label 'You must select an email body or attachment in report selection for', Comment = '%1 = Usage, for example Sales Invoice';
 
     [Test]
@@ -1360,12 +1361,101 @@ codeunit 139048 "SMB Office Pages"
         VerifyAttachAvailable('N/A', false);
     end;
 
+    [Test]
+    [Scope('OnPrem')]
+    procedure OfficeMgmtAttachAvailabilityUnexpectedlyAvailable()
+    begin
+        // [SCENARIO] Attachment availability assertion includes host diagnostics when attachments are unexpectedly available.
+        // [WHEN] An available attachment host is verified with an unavailable expectation.
+        asserterror VerifyAttachAvailable(OfficeHostType.OutlookItemRead, false);
+
+        // [THEN] The assertion reports the requested host, reported host, and configured provider.
+        Assert.ExpectedError(StrSubstNo(AttachAvailableErr, OfficeHostType.OutlookItemRead));
+        Assert.ExpectedError(
+            StrSubstNo(AttachAvailableDetailsTxt, OfficeHostType.OutlookItemRead, OfficeHostType.OutlookItemRead, Codeunit::"Library - Office Host Provider"));
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure OfficeMgmtAttachAvailabilityUnexpectedlyUnavailable()
+    begin
+        // [SCENARIO] Attachment availability assertion includes host diagnostics when attachments are unexpectedly unavailable.
+        // [WHEN] A mobile host is verified with an available expectation.
+        asserterror VerifyAttachAvailable(OfficeHostType.OutlookMobileApp, true);
+
+        // [THEN] The assertion reports the mobile host and configured provider.
+        Assert.ExpectedError(StrSubstNo(AttachAvailableErr, OfficeHostType.OutlookMobileApp));
+        Assert.ExpectedError(
+            StrSubstNo(AttachAvailableDetailsTxt, OfficeHostType.OutlookMobileApp, OfficeHostType.OutlookMobileApp, Codeunit::"Library - Office Host Provider"));
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure OfficeHostDiagnosticsReportsActualHostType()
+    var
+        Diagnostics: Text;
+    begin
+        // [SCENARIO] Host diagnostics distinguish the requested host from the host reported by the provider.
+        // [GIVEN] The provider reports a read host.
+        InitializeWithHostType(OfficeHostType.OutlookItemRead);
+
+        // [WHEN] Diagnostics are requested for a mobile host.
+        Diagnostics := GetOfficeHostDiagnostics(OfficeHostType.OutlookMobileApp);
+
+        // [THEN] Both host types and the configured provider are reported.
+        Assert.AreEqual(
+            StrSubstNo(AttachAvailableDetailsTxt, OfficeHostType.OutlookMobileApp, OfficeHostType.OutlookItemRead, Codeunit::"Library - Office Host Provider"),
+            Diagnostics, 'Host diagnostics must report the actual host type independently of the requested host type.');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure OfficeHostDiagnosticsWhenHostUnavailable()
+    var
+        Diagnostics: Text;
+    begin
+        // [SCENARIO] Host diagnostics remain available when the configured provider has no initialized host.
+        // [GIVEN] An Office host provider is configured but its host is unavailable.
+        Initialize();
+        SetOfficeHostUnAvailable();
+
+        // [WHEN] Host diagnostics are requested.
+        Diagnostics := GetOfficeHostDiagnostics(OfficeHostType.OutlookItemRead);
+
+        // [THEN] Diagnostics report the unavailable host and retain the configured provider ID.
+        Assert.AreEqual(
+            StrSubstNo(AttachAvailableDetailsTxt, OfficeHostType.OutlookItemRead, 'host not available', Codeunit::"Library - Office Host Provider"),
+            Diagnostics, 'Host diagnostics must report an unavailable host without querying its host type.');
+    end;
+
     local procedure VerifyAttachAvailable(HostType: Text; Expected: Boolean)
     var
         OfficeManagement: Codeunit "Office Management";
+        Actual: Boolean;
     begin
         InitializeWithHostType(HostType);
-        Assert.AreEqual(Expected, OfficeManagement.AttachAvailable(), StrSubstNo(AttachAvailableErr, HostType));
+        Actual := OfficeManagement.AttachAvailable();
+        if Actual <> Expected then
+            Assert.AreEqual(Expected, Actual, StrSubstNo(AttachAvailableErr, HostType) + ' ' + GetOfficeHostDiagnostics(HostType));
+    end;
+
+    local procedure GetOfficeHostDiagnostics(RequestedHostType: Text): Text
+    var
+        OfficeAddinSetup: Record "Office Add-in Setup";
+        OfficeManagement: Codeunit "Office Management";
+        OfficeHostManagement: Codeunit "Office Host Management";
+        ReportedHostType: Text;
+        ProviderId: Integer;
+    begin
+        if OfficeAddinSetup.Get() then
+            ProviderId := OfficeAddinSetup."Office Host Codeunit ID";
+
+        if OfficeManagement.IsAvailable() then
+            ReportedHostType := OfficeHostManagement.GetHostType()
+        else
+            ReportedHostType := 'host not available';
+
+        exit(StrSubstNo(AttachAvailableDetailsTxt, RequestedHostType, ReportedHostType, ProviderId));
     end;
 
     [Test]
