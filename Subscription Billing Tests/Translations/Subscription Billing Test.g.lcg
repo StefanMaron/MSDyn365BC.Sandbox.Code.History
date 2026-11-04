@@ -248,6 +248,24 @@
       <Cmt Name="Dev"><![CDATA[%1 = Subscription Header No., %2 = Subscription Line Entry No., %3 = Filtered Count, %4 = Total Count]D;]A;(Namespace=Microsoft.SubscriptionBilling)(LookupHint=Codeunit Recurring Billing Test - Method CheckServiceCommitmentConsistencyWhenCreatingDocuments - NamedType ConsistencyErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 540279428 - NamedType 98619564" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA["Cancellation Possible Until" Date is not calculated correctly.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.SubscriptionBilling)(LookupHint=Codeunit Service Commitment Test - NamedType CancellationPossibleUntilNotCalculatedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 540279428 - NamedType 1564194448" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA["Term Until" Date is not calculated correctly.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.SubscriptionBilling)(LookupHint=Codeunit Service Commitment Test - NamedType TermUntilNotCalculatedErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 540279428 - Method 4244044965 - NamedType 2283387991" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The Subscription Line cannot be deleted because it is linked to a contract line which is not yet marked as "Closed".]]></Val>

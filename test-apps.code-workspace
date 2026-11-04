@@ -40,6 +40,9 @@
       "path": "./Bank Account Reconciliation With AI Tests"
     },
     {
+      "path": "./Business Central Mirroring to Fabric Tests"
+    },
+    {
       "path": "./Business Foundation Test Libraries"
     },
     {
@@ -133,9 +136,6 @@
       "path": "./Manufacturing Tests"
     },
     {
-      "path": "./Microsoft Fabric Mirroring Tests"
-    },
-    {
       "path": "./OnPrem Permissions Tests"
     },
     {
@@ -167,6 +167,9 @@
     },
     {
       "path": "./Recommended Apps Tests"
+    },
+    {
+      "path": "./Report Filename Manager Tests"
     },
     {
       "path": "./SAF-T Tests"
