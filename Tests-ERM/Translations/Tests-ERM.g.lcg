@@ -3380,6 +3380,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Price Lists UI - NamedType MixedSourceLinesNotShownErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1304875132 - NamedType 3603133018" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Expected the Prices Overview caption to contain "%1", but it was "%2".]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Name or Description of the filtered source, %2 = Page caption]D;]A;(LookupHint=Codeunit Price Lists UI - NamedType PricesOverviewCaptionErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1304875132 - NamedType 3250133227" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[%1 must have a value]]></Val>
