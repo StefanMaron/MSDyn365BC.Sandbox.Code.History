@@ -91,7 +91,7 @@
         GeneralLedgerSetup: Record "General Ledger Setup";
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         QtyType: Option General,Invoicing,Shipping;
     begin
         // Create a Purchase Invoice, Calculates applicable VAT for a VAT Posting Group and verify it with VAT Amount Line.
@@ -606,7 +606,7 @@
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
         PurchaseHeader: Record "Purchase Header";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         PurchaseLine: Record "Purchase Line";
         QtyType: Option General,Invoicing,Shipping;
         InvDiscountAmount: Decimal;
@@ -638,7 +638,7 @@
         PurchaseLine: Record "Purchase Line";
         PurchInvHeader: Record "Purch. Inv. Header";
         PurchInvLine: Record "Purch. Inv. Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         GeneralLedgerSetup: Record "General Ledger Setup";
         InvDiscountAmount: Decimal;
         DocumentNo: Code[20];
