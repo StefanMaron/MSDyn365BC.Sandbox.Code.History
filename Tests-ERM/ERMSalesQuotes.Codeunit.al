@@ -78,7 +78,7 @@ codeunit 134379 "ERM Sales Quotes"
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         SalesReceivablesSetup: Record "Sales & Receivables Setup";
         OldDefaultPostingDate: Enum "Default Posting Date";
         OldStockoutWarning: Boolean;
