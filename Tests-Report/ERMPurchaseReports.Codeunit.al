@@ -40,7 +40,7 @@ codeunit 134983 "ERM Purchase Reports"
     var
         PurchaseHeader: Record "Purchase Header";
         TempPurchaseLine: Record "Purchase Line" temporary;
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         QtyType: Option General,Invoicing,Shipping;
     begin
         // Check Report showing correct value with different VAT.
@@ -208,7 +208,7 @@ codeunit 134983 "ERM Purchase Reports"
     var
         PurchaseHeader: Record "Purchase Header";
         TempPurchaseLine: Record "Purchase Line" temporary;
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         QtyType: Option General,Invoicing,Shipping;
     begin
         // Check Report showing correct value with different VAT.
@@ -336,7 +336,7 @@ codeunit 134983 "ERM Purchase Reports"
     var
         PurchaseHeader: Record "Purchase Header";
         TempPurchaseLine: Record "Purchase Line" temporary;
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         QtyType: Option General,Invoicing,Shipping;
     begin
         // [SCENARIO]Check Report showing correct value with different VAT.
@@ -472,7 +472,7 @@ codeunit 134983 "ERM Purchase Reports"
         TempPurchaseLine: Record "Purchase Line" temporary;
         PurchInvHeader: Record "Purch. Inv. Header";
         PurchInvLine: Record "Purch. Inv. Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
     begin
         // Check Report showing correct value with different VAT.
 
@@ -581,7 +581,7 @@ codeunit 134983 "ERM Purchase Reports"
         PurchaseHeader: Record "Purchase Header";
         PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.";
         PurchCrMemoLine: Record "Purch. Cr. Memo Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
     begin
         // Check Report showing correct value for VAT Entry.
 
