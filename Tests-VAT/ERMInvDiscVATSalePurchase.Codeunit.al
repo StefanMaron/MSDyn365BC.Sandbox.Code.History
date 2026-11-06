@@ -148,7 +148,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
     [Scope('OnPrem')]
     procedure SalesOrderVATAfterInvDisc()
     var
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         SalesCalcDiscount: Codeunit "Sales-Calc. Discount";
@@ -178,7 +178,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
     [Scope('OnPrem')]
     procedure SalesOrderVATAfterInvDiscZero()
     var
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         SalesCalcDiscount: Codeunit "Sales-Calc. Discount";
@@ -210,7 +210,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
     [Scope('OnPrem')]
     procedure PurchOrderVATAfterInvDisc()
     var
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
         PurchCalcDiscount: Codeunit "Purch.-Calc.Discount";
@@ -240,7 +240,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
     [Scope('OnPrem')]
     procedure PurchOrderVATAfterInvDiscZero()
     var
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
         PurchCalcDiscount: Codeunit "Purch.-Calc.Discount";
@@ -300,7 +300,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
     [Scope('OnPrem')]
     procedure SalesCMWithInvDiscAndVAT()
     var
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         SalesCalcDiscount: Codeunit "Sales-Calc. Discount";
@@ -341,7 +341,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
     [Scope('OnPrem')]
     procedure PurchOrderWithInvDiscAndVAT()
     var
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
         PurchCalcDiscount: Codeunit "Purch.-Calc.Discount";
@@ -384,7 +384,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
     [Scope('OnPrem')]
     procedure PurchCMWithCustomInvDisc()
     var
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
         QtyType: Option General,Invoicing,Shipping;
@@ -440,7 +440,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
     [Scope('OnPrem')]
     procedure PurchInvDiscErrForGreaterValue()
     var
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
         PurchCalcDiscount: Codeunit "Purch.-Calc.Discount";
@@ -468,7 +468,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
     [Scope('OnPrem')]
     procedure EqualInvDiscInvBasePurchOrder()
     var
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
         PurchCalcDiscount: Codeunit "Purch.-Calc.Discount";
@@ -495,7 +495,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
     [Scope('OnPrem')]
     procedure PurchInvDiscErrForZeroValue()
     var
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
         QtyType: Option General,Invoicing,Shipping;
@@ -578,7 +578,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
     [Scope('OnPrem')]
     procedure SalesOrderWithZeroVAT()
     var
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         Customer: Record Customer;
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
@@ -620,7 +620,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
     [Scope('OnPrem')]
     procedure PurchOrderWithZeroVAT()
     var
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         Vendor: Record Vendor;
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
@@ -664,7 +664,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         VATPostingSetup: Record "VAT Posting Setup";
         VATPostingSetup2: Record "VAT Posting Setup";
         InvoiceDiscountAmount: Decimal;
@@ -686,7 +686,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
         SalesLine.CalcVATAmountLines(QtyType::General, SalesHeader, SalesLine, VATAmountLine);
 
         // Verify VAT Identifier field on Sales Order Statistics (VAT Amount Line Table) and Tear Down VAT Setup.
-        VerifyStatisticsAndVATTearDown(VATPostingSetup, VATPostingSetup2, InvoiceDiscountAmount, InvoiceDiscountAmount2, VATIdentifier);
+        VerifyStatisticsAndVATTearDown(VATPostingSetup, VATPostingSetup2, InvoiceDiscountAmount, InvoiceDiscountAmount2, VATIdentifier, VATAmountLine);
     end;
 
     [Test]
@@ -697,7 +697,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
         SalesLine: Record "Sales Line";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesInvoiceLine: Record "Sales Invoice Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         VATPostingSetup: Record "VAT Posting Setup";
         VATPostingSetup2: Record "VAT Posting Setup";
         InvoiceDiscountAmount: Decimal;
@@ -721,7 +721,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
         SalesInvoiceLine.CalcVATAmountLines(SalesInvoiceHeader, VATAmountLine);
 
         // Verify VAT Identifier field on Posted Sales Invoice Statistics (VAT Amount Line Table) and Tear Down VAT Setup.
-        VerifyStatisticsAndVATTearDown(VATPostingSetup, VATPostingSetup2, InvoiceDiscountAmount, InvoiceDiscountAmount2, VATIdentifier);
+        VerifyStatisticsAndVATTearDown(VATPostingSetup, VATPostingSetup2, InvoiceDiscountAmount, InvoiceDiscountAmount2, VATIdentifier, VATAmountLine);
     end;
 
     [Test]
@@ -730,7 +730,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         VATPostingSetup: Record "VAT Posting Setup";
         VATPostingSetup2: Record "VAT Posting Setup";
         InvoiceDiscountAmount: Decimal;
@@ -752,7 +752,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
         SalesLine.CalcVATAmountLines(QtyType::General, SalesHeader, SalesLine, VATAmountLine);
 
         // Verify VAT Identifier field on Sales Credit Memo Statistics (VAT Amount Line Table) and Tear Down VAT Setup.
-        VerifyStatisticsAndVATTearDown(VATPostingSetup, VATPostingSetup2, InvoiceDiscountAmount, InvoiceDiscountAmount2, VATIdentifier);
+        VerifyStatisticsAndVATTearDown(VATPostingSetup, VATPostingSetup2, InvoiceDiscountAmount, InvoiceDiscountAmount2, VATIdentifier, VATAmountLine);
     end;
 
     [Test]
@@ -763,7 +763,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
         SalesLine: Record "Sales Line";
         SalesCrMemoHeader: Record "Sales Cr.Memo Header";
         SalesCrMemoLine: Record "Sales Cr.Memo Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         VATPostingSetup: Record "VAT Posting Setup";
         VATPostingSetup2: Record "VAT Posting Setup";
         InvoiceDiscountAmount: Decimal;
@@ -787,7 +787,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
         SalesCrMemoLine.CalcVATAmountLines(SalesCrMemoHeader, VATAmountLine);
 
         // Verify: Verify VAT Identifier field on Posted Sales Credit Memo Statistics (VAT Amount Line Table) and Tear Down VAT Setup.
-        VerifyStatisticsAndVATTearDown(VATPostingSetup, VATPostingSetup2, InvoiceDiscountAmount, InvoiceDiscountAmount2, VATIdentifier);
+        VerifyStatisticsAndVATTearDown(VATPostingSetup, VATPostingSetup2, InvoiceDiscountAmount, InvoiceDiscountAmount2, VATIdentifier, VATAmountLine);
     end;
 
     [Test]
@@ -796,7 +796,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
     var
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         VATPostingSetup: Record "VAT Posting Setup";
         VATPostingSetup2: Record "VAT Posting Setup";
         InvoiceDiscountAmount: Decimal;
@@ -818,7 +818,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
         PurchaseLine.CalcVATAmountLines(QtyType::General, PurchaseHeader, PurchaseLine, VATAmountLine);
 
         // Verify VAT Identifier field on Purchase Order Statistics (VAT Amount Line Table) and Tear Down VAT Setup.
-        VerifyStatisticsAndVATTearDown(VATPostingSetup, VATPostingSetup2, InvoiceDiscountAmount, InvoiceDiscountAmount2, VATIdentifier);
+        VerifyStatisticsAndVATTearDown(VATPostingSetup, VATPostingSetup2, InvoiceDiscountAmount, InvoiceDiscountAmount2, VATIdentifier, VATAmountLine);
     end;
 
     [Test]
@@ -829,7 +829,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
         PurchaseLine: Record "Purchase Line";
         PurchInvHeader: Record "Purch. Inv. Header";
         PurchInvLine: Record "Purch. Inv. Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         VATPostingSetup: Record "VAT Posting Setup";
         VATPostingSetup2: Record "VAT Posting Setup";
         InvoiceDiscountAmount: Decimal;
@@ -853,7 +853,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
         PurchInvLine.CalcVATAmountLines(PurchInvHeader, VATAmountLine);
 
         // Verify VAT Identifier field on Posted Purchase Invoice Statistics (VAT Amount Line Table) and Tear Down VAT Setup.
-        VerifyStatisticsAndVATTearDown(VATPostingSetup, VATPostingSetup2, InvoiceDiscountAmount, InvoiceDiscountAmount2, VATIdentifier);
+        VerifyStatisticsAndVATTearDown(VATPostingSetup, VATPostingSetup2, InvoiceDiscountAmount, InvoiceDiscountAmount2, VATIdentifier, VATAmountLine);
     end;
 
     [Test]
@@ -862,7 +862,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
     var
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         VATPostingSetup: Record "VAT Posting Setup";
         VATPostingSetup2: Record "VAT Posting Setup";
         InvoiceDiscountAmount: Decimal;
@@ -884,7 +884,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
         PurchaseLine.CalcVATAmountLines(QtyType::General, PurchaseHeader, PurchaseLine, VATAmountLine);
 
         // Verify VAT Identifier field on Purchase Credit Memo Statistics (VAT Amount Line Table) and Tear Down VAT Setup.
-        VerifyStatisticsAndVATTearDown(VATPostingSetup, VATPostingSetup2, InvoiceDiscountAmount, InvoiceDiscountAmount2, VATIdentifier);
+        VerifyStatisticsAndVATTearDown(VATPostingSetup, VATPostingSetup2, InvoiceDiscountAmount, InvoiceDiscountAmount2, VATIdentifier, VATAmountLine);
     end;
 
     [Test]
@@ -895,7 +895,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
         PurchaseLine: Record "Purchase Line";
         PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.";
         PurchCrMemoLine: Record "Purch. Cr. Memo Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         VATPostingSetup: Record "VAT Posting Setup";
         VATPostingSetup2: Record "VAT Posting Setup";
         InvoiceDiscountAmount: Decimal;
@@ -919,7 +919,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
         PurchCrMemoLine.CalcVATAmountLines(PurchCrMemoHdr, VATAmountLine);
 
         // Verify: Verify VAT Identifier field on Posted Purchase Credit Memo Statistics (VAT Amount Line Table) and Tear Down VAT Setup.
-        VerifyStatisticsAndVATTearDown(VATPostingSetup, VATPostingSetup2, InvoiceDiscountAmount, InvoiceDiscountAmount2, VATIdentifier);
+        VerifyStatisticsAndVATTearDown(VATPostingSetup, VATPostingSetup2, InvoiceDiscountAmount, InvoiceDiscountAmount2, VATIdentifier, VATAmountLine);
     end;
 
     [Test]
@@ -950,7 +950,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         QtyType: Option General,Invoicing,Shipping;
         VATAmount: Decimal;
         VATAmount2: Decimal;
@@ -970,8 +970,8 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
         SalesLine.CalcVATAmountLines(QtyType::General, SalesHeader, SalesLine, VATAmountLine);
 
         // Verify: Verify VAT Amount field on Sales Order/Credit Memo Statistics (VAT Amount Line Table).
-        VerifyVATOnStatistics(VATPct, VATAmount);
-        VerifyVATOnStatistics(SalesLine."VAT %", VATAmount2);
+        VerifyVATOnStatistics(VATPct, VATAmount, VATAmountLine);
+        VerifyVATOnStatistics(SalesLine."VAT %", VATAmount2, VATAmountLine);
     end;
 
     [Test]
@@ -1071,7 +1071,7 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
     var
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         QtyType: Option General,Invoicing,Shipping;
         VATAmount: Decimal;
         VATAmount2: Decimal;
@@ -1092,8 +1092,8 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
         PurchaseLine.CalcVATAmountLines(QtyType::General, PurchaseHeader, PurchaseLine, VATAmountLine);
 
         // Verify: Verify VAT Amount field on Purchase Order Statistics (VAT Amount Line Table).
-        VerifyVATOnStatistics(VATPct, VATAmount);
-        VerifyVATOnStatistics(PurchaseLine."VAT %", VATAmount2);
+        VerifyVATOnStatistics(VATPct, VATAmount, VATAmountLine);
+        VerifyVATOnStatistics(PurchaseLine."VAT %", VATAmount2, VATAmountLine);
     end;
 
     [Test]
@@ -2191,11 +2191,11 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
         ServiceLine.Validate("Unit Price", UnitPrice);
     end;
 
-    local procedure VerifyStatisticsAndVATTearDown(VATPostingSetup: Record "VAT Posting Setup"; VATPostingSetup2: Record "VAT Posting Setup"; InvoiceDiscountAmount: Decimal; InvoiceDiscountAmount2: Decimal; VATIdentifier: Code[20])
+    local procedure VerifyStatisticsAndVATTearDown(VATPostingSetup: Record "VAT Posting Setup"; VATPostingSetup2: Record "VAT Posting Setup"; InvoiceDiscountAmount: Decimal; InvoiceDiscountAmount2: Decimal; VATIdentifier: Code[20]; var VATAmountLine: Record "VAT Amount Line" temporary)
     begin
         // Verify: Verify VAT Identifier field on Sales/Purchase Statistics (VAT Amount Line Table).
-        VerifyDocumentStatistics(VATPostingSetup2."VAT Identifier", InvoiceDiscountAmount);
-        VerifyDocumentStatistics(VATIdentifier, InvoiceDiscountAmount2);
+        VerifyDocumentStatistics(VATPostingSetup2."VAT Identifier", InvoiceDiscountAmount, VATAmountLine);
+        VerifyDocumentStatistics(VATIdentifier, InvoiceDiscountAmount2, VATAmountLine);
 
         // Tear Down: Rollback VAT Posting Setup.
         UpdateVATPostingSetup(VATPostingSetup2, VATPostingSetup."Sales VAT Account", VATPostingSetup."Purchase VAT Account");
@@ -2337,10 +2337,9 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
           StrSubstNo(ErrorAmountErr, ExpectedAmount, PurchaseLine.TableCaption()));
     end;
 
-    local procedure VerifyDocumentStatistics(VATIdentifier: Code[20]; InvoiceDiscountAmount: Decimal)
+    local procedure VerifyDocumentStatistics(VATIdentifier: Code[20]; InvoiceDiscountAmount: Decimal; var VATAmountLine: Record "VAT Amount Line" temporary)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
-        VATAmountLine: Record "VAT Amount Line";
     begin
         GeneralLedgerSetup.Get();
         VATAmountLine.SetRange("VAT Identifier", VATIdentifier);
@@ -2351,10 +2350,9 @@ codeunit 134039 "ERM Inv Disc VAT Sale/Purchase"
             AmountErr, VATAmountLine.FieldCaption("Invoice Discount Amount"), InvoiceDiscountAmount, VATAmountLine.TableCaption()));
     end;
 
-    local procedure VerifyVATOnStatistics(VATPct: Decimal; VATAmount: Decimal)
+    local procedure VerifyVATOnStatistics(VATPct: Decimal; VATAmount: Decimal; var VATAmountLine: Record "VAT Amount Line" temporary)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
-        VATAmountLine: Record "VAT Amount Line";
     begin
         GeneralLedgerSetup.Get();
         VATAmountLine.SetRange("VAT %", VATPct);
