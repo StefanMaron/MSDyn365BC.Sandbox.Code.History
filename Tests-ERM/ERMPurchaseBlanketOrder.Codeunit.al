@@ -63,7 +63,7 @@ codeunit 134326 "ERM Purchase Blanket Order"
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
         GeneralLedgerSetup: Record "General Ledger Setup";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         QtyType: Option General,Invoicing,Shipping;
     begin
         // [SCENARIO] Test VAT Amount calculated correctly on Purchase Blanket Order.

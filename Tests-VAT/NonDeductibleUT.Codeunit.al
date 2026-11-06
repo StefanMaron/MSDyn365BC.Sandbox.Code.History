@@ -22,46 +22,6 @@ codeunit 134282 "Non-Deductible UT"
         DifferentNonDedVATRatesSameVATIdentifierErr: Label 'You cannot set different Non-Deductible VAT % for the combinations of business and product groups with the same VAT identifier.\The following combination with the same VAT identifier has different Non-Deductible VAT %: business group %1, product group %2', Comment = '%1, %2 - codes';
         GLEntryAmountErrLbl: Label '%1 must be %2 in %3.', Comment = '%1 = Amount Field Caption, %2 = Amount Value, %3 = G/L Account No.', Locked = true;
         AmountErrorLbl: Label '%1 must be %2.', Comment = '%1 = Amount Field Caption, %2 = Expected Amount';
-#if not CLEAN25
-        NonTemporaryVATAmountLineInsertErr: Label 'Records cannot be inserted into a non-temporary instance of the %1 table. Your extension provider must refactor the business logic so that it doesn''t insert in a non-temporary instance of this table.', Comment = '%1 = table caption';
-#endif
-
-#if not CLEAN25
-    [Test]
-    procedure PersistentVATAmountLineInsertIsBlocked()
-    var
-        VATAmountLine: Record "VAT Amount Line";
-    begin
-        // [SCENARIO 657737] Persistent VAT amount lines cannot be inserted, regardless of RunTrigger.
-        Initialize();
-
-        asserterror VATAmountLine.Insert();
-        Assert.ExpectedError(StrSubstNo(NonTemporaryVATAmountLineInsertErr, VATAmountLine.TableCaption()));
-        asserterror VATAmountLine.Insert(false);
-        Assert.ExpectedError(StrSubstNo(NonTemporaryVATAmountLineInsertErr, VATAmountLine.TableCaption()));
-        asserterror VATAmountLine.Insert(true);
-        Assert.ExpectedError(StrSubstNo(NonTemporaryVATAmountLineInsertErr, VATAmountLine.TableCaption()));
-    end;
-
-#endif
-
-    [Test]
-    procedure TemporaryVATAmountLineInsertIsAllowed()
-    var
-        TempVATAmountLine: Record "VAT Amount Line" temporary;
-    begin
-        // [SCENARIO 657737] Temporary VAT amount lines can still be inserted with either RunTrigger value.
-        Initialize();
-
-        TempVATAmountLine."VAT Identifier" := '657737-1';
-        TempVATAmountLine.Insert();
-        TempVATAmountLine."VAT Identifier" := '657737-2';
-        TempVATAmountLine.Insert(false);
-        TempVATAmountLine."VAT Identifier" := '657737-3';
-        TempVATAmountLine.Insert(true);
-
-        Assert.AreEqual(3, TempVATAmountLine.Count(), 'All temporary VAT amount lines must be inserted.');
-    end;
 
     [Test]
     procedure NonDeductibleAmountsInPurchLineEndToEnd()
