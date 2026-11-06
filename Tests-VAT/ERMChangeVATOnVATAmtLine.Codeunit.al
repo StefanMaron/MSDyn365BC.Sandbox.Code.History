@@ -402,7 +402,6 @@ codeunit 134028 "ERM Change VAT On VAT Amt Line"
         Assert.ExpectedError(StrSubstNo(NonTemporaryVATAmountLineInsertErr, VATAmountLine.TableCaption()));
         asserterror VATAmountLine.InsertNewLine(VATPostingSetupReverseChargeVAT."VAT Identifier", VATPostingSetupReverseChargeVAT."VAT Calculation Type", '', false, VATPostingSetupReverseChargeVAT."VAT %", true, false, 0);
         Assert.ExpectedError(StrSubstNo(NonTemporaryVATAmountLineInsertErr, VATAmountLine.TableCaption()));
-
     end;
 #endif
 
@@ -851,4 +850,3 @@ codeunit 134028 "ERM Change VAT On VAT Amt Line"
         Assert.AreEqual(VATDiff, VATAmountAfter - VATAmountBefore, VATDiffErr);
     end;
 }
-
