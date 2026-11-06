@@ -89,7 +89,7 @@
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         GeneralLedgerSetup: Record "General Ledger Setup";
         QtyType: Option General,Invoicing,Shipping;
     begin
