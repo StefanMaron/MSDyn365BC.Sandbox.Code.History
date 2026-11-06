@@ -27,9 +27,6 @@ codeunit 134028 "ERM Change VAT On VAT Amt Line"
         DefaultVATAmountLineTxt: Label 'VAT Amount';
         VATECAmountTxt: Label 'VAT+EC Amount';
         VATDiffErr: Label 'VAT Difference doesn''t match';
-#if not CLEAN25
-        NonTemporaryVATAmountLineInsertErr: Label 'Records cannot be inserted into a non-temporary instance of the %1 table. Your extension provider must refactor the business logic so that it doesn''t insert in a non-temporary instance of this table.', Comment = '%1 = table caption';
-#endif
 
     [Test]
     [Scope('OnPrem')]
@@ -85,7 +82,7 @@ codeunit 134028 "ERM Change VAT On VAT Amt Line"
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         VATPostingSetup: Record "VAT Posting Setup";
         MaxVATDiffAmt: Decimal;
         QtyType: Option General,Invoicing,Shipping;
@@ -115,7 +112,7 @@ codeunit 134028 "ERM Change VAT On VAT Amt Line"
     var
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         VATPostingSetup: Record "VAT Posting Setup";
         MaxVATDiffAmt: Decimal;
         QtyType: Option General,Invoicing,Shipping;
@@ -380,16 +377,15 @@ codeunit 134028 "ERM Change VAT On VAT Amt Line"
         Assert.AreEqual(VATECAmountTxt, TempVATAmountLine.VATAmountText(), 'VATAmountText returned wrong text');
     end;
 
-#if not CLEAN25
+#if not CLEAN26
     [Test]
     [Scope('OnPrem')]
-    procedure InsertNewLineOnNonTempVATAmountLineIsBlocked()
+    procedure VATAmountTextOnNonTempVATAmountLine()
     var
         VATAmountLine: Record "VAT Amount Line";
         VATPostingSetupNormalVAT: Record "VAT Posting Setup";
         VATPostingSetupReverseChargeVAT: Record "VAT Posting Setup";
     begin
-        // [SCENARIO 657737] InsertNewLine rejects persistent VAT amount lines for both VAT calculation types.
         LibraryERM.CreateVATPostingSetupWithAccounts(
           VATPostingSetupNormalVAT,
           VATPostingSetupNormalVAT."VAT Calculation Type"::"Normal VAT", LibraryRandom.RandIntInRange(10, 20));
@@ -398,11 +394,10 @@ codeunit 134028 "ERM Change VAT On VAT Amt Line"
           VATPostingSetupNormalVAT."VAT Calculation Type"::"Reverse Charge VAT", LibraryRandom.RandIntInRange(10, 20));
 
         VATAmountLine.Init();
-        asserterror VATAmountLine.InsertNewLine(VATPostingSetupNormalVAT."VAT Identifier", VATPostingSetupNormalVAT."VAT Calculation Type", '', false, VATPostingSetupNormalVAT."VAT %", true, false, 0, 0);
-        Assert.ExpectedError(StrSubstNo(NonTemporaryVATAmountLineInsertErr, VATAmountLine.TableCaption()));
-        asserterror VATAmountLine.InsertNewLine(VATPostingSetupReverseChargeVAT."VAT Identifier", VATPostingSetupReverseChargeVAT."VAT Calculation Type", '', false, VATPostingSetupReverseChargeVAT."VAT %", true, false, 1, 0);
-        Assert.ExpectedError(StrSubstNo(NonTemporaryVATAmountLineInsertErr, VATAmountLine.TableCaption()));
+        VATAmountLine.InsertNewLine(VATPostingSetupNormalVAT."VAT Identifier", VATPostingSetupNormalVAT."VAT Calculation Type", '', false, VATPostingSetupNormalVAT."VAT %", true, false, 0, 0);
+        VATAmountLine.InsertNewLine(VATPostingSetupReverseChargeVAT."VAT Identifier", VATPostingSetupReverseChargeVAT."VAT Calculation Type", '', false, VATPostingSetupReverseChargeVAT."VAT %", true, false, 1, 0);
 
+        Assert.ExpectedMessage(VATECAmountTxt, VATAmountLine.VATAmountText());
     end;
 #endif
 
@@ -470,7 +465,7 @@ codeunit 134028 "ERM Change VAT On VAT Amt Line"
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         MaxVATDiffAmt: Decimal;
         QtyType: Option General,Invoicing,Shipping;
     begin
@@ -509,7 +504,7 @@ codeunit 134028 "ERM Change VAT On VAT Amt Line"
     var
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         MaxVATDiffAmt: Decimal;
         QtyType: Option General,Invoicing,Shipping;
     begin
