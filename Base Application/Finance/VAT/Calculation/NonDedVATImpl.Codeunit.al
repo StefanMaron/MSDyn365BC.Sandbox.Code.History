@@ -1156,6 +1156,17 @@ codeunit 6201 "Non-Ded. VAT Impl."
         exit(DocAmountRoundingPrecision);
     end;
 
+    local procedure IsNormalVATInvoiceForVendor(GenJournalLine: Record "Gen. Journal Line"): Boolean
+    var
+        Vendor: Record Vendor;
+    begin
+        if (GenJournalLine."Document Type" = GenJournalLine."Document Type"::Invoice) and
+            (GenJournalLine."VAT Calculation Type" = GenJournalLine."VAT Calculation Type"::"Normal VAT") and
+            (Vendor.Get(GenJournalLine."Bill-to/Pay-to No.") and (Vendor."Prices Including VAT")) then
+            exit(true);
+        exit(false);
+    end;
+
     [EventSubscriber(ObjectType::Table, Database::"VAT Amount Line", 'OnBeforeInsertEvent', '', false, false)]
     local procedure BlockNonTemporaryVATAmountLineInsert(var Rec: Record "VAT Amount Line"; RunTrigger: Boolean)
     begin
