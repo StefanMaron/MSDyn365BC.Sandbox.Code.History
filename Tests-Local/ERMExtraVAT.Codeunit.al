@@ -1370,7 +1370,7 @@ codeunit 144078 "ERM Extra VAT"
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
         VATPostingSetup: Record "VAT Posting Setup";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         PurchaseInvoicePage: TestPage "Purchase Invoice";
         NonDeductibleBase: Decimal;
         NonDeductibleAmount: Decimal;
