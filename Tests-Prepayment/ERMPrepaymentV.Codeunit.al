@@ -1423,7 +1423,7 @@
     var
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
     begin
         // [FEATURE] [Purchase] [UT] [Prices Excl. VAT]
         // [SCENARIO 267789] PurchaseLine.UpdateVATOnLines() updates "Prepmt. Line Amount" to be <= "Amount" in case of Prices Excluding VAT
@@ -1450,7 +1450,7 @@
     var
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
     begin
         // [FEATURE] [Purchase] [UT] [Prices Incl. VAT]
         // [SCENARIO 267789] PurchaseLine.UpdateVATOnLines() updates "Prepmt. Line Amount" to be <= "Amount Including VAT" in case of Prices Including VAT
@@ -1477,7 +1477,7 @@
     var
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
     begin
         // [FEATURE] [Purchase] [UT]
         // [SCENARIO 267789] PurchaseLine."Prepmt. Line Amount" remains zero after UpdateVATOnLines() with negative Amount
@@ -1504,7 +1504,7 @@
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
     begin
         // [FEATURE] [Sales] [UT] [Prices Excl. VAT]
         // [SCENARIO 267789] SalesLine.UpdateVATOnLines() updates "Prepmt. Line Amount" to be <= "Amount" in case of Prices Excluding VAT
@@ -1533,7 +1533,7 @@
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
     begin
         // [FEATURE] [Sales] [UT] [Prices Incl. VAT]
         // [SCENARIO 267789] SalesLine.UpdateVATOnLines() updates "Prepmt. Line Amount" to be <= "Amount Including VAT" in case of Prices Including VAT
@@ -1562,7 +1562,7 @@
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
     begin
         // [FEATURE] [Sales] [UT]
         // [SCENARIO 267789] SalesLine."Prepmt. Line Amount" remains zero after UpdateVATOnLines() with negative Amount
@@ -2941,7 +2941,7 @@
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
         TempPurchaseLine: Record "Purchase Line" temporary;
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         VATPostingSetup: Record "Vat Posting Setup";
         GeneralPostingSetup: Record "General Posting Setup";
         Item: Record Item;
@@ -2997,7 +2997,7 @@
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         TempSalesLine: Record "Sales Line" temporary;
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         VATPostingSetup: Record "VAT Posting Setup";
         GeneralPostingSetup: Record "General Posting Setup";
         Item: Record Item;
