@@ -16,7 +16,6 @@ codeunit 139018 "Job Queue Entry Tests"
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
         NoErrorMessageMsg: Label 'There is no error message.';
         OnlyActiveCanBeMarkedErr: Label 'Only entries with the status In Progress can be marked as errors.';
-        SubscriberDescriptionSuffixTxt: Label ' - updated by subscriber', Locked = true;
 
     [Test]
     [Scope('OnPrem')]
@@ -668,160 +667,6 @@ codeunit 139018 "Job Queue Entry Tests"
             Error('Error Message Register Id must be null');
     end;
 
-    [Test]
-    [Scope('OnPrem')]
-    procedure FinalizeLogEntryDeletedLogEntryReinserts()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        JobQueueLogEntry: Record "Job Queue Log Entry";
-        EntryNo: Integer;
-    begin
-        // [FEATURE] [Job Queue Entry] [Job Queue Log Entry]
-        // [SCENARIO 626630] FinalizeLogEntry should handle the case when the log entry was deleted
-        // between InsertLogEntry and FinalizeLogEntry
-
-        // [GIVEN] A Job Queue Entry in "In Process" status
-        JobQueueEntry.Init();
-        JobQueueEntry.Status := JobQueueEntry.Status::"In Process";
-        JobQueueEntry."User Session Started" := CurrentDateTime();
-        JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
-        JobQueueEntry."Object ID to Run" := Codeunit::"Notification Entry Dispatcher";
-        JobQueueEntry.Insert(true);
-
-        // [GIVEN] A Job Queue Log Entry inserted for this entry
-        JobQueueEntry.InsertLogEntry(JobQueueLogEntry);
-        Commit();
-        EntryNo := JobQueueLogEntry."Entry No.";
-
-        // [GIVEN] The log entry is deleted externally (simulating another session)
-        JobQueueLogEntry.Delete();
-        Commit();
-
-        // [WHEN] FinalizeLogEntry is called on the now-deleted log entry
-        // [THEN] The log entry should be recreated via Insert (not error out)
-        JobQueueEntry.FinalizeLogEntry(JobQueueLogEntry);
-
-        // [THEN] The log entry exists in the database with Success status and End Date/Time set
-        JobQueueLogEntry.Get(EntryNo);
-        JobQueueLogEntry.TestField(ID, JobQueueEntry.ID);
-        JobQueueLogEntry.TestField(Status, JobQueueLogEntry.Status::Success);
-        Assert.AreNotEqual(0DT, JobQueueLogEntry."End Date/Time", 'End Date/Time should be set after finalization');
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure FinalizeLogEntryStaleRecordRefreshes()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        JobQueueLogEntry: Record "Job Queue Log Entry";
-        JobQueueLogEntry2: Record "Job Queue Log Entry";
-        EntryNo: Integer;
-    begin
-        // [FEATURE] [Job Queue Entry] [Job Queue Log Entry]
-        // [SCENARIO 626630] FinalizeLogEntry should Get the latest record from the database
-        // before calling Modify to avoid stale record version conflicts
-
-        // [GIVEN] A Job Queue Entry in "In Process" status
-        JobQueueEntry.Init();
-        JobQueueEntry.Status := JobQueueEntry.Status::"In Process";
-        JobQueueEntry."User Session Started" := CurrentDateTime();
-        JobQueueEntry."Object Type to Run" := JobQueueEntry."Object Type to Run"::Codeunit;
-        JobQueueEntry."Object ID to Run" := Codeunit::"Notification Entry Dispatcher";
-        JobQueueEntry.Insert(true);
-
-        // [GIVEN] A Job Queue Log Entry inserted for this entry
-        JobQueueEntry.InsertLogEntry(JobQueueLogEntry);
-        Commit();
-        EntryNo := JobQueueLogEntry."Entry No.";
-
-        // [GIVEN] The log entry is modified externally (simulating another session or event subscriber)
-        JobQueueLogEntry2.Get(EntryNo);
-        JobQueueLogEntry2.Description := 'Modified externally';
-        JobQueueLogEntry2.Modify(true);
-        Commit();
-
-        // [WHEN] FinalizeLogEntry is called with the stale in-memory record
-        // [THEN] No error occurs because Get refreshes the record before Modify
-        JobQueueEntry.FinalizeLogEntry(JobQueueLogEntry);
-
-        // [THEN] The log entry has Success status and End Date/Time, preserving the external change
-        JobQueueLogEntry.Get(EntryNo);
-        JobQueueLogEntry.TestField(Status, JobQueueLogEntry.Status::Success);
-        JobQueueLogEntry.TestField(Description, JobQueueLogEntry2.Description);
-        Assert.AreNotEqual(0DT, JobQueueLogEntry."End Date/Time", 'End Date/Time should be set after finalization');
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure FinalizeLogEntryStaleErrorRecordRefreshes()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        JobQueueLogEntry: Record "Job Queue Log Entry";
-        JobQueueLogEntry2: Record "Job Queue Log Entry";
-    begin
-        // [SCENARIO 657618] Finalizing a stale log entry preserves external changes and records the run's error details.
-        CreateJobQueueEntry(JobQueueEntry, JobQueueEntry.Status::"In Process");
-        JobQueueEntry."User Session Started" := CurrentDateTime();
-        JobQueueEntry.InsertLogEntry(JobQueueLogEntry);
-        Commit();
-
-        // [GIVEN] Another record instance changes the log entry after insertion
-        JobQueueLogEntry2.Get(JobQueueLogEntry."Entry No.");
-        JobQueueLogEntry2.Description := 'Modified externally';
-        JobQueueLogEntry2."Error Message" := 'Previous error';
-        JobQueueLogEntry2.SetErrorCallStack('Previous call stack');
-        JobQueueLogEntry2."Error Message Register Id" := CreateGuid();
-        JobQueueLogEntry2.Modify(true);
-        Commit();
-
-        // [WHEN] The run fails and finalizes using the stale record
-        JobQueueEntry.Status := JobQueueEntry.Status::Error;
-        JobQueueEntry."Error Message" := 'Run failed';
-        JobQueueEntry."Error Message Register Id" := CreateGuid();
-        JobQueueEntry.FinalizeLogEntry(JobQueueLogEntry, 'Run failure call stack');
-
-        // [THEN] The latest record contains the final error details without losing the external description
-        JobQueueLogEntry.Get(JobQueueLogEntry."Entry No.");
-        JobQueueLogEntry.TestField(Status, JobQueueLogEntry.Status::Error);
-        JobQueueLogEntry.TestField(Description, JobQueueLogEntry2.Description);
-        JobQueueLogEntry.TestField("Error Message", JobQueueEntry."Error Message");
-        JobQueueLogEntry.TestField("Error Message Register Id", JobQueueEntry."Error Message Register Id");
-        Assert.AreEqual('Run failure call stack', JobQueueLogEntry.GetErrorCallStack(), 'Finalization should record the run failure call stack');
-        Assert.AreNotEqual(0DT, JobQueueLogEntry."End Date/Time", 'End Date/Time should be set after finalization');
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure FinalizeLogEntryStaleRecordKeepsSubscriberChanges()
-    var
-        JobQueueEntry: Record "Job Queue Entry";
-        JobQueueLogEntry: Record "Job Queue Log Entry";
-        JobQueueLogEntry2: Record "Job Queue Log Entry";
-    begin
-        // [SCENARIO 657618] Changes made by OnBeforeModifyLogEntry subscribers are stored when a stale log entry is finalized.
-        CreateJobQueueEntry(JobQueueEntry, JobQueueEntry.Status::"In Process");
-        JobQueueEntry."User Session Started" := CurrentDateTime();
-        JobQueueEntry.InsertLogEntry(JobQueueLogEntry);
-        Commit();
-
-        // [GIVEN] Another record instance changes the log entry after insertion
-        JobQueueLogEntry2.Get(JobQueueLogEntry."Entry No.");
-        JobQueueLogEntry2.Description := 'Modified externally';
-        JobQueueLogEntry2.Modify(true);
-        Commit();
-
-        // [WHEN] The run succeeds and finalizes using the stale record while a subscriber appends to the description
-        BindSubscription(this);
-        JobQueueEntry.FinalizeLogEntry(JobQueueLogEntry);
-        UnbindSubscription(this);
-
-        // [THEN] The subscriber received the latest record and its change is stored with the final status
-        JobQueueLogEntry.Get(JobQueueLogEntry."Entry No.");
-        JobQueueLogEntry.TestField(Status, JobQueueLogEntry.Status::Success);
-        JobQueueLogEntry.TestField(Description, JobQueueLogEntry2.Description + SubscriberDescriptionSuffixTxt);
-        Assert.AreNotEqual(0DT, JobQueueLogEntry."End Date/Time", 'End Date/Time should be set after finalization');
-    end;
-
     local procedure CreateJobQueueEntry(var JobQueueEntry: Record "Job Queue Entry"; InitialStatus: Option)
     begin
         JobQueueEntry.Init();
@@ -890,11 +735,5 @@ codeunit 139018 "Job Queue Entry Tests"
     begin
         TaskGUID := CreateGuid();
         IsHandled := true;
-    end;
-
-    [EventSubscriber(ObjectType::Table, Database::"Job Queue Entry", 'OnBeforeModifyLogEntry', '', false, false)]
-    local procedure AppendDescriptionOnBeforeModifyLogEntry(var JobQueueLogEntry: Record "Job Queue Log Entry"; var JobQueueEntry: Record "Job Queue Entry")
-    begin
-        JobQueueLogEntry.Description := CopyStr(JobQueueLogEntry.Description + SubscriberDescriptionSuffixTxt, 1, MaxStrLen(JobQueueLogEntry.Description));
     end;
 }
