@@ -106,7 +106,7 @@
         GeneralLedgerSetup: Record "General Ledger Setup";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         QtyType: Option General,Invoicing,Shipping;
     begin
         // Create a Sales Order and calculates applicable VAT for a VAT Posting Group in Sales Order.
