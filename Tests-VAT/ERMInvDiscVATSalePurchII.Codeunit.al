@@ -52,7 +52,7 @@ codeunit 134040 "ERM Inv Disc VAT Sale/Purch II"
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         TempSalesLine: Record "Sales Line" temporary;
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         QtyType: Option General,Invoicing,Shipping;
     begin
         // Setup:
@@ -65,7 +65,7 @@ codeunit 134040 "ERM Inv Disc VAT Sale/Purch II"
         TempSalesLine.FindSet();
         repeat
             VerifyVATOnStatistics(
-              TempSalesLine."VAT %", RoundVATAmount(TempSalesLine."Line Amount" * TempSalesLine."VAT %" / 100, RoundingType), VATAmountLine);
+              TempSalesLine."VAT %", RoundVATAmount(TempSalesLine."Line Amount" * TempSalesLine."VAT %" / 100, RoundingType));
         until TempSalesLine.Next() = 0;
     end;
 
@@ -158,7 +158,7 @@ codeunit 134040 "ERM Inv Disc VAT Sale/Purch II"
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
         TempPurchaseLine: Record "Purchase Line" temporary;
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         QtyType: Option General,Invoicing,Shipping;
     begin
         // Setup.
@@ -172,7 +172,7 @@ codeunit 134040 "ERM Inv Disc VAT Sale/Purch II"
         TempPurchaseLine.FindSet();
         repeat
             VerifyVATOnStatistics(
-              TempPurchaseLine."VAT %", RoundVATAmount(TempPurchaseLine."Line Amount" * TempPurchaseLine."VAT %" / 100, RoundingType), VATAmountLine);
+              TempPurchaseLine."VAT %", RoundVATAmount(TempPurchaseLine."Line Amount" * TempPurchaseLine."VAT %" / 100, RoundingType));
         until TempPurchaseLine.Next() = 0;
     end;
 
@@ -241,7 +241,7 @@ codeunit 134040 "ERM Inv Disc VAT Sale/Purch II"
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         SalesCalcDiscount: Codeunit "Sales-Calc. Discount";
         InvoiceDiscountAmount: Decimal;
         QtyType: Option General,Invoicing,Shipping;
@@ -274,7 +274,7 @@ codeunit 134040 "ERM Inv Disc VAT Sale/Purch II"
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         SalesCalcDiscount: Codeunit "Sales-Calc. Discount";
         QtyType: Option General,Invoicing,Shipping;
     begin
@@ -302,7 +302,7 @@ codeunit 134040 "ERM Inv Disc VAT Sale/Purch II"
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         SalesCalcDiscount: Codeunit "Sales-Calc. Discount";
         QtyType: Option General,Invoicing,Shipping;
     begin
@@ -363,7 +363,7 @@ codeunit 134040 "ERM Inv Disc VAT Sale/Purch II"
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         "Count": Integer;
         QtyType: Option General,Invoicing,Shipping;
     begin
@@ -388,40 +388,38 @@ codeunit 134040 "ERM Inv Disc VAT Sale/Purch II"
     [Scope('OnPrem')]
     procedure VATSpecificationSalesInvoice()
     var
-        VATAmountLine: Record "VAT Amount Line" temporary;
         SalesLine: Record "Sales Line";
         InvoiceDiscountAmount: Decimal;
     begin
         // Check VAT specification field on Sales Invoice Statistics Rounded to Amount Rounding Precision of the Currency.
-        CreateSalesDocWithDiscount(SalesLine, VATAmountLine);
+        CreateSalesDocWithDiscount(SalesLine);
         InvoiceDiscountAmount := FindInvDiscAmountForCustomer(SalesLine."Sell-to Customer No.", SalesLine."Line Amount");
 
         // Verify: Verify that Line Amount, Invoice Discount Base Amount, Invoice Discount Amount, VAT Base, VAT Amount are Correctly
         // populated in VAT Amount Line.
         VerifyVATOnStatisticsAll(
           SalesLine."Currency Code", SalesLine."VAT %", SalesLine."Line Amount", InvoiceDiscountAmount,
-          (SalesLine."Line Amount" - InvoiceDiscountAmount) * SalesLine."VAT %" / 100, VATAmountLine);
+          (SalesLine."Line Amount" - InvoiceDiscountAmount) * SalesLine."VAT %" / 100);
     end;
 
     [Test]
     [Scope('OnPrem')]
     procedure VATSpecificationPurchInvoice()
     var
-        VATAmountLine: Record "VAT Amount Line" temporary;
         PurchaseLine: Record "Purchase Line";
         Currency: Record Currency;
         InvoiceDiscountAmount: Decimal;
     begin
         // Check VAT specification field on Purchase Invoice Statistics Rounded to Amount Rounding Precision of the Currency.
         CreatePurchaseDocWithDiscount(
-          PurchaseLine, CreateCurrency(Currency."VAT Rounding Type"::Nearest), PurchaseLine."Document Type"::Invoice, VATAmountLine);
+          PurchaseLine, CreateCurrency(Currency."VAT Rounding Type"::Nearest), PurchaseLine."Document Type"::Invoice);
         InvoiceDiscountAmount := FindInvDiscAmountForVendor(PurchaseLine."Buy-from Vendor No.", PurchaseLine."Line Amount");
 
         // Verify: Verify that Line Amount, Invoice Discount Base Amount, Invoice Discount Amount, VAT Base, VAT Amount are Correctly
         // populated in VAT Amount Line.
         VerifyVATOnStatisticsAll(
           PurchaseLine."Currency Code", PurchaseLine."VAT %", PurchaseLine."Line Amount", InvoiceDiscountAmount,
-          (PurchaseLine."Line Amount" - InvoiceDiscountAmount) * PurchaseLine."VAT %" / 100, VATAmountLine);
+          (PurchaseLine."Line Amount" - InvoiceDiscountAmount) * PurchaseLine."VAT %" / 100);
     end;
 
     [Test]
@@ -505,14 +503,14 @@ codeunit 134040 "ERM Inv Disc VAT Sale/Purch II"
     procedure PurchOrderNegativeInvDiscount()
     var
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         InvoiceDiscountAmount: Decimal;
     begin
         // Verify that Negative Invoice Discount can be entered on Purchase Order Statistics.
 
         // Setup: Create Purchase Order, Calculate Invoice Discount.
         Initialize();
-        CreatePurchaseDocWithDiscount(PurchaseLine, '', PurchaseLine."Document Type"::Order, VATAmountLine);
+        CreatePurchaseDocWithDiscount(PurchaseLine, '', PurchaseLine."Document Type"::Order);
         InvoiceDiscountAmount := -LibraryRandom.RandDec(100, 2);
         FindVATAmountLine(VATAmountLine, PurchaseLine."VAT Prod. Posting Group");
 
@@ -531,13 +529,13 @@ codeunit 134040 "ERM Inv Disc VAT Sale/Purch II"
     procedure PurchOrderLargeInvDiscount()
     var
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
     begin
         // Verify Error Message after Updating Invoice Discount Amount greater than Invoice Discount Base Amount on Purchase Order.
 
         // Setup: Create Purchase Order, Calculate Invoice Discount.
         Initialize();
-        CreatePurchaseDocWithDiscount(PurchaseLine, '', PurchaseLine."Document Type"::Order, VATAmountLine);
+        CreatePurchaseDocWithDiscount(PurchaseLine, '', PurchaseLine."Document Type"::Order);
         FindVATAmountLine(VATAmountLine, PurchaseLine."VAT Prod. Posting Group");
 
         // Exercise: Update Invoice Discount Amount more than Invoice Discount Base Amount.
@@ -555,13 +553,13 @@ codeunit 134040 "ERM Inv Disc VAT Sale/Purch II"
     procedure PurchOrderEqualInvDiscount()
     var
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
     begin
         // Verify VAT Base is Zero when Invoice Discount Amount is equal to Invoice Discount Base Amount for Purchase Order.
 
         // Setup: Create Purchase Order, Calculate Invoice Discount.
         Initialize();
-        CreatePurchaseDocWithDiscount(PurchaseLine, '', PurchaseLine."Document Type"::Order, VATAmountLine);
+        CreatePurchaseDocWithDiscount(PurchaseLine, '', PurchaseLine."Document Type"::Order);
         FindVATAmountLine(VATAmountLine, PurchaseLine."VAT Prod. Posting Group");
 
         // Exercise: Update Invoice Discount Amount equal to Invoice Discount Base Amount.
@@ -577,7 +575,6 @@ codeunit 134040 "ERM Inv Disc VAT Sale/Purch II"
     [Scope('OnPrem')]
     procedure PstdPurchOrderEqualInvDiscount()
     var
-        VATAmountLine: Record "VAT Amount Line" temporary;
         PurchaseLine: Record "Purchase Line";
         PurchaseHeader: Record "Purchase Header";
         GeneralPostingSetup: Record "General Posting Setup";
@@ -589,7 +586,7 @@ codeunit 134040 "ERM Inv Disc VAT Sale/Purch II"
 
         // Setup: Create Purchase Order, Calculate Invoice Discount. Update Invoice Discount Amount in Purchase Lines.
         Initialize();
-        CreatePurchaseDocWithDiscount(PurchaseLine, '', PurchaseLine."Document Type"::Order, VATAmountLine);
+        CreatePurchaseDocWithDiscount(PurchaseLine, '', PurchaseLine."Document Type"::Order);
         PurchaseHeader.Get(PurchaseHeader."Document Type"::Order, PurchaseLine."Document No.");
         InvoiceDiscountAmount := UpdatePurchaseLine(PurchaseHeader."No.");
         VATAmount := Round(InvoiceDiscountAmount * PurchaseLine."VAT %" / 100);
@@ -611,7 +608,7 @@ codeunit 134040 "ERM Inv Disc VAT Sale/Purch II"
     var
         PurchaseLine: Record "Purchase Line";
         PurchaseHeader: Record "Purchase Header";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         PurchCalcDiscount: Codeunit "Purch.-Calc.Discount";
         QtyType: Option General,Invoicing,Shipping;
         "Count": Integer;
@@ -898,9 +895,10 @@ codeunit 134040 "ERM Inv Disc VAT Sale/Purch II"
         exit(Vendor."No.");
     end;
 
-    local procedure CreatePurchaseDocWithDiscount(var PurchaseLine: Record "Purchase Line"; CurrencyCode: Code[10]; DocumentType: Enum "Purchase Document Type"; var VATAmountLine: Record "VAT Amount Line" temporary): Code[20]
+    local procedure CreatePurchaseDocWithDiscount(var PurchaseLine: Record "Purchase Line"; CurrencyCode: Code[10]; DocumentType: Enum "Purchase Document Type"): Code[20]
     var
         PurchaseHeader: Record "Purchase Header";
+        VATAmountLine: Record "VAT Amount Line";
         NoSeries: Codeunit "No. Series";
         PurchCalcDiscount: Codeunit "Purch.-Calc.Discount";
         QtyType: Option General,Invoicing,Shipping;
@@ -913,9 +911,10 @@ codeunit 134040 "ERM Inv Disc VAT Sale/Purch II"
         exit(NoSeries.PeekNextNo(PurchaseHeader."Posting No. Series"));
     end;
 
-    local procedure CreateSalesDocWithDiscount(var SalesLine: Record "Sales Line"; var VATAmountLine: Record "VAT Amount Line" temporary)
+    local procedure CreateSalesDocWithDiscount(var SalesLine: Record "Sales Line")
     var
         SalesHeader: Record "Sales Header";
+        VATAmountLine: Record "VAT Amount Line";
         Currency: Record Currency;
         SalesCalcDiscount: Codeunit "Sales-Calc. Discount";
         QtyType: Option General,Invoicing,Shipping;
@@ -1125,9 +1124,10 @@ codeunit 134040 "ERM Inv Disc VAT Sale/Purch II"
           StrSubstNo(AmountError, GLEntry.FieldCaption("VAT Amount"), ExpectedVATAmount, GLEntry.TableCaption()));
     end;
 
-    local procedure VerifyVATOnStatistics(VATPct: Decimal; VATAmount: Decimal; var VATAmountLine: Record "VAT Amount Line" temporary)
+    local procedure VerifyVATOnStatistics(VATPct: Decimal; VATAmount: Decimal)
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
+        VATAmountLine: Record "VAT Amount Line";
     begin
         GeneralLedgerSetup.Get();
         VATAmountLine.SetRange("VAT %", VATPct);
@@ -1137,8 +1137,9 @@ codeunit 134040 "ERM Inv Disc VAT Sale/Purch II"
           StrSubstNo(AmountError, VATAmountLine.FieldCaption("VAT Amount"), VATAmount, VATAmountLine.TableCaption()));
     end;
 
-    local procedure VerifyVATOnStatisticsAll(CurrencyCode: Code[10]; VATPercent: Decimal; LineAmount: Decimal; InvoiceDiscountAmount: Decimal; VATAmount: Decimal; var VATAmountLine: Record "VAT Amount Line" temporary)
+    local procedure VerifyVATOnStatisticsAll(CurrencyCode: Code[10]; VATPercent: Decimal; LineAmount: Decimal; InvoiceDiscountAmount: Decimal; VATAmount: Decimal)
     var
+        VATAmountLine: Record "VAT Amount Line";
         Currency: Record Currency;
     begin
         Currency.Get(CurrencyCode);
