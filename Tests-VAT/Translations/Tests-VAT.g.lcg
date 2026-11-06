@@ -140,15 +140,6 @@
       <Cmt Name="Dev"><![CDATA[%1=Field Caption;%2=Field Caption;%3=Field Value;]D;]A;(LookupHint=Codeunit ERM Change VAT On VAT Amt Line - NamedType ErrorWithoutCurrency)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 3396861613 - NamedType 314740153" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Records cannot be inserted into a non-temporary instance of the %1 table. Your extension provider must refactor the business logic so that it doesn't insert in a non-temporary instance of this table.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1 = table caption]D;]A;(LookupHint=Codeunit ERM Change VAT On VAT Amt Line - NamedType NonTemporaryVATAmountLineInsertErr)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 3396861613 - NamedType 3967175824" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[%1% VAT]]></Val>
@@ -966,15 +957,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[%1, %2 - codes]D;]A;(LookupHint=Codeunit Non-Deductible UT - NamedType DifferentNonDedVATRatesSameVATIdentifierErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 1722727050 - NamedType 314740153" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Records cannot be inserted into a non-temporary instance of the %1 table. Your extension provider must refactor the business logic so that it doesn't insert in a non-temporary instance of this table.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1 = table caption]D;]A;(LookupHint=Codeunit Non-Deductible UT - NamedType NonTemporaryVATAmountLineInsertErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1718597743 - NamedType 2155980144" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
