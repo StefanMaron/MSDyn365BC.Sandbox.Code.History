@@ -680,40 +680,20 @@ table 472 "Job Queue Entry"
     end;
 
     procedure FinalizeLogEntry(JobQueueLogEntry: Record "Job Queue Log Entry"; LastErrorCallStack: Text)
-    var
-        RefreshedJobQueueLogEntry: Record "Job Queue Log Entry";
-        ErrorCallStackText: Text;
     begin
-        // Compute the field values first
         if Rec.Status = Status::Error then begin
             JobQueueLogEntry.Status := JobQueueLogEntry.Status::Error;
             JobQueueLogEntry."Error Message" := Rec."Error Message";
             if LastErrorCallStack <> '' then
-                ErrorCallStackText := LastErrorCallStack
+                JobQueueLogEntry.SetErrorCallStack(LastErrorCallstack)
             else
-                ErrorCallStackText := GetLastErrorCallstack();
-            JobQueueLogEntry.SetErrorCallStack(ErrorCallStackText);
+                JobQueueLogEntry.SetErrorCallStack(GetLastErrorCallstack());
             JobQueueLogEntry."Error Message Register Id" := Rec."Error Message Register Id";
         end else
             JobQueueLogEntry.Status := JobQueueLogEntry.Status::Success;
         JobQueueLogEntry."End Date/Time" := CurrentDateTime();
-
-        // Refresh and lock the latest version, apply computed values, then let subscribers change the record that is written
-        RefreshedJobQueueLogEntry.ReadIsolation(IsolationLevel::UpdLock);
-        if RefreshedJobQueueLogEntry.Get(JobQueueLogEntry."Entry No.") then begin
-            RefreshedJobQueueLogEntry.Status := JobQueueLogEntry.Status;
-            RefreshedJobQueueLogEntry."End Date/Time" := JobQueueLogEntry."End Date/Time";
-            if JobQueueLogEntry.Status = RefreshedJobQueueLogEntry.Status::Error then begin
-                RefreshedJobQueueLogEntry."Error Message" := JobQueueLogEntry."Error Message";
-                RefreshedJobQueueLogEntry.SetErrorCallStack(ErrorCallStackText);
-                RefreshedJobQueueLogEntry."Error Message Register Id" := JobQueueLogEntry."Error Message Register Id";
-            end;
-            OnBeforeModifyLogEntry(RefreshedJobQueueLogEntry, Rec);
-            RefreshedJobQueueLogEntry.Modify(true);
-        end else begin
-            OnBeforeModifyLogEntry(JobQueueLogEntry, Rec);
-            JobQueueLogEntry.Insert(true);
-        end;
+        OnBeforeModifyLogEntry(JobQueueLogEntry, Rec);
+        JobQueueLogEntry.Modify(true);
     end;
 
     procedure SetStatus(NewStatus: Option)
