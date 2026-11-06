@@ -775,7 +775,7 @@ codeunit 144123 "ERM Sales VAT EC Calculate"
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         VATPostingSetup: Record "VAT Posting Setup";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
     begin
         // [SCENARIO 379514] VAT %  of VAT Amount Line record is copied from sales line in the SalesLine.CalcVATAmountLines function
         Initialize();
@@ -806,7 +806,7 @@ codeunit 144123 "ERM Sales VAT EC Calculate"
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
     begin
         // [FEATURE] [UT]
         // [SCENARIO 295191] "EC Amount" is calculated incorrectly by CalcVATAmountLines function when one of the lines has negative quantity
@@ -835,7 +835,7 @@ codeunit 144123 "ERM Sales VAT EC Calculate"
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
     begin
         // [FEATURE] [UT]
         // [SCENARIO 295191] "EC Amount" is calculated incorrectly by CalcVATAmountLines function when one of the lines has negative quantity
