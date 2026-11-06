@@ -206,7 +206,7 @@ codeunit 134046 "ERM Prices Incl VAT Doc"
     var
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         InvoiceDiscAmount: Decimal;
         QtyType: Option General,Invoicing,Shipping;
     begin
@@ -234,7 +234,7 @@ codeunit 134046 "ERM Prices Incl VAT Doc"
     var
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         GeneralInvDiscAmount: Decimal;
         InvoiceDiscAmount: Decimal;
         QtyType: Option General,Invoicing,Shipping;
@@ -265,7 +265,7 @@ codeunit 134046 "ERM Prices Incl VAT Doc"
     var
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         PurchInvHeader: Record "Purch. Inv. Header";
         PurchInvLine: Record "Purch. Inv. Line";
         GeneralInvDiscAmount: Decimal;
@@ -295,7 +295,7 @@ codeunit 134046 "ERM Prices Incl VAT Doc"
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         VATPostingSetup: Record "VAT Posting Setup";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         QtyType: Option General,Invoicing,Shipping;
         VATBaseAmount: Decimal;
         Amount: Decimal;
@@ -327,7 +327,7 @@ codeunit 134046 "ERM Prices Incl VAT Doc"
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
         VATPostingSetup: Record "VAT Posting Setup";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         QtyType: Option General,Invoicing,Shipping;
         VATBaseAmount: Decimal;
         Amount: Decimal;
@@ -360,7 +360,7 @@ codeunit 134046 "ERM Prices Incl VAT Doc"
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
         VATPostingSetup: Record "VAT Posting Setup";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         QtyType: Option General,Invoicing,Shipping;
         VATBaseAmount: Decimal;
         Amount: Decimal;
@@ -391,7 +391,7 @@ codeunit 134046 "ERM Prices Incl VAT Doc"
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
         VATPostingSetup: Record "VAT Posting Setup";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         QtyType: Option General,Invoicing,Shipping;
         VATBaseAmount: Decimal;
         Amount: Decimal;
@@ -494,7 +494,7 @@ codeunit 134046 "ERM Prices Incl VAT Doc"
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         VATPostingSetup: Record "VAT Posting Setup";
         VATAmount: Decimal;
         QtyType: Option General,Invoicing,Shipping;
@@ -539,7 +539,7 @@ codeunit 134046 "ERM Prices Incl VAT Doc"
     var
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         VATPostingSetup: Record "VAT Posting Setup";
         VATAmount: Decimal;
         QtyType: Option General,Invoicing,Shipping;
@@ -639,7 +639,7 @@ codeunit 134046 "ERM Prices Incl VAT Doc"
         Currency: Record Currency;
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         VATPostingSetup: Record "VAT Posting Setup";
         QtyType: Option General,Invoicing,Shipping;
         ExpectedAmountInclVAT: Decimal;
@@ -698,7 +698,7 @@ codeunit 134046 "ERM Prices Incl VAT Doc"
         Currency: Record Currency;
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         VATPostingSetup: Record "VAT Posting Setup";
         QtyType: Option General,Invoicing,Shipping;
         AmountIncludingVAT: Decimal;
@@ -757,7 +757,7 @@ codeunit 134046 "ERM Prices Incl VAT Doc"
         Currency: Record Currency;
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         QtyType: Option General,Invoicing,Shipping;
         ActualAmtInclVAT: Decimal;
         ExpectedAmtInclVAT: Decimal;
@@ -814,7 +814,7 @@ codeunit 134046 "ERM Prices Incl VAT Doc"
         Currency: Record Currency;
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         QtyType: Option General,Invoicing,Shipping;
         AmountIncludingVAT: Decimal;
         VATAmount: Decimal;
@@ -1633,7 +1633,7 @@ codeunit 134046 "ERM Prices Incl VAT Doc"
           StrSubstNo(AmountErr, VATEntry.FieldCaption(Amount), VATEntryAmount, VATEntry.TableCaption()));
     end;
 
-    local procedure VerifyVATAmountLine(var VATAmountLine: Record "VAT Amount Line"; VATPct: Decimal; VATBase: Decimal; VATAmount: Decimal)
+    local procedure VerifyVATAmountLine(VATAmountLine: Record "VAT Amount Line"; VATPct: Decimal; VATBase: Decimal; VATAmount: Decimal)
     begin
         VATAmountLine.SetRange("VAT %", VATPct);
         VATAmountLine.FindFirst();
