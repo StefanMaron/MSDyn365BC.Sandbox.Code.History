@@ -91,7 +91,6 @@ codeunit 9998 "Upgrade Tag Definitions"
         PerCompanyUpgradeTags.Add(GetClearTemporaryTablesUpgradeTag());
         PerCompanyUpgradeTags.Add(GetClearVATAmountLineTableUpgradeTag());
         PerCompanyUpgradeTags.Add(GetRerunClearVATAmountLineTableUpgradeTag());
-        PerCompanyUpgradeTags.Add(GetClearVATAmountLineTableForInsertGuardUpgradeTag());
         PerCompanyUpgradeTags.Add(GetDimSetEntryGlobalDimNoUpgradeTag());
         PerCompanyUpgradeTags.Add(GetPriceSourceGroupUpgradeTag());
         PerCompanyUpgradeTags.Add(GetPriceSourceGroupFixedUpgradeTag());
@@ -740,11 +739,6 @@ codeunit 9998 "Upgrade Tag Definitions"
     internal procedure GetClearVATAmountLineTableUpgradeTag(): Code[250]
     begin
         exit('MS-396184-CleanVATAmountLineTable-20240819');
-    end;
-
-    internal procedure GetClearVATAmountLineTableForInsertGuardUpgradeTag(): Code[250]
-    begin
-        exit('MS-657737-CleanVATAmountLineTable-20261103');
     end;
 
     internal procedure GetRerunClearVATAmountLineTableUpgradeTag(): Code[250]
