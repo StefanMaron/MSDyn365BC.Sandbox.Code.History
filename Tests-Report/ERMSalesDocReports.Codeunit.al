@@ -880,7 +880,7 @@ codeunit 134390 "ERM Sales Doc. Reports"
         LibraryReportDataset.AssertElementWithValueExists('SalesLineLineAmt', SalesLine."Line Amount");
     end;
 
-    local procedure VerifyVATAmountLineOnReport(VATAmountLine: Record "VAT Amount Line" temporary)
+    local procedure VerifyVATAmountLineOnReport(VATAmountLine: Record "VAT Amount Line")
     begin
         LibraryReportDataset.AssertElementWithValueExists('VATAmtLineVATPercentage', VATAmountLine."VAT %");
         LibraryReportDataset.AssertElementWithValueExists('VATAmtLineInvDiscAmt', VATAmountLine."Invoice Discount Amount");
