@@ -63,7 +63,7 @@ codeunit 134377 "ERM Sales Blanket Order"
         GeneralLedgerSetup: Record "General Ledger Setup";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         SalesReceivablesSetup: Record "Sales & Receivables Setup";
         QtyType: Option General,Invoicing,Shipping;
         BaseAmount: Decimal;
