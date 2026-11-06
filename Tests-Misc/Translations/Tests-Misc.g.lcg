@@ -653,6 +653,24 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Certificate Test - NamedType PasswordDoesntExistInISErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1039552797 - NamedType 2083811383" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The password-protected test certificate was not created.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Certificate Test - NamedType PasswordProtectedCertNotCreatedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1039552797 - NamedType 3070597234" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The self-signed test certificate was not created.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Certificate Test - NamedType SelfSignedCertNotCreatedErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1039552797 - NamedType 4230418330" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Stored string should match the one that is saved in Isolated storage.]]></Val>
@@ -660,33 +678,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Certificate Test - NamedType StoredCertErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 1039552797 - NamedType 624774523" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[test1234]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Certificate Test - NamedType TestCertPasswordTxt)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 1039552797 - NamedType 3719151211" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[F160CC2FFA5503AA510F72366821F0A73391B36F]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Certificate Test - NamedType TestCertThumbprintTxt)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 1039552797 - NamedType 3819986610" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[MIIFMQIBAzCCBPcGCSqGSIb3DQEHAaCCBOgEggTkMIIE4DCCAv8GCSqGSIb3DQEHBqCCAvAwggLsAgEAMIIC5QYJKoZIhvcNAQcBMBwGCiqGSIb3DQEMAQYwDgQInoKB6qoKZIQCAggAgIICuF9ZKEqoyo2dKPmAYqXL+Cf35+SDMgXxhRc89HKDXQ4va5umT+wBsy51FRxRahSiKksHmqRSLfZwTKEcQvSaOTyJdT0pL4uV5WNajrneiqw8JbdJYK57YLqol+92doBECbPMxQwZUuC2oZo3cyWJJBi3ehIqEOeSfYVBcDDCQrGy+ggmKfcYeDwjS9XDCnBO9xgl462J2w02tm/KW1rC1926xyVvmzspTdL0QFSc6t810oZ/f9L4/F04mRdvlbuR7RU09jHFSzLm5D2ybtXJd/B9YhwwGNQkfp/dPxq17Z7b4usEjXJWO7TwJtduOGXadznQJIVihWZBYBsqVI3mABh5FVZWrwdPGhfVOaeDhvAiqpKLA2+aewFuT7unaKSsjoOGHFvHF4RiiTCR/ag+2sHQPqpSUQJdlQjmiZ1F8tbpzuhJdBLY/i5Iqs13sk3zPrwP1oqwv9Xp3gd6hjktHNWyTrI/0LZct9REvJznOeLnKct0EhWuDuY4L24ZRjrMgBqNCgkm4hcUfhiOAlbYaMMVFWbUzA+6dEgwcltIp1gSZbhj8aB8MP/1fT8VjyhJsSE4p6wsqsgTpd27zsenJcLgyu7COjSstmkQ3qeIwNS/x9zuEinxzA7t3II1kROJz0nTqtQi4IgcBjb/2DiD2QwCLD4NvbbR7hWjDrUTOgtmgxrhn3qfsemDe2bQw3/ZJkKZrJO9fJzkhwXQWv7aj+4Nf1wxYIOcxKp30lB3zcKrTlBkNsmZDnVNEU7UwN8qAWkMyvWdyZaBW1TgbVer1D+YSGxXMqPesm7IJ+HBYJBUuC6xyXmOJ8QScNcIWHUDFUpb2Hg2Vw64y7nyPgxdb3C9zquM2TPAKUKEQylOGwTtzgd+73wVvoqLZbo0DXe9ZXrT/GRlac1mFP0lbF1GoAYOGgSbJoWF8jCCAdkGCSqGSIb3DQEHAaCCAcoEggHGMIIBwjCCAb4GCyqGSIb3DQEMCgECoIIBhjCCAYIwHAYKKoZIhvcNAQwBAzAOBAhJN3StWPRixwICCAAEggFg42+YWXJTaw52YnkoBFZMN5zWdMa6HlsJHV4FYbaCKE8NKTuxKibLWU/f0qgOJwo9fxy503Xz22wnEL7xRU2B9JblrlGrHlix0mswt/QU4rjhfzpYIv6kfOIHE8zKacQYdy2zDUXax54gX+Dj8m2dE22l+gCRZHqkYymV1nMdWJsqFRAiV2EsSwGLLZovYqp0/fVUxry7bYUCnu+yj9wkYr53LZ9O4EFUePDoJXMvGasPeB7876xDnVWdzQA6jZne0syZ8tH6q7/0wckPn0SvFfhphYqHFKlCc0FDCk/Nsxjod0A1PZz8HMueHJO1Jo3oODYMktI+HVCAC9UUqcmrW4jBBczEzKtCPyDgZkiP6xYU5AHUcBomHO94KHE5X5mZdgXblTRM1zc0uJS2CrBx4jc59s28S/bWABKduqNcczEnBuLyUsYKxX5/WkTmqSPdaJkU2xrfA/PcOTUodzYJVTElMCMGCSqGSIb3DQEJFTEWBBTxYMwv+lUDqlEPcjZoIfCnM5GzbzAxMCEwCQYFKw4DAhoFAAQU+06w2rleuz30pmANAqG7IHZX8q0ECF8gd+t0FeE8AgIIAA==]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Certificate Test - NamedType TestCertTxt)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 1039552797 - NamedType 2780607534" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
