@@ -833,7 +833,7 @@ codeunit 144108 "ERM Service Invoice ES"
     var
         ServiceInvoiceHeader: Record "Service Invoice Header";
         ServiceInvoiceLine: Record "Service Invoice Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
     begin
         ServiceInvoiceHeader.Get(FindServiceInvoiceHeader(CustomerNo));
         ServiceInvoiceLine.CalcVATAmountLines(ServiceInvoiceHeader, VATAmountLine);
