@@ -799,7 +799,7 @@ codeunit 134390 "ERM Sales Doc. Reports"
     local procedure CreateSalesLineAndCalcVATAmount(SalesHeader: Record "Sales Header"; VATBusinessPostingGroupCode: Code[20]): Decimal
     var
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         VATPostingSetup: Record "VAT Posting Setup";
         QtyType: Option General,Invoicing,Shipping;
     begin
