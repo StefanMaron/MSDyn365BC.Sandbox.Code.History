@@ -51,7 +51,7 @@ codeunit 139313 "Test Sana Interface calls"
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         SalesPostPrepayments: Codeunit "Sales-Post Prepayments";
         Dec: Decimal;
         Text30: Text[30];
@@ -143,7 +143,7 @@ codeunit 139313 "Test Sana Interface calls"
         SalesInvoiceLine: Record "Sales Invoice Line";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         QtyType: Option General,Invoicing,Shipping;
     begin
         // Verify
@@ -175,7 +175,7 @@ codeunit 139313 "Test Sana Interface calls"
     var
         SalesLine: Record "Sales Line";
         SalesHeader: Record "Sales Header";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         QtyType: Option General,Invoicing,Shipping;
     begin
         // Prepare
