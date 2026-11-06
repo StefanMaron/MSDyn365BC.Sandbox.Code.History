@@ -372,7 +372,7 @@ codeunit 144124 "ERM Service VAT EC Calculate"
         ServiceHeader: Record "Service Header";
         ServiceLine: Record "Service Line";
         VATPostingSetup: Record "VAT Posting Setup";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
     begin
         // [SCENARIO 379514] VAT % of VAT Amount Line record is copied from service line in the ServiceLine.CalcVATAmountLines function
 
