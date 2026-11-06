@@ -103,7 +103,7 @@
         GeneralLedgerSetup: Record "General Ledger Setup";
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         QtyType: Option General,Invoicing,Shipping;
     begin
         // Covers Document TFS_TC_ID 122459.
