@@ -1395,7 +1395,7 @@ codeunit 144122 "ERM Purchase VAT EC Calculate"
 
     local procedure VerifyVATAmountLinePostedPurchaseCreditMemo(BuyFromVendorNo: Code[20]; VATPct: Decimal; ECPct: Decimal; Amount: Decimal)
     var
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         PurchCrMemoLine: Record "Purch. Cr. Memo Line";
         PurchCrMemoHdr: Record "Purch. Cr. Memo Hdr.";
     begin
@@ -1408,7 +1408,7 @@ codeunit 144122 "ERM Purchase VAT EC Calculate"
     var
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         QtyType: Option General;
     begin
         PurchaseHeader.SetRange("Buy-from Vendor No.", BuyFromVendorNo);
@@ -1421,7 +1421,7 @@ codeunit 144122 "ERM Purchase VAT EC Calculate"
     var
         PurchInvHeader: Record "Purch. Inv. Header";
         PurchInvLine: Record "Purch. Inv. Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
     begin
         PurchInvHeader.SetRange("Buy-from Vendor No.", BuyFromVendorNo);
         PurchInvHeader.FindFirst();
