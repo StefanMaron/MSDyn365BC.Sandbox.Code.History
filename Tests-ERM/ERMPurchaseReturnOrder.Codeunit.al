@@ -83,7 +83,7 @@ codeunit 134329 "ERM Purchase Return Order"
     var
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         GeneralLedgerSetup: Record "General Ledger Setup";
         QtyType: Option General,Invoicing,Shipping;
     begin
