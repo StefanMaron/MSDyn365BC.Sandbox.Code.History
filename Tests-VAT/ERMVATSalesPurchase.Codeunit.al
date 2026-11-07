@@ -61,7 +61,7 @@
     [Scope('OnPrem')]
     procedure ErrorVATAmountOnSalesOrder()
     var
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         GeneralLedgerSetup: Record "General Ledger Setup";
     begin
         // Check that VAT Amount Difference Error raised on VAT Amount Line with Sales Order.
@@ -86,7 +86,7 @@
     procedure ErrorVATAmountOnPurchaseOrder()
     var
         GeneralLedgerSetup: Record "General Ledger Setup";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         CurrencyCode: Code[10];
     begin
         // Check that VAT Amount Difference Error raised on VAT Amount Line with Purchase Order.
@@ -111,7 +111,7 @@
     [Scope('OnPrem')]
     procedure VATDifferenceOnSalesOrder()
     var
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
     begin
         // Check VAT Difference field value on VAT Amount Line with Sales Order.
 
@@ -128,7 +128,7 @@
     [Scope('OnPrem')]
     procedure VATDifferenceOnPurchaseOrder()
     var
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
     begin
         // Check VAT Difference field value on VAT Amount Line with Purchase Order.
 
@@ -283,7 +283,7 @@
     var
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
     begin
         // Create Purchase Document and verify Negative VAT Amount Error using Random Values, Values are not important for test.
         ModifyAllowVATDifferencePurchases(false);
@@ -325,7 +325,7 @@
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
     begin
         // Create Sales Document and verify Negative VAT Amount Error using Random Values, Values are not important for test.
         ModifyAllowVATDifferenceSales(false);
@@ -346,7 +346,7 @@
     var
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         VATDifference: Decimal;
     begin
         // Check VAT Difference on VAT Amount Line for Sales Invoice after changing Customer on Sales Header.
@@ -378,7 +378,7 @@
         Currency: Record Currency;
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         VATDifference: Decimal;
     begin
         // Check VAT Difference on VAT Amount Line for Sales Order after changing Currency on Sales Header.
@@ -409,7 +409,7 @@
         Currency: Record Currency;
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         VATDifference: Decimal;
     begin
         // Check VAT Difference on VAT Amount Line for Purchase Order after changing Currency on Purchase Header.
@@ -439,7 +439,7 @@
     var
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         VATDifference: Decimal;
     begin
         // Check VAT Difference on VAT Amount Line for Purchase Invoice after changing Vendor on Purchase Header.
@@ -622,7 +622,7 @@
         SalesHeader2: Record "Sales Header";
         SalesLine: Record "Sales Line";
         GeneralLedgerSetup: Record "General Ledger Setup";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         VATDifference: Decimal;
     begin
         // Check VAT Amount on VAT Amount line after run Copy Sales Document Report which should be same with first Sales Invoice.
@@ -655,7 +655,7 @@
     [Scope('OnPrem')]
     procedure VATDifferenceOnCopyPurchDoc()
     var
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         PurchaseHeader: Record "Purchase Header";
         PurchaseHeader2: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
@@ -935,7 +935,7 @@
         VATPostingSetup: Record "VAT Posting Setup";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         MaxVATDifference: Decimal;
         GLAccountNo: Code[20];
     begin
@@ -989,7 +989,7 @@
         VATPostingSetup: Record "VAT Posting Setup";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         MaxVATDifference: Decimal;
         GLAccountNo: Code[20];
     begin
@@ -5924,7 +5924,7 @@
 
     local procedure CreateSalesDocumentAndCalcVAT(var SalesHeader: Record "Sales Header"; var SalesLine: Record "Sales Line"; DocumentType: Enum "Sales Document Type"; VATDifference: Decimal)
     var
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
     begin
         CreateSalesDocWithPartQtyToShip(SalesHeader, SalesLine, 1, DocumentType);
         CalcSalesVATAmountLines(VATAmountLine, SalesHeader, SalesLine);
@@ -6006,7 +6006,7 @@
 
     local procedure CreatePurchDocumentAndCalcVAT(var PurchaseHeader: Record "Purchase Header"; var PurchaseLine: Record "Purchase Line"; DocumentType: Enum "Purchase Document Type"; VATDifference: Decimal)
     var
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
     begin
         CreatePurchDocWithPartQtyToRcpt(PurchaseHeader, PurchaseLine, '', 1, DocumentType);
         CalcPurchaseVATAmountLines(VATAmountLine, PurchaseHeader, PurchaseLine);
@@ -6608,7 +6608,7 @@
         VerifyVATBusAndGenBusGroupOnVATEntry(DocumentNo, Vendor."VAT Bus. Posting Group", Vendor."Gen. Bus. Posting Group");
     end;
 
-    local procedure UpdateVATDiffInVATAmountLine(var VATAmountLine: Record "VAT Amount Line"; VATDifference: Decimal)
+    local procedure UpdateVATDiffInVATAmountLine(VATAmountLine: Record "VAT Amount Line"; VATDifference: Decimal)
     begin
         VATAmountLine.Validate("VAT Amount", VATAmountLine."VAT Amount" + VATDifference);
         VATAmountLine.Modify(true);
