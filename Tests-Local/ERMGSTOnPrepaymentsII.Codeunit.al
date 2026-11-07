@@ -60,7 +60,7 @@ codeunit 141027 "ERM GST On Prepayments II"
         Item: Record Item;
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         QtyType: Option General,Invoicing,Shipping;
     begin
         // [SCENARIO] VAT Amount Lines after creating Purchase Order with Prices Including VAT as True, Full GST on Prepayment on G/L Setup TRUE.
@@ -195,7 +195,7 @@ codeunit 141027 "ERM GST On Prepayments II"
         SalesLine: Record "Sales Line";
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesInvoiceLine: Record "Sales Invoice Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
         DocumentNo: Code[20];
     begin
         // [SCENARIO] VAT Amount Line after posting Sales Order with Prices including VAT TRUE and full Prepayment.
