@@ -275,7 +275,6 @@ codeunit 136822 "DA Ext. Storage Doc. Flow Test"
             AccountId,
             Enum::"Ext. File Storage Connector"::"Test File Storage Connector"
         );
-        FileConnectorMock.SetStoreFileContent(true);
     end;
 
     local procedure EnableFeatureWithDelete()
