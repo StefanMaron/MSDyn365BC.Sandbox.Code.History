@@ -2,14 +2,22 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
+namespace Microsoft.ExciseTaxes;
 
-namespace System.Test.Apps;
-
-using System.Security.AccessControl;
-
-permissionset 133100 "Ext. Mgt. Nonadmin"
+enum 7416 "Excise Bonded Handling"
 {
-    Assignable = true;
+    Extensible = true;
 
-    Permissions = tabledata "Access Control" = R;
+    value(0; "Not Bonded")
+    {
+        Caption = 'Not Bonded';
+    }
+    value(1; Bonded)
+    {
+        Caption = 'Bonded';
+    }
+    value(2; Customs)
+    {
+        Caption = 'Customs';
+    }
 }
