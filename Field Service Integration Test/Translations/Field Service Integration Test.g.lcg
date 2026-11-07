@@ -59,4 +59,22 @@
       <Cmt Name="Dev"><![CDATA[%1 - Dynamics 365 Field Service]D;]A;(Namespace=Microsoft.Test.Integration.DynamicsFieldService)(LookupHint=Codeunit FS Integration Test - NamedType SetupSuccessfulMsg)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1514372871 - NamedType 2731395484" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Attempted to synchronize an empty set of records.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.Integration.DynamicsFieldService)(LookupHint=Codeunit FS Integration Test - NamedType SynchronizeEmptySetErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1514372871 - Method 1352291239 - NamedType 1597371932" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Mapping filters must control auxiliary selection of %1.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = candidate record ID]D;]A;(Namespace=Microsoft.Test.Integration.DynamicsFieldService)(LookupHint=Codeunit FS Integration Test - Method VerifySynchronizationSelection - NamedType CandidateSelectionErr)]]></Cmt>
+    </Cmts>
+  </Item>
 </LCX>
