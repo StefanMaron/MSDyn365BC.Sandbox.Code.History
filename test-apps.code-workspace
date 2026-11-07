@@ -40,6 +40,9 @@
       "path": "./Bank Account Reconciliation With AI Tests"
     },
     {
+      "path": "./Business Central Mirroring to Fabric Tests"
+    },
+    {
       "path": "./Business Foundation Test Libraries"
     },
     {
