@@ -37,7 +37,7 @@ codeunit 141064 "ERM VAT Calc With Pmt Disc"
         GenJournalLine: Record "Gen. Journal Line";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         DocumentNo: Code[20];
         DiscountPct: Decimal;
         RemainingAmount: Decimal;
@@ -79,7 +79,7 @@ codeunit 141064 "ERM VAT Calc With Pmt Disc"
         GenJournalLine: Record "Gen. Journal Line";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         DocumentNo: Code[20];
         DiscountPct: Decimal;
         RemainingAmount: Decimal;
@@ -126,7 +126,7 @@ codeunit 141064 "ERM VAT Calc With Pmt Disc"
         GenJournalLine: Record "Gen. Journal Line";
         SalesHeader: Record "Sales Header";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         DocumentNo: Code[20];
         DiscountPct: Decimal;
         RemainingAmount: Decimal;
@@ -180,7 +180,7 @@ codeunit 141064 "ERM VAT Calc With Pmt Disc"
         GenJournalLine: Record "Gen. Journal Line";
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         DocumentNo: Code[20];
         DiscountPct: Decimal;
         RemainingAmount: Decimal;
@@ -223,7 +223,7 @@ codeunit 141064 "ERM VAT Calc With Pmt Disc"
         GenJournalLine: Record "Gen. Journal Line";
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         DocumentNo: Code[20];
         DiscountPct: Decimal;
         RemainingAmount: Decimal;
@@ -270,7 +270,7 @@ codeunit 141064 "ERM VAT Calc With Pmt Disc"
         GenJournalLine: Record "Gen. Journal Line";
         PurchaseHeader: Record "Purchase Header";
         PurchaseLine: Record "Purchase Line";
-        VATAmountLine: Record "VAT Amount Line" temporary;
+        VATAmountLine: Record "VAT Amount Line";
         DocumentNo: Code[20];
         DiscountPct: Decimal;
         RemainingAmount: Decimal;
