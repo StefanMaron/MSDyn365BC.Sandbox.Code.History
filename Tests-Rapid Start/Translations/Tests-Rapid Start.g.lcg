@@ -338,6 +338,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM RS Fld. Validate and Apply - NamedType PackageValidationError)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 212164422 - NamedType 473905689" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Unsupported comment parent type %1.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 - comment table name]D;]A;(LookupHint=Codeunit ERM RS Fld. Validate and Apply - NamedType UnsupportedCommentParentTypeErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 116448766 - NamedType 1490770099" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Cannot add a parent table. This table is already included in a three-level hierarchy, which is the maximum.]]></Val>
