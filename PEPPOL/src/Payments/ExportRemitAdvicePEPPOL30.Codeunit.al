@@ -302,7 +302,7 @@ codeunit 37208 "Export Remit. Advice PEPPOL30"
             if LineBuffer."Pmt. Discount Amount" <> 0 then
                 this.AddCbcElement(LineNode, 'Note', StrSubstNo(this.PmtDiscountNoteMsg, this.FormatAmount(LineBuffer."Pmt. Discount Amount")), ChildNode);
 
-            if LineBuffer."Applied Doc. Type" = LineBuffer."Applied Doc. Type"::"Credit Memo" then
+            if LineBuffer."Applied Doc. Type" in [LineBuffer."Applied Doc. Type"::"Credit Memo", LineBuffer."Applied Doc. Type"::Refund] then
                 this.AddMoneyElement(LineNode, 'CreditLineAmount', LineBuffer."Paid Amount", LineCurrencyCode, ChildNode)
             else
                 this.AddMoneyElement(LineNode, 'DebitLineAmount', LineBuffer."Paid Amount", LineCurrencyCode, ChildNode);
@@ -310,7 +310,7 @@ codeunit 37208 "Export Remit. Advice PEPPOL30"
             this.AddMoneyElement(LineNode, 'BalanceAmount', LineBuffer."Remaining Amount", LineCurrencyCode, ChildNode);
 
             this.AddCacElement(LineNode, 'BillingReference', BillingRefNode);
-            if LineBuffer."Applied Doc. Type" = LineBuffer."Applied Doc. Type"::"Credit Memo" then
+            if LineBuffer."Applied Doc. Type" in [LineBuffer."Applied Doc. Type"::"Credit Memo", LineBuffer."Applied Doc. Type"::Refund] then
                 this.AddCacElement(BillingRefNode, 'CreditNoteDocumentReference', DocRefNode)
             else
                 this.AddCacElement(BillingRefNode, 'InvoiceDocumentReference', DocRefNode);
