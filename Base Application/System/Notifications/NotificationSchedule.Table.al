@@ -436,9 +436,7 @@ table 1513 "Notification Schedule"
     local procedure SendNotificationInForeground()
     var
         TempJobQueueEntry: Record "Job Queue Entry" temporary;
-        NotificationEntryDispatcher: Codeunit "Notification Entry Dispatcher";
     begin
-        NotificationEntryDispatcher.SetRunInForeground(true);
-        NotificationEntryDispatcher.Run(TempJobQueueEntry);
+        Codeunit.Run(CODEUNIT::"Notification Entry Dispatcher", TempJobQueueEntry);
     end;
 }
