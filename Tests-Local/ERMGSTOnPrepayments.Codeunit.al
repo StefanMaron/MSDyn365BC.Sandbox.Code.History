@@ -500,7 +500,7 @@ codeunit 141026 "ERM GST On Prepayments"
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesInvoiceLine: Record "Sales Invoice Line";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
     begin
         // [SCENARIO] verify VAT Amount line after posting General Journal line applied to Sales Prepayment Invoice.
 
@@ -887,7 +887,7 @@ codeunit 141026 "ERM GST On Prepayments"
         SalesInvoiceHeader: Record "Sales Invoice Header";
         SalesInvoiceLine: Record "Sales Invoice Line";
         SalesLine: Record "Sales Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
     begin
         // [GIVEN] Post Sales Prepayment Invoice and apply Payment. Post Sales Order and Create Payment.
         Initialize();
@@ -1544,7 +1544,7 @@ codeunit 141026 "ERM GST On Prepayments"
     local procedure VerifyVATAmountLine(PurchaseLine: Record "Purchase Line"; PurchInvHeader: Record "Purch. Inv. Header"; VATBase: Decimal; VATAmount: Decimal; AmountIncludingVAT: Decimal)
     var
         PurchInvLine: Record "Purch. Inv. Line";
-        VATAmountLine: Record "VAT Amount Line";
+        VATAmountLine: Record "VAT Amount Line" temporary;
     begin
         PurchInvLine.CalcVATAmountLines(PurchInvHeader, VATAmountLine);
         VATAmountLine.TestField("VAT %", PurchaseLine."VAT %");
