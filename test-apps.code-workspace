@@ -1,11 +1,11 @@
 {
   "settings": {
+    "allint.enabled": false,
+    "al.enableCodeActions": false,
     "search.exclude": {
       "**.xlf": true
     },
-    "al.enableCodeAnalysis": false,
-    "al.enableCodeActions": false,
-    "allint.enabled": false
+    "al.enableCodeAnalysis": false
   },
   "folders": [
     {
@@ -354,25 +354,7 @@
       "path": "./Withholding Tax Tests"
     },
     {
-      "path": "./AI Test Toolkit/src/TestSuite"
-    },
-    {
-      "path": "./Performance Toolkit Tests/src/Mock Tests"
-    },
-    {
-      "path": "./System Application Test Library/Extension Management/testArtifacts"
-    },
-    {
-      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
-    },
-    {
-      "path": "./Test Runner/src/DataDrivenTest"
-    },
-    {
-      "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
-    },
-    {
-      "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
+      "path": "./System Application/Email/src/Test Email"
     },
     {
       "path": "./Sales Lines Suggestions Tests/AI Tests"
@@ -381,16 +363,34 @@
       "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
     },
     {
-      "path": "./System Application/Email/src/Test Email"
+      "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
     },
     {
-      "path": "./Quality Management/src/Configuration/Template/Test"
+      "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
     },
     {
       "path": "./Base Application/System/DevTools/CALTest"
     },
     {
+      "path": "./System Application Test Library/Extension Management/testArtifacts"
+    },
+    {
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
+    },
+    {
       "path": "./Subcontracting-Tests/Tests"
+    },
+    {
+      "path": "./Test Runner/src/DataDrivenTest"
+    },
+    {
+      "path": "./AI Test Toolkit/src/TestSuite"
+    },
+    {
+      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
+    },
+    {
+      "path": "./Quality Management/src/Configuration/Template/Test"
     }
   ]
 }
