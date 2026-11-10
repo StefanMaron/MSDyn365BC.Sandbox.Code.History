@@ -5,7 +5,6 @@
 namespace Microsoft.eServices.EDocument.Format;
 
 using Microsoft.eServices.EDocument;
-using Microsoft.eServices.EDocument.Processing.AI;
 using Microsoft.eServices.EDocument.Processing.Import;
 using Microsoft.eServices.EDocument.Processing.Import.Purchase;
 using Microsoft.eServices.EDocument.Processing.Interfaces;
@@ -79,16 +78,14 @@ codeunit 6231 "E-Document MLLM Handler" implements IStructureReceivedEDocument, 
         AOAIChatCompletionParams: Codeunit "AOAI Chat Completion Params";
         AOAIUserMessage: Codeunit "AOAI User Message";
         AOAIOperationResponse: Codeunit "AOAI Operation Response";
-        EDocAIToolProcessor: Codeunit "E-Doc. AI Tool Processor";
+        AOAIDeployments: Codeunit "AOAI Deployments";
         EDocMLLMSchemaHelper: Codeunit "E-Doc. MLLM Schema Helper";
         FromTempBlob: Codeunit "Temp Blob";
         CustomDimensions: Dictionary of [Text, Text];
         InStream: InStream;
         Base64Data: Text;
-        DeploymentName: Text;
         StartTime: DateTime;
         DurationMs: Integer;
-        UseCase: Option "Matching Assistance","PDF Extraction";
     begin
         // Load schema and convert PDF to base64
         FromTempBlob := EDocumentDataStorage.GetTempBlob();
@@ -96,12 +93,10 @@ codeunit 6231 "E-Document MLLM Handler" implements IStructureReceivedEDocument, 
         Base64Data := Base64Convert.ToBase64(InStream);
 
         // Build AOAI call
-        DeploymentName := EDocAIToolProcessor.GetChatCompletionsDeployment(UseCase::"PDF Extraction");
-        AzureOpenAI.SetAuthorization(Enum::"AOAI Model Type"::"Chat Completions", DeploymentName);
+        AzureOpenAI.SetAuthorization(Enum::"AOAI Model Type"::"Chat Completions", AOAIDeployments.GetGPT41MiniPreview());
         AzureOpenAI.SetCopilotCapability(Enum::"Copilot Capability"::"E-Document MLLM Analysis");
 
         AOAIChatCompletionParams.SetTemperature(0);
-        AOAIChatCompletionParams.SetMaxTokens(GetMaxTokens());
         AOAIChatCompletionParams.SetJsonMode(true);
 
         AOAIChatMessages.SetPrimarySystemMessage(NavApp.GetResourceAsText(SystemPromptResourceTok, TextEncoding::UTF8));
@@ -116,7 +111,6 @@ codeunit 6231 "E-Document MLLM Handler" implements IStructureReceivedEDocument, 
 
         CustomDimensions := GetCustomDimensions();
         CustomDimensions.Add('DurationMs', Format(DurationMs));
-        CustomDimensions.Add('Model', DeploymentName);
 
         if not AOAIOperationResponse.IsSuccess() then begin
             Telemetry.LogMessage('0000SGS', MLLMApiCallFailedMsg, Verbosity::Warning, DataClassification::SystemMetadata, TelemetryScope::All, CustomDimensions);
@@ -333,11 +327,6 @@ codeunit 6231 "E-Document MLLM Handler" implements IStructureReceivedEDocument, 
     begin
         if not CopilotCapability.IsCapabilityRegistered(Enum::"Copilot Capability"::"E-Document MLLM Analysis") then
             CopilotCapability.RegisterCapability(Enum::"Copilot Capability"::"E-Document MLLM Analysis", '');
-    end;
-
-    local procedure GetMaxTokens(): Integer
-    begin
-        exit(50000);
     end;
 
 }
