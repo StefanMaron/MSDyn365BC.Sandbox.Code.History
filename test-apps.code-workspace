@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "allint.enabled": false,
+    "al.enableCodeActions": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeAnalysis": false
+  },
   "folders": [
     {
       "path": "./_Exclude_APIV1_ Tests"
@@ -280,25 +288,7 @@
       "path": "./VAT Group Management Tests"
     },
     {
-      "path": "./AI Test Toolkit/src/TestSuite"
-    },
-    {
-      "path": "./Performance Toolkit Tests/src/Mock Tests"
-    },
-    {
-      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
-    },
-    {
-      "path": "./Test Runner/src/DataDrivenTest"
-    },
-    {
-      "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
-    },
-    {
-      "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
-    },
-    {
-      "path": "./Business Foundation Tests/DisabledTests"
+      "path": "./System Application/Email/src/Test Email"
     },
     {
       "path": "./Sales Lines Suggestions Tests/AI Tests"
@@ -307,24 +297,34 @@
       "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
     },
     {
-      "path": "./System Application/Email/src/Test Email"
+      "path": "./System Application Test/DisabledTests"
+    },
+    {
+      "path": "./System Application Test/Extension Management/testArtifacts"
+    },
+    {
+      "path": "./Business Foundation Tests/DisabledTests"
+    },
+    {
+      "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
+    },
+    {
+      "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
     },
     {
       "path": "./Base Application/System/DevTools/CALTest"
     },
     {
-      "path": "./System Application Test/DisabledTests"
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
     },
     {
-      "path": "./System Application Test/Extension Management/testArtifacts"
+      "path": "./Test Runner/src/DataDrivenTest"
+    },
+    {
+      "path": "./AI Test Toolkit/src/TestSuite"
+    },
+    {
+      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
     }
-  ],
-  "settings": {
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
-    "al.enableCodeActions": false,
-    "search.exclude": {
-      "**.xlf": true
-    }
-  }
+  ]
 }
