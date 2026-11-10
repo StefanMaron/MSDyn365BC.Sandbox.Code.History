@@ -1,11 +1,11 @@
 {
   "settings": {
+    "allint.enabled": false,
+    "al.enableCodeActions": false,
     "search.exclude": {
       "**.xlf": true
     },
-    "al.enableCodeAnalysis": false,
-    "al.enableCodeActions": false,
-    "allint.enabled": false
+    "al.enableCodeAnalysis": false
   },
   "folders": [
     {
@@ -294,31 +294,7 @@
       "path": "./VAT Group Management Tests"
     },
     {
-      "path": "./Subscription Billing Tests/DisabledTests"
-    },
-    {
-      "path": "./AI Test Toolkit/src/TestSuite"
-    },
-    {
-      "path": "./Performance Toolkit Tests/src/Mock Tests"
-    },
-    {
-      "path": "./Shopify Connector Test/DisabledTests"
-    },
-    {
-      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
-    },
-    {
-      "path": "./Test Runner/src/DataDrivenTest"
-    },
-    {
-      "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
-    },
-    {
-      "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
-    },
-    {
-      "path": "./Business Foundation Tests/DisabledTests"
+      "path": "./System Application/Email/src/Test Email"
     },
     {
       "path": "./Sales Lines Suggestions Tests/AI Tests"
@@ -327,16 +303,40 @@
       "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
     },
     {
-      "path": "./System Application/Email/src/Test Email"
-    },
-    {
-      "path": "./Base Application/System/DevTools/CALTest"
+      "path": "./Subscription Billing Tests/DisabledTests"
     },
     {
       "path": "./System Application Test/DisabledTests"
     },
     {
       "path": "./System Application Test/Extension Management/testArtifacts"
+    },
+    {
+      "path": "./Business Foundation Tests/DisabledTests"
+    },
+    {
+      "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
+    },
+    {
+      "path": "./Bank Account Reconciliation With AI Tests/src/UnitTests"
+    },
+    {
+      "path": "./Base Application/System/DevTools/CALTest"
+    },
+    {
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
+    },
+    {
+      "path": "./Shopify Connector Test/DisabledTests"
+    },
+    {
+      "path": "./Test Runner/src/DataDrivenTest"
+    },
+    {
+      "path": "./AI Test Toolkit/src/TestSuite"
+    },
+    {
+      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
     }
   ]
 }
