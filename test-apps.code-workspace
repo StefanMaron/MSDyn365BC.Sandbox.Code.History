@@ -150,7 +150,10 @@
       "path": "./Tests-Workflow"
     },
     {
-      "path": "./AI Test Toolkit/src/TestSuite"
+      "path": "./System Application/Email/src/Test Email"
+    },
+    {
+      "path": "./Base Application/System/DevTools/CALTest"
     },
     {
       "path": "./Performance Toolkit Tests/src/Mock Tests"
@@ -159,10 +162,7 @@
       "path": "./Test Runner/src/DataDrivenTest"
     },
     {
-      "path": "./System Application/Email/src/Test Email"
-    },
-    {
-      "path": "./Base Application/System/DevTools/CALTest"
+      "path": "./AI Test Toolkit/src/TestSuite"
     }
   ]
 }
