@@ -13,9 +13,19 @@ codeunit 134836 "Test Vendor Lookup"
         LibraryTestInitialize: Codeunit "Library - Test Initialize";
         LibraryUtility: Codeunit "Library - Utility";
         LibraryVariableStorage: Codeunit "Library - Variable Storage";
+        LibraryPurchase: Codeunit "Library - Purchase";
         LibrarySmallBusiness: Codeunit "Library - Small Business";
         isInitialized: Boolean;
+        VendorChangeConfirmCount: Integer;
         SelectVendErr: Label 'You must select an existing vendor.';
+        PurchaseOrderChangedErr: Label 'Changing the vendor on one purchase order must not change the next order in the filtered view.';
+        ChangeVendorQst: Label 'Do you want to change %1?', Comment = '%1 = a vendor role.';
+        BuyFromVendorTxt: Label 'Buy-from Vendor';
+        PayToVendorTxt: Label 'Pay-to Vendor';
+        UnexpectedConfirmErr: Label 'Unexpected vendor-change confirmation: %1', Comment = '%1 = the confirmation question.';
+        VendorChangeNotConfirmedErr: Label 'The vendor change on the edited order must be confirmed.';
+        BuyFromVendorChangedErr: Label 'Unexpected Buy-from vendor on purchase order %1.', Comment = '%1 = a purchase order number.';
+        PayToVendorChangedErr: Label 'Unexpected Pay-to vendor on purchase order %1.', Comment = '%1 = a purchase order number.';
 
     local procedure Initialize()
     var
@@ -153,6 +163,92 @@ codeunit 134836 "Test Vendor Lookup"
         Assert.ExpectedError(SelectVendErr);
     end;
 
+    [Test]
+    [HandlerFunctions('VendorLookupPageHandler,ConfirmHandlerYes')]
+    [Scope('OnPrem')]
+    procedure ChangingVendorOnFilteredPurchaseOrderDoesNotChangeNextOrder()
+    var
+        OriginalVendor: Record Vendor;
+        ReplacementVendor: Record Vendor;
+        FirstPurchaseHeader: Record "Purchase Header";
+        NextPurchaseHeader: Record "Purchase Header";
+        PurchaseOrder: TestPage "Purchase Order";
+    begin
+        Initialize();
+        CreateVend(OriginalVendor);
+        CreateVend(ReplacementVendor);
+        LibraryPurchase.CreatePurchHeader(FirstPurchaseHeader, FirstPurchaseHeader."Document Type"::Order, OriginalVendor."No.");
+        LibraryPurchase.CreatePurchHeader(NextPurchaseHeader, NextPurchaseHeader."Document Type"::Order, OriginalVendor."No.");
+
+        // Exercise: Select a replacement vendor on the first order while the card is filtered to the original vendor.
+        PurchaseOrder.OpenEdit();
+        PurchaseOrder.FILTER.SetFilter("Buy-from Vendor No.", OriginalVendor."No.");
+        PurchaseOrder.GotoRecord(FirstPurchaseHeader);
+        LibraryVariableStorage.Enqueue(ReplacementVendor."No.");
+        PurchaseOrder."Buy-from Vendor Name".Lookup();
+        PurchaseOrder.Close();
+
+        // Verify: The selected order changes vendor, but the next order remains with its original vendor.
+        FirstPurchaseHeader.Get(FirstPurchaseHeader."Document Type"::Order, FirstPurchaseHeader."No.");
+        NextPurchaseHeader.Get(NextPurchaseHeader."Document Type"::Order, NextPurchaseHeader."No.");
+        Assert.AreEqual(ReplacementVendor."No.", FirstPurchaseHeader."Buy-from Vendor No.", PurchaseOrderChangedErr);
+        Assert.AreEqual(ReplacementVendor."No.", FirstPurchaseHeader."Pay-to Vendor No.", PurchaseOrderChangedErr);
+        Assert.AreEqual(OriginalVendor."No.", NextPurchaseHeader."Buy-from Vendor No.", PurchaseOrderChangedErr);
+        Assert.AreEqual(OriginalVendor."No.", NextPurchaseHeader."Pay-to Vendor No.", PurchaseOrderChangedErr);
+    end;
+
+    [Test]
+    [HandlerFunctions('VendorLookupPageHandler,ConfirmVendorChangeOnlyForEditedOrder')]
+    [Scope('OnPrem')]
+    procedure ChangingVendorOnNameFilteredOrderDoesNotChangeOtherOrders()
+    var
+        OriginalVendor: Record Vendor;
+        ReplacementVendor: Record Vendor;
+        PurchaseHeaders: array[4] of Record "Purchase Header";
+        PurchaseOrder: TestPage "Purchase Order";
+        OrderIndex: Integer;
+        ExpectedVendorNo: Code[20];
+    begin
+        // [SCENARIO 654036] Vendor lookup on a Purchase Order filtered by Buy-from Vendor Name changes only that order
+        Initialize();
+        VendorChangeConfirmCount := 0;
+
+        // [GIVEN] Four purchase orders for the same vendor
+        CreateVend(OriginalVendor);
+        CreateVend(ReplacementVendor);
+        for OrderIndex := 1 to ArrayLen(PurchaseHeaders) do
+            LibraryPurchase.CreatePurchHeader(
+                PurchaseHeaders[OrderIndex], PurchaseHeaders[OrderIndex]."Document Type"::Order, OriginalVendor."No.");
+
+        // [GIVEN] Purchase Order card filtered by Buy-from Vendor Name and positioned on the first order
+        PurchaseOrder.OpenEdit();
+        PurchaseOrder.FILTER.SetFilter("Buy-from Vendor Name", OriginalVendor.Name);
+        PurchaseOrder.GotoRecord(PurchaseHeaders[1]);
+        PurchaseOrder."No.".AssertEquals(PurchaseHeaders[1]."No.");
+
+        // [WHEN] A replacement vendor is selected through the Vendor Name lookup
+        LibraryVariableStorage.Enqueue(ReplacementVendor."No.");
+        PurchaseOrder."Buy-from Vendor Name".Lookup();
+        PurchaseOrder.Close();
+
+        // [THEN] Only the vendor change on the edited order is confirmed
+        Assert.IsTrue(VendorChangeConfirmCount > 0, VendorChangeNotConfirmedErr);
+
+        // [THEN] Only the first order has the replacement vendor; the other orders are unchanged
+        for OrderIndex := 1 to ArrayLen(PurchaseHeaders) do begin
+            PurchaseHeaders[OrderIndex].Get(PurchaseHeaders[OrderIndex]."Document Type"::Order, PurchaseHeaders[OrderIndex]."No.");
+            ExpectedVendorNo := OriginalVendor."No.";
+            if OrderIndex = 1 then
+                ExpectedVendorNo := ReplacementVendor."No.";
+            Assert.AreEqual(
+                ExpectedVendorNo, PurchaseHeaders[OrderIndex]."Buy-from Vendor No.",
+                StrSubstNo(BuyFromVendorChangedErr, PurchaseHeaders[OrderIndex]."No."));
+            Assert.AreEqual(
+                ExpectedVendorNo, PurchaseHeaders[OrderIndex]."Pay-to Vendor No.",
+                StrSubstNo(PayToVendorChangedErr, PurchaseHeaders[OrderIndex]."No."));
+        end;
+    end;
+
     local procedure CreateTwoVendorsSameName(var Vend: Record Vendor)
     var
         Vend1: Record Vendor;
@@ -208,6 +304,28 @@ codeunit 134836 "Test Vendor Lookup"
         Vend.Validate("Address 2", LibraryUtility.GenerateRandomCode(Vend.FieldNo("Address 2"), DATABASE::Vendor));
         Vend.Validate("Post Code", LibraryUtility.GenerateRandomCode(Vend.FieldNo("Post Code"), DATABASE::Vendor));
         Vend.Modify();
+    end;
+
+    [ModalPageHandler]
+    [Scope('OnPrem')]
+    procedure VendorLookupPageHandler(var VendorLookup: TestPage "Vendor Lookup")
+    begin
+        VendorLookup.GotoKey(LibraryVariableStorage.DequeueText());
+        VendorLookup.OK().Invoke();
+    end;
+
+    [ConfirmHandler]
+    [Scope('OnPrem')]
+    procedure ConfirmVendorChangeOnlyForEditedOrder(Question: Text[1024]; var Reply: Boolean)
+    begin
+        // Some localizations pass the unformatted label, so accept both the label and the formatted Buy-from/Pay-to questions.
+        // More than the Buy-from and Pay-to confirmations means the change is being reapplied to another order.
+        if not (Question in [ChangeVendorQst, StrSubstNo(ChangeVendorQst, BuyFromVendorTxt), StrSubstNo(ChangeVendorQst, PayToVendorTxt)]) then
+            Error(UnexpectedConfirmErr, Question);
+        VendorChangeConfirmCount += 1;
+        if VendorChangeConfirmCount > 2 then
+            Error(UnexpectedConfirmErr, Question);
+        Reply := true;
     end;
 
     [ConfirmHandler]
