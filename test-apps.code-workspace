@@ -304,9 +304,6 @@
       "path": "./Subscription Billing Tests/DisabledTests"
     },
     {
-      "path": "./Subcontracting-Tests/Tests"
-    },
-    {
       "path": "./System Application Test/DisabledTests"
     },
     {
@@ -335,6 +332,9 @@
     },
     {
       "path": "./Shopify Connector Test/DisabledTests"
+    },
+    {
+      "path": "./Subcontracting-Tests/Tests"
     },
     {
       "path": "./Test Runner/src/DataDrivenTest"
