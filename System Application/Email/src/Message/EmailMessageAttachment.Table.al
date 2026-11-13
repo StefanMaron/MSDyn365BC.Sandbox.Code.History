@@ -67,10 +67,6 @@ table 8904 "Email Message Attachment"
         {
 
         }
-
-        key(Data; Data)
-        {
-        }
     }
 
 }
