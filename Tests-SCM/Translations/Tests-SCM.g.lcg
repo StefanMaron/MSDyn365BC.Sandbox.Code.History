@@ -2255,6 +2255,24 @@
       <Cmt Name="Dev"><![CDATA[%1: Item Ledger Entry No.]D;]A;(LookupHint=Codeunit SCM Inventory Orders-II - Method VerifyItemLedgEntriesAmount - NamedType WrongCostAmountErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3569328050 - NamedType 3137049135" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Expected one aggregated row per item/customer.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Reports - I - NamedType CustomerSalesAggregatedRowCountErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3569328050 - NamedType 1672758044" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Expected two customer rows and one item subtotal, without empty ledger entry rows.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Inventory Reports - I - NamedType CustomerSalesRowCountErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3569328050 - NamedType 841846586" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Row count in report Inventory Validation before posting purchase order should be the same as after posting purchase order]]></Val>
