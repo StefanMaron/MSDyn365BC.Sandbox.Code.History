@@ -163,7 +163,14 @@ table 4401 "EXR Aging Report Buffer"
 
     internal procedure SetReportingDate()
     begin
-        Rec."Reporting Date" := GetAgingDate();
+        case Rec."Aged By" of
+            Rec."Aged By"::"Due Date":
+                Rec."Reporting Date" := Rec."Due Date";
+            Rec."Aged By"::"Posting Date":
+                Rec."Reporting Date" := Rec."Posting Date";
+            Rec."Aged By"::"Document Date":
+                Rec."Reporting Date" := Rec."Document Date";
+        end;
 
         Rec."Reporting Date Month" := Date2DMY(Rec."Reporting Date", 2);
         Rec."Reporting Date Year" := Date2DMY(Rec."Reporting Date", 3);
@@ -176,41 +183,46 @@ table 4401 "EXR Aging Report Buffer"
     end;
 
     internal procedure SetPeriodStartAndEndDate(PeriodStarts: List of [Date]; PeriodEnds: List of [Date])
-    var
-        PeriodIndex: Integer;
-    begin
-        PeriodIndex := FindPeriodIndex(GetAgingDate(), PeriodStarts);
-        if PeriodIndex = 0 then begin
-            Clear(Rec."Period Start Date");
-            Clear(Rec."Period End Date");
-            exit;
-        end;
-
-        Rec."Period Start Date" := PeriodStarts.Get(PeriodIndex);
-        Rec."Period End Date" := PeriodEnds.Get(PeriodIndex);
-    end;
-
-    local procedure GetAgingDate(): Date
     begin
         case Rec."Aged By" of
             Rec."Aged By"::"Due Date":
-                exit(Rec."Due Date");
+                begin
+                    Rec."Period Start Date" := FindPeriodStart(Rec."Due Date", PeriodStarts);
+                    Rec."Period End Date" := FindPeriodEnd(Rec."Due Date", PeriodEnds);
+                end;
             Rec."Aged By"::"Posting Date":
-                exit(Rec."Posting Date");
+                begin
+                    Rec."Period Start Date" := FindPeriodStart(Rec."Posting Date", PeriodStarts);
+                    Rec."Period End Date" := FindPeriodEnd(Rec."Posting Date", PeriodEnds);
+                end;
             Rec."Aged By"::"Document Date":
-                exit(Rec."Document Date");
+                begin
+                    Rec."Period Start Date" := FindPeriodStart(Rec."Document Date", PeriodStarts);
+                    Rec."Period End Date" := FindPeriodEnd(Rec."Document Date", PeriodEnds);
+                end;
         end;
     end;
 
-    local procedure FindPeriodIndex(WhatDate: Date; PeriodStarts: List of [Date]): Integer
+    local procedure FindPeriodStart(WhatDate: Date; PeriodStarts: List of [Date]): Date
     var
-        Index: Integer;
+        PossibleDate: Date;
     begin
-        for Index := 1 to PeriodStarts.Count() do
-            if WhatDate >= PeriodStarts.Get(Index) then
-                exit(Index);
+        foreach PossibleDate in PeriodStarts do
+            if WhatDate >= PossibleDate then
+                exit(PossibleDate);
 
-        exit(0);
+        exit(PossibleDate);
+    end;
+
+    local procedure FindPeriodEnd(WhatDate: Date; PeriodEnds: List of [Date]): Date
+    var
+        PossibleDate: Date;
+    begin
+        foreach PossibleDate in PeriodEnds do
+            if WhatDate < PossibleDate then
+                exit(PossibleDate);
+
+        exit(PossibleDate);
     end;
 
     [IntegrationEvent(false, false)]
