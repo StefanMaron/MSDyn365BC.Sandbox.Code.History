@@ -226,6 +226,9 @@
       "path": "./Tests-Company Creation"
     },
     {
+      "path": "./Tests-Concurrent Posting"
+    },
+    {
       "path": "./Tests-Cost Accounting"
     },
     {
