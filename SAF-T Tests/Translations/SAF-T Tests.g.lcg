@@ -5,6 +5,177 @@
     <Cmt Name="LcxAdmin" />
     <Cmt Name="Rccx" />
   </OwnedComments>
+  <Item ItemId=";Codeunit 1721378017 - NamedType 322449200" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended No. mismatch for account %1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: Account No.]D;]A;(LookupHint=Codeunit Extended Category Import Tests - NamedType AccountExtendedNoMismatchErrLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1721378017 - NamedType 2102225167" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Extended No. mismatch for category %1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: Category No.]D;]A;(LookupHint=Codeunit Extended Category Import Tests - NamedType CategoryExtendedNoMismatchErrLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1721378017 - NamedType 1249646167" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Description mismatch for category %1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: Category No.]D;]A;(LookupHint=Codeunit Extended Category Import Tests - NamedType DescriptionMismatchErrLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1721378017 - NamedType 2360009623" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[<GroupingCode><CategoryCode>%1</CategoryCode><CategoryDescription>%2</CategoryDescription><AccountNo>%3</AccountNo><AccountDescription>Account 1</AccountDescription></GroupingCode>]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: Category Code, %2: Category Description, %3: Account No.]D;]A;(LookupHint=Codeunit Extended Category Import Tests - NamedType GroupingCodeAccount1XMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1721378017 - NamedType 2552303354" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[<GroupingCode><CategoryCode>%1</CategoryCode><CategoryDescription>%2</CategoryDescription><AccountNo>%3</AccountNo><AccountDescription>Account 2</AccountDescription></GroupingCode>]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: Category Code, %2: Category Description, %3: Account No.]D;]A;(LookupHint=Codeunit Extended Category Import Tests - NamedType GroupingCodeAccount2XMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1721378017 - NamedType 283693977" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[<GroupingCode><CategoryCode>%1</CategoryCode><CategoryDescription>%2</CategoryDescription><AccountNo>%3</AccountNo><AccountDescription>Account 3</AccountDescription></GroupingCode>]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: Category Code, %2: Category Description, %3: Account No.]D;]A;(LookupHint=Codeunit Extended Category Import Tests - NamedType GroupingCodeAccount3XMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1721378017 - NamedType 2070084807" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[<GroupingCode><CategoryCode>%1</CategoryCode><CategoryDescription>Desc 1</CategoryDescription><AccountNo>ACC001</AccountNo><AccountDescription>Account 1</AccountDescription></GroupingCode>]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: Category Code]D;]A;(LookupHint=Codeunit Extended Category Import Tests - NamedType GroupingCodeDesc1XMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1721378017 - NamedType 3600555242" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[<GroupingCode><CategoryCode>%1</CategoryCode><CategoryDescription>Desc 2</CategoryDescription><AccountNo>ACC002</AccountNo><AccountDescription>Account 2</AccountDescription></GroupingCode>]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: Category Code]D;]A;(LookupHint=Codeunit Extended Category Import Tests - NamedType GroupingCodeDesc2XMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1721378017 - NamedType 545032521" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[<GroupingCode><CategoryCode>%1</CategoryCode><CategoryDescription>Desc 3</CategoryDescription><AccountNo>ACC003</AccountNo><AccountDescription>Account 3</AccountDescription></GroupingCode>]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: Category Code]D;]A;(LookupHint=Codeunit Extended Category Import Tests - NamedType GroupingCodeDesc3XMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1721378017 - NamedType 2081143894" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[<Root><GroupingCode><CategoryCode>%1</CategoryCode><CategoryDescription>%2</CategoryDescription><CategoryDescription>%3</CategoryDescription><AccountNo>%4</AccountNo><AccountDescription>%5</AccountDescription></GroupingCode></Root>]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: Category Code, %2: Category Description, %3: Extended Category Description, %4: Account No., %5: Account Description]D;]A;(LookupHint=Codeunit Extended Category Import Tests - NamedType GroupingCodeExtendedXMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1721378017 - NamedType 988165809" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[<GroupingCode><CategoryCode>%1</CategoryCode><CategoryDescription>Long Desc 1</CategoryDescription><AccountNo>ACC001</AccountNo><AccountDescription>Account 1</AccountDescription></GroupingCode>]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: Category Code]D;]A;(LookupHint=Codeunit Extended Category Import Tests - NamedType GroupingCodeLongDesc1XMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1721378017 - NamedType 551920144" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[<GroupingCode><CategoryCode>%1</CategoryCode><CategoryDescription>Long Desc 2</CategoryDescription><AccountNo>ACC003</AccountNo><AccountDescription>Account 3</AccountDescription></GroupingCode>]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: Category Code]D;]A;(LookupHint=Codeunit Extended Category Import Tests - NamedType GroupingCodeLongDesc2XMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1721378017 - NamedType 763584258" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[<GroupingCode><CategoryCode>%1</CategoryCode><CategoryDescription>Long Desc</CategoryDescription><AccountNo>ACC002</AccountNo><AccountDescription>Account 2</AccountDescription></GroupingCode>]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: Category Code]D;]A;(LookupHint=Codeunit Extended Category Import Tests - NamedType GroupingCodeLongDescXMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1721378017 - NamedType 3272146496" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[<GroupingCode><CategoryCode>%1</CategoryCode><CategoryDescription>Short Desc</CategoryDescription><AccountNo>ACC002</AccountNo><AccountDescription>Account 2</AccountDescription></GroupingCode>]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: Category Code]D;]A;(LookupHint=Codeunit Extended Category Import Tests - NamedType GroupingCodeShortDesc2XMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1721378017 - NamedType 1948843090" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[<GroupingCode><CategoryCode>%1</CategoryCode><CategoryDescription>Short Desc</CategoryDescription><AccountNo>ACC001</AccountNo><AccountDescription>Account 1</AccountDescription></GroupingCode>]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: Category Code]D;]A;(LookupHint=Codeunit Extended Category Import Tests - NamedType GroupingCodeShortDescXMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1721378017 - NamedType 2425239951" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[<Root><GroupingCode><CategoryCode>%1</CategoryCode><CategoryDescription>%2</CategoryDescription><AccountNo>%3</AccountNo><AccountDescription>%4</AccountDescription></GroupingCode></Root>]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: Category Code, %2: Category Description, %3: Account No., %4: Account Description]D;]A;(LookupHint=Codeunit Extended Category Import Tests - NamedType GroupingCodeXMLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3289622092 - NamedType 3354745171" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[File name must end with %1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: File name suffix]D;]A;(LookupHint=Codeunit SAF-T Tests - NamedType FileNameEndErrLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3289622092 - NamedType 2607612018" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[File name must start with %1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: File name prefix]D;]A;(LookupHint=Codeunit SAF-T Tests - NamedType FileNameStartErrLbl)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3289622092 - NamedType 2745318062" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[SAF-T Financial_%1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1: VAT Registration No.]D;]A;(LookupHint=Codeunit SAF-T Tests - NamedType SAFTFinancialFileNameLbl)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 718785194 - NamedType 3352988643" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[DEFAULT SAF-T]]></Val>

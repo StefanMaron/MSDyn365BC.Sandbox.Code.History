@@ -4,7 +4,7 @@
   "publisher": "Microsoft",
   "brief": "Tests for the Report Filename Manager app.",
   "description": "Proves that one configured pattern names a report identically on every delivery route. DESTRUCTIVE: it deletes every row of Report Filename Pattern to isolate its own, and creates job queue entries. It refuses to run unless the environment is a sandbox or an on-premises installation. Never install it in a production environment.",
-  "version": "30.0.58159.0",
+  "version": "30.0.58196.0",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
   "EULA": "https://go.microsoft.com/fwlink/?linkid=2009120",
   "help": "https://go.microsoft.com/fwlink/?LinkId=724011",

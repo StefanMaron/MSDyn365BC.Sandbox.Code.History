@@ -2,7 +2,7 @@
   "id": "dfe6916f-cba8-4973-afdc-1544705c661f",
   "name": "SAF-T Tests",
   "publisher": "Microsoft",
-  "version": "30.0.58159.0",
+  "version": "30.0.58196.0",
   "brief": "Tests for the SAF-T extension.",
   "description": "Tests for the SAF-T extension.",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
@@ -55,6 +55,9 @@
       "from": 139537,
       "to": 139537
     }
+  ],
+  "features": [
+    "TranslationFile"
   ],
   "resourceExposurePolicy": {
     "allowDebugging": true,
