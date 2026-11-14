@@ -14,6 +14,15 @@
       <Cmt Name="Dev"><![CDATA[%1 = HTTP method, %2 = request URI]D;]A;(Namespace=Microsoft.FabricExport)(LookupHint=Codeunit Fabric Platform Test Sub - NamedType UnexpectedHttpRequestErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3305318920 - NamedType 249991751" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The file could not be read as a valid package definition.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.FabricExport)(LookupHint=Codeunit Test FAB API Package Import - NamedType InvalidPackageFileTxt)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 61417957 - NamedType 32628471" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[1 table(s) were not removed because they are also included in at least one other active package.]]></Val>
