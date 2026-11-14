@@ -1796,15 +1796,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Employee Name - NamedType FullNameTxt)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 847919081 - NamedType 2048598950" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[\App\Test\Files\ImageAnalysis\AllowedImage.jpg]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Employee Name - NamedType ImagePathTxt)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 847919081 - NamedType 2585284551" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Name must exist on Caption.]]></Val>
