@@ -212,15 +212,6 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit DotNet Exception Handler Tests - NamedType XmlExceptionNotCollectedErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 666889080 - NamedType 1025595917" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ECSL XML Gen. Test - NamedType MonthsTok)]]></Cmt>
-    </Cmts>
-  </Item>
   <Item ItemId=";Codeunit 2481379553 - NamedType 1050127573" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The company information has been updated.]]></Val>
@@ -273,24 +264,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM VAT VIES Lookup WebService - NamedType VendorUpdatedMsg)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 3319130919 - NamedType 2344007870" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[GovTalk needs to know which company the documents are for. Before you can submit documents, you must enter your company's VAT registration number on the Company Information page.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit GovTalk Setup Test - NamedType NoVatNoMsg)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 3319130919 - NamedType 1234289210" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[You are accessing a third-party website and service. You should review the third-party''s terms and privacy policy.]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit GovTalk Setup Test - NamedType ThirdPartyNoticeMsg)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3460294156 - NamedType 2090081812" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
