@@ -734,13 +734,13 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM Extra VAT - NamedType VATFieldErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 389291773 - NamedType 2026635011" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+  <Item ItemId=";Codeunit 389291773 - NamedType 3670196099" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[VAT Period Closed must be equal to 'No'  in Periodic Settlement VAT Entry: VAT Period=%1/%2. Current value is 'Yes'.]]></Val>
+      <Val><![CDATA[VAT Period Closed must be equal to 'No'  in Periodic VAT Settlement Entry: VAT Period=%1/%2, Activity Code=%3. Current value is 'Yes'.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1=Field Value,%2=Field Value]D;]A;(LookupHint=Codeunit ERM Extra VAT - NamedType VATPeriodClosedErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1=Field Value,%2=Field Value,%3=Field Value]D;]A;(LookupHint=Codeunit ERM Extra VAT - NamedType VATPeriodActivityCodeClosedErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 389291773 - NamedType 2732499514" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
