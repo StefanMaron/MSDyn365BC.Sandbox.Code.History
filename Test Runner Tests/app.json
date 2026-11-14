@@ -4,7 +4,7 @@
   "publisher": "Microsoft",
   "brief": "Regression tests for the Test Runner.",
   "description": "Tests runtime input placeholders, date formulas, and explicit raw reads.",
-  "version": "30.0.58114.0",
+  "version": "30.0.58153.0",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
   "EULA": "https://go.microsoft.com/fwlink/?linkid=2009120",
   "help": "https://go.microsoft.com/fwlink/?linkid=2131960",
