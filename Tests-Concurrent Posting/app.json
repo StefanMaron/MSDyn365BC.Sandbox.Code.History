@@ -2,7 +2,7 @@
   "id": "27da3ad8-e261-495c-bddd-9c7ff519a7d4",
   "name": "Tests-Concurrent Posting",
   "publisher": "Microsoft",
-  "version": "30.0.58159.0",
+  "version": "30.0.58196.0",
   "platform": "30.0.0.0",
   "brief": "Tests-Concurrent Posting (DK)",
   "description": "This extension provides multi-session concurrency tests for posting in Business Central.",
