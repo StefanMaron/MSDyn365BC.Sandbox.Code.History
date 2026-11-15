@@ -419,6 +419,24 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Costing Bugs II - NamedType WrongStandardCostVarianceErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 219962826 - NamedType 2676348075" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Each sale must trigger an exclusion rescan over the valuation period. Exclusion checks: %1.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = number of exclusion checks]D;]A;(LookupHint=Codeunit SCM Costing Performance - NamedType ExclusionRescansNotRepeatedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 219962826 - NamedType 2992022004" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Item ledger entry sign must not be re-read on each exclusion rescan. Sign reads: %1, average cost exception checks: %2, exclusion checks: %3.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = item ledger entry reads, %2 = average cost exception checks, %3 = exclusion checks]D;]A;(LookupHint=Codeunit SCM Costing Performance - NamedType ItemLedgEntrySignRereadErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 219962826 - NamedType 3719029338" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Computational cost must be constant.]]></Val>
@@ -462,6 +480,15 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[%1 = receipt processing count for 50 entries, %2 = receipt processing count for 100 entries]D;]A;(LookupHint=Codeunit SCM Costing Performance - NamedType ReceiptProcessing50To100Err)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 219962826 - NamedType 15812227" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Sale cost amount (actual) must be the average cost of the valuation date.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit SCM Costing Performance - NamedType SaleCostAmountErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2120547703 - NamedType 2657861348" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
