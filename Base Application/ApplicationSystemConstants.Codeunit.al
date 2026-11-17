@@ -53,7 +53,7 @@ codeunit 9015 "Application System Constants"
     begin
         // Should be 'Build branch' with ! on both sides.
         // Will return a string representing the name of the internal branch that generated the build.
-        exit('NAV274N10');
+        exit('NAV275');
     end;
 
     procedure PlatformProductVersion(): Text[80]
