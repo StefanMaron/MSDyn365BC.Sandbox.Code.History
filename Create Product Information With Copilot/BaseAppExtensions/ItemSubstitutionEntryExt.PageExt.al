@@ -3,6 +3,7 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Item.Substitution;
+using System.AI;
 
 pageextension 7330 "Item Substitution Entry Ext." extends "Item Substitution Entry"
 {
@@ -16,22 +17,26 @@ pageextension 7330 "Item Substitution Entry Ext." extends "Item Substitution Ent
                 Caption = 'Suggest with Copilot';
                 Image = SparkleFilled;
                 ToolTip = 'Get item substitution suggestion from Copilot';
-                Enabled = false;
-                Visible = false;
+                Enabled = IsCapabilityRegistered;
+                Visible = IsCapabilityRegistered;
 
                 trigger OnAction()
                 begin
-                    ItemSubstDiscontNotif.SendNotification();
+                    ItemSubstSuggestionImpl.GetItemSubstitutionSuggestion(Rec);
                 end;
             }
         }
     }
 
     var
-        ItemSubstDiscontNotif: Codeunit "Item Subst. Discont. Notif.";
+        ItemSubstSuggestionImpl: Codeunit "Item Subst. Suggestion Impl.";
+        IsCapabilityRegistered: Boolean;
 
     trigger OnOpenPage()
+    var
+        CopilotCapability: Codeunit "Copilot Capability";
     begin
-        ItemSubstDiscontNotif.SendNotification();
+        IsCapabilityRegistered := CopilotCapability.IsCapabilityRegistered(Enum::"Copilot Capability"::"Create Product Information");
     end;
+
 }
