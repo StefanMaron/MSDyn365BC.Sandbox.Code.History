@@ -145,4 +145,10 @@ codeunit 7330 "Item Subst. Suggestion Impl."
 
         exit(CompletionAnswer);
     end;
+
+    [EventSubscriber(ObjectType::Page, Page::"Copilot AI Capabilities", 'OnRegisterCopilotCapability', '', false, false)]
+    local procedure OnRegisterCopilotCapability()
+    begin
+        ItemSubstSuggestUtility.RegisterCapability();
+    end;
 }
