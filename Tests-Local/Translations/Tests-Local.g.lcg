@@ -86,6 +86,15 @@
       <Cmt Name="Dev"><![CDATA[%1 = Additional Currency Base]D;]A;(LookupHint=Codeunit AU Feature Bugs - Method VerifyACYCalculatedPerVATEntry - NamedType DifferentACYBaseErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3279414893 - Method 138287129 - NamedType 785730154" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The two VAT entries are expected to have the different Additional-Currency Base: %1.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Additional Currency Base]D;]A;(LookupHint=Codeunit AU Feature Bugs - Method VerifyPurchaseACYCalculatedPerVATEntry - NamedType DifferentACYBaseErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2378213771 - NamedType 1817428561" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[BAS XML Field ID must exist for XML field ID "%1" and BAS field No. %2.]]></Val>
