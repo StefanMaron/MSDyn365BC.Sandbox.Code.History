@@ -4,8 +4,6 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.Inventory.Item.Substitution;
 
-using System.AI;
-
 codeunit 7331 "Create Product Info. Install"
 {
     Access = Internal;
@@ -13,16 +11,10 @@ codeunit 7331 "Create Product Info. Install"
     InherentPermissions = X;
     InherentEntitlements = X;
 
-    trigger OnInstallAppPerDatabase()
-    begin
-        UnregisterCapability();
-    end;
-
-    local procedure UnregisterCapability()
+    trigger OnInstallAppPerCompany()
     var
-        CopilotCapability: Codeunit "Copilot Capability";
+        ItemSubstSuggestUtility: Codeunit "Create Product Info. Utility";
     begin
-        if CopilotCapability.IsCapabilityRegistered(Enum::"Copilot Capability"::"Create Product Information") then
-            CopilotCapability.UnregisterCapability(Enum::"Copilot Capability"::"Create Product Information");
+        ItemSubstSuggestUtility.RegisterCapability();
     end;
 }
