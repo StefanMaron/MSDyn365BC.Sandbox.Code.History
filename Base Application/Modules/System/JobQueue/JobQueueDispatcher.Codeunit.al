@@ -117,7 +117,7 @@ codeunit 448 "Job Queue Dispatcher"
         JobQueueEntry.FinalizeLogEntry(JobQueueLogEntry);
 
         if JobQueueEntry.DoesExistLocked() then
-            JobQueueEntry.FinalizeRun(JobQueueLogEntry."System Task Id")
+            JobQueueEntry.FinalizeRun()
         else
             SendTraceOnFailedToGetRecordBeforeFinalizingRecord(JobQueueEntry);
 
