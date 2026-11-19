@@ -527,6 +527,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM VAT Reg. No Validity Check - NamedType WrongLogEntryOnPageErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 319318622 - NamedType 1226956002" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The VAT registration check was run for an unexpected VAT Registration No.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM VAT Reg. No Validity Check - NamedType WrongVATRegNoValidatedErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 324926729 - NamedType 2763291245" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Filter not correct]]></Val>
