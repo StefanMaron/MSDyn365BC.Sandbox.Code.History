@@ -172,8 +172,7 @@ codeunit 7282 "Search"
                 if (QuantityToken.IsValue() and (QuantityToken.AsValue().AsText() <> '')) then
                     if not JsonValueAsDecimal(QuantityToken.AsValue(), Quantity) then
                         Quantity := 0;
-            end else
-                Quantity := 1;
+            end;
 
             if ItemToken.AsObject().Get('unit_of_measure', UOMToken) then begin
                 ItemTokenForQueryIndex.AsObject().Remove('unit_of_measure');
@@ -202,7 +201,7 @@ codeunit 7282 "Search"
                     QueryResults := ALSearchResult.GetResultsForQuery(Format(i));
 
                     foreach ALSearchQueryResult in QueryResults do
-                        if ALSearchQueryResult.ContextAwareRankingScore >= 0.25 then begin
+                        if ALSearchQueryResult.ContextAwareRankingScore > 0.70 then begin
                             TempSearchResponse.SysId := ALSearchQueryResult.SystemId;
                             TempSearchResponse.Score := ALSearchQueryResult.ContextAwareRankingScore;
                             TempSearchResponse.Insert();
@@ -340,13 +339,13 @@ codeunit 7282 "Search"
         exit(SearchKeywords);
     end;
 
-    internal procedure GetConfidence(Score: Decimal): Enum "Search Confidence"
+    local procedure GetConfidence(Score: Decimal): Enum "Search Confidence"
     begin
-        if Score >= 0.55 then
+        if Score > 0.81 then
             exit("Search Confidence"::High);
-        if Score >= 0.45 then
+        if Score > 0.75 then
             exit("Search Confidence"::Medium);
-        if Score >= 0.25 then
+        if Score > 0.70 then
             exit("Search Confidence"::Low);
 
         exit("Search Confidence"::None);
