@@ -29,19 +29,27 @@ codeunit 7276 "SLS Prompts"
         BCSLSTaskPrompt: SecretText;
     begin
         GetAzureKeyVaultSecret(BCSLSMetaPrompt, 'BCSLSMetaPrompt-V250');
-        BCSLSTaskPrompt := NavApp.GetResourceAsText('BCSLSTaskPrompt.md', TextEncoding::UTF8);
+        GetAzureKeyVaultSecret(BCSLSTaskPrompt, 'BCSLSTaskPrompt-V250');
 
         exit(SecretStrSubstNo('%1%2', BCSLSMetaPrompt, AddDateToTaskPrompt(BCSLSTaskPrompt)));
     end;
 
     internal procedure GetSLSSearchItemsWithFiltersPrompt(): SecretText
+    var
+        BCSLSSearchItemsWithFiltersPrompt: SecretText;
     begin
-        exit(NavApp.GetResourceAsText('BCSLSSearchItemsWithFiltersPrompt.json', TextEncoding::UTF8));
+        GetAzureKeyVaultSecret(BCSLSSearchItemsWithFiltersPrompt, 'BCSLSSearchItemsWithFiltersPrompt');
+
+        exit(BCSLSSearchItemsWithFiltersPrompt);
     end;
 
     internal procedure GetSLSMagicFunctionPrompt(): SecretText
+    var
+        BCSLSMagicFunctionPrompt: SecretText;
     begin
-        exit(NavApp.GetResourceAsText('BCSLSMagicFunctionPrompt.json', TextEncoding::UTF8));
+        GetAzureKeyVaultSecret(BCSLSMagicFunctionPrompt, 'BCSLSMagicFunctionPrompt');
+
+        exit(BCSLSMagicFunctionPrompt);
     end;
 
     internal procedure GetAttachmentSystemPrompt(): SecretText
@@ -50,19 +58,27 @@ codeunit 7276 "SLS Prompts"
         BCSLSAttachmentTaskPrompt: SecretText;
     begin
         GetAzureKeyVaultSecret(BCSLSAttachmentMetaPrompt, 'BCSLSAttachmentMetaPrompt');
-        BCSLSAttachmentTaskPrompt := NavApp.GetResourceAsText('BCSLSAttachmentTaskPrompt.md', TextEncoding::UTF8);
+        GetAzureKeyVaultSecret(BCSLSAttachmentTaskPrompt, 'BCSLSAttachmentTaskPrompt');
 
         exit(SecretStrSubstNo('%1%2', BCSLSAttachmentMetaPrompt, BCSLSAttachmentTaskPrompt));
     end;
 
     internal procedure GetParsingCsvPrompt(): SecretText
+    var
+        BCSLSParseCsvPrompt: SecretText;
     begin
-        exit(NavApp.GetResourceAsText('BCSLSParseCsvPrompt.json', TextEncoding::UTF8));
+        GetAzureKeyVaultSecret(BCSLSParseCsvPrompt, 'BCSLSParseCsvPrompt');
+
+        exit(BCSLSParseCsvPrompt);
     end;
 
     internal procedure GetProductFromCsvTemplateUserInputPrompt(): SecretText
+    var
+        BCSLSGetProductFromCsvTemplateUserInputPrompt: SecretText;
     begin
-        exit(NavApp.GetResourceAsText('BCSLSGetProductFromCsvTemplateUserInputPrompt.md', TextEncoding::UTF8));
+        GetAzureKeyVaultSecret(BCSLSGetProductFromCsvTemplateUserInputPrompt, 'BCSLSGetProductFromCsvTemplateUserInputPrompt');
+
+        exit(BCSLSGetProductFromCsvTemplateUserInputPrompt);
     end;
 
     [NonDebuggable]
