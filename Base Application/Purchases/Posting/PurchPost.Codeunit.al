@@ -7012,6 +7012,8 @@ codeunit 90 "Purch.-Post"
         SalesShptLine."Qty. Invoiced (Base)" := 0;
         SalesShptLine."Order No." := SalesOrderLine."Document No.";
         SalesShptLine."Order Line No." := SalesOrderLine."Line No.";
+        SalesShptLine."External Document No." := SalesShptHeader."External Document No.";
+        SalesShptLine."Your Reference" := SalesShptHeader."Your Reference";
         SalesShptLine."Qty. Shipped Not Invoiced" :=
           SalesShptLine.Quantity - SalesShptLine."Quantity Invoiced";
         if SalesShptLine.Quantity <> 0 then begin
@@ -7447,6 +7449,8 @@ codeunit 90 "Purch.-Post"
                                 SalesShptLine."Document No." := SalesShptHeader."No.";
                                 SalesShptLine."Order No." := SalesOrderLine."Document No.";
                                 SalesShptLine."Order Line No." := SalesOrderLine."Line No.";
+                                SalesShptLine."External Document No." := SalesShptHeader."External Document No.";
+                                SalesShptLine."Your Reference" := SalesShptHeader."Your Reference";
                                 Clear(IsHandled);
                                 OnBeforeSalesShptLineInsert(SalesShptLine, SalesShptHeader, SalesOrderLine, SuppressCommit, TempDropShptPostBuffer, IsHandled);
                                 if not IsHandled then
