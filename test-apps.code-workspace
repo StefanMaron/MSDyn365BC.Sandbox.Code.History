@@ -142,10 +142,10 @@
       "path": "./System Application/Email/src/Test Email"
     },
     {
-      "path": "./Base Application/System/DevTools/CALTest"
+      "path": "./System Application Test Library/Extension Management/testArtifacts"
     },
     {
-      "path": "./System Application Test Library/Extension Management/testArtifacts"
+      "path": "./Base Application/System/DevTools/CALTest"
     },
     {
       "path": "./Test Runner/src/DataDrivenTest"
@@ -155,11 +155,11 @@
     }
   ],
   "settings": {
+    "al.enableCodeAnalysis": false,
     "al.enableCodeActions": false,
+    "allint.enabled": false,
     "search.exclude": {
       "**.xlf": true
-    },
-    "al.enableCodeAnalysis": false,
-    "allint.enabled": false
+    }
   }
 }
