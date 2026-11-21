@@ -351,6 +351,9 @@
       "path": "./System Application Test/DisabledTests"
     },
     {
+      "path": "./Subcontracting-Tests/Tests"
+    },
+    {
       "path": "./Quality Management/src/Configuration/Template/Test"
     },
     {
