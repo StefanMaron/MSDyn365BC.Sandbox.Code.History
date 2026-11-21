@@ -4,7 +4,6 @@
 // ------------------------------------------------------------------------------------------------
 namespace Microsoft.CRM.Outlook;
 
-using Microsoft.Integration.Graph;
 using Microsoft.Inventory.Item;
 using Microsoft.Purchases.Document;
 using Microsoft.Sales.Document;
@@ -165,46 +164,18 @@ codeunit 1639 "Office Line Generation"
         AddedCount: Integer;
     begin
         if PageCloseAction in [ACTION::OK, ACTION::LookupOK] then
-            if TempOfficeSuggestedLineItem.FindSet() then begin
-                InsertLineItemsAndUpdateAggregate(TempOfficeSuggestedLineItem, HeaderRecRef, AddedCount);
-                if AddedCount > 0 then
-                    Commit();
-            end;
+            if TempOfficeSuggestedLineItem.FindSet() then
+                repeat
+                    if TempOfficeSuggestedLineItem.Add then begin
+                        InsertLineItem(HeaderRecRef, TempOfficeSuggestedLineItem."Item No.", TempOfficeSuggestedLineItem.Quantity);
+                        AddedCount += 1;
+                    end;
+                until TempOfficeSuggestedLineItem.Next() = 0;
 
         Session.LogMessage('00001KJ', StrSubstNo(TelemetryClosedPageTxt, NewLine(),
             PageCloseAction,
             TempOfficeSuggestedLineItem.Count,
             AddedCount), Verbosity::Normal, DataClassification::SystemMetadata, TelemetryScope::ExtensionPublisher, 'Category', OfficeMgt.GetOfficeAddinTelemetryCategory());
-    end;
-
-    [CommitBehavior(CommitBehavior::Ignore)]
-    internal procedure InsertLineItemsAndUpdateAggregate(var TempOfficeSuggestedLineItem: Record "Office Suggested Line Item" temporary; var HeaderRecRef: RecordRef; var AddedCount: Integer)
-    var
-        DisableAggregateTableUpdate: Codeunit "Disable Aggregate Table Update";
-        LastItemNo: Text[50];
-        LastQuantity: Integer;
-        LastLinePending: Boolean;
-    begin
-        DisableAggregateTableUpdate.SetDisableAllRecords(true);
-        BindSubscription(DisableAggregateTableUpdate);
-        LastQuantity := 0;
-        repeat
-            if TempOfficeSuggestedLineItem.Add then begin
-                if LastLinePending then begin
-                    InsertLineItem(HeaderRecRef, LastItemNo, LastQuantity);
-                    AddedCount += 1;
-                end;
-                LastItemNo := TempOfficeSuggestedLineItem."Item No.";
-                LastQuantity := TempOfficeSuggestedLineItem.Quantity;
-                LastLinePending := true;
-            end;
-        until TempOfficeSuggestedLineItem.Next() = 0;
-        if UnbindSubscription(DisableAggregateTableUpdate) then;
-
-        if LastLinePending then begin
-            InsertLineItem(HeaderRecRef, LastItemNo, LastQuantity);
-            AddedCount += 1;
-        end;
     end;
 
     local procedure CalculateMatchStrength(ItemNo: Text[50]; Matches: Integer; SearchText: Text; AlreadyFound: Boolean) Strength: Decimal
@@ -434,6 +405,7 @@ codeunit 1639 "Office Line Generation"
         SalesLine.Validate("No.", CopyStr(ItemNo, 1, 20));
         SalesLine.Validate(Quantity, Quantity);
         SalesLine.Insert(true);
+        Commit();
     end;
 
     local procedure InsertPurchaseLine(var PurchaseHeader: Record "Purchase Header"; ItemNo: Text[50]; Quantity: Integer)
@@ -456,6 +428,7 @@ codeunit 1639 "Office Line Generation"
         PurchaseLine.Validate("No.", CopyStr(ItemNo, 1, 20));
         PurchaseLine.Validate(Quantity, Quantity);
         PurchaseLine.Insert(true);
+        Commit();
     end;
 
     local procedure NewLine() CrLf: Text[2]
@@ -630,3 +603,4 @@ codeunit 1639 "Office Line Generation"
     begin
     end;
 }
+
