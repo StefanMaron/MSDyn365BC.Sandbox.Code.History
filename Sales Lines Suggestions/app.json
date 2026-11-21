@@ -12,6 +12,9 @@
   "contextSensitiveHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2261665",
   "logo": "ExtensionLogo.png",
   "dependencies": [],
+  "resourceFolders": [
+    ".resources"
+  ],
   "screenshots": [],
   "platform": "$(app_platformVersion)",
   "application": "$(app_minimumVersion)",
