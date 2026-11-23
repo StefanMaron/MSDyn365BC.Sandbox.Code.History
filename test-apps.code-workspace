@@ -1,4 +1,12 @@
 {
+  "settings": {
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "al.enableCodeAnalysis": false,
+    "al.enableCodeActions": false,
+    "allint.enabled": false
+  },
   "folders": [
     {
       "path": "./_Exclude_APIV1_ Tests"
@@ -286,25 +294,22 @@
       "path": "./VAT Group Management Tests"
     },
     {
-      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
-    },
-    {
-      "path": "./Sales Lines Suggestions Tests/AI Tests"
-    },
-    {
-      "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
-    },
-    {
-      "path": "./Base Application/System/DevTools/CALTest"
+      "path": "./Shopify Connector Test/DisabledTests"
     },
     {
       "path": "./System Application/Email/src/Test Email"
     },
     {
-      "path": "./Performance Toolkit Tests/src/Mock Tests"
+      "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
     },
     {
-      "path": "./AI Test Toolkit/src/TestSuite"
+      "path": "./Business Foundation Tests/DisabledTests"
+    },
+    {
+      "path": "./Subscription Billing Tests/DisabledTests"
+    },
+    {
+      "path": "./Base Application/System/DevTools/CALTest"
     },
     {
       "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
@@ -316,10 +321,7 @@
       "path": "./Test Runner/src/DataDrivenTest"
     },
     {
-      "path": "./Subscription Billing Tests/DisabledTests"
-    },
-    {
-      "path": "./Shopify Connector Test/DisabledTests"
+      "path": "./AI Test Toolkit/src/TestSuite"
     },
     {
       "path": "./System Application Test/DisabledTests"
@@ -328,15 +330,13 @@
       "path": "./System Application Test/Extension Management/testArtifacts"
     },
     {
-      "path": "./Business Foundation Tests/DisabledTests"
-    }
-  ],
-  "settings": {
-    "al.enableCodeAnalysis": false,
-    "al.enableCodeActions": false,
-    "search.exclude": {
-      "**.xlf": true
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
     },
-    "allint.enabled": false
-  }
+    {
+      "path": "./Sales Lines Suggestions Tests/AI Tests"
+    },
+    {
+      "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
+    }
+  ]
 }
