@@ -152,6 +152,7 @@ codeunit 1233 "SEPA DD-Check Line"
     var
         SEPADirectDebitMandate: Record "SEPA Direct Debit Mandate";
         CustLedgerEntry: Record "Cust. Ledger Entry";
+        AppliedEntryCount: Integer;
         IsHandled: Boolean;
     begin
         IsHandled := false;
@@ -170,12 +171,23 @@ codeunit 1233 "SEPA DD-Check Line"
             DirectDebitCollectionEntry.InsertPaymentFileError(StrSubstNo(UnappliedLinesNotAllowedErr, PaymentLine."Line No."))
         else begin
             PaymentLine.GetAppliesToDocCustLedgEntry(CustLedgerEntry);
-            if CustLedgerEntry.Count > 1 then
-                DirectDebitCollectionEntry.InsertPaymentFileError(SummarizeNotAllowedErr);
-            CustLedgerEntry.FindFirst();
-            if CustLedgerEntry."Document Type" <> CustLedgerEntry."Document Type"::Invoice then
+            if CustLedgerEntry.Count > 1 then begin
+                AppliedEntryCount := CustLedgerEntry.Count;
+                CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::Invoice);
+                if CustLedgerEntry.Count <> 1 then
+                    DirectDebitCollectionEntry.InsertPaymentFileError(SummarizeNotAllowedErr);
+                CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::"Credit Memo");
+                if CustLedgerEntry.Count <> AppliedEntryCount - 1 then
+                    DirectDebitCollectionEntry.InsertPaymentFileError(SummarizeNotAllowedErr);
+                CustLedgerEntry.SetRange("Document Type", CustLedgerEntry."Document Type"::Invoice);
+            end;
+            if CustLedgerEntry.FindFirst() then begin
+                if CustLedgerEntry."Document Type" = CustLedgerEntry."Document Type"::Invoice then
+                    AppliesToEntryNo := CustLedgerEntry."Entry No."
+                else
+                    DirectDebitCollectionEntry.InsertPaymentFileError(StrSubstNo(UnappliedLinesNotAllowedErr, PaymentLine."Line No."));
+            end else
                 DirectDebitCollectionEntry.InsertPaymentFileError(StrSubstNo(UnappliedLinesNotAllowedErr, PaymentLine."Line No."));
-            AppliesToEntryNo := CustLedgerEntry."Entry No.";
         end;
 
         exit(not DirectDebitCollectionEntry.HasPaymentFileErrors());

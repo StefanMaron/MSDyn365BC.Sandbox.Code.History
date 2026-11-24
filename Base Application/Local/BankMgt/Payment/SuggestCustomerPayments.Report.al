@@ -426,7 +426,8 @@ report 10864 "Suggest Customer Payments"
                     if SEPADirectDebitMandate.Get(CustLedgEntry."Direct Debit Mandate ID") then
                         GenPayLine.Validate("Bank Account Code", SEPADirectDebitMandate."Customer Bank Account Code");
                     GenPayLine."Direct Debit Mandate ID" := CustLedgEntry."Direct Debit Mandate ID";
-                end;
+                end else
+                    SetDirectDebitMandate(GenPayLine, SEPADirectDebitMandate);
                 case SummarizePer of
                     SummarizePer::" ":
                         GenPayLine."Due Date" := CustLedgEntry."Due Date";
@@ -449,6 +450,20 @@ report 10864 "Suggest Customer Payments"
                 end;
                 GenPayLineInserted := true;
             until TempPaymentPostBuffer.Next() = 0;
+    end;
+
+    local procedure SetDirectDebitMandate(var PaymentLine: Record "Payment Line"; var SEPADirectDebitMandate: Record "SEPA Direct Debit Mandate")
+    var
+        AppliedCustLedgerEntry: Record "Cust. Ledger Entry";
+    begin
+        PaymentLine.GetAppliesToDocCustLedgEntry(AppliedCustLedgerEntry);
+        AppliedCustLedgerEntry.SetRange("Document Type", AppliedCustLedgerEntry."Document Type"::Invoice);
+        if not AppliedCustLedgerEntry.FindFirst() then
+            exit;
+
+        PaymentLine."Direct Debit Mandate ID" := AppliedCustLedgerEntry."Direct Debit Mandate ID";
+        if SEPADirectDebitMandate.Get(PaymentLine."Direct Debit Mandate ID") then
+            PaymentLine.Validate("Bank Account Code", SEPADirectDebitMandate."Customer Bank Account Code");
     end;
 
     local procedure ShowMessage(Text: Text)
