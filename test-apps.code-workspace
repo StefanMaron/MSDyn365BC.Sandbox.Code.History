@@ -1,12 +1,4 @@
 {
-  "settings": {
-    "search.exclude": {
-      "**.xlf": true
-    },
-    "al.enableCodeAnalysis": false,
-    "al.enableCodeActions": false,
-    "allint.enabled": false
-  },
   "folders": [
     {
       "path": "./_Exclude_APIV1_ Tests"
@@ -407,5 +399,13 @@
     {
       "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
     }
-  ]
+  ],
+  "settings": {
+    "al.enableCodeAnalysis": false,
+    "al.enableCodeActions": false,
+    "allint.enabled": false,
+    "search.exclude": {
+      "**.xlf": true
+    }
+  }
 }
