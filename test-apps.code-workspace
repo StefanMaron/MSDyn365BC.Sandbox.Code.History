@@ -1,8 +1,8 @@
 {
   "settings": {
-    "allint.enabled": false,
     "al.enableCodeAnalysis": false,
     "al.enableCodeActions": false,
+    "allint.enabled": false,
     "search.exclude": {
       "**.xlf": true
     }
@@ -156,13 +156,13 @@
       "path": "./Base Application/System/DevTools/CALTest"
     },
     {
-      "path": "./Performance Toolkit Tests/src/Mock Tests"
-    },
-    {
       "path": "./Test Runner/src/DataDrivenTest"
     },
     {
       "path": "./AI Test Toolkit/src/TestSuite"
+    },
+    {
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
     }
   ]
 }
