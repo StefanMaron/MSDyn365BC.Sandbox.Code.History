@@ -331,6 +331,9 @@
       "path": "./AI Test Toolkit/src/TestSuite"
     },
     {
+      "path": "./Subcontracting-Tests/Tests"
+    },
+    {
       "path": "./Quality Management/src/Configuration/Template/Test"
     },
     {
