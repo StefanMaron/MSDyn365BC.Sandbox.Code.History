@@ -167,6 +167,51 @@
       <Cmt Name="Dev"><![CDATA[%1 the name]D;]A;(Namespace=Microsoft.Test.Foundation.Reporting.FileNaming)(LookupHint=Codeunit Filename Batch Measure - NamedType PassUntouchedMsg)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1539944398 - NamedType 3947992326" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[A nonexistent report must not resolve a caption.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.Foundation.Reporting.FileNaming)(LookupHint=Codeunit Filename Caption Tests - NamedType InvalidReportResolvedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1539944398 - NamedType 807979042" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Resolving a caption did not restore the caller language.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.Foundation.Reporting.FileNaming)(LookupHint=Codeunit Filename Caption Tests - NamedType LanguageNotRestoredErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1539944398 - NamedType 3362090628" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The report caption was not resolved.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.Foundation.Reporting.FileNaming)(LookupHint=Codeunit Filename Caption Tests - NamedType NotResolvedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1539944398 - NamedType 4211988488" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[A nonexistent report must clear the previous caption.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.Foundation.Reporting.FileNaming)(LookupHint=Codeunit Filename Caption Tests - NamedType StaleCaptionErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1539944398 - NamedType 279306324" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The caption did not match the requested language resource.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.Foundation.Reporting.FileNaming)(LookupHint=Codeunit Filename Caption Tests - NamedType WrongCaptionErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2621019516 - NamedType 2774578044" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Activating an action on a brand-new pattern left no row in the table, so the action has to save the record itself.]]></Val>
@@ -3765,6 +3810,24 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.Foundation.Reporting.FileNaming)(LookupHint=Codeunit Report Filename Proof - NamedType SameEitherWayMsg)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Report 2950168180 - Property 2879900210" ItemType=";Report - Report" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Caption probe EN]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.Foundation.Reporting.FileNaming)(LookupHint=Report Filename Caption Control - Property Caption)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Report 3385569053 - Property 2879900210" ItemType=";Report - Report" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Caption probe untranslated]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.Foundation.Reporting.FileNaming)(LookupHint=Report Filename Caption Missing - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Report 3875979141 - Property 2879900210" ItemType=";Report - Report" PsrId="63" InstFlg="true" Leaf="true">

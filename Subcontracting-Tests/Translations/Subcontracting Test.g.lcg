@@ -392,6 +392,33 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Manufacturing.Subcontracting.Test)(LookupHint=Codeunit Subc. Pricing Test - NamedType WorksheetOrderDateAssertMsg)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 663728988 - NamedType 3304850081" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Purchase order %1 referenced by worksheet line %2 no longer exists.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = purchase order number, %2 = worksheet line number]D;]A;(Namespace=Microsoft.Manufacturing.Subcontracting.Test)(LookupHint=Codeunit Subc. PurchOrderTarget UI Test - NamedType MissingOrderErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2693994680 - NamedType 764336649" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[the purchasing code does not match worksheet line %1 assigned to the same order]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = line number]D;]A;(Namespace=Microsoft.Manufacturing.Subcontracting.Test)(LookupHint=Codeunit Subc. PurchOrderTargetTest - NamedType PurchasingSuggestionErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 2693994680 - NamedType 3123911384" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Worksheet line %1 in %2/%3 cannot use purchase order %4: %5.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = line number, %2 = template, %3 = batch, %4 = order number, %5 = failed condition]D;]A;(Namespace=Microsoft.Manufacturing.Subcontracting.Test)(LookupHint=Codeunit Subc. PurchOrderTargetTest - NamedType TargetErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 230988204 - NamedType 3917320619" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Quantity Ready to Start of operation %1 is incorrect.]]></Val>

@@ -4,7 +4,7 @@
   "publisher": "Microsoft",
   "brief": "Test suite for the System Application.",
   "description": "Contains an expansive set tests for the System Application.",
-  "version": "30.0.58876.0",
+  "version": "30.0.58887.0",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
   "EULA": "https://go.microsoft.com/fwlink/?linkid=2009120",
   "help": "https://go.microsoft.com/fwlink/?linkid=2131960",
@@ -12,6 +12,12 @@
   "logo": "ExtensionLogo.png",
   "contextSensitiveHelpUrl": "https://learn.microsoft.com/dynamics365/business-central/dev-itpro/developer/devenv-testing-application/",
   "dependencies": [
+    {
+      "id": "bebde88d-6846-479d-8b30-b9f8940fdcf8",
+      "name": "Business Skills Test Library",
+      "publisher": "Microsoft",
+      "version": "30.0.0.0"
+    },
     {
       "id": "63ca2fa4-4f03-4f2b-a480-172fef340d3f",
       "name": "System Application",

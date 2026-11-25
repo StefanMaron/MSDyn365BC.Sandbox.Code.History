@@ -167,6 +167,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Sales.Document.Test)(LookupHint=Codeunit Extract Info. from csv Prompt - NamedType ExtractInformationFromCsvFunctionLbl)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2889088588 - Method 141993490 - NamedType 3017934049" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Confidence is below the minimum. Expected at least: %1, Actual: %2]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = Minimum expected confidence, %2 = Actual confidence]D;]A;(Namespace=Microsoft.Sales.Document.Test)(LookupHint=Codeunit Item Entity Search - Method AssertConfidence - NamedType MinimumConfidenceErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2889088588 - Method 2493584938 - NamedType 4123945839" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Item No. does not match. Expected: %1, Actual: %2]]></Val>
@@ -347,31 +356,13 @@
       <Cmt Name="Dev"><![CDATA[%1 = Json property name]D;]A;(Namespace=Microsoft.Sales.Document.Test)(LookupHint=Codeunit SLS Prompt Test - NamedType JsonPropValueErr)]]></Cmt>
     </Cmts>
   </Item>
-  <Item ItemId=";Codeunit 43997058 - Method 4027679352 - NamedType 1029690167" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
+  <Item ItemId=";Codeunit 43997058 - Method 3809630612 - NamedType 3969831005" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA["%1" not found in the json array property "%2": [%3]5D;]]></Val>
+      <Val><![CDATA[%1 must be an array.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1 = Json token, %2 = Json array property name, %3 = json array values]D;]A;(Namespace=Microsoft.Sales.Document.Test)(LookupHint=Codeunit SLS Prompt Test - Method AssertExpectedArrayContainsActualArrayElements - NamedType JsonTokenNotFoundErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 43997058 - Method 2973877519 - NamedType 2898742944" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Array length for "%1" is incorrect.\Expected Array: [%2]5D; \Actual Array: [%3]5D;]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1 = Json array property name, %2 = Expected array values, %3 = Actual array values]D;]A;(Namespace=Microsoft.Sales.Document.Test)(LookupHint=Codeunit SLS Prompt Test - Method AssertJsonArraysContentAreSame - NamedType JsonArrayLengthMismatchErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 43997058 - Method 2973877519 - NamedType 1029690167" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA["%1" not found in the json array property "%2": [%3]5D;]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1 = Json token, %2 = Json array property name, %3 = Actual json array]D;]A;(Namespace=Microsoft.Sales.Document.Test)(LookupHint=Codeunit SLS Prompt Test - Method AssertJsonArraysContentAreSame - NamedType JsonTokenNotFoundErr)]]></Cmt>
+      <Cmt Name="Dev"><![CDATA[%1 = Json property name]D;]A;(Namespace=Microsoft.Sales.Document.Test)(LookupHint=Codeunit SLS Prompt Test - Method AssertSearchItemSchema - NamedType ArrayPropertyErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 883189259 - Method 1489119318 - NamedType 3196385904" ItemType=";Codeunit - LocalVariable" PsrId="63" InstFlg="true" Leaf="true">

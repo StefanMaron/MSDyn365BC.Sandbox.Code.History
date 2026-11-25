@@ -34,7 +34,7 @@
   </Item>
   <Item ItemId=";Codeunit 2862924864 - NamedType 526286735" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Reset was requested. The platform runs asynchronously; open Export Summary to follow progress.]]></Val>
+      <Val><![CDATA[Reset was requested. The platform runs asynchronously; open Fabric Synchronization Overview to follow progress.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -43,7 +43,7 @@
   </Item>
   <Item ItemId=";Codeunit 2862924864 - NamedType 1862524228" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Enable was requested. The platform runs asynchronously; open Export Summary to follow progress.]]></Val>
+      <Val><![CDATA[Enable was requested. The platform runs asynchronously; open Fabric Synchronization Overview to follow progress.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -52,7 +52,7 @@
   </Item>
   <Item ItemId=";Codeunit 2862924864 - NamedType 4034374723" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Start was requested. The platform runs asynchronously; open Export Summary to follow progress.]]></Val>
+      <Val><![CDATA[Start was requested. The platform runs asynchronously; open Fabric Synchronization Overview to follow progress.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>
@@ -61,7 +61,7 @@
   </Item>
   <Item ItemId=";Codeunit 2862924864 - NamedType 3389668771" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[Stop was requested. The platform runs asynchronously; open Export Summary to follow progress.]]></Val>
+      <Val><![CDATA[Stop was requested. The platform runs asynchronously; open Fabric Synchronization Overview to follow progress.]]></Val>
     </Str>
     <Disp Icon="Str" Expand="true" />
     <Cmts>

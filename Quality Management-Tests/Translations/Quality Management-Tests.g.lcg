@@ -851,6 +851,15 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.QualityManagement)(LookupHint=Codeunit Qlty. Tests - Test Table - NamedType ConditionFilterWhseReceiptTok)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1163552122 - NamedType 1097987574" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Copied inspection template]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.QualityManagement)(LookupHint=Codeunit Qlty. Tests - Test Table - NamedType CopiedTemplateDescriptionTxt)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1163552122 - NamedType 2232770848" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[><{}.@!`~'"|\/?&*()-_$#-=,%%:ELECTRICAL CONDUCTIVITY]]></Val>
