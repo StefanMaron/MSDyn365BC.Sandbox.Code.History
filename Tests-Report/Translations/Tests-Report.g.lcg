@@ -689,6 +689,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Report Layouts Test - NamedType EditedLayoutNameTxt)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1429324707 - NamedType 2452652312" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The extension-installed test layout %1 must exist.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = layout name]D;]A;(LookupHint=Codeunit Report Layouts Test - NamedType ExtensionInstalledTestLayoutMustExistErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1429324707 - NamedType 1882891539" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[The global override for %1 should carry the Approved status.]]></Val>
@@ -716,6 +725,15 @@
       <Cmt Name="Dev"><![CDATA[%1 = layout name]D;]A;(LookupHint=Codeunit Report Layouts Test - NamedType GlobalOverrideRetiredErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 1429324707 - NamedType 2875406363" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The layout could not be prepared. %1]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = layout validation error]D;]A;(LookupHint=Codeunit Report Layouts Test - NamedType LayoutCouldNotBePreparedErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 1429324707 - NamedType 122168779" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[NewLayout]]></Val>
@@ -732,6 +750,24 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Report Layouts Test - NamedType SampleTextTxt)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1429324707 - NamedType 1928515693" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The test report must provide a built-in %1 layout.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = layout name]D;]A;(LookupHint=Codeunit Report Layouts Test - NamedType TheTestReportMustProvideBuiltInLayoutErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 1429324707 - NamedType 1101346673" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Unsupported test layout format: %1.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 = layout format]D;]A;(LookupHint=Codeunit Report Layouts Test - NamedType UnsupportedTestLayoutFormatErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 3241257733 - NamedType 2272461218" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
