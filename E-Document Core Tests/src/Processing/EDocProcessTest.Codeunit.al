@@ -2079,6 +2079,16 @@ codeunit 139883 "E-Doc Process Test"
         Assert.IsTrue(LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-creditnote-0.xml', TempEDocImportParams), 'The credit note draft should be prepared');
     end;
 
+    local procedure ReadPEPPOLInvoiceIntoDraft(var EDocument: Record "E-Document")
+    var
+        TempEDocImportParams: Record "E-Doc. Import Parameters";
+    begin
+        Clear(EDocument);
+        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Read into Draft";
+        Assert.IsTrue(LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-invoice-0.xml', TempEDocImportParams), 'The invoice should be read into a draft');
+        EDocument.Get(EDocument."Entry No");
+    end;
+
     local procedure RunPrepareDraft(var EDocument: Record "E-Document")
     var
         TempEDocImportParams: Record "E-Doc. Import Parameters";
@@ -2718,16 +2728,6 @@ codeunit 139883 "E-Doc Process Test"
     end;
 
     #endregion
-
-    local procedure ReadPEPPOLInvoiceIntoDraft(var EDocument: Record "E-Document")
-    var
-        TempEDocImportParams: Record "E-Doc. Import Parameters";
-    begin
-        Clear(EDocument);
-        TempEDocImportParams."Step to Run" := "Import E-Document Steps"::"Read into Draft";
-        Assert.IsTrue(LibraryEDoc.CreateInboundPEPPOLDocumentToState(EDocument, EDocumentService, 'peppol/peppol-invoice-0.xml', TempEDocImportParams), 'The invoice should be read into a draft');
-        EDocument.Get(EDocument."Entry No");
-    end;
 
     local procedure Initialize(Integration: Enum "Service Integration")
     var
