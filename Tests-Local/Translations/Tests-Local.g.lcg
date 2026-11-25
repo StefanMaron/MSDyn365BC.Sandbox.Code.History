@@ -3983,6 +3983,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit UT Fiscal LIFO - NamedType ItemNoCap)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 2720792425 - NamedType 2895079328" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Report row for item %1 was not found.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 - Item No.]D;]A;(LookupHint=Codeunit UT Fiscal LIFO - NamedType RowNotFoundErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 2720792425 - NamedType 1219904297" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[UnitCost]]></Val>
