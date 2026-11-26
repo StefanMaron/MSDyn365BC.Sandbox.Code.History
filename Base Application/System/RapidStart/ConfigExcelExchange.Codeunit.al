@@ -39,6 +39,13 @@ codeunit 8618 "Config. Excel Exchange"
         FileOnServer: Boolean;
 
         CannotCreateXmlSchemaErr: Label 'Could not create XML Schema.';
+        UnsupportedXMLSchemaErr: Label 'The Excel workbook contains an unsupported XML schema. Export a new configuration workbook and try again.';
+        XMLSchemaNamespaceTxt: Label 'http://www.w3.org/2001/XMLSchema', Locked = true;
+        MsDataNamespaceTxt: Label 'urn:schemas-microsoft-com:xml-msdata', Locked = true;
+        XMLSchemaTooLargeErr: Label 'The Excel workbook contains an XML schema larger than the maximum supported size.';
+        XMLSchemaCleanupErr: Label 'The temporary XML schema could not be cleaned up. %1', Comment = '%1 = cleanup error details';
+        XMLSchemaImportAndCleanupErr: Label '%1\The temporary XML schema could not be cleaned up. %2', Comment = '%1 = original import error; %2 = cleanup error details';
+        CannotDeleteXMLSchemaErr: Label 'The temporary XML schema file could not be deleted.';
         CreatingExcelMsg: Label 'Creating Excel worksheet';
         VmlDrawingXmlTxt: Label '<xml xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><o:shapelayout v:ext="edit"><o:idmap v:ext="edit" data="1"/></o:shapelayout><v:shapetype id="_x0000_t202" coordsize="21600,21600" o:spt="202"  path="m,l,21600r21600,l21600,xe"><v:stroke joinstyle="miter"/><v:path gradientshapeok="t" o:connecttype="rect"/></v:shapetype>', Locked = true;
         EndXmlTokenTxt: Label '</xml>', Locked = true;
@@ -388,8 +395,7 @@ codeunit 8618 "Config. Excel Exchange"
 
         WrkSheetId := WrkbkReader.FirstSheetId;
         SheetCount := WorkBookPart.Workbook.Sheets.ChildElements.Count + WrkSheetId;
-        DataSet := DataSet.DataSet();
-        DataSet.ReadXmlSchema(XMLSchemaDataFile);
+        ReadXMLSchema(XMLSchemaDataFile);
 
         WrkSheetId := WrkbkReader.FirstSheetId;
         DataColumnTableId := 0;
@@ -412,6 +418,137 @@ codeunit 8618 "Config. Excel Exchange"
             Imported := true;
 
         exit(Imported);
+    end;
+
+    local procedure ReadXMLSchema(XMLSchemaDataFile: Text)
+    var
+        SchemaXmlReader: DotNet XmlReader;
+        ImportError: Text;
+        CleanupError: Text;
+        SchemaRead: Boolean;
+    begin
+        SchemaRead := TryReadXMLSchema(XMLSchemaDataFile, SchemaXmlReader);
+        if not SchemaRead then
+            ImportError := GetLastErrorText();
+
+        if not IsNull(SchemaXmlReader) then
+            if not TryCloseXMLSchemaReader(SchemaXmlReader) then
+                CleanupError := GetLastErrorText();
+        if not TryDeleteXMLSchema(XMLSchemaDataFile) and (CleanupError = '') then
+            CleanupError := GetLastErrorText();
+
+        if not SchemaRead or (CleanupError <> '') then begin
+            Clear(DataSet);
+            if not IsNull(WrkbkReader) then
+                if not TryCloseWorkbookReader(WrkbkReader) and (CleanupError = '') then
+                    CleanupError := GetLastErrorText();
+            Clear(WrkbkReader);
+            if not SchemaRead then begin
+                if CleanupError <> '' then
+                    Error(XMLSchemaImportAndCleanupErr, ImportError, CleanupError);
+                Error(ImportError);
+            end;
+            Error(XMLSchemaCleanupErr, CleanupError);
+        end;
+    end;
+
+    [TryFunction]
+    local procedure TryReadXMLSchema(XMLSchemaDataFile: Text; var SchemaXmlReader: DotNet XmlReader)
+    var
+        DotNetFile: DotNet File;
+        SchemaFileInfo: DotNet FileInfo;
+        SchemaStringReader: DotNet StringReader;
+        XmlReaderSettings: DotNet XmlReaderSettings;
+        DtdProcessing: DotNet DtdProcessing;
+        SchemaText: Text;
+        MaximumSchemaSize: Integer;
+        SchemaSize: BigInteger;
+    begin
+        MaximumSchemaSize := 64 * 1024 * 1024;
+        FileMgt.IsAllowedPath(XMLSchemaDataFile, false);
+        SchemaSize := SchemaFileInfo.FileInfo(XMLSchemaDataFile).Length;
+        if SchemaSize > MaximumSchemaSize then
+            Error(XMLSchemaTooLargeErr);
+        SchemaText := DotNetFile.ReadAllText(XMLSchemaDataFile);
+        if StrLen(SchemaText) > MaximumSchemaSize then
+            Error(XMLSchemaTooLargeErr);
+
+        XmlReaderSettings := XmlReaderSettings.XmlReaderSettings();
+        // Keep the resolver at the .NET default of null on both Framework and Core.
+        XmlReaderSettings.DtdProcessing := DtdProcessing.Prohibit;
+        XmlReaderSettings.MaxCharactersInDocument := MaximumSchemaSize;
+        XmlReaderSettings.MaxCharactersFromEntities := MaximumSchemaSize;
+        XmlReaderSettings.CloseInput := true;
+
+        // Both passes consume the same private snapshot, never a reopened schema file.
+        SchemaStringReader := SchemaStringReader.StringReader(SchemaText);
+        SchemaXmlReader := SchemaXmlReader.Create(SchemaStringReader, XmlReaderSettings);
+        ValidateXMLSchema(SchemaXmlReader);
+        SchemaXmlReader.Close();
+
+        SchemaStringReader := SchemaStringReader.StringReader(SchemaText);
+        SchemaXmlReader := SchemaXmlReader.Create(SchemaStringReader, XmlReaderSettings);
+        DataSet := DataSet.DataSet();
+        DataSet.ReadXmlSchema(SchemaXmlReader);
+    end;
+
+    local procedure ValidateXMLSchema(SchemaXmlReader: DotNet XmlReader)
+    var
+        XmlNodeType: DotNet XmlNodeType;
+        RootSeen: Boolean;
+        IsSchemaElement: Boolean;
+    begin
+        while SchemaXmlReader.Read() do
+            if SchemaXmlReader.NodeType.Equals(XmlNodeType.Element) then begin
+                if SchemaXmlReader.Depth > 128 then
+                    Error(UnsupportedXMLSchemaErr);
+                if not RootSeen then begin
+                    if not SchemaXmlReader.LocalName.Equals('schema') or not SchemaXmlReader.NamespaceURI.Equals(XMLSchemaNamespaceTxt) then
+                        Error(UnsupportedXMLSchemaErr);
+                    RootSeen := true;
+                end;
+                IsSchemaElement := SchemaXmlReader.NamespaceURI.Equals(XMLSchemaNamespaceTxt);
+                if IsSchemaElement then
+                    if SchemaXmlReader.LocalName in ['include', 'import', 'redefine', 'override'] then
+                        Error(UnsupportedXMLSchemaErr);
+                if SchemaXmlReader.HasAttributes then
+                    if SchemaXmlReader.MoveToFirstAttribute() then begin
+                        repeat
+                            // Defaults can deserialize objects even without CLR DataType metadata.
+                            if IsSchemaElement and SchemaXmlReader.NamespaceURI.Equals('') and
+                               (SchemaXmlReader.LocalName in ['default', 'fixed'])
+                            then
+                                Error(UnsupportedXMLSchemaErr);
+                            if SchemaXmlReader.NamespaceURI.Equals(MsDataNamespaceTxt) and
+                               (SchemaXmlReader.LocalName in ['DataType', 'Expression', 'DefaultValue', 'InstanceType'])
+                            then
+                                Error(UnsupportedXMLSchemaErr);
+                        until not SchemaXmlReader.MoveToNextAttribute();
+                        SchemaXmlReader.MoveToElement();
+                    end;
+            end;
+        if not RootSeen then
+            Error(UnsupportedXMLSchemaErr);
+    end;
+
+    [TryFunction]
+    local procedure TryCloseXMLSchemaReader(SchemaXmlReader: DotNet XmlReader)
+    begin
+        SchemaXmlReader.Close();
+    end;
+
+    [TryFunction]
+    local procedure TryCloseWorkbookReader(WorkbookReader: DotNet WorkbookReader)
+    begin
+        WorkbookReader.Close();
+    end;
+
+    [TryFunction]
+    local procedure TryDeleteXMLSchema(XMLSchemaDataFile: Text)
+    begin
+        if File.Exists(XMLSchemaDataFile) then
+            if not File.Erase(XMLSchemaDataFile) then
+                Error(CannotDeleteXMLSchemaErr);
     end;
 
     local procedure ReadWorksheetData(WrkSheetId: Integer; DataColumnTableId: Integer)
