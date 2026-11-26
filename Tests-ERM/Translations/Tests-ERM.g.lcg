@@ -1697,6 +1697,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit O365 Correct Purchase Invoice - NamedType CorrectPostedInvoiceFromSingleOrderQst)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3835063973 - NamedType 2093339612" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The quantity that you are trying to invoice is greater than the quantity in return shipment %1.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 - the return shipment number]D;]A;(LookupHint=Codeunit O365 Correct Purchase Invoice - NamedType ReturnShipmentQtyExceededErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3835063973 - NamedType 3672369801" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[You cannot cancel this posted purchase invoice because item %1 %2 has already been fully or partially returned.]]></Val>
