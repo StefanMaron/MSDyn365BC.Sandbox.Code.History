@@ -316,7 +316,13 @@
       "path": "./System Application Test/Extension Management/testArtifacts"
     },
     {
-      "path": "./Business Foundation Tests/DisabledTests"
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
+    },
+    {
+      "path": "./Sales Lines Suggestions Tests/AI Tests"
+    },
+    {
+      "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
     }
   ],
   "settings": {
