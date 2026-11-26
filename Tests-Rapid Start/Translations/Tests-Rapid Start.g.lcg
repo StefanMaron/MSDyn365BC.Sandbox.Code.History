@@ -752,6 +752,15 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM RS Package Operations - NamedType UnhandledConfirmErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3444400497 - NamedType 365798540" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The Excel workbook contains an unsupported XML schema. Export a new configuration workbook and try again.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit ERM RS Package Operations - NamedType UnsupportedXMLSchemaErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3444400497 - NamedType 4186067537" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[Localization information in the XML document was generated incorrectly.]]></Val>

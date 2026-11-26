@@ -54,11 +54,14 @@ codeunit 136603 "ERM RS Package Operations"
         RedundancyInTheShopCalendarErr: Label 'There is redundancy in the Shop Calendar.';
         MustBeIntegersErr: Label 'must be Integer or BigInteger';
         FileNameForHandler: Text;
+        ExportedXSDTypeForHandler: Text[30];
         MissingLineErr: Label 'Line %1 does not exist in preview page.', Locked = true;
         ExistingLineErr: Label 'Line %1 must not exist in preview page.', Locked = true;
         PackageCodeMustMatchErr: Label 'The package code in all sheets of the Excel file must match the selected package code, %1. Modify the package code in the Excel file or import this file from the Configuration Packages page to create a new package.', Comment = '%1 - package code';
         ImportNotAllowedErr: Label 'Cannot import table %1 through a Configuration Package.', Comment = '%1 = The name of the table.';
         ExternalTablesAreNotAllowedErr: Label 'External tables cannot be added in Configuration Packages.';
+        UnsupportedXMLSchemaErr: Label 'The Excel workbook contains an unsupported XML schema. Export a new configuration workbook and try again.';
+        XMLSchemaNamespaceTxt: Label 'http://www.w3.org/2001/XMLSchema', Locked = true;
 
 
 
@@ -1888,6 +1891,143 @@ codeunit 136603 "ERM RS Package Operations"
     end;
 
     [Test]
+    [Scope('OnPrem')]
+    procedure ImportFromExcelAcceptsExportedSchema()
+    begin
+        // [SCENARIO] The exported schema remains usable when importing a package that does not yet exist.
+        AssertExcelSchemaImported('');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ImportFromExcelAcceptsCustomNumericSchemaTypes()
+    begin
+        // [SCENARIO] Exporter customizations can use supported built-in numeric types without CLR metadata.
+        AssertExcelSchemaImported('xsd:decimal');
+        AssertExcelSchemaImported('xsd:double');
+        AssertExcelSchemaImported('xsd:int');
+        AssertExcelSchemaImported('xsd:unsignedInt');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ImportFromExcelAcceptsOtherCustomPrimitiveSchemaTypes()
+    begin
+        // [SCENARIO] Supported text, binary, duration, and URI schema types remain usable on import.
+        AssertExcelSchemaImported('xsd:normalizedString');
+        AssertExcelSchemaImported('xsd:hexBinary');
+        AssertExcelSchemaImported('xsd:duration');
+        AssertExcelSchemaImported('xsd:anyURI');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ImportFromExcelAcceptsBuiltinObjectWithoutDefault()
+    begin
+        // [SCENARIO] Object-valued built-ins do not require a type allowlist when schema materialization is prohibited.
+        AssertExcelSchemaImported('xsd:anyType');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ImportFromExcelAcceptsNamedRestrictionsAndAnnotations()
+    begin
+        // [SCENARIO] Named scalar restrictions and inert annotations beyond the stock depth remain usable.
+        AssertExcelSchemaImported('Amount', 16);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ImportFromExcelAcceptsSchemaAtDepthLimit()
+    begin
+        // [SCENARIO] A schema with elements at depth 128 is accepted.
+        AssertExcelSchemaImported('xsd:decimal', 126);
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ImportFromExcelRejectsObjectSchemaDefaults()
+    begin
+        // [SCENARIO] Built-in object defaults cannot reach a nested serializer.
+        AssertExcelSchemaRejected('<xs:element name="Value" type="xs:anyType" default="example" />');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ImportFromExcelRejectsClrSchemaTypes()
+    begin
+        // [SCENARIO] CLR type metadata is rejected regardless of the namespace prefix used in the schema.
+        AssertExcelSchemaRejected(
+            '<xs:element name="Value" type="xs:string" xmlns:custom="urn:schemas-microsoft-com:xml-msdata" custom:DataType="System.String" />');
+        AssertExcelSchemaRejected(
+            '<xs:element name="Value" type="xs:string" xmlns:custom="urn:schemas-microsoft-com:xml-msdata" custom:DataType="" />');
+        AssertExcelSchemaRejected(
+            '<xs:element name="Value" type="xs:string" xmlns:custom="urn:schemas-microsoft-com:xml-msdata" custom:DataType=" " />');
+        AssertExcelSchemaRejected(
+            '<xs:element name="Value" type="xs:string" xmlns:custom="urn:schemas-microsoft-com:xml-msdata" custom:InstanceType="System.String" />');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ImportFromExcelRejectsSchemaExpressions()
+    begin
+        // [SCENARIO] Schema expressions are rejected before any CLR type-name binding.
+        AssertExcelSchemaRejected(
+            '<xs:element name="Value" type="xs:string" xmlns:custom="urn:schemas-microsoft-com:xml-msdata" custom:Expression="Convert(&apos;example&apos;,&apos;System.String&apos;)" />');
+        AssertExcelSchemaRejected(
+            '<xs:element name="Value" type="xs:string" xmlns:custom="urn:schemas-microsoft-com:xml-msdata" custom:Expression="" />');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ImportFromExcelRejectsSchemaDefaults()
+    begin
+        // [SCENARIO] Schema loading must not materialize default or fixed values.
+        AssertExcelSchemaRejected('<xs:element name="Value" type="xs:string" default="example" />');
+        AssertExcelSchemaRejected('<xs:element name="Value" type="xs:string" fixed="example" />');
+        AssertExcelSchemaRejected(
+            '<xs:element name="Value" type="xs:string" xmlns:custom="urn:schemas-microsoft-com:xml-msdata" custom:DefaultValue="example" />');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ImportFromExcelRejectsExternalSchemas()
+    begin
+        // [SCENARIO] External schema references cannot bypass validation of the embedded schema.
+        AssertExcelSchemaRejected('<xs:include schemaLocation="urn:rapidstart-test:external-schema" />');
+        AssertExcelSchemaRejected('<xs:import namespace="urn:rapidstart-test:external-schema" />');
+        AssertExcelSchemaRejected('<xs:redefine schemaLocation="urn:rapidstart-test:external-schema" />');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ImportFromExcelRejectsAlternateSchemaRoots()
+    begin
+        // [SCENARIO] Schema approval cannot enable XDR or wrapper/inference modes.
+        AssertExcelSchemaDocumentRejected('<Schema xmlns="urn:schemas-microsoft-com:xml-data" />');
+        AssertExcelSchemaDocumentRejected('<Envelope><xs:schema xmlns:xs="' + XMLSchemaNamespaceTxt + '" /></Envelope>');
+        AssertExcelSchemaDocumentRejected('<schema xmlns="urn:rapidstart-test:unrelated" />');
+    end;
+
+    [Test]
+    [Scope('OnPrem')]
+    procedure ImportFromExcelRejectsExcessiveSchemaDepth()
+    var
+        Content: Text;
+        Index: Integer;
+    begin
+        // [SCENARIO] A schema with elements at depth 129 is rejected before DataSet loading.
+        Content := '<xs:annotation><xs:documentation>';
+        for Index := 1 to 127 do
+            Content += '<level xmlns="urn:rapidstart-test:annotation">';
+        Content += 'example';
+        for Index := 1 to 127 do
+            Content += '</level>';
+        Content += '</xs:documentation></xs:annotation>';
+        AssertExcelSchemaRejected(Content);
+    end;
+
+    [Test]
     [HandlerFunctions('ExcelImportPreviewHandler')]
     [Scope('OnPrem')]
     procedure ImportFromExcelNotExistingPackageFromListPage()
@@ -3067,6 +3207,11 @@ codeunit 136603 "ERM RS Package Operations"
         FileNameForHandler := FileName;
     end;
 
+    procedure SetExportedXSDType(DataType: Text[30])
+    begin
+        ExportedXSDTypeForHandler := DataType;
+    end;
+
     local procedure DeleteCustomerRelatedData(CustomerNo: Code[20])
     var
         Customer: Record Customer;
@@ -3663,6 +3808,139 @@ codeunit 136603 "ERM RS Package Operations"
         FilePath := FileMgt.ServerTempFileName('xml');
         ConfigPackageTable.SetRange("Package Code", PackageCode);
         ConfigXMLExchange.ExportPackageXML(ConfigPackageTable, FilePath);
+    end;
+
+    local procedure AssertExcelSchemaImported(ExportedXSDType: Text[30])
+    begin
+        AssertExcelSchemaImported(ExportedXSDType, 0);
+    end;
+
+    local procedure AssertExcelSchemaImported(ExportedXSDType: Text[30]; AnnotationDepth: Integer)
+    var
+        ConfigPackage: Record "Config. Package";
+        ConfigPackageTable: Record "Config. Package Table";
+        ConfigPackageData: Record "Config. Package Data";
+        Currency: Record Currency;
+        TempBlob: Codeunit "Temp Blob";
+        ConfigExcelExchange: Codeunit "Config. Excel Exchange";
+        ERMRSPackageOperations: Codeunit "ERM RS Package Operations";
+        PackageCode: Code[20];
+    begin
+        Initialize();
+        LibraryERM.CreateCurrency(Currency);
+        CreatePackageWithTable(ConfigPackage, ConfigPackageTable, Database::Currency);
+        if ExportedXSDType <> '' then begin
+            ERMRSPackageOperations.SetExportedXSDType(ExportedXSDType);
+            BindSubscription(ERMRSPackageOperations);
+        end;
+        ExportToExcel(ConfigPackageTable);
+        if ExportedXSDType <> '' then
+            UnbindSubscription(ERMRSPackageOperations);
+        FileMgt.BLOBImportFromServerFile(TempBlob, LibraryReportValidation.GetFileName());
+        if (ExportedXSDType = 'Amount') or (AnnotationDepth > 0) then
+            AddExcelSchemaTestDeclarations(TempBlob, ExportedXSDType = 'Amount', AnnotationDepth);
+        PackageCode := ConfigPackage.Code;
+        LibraryRapidStart.CleanUp(PackageCode);
+
+        ConfigExcelExchange.SetHideDialog(true);
+        Assert.IsTrue(ConfigExcelExchange.ImportExcel(TempBlob), NoDataAfterImportErr);
+
+        ConfigPackage.Get(PackageCode);
+        ConfigPackageTable.Get(PackageCode, Database::Currency);
+        ConfigPackageData.SetRange("Package Code", PackageCode);
+        ConfigPackageData.SetRange("Table ID", Database::Currency);
+        ConfigPackageData.SetRange("Field ID", Currency.FieldNo(Code));
+        ConfigPackageData.SetRange(Value, Currency.Code);
+        Assert.RecordCount(ConfigPackageData, 1);
+    end;
+
+    local procedure AssertExcelSchemaRejected(SchemaContent: Text)
+    begin
+        AssertExcelSchemaDocumentRejected('<xs:schema xmlns:xs="' + XMLSchemaNamespaceTxt + '">' + SchemaContent + '</xs:schema>');
+    end;
+
+    local procedure AssertExcelSchemaDocumentRejected(SchemaDocument: Text)
+    var
+        TempBlob: Codeunit "Temp Blob";
+        ConfigExcelExchange: Codeunit "Config. Excel Exchange";
+        OpenXMLManagement: Codeunit "OpenXML Management";
+        WrkBkWriter: DotNet WorkbookWriter;
+        MapInfo: DotNet MapInfo;
+    begin
+        OpenXMLManagement.CreateBook(TempBlob, WrkBkWriter);
+        WrkBkWriter.AddCustomXmlMappingsPart();
+        MapInfo := MapInfo.MapInfo();
+        MapInfo.InnerXml(
+            '<Schema xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" ID="Schema1">' +
+            SchemaDocument + '</Schema>');
+        WrkBkWriter.Workbook.WorkbookPart.CustomXmlMappingsPart.MapInfo := MapInfo;
+        OpenXMLManagement.CloseBook(WrkBkWriter);
+
+        ConfigExcelExchange.SetHideDialog(true);
+        asserterror ConfigExcelExchange.ImportExcel(TempBlob);
+        Assert.ExpectedError(UnsupportedXMLSchemaErr);
+    end;
+
+    local procedure AddExcelSchemaTestDeclarations(var TempBlob: Codeunit "Temp Blob"; NamedRestriction: Boolean; AnnotationDepth: Integer)
+    var
+        MapBlob: Codeunit "Temp Blob";
+        DataCompression: Codeunit "Data Compression";
+        MapDocument: DotNet XmlDocument;
+        NamespaceManager: DotNet XmlNamespaceManager;
+        SchemaElement: DotNet XmlElement;
+        ColumnElement: DotNet XmlElement;
+        Declaration: DotNet XmlElement;
+        Restriction: DotNet XmlElement;
+        Annotation: DotNet XmlElement;
+        Documentation: DotNet XmlElement;
+        Layer: DotNet XmlElement;
+        InStream: InStream;
+        OutStream: OutStream;
+        Index: Integer;
+    begin
+        DataCompression.OpenZipArchive(TempBlob, false);
+        DataCompression.ExtractEntry('xl/xmlMaps.xml', MapBlob);
+        DataCompression.CloseZipArchive();
+        MapBlob.CreateInStream(InStream);
+        MapDocument := MapDocument.XmlDocument();
+        MapDocument.Load(InStream);
+        NamespaceManager := NamespaceManager.XmlNamespaceManager(MapDocument.NameTable);
+        NamespaceManager.AddNamespace('xs', XMLSchemaNamespaceTxt);
+        SchemaElement := MapDocument.SelectSingleNode('//xs:schema', NamespaceManager);
+        Assert.IsFalse(IsNull(SchemaElement), 'The exported workbook must contain a schema.');
+        SchemaElement.SetAttribute('xmlns:xsd', XMLSchemaNamespaceTxt);
+        if NamedRestriction then begin
+            foreach ColumnElement in MapDocument.SelectNodes('//xs:*', NamespaceManager) do
+                ColumnElement.Prefix := 'xsd';
+            SchemaElement.SetAttribute('xmlns', '');
+            Declaration := MapDocument.CreateElement('xsd', 'simpleType', XMLSchemaNamespaceTxt);
+            Declaration.SetAttribute('name', 'Amount');
+            Restriction := MapDocument.CreateElement('xsd', 'restriction', XMLSchemaNamespaceTxt);
+            Restriction.SetAttribute('base', 'xsd:decimal');
+            Declaration.AppendChild(Restriction);
+            SchemaElement.AppendChild(Declaration);
+        end;
+        if AnnotationDepth > 0 then begin
+            Annotation := MapDocument.CreateElement('xsd', 'annotation', XMLSchemaNamespaceTxt);
+            Documentation := MapDocument.CreateElement('xsd', 'documentation', XMLSchemaNamespaceTxt);
+            Annotation.AppendChild(Documentation);
+            SchemaElement.AppendChild(Annotation);
+            for Index := 1 to AnnotationDepth do begin
+                Layer := MapDocument.CreateElement('level', 'urn:rapidstart-test:annotation');
+                Documentation.AppendChild(Layer);
+                Documentation := Layer;
+            end;
+            Documentation.InnerText := 'example';
+        end;
+        Clear(MapBlob);
+        MapBlob.CreateOutStream(OutStream);
+        MapDocument.Save(OutStream);
+        MapBlob.CreateInStream(InStream);
+        DataCompression.OpenZipArchive(TempBlob, true);
+        DataCompression.RemoveEntry('xl/xmlMaps.xml');
+        DataCompression.AddEntry(InStream, 'xl/xmlMaps.xml');
+        DataCompression.SaveZipArchive(TempBlob);
+        DataCompression.CloseZipArchive();
     end;
 
     local procedure ExportToExcel(var ConfigPackageTable: Record "Config. Package Table")
@@ -4314,6 +4592,20 @@ codeunit 136603 "ERM RS Package Operations"
     begin
         FileMgt.BLOBImportFromServerFile(TempBlob, FileNameForHandler);
         IsHandled := TempBlob.HasValue();
+    end;
+
+    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Config. XML Exchange", 'OnBeforeGetXSDType', '', false, false)]
+    local procedure OnBeforeGetXSDType(TableID: Integer; FieldID: Integer; var Result: Text[30]; var IsHandled: Boolean)
+    var
+        Currency: Record Currency;
+    begin
+        if (ExportedXSDTypeForHandler = '') or (TableID <> Database::Currency) or
+           (FieldID <> Currency.FieldNo("Amount Rounding Precision"))
+        then
+            exit;
+
+        Result := ExportedXSDTypeForHandler;
+        IsHandled := true;
     end;
 
     [ModalPageHandler]
