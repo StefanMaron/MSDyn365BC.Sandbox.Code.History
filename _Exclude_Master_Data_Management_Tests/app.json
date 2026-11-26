@@ -4,7 +4,7 @@
   "publisher": "Microsoft",
   "brief": "Tests for the _Exclude_Master_Data_Management extension.",
   "description": "Tests for the _Exclude_Master_Data_Management extension.",
-  "version": "30.0.58918.0",
+  "version": "30.0.58946.0",
   "privacyStatement": "https://go.microsoft.com/fwlink/?LinkId=724009",
   "EULA": "https://go.microsoft.com/fwlink/?linkid=2182906",
   "help": "https://go.microsoft.com/fwlink/?linkid=2206176",
@@ -33,6 +33,12 @@
     {
       "id": "044e7b4c-db9b-43c6-8a08-e1fd8954d40c",
       "name": "_Exclude_Master_Data_Management_Test_Library",
+      "publisher": "Microsoft",
+      "version": "30.0.0.0"
+    },
+    {
+      "id": "40860557-a18d-42ad-aecb-22b7dd80dc80",
+      "name": "Permissions Mock",
       "publisher": "Microsoft",
       "version": "30.0.0.0"
     }
