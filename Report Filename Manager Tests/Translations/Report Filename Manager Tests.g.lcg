@@ -122,6 +122,24 @@
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.Foundation.Reporting.FileNaming)(LookupHint=Table Filename Proof Log - Field Value - Property Caption)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 3229112936 - NamedType 2407304987" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The API's PDF should be named "%1" but is "%2".]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 expected, %2 actual]D;]A;(Namespace=Microsoft.Test.Foundation.Reporting.FileNaming)(LookupHint=Codeunit Filename API Tests - NamedType ApiPdfNotNamedErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 3229112936 - NamedType 3379911866" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[The PDF document handler produced no PDF for the document that should be named "%1".]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[%1 the expected name]D;]A;(Namespace=Microsoft.Test.Foundation.Reporting.FileNaming)(LookupHint=Codeunit Filename API Tests - NamedType NoApiPdfErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 61534607 - NamedType 1738702236" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[FAIL - expected two files, got %1.]]></Val>
@@ -228,15 +246,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[%1 what was typed, %2 what was saved]D;]A;(Namespace=Microsoft.Test.Foundation.Reporting.FileNaming)(LookupHint=Codeunit Filename Card Tests - NamedType ActionSavedSomethingElseErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 2621019516 - NamedType 2407304987" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[The API's PDF should be named "%1" but is "%2".]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1 expected, %2 actual]D;]A;(Namespace=Microsoft.Test.Foundation.Reporting.FileNaming)(LookupHint=Codeunit Filename Card Tests - NamedType ApiPdfNotNamedErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2621019516 - NamedType 511460594" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
@@ -525,15 +534,6 @@
     <Disp Icon="Str" Expand="true" />
     <Cmts>
       <Cmt Name="Dev"><![CDATA[(Namespace=Microsoft.Test.Foundation.Reporting.FileNaming)(LookupHint=Codeunit Filename Card Tests - NamedType NewPatternIsLiveErr)]]></Cmt>
-    </Cmts>
-  </Item>
-  <Item ItemId=";Codeunit 2621019516 - NamedType 3379911866" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
-    <Str Cat="Text" CP="DOS">
-      <Val><![CDATA[The PDF document handler produced no PDF for the document that should be named "%1".]]></Val>
-    </Str>
-    <Disp Icon="Str" Expand="true" />
-    <Cmts>
-      <Cmt Name="Dev"><![CDATA[%1 the expected name]D;]A;(Namespace=Microsoft.Test.Foundation.Reporting.FileNaming)(LookupHint=Codeunit Filename Card Tests - NamedType NoApiPdfErr)]]></Cmt>
     </Cmts>
   </Item>
   <Item ItemId=";Codeunit 2621019516 - NamedType 4100991694" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
