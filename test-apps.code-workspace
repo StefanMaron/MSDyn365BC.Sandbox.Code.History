@@ -361,16 +361,28 @@
       "path": "./Withholding Tax Tests"
     },
     {
-      "path": "./System Application/Email/src/Test Email"
-    },
-    {
       "path": "./Contoso Coffee Demo Dataset Tests/src/TestImplementations"
     },
     {
-      "path": "./System Application Test Library/Extension Management/testArtifacts"
+      "path": "./Sales Lines Suggestions Tests/AI Tests"
+    },
+    {
+      "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
     },
     {
       "path": "./Base Application/System/DevTools/CALTest"
+    },
+    {
+      "path": "./System Application/Email/src/Test Email"
+    },
+    {
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
+    },
+    {
+      "path": "./AI Test Toolkit/src/TestSuite"
+    },
+    {
+      "path": "./System Application Test Library/Extension Management/testArtifacts"
     },
     {
       "path": "./Bank Account Reconciliation With AI Tests/src/PromptTests"
@@ -382,33 +394,21 @@
       "path": "./Test Runner/src/DataDrivenTest"
     },
     {
-      "path": "./AI Test Toolkit/src/TestSuite"
-    },
-    {
-      "path": "./Quality Management/src/Configuration/Template/Test"
-    },
-    {
-      "path": "./Performance Toolkit Tests/src/Mock Tests"
-    },
-    {
       "path": "./Subcontracting-Tests/Tests"
     },
     {
       "path": "./Subcontracting-Tests/src/Codeunits/Tests"
     },
     {
-      "path": "./Sales Lines Suggestions Tests/AI Tests"
-    },
-    {
-      "path": "./Sales Lines Suggestions Tests/AttachmentHandlerPromptTests"
+      "path": "./Quality Management/src/Configuration/Template/Test"
     }
   ],
   "settings": {
+    "al.enableCodeActions": false,
     "search.exclude": {
       "**.xlf": true
     },
     "al.enableCodeAnalysis": false,
-    "allint.enabled": false,
-    "al.enableCodeActions": false
+    "allint.enabled": false
   }
 }
