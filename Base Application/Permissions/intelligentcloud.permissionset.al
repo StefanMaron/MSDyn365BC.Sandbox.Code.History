@@ -391,7 +391,7 @@ permissionset 6121 "INTELLIGENT CLOUD"
                   tabledata "Availability Calc. Overview" = R,
                   tabledata "Average Cost Calc. Overview" = R,
                   tabledata "Avg. Cost Adjmt. Entry Point" = R,
-                  tabledata "Azure AD App Setup" = R,
+                  tabledata "Azure AD App Setup" = r,
                   tabledata "Azure AD Mgt. Setup" = R,
                   tabledata "Azure AI Usage" = R,
                   tabledata "Balance Sheet Buffer" = R,
