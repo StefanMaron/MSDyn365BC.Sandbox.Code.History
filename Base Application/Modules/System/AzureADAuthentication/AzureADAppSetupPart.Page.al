@@ -34,9 +34,8 @@ page 6301 "Azure AD App Setup Part"
             {
                 ApplicationArea = Basic, Suite;
                 Caption = 'Key';
-                NotBlank = true;
-                ShowMandatory = true;
-                ToolTip = 'Specifies the secret key (or client secret) that is used along with the Application ID for authenticating with Microsoft Entra ID.';
+                ExtendedDatatype = Masked;
+                ToolTip = 'Specifies a replacement secret key (or client secret) that is used along with the Application ID for authenticating with Microsoft Entra ID.';
             }
         }
     }
@@ -55,7 +54,16 @@ page 6301 "Azure AD App Setup Part"
         HomePageUrl := GetUrl(CLIENTTYPE::Web);
         RedirectUrl := AzureADMgt.GetRedirectUrl();
         AppId := Rec."App ID";
-        SetSecretKeyGlobalFromIsolatedStorage();
+        SecretKey := '';
+        SecretKeyExists := not IsNullGuid(Rec."Isolated Storage Secret Key");
+    end;
+
+    trigger OnInit()
+    var
+        AzureADAppSetup: Record "Azure AD App Setup";
+    begin
+        if not AzureADAppSetup.WritePermission() then
+            Error(PermissionsErr);
     end;
 
     var
@@ -63,15 +71,11 @@ page 6301 "Azure AD App Setup Part"
         RedirectUrl: Text[150];
         [NonDebuggable]
         SecretKey: Text;
+        SecretKeyExists: Boolean;
         AppId: Guid;
         InvalidAppIdErr: Label 'Enter valid GUID for Application ID.';
         InvalidClientSecretErr: Label 'Key is required.';
-
-    [NonDebuggable]
-    local procedure SetSecretKeyGlobalFromIsolatedStorage()
-    begin
-        SecretKey := Rec.GetSecretKeyFromIsolatedStorageAsSecretText().Unwrap();
-    end;
+        PermissionsErr: Label 'Please contact an administrator to set up your Microsoft Entra application.';
 
     [NonDebuggable]
     procedure Save()
@@ -81,10 +85,14 @@ page 6301 "Azure AD App Setup Part"
         SecretKeyText := SecretKey;
         Rec."Redirect URL" := RedirectUrl;
         Rec."App ID" := AppId;
-        Rec.SetSecretKeyToIsolatedStorage(SecretKeyText);
+        if SecretKey <> '' then
+            Rec.SetSecretKeyToIsolatedStorage(SecretKeyText);
 
         if not Rec.Modify(true) then
             Rec.Insert(true);
+
+        SecretKey := '';
+        SecretKeyExists := not IsNullGuid(Rec."Isolated Storage Secret Key");
     end;
 
     procedure ValidateFields()
@@ -92,7 +100,7 @@ page 6301 "Azure AD App Setup Part"
         if IsNullGuid(AppId) then
             Error(InvalidAppIdErr);
 
-        if SecretKey = '' then
+        if (SecretKey = '') and not SecretKeyExists then
             Error(InvalidClientSecretErr);
     end;
 
