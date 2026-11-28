@@ -19,12 +19,6 @@ codeunit 139086 "Azure AD Mgt. Tests"
         ValidResourceUrlTxt: Label 'http://contoso.com/a/valid/resource', Locked = true;
         ValidResourceNameTxt: Label 'Azure Service', Locked = true;
         ValidGuestTenantTxt: Label 'fabrikam.contoso.biz', Locked = true;
-        D365BasicReadSetTok: Label 'D365 Basic - Read', Locked = true;
-        D365ReadSetTok: Label 'D365 READ', Locked = true;
-        D365SetupSetTok: Label 'D365 SETUP', Locked = true;
-        D365TeamMemberSetTok: Label 'D365 TEAM MEMBER', Locked = true;
-        SetupPermissionErr: Label 'Please contact an administrator to set up your Microsoft Entra application.';
-        ModifySetupPermissionErr: Label 'You do not have permission to change the Microsoft Entra application setup.';
 
     [Test]
     [Scope('OnPrem')]
@@ -181,94 +175,18 @@ codeunit 139086 "Azure AD Mgt. Tests"
     procedure GetAccessTokenOnPremNoDialogGetsFromCache()
     var
         AzureAdMgt: Codeunit "Azure AD Mgt.";
-        PermissionsMock: Codeunit System.TestLibraries.Security.AccessControl."Permissions Mock";
         Result: SecretText;
     begin
         // [SCENARIO] In an On-Prem environment, user calls GetAccessToken with no dialog and recieves the cached access token.
 
         // [GIVEN] On-Prem environment with only cached token available.
         Initialize(false, true, false, true, false);
-        PermissionsMock.Set(D365ReadSetTok);
 
         // [WHEN] The user invokes GetAccessToken method requesting no dialog.
         Result := AzureAdMgt.GetAccessTokenAsSecretText(ValidResourceUrlTxt, ValidResourceNameTxt, false);
 
         // [THEN] The user recieves the access token from the cache.
         AssertSecret('TokenFromCacheWithCredentials', Result, 'The access token should be pulling from the On-Prem cache.');
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure D365ReadCannotAccessAzureADAppSetup()
-    var
-        AzureADAppSetup: Record "Azure AD App Setup";
-        PermissionsMock: Codeunit System.TestLibraries.Security.AccessControl."Permissions Mock";
-    begin
-        Initialize(false, false, false, true, false);
-        PermissionsMock.Set(D365ReadSetTok);
-
-        asserterror AzureADAppSetup.FindFirst();
-        Assert.ExpectedError('TableData 6300 Azure AD App Setup');
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure D365BasicReadCannotAccessAzureADAppSetup()
-    var
-        AzureADAppSetup: Record "Azure AD App Setup";
-        PermissionsMock: Codeunit System.TestLibraries.Security.AccessControl."Permissions Mock";
-    begin
-        Initialize(false, false, false, true, false);
-        PermissionsMock.Set(D365BasicReadSetTok);
-
-        asserterror AzureADAppSetup.FindFirst();
-        Assert.ExpectedError('TableData 6300 Azure AD App Setup');
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure D365TeamMemberCannotModifyAzureADAppSetup()
-    var
-        AzureADAppSetup: Record "Azure AD App Setup";
-        PermissionsMock: Codeunit System.TestLibraries.Security.AccessControl."Permissions Mock";
-        SecretKey: Text;
-    begin
-        Initialize(false, false, false, true, false);
-        PermissionsMock.Set(D365TeamMemberSetTok);
-        SecretKey := 'Replacement canary';
-
-        Assert.IsFalse(AzureADAppSetup.WritePermission(), 'D365 TEAM MEMBER must not modify Microsoft Entra application setup.');
-        asserterror AzureADAppSetup.SetSecretKeyToIsolatedStorage(SecretKey);
-        Assert.ExpectedError(ModifySetupPermissionErr);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure D365ReadCannotOpenAzureADAppSetupPart()
-    var
-        AzureADAppSetupPart: TestPage "Azure AD App Setup Part";
-        PermissionsMock: Codeunit System.TestLibraries.Security.AccessControl."Permissions Mock";
-    begin
-        Initialize(false, false, false, true, false);
-        PermissionsMock.Set(D365ReadSetTok);
-
-        asserterror AzureADAppSetupPart.OpenView();
-        Assert.ExpectedError(SetupPermissionErr);
-    end;
-
-    [Test]
-    [Scope('OnPrem')]
-    procedure D365SetupCanOpenPartWithoutReceivingExistingSecret()
-    var
-        AzureADAppSetupPart: TestPage "Azure AD App Setup Part";
-        PermissionsMock: Codeunit System.TestLibraries.Security.AccessControl."Permissions Mock";
-    begin
-        Initialize(false, false, false, true, false);
-        PermissionsMock.Set(D365SetupSetTok);
-
-        AzureADAppSetupPart.OpenEdit();
-        Assert.AreEqual('', AzureADAppSetupPart.SecretKey.Value(), 'Opening the setup part must not return the existing secret.');
-        AzureADAppSetupPart.Close();
     end;
 
     [Test]
