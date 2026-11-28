@@ -18,7 +18,7 @@ table 6300 "Azure AD App Setup"
         field(2; "Secret Key"; BLOB)
         {
             Caption = 'Secret Key';
-            ObsoleteReason = 'The Secret Key has been moved to Isolated Storage. Use SetSecretKeyToIsolatedStorage to set the Secret Key.';
+            ObsoleteReason = 'The Secret Key has been moved to Isolated Storage. Use GetSecretKeyFromIsolatedStorage/SetSecretKeyToIsolatedStorage to retrieve or set the Secret Key.';
             ObsoleteState = Removed;
             ObsoleteTag = '28.0';
         }
@@ -58,7 +58,16 @@ table 6300 "Azure AD App Setup"
 
     var
         OnlyOneRecordErr: Label 'There should be only one record for Microsoft Entra App Setup.';
-        ModifySetupErr: Label 'You do not have permission to change the Microsoft Entra application setup.';
+
+    [Scope('OnPrem')]
+    procedure GetSecretKeyFromIsolatedStorageAsSecretText() SecretKey: SecretText
+    begin
+        if not IsNullGuid("Isolated Storage Secret Key") then
+            if not IsolatedStorage.Get("Isolated Storage Secret Key", DataScope::Module, SecretKey) then;
+
+        exit(SecretKey);
+    end;
+
     [NonDebuggable]
     local procedure StringToEncryptCanBeEncrypted(ToEncrypt: SecretText): Boolean
     begin
@@ -70,9 +79,6 @@ table 6300 "Azure AD App Setup"
     var
         NewSecretGuid: Guid;
     begin
-        if not Rec.WritePermission() then
-            Error(ModifySetupErr);
-
         if not IsNullGuid("Isolated Storage Secret Key") then
             if not IsolatedStorage.Delete("Isolated Storage Secret Key", DataScope::Module) then;
 
