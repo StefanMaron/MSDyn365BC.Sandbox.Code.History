@@ -7,6 +7,7 @@ using System.Utilities;
 codeunit 6300 "Azure AD Mgt."
 {
     // // Provides functions to authorize NAV app to use Azure Active Directory resources on behalf of a user.
+    Permissions = TableData "Azure AD App Setup" = R;
     InherentPermissions = X;
     InherentEntitlements = X;
 
@@ -48,7 +49,7 @@ codeunit 6300 "Azure AD Mgt."
             AccessToken := AzureADAuthFlow.AcquireTokenByAuthorizationCodeWithCredentialsAsSecretText(
                 AuthorizationCode,
                 GetClientId(),
-                AzureADAppSetup.GetSecretKeyFromIsolatedStorageAsSecretText(),
+                GetSecretKey(),
                 ResourceUrl);
         end;
     end;
@@ -289,9 +290,19 @@ codeunit 6300 "Azure AD Mgt."
             AzureADAppSetup.FindFirst();
             AccessToken := AzureADAuthFlow.AcquireTokenFromCacheWithCredentialsAsSecretText(
                 GetClientId(),
-                AzureADAppSetup.GetSecretKeyFromIsolatedStorageAsSecretText(),
+                GetSecretKey(),
                 ResourceName);
         end;
+    end;
+
+    [NonDebuggable]
+    local procedure GetSecretKey() SecretKey: SecretText
+    begin
+        AzureADAppSetup.FindFirst();
+        if not IsNullGuid(AzureADAppSetup."Isolated Storage Secret Key") then
+            if not IsolatedStorage.Get(AzureADAppSetup."Isolated Storage Secret Key", DataScope::Module, SecretKey) then;
+
+        exit(SecretKey);
     end;
 
     [NonDebuggable]
