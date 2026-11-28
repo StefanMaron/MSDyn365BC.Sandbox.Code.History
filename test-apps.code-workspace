@@ -1,12 +1,4 @@
 {
-  "settings": {
-    "al.enableCodeAnalysis": false,
-    "al.enableCodeActions": false,
-    "allint.enabled": false,
-    "search.exclude": {
-      "**.xlf": true
-    }
-  },
   "folders": [
     {
       "path": "./AI Test Toolkit"
@@ -153,6 +145,9 @@
       "path": "./System Application/Email/src/Test Email"
     },
     {
+      "path": "./Performance Toolkit Tests/src/Mock Tests"
+    },
+    {
       "path": "./Base Application/System/DevTools/CALTest"
     },
     {
@@ -160,9 +155,14 @@
     },
     {
       "path": "./AI Test Toolkit/src/TestSuite"
-    },
-    {
-      "path": "./Performance Toolkit Tests/src/Mock Tests"
     }
-  ]
+  ],
+  "settings": {
+    "al.enableCodeActions": false,
+    "al.enableCodeAnalysis": false,
+    "search.exclude": {
+      "**.xlf": true
+    },
+    "allint.enabled": false
+  }
 }
