@@ -399,7 +399,7 @@ permissionset 7931 "D365 TEAM MEMBER"
                   tabledata "Availability Calc. Overview" = RM,
                   tabledata "Average Cost Calc. Overview" = RM,
                   tabledata "Avg. Cost Adjmt. Entry Point" = RIMD,
-                  tabledata "Azure AD App Setup" = r,
+                  tabledata "Azure AD App Setup" = RM,
                   tabledata "Azure AD Mgt. Setup" = Rim,
                   tabledata "Azure AI Usage" = Rimd,
                   tabledata "Balance Sheet Buffer" = RIMD,
