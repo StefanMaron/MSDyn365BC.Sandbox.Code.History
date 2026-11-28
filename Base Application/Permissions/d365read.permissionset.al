@@ -359,7 +359,7 @@ permissionset 1044 "D365 READ"
                   tabledata "Availability Calc. Overview" = R,
                   tabledata "Average Cost Calc. Overview" = R,
                   tabledata "Avg. Cost Adjmt. Entry Point" = R,
-                  tabledata "Azure AD App Setup" = R,
+                  tabledata "Azure AD App Setup" = r,
                   tabledata "Azure AD Mgt. Setup" = R,
                   tabledata "Azure AI Usage" = R,
                   tabledata "Balance Sheet Buffer" = R,
