@@ -261,7 +261,7 @@ permissionset 209 "D365 Basic - Read"
                   tabledata "Autocomplete Address" = R,
                   tabledata "Availability at Date" = R,
                   tabledata "Availability Calc. Overview" = R,
-                  tabledata "Azure AD App Setup" = r,
+                  tabledata "Azure AD App Setup" = R,
                   tabledata "Azure AD Mgt. Setup" = R,
                   tabledata "Azure AI Usage" = R,
                   tabledata "Balance Sheet Buffer" = R,
