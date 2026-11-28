@@ -392,6 +392,24 @@
       <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Attachment Storage Type - NamedType SendAttachmentErr)]]></Cmt>
     </Cmts>
   </Item>
+  <Item ItemId=";Codeunit 490952843 - NamedType 1467760995" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[You do not have permission to change the Microsoft Entra application setup.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Azure AD Mgt. Tests - NamedType ModifySetupPermissionErr)]]></Cmt>
+    </Cmts>
+  </Item>
+  <Item ItemId=";Codeunit 490952843 - NamedType 1473014683" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
+    <Str Cat="Text" CP="DOS">
+      <Val><![CDATA[Please contact an administrator to set up your Microsoft Entra application.]]></Val>
+    </Str>
+    <Disp Icon="Str" Expand="true" />
+    <Cmts>
+      <Cmt Name="Dev"><![CDATA[(LookupHint=Codeunit Azure AD Mgt. Tests - NamedType SetupPermissionErr)]]></Cmt>
+    </Cmts>
+  </Item>
   <Item ItemId=";Codeunit 3808007876 - NamedType 478234251" ItemType=";Codeunit - GlobalVariable" PsrId="63" InstFlg="true" Leaf="true">
     <Str Cat="Text" CP="DOS">
       <Val><![CDATA[machinelearning]]></Val>
