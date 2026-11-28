@@ -403,7 +403,7 @@ permissionset 5117 "D365 AUTOMATION"
                   tabledata "Availability Calc. Overview" = RIMD,
                   tabledata "Average Cost Calc. Overview" = RIMD,
                   tabledata "Avg. Cost Adjmt. Entry Point" = RIMD,
-                  tabledata "Azure AD App Setup" = RIMD,
+                  tabledata "Azure AD App Setup" = r,
                   tabledata "Azure AD Mgt. Setup" = RIMD,
                   tabledata "Azure AI Usage" = Rimd,
                   tabledata "Balance Sheet Buffer" = RIMD,
